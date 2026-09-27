@@ -1,0 +1,52 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.changeset/**'
+      - 'packages/**'
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push tags and the Version Packages PR
+      pull-requests: write # open the Version Packages PR
+      id-token: write # OIDC handshake with npm (trusted publishing)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install
+        uses: ./.github/composite-actions/install
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Publish packages
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: pnpm release
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NPM_CONFIG_PROVENANCE: true
+
+      - name: Slack Notification
+        if: steps.changesets.outputs.published == 'true'
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook-type: webhook-trigger
+          payload: |
+            {
+              "package_name": "@pandacss/dev",
+              "changelog_url": "https://github.com/chakra-ui/panda/blob/main/CHANGELOG.md"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

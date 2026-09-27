@@ -1,0 +1,45 @@
+{
+  "name": "@pandacss/types",
+  "version": "1.12.1",
+  "description": "The types for css panda",
+  "main": "dist/index.d.ts",
+  "author": "Segun Adebayo <joseshegs@gmail.com>",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "prepare": "ncp node_modules/csstype/index.d.ts src/csstype.d.ts",
+    "dev": "tsx scripts/watch.ts",
+    "build": "cross-env PANDA_BUILD=1 tsx scripts/postbuild.ts && tsx scripts/build.ts"
+  },
+  "sideEffects": false,
+  "homepage": "https://panda-css.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chakra-ui/panda.git",
+    "directory": "packages/types"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@pandacss/extractor": "workspace:*",
+    "csstype": "3.2.3",
+    "microdiff": "1.5.0",
+    "ncp": "2.0.0",
+    "pkg-types": "2.3.0",
+    "ts-morph": "28.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

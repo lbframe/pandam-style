@@ -1,0 +1,23 @@
+name: 'Install'
+description: 'Sets up Node.js and runs install'
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: 22
+        cache: 'pnpm'
+
+    - name: Setup Git User
+      shell: bash
+      run: |
+        git config --global user.email "joseshegs@gmail.com"
+        git config --global user.name "Segun Adebayo"
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install

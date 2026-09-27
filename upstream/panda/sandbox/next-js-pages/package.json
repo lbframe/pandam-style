@@ -1,0 +1,22 @@
+{
+  "name": "sandbox-next-js-pages",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prepare": "panda codegen",
+    "dev": "node ../../scripts/rm.mjs .next && next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@pandacss/dev": "workspace:*",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "eslint-config-next": "16.0.6",
+    "next": "15.5.7",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "typescript": "6.0.2"
+  }
+}

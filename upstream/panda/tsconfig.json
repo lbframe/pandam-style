@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "paths": {
+      "@pandacss/fixture": ["./packages/fixture/src/index.ts"],
+      "@pandacss/types": ["./packages/types/src/index.ts"]
+    }
+  },
+  "include": ["packages/**/*.ts"],
+  "types": ["vitest/globals"],
+  "exclude": [
+    "node_modules",
+    "./packages/extractor/__tests__/npm-bench",
+    "./packages/extractor/__tests__/samples",
+    "./packages/config/__tests__/samples"
+  ]
+}

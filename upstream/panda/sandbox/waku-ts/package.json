@@ -1,0 +1,23 @@
+{
+  "name": "sandbox-waku-ts",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "waku dev --with-ssr",
+    "build": "waku build --with-ssr",
+    "start": "waku start --with-ssr"
+  },
+  "dependencies": {
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-server-dom-webpack": "19.2.0",
+    "waku": "0.27.2"
+  },
+  "devDependencies": {
+    "@pandacss/dev": "workspace:*",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "typescript": "6.0.2"
+  }
+}

@@ -1,0 +1,15 @@
+import { calloutRecipe } from './callout.recipe'
+import { cardRecipe } from './card.recipe'
+import { navbarRecipe } from './navbar.recipe'
+import { nextraTabsRecipe } from './nextra-tabs.recipe'
+import { codeTabsRecipe } from './code-tabs.recipe'
+import { buttonRecipe } from './button.recipe'
+
+export const recipes = {
+  button: buttonRecipe,
+  codeTabs: codeTabsRecipe,
+  card: cardRecipe,
+  callout: calloutRecipe,
+  navbar: navbarRecipe,
+  nextraTabs: nextraTabsRecipe
+}
