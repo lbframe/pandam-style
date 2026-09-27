@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "documentKind": "illustrative-manifest-excerpt",
+  "project": "PandamStyle",
+  "compilerContractVersion": "0.1-draft",
+  "systemId": "conformance",
+  "registryDigest": "$REGISTRY_DIGEST",
+  "projection": "consumer",
+  "profileId": "conformance-strict",
+  "capabilities": {
+    "tokens": true,
+    "semanticTokens": true,
+    "themes": true,
+    "namedConditions": true,
+    "recipes": true,
+    "slots": false,
+    "compoundVariants": false,
+    "patterns": false,
+    "rawDynamicStyles": false
+  },
+  "tokens": {
+    "spacing.md": {
+      "category": "spacing",
+      "kind": "primitive",
+      "visibility": "public",
+      "values": {
+        "light": "16px",
+        "dark": "16px"
+      }
+    },
+    "spacing.lg": {
+      "category": "spacing",
+      "kind": "primitive",
+      "visibility": "public",
+      "values": {
+        "light": "24px",
+        "dark": "24px"
+      }
+    }
+  },
+  "semanticTokens": {
+    "colors.surface.primary": {
+      "category": "colors",
+      "kind": "semantic",
+      "visibility": "public",
+      "values": {
+        "light": "#ffffff",
+        "dark": "#141414"
+      }
+    },
+    "colors.text.primary": {
+      "category": "colors",
+      "kind": "semantic",
+      "visibility": "public",
+      "values": {
+        "light": "#141414",
+        "dark": "#ffffff"
+      }
+    }
+  },
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "conditions": {
+    "wide": {
+      "family": "media-width",
+      "definition": "@media (min-width: 768px)"
+    },
+    "hover": {
+      "family": "self-state",
+      "definition": "&:is(:hover, [data-hover])"
+    }
+  },
+  "recipes": {
+    "button": {
+      "axisOrder": [
+        "variant",
+        "size"
+      ],
+      "variants": {
+        "variant": [
+          "primary",
+          "secondary"
+        ],
+        "size": [
+          "sm",
+          "md"
+        ]
+      },
+      "defaultVariants": {
+        "variant": "primary",
+        "size": "md"
+      }
+    }
+  },
+  "policies": {
+    "strictCategories": [
+      "colors",
+      "spacing",
+      "radii",
+      "typography",
+      "shadows",
+      "motion"
+    ],
+    "conditions": "named-only",
+    "arbitraryCssVariables": false,
+    "rawDynamicStyles": false,
+    "privateTokenConsumption": false,
+    "autofix": "disabled"
+  },
+  "note": "Illustrative excerpt, not the complete conformance registry or an emitted compiler artifact."
+}

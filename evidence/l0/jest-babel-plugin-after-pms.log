@@ -1,0 +1,1392 @@
+(node:54815) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54835) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/legacy/transform-legacy-polyfills-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS property polyfills (styleResolution: application-order)
+      ✓ [non-standard] "end" (aka "insetInlineEnd") (158 ms)
+      ✓ [non-standard] "marginEnd" (aka "marginInlineEnd") (7 ms)
+      ✓ [non-standard] "marginHorizontal" (aka "marginInline") (5 ms)
+      ✓ [non-standard] "marginStart" (aka "marginInlineStart") (10 ms)
+      ✓ [non-standard] "marginVertical" (aka "marginBlock") (6 ms)
+      ✓ [non-standard] "paddingEnd" (aka "paddingInlineEnd") (4 ms)
+      ✓ [non-standard] "paddingHorizontal" (aka "paddingInline") (4 ms)
+      ✓ [non-standard] "paddingStart" (aka "paddingInlineStart") (15 ms)
+      ✓ [non-standard] "paddingVertical" (aka "paddingBlock") (5 ms)
+      ✓ [non-standard] "start" (aka "insetInlineStart") (9 ms)
+    [transform] CSS value polyfills (styleResolution: application-order)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "clear" property (7 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "clear" property (3 ms)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "float" property (63 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "float" property (2 ms)
+    [transform] CSS property polyfills (styleResolution: legacy-expand-shorthands and enableLogicalStylesPolyfill: true)
+      ✓ [non-standard] "end" (aka "insetInlineEnd") (14 ms)
+      ✓ [non-standard] "marginEnd" (aka "marginInlineEnd") (4 ms)
+      ✓ [non-standard] "marginHorizontal" (aka "marginInline") (14 ms)
+      ✓ [non-standard] "marginStart" (aka "marginInlineStart") (11 ms)
+      ✓ [non-standard] "marginVertical" (aka "marginBlock") (4 ms)
+      ✓ [non-standard] "paddingEnd" (aka "paddingInlineEnd") (25 ms)
+      ✓ [non-standard] "paddingHorizontal" (aka "paddingInline") (4 ms)
+      ✓ [non-standard] "paddingStart" (aka "paddingInlineStart") (35 ms)
+      ✓ [non-standard] "paddingVertical" (aka "paddingBlock") (5 ms)
+      ✓ [non-standard] "start" (aka "insetInlineStart") (3 ms)
+    [transform] CSS value polyfills (styleResolution: legacy-expand-shorthands and enableLogicalStylesPolyfill: true)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "clear" property (13 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "clear" property (3 ms)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "float" property (3 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "float" property (10 ms)
+    [transform] CSS property polyfills (styleResolution: legacy-expand-shorthands and enableLogicalStylesPolyfill: false)
+      ✓ [non-standard] "end" (aka "insetInlineEnd") (4 ms)
+      ✓ [non-standard] "marginEnd" (aka "marginInlineEnd") (2 ms)
+      ✓ [non-standard] "marginHorizontal" (aka "marginInline") (4 ms)
+      ✓ [non-standard] "marginStart" (aka "marginInlineStart") (16 ms)
+      ✓ [non-standard] "marginVertical" (aka "marginBlock") (3 ms)
+      ✓ [non-standard] "paddingEnd" (aka "paddingInlineEnd") (6 ms)
+      ✓ [non-standard] "paddingHorizontal" (aka "paddingInline") (5 ms)
+      ✓ [non-standard] "paddingStart" (aka "paddingInlineStart") (2 ms)
+      ✓ [non-standard] "paddingVertical" (aka "paddingBlock") (2 ms)
+      ✓ [non-standard] "start" (aka "insetInlineStart") (7 ms)
+    [transform] CSS value polyfills (styleResolution: legacy-expand-shorthands and enableLogicalStylesPolyfill: false)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "clear" property (5 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "clear" property (6 ms)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "float" property (3 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "float" property (6 ms)
+
+(node:54849) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54826) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/legacy/transform-logical-values-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS logical values
+      ✓ value "inline-end" for "clear" property (176 ms)
+      ✓ value "inline-start" for "clear" property (9 ms)
+      ✓ value "inline-end" for "float" property (8 ms)
+      ✓ value "inline-start" for "float" property (21 ms)
+      ✓ value "end" for "textAlign" property (13 ms)
+      ✓ value "start" for "textAlign" property (5 ms)
+      ✓ [legacy] value "e-resize" for "cursor" property (5 ms)
+      ✓ [legacy] value "w-resize" for "cursor" property (12 ms)
+      ✓ [legacy] value "ne-resize" for "cursor" property (8 ms)
+      ✓ [legacy] value "nw-resize" for "cursor" property (115 ms)
+      ✓ [legacy] value "se-resize" for "cursor" property (26 ms)
+      ✓ [legacy] value "sw-resize" for "cursor" property (8 ms)
+      ✓ [legacy] value of "animationName" property (4 ms)
+      ✓ [legacy] value of "backgroundPosition" property (14 ms)
+      ✓ [legacy] value of "paddingInline" property (19 ms)
+      ✓ [legacy] value of "boxShadow" property (49 ms)
+      ✓ [legacy] value of "textShadow" property (16 ms)
+
+PASS __tests__/transform-stylex-defineConsts-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.defineConsts()
+      ✓ constants are unique (159 ms)
+      ✓ constants object (8 ms)
+      ✓ constants object (haste) (9 ms)
+      ✓ constant names: special characters (4 ms)
+      ✓ constant names: number (4 ms)
+      ✓ constant names: -- prefix preserves user-authored name (9 ms)
+    [transform] stylex.defineConsts() in stylex.create() 
+      ✓ adds placeholder for constant value from constants.stylex (41 ms)
+      ✓ adds media query placeholder from constants.stylex (18 ms)
+      ✓ resolves /ROOT/ placeholder alias paths for defineConsts imports (54 ms)
+      ✓ resolves aliased absolute paths for defineConsts imports (10 ms)
+      ✓ works with dynamic styles constants (60 ms)
+      ✓ works with dynamic styles at-rules (13 ms)
+      ✓ adds multiple media query placeholders from constants.stylex (15 ms)
+      ✓ adds nested media query placeholders from constants.stylex (22 ms)
+      ○ skipped works with firstThatWorks
+    [transform] stylex.defineConsts() with runtimeInjection
+      ✓ constants object with runtimeInjection: true (39 ms)
+      ✓ numeric constants with runtimeInjection: true (10 ms)
+      ✓ string constants with runtimeInjection: true (5 ms)
+      ✓ mixed string and numeric constants with runtimeInjection: true (21 ms)
+      ✓ constants with special characters with runtimeInjection: true (5 ms)
+      ✓ constants with custom inject path with runtimeInjection (4 ms)
+      ✓ haste module with runtimeInjection: true (6 ms)
+      ✓ constants with numeric keys with runtimeInjection: true (5 ms)
+      ✓ multiple defineConsts calls with runtimeInjection: true (6 ms)
+
+(node:54850) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/transform-stylex-defineVars-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.defineVars()
+      ✓ tokens as null (159 ms)
+      ✓ tokens object (8 ms)
+      ✓ tokens object (haste) (26 ms)
+      ✓ tokens object deep in file tree (17 ms)
+      ✓ tokens object with nested @-rules (5 ms)
+      ✓ literal tokens object (16 ms)
+      ✓ local variable tokens object (49 ms)
+      ✓ local variables used in tokens objects (13 ms)
+      ✓ template literals used in tokens objects (61 ms)
+      ✓ expressions used in tokens objects (9 ms)
+      ✓ stylex.types used in tokens object (6 ms)
+      ✓ same-group references inside function values (24 ms)
+      ✓ same-group references can point to later keys (4 ms)
+      ✓ nested function leaves resolve same-group refs inside at-rules (12 ms)
+      ✓ function values can mix same-group and same-file references (5 ms)
+      ✓ function values can reference typed vars (18 ms)
+      ✓ function values can return stylex.types (4 ms)
+      ✓ function values can return nested objects (4 ms)
+      ✓ multiple variables objects (same file) (7 ms)
+      ✓ multiple variables objects (dependency) (14 ms)
+      ✓ multiple variables objects (different files) (11 ms)
+      options `debug:true`
+        ✓ tokens object uses hashed variable names (4 ms)
+        ✓ tokens with special-character keys use hashed variable names (5 ms)
+      options `dev:true`
+        ✓ tokens object (7 ms)
+      options `runtimeInjection:true`
+        ✓ tokens object (11 ms)
+      options `themeFileExtension`
+        ✓ processes tokens in files with configured extension (4 ms)
+
+(node:54825) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/transform-stylex-defineVarsNested-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.unstable_defineVarsNested()
+      ✓ basic nested tokens (172 ms)
+      ✓ deeply nested tokens (3 levels) (8 ms)
+      ✓ conditional @media values inside nesting (7 ms)
+      ✓ mixed flat and nested values (6 ms)
+      ✓ works with named import (10 ms)
+      ✓ works with renamed named import (5 ms)
+      ✓ produces different hashes for different nested keys (26 ms)
+      ✓ deeply nested conditional with @supports (5 ms)
+      ✓ throws: must be a named export (237 ms)
+      ✓ throws: must have exactly 1 argument (14 ms)
+      ✓ throws: must have an argument (6 ms)
+      ✓ works with stylex.unstable_conditional for @media values (10 ms)
+      ✓ works with named import of unstable_conditional (6 ms)
+      ✓ unstable_conditional is backward compatible — heuristic still works without it (4 ms)
+      ✓ unstable_conditional works in flat defineVars too (5 ms)
+    [cross-file] nested tokens used in stylex.create()
+      ✓ cross-file: nested token access in stylex.create (24 ms)
+      ✓ cross-file: deeply nested token access (3+ levels) (12 ms)
+      ✓ cross-file: mixed flat and nested access (8 ms)
+      ✓ cross-file: nested tokens used in createTheme (flat key format) (18 ms)
+    [cross-package] nested tokens from node_modules (commonJS)
+      ✓ cross-package: nested token access from node_modules in stylex.create (11 ms)
+      ✓ cross-package: deeply nested token access (3+ levels) from node_modules (17 ms)
+      ✓ cross-package: createThemeNested overriding tokens from node_modules (11 ms)
+
+(node:54824) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/transform-stylex-createTheme-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.createTheme()
+      ✓ theme object (227 ms)
+      ✓ theme object (haste) (73 ms)
+      ✓ theme object deep in file tree (39 ms)
+      ✓ literal tokens theme object (25 ms)
+      ✓ local variable theme object (39 ms)
+      ✓ local variables used in theme objects (16 ms)
+      ✓ stylex.env.override for partial theme overrides (16 ms)
+      ✓ template literals used in theme objects (20 ms)
+      ✓ expressions used in theme objects (8 ms)
+      ✓ stylex.types used in theme object (25 ms)
+      ✓ multiple theme objects (same vars) (12 ms)
+      ✓ multiple theme objects (different vars) (25 ms)
+      ✓ themes are indifferent to order of keys (24 ms)
+      options `debug:true`
+        ✓ adds debug data (13 ms)
+        ✓ adds debug data for npm packages (7 ms)
+        ✓ adds debug data (haste) (13 ms)
+        ✓ adds debug data for npm packages (haste) (13 ms)
+      options `dev:true`
+        ✓ adds dev data (10 ms)
+      options `runtimeInjection:true`
+        ✓ adds style injection (23 ms)
+
+(node:54821) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/validation-stylex-create-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.create()
+      ✓ invalid use: not bound (226 ms)
+      ✓ invalid argument: none (26 ms)
+      ✓ invalid argument: too many (10 ms)
+      ✓ invalid argument: non-static (52 ms)
+      ✓ valid argument: object (43 ms)
+      style rules
+        ✓ invalid key: non-static (59 ms)
+        ✓ invalid rule: non-object (20 ms)
+        ✓ invalid rule: spread (12 ms)
+        ✓ valid rule: object (14 ms)
+        ✓ invalid dynamic rule: default object value (18 ms)
+        ✓ invalid dynamic rule: default string value (7 ms)
+        ✓ invalid dynamic rule: destructuring  (11 ms)
+        ✓ invalid dynamic rule: rest param  (5 ms)
+        ✓ valid dynamic rule (24 ms)
+      style declarations
+        ✓ invalid property: non-static value (6 ms)
+        ✓ invalid value: boolean (9 ms)
+        ✓ invalid value: non-static (16 ms)
+        ✓ invalid value: array of objects (3 ms)
+        ✓ valid value: number (3 ms)
+        ✓ valid value: string (8 ms)
+        ✓ valid value: array of numbers (5 ms)
+        ✓ valid value: array of strings (3 ms)
+        ✓ valid value: single-expr function call (7 ms)
+        ✓ valid value: single-expr function call in object (15 ms)
+        ✓ valid value: local variable (4 ms)
+        ✓ valid value: pure complex expression (9 ms)
+        ✓ valid value: template literal expressions (5 ms)
+        ✓ valid object value: key is "default" (12 ms)
+        ✓ valid object value: key starts with ":" (4 ms)
+        ✓ valid object value: multiple valid keys (3 ms)
+        ✓ valid object value: nested pseudo-classes (39 ms)
+        ✓ invalid CSS variable: unclosed function (14 ms)
+        ✓ invalid value: unclosed double-quoted string (7 ms)
+        ✓ invalid value: unclosed single-quoted string (5 ms)
+        ✓ invalid value: unclosed string in multi-value property (3 ms)
+        ✓ invalid value: stray apostrophe in font-family list (6 ms)
+        ✓ valid value: properly closed strings do not throw (3 ms)
+        ✓ valid value: properly closed single-quoted string (2 ms)
+        ✓ invalid CSS variable: unprefixed custom property (10 ms)
+        ✓ valid CSS variable: defined custom properties (3 ms)
+        ✓ valid CSS variable: undefined custom properties (16 ms)
+        ✓ [legacy] pseudo-classes must start with ":" character (2 ms)
+        ○ skipped invalid value: empty object
+        ○ skipped invalid object value: contains disallowed key
+    [validation] invalid properties
+      ○ skipped invalid property: "animation"
+      ○ skipped invalid property: "background"
+      ○ skipped invalid property: "border"
+      ○ skipped invalid property: "borderBlock"
+      ○ skipped invalid property: "borderBlockEnd"
+      ○ skipped invalid property: "borderBlockStart"
+      ○ skipped invalid property: "borderBottom"
+      ○ skipped invalid property: "borderImage"
+      ○ skipped invalid property: "borderInline"
+      ○ skipped invalid property: "borderInlineEnd"
+      ○ skipped invalid property: "borderInlineStart"
+      ○ skipped invalid property: "borderLeft"
+      ○ skipped invalid property: "borderRight"
+      ○ skipped invalid property: "borderTop"
+      ○ skipped invalid property: "flexFlow"
+      ○ skipped invalid property: "font"
+      ○ skipped invalid property: "listStyle"
+      ○ skipped invalid property: "textDecoration"
+      ○ skipped invalid property: "transition"
+    [validation] invalid values
+      ○ skipped invalid value: "block !important" for "display"
+      ○ skipped invalid value: "top left" for "backgroundPosition"
+      ○ skipped invalid value: "red blue" for "borderColor"
+      ○ skipped invalid value: "1px 2px" for "borderRadius"
+      ○ skipped invalid value: "solid dashed" for "borderStyle"
+      ○ skipped invalid value: "1px 2px" for "borderWidth"
+      ○ skipped invalid value: "1px 2px" for "inset"
+      ○ skipped invalid value: "1px 2px" for "insetBlock"
+      ○ skipped invalid value: "1px 2px" for "insetInline"
+      ○ skipped invalid value: "1 1 0" for "flex"
+      ○ skipped invalid value: "1 1 0" for "grid"
+      ○ skipped invalid value: "1px 2px" for "margin"
+      ○ skipped invalid value: "1px 2px" for "marginBlock"
+      ○ skipped invalid value: "1px 2px" for "marginInline"
+      ○ skipped invalid value: "1px solid red" for "outline"
+      ○ skipped invalid value: "hidden visible" for "overflow"
+      ○ skipped invalid value: "1px 2px" for "padding"
+      ○ skipped invalid value: "1px 2px" for "paddingBlock"
+      ○ skipped invalid value: "1px 2px" for "paddingInline"
+      ○ skipped invalid value: "all" for "transitionProperty"
+      ○ skipped invalid value: "bottom" for "transitionProperty"
+      ○ skipped invalid value: "end" for "transitionProperty"
+      ○ skipped invalid value: "height" for "transitionProperty"
+      ○ skipped invalid value: "inset" for "transitionProperty"
+      ○ skipped invalid value: "inset-block" for "transitionProperty"
+      ○ skipped invalid value: "inset-inline" for "transitionProperty"
+      ○ skipped invalid value: "inset-block-end" for "transitionProperty"
+      ○ skipped invalid value: "inset-block-start" for "transitionProperty"
+      ○ skipped invalid value: "inset-inline-end" for "transitionProperty"
+      ○ skipped invalid value: "inset-inline-start" for "transitionProperty"
+      ○ skipped invalid value: "margin" for "transitionProperty"
+      ○ skipped invalid value: "left" for "transitionProperty"
+      ○ skipped invalid value: "padding" for "transitionProperty"
+      ○ skipped invalid value: "right" for "transitionProperty"
+      ○ skipped invalid value: "start" for "transitionProperty"
+      ○ skipped invalid value: "top" for "transitionProperty"
+      ○ skipped invalid value: "width" for "transitionProperty"
+    [validation] propertyValidationMode config
+      ✓ does not throw by default for disallowed properties (silent mode) (13 ms)
+      ✓ throws error when propertyValidationMode is "throw" (9 ms)
+      ✓ does not throw when propertyValidationMode is "warn" (4 ms)
+      ✓ does not throw when propertyValidationMode is "silent" (16 ms)
+      ✓ works with background property (3 ms)
+      ✓ works with animation property (3 ms)
+
+fatal: not a git repository (or any of the parent directories): .git
+PASS __tests__/pandamstyle/artifacts-test.js
+  pandamstyle: artefacts
+    ✓ build de la fixture conformance + page exemple + rejet 17px (77 ms)
+
+(node:54823) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/legacy/stylex-transform-legacy-shorthands-test.js
+  legacy-shorthand-expansion style resolution (enableLogicalStylesPolyfill: true)
+    while using RN non-standard properties
+      ✓ padding: with longhand property collisions (210 ms)
+      ✓ padding: with null longhand property collisions (29 ms)
+      ✓ borderColor: basic shorthand (37 ms)
+      ✓ borderWidth: basic shorthand (38 ms)
+    while using standard logical properties
+      ✓ padding: basic shorthand (24 ms)
+      ✓ margin: basic shorthand (65 ms)
+      ✓ paddingInline: basic shorthand (13 ms)
+      ✓ paddingInline: basic multivalue shorthand (13 ms)
+      ✓ padding: with longhand property collisions (10 ms)
+      ✓ padding: with longhand directional and logical property collisions (20 ms)
+      ✓ padding: with null longhand property collisions (9 ms)
+      ✓ marginInline: basic shorthand (5 ms)
+      ✓ marginInline: basic multivalue shorthand (7 ms)
+      ✓ marginBlock: basic multivalue shorthand (5 ms)
+      ✓ margin: with longhand property collisions (6 ms)
+      ✓ margin: with null longhand property collisions (7 ms)
+      ✓ border: basic shorthand (13 ms)
+      ✓ borderInlineColor: basic shorthand (3 ms)
+      ✓ borderInlineWidth: basic shorthand (8 ms)
+      ✓ inset: basic shorthand (5 ms)
+      ✓ inset: multivalue shorthand (4 ms)
+      ✓ insetInline: basic shorthand (8 ms)
+      ✓ insetInline: multivalue shorthand (4 ms)
+      ✓ insetBlock: basic shorthand (5 ms)
+      ✓ insetBlock: multivalue shorthand (4 ms)
+      ✓ listStyle: basic shorthand (15 ms)
+      ✓ listStyle: multi-value shorthand (15 ms)
+      ✓ listStyle: with longhand collisions (14 ms)
+      ✓ listStyle: invalid values (118 ms)
+  legacy-shorthand-expansion resolution (enableLogicalStylesPolyfill: false)
+    while using RN non-standard properties
+      ✓ padding: with longhand property collisions (14 ms)
+      ✓ padding: with null longhand property collisions (5 ms)
+      ✓ borderColor: basic shorthand (7 ms)
+      ✓ borderWidth: basic shorthand (4 ms)
+    while using standard logical properties
+      ✓ padding: basic shorthand (11 ms)
+      ✓ margin: basic shorthand (4 ms)
+      ✓ paddingInline: basic shorthand (11 ms)
+      ✓ padding: with longhand property collisions (7 ms)
+      ✓ paddingBlock: basic multivalue shorthand (7 ms)
+      ✓ padding: with null longhand property collisions (6 ms)
+      ✓ marginInline: basic shorthand (11 ms)
+      ✓ margin: with longhand property collisions (8 ms)
+      ✓ margin: with null longhand property collisions (6 ms)
+      ✓ border: basic shorthand (25 ms)
+      ✓ borderInlineColor: basic shorthand (7 ms)
+      ✓ borderInlineWidth: basic shorthand (11 ms)
+
+(node:54822) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/legacy/transform-logical-properties-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS logical properties (styleResolution: "application-order")
+      ✓ "borderBlockColor" (166 ms)
+      ✓ "borderBlockStartColor" (9 ms)
+      ✓ "borderBlockEndColor" (19 ms)
+      ✓ "borderInlineColor" (6 ms)
+      ✓ "borderInlineStartColor" (21 ms)
+      ✓ "borderInlineEndColor" (5 ms)
+      ✓ "borderBlockStyle" (50 ms)
+      ✓ "borderBlockStartStyle" (20 ms)
+      ✓ "borderBlockEndStyle" (14 ms)
+      ✓ "borderInlineStyle" (25 ms)
+      ✓ "borderInlineStartStyle" (46 ms)
+      ✓ "borderInlineEndStyle" (18 ms)
+      ✓ "borderBlockWidth" (3 ms)
+      ✓ "borderBlockStartWidth" (4 ms)
+      ✓ "borderBlockEndWidth" (12 ms)
+      ✓ "borderInlineWidth" (4 ms)
+      ✓ "borderInlineStartWidth" (4 ms)
+      ✓ "borderInlineEndWidth" (18 ms)
+      ✓ "borderTopStartRadius" (4 ms)
+      ✓ "borderBottomStartRadius" (6 ms)
+      ✓ "borderTopEndRadius" (3 ms)
+      ✓ "borderBottomEndRadius" (4 ms)
+      ✓ "cornerShape" (12 ms)
+      ✓ "cornerStartStartShape" (4 ms)
+      ✓ "cornerTopLeftShape" (4 ms)
+      ✓ "insetBlock" (8 ms)
+      ✓ "insetBlockEnd" (3 ms)
+      ✓ "insetBlockStart" (4 ms)
+      ✓ "insetInline" (6 ms)
+      ✓ "insetInlineEnd" (6 ms)
+      ✓ "insetInlineStart" (5 ms)
+      ✓ "marginBlock" (3 ms)
+      ✓ "marginBlockEnd" (8 ms)
+      ✓ "marginBlockStart" (7 ms)
+      ✓ "marginInline" (3 ms)
+      ✓ "marginInlineEnd" (4 ms)
+      ✓ "marginInlineStart" (6 ms)
+      ✓ "paddingBlock" (4 ms)
+      ✓ "paddingBlockEnd" (3 ms)
+      ✓ "paddingBlockStart" (6 ms)
+      ✓ "paddingInline" (4 ms)
+      ✓ "paddingInlineEnd" (10 ms)
+      ✓ "paddingInlineStart" (4 ms)
+      ✓ [legacy] short-form property value flipping (5 ms)
+    [transform] CSS logical properties  (styleResolution: "legacy-expand-shorthands")
+      with enableLogicalStylesPolyfill: true
+        ✓ marginInline (11 ms)
+        ✓ marginInlineStart (5 ms)
+        ✓ marginInlineEnd (10 ms)
+        ✓ paddingInline (5 ms)
+        ✓ paddingInlineStart (17 ms)
+        ✓ paddingInlineEnd (5 ms)
+        ✓ borderInlineColor (9 ms)
+        ✓ borderInlineStartColor (5 ms)
+        ✓ borderInlineStyle (5 ms)
+        ✓ borderInlineWidth (5 ms)
+        ✓ borderBlockColor (5 ms)
+        ✓ borderBlockStyle (9 ms)
+        ✓ borderBlockWidth (4 ms)
+        ✓ insetBlock (7 ms)
+        ✓ insetBlockStart (4 ms)
+        ✓ insetBlockEnd (4 ms)
+        ✓ insetInline (9 ms)
+        ✓ insetInlineStart (3 ms)
+        ✓ insetInlineEnd (5 ms)
+        ✓ borderTopStartRadius (3 ms)
+        ✓ borderBottomStartRadius (4 ms)
+        ✓ borderTopEndRadius (3 ms)
+        ✓ borderBottomEndRadius (5 ms)
+      with enableLogicalStylesPolyfill: false
+        ✓ marginInline (3 ms)
+        ✓ marginInlineStart (4 ms)
+        ✓ marginInlineEnd (3 ms)
+        ✓ paddingInline (4 ms)
+        ✓ paddingInlineStart (12 ms)
+        ✓ paddingInlineEnd (4 ms)
+        ✓ borderInlineColor (4 ms)
+        ✓ borderInlineStartColor (12 ms)
+        ✓ borderInlineStyle (5 ms)
+        ✓ borderInlineWidth (6 ms)
+        ✓ borderBlockColor (4 ms)
+        ✓ borderBlockStyle (3 ms)
+        ✓ borderBlockWidth (13 ms)
+        ✓ insetBlock (10 ms)
+        ✓ insetBlockStart (7 ms)
+        ✓ insetBlockEnd (10 ms)
+        ✓ insetInline (5 ms)
+        ✓ insetInlineStart (7 ms)
+        ✓ insetInlineEnd (5 ms)
+        ✓ borderTopStartRadius (3 ms)
+        ✓ borderBottomStartRadius (6 ms)
+        ✓ borderTopEndRadius (4 ms)
+        ✓ borderBottomEndRadius (15 ms)
+
+PASS __tests__/transform-stylex-createThemeNested-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.unstable_createThemeNested()
+      ✓ creates theme override for nested vars (90 ms)
+      ✓ partial override (only some branches) (16 ms)
+      ✓ conditional override with @media (8 ms)
+      ✓ works with named import (6 ms)
+      ✓ override CSS uses correct var hashes from defineVarsNested (10 ms)
+      ✓ throws: must have exactly 2 arguments (111 ms)
+      ✓ throws: must be assigned to a variable (9 ms)
+      ✓ throws: first arg must have __varGroupHash__ (5 ms)
+
+(node:54820) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/transform-import-export-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex imports
+      ✓ import: none (269 ms)
+      ✓ import: non-stylex (155 ms)
+      ✓ require: non-stylex (58 ms)
+      ✓ import: wildcard (the default) (89 ms)
+      ✓ import: wildcard (non-stylex name) (90 ms)
+      ✓ import: named (77 ms)
+      ✓ import: named alias (91 ms)
+      ✓ importSources (string) (92 ms)
+      ✓ importSources (object) (64 ms)
+      ✓ [META-ONLY] import: default (80 ms)
+    [transform] stylex exports
+      ✓ export: named property (5 ms)
+      ✓ export: named declaration (5 ms)
+      ✓ export: default (6 ms)
+      ✓ module.export (9 ms)
+
+PASS __tests__/transform-stylex-when-test.js
+  @stylexjs/babel-plugin
+    [transform] when functions
+      ✓ when.ancestor function (101 ms)
+      ✓ when.siblingBefore function (6 ms)
+      ✓ namespace imports (7 ms)
+      ✓ aliased imports (5 ms)
+    [validation] when functions
+      ✓ validates pseudo selector format (137 ms)
+      ✓ rejects pseudo-elements (7 ms)
+      ✓ validates attribute selector format (7 ms)
+      ✓ rejects invalid selector format (5 ms)
+    [transform] when functions with attribute selectors
+      ✓ when.ancestor with attribute selector (5 ms)
+      ✓ when.descendant with attribute selector (6 ms)
+    [transform] using stylex.defaultMarker
+      ✓ named import (4 ms)
+      ✓ namespace import (3 ms)
+    [transform] using custom markers
+      ✓ named import of custom marker (8 ms)
+
+PASS __tests__/evaluation-import-test.js
+  Evaluation of imported values works based on configuration
+    Theme name hashing based on fileName alone works
+      ✓ Importing file with ".stylex" suffix works (113 ms)
+      ✓ Importing file with ".stylex" and reading __varGroupHash__ returns a className (10 ms)
+      ✓ Maintains variable names that start with -- from "*.stylex" files (6 ms)
+      ✓ Importing file with ".stylex" suffix works with keyframes (7 ms)
+      ✓ Importing file with ".stylex.js" suffix works (5 ms)
+      ✓ Importing file with ".stylex.js" with an alias suffix works (5 ms)
+      ✓ Importing file without a ".stylex" suffix fails (127 ms)
+      ✓ Imported vars with ".stylex" suffix can be used as style keys (5 ms)
+      ✓ Imported vars with ".stylex" suffix can be used as style keys dynamically (15 ms)
+    Module resolution commonJS
+      ✓ Recognizes .ts stylex imports when resolving .js relative imports (5 ms)
+
+(node:54819) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/transform-stylex-props-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.props() call
+      ✓ empty stylex.props call (153 ms)
+      ✓ basic stylex call (26 ms)
+      ✓ basic stylex attrs call (18 ms)
+      ✓ stylex.env resolves in inline objects (14 ms)
+      ✓ stylex.attrs named import resolves in inline objects (29 ms)
+      ✓ stylex.env named import resolves in inline objects (16 ms)
+      ✓ stylex call with number (4 ms)
+      ✓ stylex call with computed number (5 ms)
+      ✓ stylex call with computed string (6 ms)
+      ✓ stylex call with multiple namespaces (7 ms)
+      ✓ stylex call within variable declarations (4 ms)
+      ✓ stylex call with styles variable assignment (5 ms)
+      ✓ stylex call within export declarations (7 ms)
+      ✓ stylex call with short-form properties (5 ms)
+      ✓ stylex call with exported short-form properties (3 ms)
+      ✓ Last property wins, even if shorthand (16 ms)
+      ✓ stylex call using styles with pseudo selectors (5 ms)
+      ✓ stylex call using styles with pseudo selectors within property (4 ms)
+      ✓ stylex call using styles with Media Queries (9 ms)
+      ✓ stylex call using styles with Media Queries within property (105 ms)
+      ✓ stylex call using styles with Support Queries (4 ms)
+      ✓ stylex call using styles with Support Queries within property (4 ms)
+      props calls with jsx
+        ✓ local static styles (23 ms)
+        ✓ Test that sx attribute can be used instead of ...stylex.props (92 ms)
+        ✓ sx prop with custom sxPropName (44 ms)
+        ✓ local dynamic styles (22 ms)
+        ✓ non-local styles (5 ms)
+        sx attribute runtime binding
+          ✓ injects a value namespace import alongside a type namespace import (30 ms)
+          ✓ injects a value namespace import alongside a named type import (16 ms)
+          ✓ injects a value namespace import when there is no stylex import (5 ms)
+          ✓ injects from configured import source when there is no stylex import (3 ms)
+          ✓ injects from existing type-only custom import source (10 ms)
+          ✓ reuses an existing value namespace import (4 ms)
+          ✓ avoids a local stylex binding that would shadow the injected import (5 ms)
+          ✓ injects one value namespace import for multiple sx attributes (10 ms)
+          ✓ does not transform sx on capitalized components (3 ms)
+      props calls with atoms
+        ✓ inline static styles match stylex.create (7 ms)
+        ✓ inline static supports leading underscore value (7 ms)
+        ✓ inline static supports computed key syntax (9 ms)
+        ✓ inline css supports default imports (7 ms)
+        ✓ dedupes duplicate properties across create and atoms (5 ms)
+        ✓ dynamic style (21 ms)
+        ✓ inline static + inline dynamic coexist (8 ms)
+        ✓ inline static + create dynamic (14 ms)
+        ✓ inline dynamic + create dynamic (16 ms)
+        conditional atoms
+          ✓ atoms with && conditional (5 ms)
+          ✓ atoms with ternary conditional (6 ms)
+          ✓ atoms with conditional and create styles (13 ms)
+          ✓ dynamic atoms with ternary conditional (12 ms)
+        atoms with runtime bailout
+          ✓ atoms mixed with unknown external styles (9 ms)
+          ✓ atoms with dynamic conditional inside function (8 ms)
+          ✓ atoms with variable reference forces bailout (9 ms)
+        atoms inside functions
+          ✓ static atoms inside function declaration (4 ms)
+          ✓ dynamic atoms inside function declaration (9 ms)
+          ✓ atoms inside arrow function (3 ms)
+          ✓ multiple stylex.props calls with atoms in same function (9 ms)
+        with options
+          ✓ dev classnames and debug data for atoms (4 ms)
+      with contextual styles and collisions
+        ✓ stylex call with conditions (9 ms)
+        ✓ stylex call with conditions - skip conditional (5 ms)
+        ✓ stylex call with property collisions (4 ms)
+        ✓ stylex call with reverting by null (3 ms)
+        ✓ stylex call with short-form property collisions (7 ms)
+        ✓ stylex call with short-form property collisions with null (4 ms)
+        ✓ stylex call with conditions and collisions (4 ms)
+        ✓ stylex call with conditions and collisions - skip conditional (13 ms)
+        ✓ stylex call with conditions and null collisions (4 ms)
+        ✓ stylex call with conditions and null collisions - skip conditional (5 ms)
+      with plugin options
+        ✓ dev:true and enableInlinedConditionalMerge:false (10 ms)
+        ✓ dev:true (14 ms)
+    Keep stylex.create when needed
+      ✓ stylex call with computed key access (12 ms)
+      ✓ stylex call with composition of external styles (4 ms)
+      ✓ stylex call using exported styles with pseudo selectors, and queries (4 ms)
+      even when stylex calls come first
+        ✓ stylex call with computed key access (3 ms)
+        ✓ stylex call with mixed access (9 ms)
+        ✓ stylex call with composition of external styles (8 ms)
+        ✓ stylex call using exported styles with pseudo selectors, and queries (14 ms)
+    Setting custom import paths
+      ✓ Basic stylex call (3 ms)
+    Specific edge-case bugs
+      ✓ Basic stylex call (10 ms)
+      ✓ Basic stylex call (13 ms)
+      ✓ Stylex call with debug on (14 ms)
+      ✓ Stylex call with debug on uses hashed classnames (10 ms)
+      ✓ hoisting correctly with duplicate names (6 ms)
+      ✓ does not hoist $$css objects that reference local variables (5 ms)
+    dealing with imports
+      ✓ all local styles (5 ms)
+      ✓ local array styles (10 ms)
+      ✓ regular style import (8 ms)
+      ✓ default import from .stylex.js file (15 ms)
+      ✓ object import from .stylex.js file (6 ms)
+
+PASS __tests__/validation-stylex-defineConsts-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.defineConsts()
+      ✓ invalid export: not bound (154 ms)
+      ✓ invalid argument: none (5 ms)
+      ✓ invalid argument: too many (5 ms)
+      ✓ invalid argument: number (5 ms)
+      ✓ invalid argument: string (5 ms)
+      ✓ invalid argument: non-static (5 ms)
+      ✓ valid argument: object (4 ms)
+      ✓ valid export: separate const and export statement (4 ms)
+      ✓ invalid export: re-export from another file does not count (13 ms)
+      ✓ invalid export: renamed re-export from another file does not count (4 ms)
+      ✓ invalid export: default export does not count (7 ms)
+      ✓ invalid export: renamed export with as syntax (6 ms)
+      ✓ valid key: starts with "--" (6 ms)
+      ✓ invalid key: non-static (6 ms)
+      ✓ invalid value: non-static (13 ms)
+      ✓ valid value: number (6 ms)
+      ✓ valid value: string (3 ms)
+      ○ skipped valid value: keyframes
+
+PASS __tests__/transform-value-normalization-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS value normalization
+      ✓ normalize whitespace in CSS values (90 ms)
+      ✓ no dimensions for 0 values (19 ms)
+      ✓ preserves zero units inside a non-first function (5 ms)
+      ✓ 0 timings are all "0s" (6 ms)
+      ✓ 0 angles are all "0deg" (4 ms)
+      ✓ calc() preserves spaces around "+" and "-" (4 ms)
+      ✓ strip leading zeros (4 ms)
+      ✓ use double quotes in empty strings (5 ms)
+      ✓ timing values are converted to seconds unless < 10ms (15 ms)
+      ✓ transforms non-unitless property values (8 ms)
+      ✓ number values rounded down to four decimal points (3 ms)
+      ✓ "content" property values are wrapped in quotes (4 ms)
+      ✓ "content" property values containing quotes are wrapped in quotes (6 ms)
+      ✓ "content" property values keep their CSS escape sequences (6 ms)
+      ✓ [legacy] no space before "!important" (6 ms)
+    [transform] fontSize with:
+      enableFontSizePxToRem: true
+        ✓ transforms font size from px to rem (5 ms)
+        ✓ transforms font size from px to rem even with calc (8 ms)
+      enableFontSizePxToRem: false
+        ✓ ignores px font size (5 ms)
+        ✓ ignores px font size within calc (9 ms)
+
+PASS __tests__/transform-stylex-defineConstsNested-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.unstable_defineConstsNested()
+      ✓ basic nested consts with original values preserved (86 ms)
+      ✓ deeply nested constants (3 levels) (7 ms)
+      ✓ j-malt PR #1303 use case: three-tiered tokens with state namespaces (9 ms)
+      ✓ handles number values (11 ms)
+      ✓ works with named import (3 ms)
+      ✓ mixed string and number values (6 ms)
+      ✓ throws: must be a named export (76 ms)
+      ✓ throws: must have exactly 1 argument (16 ms)
+
+PASS __tests__/validation-stylex-keyframes-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.keyframes()
+      ✓ local variable keyframes object (143 ms)
+      ✓ only argument must be an object of objects (25 ms)
+      ✓ allow defined CSS variables in keyframes (7 ms)
+      ✓ allow undefined CSS variables in keyframes (16 ms)
+
+PASS __tests__/legacy/transform-pre-plugin-test.js
+  [transform] stylex.create()
+    ✓ transforms style object (223 ms)
+
+PASS __tests__/transform-stylex-viewTransitionClass-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.viewTransitionClass
+      ✓ basic object (75 ms)
+      ✓ local variables used in view transition class (6 ms)
+      ✓ using keyframes (12 ms)
+      ✓ using inline keyframes (4 ms)
+      ✓ unitless numbers (5 ms)
+      ○ skipped using contextual styles
+
+PASS __tests__/validation-import-export-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex imports
+      ✓ valid import: non-stylex (69 ms)
+      ✓ valid import: named export of stylex.create() (7 ms)
+      ✓ valid import: default export of stylex.create() (9 ms)
+      ✓ valid import: positionTry named import (4 ms)
+      ✓ valid import: positionTry from namespace import (5 ms)
+      ✓ valid import: viewTransitionClass named import (8 ms)
+      ✓ valid import: viewTransitionClass from namespace import (4 ms)
+
+PASS src/utils/__tests__/evaluate-path-test.js
+  custom path evaluation works as expected
+    ✓ Evaluates Primitive Value expressions (32 ms)
+    ✓ Evaluates Simple Arrays and Objects (4 ms)
+    ✓ Evaluates Objects with spreads (4 ms)
+    ✓ Evaluates built-in functions (4 ms)
+    ✓ Evaluates built-in functions without the Node global alias (2 ms)
+    ✓ Evaluates custom functions (4 ms)
+    ✓ Evaluates custom functions that return non-static values (1 ms)
+    ✓ Evaluates custom functions used as spread values (8 ms)
+    ✓ Evaluates custom functions that take paths (1 ms)
+    evaluating function expressions
+      ✓ function with a single params (5 ms)
+      ✓ function with a two params (1 ms)
+      ✓ Array map (1 ms)
+      ✓ Array filter (1 ms)
+      ✓ Array map and filter (1 ms)
+      ✓ Object entries (6 ms)
+      ✓ Methods called by string should be bind (1 ms)
+    evaluate-path prototype-chain escape prevention
+      ✓ blocks reading .constructor off an object literal (1 ms)
+      ✓ blocks walking to Function via .constructor.constructor (1 ms)
+      ✓ blocks arbitrary code execution via Function constructor (1 ms)
+      ✓ blocks constructor calls on allowlisted globals (1 ms)
+      ✓ blocks computed-property access to constructor (1 ms)
+      ✓ blocks computed-property access after property-key coercion (3 ms)
+      ✓ blocks __proto__ traversal (1 ms)
+      ✓ blocks prototype traversal (5 ms)
+      ✓ blocks .constructor off a string literal (1 ms)
+      ✓ blocks .constructor reached through a bound variable (1 ms)
+      ✓ blocks Function reached through reflection (1 ms)
+      ✓ blocks Function reached through inherited config properties (1 ms)
+      ✓ blocks reflective Object methods (2 ms)
+      ✓ still allows built-in methods that return plain data (4 ms)
+      ✓ still deopts on non-deterministic and mutating methods (2 ms)
+      ✓ still allows legitimate member access (2 ms)
+      ✓ a payload is never executed, however it is reached (15 ms)
+    evaluate-path mutation detection
+      ✓ evaluates constant array correctly (1 ms)
+      ✓ should bail out when array is mutated via push (1 ms)
+      ✓ should bail out when array is mutated via assignment (1 ms)
+      ✓ should bail out when object is mutated via Object.assign
+
+PASS src/utils/__tests__/js-to-ast-test.js
+  convertObjectToAST
+    ✓ converts empty object (2 ms)
+    ✓ converts object with values (1 ms)
+
+PASS __tests__/validation-stylex-defineMarker-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.defineMarker()
+      ✓ must be bound to a named export (157 ms)
+      ✓ no arguments allowed (7 ms)
+      ✓ valid export: direct named export (8 ms)
+      ✓ valid export: separate const and export statement (20 ms)
+      ✓ invalid export: re-export from another file does not count (6 ms)
+      ✓ invalid export: renamed re-export from another file does not count (4 ms)
+      ✓ invalid export: default export does not count (4 ms)
+      ✓ invalid export: renamed export with as syntax (10 ms)
+
+PASS __tests__/transform-stylex-positionTry-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.positionTry
+      ✓ positionTry object (79 ms)
+      ✓ local constants used in positionTry object (5 ms)
+      ✓ positionTry value used within create (8 ms)
+      ✓ positionTry object used inline (4 ms)
+      ✓ processStylexRules does not inject ancestor selector into @position-try (10 ms)
+      ✓ processStylexRules does not inject specificity into @position-try (3 ms)
+
+PASS src/utils/__tests__/state-manager-test.js
+  StateManager config parsing
+    "classNamePrefix" option
+      ✓ logs errors if invalid (4 ms)
+      ✓ default value (12 ms)
+      ✓ empty string value
+      ✓ provided value (1 ms)
+    "debug" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "dev" option (boolean)
+      ✓ logs errors if invalid
+      ✓ default value (1 ms)
+      ✓ false value
+      ✓ true value (1 ms)
+    "enableDebugDataProp" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "enableDevClassNames" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value (1 ms)
+      ✓ false value
+      ✓ true value (1 ms)
+    "enableInlinedConditionalMerge" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "enableMinifiedKeys" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "importSources" option
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ empty value (1 ms)
+      ✓ provided value (1 ms)
+    "runtimeInjection" option
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value (1 ms)
+      ✓ false value (1 ms)
+      ✓ true value (1 ms)
+      ✓ "true" value
+    "styleResolution" option
+      ✓ logs errors if invalid
+      ✓ default value (1 ms)
+      ✓ valid values (1 ms)
+    "test" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "treeshakeCompensation" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value (4 ms)
+    "unstable_moduleResolution" option
+      ✓ default value (1 ms)
+      ✓ "commonJS" type
+      ✓ "haste" type (1 ms)
+      ✓ "custom" type (2 ms)
+      ✓ "rootDir" option (1 ms)
+    "enableFontSizePxToRem" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "propertyValidationMode" option
+      ✓ logs errors if invalid
+      ✓ default value (1 ms)
+      ✓ valid values (3 ms)
+
+PASS __tests__/transform-stylex-keyframes-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS keyframes
+      ✓ keyframes object (83 ms)
+      ✓ local variables used in keyframes object (5 ms)
+      ✓ template literals used in keyframes object (11 ms)
+      ✓ keyframes object used inline (6 ms)
+      ✓ keyframes object (9 ms)
+      ✓ unitless numbers in keyframes object (5 ms)
+      ✓ [legacy] keyframes object RTL polyfills (14 ms)
+
+PASS src/visitors/__tests__/parse-stylex-create-arg-test.js
+  custom path evaluation works as expected
+    ✓ Evaluates Empty Object (13 ms)
+    ✓ Evaluates Static Style Object (2 ms)
+    ✓ Evaluates object with function styles (identifier) (9 ms)
+    ✓ Evaluates object with function styles (binary expression) (7 ms)
+
+PASS __tests__/stylex-nested-utils-test.js
+  stylex-nested-utils
+    flattenNestedVarsConfig
+      ✓ flattens a simple one-level nested object (2 ms)
+      ✓ flattens a deeply nested object (3+ levels) (1 ms)
+      ✓ flattens 4 levels deep (2 ms)
+      ✓ keeps top-level string values as-is (1 ms)
+      ✓ stops at objects with a "default" key (conditional @-rule values)
+      ✓ stops at deeply nested conditional @-rule values (1 ms)
+      ✓ handles mixed namespaces and conditional values at the same level (1 ms)
+      ✓ handles multiple branches at the same level
+      ✓ returns empty object for empty input (1 ms)
+      ✓ throws on keys containing dots (32 ms)
+      ✓ throws on nested keys containing dots (1 ms)
+      ✓ handles object with only top-level leaves (no nesting) (1 ms)
+      ✓ preserves conditional value objects
+      ✓ object with default key set to a nested conditional is still a leaf (1 ms)
+    flattenNestedConstsConfig
+      ✓ treats objects with "default" key as namespaces (NOT conditional leaves)
+      ✓ still treats strings and numbers as leaves (1 ms)
+      ✓ flattens the full j-malt PR #1303 three-tiered structure
+      ✓ differs from flattenNestedVarsConfig for objects with "default" key (1 ms)
+      ✓ handles empty object
+      ✓ throws on keys containing dots (1 ms)
+    flattenNestedStringConfig
+      ✓ throws on keys containing dots (1 ms)
+    unflattenObject
+      ✓ unflattens a single dot-separated key (5 ms)
+      ✓ merges multiple keys into the same branch (1 ms)
+      ✓ preserves __varGroupHash__ at top level without splitting
+      ✓ preserves $$css at top level without splitting (1 ms)
+      ✓ preserves non-dotted keys at top level
+      ✓ handles deeply nested keys (4 levels) (1 ms)
+      ✓ returns empty object for empty input
+      ✓ handles only special keys
+      ✓ handles only non-dotted keys (1 ms)
+      ✓ handles keys that share a common prefix
+    flattenNestedVarsConfig and unflattenObject round-trip
+      ✓ round-trips a simple nested object (1 ms)
+      ✓ round-trips with conditional values preserved
+      ✓ round-trips a complex multi-branch structure (1 ms)
+      ✓ round-trips with string values
+      ✓ round-trips a flat object unchanged
+
+PASS src/shared/types/__tests__/stylex-types-test.js
+  stylex-types-test
+    class methods
+      ✓ angle (2 ms)
+      ✓ color (6 ms)
+      ✓ image (6 ms)
+      ✓ integer
+      ✓ length (1 ms)
+      ✓ percentage (1 ms)
+      ✓ num
+      ✓ integer (1 ms)
+      ✓ resolution
+      ✓ time (1 ms)
+      ✓ transformFunction
+      ✓ transformList (1 ms)
+      ✓ url
+    standalone factory functions
+      ✓ angle
+      ✓ color
+      ✓ image
+      ✓ integer (1 ms)
+      ✓ length
+      ✓ percentage (1 ms)
+      ✓ num
+      ✓ integer (2 ms)
+      ✓ resolution
+      ✓ time (1 ms)
+      ✓ transformFunction
+      ✓ transformList (3 ms)
+      ✓ url
+
+PASS __tests__/shared-stylex-nested-transforms-test.js
+  shared nested transforms
+    styleXDefineVarsNested
+      ✓ returns nested JS output with var() references (4 ms)
+      ✓ produces same CSS as flat defineVars with equivalent keys
+      ✓ produces same __varGroupHash__ as flat defineVars
+      ✓ handles deeply nested tokens (3 levels) (1 ms)
+      ✓ handles conditional @-rule values inside nesting (9 ms)
+      ✓ handles mixed flat and nested values (1 ms)
+      ✓ different nested keys produce different var() hashes
+    styleXDefineConstsNested
+      ✓ returns nested JS output with original values preserved (1 ms)
+      ✓ generates empty CSS (consts do not emit CSS variables) (1 ms)
+      ✓ preserves number values
+      ✓ handles deeply nested constants (1 ms)
+      ✓ produces same const metadata as flat defineConsts with equivalent keys
+      ✓ j-malt PR #1303 use case: three-tiered design system tokens with state namespaces
+      ✓ handles mixed string and number values
+    styleXCreateThemeNested
+      ✓ creates theme override from nested vars and nested overrides (2 ms)
+      ✓ supports partial overrides (only some leaves) (1 ms)
+      ✓ produces same output as flat createTheme with equivalent flattened inputs (4 ms)
+      ✓ handles conditional overrides with @media (2 ms)
+      ✓ throws when first arg lacks __varGroupHash__ (23 ms)
+
+PASS src/shared/preprocess-rules/__tests__/flatten-raw-style-obj-test.js
+  Flatten Style Object with legacy shorthand expansion
+    Simple Objects
+      ✓ should create PreRule objects for simple style values (2 ms)
+      ✓ should expand simple gap values (1 ms)
+      ✓ should expand simple containIntrinsicSize values (1 ms)
+      ✓ should expand simple shorthands (1 ms)
+      ✓ should expand shorthands with space-separated values (1 ms)
+      ✓ should expand simple gap with space-separated values
+      ✓ should expand simple containIntrinsicSize with space-separated values (2 ms)
+      ✓ should expand shorthands with fallbacks (1 ms)
+    Nested Objects
+      ✓ Legacy Pseudo classes (1 ms)
+      ✓ Modern Pseudo classes (1 ms)
+      ✓ Modern Pseudo classes with shorthands (1 ms)
+      ✓ Modern Pseudo classes with complex shorthands (2 ms)
+      ✓ Modern pseudo and at-rules (5 ms)
+      ✓ Attribute selector conditions (1 ms)
+    Multiple levels of nesting
+      ✓ Fallback styles within nested objects (3 ms)
+      ✓ pseudo within a media query - legacy syntax
+      ✓ pseudo with a pseudo within a media query - legacy syntax (1 ms)
+      ✓ pseudo within a media query - modern syntax
+      ✓ extra deep, pseudo within a media query - modern syntax (1 ms)
+
+PASS src/shared/utils/__tests__/convert-to-className-test.js
+  convert-to-className test
+    ✓ converts style to className (3 ms)
+    ✓ generates the same classname in debug and production modes (5 ms)
+    ✓ converts margin number to px (1 ms)
+    ✓ keeps number for zIndex
+    ✓ keeps fr for 0 fraction values (1 ms)
+    ✓ keeps fr for 0 percentage values
+    ✓ keeps number for opacity (1 ms)
+    ✓ handles array of values
+    ✓ handles array of values with var (1 ms)
+    ✓ handles array with multiple vars (1 ms)
+    ✓ handles array with multiple vars and multiple fallbacks
+    ✓ handles array with variable default and multiple constant fallbacks (1 ms)
+    ✓ handles array with variable default and multiple variable and constant fallbacks
+    ✓ handles array of all variables (1 ms)
+
+PASS __tests__/transform-stylex-defineMarker-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.defineMarker()
+      ✓ member call (92 ms)
+      ✓ named import call (5 ms)
+
+PASS src/shared/utils/__tests__/split-css-value-test.js
+  Ensure CSS values are split correctly
+    ✓ simple space-separated numbers (2 ms)
+    ✓ simple space-separated lengths
+    ✓ simple comma-separated numbers (1 ms)
+    ✓ simple comma-separated lengths
+    ✓ Does not lists within functions (1 ms)
+    ✓ Does not lists within calc
+
+PASS src/shared/utils/__tests__/transform-value-test.js
+  transformValue content property tests
+    ✓ preserves CSS functions without quotes (11 ms)
+    ✓ preserves CSS keywords without quotes (3 ms)
+    ✓ handles mixed content values (1 ms)
+    ✓ adds quotes to plain strings (1 ms)
+    ✓ adds quotes to plain strings containing quote characters
+    ✓ preserves CSS escape sequences when adding quotes (1 ms)
+    ✓ preserves quote keywords combined with strings (1 ms)
+    ✓ preserve units in zero values CSS variables (3 ms)
+
+PASS src/shared/preprocess-rules/__tests__/PreRule-test.js
+  Converting PreRule to CSS
+    ✓ should convert a PreRule to CSS (1 ms)
+
+(node:54818) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/transform-stylex-create-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.create()
+      static styles
+        ✓ unused style object (164 ms)
+        ✓ style object (18 ms)
+        ✓ stylex.env resolves compile-time constants (9 ms)
+        ✓ stylex.env named import resolves compile-time constants (61 ms)
+        ✓ stylex.env destructured import resolves compile-time constants (20 ms)
+        ✓ stylex.env function call resolves at compile time (12 ms)
+        ✓ stylex.env named import function call resolves at compile time (26 ms)
+        ✓ stylex.env function using template literals (49 ms)
+        ✓ stylex.env function with multiple properties (7 ms)
+        ✓ nested referenced style object (41 ms)
+        ✓ multiple nested referenced style object (139 ms)
+        ✓ style object (multiple) (11 ms)
+        ✓ style object with custom properties (5 ms)
+        ✓ style object with shortform properties (12 ms)
+        ✓ style object with shortform properties (styleResolution: "property-specificity") (10 ms)
+        ✓ style object requiring vendor prefixes (4 ms)
+        simple values
+          ✓ set custom property (7 ms)
+          ✓ set "transitionProperty" (14 ms)
+          ✓ set "willChange" (16 ms)
+          ✓ use "attr()" function (3 ms)
+          ✓ use array (fallbacks) (4 ms)
+          ✓ use CSS variable (3 ms)
+          ✓ use string containing CSS variables (3 ms)
+        function value: stylex.firstThatWorks()
+          ✓ args: value, value (3 ms)
+          ✓ args: value, var (4 ms)
+          ✓ args: var, value (2 ms)
+          ✓ args: var, var (3 ms)
+          ✓ args: var, var, var (3 ms)
+          ✓ args: func, var, value (3 ms)
+          ✓ args: func, var, value, value (3 ms)
+        object values: pseudo-classes
+          ✓ invalid pseudo-class (3 ms)
+          ✓ valid pseudo-class (4 ms)
+          ✓ pseudo-class generated order (4 ms)
+          ✓ pseudo-class generated order (nested, same value) (29 ms)
+          ✓ pseudo-class generated order (nested, different value) (5 ms)
+          ✓ attribute selector with pseudo-class (nested, same value) (3 ms)
+          ✓ pseudo-class with array fallbacks (9 ms)
+        object values: pseudo-elements
+          ✓ "::before" and "::after" (3 ms)
+          ✓ "::placeholder" (3 ms)
+          ✓ "::thumb" (4 ms)
+          ✓ "::before" containing pseudo-classes (3 ms)
+          ✓ legacy compound ":hover::after" selector as single key (8 ms)
+          ✓ compound ":hover::after" selector as single key (4 ms)
+          ✓ "::after" with multiple pseudo-class conditions (4 ms)
+        object values: queries
+          ✓ media queries without last query wins (140 ms)
+          ✓ media queries without last query wins (52 ms)
+          ✓ media queries without last query wins (5 ms)
+          ✓ media queries (79 ms)
+          ✓ supports queries (4 ms)
+          ✓ media query with pseudo-classes (24 ms)
+          ✓ media query with array fallbacks (26 ms)
+      dynamic styles
+        ✓ style function (6 ms)
+        ✓ style function and object (7 ms)
+        ✓ style function with custom properties (5 ms)
+        safe conditional checks
+          ✓ template literal expressions (15 ms)
+          ✓ binary expressions (19 ms)
+          ✓ unary expressions (13 ms)
+          ✓ logical expressions with safe left side (12 ms)
+          ✓ logical expressions with safe right side (8 ms)
+          ✓ nullish coalescing with safe left side (6 ms)
+          ✓ conditional expressions with safe branches (5 ms)
+          ✓ conditional expressions with safe branches (6 ms)
+          ✓ complex nested safe expressions (12 ms)
+          ✓ complex safe ternary expressions (20 ms)
+          ✓ template literal expressions (8 ms)
+          ✓ binary expressions (10 ms)
+          ✓ unary expressions (6 ms)
+          ✓ logical expressions with safe left side (16 ms)
+          ✓ logical expressions with safe right side (6 ms)
+          ✓ nullish coalescing with safe left side (13 ms)
+          ✓ conditional expressions with safe branches (11 ms)
+          ✓ complex nested safe expressions (14 ms)
+        simple values
+          ✓ set number unit (6 ms)
+          ✓ set mixed values (12 ms)
+          ✓ set custom property (5 ms)
+        object values: pseudo-classes
+          ✓ valid pseudo-class (5 ms)
+          ✓ pseudo-class generated order (12 ms)
+        object values: pseudo-elements
+          ✓ "::before" and "::after" (5 ms)
+          ✓ "::placeholder" (6 ms)
+          ✓ "::thumb" (4 ms)
+          ✓ "::before" containing pseudo-classes (10 ms)
+          ✓ dynamic style in "::after" generates valid @property with inherits (4 ms)
+        object values: queries
+          ✓ media queries (85 ms)
+          ✓ supports queries (8 ms)
+          ✓ media query with pseudo-classes (33 ms)
+          ✓ media query values with nullish coalescing (97 ms)
+      options `debug:true`
+        ✓ adds debug data (8 ms)
+        ✓ adds debug data for npm packages (3 ms)
+        ✓ adds debug data (haste) (4 ms)
+        ✓ adds debug data for npm packages (haste) (3 ms)
+      legacy / deprecated
+        ✓ transforms nested pseudo-class to CSS (5 ms)
+        ✓ transforms legacy pseudo class within a pseudo element (2 ms)
+        ✓ transforms pseudo elements within legacy pseudo class (2 ms)
+        ✓ transforms pseudo elements sandwiched within pseudo classes (3 ms)
+        ✓ transforms media queries (3 ms)
+        ✓ transforms supports queries (2 ms)
+        ✓ transforms dynamic shorthands in legacy-expand-shorthands mode (7 ms)
+        pseudo-classes
+          ✓ transforms invalid pseudo-class (3 ms)
+          ✓ transforms valid pseudo-classes in order (3 ms)
+          ✓ transforms pseudo-class with array value as fallbacks (2 ms)
+
+PASS __tests__/pandamstyle/chain-test.js
+  pandamstyle: registre
+    ✓ références résolues, catégories et visibilité conservées (9 ms)
+    ✓ référence vers un identifiant absent -> PMS_UNKNOWN_TOKEN (1 ms)
+    ✓ cycle de références -> PMS_TOKEN_CYCLE avec chemin (1 ms)
+  pandamstyle: tokens -> CSS
+    ✓ un token compilé devient var(--…) et les variables sont émises (3 ms)
+    ✓ condition nommée -> bloc canonique @media (3 ms)
+    ✓ deux thèmes partagent les mêmes identités de variables (2 ms)
+  pandamstyle: rejets de politique (sans TypeScript)
+    ✓ valeur brute '17px' rejetée avec candidats admis (2 ms)
+    ✓ token de mauvaise catégorie -> PMS_INVALID_TOKEN_CATEGORY (1 ms)
+    ✓ token privé côté consommateur -> PMS_TOKEN_NOT_PUBLIC (11 ms)
+    ✓ forme composite border -> PMS_UNSUPPORTED_PROPERTY_FORM (2 ms)
+    ✓ propriété hors profil -> PMS_UNSUPPORTED_PROPERTY (1 ms)
+    ✓ condition inconnue -> PMS_UNKNOWN_CONDITION (2 ms)
+  pandamstyle: recipe -> CSS
+    ✓ sélection bornée : base + branches par axe selon axisOrder (3 ms)
+    ✓ défauts appliqués quand la prop est absente ou undefined (1 ms)
+    ✓ valeur hors domaine rejetée de façon déterministe au runtime (12 ms)
+    ✓ clé inconnue et null rejetés (2 ms)
+    ✓ conflit base/hover : la variante gagne hors condition, hover conservé (1 ms)
+  pandamstyle: manifeste
+    ✓ projection consommateur : publics seulement, capacités P1 à false (2 ms)
+
+(node:54817) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/legacy/stylex-transform-call-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex() call
+      ✓ empty stylex call (142 ms)
+      ✓ basic stylex call (34 ms)
+      ✓ stylex call with number (17 ms)
+      ✓ stylex call with computed number (9 ms)
+      ✓ stylex call with computed number (25 ms)
+      ✓ stylex call with computed string (6 ms)
+      ✓ stylex call with multiple namespaces (27 ms)
+      ✓ stylex call within variable declarations (80 ms)
+      ✓ stylex call with styles variable assignment (8 ms)
+      ✓ stylex call within export declarations (46 ms)
+      ✓ stylex call with short-form properties (20 ms)
+      ✓ stylex call with exported short-form properties (4 ms)
+      ✓ stylex call keeps only the styles that are needed (15 ms)
+      ✓ stylex keeps all null when applied after unknown (13 ms)
+      ✓ stylex call keeps only the nulls that are needed (19 ms)
+      ✓ stylex call using styles with pseudo selectors (5 ms)
+      ✓ stylex call using styles with pseudo selectors within property (7 ms)
+      ✓ stylex call using styles with Media Queries (4 ms)
+      ✓ stylex call using styles with Media Queries within property (79 ms)
+      ✓ stylex call using styles with Support Queries (6 ms)
+      ✓ stylex call using styles with Support Queries within property (6 ms)
+      with contextual styles and collisions
+        ✓ stylex call with conditions (15 ms)
+        ✓ stylex call with conditions - skip conditional (10 ms)
+        ✓ stylex call with property collisions (10 ms)
+        ✓ stylex call with reverting by null (7 ms)
+        ✓ stylex call with short-form property collisions (10 ms)
+        ✓ stylex call with short-form property collisions with null (11 ms)
+        ✓ stylex call with conditions and collisions (5 ms)
+        ✓ stylex call with conditions and collisions - skip conditional (10 ms)
+        ✓ stylex call with conditions and null collisions (4 ms)
+        ✓ stylex call with conditions and null collisions - skip conditional (9 ms)
+      with plugin options
+        ✓ dev:true and enableInlinedConditionalMerge:false (15 ms)
+        ✓ dev:true (18 ms)
+    Keep stylex.create when needed
+      ✓ stylex call with computed key access (8 ms)
+      ✓ stylex keeps spaces around operators (5 ms)
+      ✓ stylex call with composition of external styles (6 ms)
+      ✓ stylex call using exported styles with pseudo selectors, and queries (5 ms)
+      ✓ stylex call using exported styles with pseudo selectors, and queries within props (23 ms)
+      even when stylex calls come first
+        ✓ stylex call with computed key access (4 ms)
+        ✓ stylex call with mixed access (20 ms)
+        ✓ stylex call with composition of external styles (12 ms)
+        ✓ stylex call with composition border shorthands with external styles (14 ms)
+        ✓ stylex call using exported styles with pseudo selectors, and queries (4 ms)
+    Setting custom import paths
+      ✓ Basic stylex call (3 ms)
+      ✓ Named import from custom source (5 ms)
+      ✓ Named import with other name from custom source (4 ms)
+    Extreme use-cases
+      ✓ Basic stylex call (952 ms)
+      ✓ Basic exported stylex.create call (9 ms)
+      ✓ Basic stylex call - skip conditional (7 ms)
+      ✓ Basic stylex call (6 ms)
+    Accounts for edge-cases
+      ✓ Using stylex() in a for loop (2 ms)
+      ✓ Using stylex.props() in a for loop (3 ms)
+      ✓ trying to use an unknown style in stylex() (2 ms)
+      ✓ trying to use an unknown style in stylex.props() (3 ms)
+
+PASS __tests__/validation-stylex-defineVars-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.defineVars()
+      ✓ invalid export: not bound (1326 ms)
+      ✓ invalid argument: none (13 ms)
+      ✓ invalid argument: too many (8 ms)
+      ✓ invalid argument: number (11 ms)
+      ✓ invalid argument: string (5 ms)
+      ✓ invalid argument: non-static (7 ms)
+      ✓ valid argument: object (41 ms)
+      ✓ valid export: separate const and export statement (12 ms)
+      ✓ invalid export: re-export from another file does not count (5 ms)
+      ✓ invalid export: renamed re-export from another file does not count (6 ms)
+      ✓ invalid export: default export does not count (4 ms)
+      ✓ invalid export: renamed export with as syntax (4 ms)
+      ✓ invalid key: non-static (6 ms)
+      ✓ invalid value: non-static (8 ms)
+      ✓ valid value: number (10 ms)
+      ✓ valid value: string (19 ms)
+      ✓ valid value: keyframes (11 ms)
+      ✓ valid value: same-group function reference (11 ms)
+      ✓ invalid function value: parameterized (6 ms)
+      ✓ invalid function value: non-static body (4 ms)
+      ✓ valid function value: returns stylex.types (8 ms)
+      ✓ valid function value: returns object (6 ms)
+      ✓ invalid same-group reference: unknown key (4 ms)
+      ✓ invalid same-group reference: direct cycle (4 ms)
+      ✓ invalid same-group reference: indirect cycle (4 ms)
+
+PASS __tests__/validation-stylex-createTheme-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.createTheme()
+      ✓ must be bound to a variable (999 ms)
+      ✓ it must have two arguments (39 ms)
+      ✓ variable keys must be a static value (4 ms)
+      ✓ values must be static number or string in stylex.createTheme() (23 ms)
+
+(node:54816) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/transform-process-test.js
+  @stylexjs/babel-plugin
+    [transform] stylexPlugin.processStylexRules
+      ✓ no rules (222 ms)
+      ✓ all rules (useLayers:false) (308 ms)
+      ✓ all rules (useLayers:true) (133 ms)
+      ✓ custom properties stay inside @layer alongside priority-0 at-rules (17 ms)
+      ✓ keeps @keyframes fade{from{opacity:0}to{opacity:1}} unlayered with and without custom properties (1 ms)
+      ✓ keeps @property --card-padding{syntax:"<length>";inherits:false;initial-value:0px} unlayered with and without custom properties
+      ✓ keeps @position-try --fallback{top:0} unlayered with and without custom properties (1 ms)
+      ✓ useLayers with before option (118 ms)
+      ✓ useLayers with after option (136 ms)
+      ✓ useLayers with both before and after (118 ms)
+      ✓ useLayers with prefix option (121 ms)
+      ✓ useLayers with prefix, before, and after combined (113 ms)
+      ✓ useLayers with multi-segment dot-notated prefix (XDS use case) (143 ms)
+      ✓ empty before/after produce standard layer declaration (116 ms)
+      ✓ all rules (legacyDisableLayers:true) (122 ms)
+      ✓ legacy-expand-shorthands with logical styles polyfill (12 ms)
+      ✓ logical float vars are emitted when the float comes from a constant (1 ms)
+      ✓ substitutes a constant value containing `$&` verbatim
+      ✓ substitutes a constant value containing `$&` with no alias chain (1 ms)
+      ✓ substitutes constant values containing other `$` sequences verbatim
+      ✓ legacy-expand-shorthands duplicates theme selectors for higher precedence (9 ms)
+      ✓ no mutation of rules (53 ms)
+      ✓ useLegacyClassnamesSort: false (default behavior) (51 ms)
+      ✓ useLegacyClassnamesSort: true (legacy behavior) (53 ms)
+      ✓ sorts min-width with screen and media type (5 ms)
+      ✓ does not misorder negated min-width media queries (22 ms)
+      ✓ does not sort a min-width paired with a negated max-width (14 ms)
+      ✓ sorts min-width breakpoints nested inside another at-rule (14 ms)
+      ✓ sorts max-width defineConsts breakpoints using real transform metadata (32 ms)
+      ✓ sorts min-width defineConsts breakpoints in ascending px order (9 ms)
+      ✓ sorts min-width breakpoints via template literal partial value (10 ms)
+      ✓ sorts max-width defineConsts breakpoints in descending px order (9 ms)
+      ✓ sorts CSS Level 4 range syntax (width >= Xpx) as min-width (9 ms)
+      ✓ range queries (both min and max-width) fall through to existing sort (8 ms)
+      ✓ sort is a total order across px min- and max-width rules (1 ms)
+      ✓ orders the min-width group before the max-width group (17 ms)
+      ✓ sorts unitless zero, any-unit zero, and mixed-case px (16 ms)
+      ✓ does not sort a width whose value is a ratio (11 ms)
+      ✓ does not sort a unitless non-zero width (7 ms)
+      ✓ does not sort rem breakpoints (7 ms)
+      ✓ does not sort a query with two bounds on the same side (8 ms)
+      ✓ sort is deterministic regardless of input order (25 ms)
+      ✓ sort is deterministic with duplicate rules in different input orders (1 ms)
+
+Test Suites: 1 skipped, 44 passed, 44 of 45 total
+Tests:       64 skipped, 1026 passed, 1090 total
+Snapshots:   887 passed, 887 total
+Time:        6.156 s
+Ran all test suites.

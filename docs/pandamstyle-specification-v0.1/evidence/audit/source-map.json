@@ -1,0 +1,250 @@
+{
+  "audit_date": "2026-09-27",
+  "project": "PandamStyle",
+  "method": "Lecture distante du code et des tests via le plugin GitHub ; analyse statique ciblée.",
+  "baselines": {
+    "stylex": {
+      "repository": "facebook/stylex",
+      "ref": "main",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2"
+    },
+    "panda_v1": {
+      "repository": "chakra-ui/panda",
+      "ref": "@pandacss/postcss@1.12.1",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "tag_object": "0eeeb891145622b7737a96dc402ef14208851f16"
+    },
+    "panda_v2": {
+      "repository": "chakra-ui/panda",
+      "ref": "v2",
+      "commit": "c171f630adc6dec4a1f9e4b9a79ef706d8278aae"
+    }
+  },
+  "tests_executed": false,
+  "implementation_performed": false,
+  "limitations": [
+    "Lecture ciblée des chemins structurants, pas lecture exhaustive de chaque fichier des dépôts.",
+    "Aucun benchmark, build, test navigateur ou prototype de portage exécuté.",
+    "Les tests cités sont des preuves de comportements attendus par upstream, pas des résultats de cette session.",
+    "La branche Panda v2 n’a pas fait l’objet d’un audit complet des crates Rust.",
+    "Les performances TypeScript, les dépendances transitives et toutes les intégrations restent à mesurer ou auditer."
+  ],
+  "sources": {
+    "SX-01": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/babel-plugin/src/index.js",
+      "coverage": "Entrée et traversées reçues dans le premier extrait ; émission CSS relue explicitement aux lignes 500–915.",
+      "kind": "code",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/babel-plugin/src/index.js"
+    },
+    "SX-02": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "coverage": "Lignes 1–255.",
+      "kind": "code",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js"
+    },
+    "SX-03": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/babel-plugin/src/shared/stylex-create.js"
+    },
+    "SX-04": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/basic-validation.js",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/basic-validation.js"
+    },
+    "SX-05": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "coverage": "Lignes 1–220.",
+      "kind": "code",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    "SX-06": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/stylex/src/stylex.js",
+      "coverage": "Lignes 1–285.",
+      "kind": "code",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/stylex/src/stylex.js"
+    },
+    "SX-07": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/stylex/__tests__/stylex-test.js",
+      "coverage": "Fichier complet ; tests lus, non exécutés.",
+      "kind": "test",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/stylex/__tests__/stylex-test.js"
+    },
+    "SX-08": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/atoms/README.md",
+      "coverage": "Fichier complet ; invocation de la transformation recoupée dans SX-01.",
+      "kind": "documentation",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/atoms/README.md"
+    },
+    "SX-09": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js"
+    },
+    "SX-10": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js"
+    },
+    "SX-11": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "packages/@stylexjs/unplugin/src/core.js",
+      "coverage": "Lignes 1–500 ; adaptateurs individuels non audités intégralement.",
+      "kind": "code",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/packages/@stylexjs/unplugin/src/core.js"
+    },
+    "SX-12": {
+      "repository": "facebook/stylex",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2",
+      "path": "LICENSE",
+      "coverage": "Fichier complet.",
+      "kind": "license",
+      "url": "https://github.com/facebook/stylex/blob/fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2/LICENSE"
+    },
+    "PD-01": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/generator/src/artifacts/types/style-props.ts",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/generator/src/artifacts/types/style-props.ts"
+    },
+    "PD-02": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/core/src/utility.ts",
+      "coverage": "Lignes 1–530.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/core/src/utility.ts"
+    },
+    "PD-03": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/token-dictionary/src/dictionary.ts",
+      "coverage": "Lignes 1–545 ; fin des vues dérivées non lue.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/token-dictionary/src/dictionary.ts"
+    },
+    "PD-04": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/token-dictionary/src/token.ts",
+      "coverage": "Lignes 1–240.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/token-dictionary/src/token.ts"
+    },
+    "PD-05": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/generator/src/artifacts/js/cva.ts",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/generator/src/artifacts/js/cva.ts"
+    },
+    "PD-06": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/generator/src/artifacts/js/sva.ts",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/generator/src/artifacts/js/sva.ts"
+    },
+    "PD-07": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/core/src/recipes.ts",
+      "coverage": "Lignes 1–300.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/core/src/recipes.ts"
+    },
+    "PD-08": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/preset-base/src/patterns.ts",
+      "coverage": "Lignes 1–270 ; principaux patterns de layout.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/preset-base/src/patterns.ts"
+    },
+    "PD-09": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/types/src/pattern.ts",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/types/src/pattern.ts"
+    },
+    "PD-10": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/preset-base/src/conditions.ts",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/preset-base/src/conditions.ts"
+    },
+    "PD-11": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "packages/core/__tests__/atomic-recipe.test.ts",
+      "coverage": "Fichier complet ; test lu, non exécuté.",
+      "kind": "test",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/packages/core/__tests__/atomic-recipe.test.ts"
+    },
+    "PD-12": {
+      "repository": "chakra-ui/panda",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "path": "LICENSE.md",
+      "coverage": "Fichier complet.",
+      "kind": "license",
+      "url": "https://github.com/chakra-ui/panda/blob/1a310482ff18102c44b2a478b7644b064a80d7c6/LICENSE.md"
+    },
+    "PV2-01": {
+      "repository": "chakra-ui/panda",
+      "commit": "c171f630adc6dec4a1f9e4b9a79ef706d8278aae",
+      "path": "V2_MIGRATION.md",
+      "coverage": "Lignes 1–200 ; document upstream, pas une mesure indépendante.",
+      "kind": "documentation",
+      "url": "https://github.com/chakra-ui/panda/blob/c171f630adc6dec4a1f9e4b9a79ef706d8278aae/V2_MIGRATION.md"
+    },
+    "PV2-02": {
+      "repository": "chakra-ui/panda",
+      "commit": "c171f630adc6dec4a1f9e4b9a79ef706d8278aae",
+      "path": "packages/mcp/src/server.ts",
+      "coverage": "Fichier complet.",
+      "kind": "code",
+      "url": "https://github.com/chakra-ui/panda/blob/c171f630adc6dec4a1f9e4b9a79ef706d8278aae/packages/mcp/src/server.ts"
+    },
+    "PV2-03": {
+      "repository": "chakra-ui/panda",
+      "commit": "c171f630adc6dec4a1f9e4b9a79ef706d8278aae",
+      "path": "crates/pandacss_codegen/tests/types_artifact.rs",
+      "coverage": "Lignes 1–240 et portion reçue des lignes 260–590. Initialisation stricte et types générés ; pas une preuve de rejet CSS strict. Tests non exécutés.",
+      "kind": "test",
+      "url": "https://github.com/chakra-ui/panda/blob/c171f630adc6dec4a1f9e4b9a79ef706d8278aae/crates/pandacss_codegen/tests/types_artifact.rs"
+    }
+  }
+}

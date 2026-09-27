@@ -1,0 +1,37 @@
+fatal: not a git repository (or any of the parent directories): .git
+(node:54178) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS __tests__/pandamstyle/artifacts-test.js
+  pandamstyle: artefacts
+    ✓ build de la fixture conformance + page exemple + rejet 17px (30 ms)
+
+PASS __tests__/pandamstyle/chain-test.js
+  pandamstyle: registre
+    ✓ références résolues, catégories et visibilité conservées (3 ms)
+    ✓ référence vers un identifiant absent -> PMS_UNKNOWN_TOKEN
+    ✓ cycle de références -> PMS_TOKEN_CYCLE avec chemin (1 ms)
+  pandamstyle: tokens -> CSS
+    ✓ un token compilé devient var(--…) et les variables sont émises (3 ms)
+    ✓ condition nommée -> bloc canonique @media (2 ms)
+    ✓ deux thèmes partagent les mêmes identités de variables (2 ms)
+  pandamstyle: rejets de politique (sans TypeScript)
+    ✓ valeur brute '17px' rejetée avec candidats admis (1 ms)
+    ✓ token de mauvaise catégorie -> PMS_INVALID_TOKEN_CATEGORY (1 ms)
+    ✓ token privé côté consommateur -> PMS_TOKEN_NOT_PUBLIC (2 ms)
+    ✓ forme composite border -> PMS_UNSUPPORTED_PROPERTY_FORM (1 ms)
+    ✓ propriété hors profil -> PMS_UNSUPPORTED_PROPERTY (1 ms)
+    ✓ condition inconnue -> PMS_UNKNOWN_CONDITION (2 ms)
+  pandamstyle: recipe -> CSS
+    ✓ sélection bornée : base + branches par axe selon axisOrder (1 ms)
+    ✓ défauts appliqués quand la prop est absente ou undefined (2 ms)
+    ✓ valeur hors domaine rejetée de façon déterministe au runtime (13 ms)
+    ✓ clé inconnue et null rejetés (2 ms)
+    ✓ conflit base/hover : la variante gagne hors condition, hover conservé (1 ms)
+  pandamstyle: manifeste
+    ✓ projection consommateur : publics seulement, capacités P1 à false (2 ms)
+
+Test Suites: 2 passed, 2 total
+Tests:       19 passed, 19 total
+Snapshots:   0 total
+Time:        0.804 s, estimated 1 s
+Ran all test suites matching __tests__/pandamstyle/.

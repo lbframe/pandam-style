@@ -1,0 +1,1393 @@
+{
+  "schemaVersion": 1,
+  "documentKind": "acceptance-specification",
+  "project": "PandamStyle",
+  "specVersion": "0.1",
+  "status": "specified_not_run",
+  "testRunnerProvided": false,
+  "caseCount": 66,
+  "cases": [
+    {
+      "id": "AC-001",
+      "phase": "P0",
+      "group": "baseline",
+      "requirements": [
+        "ARC-01",
+        "ARC-18",
+        "P0-12"
+      ],
+      "given": "Commits donneurs épinglés et environnement propre.",
+      "when": "Installer et exécuter les suites upstream sélectionnées avant modification.",
+      "then": "Rapport exact des suites, versions, commandes, codes de sortie et échecs préexistants ; aucune sélection rétroactive des seuls succès.",
+      "evidence": [
+        "logs complets",
+        "lockfile",
+        "SHA des sources"
+      ],
+      "sources": [
+        "A-UPSTREAM",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-002",
+      "phase": "P0",
+      "group": "baseline",
+      "requirements": [
+        "ARC-01",
+        "ARC-18",
+        "P0-12"
+      ],
+      "given": "Fichiers PandamStyle après le premier portage.",
+      "when": "Comparer aux donneurs et inspecter les dépendances des fonctions reprises.",
+      "then": "Le code StyleX et les algorithmes Panda portés sont identifiables ; un wrapper de packages upstream ne satisfait pas le cas.",
+      "evidence": [
+        "diff de portage",
+        "registre de provenance",
+        "inventaire transitif"
+      ],
+      "sources": [
+        "A-FILES",
+        "U-01"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-003",
+      "phase": "P0",
+      "group": "registry",
+      "requirements": [
+        "ARC-07",
+        "ARC-08",
+        "P0-01"
+      ],
+      "given": "Tokens privés/publics et alias sémantiques sur deux sauts compatibles.",
+      "when": "Construire le registre.",
+      "then": "Références résolues, catégories/visibilité conservées et identités uniques.",
+      "evidence": [
+        "registre normalisé",
+        "assertions des références"
+      ],
+      "sources": [
+        "PD-03",
+        "PD-04"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-004",
+      "phase": "P0",
+      "group": "registry",
+      "requirements": [
+        "ARC-08",
+        "P0-01"
+      ],
+      "given": "Token sémantique pointant vers un identifiant absent.",
+      "when": "Construire le registre.",
+      "then": "Échec PMS_UNKNOWN_TOKEN ; source et référence manquante indiquées ; pas de fallback à une chaîne brute.",
+      "evidence": [
+        "diagnostic JSON",
+        "code de sortie non nul"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-005",
+      "phase": "P0",
+      "group": "registry",
+      "requirements": [
+        "ARC-08",
+        "P0-01"
+      ],
+      "given": "Cycle direct puis cycle indirect entre tokens.",
+      "when": "Construire chaque registre.",
+      "then": "Échec PMS_TOKEN_CYCLE avec le chemin du cycle ; ni récursion infinie ni timeout présenté comme succès.",
+      "evidence": [
+        "diagnostic de chaque fixture",
+        "trace du cycle"
+      ],
+      "sources": [
+        "A-TESTS",
+        "PD-04"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-006",
+      "phase": "P0",
+      "group": "registry",
+      "requirements": [
+        "ARC-08",
+        "P0-01",
+        "P0-03"
+      ],
+      "given": "Thème de base valide ; référence cyclique uniquement dans dark.",
+      "when": "Construire tous les thèmes effectifs.",
+      "then": "Le registre entier échoue ; thème inactif au runtime ne masque pas une définition invalide.",
+      "evidence": [
+        "diagnostic avec thème",
+        "code de sortie"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-007",
+      "phase": "P0",
+      "group": "registry",
+      "requirements": [
+        "ARC-07",
+        "P0-01"
+      ],
+      "given": "Deux définitions ont le même identifiant canonique.",
+      "when": "Fusionner les fichiers de déclaration.",
+      "then": "Échec PMS_DUPLICATE_ID donnant les deux sources, sans dernière définition gagnante.",
+      "evidence": [
+        "diagnostic multi-sources"
+      ],
+      "sources": [
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-008",
+      "phase": "P0",
+      "group": "registry",
+      "requirements": [
+        "ARC-08",
+        "P0-01"
+      ],
+      "given": "Alias de couleur vers un token spacing de même valeur textuelle possible.",
+      "when": "Valider le graphe.",
+      "then": "Échec PMS_TOKEN_CATEGORY ; la valeur finale ne remplace pas la catégorie.",
+      "evidence": [
+        "diagnostic JSON"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-009",
+      "phase": "P0",
+      "group": "registry",
+      "requirements": [
+        "ARC-07",
+        "ARC-15",
+        "P0-01"
+      ],
+      "given": "Même système copié dans deux chemins absolus différents.",
+      "when": "Générer les identités.",
+      "then": "Même registryDigest et mêmes identités logiques/variables ; aucun chemin absolu dans leur calcul.",
+      "evidence": [
+        "comparaison des artefacts normalisés"
+      ],
+      "sources": [
+        "SX-09",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-010",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Profil strict et token spacing.md public.",
+      "when": "Compiler padding: token(spacing.md).",
+      "then": "Succès ; token résolu de catégorie spacing ; CSS extrait correspondant.",
+      "evidence": [
+        "CSS",
+        "trace de résolution"
+      ],
+      "sources": [
+        "B-P0",
+        "B-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-011",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "ARC-16",
+        "P0-02",
+        "P0-07"
+      ],
+      "given": "Profil strict, spacing.sm=8px, md=16px, lg=24px.",
+      "when": "Compiler padding: 17px brut.",
+      "then": "Échec PMS_RAW_DESIGN_VALUE ; suggestion md=16px quand visible/comparable ; autofix null.",
+      "evidence": [
+        "diagnostic JSON",
+        "code de sortie"
+      ],
+      "sources": [
+        "B-TESTS",
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-012",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Une fixture valide et une brute par catégorie stricte : couleurs, rayons, typo, ombres, mouvement.",
+      "when": "Compiler toutes les fixtures et chaque longhand minimal supporté.",
+      "then": "Les références valides passent ; chaque valeur brute interdite échoue sans dépendre de TypeScript.",
+      "evidence": [
+        "matrice propriété/catégorie",
+        "diagnostics de chaque cas"
+      ],
+      "sources": [
+        "B-P0",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-013",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Profil strict, token de couleur et token spacing disponibles.",
+      "when": "Utiliser un token couleur sur padding, puis spacing sur fontSize.",
+      "then": "PMS_TOKEN_CATEGORY ; aucune acceptation sur similitude de type CSS.",
+      "evidence": [
+        "diagnostics ciblés"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-014",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Deux syntaxes mono-valeur équivalentes : padding et paddingLeft, puis formes logiques.",
+      "when": "Introduire 17px via chacune, avec token valide en contrôle.",
+      "then": "La normalisation ne contourne pas la catégorie ; les positifs passent et chaque brut échoue.",
+      "evidence": [
+        "fixtures par syntaxe",
+        "diagnostics"
+      ],
+      "sources": [
+        "PD-02",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-015",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Valeur brute cachée dans un composite background, font ou transition.",
+      "when": "Compiler dans le profil P0.",
+      "then": "PMS_UNSUPPORTED_PROPERTY_FORM ; aucune transformation partielle qui laisserait sortir du CSS interdit.",
+      "evidence": [
+        "diagnostic",
+        "absence de nouvelle génération valide"
+      ],
+      "sources": [
+        "A-RISKS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-016",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Valeur CSS var(--forged) sur un espacement strict.",
+      "when": "Compiler, puis répéter avec un nom identique à une variable émise.",
+      "then": "PMS_RAW_DESIGN_VALUE ; seule une référence résolue par l’API confère le statut de token.",
+      "evidence": [
+        "diagnostics",
+        "trace de provenance"
+      ],
+      "sources": [
+        "A-ARCH"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-017",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Même erreur brute écrite en JS, TS avec as any, et TS avec @ts-ignore.",
+      "when": "Compiler sans exécuter tsc.",
+      "then": "Même refus de politique dans les trois fichiers ; un échec de tsc seul ne satisfait pas le cas.",
+      "evidence": [
+        "commandes sans typecheck",
+        "codes de sortie",
+        "diagnostics"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-018",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02",
+        "ARC-05"
+      ],
+      "given": "Valeurs valides et invalides transitant par constantes, spreads et imports statiques.",
+      "when": "Compiler chaque route.",
+      "then": "Preuve conservée pour le token ; brut rejeté ; expression non résolue rejetée explicitement.",
+      "evidence": [
+        "fixtures de provenance",
+        "diagnostics"
+      ],
+      "sources": [
+        "SX-02",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-019",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Fonction locale nommée token et helper officiel importé avec alias.",
+      "when": "Compiler les deux usages.",
+      "then": "Le helper officiel reste reconnu via sa liaison ; la fonction locale ne gagne aucun privilège.",
+      "evidence": [
+        "résolution des symboles",
+        "diagnostics"
+      ],
+      "sources": [
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-020",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-12",
+        "P0-02",
+        "P0-09"
+      ],
+      "given": "Primitive de couleur privée déclarée dans un module auteur.",
+      "when": "Compiler sa définition puis une sélection directe par un consommateur.",
+      "then": "Définition primitive valide ; consommation interdite PMS_PRIVATE_TOKEN ; recipe auteur conforme à sa politique.",
+      "evidence": [
+        "fixtures auteur/consommateur",
+        "diagnostic"
+      ],
+      "sources": [
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-021",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-12",
+        "P0-02"
+      ],
+      "given": "Recipe auteur utilisant 17px au lieu d’un token strict.",
+      "when": "Compiler la définition de recipe.",
+      "then": "PMS_RAW_DESIGN_VALUE ; le rôle auteur ne désactive pas la politique des déclarations de style.",
+      "evidence": [
+        "diagnostic sur fichier auteur"
+      ],
+      "sources": [
+        "U-02",
+        "A-ARCH"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-022",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Valeurs structurelles du profil et valeurs numériques hors domaine.",
+      "when": "Compiler display:flex, width:100%, opacity:0.5 puis opacity:2, NaN, padding:0 brut.",
+      "then": "Domaines structurels déclarés acceptés ; valeurs hors domaine ou espacement sans token refusés.",
+      "evidence": [
+        "matrice de domaines",
+        "diagnostics"
+      ],
+      "sources": [
+        "B-P0",
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-023",
+      "phase": "P0",
+      "group": "policy",
+      "requirements": [
+        "ARC-06",
+        "P0-02"
+      ],
+      "given": "Une valeur CSS obtenue directement depuis une prop runtime.",
+      "when": "Compiler padding: props.value et une fonction de style équivalente.",
+      "then": "PMS_NON_STATIC_VALUE ; aucun abaissement en variable CSS ne blanchit la valeur.",
+      "evidence": [
+        "diagnostic",
+        "inspection du JS"
+      ],
+      "sources": [
+        "A-P0"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-024",
+      "phase": "P0",
+      "group": "conditions",
+      "requirements": [
+        "ARC-09",
+        "P0-04"
+      ],
+      "given": "Token valide sous une condition wide déclarée.",
+      "when": "Compiler et afficher sous puis au-dessus de la borne.",
+      "then": "Le style de base puis le style wide attendu sont observés.",
+      "evidence": [
+        "snapshot CSS",
+        "assertions navigateur"
+      ],
+      "sources": [
+        "B-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-025",
+      "phase": "P0",
+      "group": "conditions",
+      "requirements": [
+        "ARC-09",
+        "P0-04"
+      ],
+      "given": "Condition absente puis media locale 823px.",
+      "when": "Compiler chaque cas consommateur.",
+      "then": "PMS_UNKNOWN_CONDITION puis PMS_RAW_CONDITION ; pas de suppression silencieuse.",
+      "evidence": [
+        "diagnostics",
+        "codes de sortie"
+      ],
+      "sources": [
+        "B-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-026",
+      "phase": "P0",
+      "group": "conditions",
+      "requirements": [
+        "ARC-09",
+        "P0-04"
+      ],
+      "given": "Deux écritures candidates du même style conditionnel.",
+      "when": "Normaliser puis compiler.",
+      "then": "Même représentation canonique et mêmes résultats ; pas de variation selon syntaxe orientée propriété ou bloc.",
+      "evidence": [
+        "IR comparée",
+        "CSS comparé",
+        "assertions navigateur"
+      ],
+      "sources": [
+        "SX-13"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-027",
+      "phase": "P0",
+      "group": "conditions",
+      "requirements": [
+        "ARC-09",
+        "P0-04"
+      ],
+      "given": "hover couvre :hover et data-hover ; disabled couvre les états déclarés.",
+      "when": "Activer chaque alternative séparément.",
+      "then": "Toutes les alternatives attendues produisent le style ; aucune perte de sémantique lors du portage.",
+      "evidence": [
+        "matrice d’états navigateur",
+        "sélecteurs générés"
+      ],
+      "sources": [
+        "PD-10"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-028",
+      "phase": "P0",
+      "group": "conditions",
+      "requirements": [
+        "ARC-09",
+        "P0-04"
+      ],
+      "given": "Deux min-width et deux max-width comparables, modules de sources dans différents ordres.",
+      "when": "Construire et tester les largeurs limites/chevauchements.",
+      "then": "Ordre numérique attendu, même résultat malgré ordre de parcours ; cascade conforme à la forme canonique.",
+      "evidence": [
+        "snapshots de règles",
+        "styles calculés aux bornes"
+      ],
+      "sources": [
+        "A-TESTS",
+        "SX-01"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-029",
+      "phase": "P0",
+      "group": "conditions",
+      "requirements": [
+        "ARC-09",
+        "P0-04"
+      ],
+      "given": "Définition avec em/rem, not/or, group/peer, @supports ou deux media imbriquées.",
+      "when": "Valider dans le profil P0.",
+      "then": "PMS_UNSUPPORTED_CONDITION ; aucune prétention de support par approximation.",
+      "evidence": [
+        "diagnostics par forme"
+      ],
+      "sources": [
+        "A-RISKS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-030",
+      "phase": "P0",
+      "group": "conditions",
+      "requirements": [
+        "ARC-09",
+        "P0-04"
+      ],
+      "given": "Une condition media et une condition self-state supportées.",
+      "when": "Compiler leur combinaison et activer quatre combinaisons de vérité.",
+      "then": "Style actif seulement lorsque les deux conditions sont vraies ; sortie sans double interprétation.",
+      "evidence": [
+        "CSS",
+        "quatre assertions navigateur"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-031",
+      "phase": "P0",
+      "group": "conditions",
+      "requirements": [
+        "ARC-09",
+        "P0-04"
+      ],
+      "given": "Deux noms de conditions avec la même définition canonique.",
+      "when": "Composer des déclarations concurrentes sur ces deux noms.",
+      "then": "Elles partagent la même identité de conflit ; aucune priorité arbitraire liée au nom.",
+      "evidence": [
+        "IR",
+        "style calculé"
+      ],
+      "sources": [
+        "A-ARCH"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-032",
+      "phase": "P0",
+      "group": "themes",
+      "requirements": [
+        "ARC-08",
+        "ARC-15",
+        "P0-03"
+      ],
+      "given": "Deux thèmes et mêmes tokens sémantiques.",
+      "when": "Appliquer light puis dark.",
+      "then": "Même identité de variable ; valeurs effectives attendues ; aucune réinterprétation de CSS brut.",
+      "evidence": [
+        "CSS",
+        "styles calculés",
+        "trace runtime"
+      ],
+      "sources": [
+        "SX-09",
+        "SX-10"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-033",
+      "phase": "P0",
+      "group": "themes",
+      "requirements": [
+        "ARC-08",
+        "P0-03"
+      ],
+      "given": "Thème dark surcharge une partie des tokens seulement.",
+      "when": "Calculer le thème effectif puis appliquer dark.",
+      "then": "Les non-surchargés héritent de la base, les références restent cohérentes ; pas de token manquant masqué.",
+      "evidence": [
+        "registre effectif",
+        "assertions navigateur"
+      ],
+      "sources": [
+        "A-P0"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-034",
+      "phase": "P0",
+      "group": "themes",
+      "requirements": [
+        "ARC-08",
+        "P0-03"
+      ],
+      "given": "Thème dark extérieur et light intérieur, puis l’inverse.",
+      "when": "Afficher les deux imbrications.",
+      "then": "Le sous-arbre utilise le thème demandé, sans fuite des valeurs extérieures.",
+      "evidence": [
+        "styles calculés pour chaque portée"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-035",
+      "phase": "P0",
+      "group": "themes",
+      "requirements": [
+        "ARC-08",
+        "P0-03",
+        "P0-04"
+      ],
+      "given": "Préférence système sombre avec sélection explicite light.",
+      "when": "Émuler la préférence puis changer uniquement la classe de thème.",
+      "then": "Préférence et sélection restent des mécanismes distincts ; la spec ne les assimile pas.",
+      "evidence": [
+        "test navigateur de préférence/thème"
+      ],
+      "sources": [
+        "PD-10",
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-036",
+      "phase": "P0",
+      "group": "recipes",
+      "requirements": [
+        "ARC-10",
+        "ARC-11",
+        "P0-05"
+      ],
+      "given": "Recipe base + deux axes ordonnés + défauts.",
+      "when": "Compiler et sélectionner toutes les valeurs déclarées.",
+      "then": "Styles attendus, inférence des domaines et sélection uniquement parmi des branches compilées.",
+      "evidence": [
+        "IR de branches",
+        "JS généré",
+        "styles calculés"
+      ],
+      "sources": [
+        "PD-05",
+        "A-P0"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-037",
+      "phase": "P0",
+      "group": "recipes",
+      "requirements": [
+        "ARC-10",
+        "P0-05"
+      ],
+      "given": "Deux axes écrivent la même propriété et la même condition.",
+      "when": "Appeler avec objets de props dans des ordres différents.",
+      "then": "Même résultat ; dernier axe selon axisOrder gagne, pas la dernière clé de l’objet d’appel.",
+      "evidence": [
+        "comparaison des résultats"
+      ],
+      "sources": [
+        "A-API",
+        "A-P0"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-038",
+      "phase": "P0",
+      "group": "recipes",
+      "requirements": [
+        "ARC-10",
+        "P0-05"
+      ],
+      "given": "Valeur absente, undefined, null, axe booléen false, axe inconnu, valeur inconnue.",
+      "when": "Compiler les cas statiques puis appeler avec des données runtime équivalentes.",
+      "then": "Défauts pour absence/undefined, false conservé, erreurs pour null/inconnus ; même contrat serveur/client.",
+      "evidence": [
+        "matrice de sélection",
+        "codes PMS_RECIPE_*"
+      ],
+      "sources": [
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-039",
+      "phase": "P0",
+      "group": "recipes",
+      "requirements": [
+        "ARC-10",
+        "P0-05"
+      ],
+      "given": "Choix runtime alimenté par une chaîne non typée.",
+      "when": "Sélectionner une valeur valide puis une valeur non déclarée.",
+      "then": "Le valide sélectionne une branche existante ; l’invalide lève PMS_RECIPE_VALUE avant tout style de remplacement.",
+      "evidence": [
+        "tests runtime",
+        "absence de CSS supplémentaire"
+      ],
+      "sources": [
+        "A-P0"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-040",
+      "phase": "P0",
+      "group": "recipes",
+      "requirements": [
+        "ARC-11",
+        "P0-05"
+      ],
+      "given": "Nombreux axes avec plusieurs valeurs chacun.",
+      "when": "Compiler sans compound variants.",
+      "then": "Nombre de branches au plus base + somme des valeurs ; aucun produit cartésien par défaut.",
+      "evidence": [
+        "comptage IR",
+        "mesure JS/CSS"
+      ],
+      "sources": [
+        "A-RISKS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-041",
+      "phase": "P0",
+      "group": "composition",
+      "requirements": [
+        "ARC-09",
+        "ARC-11",
+        "P0-05"
+      ],
+      "given": "Base contient hover, variante modifie seulement la valeur sans condition.",
+      "when": "Composer les branches normalisées.",
+      "then": "La valeur de base est surchargée ; hover reste présent. Une surcharge sous hover le remplace explicitement.",
+      "evidence": [
+        "test différentiel StyleX",
+        "assertions navigateur"
+      ],
+      "sources": [
+        "SX-13",
+        "SX-07"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-042",
+      "phase": "P0",
+      "group": "composition",
+      "requirements": [
+        "ARC-09",
+        "P0-02",
+        "P0-05"
+      ],
+      "given": "Conflit padding/paddingLeft puis propriétés logiques/physiques.",
+      "when": "Normaliser et composer dans les deux ordres.",
+      "then": "Résultat décrit par la forme normalisée et vérifié avec le moteur de référence ; aucune concaténation naïve des classes Panda.",
+      "evidence": [
+        "IR",
+        "comparaison moteur",
+        "navigateur"
+      ],
+      "sources": [
+        "SX-03",
+        "SX-07"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-043",
+      "phase": "P0",
+      "group": "capabilities",
+      "requirements": [
+        "ARC-07",
+        "ARC-11",
+        "P0-05",
+        "P0-08"
+      ],
+      "given": "Configuration contenant slots, compoundVariants ou patterns.",
+      "when": "Compiler avec capacités P0.",
+      "then": "PMS_UNSUPPORTED_FEATURE ; les champs ne sont ni acceptés ni ignorés silencieusement.",
+      "evidence": [
+        "diagnostics",
+        "manifeste de capacités"
+      ],
+      "sources": [
+        "B-PHASES"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-044",
+      "phase": "P0",
+      "group": "types",
+      "requirements": [
+        "ARC-03",
+        "P0-06"
+      ],
+      "given": "Registre avec plusieurs catégories et recipe.",
+      "when": "Générer les types et lancer les tests TypeScript positifs/négatifs.",
+      "then": "Domaines dérivés ; aucun maintien parallèle d’unions manuelles ; erreurs statiques sur tokens/axes invalides.",
+      "evidence": [
+        "sortie tsc",
+        "artefacts générés"
+      ],
+      "sources": [
+        "B-P0",
+        "PD-01"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-045",
+      "phase": "P0",
+      "group": "manifest",
+      "requirements": [
+        "ARC-03",
+        "ARC-17",
+        "P0-08"
+      ],
+      "given": "Registre avec tokens publics/privés et capacités P0.",
+      "when": "Produire le manifeste consommateur.",
+      "then": "Choix privés non sélectionnables ; noms/variantes/conditions/politiques cohérents ; capacités P1 explicitement fausses.",
+      "evidence": [
+        "manifeste validé",
+        "comparaison au registre"
+      ],
+      "sources": [
+        "B-TESTS",
+        "PV2-02"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-046",
+      "phase": "P0",
+      "group": "manifest",
+      "requirements": [
+        "ARC-03",
+        "ARC-14",
+        "P0-06",
+        "P0-08"
+      ],
+      "given": "Types, manifeste et CSS d’une génération, puis un artefact ancien.",
+      "when": "Vérifier les métadonnées de génération.",
+      "then": "L’artefact ancien est rejeté ou régénéré ; aucun mélange présenté comme génération valide.",
+      "evidence": [
+        "digests",
+        "rapport de génération"
+      ],
+      "sources": [
+        "A-API",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-047",
+      "phase": "P0",
+      "group": "diagnostics",
+      "requirements": [
+        "ARC-16",
+        "P0-07"
+      ],
+      "given": "Erreur dans un fichier importé et propagée dans du code généré.",
+      "when": "Compiler et émettre les diagnostics texte et JSON.",
+      "then": "Localisation du fichier d’origine, source liée, code stable et règle ; pas seulement une ligne de code généré.",
+      "evidence": [
+        "diagnostics",
+        "source maps"
+      ],
+      "sources": [
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-048",
+      "phase": "P0",
+      "group": "diagnostics",
+      "requirements": [
+        "ARC-16",
+        "P0-07"
+      ],
+      "given": "Candidats px, rem, privés ou non autorisés selon le rôle/thème.",
+      "when": "Demander une suggestion pour 17px.",
+      "then": "Seuls candidats admissibles et comparables classés ; contexte de thème explicite ; aucun autofix ; pas de comparaison artificielle d’unités.",
+      "evidence": [
+        "snapshots diagnostic"
+      ],
+      "sources": [
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-049",
+      "phase": "P0",
+      "group": "diagnostics",
+      "requirements": [
+        "ARC-16",
+        "P0-07"
+      ],
+      "given": "Même erreur avec ordre de parcours ou locale différents.",
+      "when": "Compiler plusieurs fois.",
+      "then": "Codes, ordre déterministe des erreurs et candidats, messages/contextes stables hors chemins de test normalisés.",
+      "evidence": [
+        "comparaison JSON normalisée"
+      ],
+      "sources": [
+        "B-TESTS",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-050",
+      "phase": "P0",
+      "group": "boundary",
+      "requirements": [
+        "ARC-12",
+        "ARC-13",
+        "P0-09"
+      ],
+      "given": "Page importe seulement le module généré ; réexport local supplémentaire.",
+      "when": "Introduire une valeur interdite dans cette route.",
+      "then": "Le fichier est contrôlé et échoue ; filtre upstream d’import non utilisé comme seul critère.",
+      "evidence": [
+        "rapport de couverture",
+        "diagnostic"
+      ],
+      "sources": [
+        "SX-11"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-051",
+      "phase": "P0",
+      "group": "boundary",
+      "requirements": [
+        "ARC-12",
+        "ARC-13",
+        "P0-09"
+      ],
+      "given": "Imports directs StyleX/Panda, alias de résolution et réexports via module local.",
+      "when": "Compiler chaque route depuis un consommateur.",
+      "then": "PMS_FORBIDDEN_IMPORT ; sous-chemins privés et alias ne contournent pas le contrôle.",
+      "evidence": [
+        "résolution des imports",
+        "diagnostics"
+      ],
+      "sources": [
+        "B-P0",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-052",
+      "phase": "P0",
+      "group": "boundary",
+      "requirements": [
+        "ARC-12",
+        "ARC-13",
+        "P0-09"
+      ],
+      "given": "API atoms, sx, defineVars, keyframes ou appel bas niveau hors surface autorisée.",
+      "when": "Essayer chacun des chemins upstream inventoriés.",
+      "then": "Chaque chemin est contrôlé ou refusé explicitement ; aucun visiteur alternatif non couvert.",
+      "evidence": [
+        "inventaire des entrées",
+        "fixtures négatives"
+      ],
+      "sources": [
+        "SX-01",
+        "SX-08"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-053",
+      "phase": "P0",
+      "group": "boundary",
+      "requirements": [
+        "ARC-12",
+        "P0-09"
+      ],
+      "given": "Page crée des tokens ou affirme trusted:true ; configuration ne lui donne pas le rôle auteur.",
+      "when": "Compiler.",
+      "then": "PMS_ROLE_VIOLATION ; une déclaration auto-attribuée ne crée pas d’autorité.",
+      "evidence": [
+        "diagnostic de rôle"
+      ],
+      "sources": [
+        "A-API"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-054",
+      "phase": "P0",
+      "group": "boundary",
+      "requirements": [
+        "ARC-13",
+        "P0-09"
+      ],
+      "given": "JSX style/className bruts, spread pouvant les porter, et import CSS local non autorisé.",
+      "when": "Compiler dans le profil fermé avec chaque forme.",
+      "then": "PMS_FORBIDDEN_STYLE_CHANNEL ou PMS_UNVERIFIED_JSX_SPREAD ; preuve contraire obligatoire pour les spreads admis.",
+      "evidence": [
+        "fixtures scanner",
+        "diagnostics"
+      ],
+      "sources": [
+        "B-GUARDS",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-055",
+      "phase": "P0",
+      "group": "boundary",
+      "requirements": [
+        "ARC-13",
+        "P0-09",
+        "ARC-04"
+      ],
+      "given": "Fichier invalide couvert par une racine mais retiré d’un filtre secondaire.",
+      "when": "Lancer le build de conformité.",
+      "then": "PMS_COVERAGE_GAP ou analyse effective ; exclure le fichier ne permet pas un PASS.",
+      "evidence": [
+        "inventaire racines/imports",
+        "rapport de couverture"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-056",
+      "phase": "P0",
+      "group": "incremental",
+      "requirements": [
+        "ARC-14",
+        "P0-10"
+      ],
+      "given": "Build valide puis suppression d’un token utilisé sans modification du consommateur.",
+      "when": "Rebuild et génération de types.",
+      "then": "Échec aux usages périmés, types/manifeste recalculés, ancienne génération non présentée comme nouvelle.",
+      "evidence": [
+        "logs de watch",
+        "digests",
+        "diagnostics"
+      ],
+      "sources": [
+        "B-TESTS",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-057",
+      "phase": "P0",
+      "group": "incremental",
+      "requirements": [
+        "ARC-14",
+        "P0-10"
+      ],
+      "given": "Build valide puis changement de valeur de token.",
+      "when": "Rebuild.",
+      "then": "Digest/CSS mis à jour, identité logique de variable préservée, aucun artefact périmé.",
+      "evidence": [
+        "comparaison avant/après"
+      ],
+      "sources": [
+        "A-TESTS",
+        "SX-09"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-058",
+      "phase": "P0",
+      "group": "incremental",
+      "requirements": [
+        "ARC-14",
+        "P0-10"
+      ],
+      "given": "Build valide puis retrait d’un mot-clé autorisé ou condition renommée.",
+      "when": "Rebuild sans toucher aux usages.",
+      "then": "Tous les usages concernés sont revalidés ; aucun résultat cache sous ancienne politique.",
+      "evidence": [
+        "logs d’invalidation",
+        "diagnostics"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-059",
+      "phase": "P0",
+      "group": "incremental",
+      "requirements": [
+        "ARC-14",
+        "P0-10"
+      ],
+      "given": "Deux systèmes/projets avec mêmes chemins relatifs mais registres différents.",
+      "when": "Construire en parallèle puis en séquence.",
+      "then": "Aucune contamination de caches, règles ou types ; clés isolées par contexte.",
+      "evidence": [
+        "tests multi-contextes",
+        "artefacts comparés"
+      ],
+      "sources": [
+        "SX-11",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-060",
+      "phase": "P0",
+      "group": "incremental",
+      "requirements": [
+        "ARC-14",
+        "P0-10"
+      ],
+      "given": "Échec forcé pendant la génération après une génération valide.",
+      "when": "Construire à nouveau.",
+      "then": "Statut échec ; aucun résultat partiellement publié comme courant ; dernier valide identifiable uniquement comme ancien.",
+      "evidence": [
+        "rapport de génération",
+        "état des fichiers"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-061",
+      "phase": "P0",
+      "group": "integration",
+      "requirements": [
+        "ARC-15",
+        "P0-11"
+      ],
+      "given": "Pilote SSR/client avec mêmes props et thème initial.",
+      "when": "Rendre puis hydrater.",
+      "then": "Classes/variables cohérentes, CSS présent au premier rendu, aucune divergence d’hydratation attribuable au styling.",
+      "evidence": [
+        "HTML SSR",
+        "console navigateur",
+        "styles calculés"
+      ],
+      "sources": [
+        "A-P0",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-062",
+      "phase": "P0",
+      "group": "integration",
+      "requirements": [
+        "ARC-02",
+        "ARC-11",
+        "P0-05",
+        "P0-11"
+      ],
+      "given": "Pilote construit et styles/branches finies chargés.",
+      "when": "Changer variantes et thème dans le navigateur.",
+      "then": "Aucune nouvelle compilation CSS ni injection de règles pour ces sélections ; runtime borné.",
+      "evidence": [
+        "instrumentation DOM/CSSOM",
+        "inspection bundle"
+      ],
+      "sources": [
+        "SX-06",
+        "PD-05"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-063",
+      "phase": "P0",
+      "group": "integration",
+      "requirements": [
+        "ARC-14",
+        "ARC-15",
+        "P0-11"
+      ],
+      "given": "Même fixture avec build froid, cache chaud et clone déplacé.",
+      "when": "Comparer les sorties pertinentes.",
+      "then": "Mêmes identités et CSS sémantique ; différences de source maps absolues isolées des artefacts déterministes.",
+      "evidence": [
+        "hashes des artefacts normalisés",
+        "comparatif"
+      ],
+      "sources": [
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-064",
+      "phase": "P0",
+      "group": "distribution",
+      "requirements": [
+        "ARC-01",
+        "ARC-18",
+        "P0-12"
+      ],
+      "given": "Packages construits puis empaquetés localement.",
+      "when": "Installer dans une application hors workspace et compiler.",
+      "then": "Exports/types/sidecars présents ; pas de dépendance publique au second moteur Panda ni façade exécutant StyleX upstream à sa place.",
+      "evidence": [
+        "pack tarball inventory",
+        "build externe",
+        "graphe des dépendances"
+      ],
+      "sources": [
+        "A-UPSTREAM",
+        "A-TESTS"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-065",
+      "phase": "P0",
+      "group": "distribution",
+      "requirements": [
+        "ARC-18",
+        "P0-12"
+      ],
+      "given": "Packages de distribution finaux.",
+      "when": "Contrôler attributions et dépendances effectivement livrées.",
+      "then": "Mentions applicables conservées, provenance et licences transitives documentées ; absence non remplacée par la seule mention MIT racine.",
+      "evidence": [
+        "inventaire de licences",
+        "registre de portage"
+      ],
+      "sources": [
+        "A-UPSTREAM"
+      ],
+      "status": "specified_not_run"
+    },
+    {
+      "id": "AC-066",
+      "phase": "P0",
+      "group": "performance",
+      "requirements": [
+        "ARC-02",
+        "ARC-11",
+        "P0-06",
+        "P0-11",
+        "P0-12"
+      ],
+      "given": "Fixtures petite/moyenne/grande, référence StyleX et machines/outils documentés.",
+      "when": "Mesurer build froid/chaud, changement de registre, génération/tsc, mémoire, tailles JS/CSS et sélection runtime.",
+      "then": "Mesures brutes et comparaisons publiées ; aucune conclusion de performance ni plafond prétendument validé sans budget décidé.",
+      "evidence": [
+        "résultats bruts",
+        "méthode",
+        "versions",
+        "analyse des écarts"
+      ],
+      "sources": [
+        "A-TESTS",
+        "A-RISKS"
+      ],
+      "status": "specified_not_run"
+    }
+  ]
+}

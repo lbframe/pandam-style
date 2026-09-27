@@ -1,0 +1,395 @@
+Oui. Le choix **fork StyleX + idées de Panda CSS** venait moins d’une préférence de framework que d’un besoin architectural très précis : **faire un système de styling pensé pour des agents IA, où la qualité visuelle est contrainte par le système plutôt que laissée à la discipline du prompt**.
+
+Le problème de départ était celui-ci : avec un agent qui génère du frontend, le danger principal n’est pas seulement qu’il fasse du mauvais CSS. C’est qu’il **réinvente en permanence des micro-décisions de design** : un `17px` ici, un nouveau gris là, un breakpoint exotique, une ombre différente, un radius légèrement différent, etc. Au bout de quelques centaines de composants, tu obtiens un produit visuellement incohérent même si chaque écran pris individuellement est “correct”.
+
+Ton besoin était donc de construire un environnement où **l’agent compose avec un vocabulaire autorisé**, plutôt qu’un environnement où il a accès à tout CSS.
+
+### Pourquoi StyleX nous intéressait
+
+StyleX avait plusieurs qualités qui correspondaient très bien à ton approche.
+
+D’abord, c’est un système **compiler-first et statique**. Tu voulais éviter une couche CSS-in-JS magique qui interprète beaucoup de choses au runtime. Pour un système utilisé massivement par des agents, le déterminisme est très précieux : même entrée, même compilation, même CSS.
+
+Ensuite, StyleX donne une base relativement basse couche. C’était important parce que tu ne voulais pas adopter toute la philosophie d’un framework UI existant. Tu construis ton propre **Framework UI LB**, donc il te fallait davantage un moteur qu’un produit fini.
+
+Enfin, StyleX est particulièrement intéressant pour une architecture où les styles restent proches du code tout en étant extraits statiquement. Ça correspond bien à des agents qui modifient des composants TS/TSX sans devoir jongler en permanence entre plusieurs langages ou fichiers de styles.
+
+En gros, StyleX répondait bien à :
+
+**“Quel moteur voulons-nous sous notre design system ?”**
+
+Mais pas suffisamment à :
+
+**“Comment empêcher un agent de massacrer progressivement notre design system ?”**
+
+C’est là que Panda entrait en jeu.
+
+---
+
+### Ce qu’on aimait réellement dans Panda CSS
+
+Panda était presque l’inverse : ce n’était pas nécessairement le moteur qu’on voulait conserver à long terme, mais il avait plusieurs **idées de design-system extrêmement pertinentes**.
+
+La plus importante était `strictTokens`.
+
+C’est probablement le point qui a déclenché toute la réflexion.
+
+Avec un système strict, tu peux dire en substance :
+
+> Pour `padding`, tu ne choisis pas une valeur CSS. Tu choisis une valeur dans notre échelle de spacing.
+
+Donc l’agent ne peut plus faire :
+
+```ts
+padding: "17px"
+```
+
+Il doit faire :
+
+```ts
+padding: "md"
+```
+
+Même logique pour les couleurs, shadows, radius, font sizes, etc.
+
+Ce n’est plus une recommandation dans un `DESIGN.md`.  
+C’est une **contrainte du compilateur**.
+
+Et c’est exactement ce que tu cherchais pour les agents.
+
+---
+
+### Le deuxième besoin : séparer valeur et intention
+
+Panda nous plaisait aussi pour ses **semantic tokens**.
+
+Tu ne voulais pas que l’agent sache ou décide que le fond d’une carte vaut `#141414`.
+
+Tu voulais qu’il exprime :
+
+```ts
+backgroundColor: "surface.elevated"
+```
+
+Pourquoi ?
+
+Parce que l’agent manipule alors la **sémantique du design system**, pas son implémentation.
+
+C’est beaucoup plus robuste.
+
+Demain tu peux changer :
+
+```text
+surface.elevated
+```
+
+de `#141414` à `#171717`, et toute l’application change sans que l’agent ait besoin de comprendre quoi que ce soit.
+
+Encore plus important, ça permet d’avoir des designs multi-theme, dark/light, voire multi-brand sans que le code produit soit rempli de valeurs concrètes.
+
+---
+
+### Le troisième besoin : empêcher l’agent de redessiner les composants
+
+Les **recipes** de Panda répondaient à un autre problème.
+
+Sans recipes, un agent confronté à un bouton peut se dire :
+
+> OK, je vais lui mettre ce padding, ce radius, cette couleur, cette typo…
+
+Alors que ce que tu veux est plutôt :
+
+```ts
+button({
+  variant: "primary",
+  size: "md"
+})
+```
+
+L’agent choisit parmi des décisions **déjà validées par le design system**.
+
+C’est une différence fondamentale.
+
+Tu passes de :
+
+> “Génère le design du bouton.”
+
+à :
+
+> “Choisis la variante appropriée du bouton.”
+
+Et cette idée s’applique aux cards, alerts, navigation, dialogs, inputs, etc.
+
+D’où aussi notre intérêt pour les **slot recipes**, parce qu’un composant complexe n’est pas juste un style unique :
+
+```text
+Card
+├── root
+├── header
+├── title
+├── body
+└── footer
+```
+
+Il faut pouvoir faire varier l’ensemble sans autoriser chaque écran à redéfinir individuellement chaque slot.
+
+---
+
+### Le quatrième besoin : contraindre aussi le layout
+
+Tu avais le même problème pour la composition des pages.
+
+Un agent peut très facilement produire :
+
+```css
+max-width: 1173px;
+padding-left: 37px;
+gap: 19px;
+```
+
+et ça reste techniquement “correct”.
+
+Mais ça détruit progressivement la cohérence du site.
+
+Les **patterns** de Panda donnaient une piste particulièrement intéressante :
+
+```tsx
+<Section>
+  <Container>
+    <Stack gap="lg">
+      ...
+    </Stack>
+  </Container>
+</Section>
+```
+
+Donc là encore, l’agent ne décide plus librement de 15 propriétés CSS.
+
+Il choisit une primitive de layout :
+
+- `Stack`
+- `Cluster`
+- `Grid`
+- `Container`
+- `Section`
+- `Split`
+- etc.
+
+Ça rejoint très directement ton objectif avec le redesign LB Frame : **la qualité AAA ne doit pas dépendre du fait que l’agent ait “du goût” à chaque génération**.
+
+Le goût doit être **encodé dans le système**.
+
+---
+
+### Le cinquième besoin : rendre les erreurs exploitables par un agent
+
+C’était aussi une raison importante pour laquelle un simple assemblage de librairies existantes ne nous suffisait pas.
+
+Si un agent écrit :
+
+```ts
+padding: "17px"
+```
+
+et que le compilateur répond :
+
+```text
+Invalid property value
+```
+
+ça ne suffit pas.
+
+Pour un système réellement agent-friendly, on voulait quelque chose comme :
+
+```text
+Raw spacing value "17px" is forbidden.
+
+Closest allowed token:
+space.md = 16px
+
+Use:
+padding: "space.md"
+```
+
+Autrement dit, le compilateur devient presque une **API de feedback pour agents**.
+
+L’agent doit pouvoir :
+
+1. générer ;
+2. compiler ;
+3. recevoir un diagnostic ;
+4. réparer automatiquement.
+
+Ça correspond d’ailleurs assez bien à ta philosophie générale sur les agents : **on ne leur fait pas confiance pour tout bien faire du premier coup ; on construit les garde-fous qui les obligent à vérifier et corriger**. 
+
+---
+
+### Pourquoi on n’a finalement pas retenu “Panda + StyleX côte à côte”
+
+À un moment, la stack avait été formulée comme :
+
+```text
+Framework UI LB
+├── Panda CSS
+├── StyleX
+└── Ark UI
+```
+
+Mais ça posait immédiatement un problème conceptuel.
+
+Si l’agent a deux systèmes de styling disponibles, il doit choisir :
+
+> Est-ce que je fais ça avec Panda ou avec StyleX ?
+
+Et tu recrées précisément ce qu’on voulait supprimer : **une décision ambiguë supplémentaire**.
+
+Il pouvait même commencer un composant dans l’un et finir dans l’autre.
+
+Donc on est arrivé à l’idée qu’il ne fallait pas réellement une “coexistence”.
+
+Il fallait :
+
+```text
+une seule API publique
+        ↓
+LB Frame Style System
+        ↓
+StyleX comme moteur
+        +
+les bonnes idées de Panda
+```
+
+Panda devenait alors davantage un **corpus d’idées à reprendre** qu’une dépendance runtime à exposer aux développeurs.
+
+---
+
+### Pourquoi forker plutôt que simplement wrapper StyleX
+
+Au début, le wrapper est évidemment séduisant.
+
+Tu pourrais faire :
+
+```text
+@lbframe/ui
+   ↓
+wrapper
+   ↓
+StyleX
+```
+
+et implémenter recipes, patterns, tokens au-dessus.
+
+Mais certaines contraintes que tu veux sont plus profondes.
+
+Par exemple :
+
+```ts
+padding: "17px"
+```
+
+Si StyleX accepte cette valeur avant que ton système ait réellement la possibilité de l’interdire proprement, tu te retrouves soit avec :
+
+- du lint ;
+- du post-processing ;
+- des conventions ;
+- des wrappers faciles à contourner.
+
+Or ton besoin était justement :
+
+> **les invariants importants ne doivent pas être contournables par accident.**
+
+Le fork devient pertinent si on constate qu’il faut intervenir dans :
+
+- la validation AST ;
+- la résolution des valeurs ;
+- les types ;
+- le compiler pipeline ;
+- les diagnostics ;
+- éventuellement les metadata générées.
+
+C’est aussi pour ça que le brief GPT-6 Pro lui demande explicitement de vérifier une chose avant de coder :
+
+> **quelles features nécessitent réellement un fork du core StyleX et lesquelles peuvent rester dans une couche LB Frame upstream-compatible ?**
+
+Parce que le meilleur résultat n’est pas forcément “modifier 40 % de StyleX”.
+
+Le meilleur résultat serait probablement :
+
+```text
+StyleX fork
+│
+├── modifications core minimales
+│   ├── hooks validation
+│   ├── diagnostics
+│   └── primitives nécessaires
+│
+└── LB Frame packages
+    ├── tokens
+    ├── recipes
+    ├── patterns
+    └── policy engine
+```
+
+Donc fork oui, mais **surface de fork minimale**.
+
+---
+
+## Ton besoin réel derrière tout ça
+
+Si je le reformule aujourd’hui, je dirais que tu ne cherches pas vraiment “un meilleur CSS framework”.
+
+Tu cherches un **langage de design contraint pour agents**.
+
+L’objectif final ressemble davantage à ça :
+
+```text
+Agent
+  │
+  │ "je veux une section hero avec CTA"
+  ▼
+Allowed design vocabulary
+  │
+  ├── Hero recipe
+  ├── Section
+  ├── Container
+  ├── Stack
+  ├── Button.primary
+  └── semantic tokens
+  │
+  ▼
+Compiler + policy engine
+  │
+  ├── reject invalid values
+  ├── reject arbitrary design
+  ├── suggest fixes
+  └── statically extract CSS
+  │
+  ▼
+Consistent UI
+```
+
+L’agent garde une grande liberté sur :
+
+- la structure du contenu ;
+- la hiérarchie ;
+- la composition ;
+- le choix des composants ;
+- les variantes appropriées.
+
+Mais beaucoup moins sur :
+
+- les couleurs ;
+- les espacements ;
+- les breakpoints ;
+- les shadows ;
+- les radii ;
+- la typographie ;
+- les détails internes des composants.
+
+C’est là qu’on avait fini par arriver à notre phrase-clé :
+
+> **The page-generation LLM performs composition, not micro-design.**
+
+Et je pense que c’est encore aujourd’hui la meilleure définition du besoin.
+
+Le fork StyleX + les idées Panda n’est donc que **la conséquence technique** de ce principe, pas le principe lui-même.

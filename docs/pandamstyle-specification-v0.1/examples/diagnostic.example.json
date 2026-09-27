@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "documentKind": "illustrative-diagnostic",
+  "code": "PMS_RAW_DESIGN_VALUE",
+  "severity": "error",
+  "phase": "policy",
+  "message": "Raw spacing value \"17px\" is forbidden for property \"padding\".",
+  "location": {
+    "file": "src/page.tsx",
+    "start": {
+      "line": 8,
+      "column": 14
+    },
+    "end": {
+      "line": 8,
+      "column": 20
+    }
+  },
+  "systemId": "conformance",
+  "registryDigest": "$REGISTRY_DIGEST",
+  "property": "padding",
+  "category": "spacing",
+  "received": "17px",
+  "rule": "token-only",
+  "sourceRole": "consumer",
+  "candidates": [
+    {
+      "tokenId": "spacing.md",
+      "value": "16px",
+      "theme": "light",
+      "distance": "1px",
+      "reason": "Visible spacing token with a comparable px value."
+    }
+  ],
+  "autofix": null,
+  "relatedLocations": []
+}

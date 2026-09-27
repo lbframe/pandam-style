@@ -1,0 +1,240 @@
+{
+  "project": "PandamStyle",
+  "artifactType": "architecture-and-p0-specification",
+  "version": "0.1",
+  "date": "2026-09-28",
+  "status": "draft-proposal-not-implemented",
+  "acceptanceCasesSpecified": 66,
+  "compilerBuildsExecuted": 0,
+  "compilerTestsExecuted": 0,
+  "baselines": {
+    "stylex": {
+      "repository": "facebook/stylex",
+      "ref": "main",
+      "commit": "fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2"
+    },
+    "panda_v1": {
+      "repository": "chakra-ui/panda",
+      "ref": "@pandacss/postcss@1.12.1",
+      "commit": "1a310482ff18102c44b2a478b7644b064a80d7c6",
+      "tag_object": "0eeeb891145622b7737a96dc402ef14208851f16"
+    },
+    "panda_v2": {
+      "repository": "chakra-ui/panda",
+      "ref": "v2",
+      "commit": "c171f630adc6dec4a1f9e4b9a79ef706d8278aae"
+    }
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "sizeBytes": 3218,
+      "sha256": "1a9d765debc12b948b547e0685071c064ad12eb1caef4f76c3f3930fa1aea534"
+    },
+    {
+      "path": "SOURCES.md",
+      "sizeBytes": 12376,
+      "sha256": "c6fbdfd3e5281e0d84329b5d9596e391031d30c8ff7de8afacab75e8d982fe8b"
+    },
+    {
+      "path": "VALIDATION.md",
+      "sizeBytes": 912,
+      "sha256": "ec7bef6c78ddc0850d394d885b0934ca1ae230a250209e8e69d9e8c716c5c2fa"
+    },
+    {
+      "path": "acceptance/cases.json",
+      "sizeBytes": 39772,
+      "sha256": "fa08db09e03c5203be5d1d7facba2d78bb47b4d4c5de8e65588b10547323c876"
+    },
+    {
+      "path": "evidence/audit/MANIFEST.json",
+      "sizeBytes": 2851,
+      "sha256": "f7e270af5e0b46450daf52e9676f01584123644bbe2da92bc41d389cb8bf76dc"
+    },
+    {
+      "path": "evidence/audit/README.md",
+      "sizeBytes": 4367,
+      "sha256": "167fbe3f215189acdebbd48efd5177ee40a06907562d5b6d8080c66debae068b"
+    },
+    {
+      "path": "evidence/audit/SOURCES.md",
+      "sizeBytes": 11176,
+      "sha256": "091c32a999accde28ed9cc1ffdc16452eb6b2cd806fe52ad98fd4c6c15b89618"
+    },
+    {
+      "path": "evidence/audit/analysis/API_PROPOSAL.md",
+      "sizeBytes": 6003,
+      "sha256": "5c039dfff1032a5977fbb9517275c40810f91e22b014d0697d106ce59663c504"
+    },
+    {
+      "path": "evidence/audit/analysis/ARCHITECTURE.md",
+      "sizeBytes": 9002,
+      "sha256": "66816662b79101c9b1d0784347d980a72803aadc6df218a13496dd1d580d724f"
+    },
+    {
+      "path": "evidence/audit/analysis/DECISION.md",
+      "sizeBytes": 6035,
+      "sha256": "998445470d6cc895f5b2e2dfb1bb99dcfc9341f57e5724096b29a9acb66b7357"
+    },
+    {
+      "path": "evidence/audit/analysis/FEATURE_MATRIX.md",
+      "sizeBytes": 7159,
+      "sha256": "77150455d9925d739dd2f564df3b9ea20ecee6555f4b91d2b40336a9e5c69572"
+    },
+    {
+      "path": "evidence/audit/analysis/FILE_CHANGE_PLAN.md",
+      "sizeBytes": 8071,
+      "sha256": "ea323d3ae31056bc6e2b4cfb8f5982286cded3edd1a0c847f97b0541d617459b"
+    },
+    {
+      "path": "evidence/audit/analysis/GAP_ANALYSIS.md",
+      "sizeBytes": 8341,
+      "sha256": "2c0a52c212ccc504e7c6cb28f69c7d5ea5f3c6b7be589310a503f4738aa011ff"
+    },
+    {
+      "path": "evidence/audit/analysis/P0_IMPLEMENTATION_PLAN.md",
+      "sizeBytes": 6026,
+      "sha256": "f6a6568370888846fe130e49e8ef59f22227bad6da48d632fec55926dbb7fb37"
+    },
+    {
+      "path": "evidence/audit/analysis/RISK_REGISTER.md",
+      "sizeBytes": 6122,
+      "sha256": "6f33783fb613b642f8fe2a7c4e5d18bf0c389a8b5eedf4d06f324304fbefd8d3"
+    },
+    {
+      "path": "evidence/audit/analysis/TEST_PLAN.md",
+      "sizeBytes": 6661,
+      "sha256": "efe286ceff1dd62666b2f40dd4a9cb5d00d0576fe065d81c1122995cd2a9e8cd"
+    },
+    {
+      "path": "evidence/audit/analysis/UPSTREAM_COMPATIBILITY.md",
+      "sizeBytes": 5315,
+      "sha256": "3224cef1d1235c7680e5fdd8dcc66a15009756db5fcc1c1229f8310b4d4472ed"
+    },
+    {
+      "path": "evidence/audit/source-map.json",
+      "sizeBytes": 12082,
+      "sha256": "22f5fee8d0a8b2fe0e4b3b8467eab22bbb2ec4c26adc7d1bb25f1ba252c25d47"
+    },
+    {
+      "path": "evidence/founding-contract-v0.1.md",
+      "sizeBytes": 16506,
+      "sha256": "fb325cd2fd534a22d68f47cb7c23e01cc47b040637fd4c626e7d1f032f65bc3d"
+    },
+    {
+      "path": "evidence/input-files.json",
+      "sizeBytes": 539,
+      "sha256": "a165becfb6af87f3e0792f20034810248ac00299e8e76d5c293c0bee5129ad1c"
+    },
+    {
+      "path": "evidence/original-brief/01_CONTEXT.md",
+      "sizeBytes": 1948,
+      "sha256": "5b2e0635e864d8d9851db484497ff8b442df181b310194b21718017fac42fd87"
+    },
+    {
+      "path": "evidence/original-brief/02_TARGET_ARCHITECTURE.md",
+      "sizeBytes": 1829,
+      "sha256": "b84cb9dfbd10e62ef4c9ae99c2dcc6253058f7c7bb0b07c4635d6483655a9de2"
+    },
+    {
+      "path": "evidence/original-brief/03_FEATURE_MATRIX.md",
+      "sizeBytes": 1861,
+      "sha256": "f326b7f083a1accc0f506134e5709340a6dd4509efb8b03638dcf646dbc4c21c"
+    },
+    {
+      "path": "evidence/original-brief/04_P0_SPEC.md",
+      "sizeBytes": 3767,
+      "sha256": "9eee10ebb54545d830806525fd12c0a41bde2db76215b0e3f63cf7aa1d9537b1"
+    },
+    {
+      "path": "evidence/original-brief/05_P1_P2_ROADMAP.md",
+      "sizeBytes": 2128,
+      "sha256": "7deea0a0477318a273f2721855b137d3e72a52de44ebfb5fb2e5893a432b3ef2"
+    },
+    {
+      "path": "evidence/original-brief/06_AGENT_GUARDRAILS.md",
+      "sizeBytes": 1553,
+      "sha256": "b7b15d4e8df60c9a49829f559c4432808680897b811e673ce53fadf3cfe8c34c"
+    },
+    {
+      "path": "evidence/original-brief/07_ACCEPTANCE_TESTS.md",
+      "sizeBytes": 1975,
+      "sha256": "2ee5dc46e1905d72cdd4b0bdec3a1235be4d5f325c798046134bad8d213bd8fe"
+    },
+    {
+      "path": "evidence/original-brief/08_GPT6_PRO_BRIEF.md",
+      "sizeBytes": 3916,
+      "sha256": "d105514830065879c049df92ee6ff02d2efeaa228d22a4064d179b4793012205"
+    },
+    {
+      "path": "evidence/original-brief/09_OPEN_QUESTIONS.md",
+      "sizeBytes": 1755,
+      "sha256": "6c255eadd3f760081691fb075cba71360bd86611c471b6d3c38ffb839492d778"
+    },
+    {
+      "path": "evidence/original-brief/README.md",
+      "sizeBytes": 2367,
+      "sha256": "fa8a224a4a7168e2bdc0c193dd3118f43006aa9b313e0ec785e53008b30f1016"
+    },
+    {
+      "path": "evidence/original-brief/manifest.json",
+      "sizeBytes": 749,
+      "sha256": "6c6d4bdddbaa7412716529a86dadd910d35978ac76a6a1fb3ad9f576917e9765"
+    },
+    {
+      "path": "evidence/rationale.txt",
+      "sizeBytes": 10844,
+      "sha256": "7237416d5804e10001dbda4bd9ea87b87641e9305cfda534edf7782d9f655909"
+    },
+    {
+      "path": "evidence/source-map-for-spec.json",
+      "sizeBytes": 12969,
+      "sha256": "0f328b77e68ecf6bdeaae99bc372358e2570d2df32ddaaa2d95be1f9b3483003"
+    },
+    {
+      "path": "examples/README.md",
+      "sizeBytes": 1719,
+      "sha256": "64333805c00b88f00a6a862bef7a6cb5273177df52b276e7168fa4f30b474e68"
+    },
+    {
+      "path": "examples/build-report.example.json",
+      "sizeBytes": 6866,
+      "sha256": "b5ebdb107c62b57ce06faf3793b2166c428db971c213c4ba210fb3aee60dea16"
+    },
+    {
+      "path": "examples/diagnostic.example.json",
+      "sizeBytes": 836,
+      "sha256": "ec53ee62fc9f606ed695db49f1029a140a455993c13ac862d830ffc5889f88f1"
+    },
+    {
+      "path": "examples/manifest.example.json",
+      "sizeBytes": 2392,
+      "sha256": "51b7ad834ceeacb77dbcc6ebe78d9d3778b9b1df280f7aaa04fe41f3c8eefb9d"
+    },
+    {
+      "path": "specs/01-ARCHITECTURE.md",
+      "sizeBytes": 25154,
+      "sha256": "69a41ec97b8a712c68838286a9895b3e65274ec42b5b515db6c43c9885ea1e7c"
+    },
+    {
+      "path": "specs/02-P0-SCOPE.md",
+      "sizeBytes": 17250,
+      "sha256": "0349372b6f48c48c0563b54b41fcd1f9a858d201126c08d9fda26da5e509a40c"
+    },
+    {
+      "path": "specs/03-ACCEPTANCE.md",
+      "sizeBytes": 10267,
+      "sha256": "9151e2221fbc514cddee701466f05e23b9682cc360af7ad4a474d5ce76d302c9"
+    },
+    {
+      "path": "specs/04-DECISIONS.md",
+      "sizeBytes": 9273,
+      "sha256": "2b7ba5dc7c2188d2e3829d68d9f1fc5dd21529d23e712244f18f3b519fbf2e4b"
+    },
+    {
+      "path": "validation.json",
+      "sizeBytes": 379,
+      "sha256": "b61d0607142148618b3f3c403efe842bf778e663aad289210de005b791567cd1"
+    }
+  ]
+}
