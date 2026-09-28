@@ -21,7 +21,12 @@ module.exports = {
   plugins: [
     ['babel-plugin-syntax-hermes-parser', { flow: 'detect' }],
     ...(isESM
-      ? [[require.resolve('./babel-plugins/add-mjs-extension.js'), { extension: '.mjs' }]]
+      ? [
+          [
+            require.resolve('./babel-plugins/add-mjs-extension.js'),
+            { extension: '.mjs' },
+          ],
+        ]
       : []),
   ],
 };

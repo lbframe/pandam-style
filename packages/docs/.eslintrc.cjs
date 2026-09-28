@@ -16,11 +16,10 @@ module.exports = {
     '@stylexjs/valid-styles': 'error',
     '@stylexjs/no-unused': 'error',
     '@stylexjs/no-legacy-contextual-styles': 'error',
-    '@stylexjs/sort-keys': ['error', {order: 'recess'}],
+    '@stylexjs/sort-keys': ['error', { order: 'recess' }],
     'ft-flow/space-after-type-colon': 0,
     'ft-flow/no-types-missing-file-annotation': 0,
     'ft-flow/generic-spacing': 0,
     'react/jsx-pascal-case': 0,
   },
 };
-  

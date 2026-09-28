@@ -65,7 +65,13 @@ module.exports = {
   ],
   overrides: [
     {
-      files: ['*.ts', '*.tsx'],
+      // TypeScript-family sources. The .mts and .cts entries are the ESM and
+      // CommonJS TypeScript extensions; without them those files fall back to
+      // the default hermes parser and are judged by the Flow type rules, which
+      // reject TypeScript annotations. They match the surface extensions
+      // rather than the tracked file count, so a future .cts file is parsed as
+      // TypeScript from the moment it is added to the --ext list below.
+      files: ['*.ts', '*.tsx', '*.mts', '*.cts'],
       parser: '@typescript-eslint/parser',
       parserOptions: {
         ecmaVersion: 'latest',

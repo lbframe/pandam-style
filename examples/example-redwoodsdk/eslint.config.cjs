@@ -16,7 +16,12 @@ const stylexRules = {
 
 module.exports = [
   {
-    ignores: ['dist/**', 'node_modules/**', 'types/**', 'worker-configuration.d.ts'],
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'types/**',
+      'worker-configuration.d.ts',
+    ],
   },
   {
     files: ['**/*.{js,jsx,mjs,cjs}'],

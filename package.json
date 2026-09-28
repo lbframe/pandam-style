@@ -10,10 +10,10 @@
     "build": "npm run build --workspaces --if-present",
     "build:examples": "npm run example:build --workspaces --if-present",
     "flow": "flow",
-    "prettier": "prettier --write \"**/*.{js,flow,mjs,tsx,ts}\"",
-    "prettier:report": "prettier --check \"**/*.{js,flow,mjs,tsx,ts}\"",
+    "prettier": "prettier --write \"**/*.{js,jsx,mjs,cjs,flow,tsx,mts,ts}\"",
+    "prettier:report": "prettier --check \"**/*.{js,jsx,mjs,cjs,flow,tsx,mts,ts}\"",
     "lint": "npm run lint:report -- --fix",
-    "lint:report": "eslint . --ext .flow,.js,.jsx,.mjs,.ts,.tsx",
+    "lint:report": "eslint . --ext .flow,.js,.jsx,.mjs,.cjs,.ts,.tsx,.mts",
     "release": "tools/npm/release.js",
     "test:packages": "npm run test --workspaces --if-present",
     "test": "npm run build && npm run flow && npm run test:packages && npm run prettier:report && npm run lint:report"
@@ -66,6 +66,7 @@
           "*.js",
           "*.jsx",
           "*.mjs",
+          "*.cjs",
           "*.flow"
         ],
         "options": {
@@ -75,7 +76,7 @@
     ]
   },
   "lint-staged": {
-    "**/*.{js,jsx,mjs,flow,ts,tsx}": [
+    "**/*.{js,jsx,mjs,cjs,flow,ts,tsx,mts}": [
       "prettier --write",
       "eslint --fix"
     ]
