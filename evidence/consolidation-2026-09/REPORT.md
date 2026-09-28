@@ -27,6 +27,23 @@ Commits on this branch, both on top of the base:
 131ea132 [pandamstyle] Consolidate the native compiler: provenance, bindings, coverage, publication
 ```
 
+### Tested commit vs delivered branch head — they differ, and only in this report
+
+The tested commit is `9dfb48b7…`. The delivered branch head is one commit
+ahead of it, and that commit contains **only this evidence directory**:
+
+```
+$ git diff --name-only 9dfb48b7..HEAD -- packages/ tools/ verify-pms.sh .gitignore | wc -l
+0
+```
+
+No compiler source, no test, no tool, no script and no fixture differs between
+the tested commit and the delivered head. The full file list of that one commit
+is `evidence/consolidation-2026-09/**`. A reader who needs the tested tree
+byte-for-byte should check out `9dfb48b7bd4dfca7a051e8d41c0350bdfab87301`
+(tree `8bbd5012c8b853ee2515250c0120a316dde02626`); a reader who wants the code
+plus its evidence should take the branch head.
+
 66 files changed, 4800 insertions(+), 348 deletions(-). Two new compiler
 modules (`pandamstyle/provenance.js`, `pandamstyle/generation.js`), five new test
 files, 15 new negative fixture projects, two new files in the valid fixture.
