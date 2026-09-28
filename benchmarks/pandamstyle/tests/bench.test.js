@@ -749,6 +749,25 @@ test(
   'the differential oracle runs green on a small corpus',
   { timeout: 900000 },
   () => {
+    // The oracle spawns BOTH engines' real CLIs, and each CLI requires its own
+    // built bundle. `lib/` is gitignored, so a fresh checkout has none, and the
+    // variant engine then exits 2 ("usage or environment error") - which reads
+    // as a divergence rather than as a missing build. Failing here with the
+    // actual cause is worth more than a confusing diff downstream.
+    const variantLib = path.join(
+      REPO_ROOT,
+      'packages',
+      '@pandamstyle',
+      'compiler',
+      'lib',
+      'index.js',
+    );
+    assert.ok(
+      fs.existsSync(variantLib),
+      `${variantLib} is missing. The oracle drives the real compiler CLI, so ` +
+        'build it first: yarn --cwd packages/@pandamstyle/compiler build ' +
+        '(./verify-pms.sh does this in its build step).',
+    );
     const dir = tmpdir('oracle');
     const res = spawnSync(
       process.execPath,
