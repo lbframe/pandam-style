@@ -1,0 +1,125 @@
+PASS __tests__/createOrderedCSSStyleSheet-test.js
+  createOrderedCSSStyleSheet
+    #insert
+      ✓ does not throw on invalid rule (10 ms)
+      ✓ insertion of CSSStyleRule (3 ms)
+      ✓ insertion of CSSMediaRule (1 ms)
+      ✓ insertion of CSSMediaRule within CSSConditionRule (1 ms)
+      ✓ insertion order for same group (1 ms)
+      ✓ deduplication for same group (1 ms)
+      ✓ order for same group (1 ms)
+      ✓ insertion order for different groups (1 ms)
+    #update
+      ✓ updates an existing rule with same selector (2 ms)
+      ✓ updates a media query rule (1 ms)
+      ✓ updates multiple properties in a rule (1 ms)
+      ✓ inserts new rule if old rule does not exist (2 ms)
+      ✓ inserts new rule if selectors are different (1 ms)
+      ✓ updates rule in different group
+      ✓ updates nested at-rules
+      ✓ handles update when rule has specificity selectors (1 ms)
+    client-side hydration
+      ✓ from SSR CSS (22 ms)
+      ✓ works when the group marker is in single quotes (4 ms)
+
+PASS __tests__/inject-test.js
+  inject
+    ✓ @keyframes (13 ms)
+    ✓ @positionTry (2 ms)
+    ✓ ::view-transition (2 ms)
+    ✓ @media (2 ms)
+    ✓ ::before (1 ms)
+    ✓ :hover (1 ms)
+    ✓ ::before:hover (1 ms)
+    defineConsts runtime injection
+      ✓ registers a constant (1 ms)
+      ✓ inlines constant in CSS rule (1 ms)
+      ✓ inlines multiple constants in one rule (1 ms)
+      ✓ handles numeric constants (1 ms)
+      ✓ leaves unreferenced constants unchanged in CSS (1 ms)
+      ✓ handles constants in media queries (2 ms)
+      ✓ handles nested at-rules with constants (1 ms)
+      ✓ handles constants for container queries (1 ms)
+      ✓ handles constants for supports queries (2 ms)
+      ✓ handles constants in CSS variable definitions (1 ms)
+      ✓ handles constants with special characters in values (1 ms)
+      ✓ preserves other var() references that are not constants (1 ms)
+      ✓ updates dependent rules when constant changes (2 ms)
+      ✓ handles constants with zero values (1 ms)
+      ✓ handles constants in complex selectors (1 ms)
+      ✓ updates multiple dependent rules when constant changes (3 ms)
+      ✓ does not update dependent rules if constant value stays the same (2 ms)
+      ✓ updates dependent at-rules when constant changes (2 ms)
+      ✓ prevents duplicate dependency tracking (2 ms)
+      ✓ tracks dependencies for multiple constants in one rule (5 ms)
+      ✓ correctly updates stylesheet when constant value changes (2 ms)
+      ✓ handles constant updates with at-rules and regular properties (1 ms)
+      ✓ handles mixed constant and non-constant values (2 ms)
+
+PASS __tests__/createSheet-test.js
+  createSheet
+    client side
+      ✓ creates a sheet (27 ms)
+      ✓ creates multiple sheets (2 ms)
+      ✓ reuses existing sheet for given root (4 ms)
+      ✓ supports updating styles across multiple documents (38 ms)
+      ✓ update method updates rules across all sheets (36 ms)
+    server side
+      ✓ creates a sheet (2 ms)
+      ✓ creates multiple sheets (2 ms)
+
+PASS __tests__/stylex-test.js
+  stylex
+    error handling
+      ✓ stylex.create (35 ms)
+      ✓ stylex.createTheme (4 ms)
+      ✓ stylex.defineConsts (2 ms)
+      ✓ stylex.defineVars (2 ms)
+      ✓ stylex.firstThatWorks (2 ms)
+      ✓ stylex.keyframes (1 ms)
+      ✓ stylex.positionTry (2 ms)
+      ✓ stylex.viewTransitionClass (1 ms)
+      ✓ stylex.defaultMarker (2 ms)
+      ✓ stylex.defineMarker (2 ms)
+      ✓ stylex.unstable_conditional (2 ms)
+      ✓ stylex.unstable_defineVarsNested (1 ms)
+      ✓ stylex.unstable_defineConstsNested (2 ms)
+      ✓ stylex.unstable_createThemeNested (1 ms)
+      ✓ stylex.typesangle (2 ms)
+      ✓ stylex.typescolor (2 ms)
+      ✓ stylex.typesurl (1 ms)
+      ✓ stylex.typesimage (2 ms)
+      ✓ stylex.typesinteger (2 ms)
+      ✓ stylex.typeslengthPercentage (1 ms)
+      ✓ stylex.typeslength (3 ms)
+      ✓ stylex.typespercentage (3 ms)
+      ✓ stylex.typesnumber (2 ms)
+      ✓ stylex.typesresolution (10 ms)
+      ✓ stylex.typestime (2 ms)
+      ✓ stylex.typestransformFunction (1 ms)
+      ✓ stylex.typestransformList (1 ms)
+      ✓ stylex.whenancestor (2 ms)
+      ✓ stylex.whendescendant (2 ms)
+      ✓ stylex.whensiblingBefore (2 ms)
+      ✓ stylex.whensiblingAfter (1 ms)
+      ✓ stylex.whenanySibling (1 ms)
+    props
+      ✓ basic resolve (1 ms)
+      ✓ merge order (1 ms)
+      ✓ with a top-level array of simple overridden classes (2 ms)
+      ✓ with nested arrays and pseudoClasses overriding things (1 ms)
+      ✓ with just pseudoclasses (1 ms)
+      ✓ with complicated set of arguments (2 ms)
+      ✓ with dynamic styles (8 ms)
+      ✓ data prop for source map data (2 ms)
+    attrs
+      ✓ basic resolve (1 ms)
+      ✓ with dynamic styles (2 ms)
+      ✓ legacyMerge merges classNames (2 ms)
+      ✓ legacyMerge exposes attrs (1 ms)
+
+Test Suites: 4 passed, 4 total
+Tests:       99 passed, 99 total
+Snapshots:   74 passed, 74 total
+Time:        3.284 s
+Ran all test suites.

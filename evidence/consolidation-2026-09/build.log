@@ -1,0 +1,74 @@
+Successfully compiled 33 files with Babel (1817ms).
+Successfully compiled 2 files with Babel (817ms).
+[36m
+[1m./src/stylex.js, ./src/inject.js[22m → [1m./lib/cjs[22m...[39m
+[32mcreated [1m./lib/cjs[22m in [1m1s[22m[39m
+[36m
+[1m./src/stylex.js, ./src/inject.js[22m → [1m./lib/es/[22m...[39m
+[32mcreated [1m./lib/es/[22m in [1m1s[22m[39m
+[36m
+[1m./src/index.js[22m → [1m./lib/index.js[22m...[39m
+[32mcreated [1m./lib/index.js[22m in [1m3.4s[22m[39m
+[36m
+[1m./src/index.js[22m → [1m./lib/index.browser.js[22m...[39m
+[1m[33m(!) Missing exports[39m[22m
+[90mhttps://rollupjs.org/troubleshooting/#error-name-is-not-exported-by-module[39m
+[1msrc/visitors/stylex-create.js[22m
+logicalExpression is not exported by @babel/types
+[90m475: 
+476:               const guardedObjs = guardedProps.map(({ prop, expr }) =>
+477:                 t.logicalExpression(
+                       ^
+478:                   '&&',
+479:                   t.binaryExpression([39m
+[1msrc/visitors/stylex-create.js[22m
+cloneNode is not exported by @babel/types
+[90m479:                   t.binaryExpression(
+480:                     '!==',
+481:                     t.cloneNode(expr),
+                           ^
+482:                     t.identifier('undefined'),
+483:                   ),[39m
+[1msrc/visitors/stylex-create.js[22m
+cloneNode is not exported by @babel/types
+[90m486:                     t.objectProperty(
+487:                       t.identifier('$$css'),
+488:                       t.cloneNode(cssTagValue),
+                             ^
+489:                     ),
+490:                   ]),[39m
+[1msrc/visitors/stylex-props.js[22m
+isLiteral is not exported by @babel/types
+[90m528:         return false;
+529:       }
+530:     } else if (!t.isLiteral(val)) {
+                       ^
+531:       return false;
+532:     }[39m
+[1msrc/index.js[22m
+importNamespaceSpecifier is not exported by @babel/types
+[90m446:     'body',
+447:     t.importDeclaration(
+448:       [t.importNamespaceSpecifier(t.identifier(stylexLocalName))],
+              ^
+449:       t.stringLiteral(importSource),
+450:     ),[39m
+[32mcreated [1m./lib/index.browser.js[22m in [1m2.4s[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/entry-node.js[22m → [1m./lib/index.js[22m...[39m
+[32mcreated [1m./lib/index.js[22m in [1m3.7s[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/entry-node.js[22m → [1m./lib/index.mjs[22m...[39m
+[32mcreated [1m./lib/index.mjs[22m in [1m2.5s[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/vite.js[22m → [1m./lib/vite.js[22m...[39m
+[32mcreated [1m./lib/vite.js[22m in [1m2.4s[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/vite.js[22m → [1m./lib/vite.mjs[22m...[39m
+[32mcreated [1m./lib/vite.mjs[22m in [1m2.5s[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/runtime.js[22m → [1m./lib/runtime.mjs[22m...[39m
+[32mcreated [1m./lib/runtime.mjs[22m in [1m58ms[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/runtime.js[22m → [1m./lib/runtime.cjs[22m...[39m
+[32mcreated [1m./lib/runtime.cjs[22m in [1m61ms[22m[39m

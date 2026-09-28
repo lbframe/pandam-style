@@ -1,0 +1,99 @@
+{
+  "documentKind": "pandamstyle-run-summary",
+  "testedCommit": "9dfb48b7bd4dfca7a051e8d41c0350bdfab87301",
+  "testedTree": "8bbd5012c8b853ee2515250c0120a316dde02626",
+  "workingTree": "dirty",
+  "outDir": "/Users/leonardoballand/lab/pandam-style/upstream/stylex/evidence/consolidation-2026-09",
+  "toolchain": {
+    "node": "v22.23.2",
+    "yarn": "1.22.22",
+    "npm": "10.9.8"
+  },
+  "complete": true,
+  "skippedSteps": [],
+  "failedSteps": [],
+  "steps": {
+    "install": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null
+    },
+    "build": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null
+    },
+    "upstream-babel-plugin": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 1007,
+          "total": 1071,
+          "skipped": 64
+        },
+        "suites": {
+          "passed": 42,
+          "total": 43,
+          "skipped": 1
+        }
+      }
+    },
+    "upstream-stylex": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 99,
+          "total": 99,
+          "skipped": null
+        },
+        "suites": {
+          "passed": 4,
+          "total": 4,
+          "skipped": null
+        }
+      }
+    },
+    "pandamstyle": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 253,
+          "total": 253,
+          "skipped": null
+        },
+        "suites": {
+          "passed": 11,
+          "total": 11,
+          "skipped": null
+        }
+      }
+    },
+    "pilot": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null
+    },
+    "artifacts": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null
+    }
+  }
+}

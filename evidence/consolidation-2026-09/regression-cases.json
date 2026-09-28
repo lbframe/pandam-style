@@ -1,0 +1,381 @@
+{
+  "documentKind": "pandamstyle-regression-cases",
+  "note": "Every row was produced by spawning the real build CLI. observedExitCode and observedCodes are read back from the process.",
+  "negatives": [
+    {
+      "criterion": "BC-1",
+      "fixture": "neg-props-raw-object",
+      "what": "object literal: padding, color, multi-property",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNVERIFIED_PROPS_SOURCE"
+      ],
+      "expectedCode": "PMS_UNVERIFIED_PROPS_SOURCE",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-1",
+      "fixture": "neg-props-raw-reference",
+      "what": "arbitrary local object, and a spread of it",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNVERIFIED_PROPS_SOURCE"
+      ],
+      "expectedCode": "PMS_UNVERIFIED_PROPS_SOURCE",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-2",
+      "fixture": "neg-props-shadowing",
+      "what": "parameter shadowing a module-level props() result",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNVERIFIED_JSX_SPREAD"
+      ],
+      "expectedCode": "PMS_UNVERIFIED_JSX_SPREAD",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-2",
+      "fixture": "neg-props-reassigned",
+      "what": "props() result then reassigned",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNVERIFIED_JSX_SPREAD"
+      ],
+      "expectedCode": "PMS_UNVERIFIED_JSX_SPREAD",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-2",
+      "fixture": "neg-props-mutated",
+      "what": "member written to after the value was proven",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNVERIFIED_PROVENANCE"
+      ],
+      "expectedCode": "PMS_UNVERIFIED_PROVENANCE",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-2",
+      "fixture": "neg-props-escaped",
+      "what": "value passed to an unknown call and to Object.assign",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNVERIFIED_PROVENANCE"
+      ],
+      "expectedCode": "PMS_UNVERIFIED_PROVENANCE",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-2",
+      "fixture": "neg-helper-shadowed",
+      "what": "alias of the helper, and a nested shadow of it",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNVERIFIED_JSX_SPREAD",
+        "PMS_UNVERIFIED_PROVENANCE"
+      ],
+      "expectedCode": "PMS_UNVERIFIED_JSX_SPREAD",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-3",
+      "fixture": "neg-relay-reexport-star",
+      "what": "module outside every root, via `export *`",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_STYLE_CHANNEL"
+      ],
+      "expectedCode": "PMS_FORBIDDEN_STYLE_CHANNEL",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-3",
+      "fixture": "neg-relay-reexport-named",
+      "what": "module outside every root, via a named re-export",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_STYLE_CHANNEL"
+      ],
+      "expectedCode": "PMS_FORBIDDEN_STYLE_CHANNEL",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-3",
+      "fixture": "neg-relay-barrel-chain",
+      "what": "two barrels deep, both outside every root",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_STYLE_CHANNEL"
+      ],
+      "expectedCode": "PMS_FORBIDDEN_STYLE_CHANNEL",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-3",
+      "fixture": "neg-stylesheet-via-relay",
+      "what": "unapproved stylesheet reached only through a relay",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_STYLE_CHANNEL"
+      ],
+      "expectedCode": "PMS_FORBIDDEN_STYLE_CHANNEL",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-3",
+      "fixture": "neg-dynamic-import",
+      "what": "dynamic request that is not a static string",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_COVERAGE_GAP"
+      ],
+      "expectedCode": "PMS_COVERAGE_GAP",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-3",
+      "fixture": "neg-dynamic-import-local",
+      "what": "literal dynamic import: a normal local edge, analysed",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_STYLE_CHANNEL"
+      ],
+      "expectedCode": "PMS_FORBIDDEN_STYLE_CHANNEL",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-3",
+      "fixture": "neg-unresolved-import",
+      "what": "local import that resolves to nothing",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_COVERAGE_GAP"
+      ],
+      "expectedCode": "PMS_COVERAGE_GAP",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-6",
+      "fixture": "neg-reserved-authority",
+      "what": "reserved __pms* field in ordinary data",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_ROLE_VIOLATION"
+      ],
+      "expectedCode": "PMS_ROLE_VIOLATION",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "BC-6",
+      "fixture": "neg-role-violation",
+      "what": "authority field inside a recognized PandamStyle call",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_IMPORT",
+        "PMS_ROLE_VIOLATION"
+      ],
+      "expectedCode": "PMS_ROLE_VIOLATION",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-011",
+      "fixture": "neg-forbidden-value",
+      "what": "raw 17px, forged var(), forged ref, alias, computed key, spread",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_VALUE"
+      ],
+      "expectedCode": "PMS_FORBIDDEN_VALUE",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-012",
+      "fixture": "neg-unknown-token",
+      "what": "token absent from the registry",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNKNOWN_TOKEN"
+      ],
+      "expectedCode": "PMS_UNKNOWN_TOKEN",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-020",
+      "fixture": "neg-private-token",
+      "what": "private primitive from a consumer page",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_TOKEN_NOT_PUBLIC"
+      ],
+      "expectedCode": "PMS_TOKEN_NOT_PUBLIC",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-015",
+      "fixture": "neg-composite-form",
+      "what": "composite border shorthand",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNSUPPORTED_PROPERTY_FORM"
+      ],
+      "expectedCode": "PMS_UNSUPPORTED_PROPERTY_FORM",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-051",
+      "fixture": "neg-forbidden-import",
+      "what": "engine entries and the atoms path",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_IMPORT"
+      ],
+      "expectedCode": "PMS_FORBIDDEN_IMPORT",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-054",
+      "fixture": "neg-style-channel",
+      "what": "inline style attribute and local stylesheet",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_STYLE_CHANNEL"
+      ],
+      "expectedCode": "PMS_FORBIDDEN_STYLE_CHANNEL",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-054",
+      "fixture": "neg-jsx-spread",
+      "what": "JSX spread not provably free of style/className",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_UNVERIFIED_JSX_SPREAD"
+      ],
+      "expectedCode": "PMS_UNVERIFIED_JSX_SPREAD",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-039",
+      "fixture": "neg-invalid-variant",
+      "what": "literal invalid variant refused at build",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_INVALID_VARIANT_VALUE"
+      ],
+      "expectedCode": "PMS_INVALID_VARIANT_VALUE",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-023",
+      "fixture": "neg-non-static",
+      "what": "a local helper named token gains no trust",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_NON_STATIC_VALUE"
+      ],
+      "expectedCode": "PMS_NON_STATIC_VALUE",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    },
+    {
+      "criterion": "AC-017",
+      "fixture": "neg-forbidden-value-ts",
+      "what": "same error in TSX, no tsc involved",
+      "observedExitCode": 1,
+      "observedCodes": [
+        "PMS_FORBIDDEN_VALUE"
+      ],
+      "expectedCode": "PMS_FORBIDDEN_VALUE",
+      "expectedCodeObserved": true,
+      "publishedManifest": false,
+      "internalError": false,
+      "publishedFileCount": 0
+    }
+  ],
+  "positives": [
+    {
+      "fixture": "valid",
+      "observedExitCode": 0,
+      "observedCodes": [],
+      "stderrHasDiagnostic": false,
+      "stdout": "pandamstyle build ok registryDigest=1d58021beceabbd4 files=10 cssBytes=2495"
+    }
+  ]
+}

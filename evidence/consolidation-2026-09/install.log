@@ -1,0 +1,706 @@
+yarn install v1.22.22
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+warning Pattern ["@vitejs/plugin-react@latest"] is trying to unpack in the same destination "/Users/leonardoballand/Library/Caches/Yarn/v6/npm-@vitejs-plugin-react-5.1.1-integrity/node_modules/@vitejs/plugin-react" as pattern ["@vitejs/plugin-react@^5.0.3","@vitejs/plugin-react@^5.0.4"]. This could result in non-deterministic behavior, skipping.
+warning Pattern ["@vitejs/plugin-rsc@latest"] is trying to unpack in the same destination "/Users/leonardoballand/Library/Caches/Yarn/v6/npm-@vitejs-plugin-rsc-0.5.26-integrity/node_modules/@vitejs/plugin-rsc" as pattern ["@vitejs/plugin-rsc@^0.5.24","@vitejs/plugin-rsc@^0.5.9"]. This could result in non-deterministic behavior, skipping.
+warning svelte-eslint-parser@1.8.0: The engine "pnpm" appears to be invalid.
+warning bare-fs@4.5.1: The engine "bare" appears to be invalid.
+warning bare-os@3.6.2: The engine "bare" appears to be invalid.
+[3/4] Linking dependencies...
+warning "@typescript-eslint/parser > @typescript-eslint/typescript-estree > ts-api-utils@1.4.3" has unmet peer dependency "typescript@>=4.2.0".
+warning " > @stylexjs/unplugin@0.19.1" has unmet peer dependency "unplugin@^2.3.11".
+warning " > @stylexjs/shared-ui@0.19.1" has unmet peer dependency "react@>=18".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > @stylexjs/devtools-extension > @babel/plugin-transform-flow-strip-types@7.27.1" has unmet peer dependency "@babel/core@^7.0.0-0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > docs-new > @monaco-editor/react@4.7.0" has unmet peer dependency "monaco-editor@>= 0.25.0 < 1".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react@^19.2.6".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react-dom@^19.2.6".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > docs-new > react-server-dom-webpack@19.2.6" has unmet peer dependency "webpack@^5.59.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-nextjs > autoprefixer@10.4.23" has unmet peer dependency "postcss@^8.1.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "vite@^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @typescript-eslint/eslint-plugin@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @typescript-eslint/parser@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @vitejs/plugin-react@5.1.1" has unmet peer dependency "vite@^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @vitest/browser@4.0.18" has incorrect peer dependency "vitest@4.0.18".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @vitest/coverage-v8@4.0.18" has incorrect peer dependency "vitest@4.0.18".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > autoprefixer@10.4.22" has unmet peer dependency "postcss@^8.1.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > postcss-nesting@13.0.2" has unmet peer dependency "postcss@^8.4".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "@rollup/pluginutils@>=5.1".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "astring@>=1.9.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "estree-walker@>=3.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "vite@>=5.2".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > rollup-plugin-node-externals@8.1.2" has unmet peer dependency "rollup@^4.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > typescript-eslint@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > vite-plugin-dts@4.5.4" has unmet peer dependency "typescript@*".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > vitest@4.1.11" has unmet peer dependency "vite@^6.0.0 || ^7.0.0 || ^8.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-waku > @vitejs/plugin-react@5.1.0" has unmet peer dependency "vite@^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @storybook/addon-docs > @mdx-js/react@3.1.1" has unmet peer dependency "@types/react@>=16".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @storybook/react-vite > @joshwooding/vite-plugin-react-docgen-typescript@0.6.1" has unmet peer dependency "vite@^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @storybook/react-vite > @storybook/builder-vite@9.1.16" has unmet peer dependency "vite@^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @storybook/react-vite > @storybook/react@9.1.16" has unmet peer dependency "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @storybook/react-vite > @storybook/react@9.1.16" has unmet peer dependency "react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @typescript-eslint/eslint-plugin > @typescript-eslint/type-utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @typescript-eslint/eslint-plugin > @typescript-eslint/utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @typescript-eslint/eslint-plugin > ts-api-utils@2.5.0" has unmet peer dependency "typescript@>=4.8.4".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > storybook > @testing-library/user-event@14.6.1" has unmet peer dependency "@testing-library/dom@>=7.21.4".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > typescript-eslint > @typescript-eslint/eslint-plugin@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > typescript-eslint > @typescript-eslint/utils@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @storybook/react-vite > @joshwooding/vite-plugin-react-docgen-typescript > react-docgen-typescript@2.4.0" has unmet peer dependency "typescript@>= 4.3.x".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree > @typescript-eslint/project-service@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree > @typescript-eslint/tsconfig-utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-storybook > typescript-eslint > @typescript-eslint/eslint-plugin > @typescript-eslint/type-utils@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > example-react-router > react-router@8.3.0" has incorrect peer dependency "react@>=19.2.7".
+warning "workspace-aggregator-fabe27f2-3030-48d3-9ae3-bb69a5285d51 > @redwoodjs/starter > react-server-dom-webpack@19.2.8" has unmet peer dependency "webpack@^5.59.0".
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+[4/4] Building fresh packages...
+$ npm run build
+
+> stylex-monorepo@0.0.0 build
+> npm run build --workspaces --if-present
+
+
+> style-value-parser@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> style-value-parser@0.19.1 build
+> babel src --out-dir lib --ignore "**/__tests__/**","**/__benchmarks__/**"
+
+Successfully compiled 33 files with Babel (2142ms).
+
+> @stylexjs/shared@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/shared@0.19.1 build
+> babel src/ --out-dir lib/
+
+Successfully compiled 2 files with Babel (833ms).
+
+> @stylexjs/stylex@0.19.1 prebuild
+> shx rm -rf lib && gen-types -i src/ -o lib/cjs && shx cp -r lib/cjs lib/es
+
+Successfully generated type definitions
+
+> @stylexjs/stylex@0.19.1 build
+> npm run build:cjs && npm run build:esm
+
+
+> @stylexjs/stylex@0.19.1 build:cjs
+> cross-env BABEL_ENV=cjs rollup -c ./rollup.config.mjs
+
+[36m
+[1m./src/stylex.js, ./src/inject.js[22m → [1m./lib/cjs[22m...[39m
+[32mcreated [1m./lib/cjs[22m in [1m1.2s[22m[39m
+
+> @stylexjs/stylex@0.19.1 build:esm
+> cross-env BABEL_ENV=esm rollup -c ./rollup.config.mjs
+
+[36m
+[1m./src/stylex.js, ./src/inject.js[22m → [1m./lib/es/[22m...[39m
+[32mcreated [1m./lib/es/[22m in [1m1.1s[22m[39m
+
+> @stylexjs/babel-plugin@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/babel-plugin@0.19.1 build
+> rollup --config ./rollup.config.mjs
+
+[36m
+[1m./src/index.js[22m → [1m./lib/index.js[22m...[39m
+[32mcreated [1m./lib/index.js[22m in [1m3.6s[22m[39m
+[36m
+[1m./src/index.js[22m → [1m./lib/index.browser.js[22m...[39m
+[1m[33m(!) Missing exports[39m[22m
+[90mhttps://rollupjs.org/troubleshooting/#error-name-is-not-exported-by-module[39m
+[1msrc/visitors/stylex-create.js[22m
+logicalExpression is not exported by @babel/types
+[90m475: 
+476:               const guardedObjs = guardedProps.map(({ prop, expr }) =>
+477:                 t.logicalExpression(
+                       ^
+478:                   '&&',
+479:                   t.binaryExpression([39m
+[1msrc/visitors/stylex-create.js[22m
+cloneNode is not exported by @babel/types
+[90m479:                   t.binaryExpression(
+480:                     '!==',
+481:                     t.cloneNode(expr),
+                           ^
+482:                     t.identifier('undefined'),
+483:                   ),[39m
+[1msrc/visitors/stylex-create.js[22m
+cloneNode is not exported by @babel/types
+[90m486:                     t.objectProperty(
+487:                       t.identifier('$$css'),
+488:                       t.cloneNode(cssTagValue),
+                             ^
+489:                     ),
+490:                   ]),[39m
+[1msrc/visitors/stylex-props.js[22m
+isLiteral is not exported by @babel/types
+[90m528:         return false;
+529:       }
+530:     } else if (!t.isLiteral(val)) {
+                       ^
+531:       return false;
+532:     }[39m
+[1msrc/index.js[22m
+importNamespaceSpecifier is not exported by @babel/types
+[90m446:     'body',
+447:     t.importDeclaration(
+448:       [t.importNamespaceSpecifier(t.identifier(stylexLocalName))],
+              ^
+449:       t.stringLiteral(importSource),
+450:     ),[39m
+[32mcreated [1m./lib/index.browser.js[22m in [1m2.2s[22m[39m
+
+> @stylexjs/unplugin@0.19.1 build
+> npm run build:cjs && npm run build:esm
+
+
+> @stylexjs/unplugin@0.19.1 build:cjs
+> cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files
+
+Successfully compiled 13 files with Babel (1146ms).
+
+> @stylexjs/unplugin@0.19.1 build:esm
+> cross-env BABEL_ENV=esm babel src/ --out-dir lib/es --out-file-extension .mjs
+
+Successfully compiled 13 files with Babel (906ms).
+
+> @stylexjs/cli@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/cli@0.19.1 build
+> npm run build:cjs && npm run build:esm
+
+
+> @stylexjs/cli@0.19.1 build:cjs
+> cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files
+
+Successfully compiled 11 files with Babel (929ms).
+
+> @stylexjs/cli@0.19.1 build:esm
+> cross-env BABEL_ENV=esm babel src/ --out-dir lib/es --out-file-extension .mjs
+
+Successfully compiled 11 files with Babel (1079ms).
+
+> @stylexjs/cli@0.19.1 postbuild:esm
+> rollup -c ./rollup.config.mjs
+
+[36m
+[1m./src/index.js[22m → [1m./lib/index.js[22m...[39m
+[32mcreated [1m./lib/index.js[22m in [1m1.4s[22m[39m
+
+> create-stylex-app@0.19.1 build
+> cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files && chmod +x lib/index.js
+
+Successfully compiled 5 files with Babel (694ms).
+
+> @stylexjs/devtools-extension@0.19.1 build
+> rollup -c
+
+[36m
+[1m/Users/leonardoballand/lab/pandam-style/upstream/stylex/packages/@stylexjs/devtools-extension/src/inspected/runtimeEntry.js[22m → [1mdist/.shared/runtime[22m...[39m
+[32mcreated [1mdist/.shared/runtime[22m in [1m2.1s[22m[39m
+[36m
+[1m/Users/leonardoballand/lab/pandam-style/upstream/stylex/packages/@stylexjs/devtools-extension/src/devtools/main.js, /Users/leonardoballand/lab/pandam-style/upstream/stylex/packages/@stylexjs/devtools-extension/src/panel/main.js[22m → [1mdist/.shared/app[22m...[39m
+[32mcreated [1mdist/.shared/app[22m in [1m2.8s[22m[39m
+
+> @stylexjs/eslint-plugin@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/eslint-plugin@0.19.1 build
+> babel src/ --out-dir lib/
+
+Successfully compiled 42 files with Babel (2030ms).
+
+> @stylexjs/rollup-plugin@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/rollup-plugin@0.19.1 build
+> npm run build:cjs && npm run build:esm
+
+
+> @stylexjs/rollup-plugin@0.19.1 build:cjs
+> cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files
+
+Successfully compiled 1 file with Babel (906ms).
+
+> @stylexjs/rollup-plugin@0.19.1 build:esm
+> cross-env BABEL_ENV=esm babel src/ --out-dir lib/es --out-file-extension .mjs
+
+Successfully compiled 1 file with Babel (752ms).
+
+> @pandamstyle/compiler@0.1.0 prebuild
+> node -e "require('fs').rmSync('lib',{recursive:true,force:true})"
+
+
+> @pandamstyle/compiler@0.1.0 build
+> rollup --config ./rollup.config.mjs
+
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/entry-node.js[22m → [1m./lib/index.js[22m...[39m
+[32mcreated [1m./lib/index.js[22m in [1m4.2s[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/entry-node.js[22m → [1m./lib/index.mjs[22m...[39m
+[32mcreated [1m./lib/index.mjs[22m in [1m3s[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/vite.js[22m → [1m./lib/vite.js[22m...[39m
+[32mcreated [1m./lib/vite.js[22m in [1m2.5s[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/vite.js[22m → [1m./lib/vite.mjs[22m...[39m
+[32mcreated [1m./lib/vite.mjs[22m in [1m2.7s[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/runtime.js[22m → [1m./lib/runtime.mjs[22m...[39m
+[32mcreated [1m./lib/runtime.mjs[22m in [1m68ms[22m[39m
+[36m
+[1m../../@stylexjs/babel-plugin/pandamstyle/runtime.js[22m → [1m./lib/runtime.cjs[22m...[39m
+[32mcreated [1m./lib/runtime.cjs[22m in [1m161ms[22m[39m
+
+> docs-new@0.19.1 build
+> waku build
+
+[tsconfig-paths] An error occurred while parsing "/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/astro/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"astro/tsconfigs/base" in /Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/astro/tsconfig.json
+    at resolveExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:197:24)
+    ... 5 lines matching cause stack trace ...
+    at async Module.createBuilder (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/waku/dist/cli.js:43:9) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module 'astro/tsconfigs/base/tsconfig.json'
+  Require stack:
+  - /Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/astro/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+      at Function.resolve (node:internal/modules/helpers:157:19)
+      at resolveExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:256:15)
+      at parseExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 39)
+      at async BasicMinimalPluginContext.configResolved (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1)
+      at async resolveConfig (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/astro/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/astro/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/docusaurus-ts/tsconfig.json". See below for details.
+TSConfckParseError: failed to resolve "extends":"@docusaurus/tsconfig" in /Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/docusaurus-ts/tsconfig.json
+    at resolveExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:197:24)
+    ... 5 lines matching cause stack trace ...
+    at async Module.createBuilder (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/waku/dist/cli.js:43:9) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '@docusaurus/tsconfig/tsconfig.json'
+  Require stack:
+  - /Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/docusaurus-ts/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+      at Function.resolve (node:internal/modules/helpers:157:19)
+      at resolveExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:256:15)
+      at parseExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 40)
+      at async BasicMinimalPluginContext.configResolved (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1)
+      at async resolveConfig (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/docusaurus-ts/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/docusaurus-ts/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/nuxt/tsconfig.json". See below for details.
+TSConfckParseError: failed to resolve "extends":"./.nuxt/tsconfig.json" in /Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/nuxt/tsconfig.json
+    at resolveExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:197:24)
+    ... 5 lines matching cause stack trace ...
+    at async Module.createBuilder (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/waku/dist/cli.js:43:9) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module './.nuxt/tsconfig.json'
+  Require stack:
+  - /Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/nuxt/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+      at Function.resolve (node:internal/modules/helpers:157:19)
+      at resolveExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 47)
+      at async BasicMinimalPluginContext.configResolved (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1)
+      at async resolveConfig (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/nuxt/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/nuxt/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json". See below for details.
+TSConfckParseError: failed to resolve "extends":"./.nuxt/tsconfig.json" in /Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json
+    at resolveExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:197:24)
+    ... 5 lines matching cause stack trace ...
+    at async Module.createBuilder (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/waku/dist/cli.js:43:9) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module './.nuxt/tsconfig.json'
+  Require stack:
+  - /Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+      at Function.resolve (node:internal/modules/helpers:157:19)
+      at resolveExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 62)
+      at async BasicMinimalPluginContext.configResolved (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1)
+      at async resolveConfig (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///Users/leonardoballand/lab/pandam-style/upstream/stylex/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/Users/leonardoballand/lab/pandam-style/upstream/stylex/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json'
+}
+[1/5] analyze client references...
+vite v7.3.2 building rsc environment for production...
+[MDX] generated files in 3.7149640000002364ms
+transforming...
+✓ 1994 modules transformed.
+rendering chunks...
+✓ built in 10.57s
+[2/5] analyze server references...
+vite v7.3.2 building ssr environment for production...
+[MDX] generated files in 1.041823999999906ms
+transforming...
+✓ 1970 modules transformed.
+rendering chunks...
+✓ built in 7.00s
+[3/5] build rsc environment...
+vite v7.3.2 building rsc environment for production...
+[MDX] generated files in 0.9274489999988873ms
+✓ 1994 modules transformed.
+dist/server/assets/nmn-B2JWaNf2.jpg                              17.24 kB
+dist/server/assets/necolas-D_9YEUI7.jpg                          19.31 kB
+dist/server/assets/stylex-cover-photo-BWp08ZxO.png               73.36 kB
+dist/server/assets/mellyeliu-CCOt2mL7.jpg                        96.39 kB
+dist/server/assets/vincentriemer-OXz-58Lb.png                   239.86 kB
+dist/server/assets/_layout-Dox5lVp4.css                          32.22 kB
+dist/server/assets/meta-BrN0B9YI.js                               0.17 kB
+dist/server/assets/meta-DHzYRmyU.js                               0.17 kB
+dist/server/assets/meta-Cpa2BUIq.js                               0.17 kB
+dist/server/assets/meta-C5S3_jlz.js                               0.23 kB
+dist/server/assets/meta-J5Gwxvr0.js                               0.23 kB
+dist/server/assets/meta-Cc7tccUB.js                               0.23 kB
+dist/server/assets/meta-CqpRXoUI.js                               0.25 kB
+dist/server/assets/meta-D1EzAEzm.js                               0.25 kB
+dist/server/assets/meta-Cmi-Dw0r.js                               0.26 kB
+dist/server/assets/link-CEkarDPT.js                               0.29 kB
+dist/server/assets/docs-wi723a8l.js                               0.31 kB
+dist/server/assets/blog-date-4u9OcVqU.js                          0.37 kB
+dist/server/assets/meta-Dh38GiSY.js                               0.39 kB
+dist/server/index.js                                              0.53 kB
+dist/server/assets/_layout-x4wKNA7U.js                            0.69 kB
+dist/server/assets/blog-rss.xml-DW8yoX3E.js                       0.71 kB
+dist/server/assets/blog-atom.xml-BscYF7e6.js                      0.71 kB
+dist/server/assets/_layout-BZolpxzb.js                            0.72 kB
+dist/server/assets/index-BMzkidlQ.js                              0.76 kB
+dist/server/assets/_layout-LQJ08bqn.js                            0.77 kB
+dist/server/assets/llms-full.txt-yjVyEmOs.js                      1.04 kB
+dist/server/assets/_layout-DDQdNITt.js                            1.16 kB
+dist/server/assets/index-BZL-ttAf.js                              1.22 kB
+dist/server/build.js                                              1.23 kB
+dist/server/assets/playground-DnvzG8n-.js                         1.38 kB
+dist/server/assets/2024-06-28-Release-v0.7.3-LpotBGx9.js          2.18 kB
+dist/server/assets/_...slugs_-PMZaga2z.js                         2.24 kB
+dist/server/assets/_root-Baren68Z.js                              2.31 kB
+dist/server/assets/createLucideIcon-K72H_i6x.js                   2.33 kB
+dist/server/assets/index-Ban8xIuR.js                              3.07 kB
+dist/server/assets/_...slugs_-Cn5LHeT8.js                         4.37 kB
+dist/server/assets/_layout-DRKxL6Aw.js                            4.50 kB
+dist/server/assets/llm-resources-t59XmSkU.js                      4.70 kB
+dist/server/assets/stylex-CtTCSF8E.js                             4.97 kB
+dist/server/assets/index-Dq5Eb9Ok.js                              5.14 kB
+dist/server/assets/layout.shared-6QuZf2I5.js                      5.50 kB
+dist/server/assets/index-CSUHU1HM.js                              8.18 kB
+dist/server/assets/acknowledgements-CbwtGItl.js                   9.63 kB
+dist/server/assets/ecosystem-C2z3JQ-i.js                         11.40 kB
+dist/server/assets/reset-themes-O3Ttpo3_.js                      13.53 kB
+dist/server/assets/2025-01-17-Release-v0.10.1-CeaR29oK.js        13.55 kB
+dist/server/assets/index-DQgY9XCq.js                             14.29 kB
+dist/server/assets/vite-react-BuepbuCY.js                        16.99 kB
+dist/server/assets/index-VCgY5wnD.js                             17.53 kB
+dist/server/assets/firstThatWorks-D_A3JnnV.js                    17.79 kB
+dist/server/assets/2023-12-29-Release-v0.4.1-Qz03TE3k.js         17.84 kB
+dist/server/assets/esbuild-ugVLyayk.js                           18.45 kB
+dist/server/assets/merge-themes-C3iEg17M.js                      22.49 kB
+dist/server/assets/create-CNLYa6T2.js                            23.29 kB
+dist/server/assets/bun--uDC5HQS.js                               23.29 kB
+dist/server/assets/cli-BhOkRvcv.js                               24.46 kB
+dist/server/assets/StyleXStyles-CiXSOeqN.js                      24.57 kB
+dist/server/assets/2024-06-25-Release-v0.7.0-CjfCSqih.js         24.65 kB
+dist/server/assets/StaticStyles-DoOSYED6.js                      24.86 kB
+dist/server/assets/rspack-wT-IDxC6.js                            26.86 kB
+dist/server/assets/create-eMNwJPAl.js                            27.12 kB
+dist/server/assets/2026-01-01-new-year-new-website-DeX503f5.js   27.54 kB
+dist/server/assets/attrs-q5ObItwH.js                             27.79 kB
+dist/server/assets/createTheme-nn519JAV.js                       28.52 kB
+dist/server/assets/2025-04-10-Release-v0.12.0-C4LU0TSO.js        28.96 kB
+dist/server/assets/Footer-dt4MF_E_.js                            29.02 kB
+dist/server/assets/2025-02-27-Release-v0.11.0-DB3faAki.js        30.95 kB
+dist/server/assets/source-B_eo5-Jc.js                            34.18 kB
+dist/server/assets/2024-01-25-Release-v0.5.0-B_x_eCus.js         35.54 kB
+dist/server/assets/sveltekit-CB9Fse8Q.js                         36.13 kB
+dist/server/assets/webpack-BWOgejrh.js                           38.56 kB
+dist/server/assets/creating-themes-fvt_3URx.js                   39.90 kB
+dist/server/assets/StyleXStylesWithout-Dmb1grO3.js               40.59 kB
+dist/server/assets/positionTry-BU8KYBK_.js                       41.14 kB
+dist/server/assets/Theme-DWuoeDKW.js                             42.47 kB
+dist/server/assets/postcss-CFaOBuVm.js                           43.19 kB
+dist/server/assets/2026-06-14-Release-v0.19.0-TJaVvB0M.js        43.86 kB
+dist/server/assets/using-variables-BXJft1My.js                   44.58 kB
+dist/server/assets/light-dark-themes-DXl2Bb_a.js                 45.05 kB
+dist/server/assets/defineVars-B0HRTaRV.js                        45.42 kB
+dist/server/assets/2025-01-02-Release-v0.10.0-D3BOWxnW.js        45.94 kB
+dist/server/assets/descendant-styles-ByGaJw7c.js                 46.73 kB
+dist/server/assets/viewTransitionClass-CdgA2K9M.js               48.59 kB
+dist/server/assets/nextjs-Di9lAGyn.js                            50.16 kB
+dist/server/assets/props-C76Joo6o.js                             50.47 kB
+dist/server/assets/2025-07-31-Release-v0.15.0-B-8vqQ89.js        51.05 kB
+dist/server/assets/defineConsts-C5HOSAXy.js                      52.57 kB
+dist/server/assets/postcss-plugin-DqUVQP42.js                    53.79 kB
+dist/server/assets/types-DnhIUo2n.js                             55.53 kB
+dist/server/assets/index-8hl8nDHh.js                             57.41 kB
+dist/server/assets/react-router-C9bAw3B5.js                      58.01 kB
+dist/server/assets/context-driven-styles-BK6Rr0ut.js             59.32 kB
+dist/server/assets/2023-12-05-introducing-stylex-CWs3fr8i.js     59.49 kB
+dist/server/assets/2025-06-30-Release-v0.14.0-C0g1V2lC.js        60.41 kB
+dist/server/assets/waku-CLWGkvSd.js                              62.99 kB
+dist/server/assets/keyframes-CuIxQh37.js                         63.47 kB
+dist/server/assets/redwoodsdk-5EQx6085.js                        66.46 kB
+dist/server/assets/atoms-rCuA4gia.js                             67.15 kB
+dist/server/assets/vite-rsc-Dtqw1ccP.js                          70.32 kB
+dist/server/assets/index-rEY4xnni.js                             70.33 kB
+dist/server/assets/index-DE2A9OeV.js                             70.34 kB
+dist/server/assets/2025-05-19-Release-v0.13.0-C4b6Hz66.js        79.79 kB
+dist/server/assets/env-BxYoVJDq.js                               84.14 kB
+dist/server/assets/2024-04-16-Release-v0.6.1-DMVfSXXb.js         84.89 kB
+dist/server/assets/defining-variables-ByfAv9i5.js                88.79 kB
+dist/server/assets/VarGroup-Ddm0AcQC.js                          94.10 kB
+dist/server/assets/shareable-tokens-BfTfcfyB.js                  97.67 kB
+dist/server/assets/2024-10-06-Release-v0.8.0-BqsfJCBB.js         99.39 kB
+dist/server/assets/2025-09-25-Release-v0.16.0-CQXs_2L6.js        99.69 kB
+dist/server/assets/2025-11-25-Release-v0.17.1-r1AT9niu.js        99.96 kB
+dist/server/assets/unplugin-CdF57cVq.js                         103.68 kB
+dist/server/assets/variable-types-BSGVU-1B.js                   107.01 kB
+dist/server/assets/2024-11-01-Release-v0.9.3-Bs5BTlN8.js        113.85 kB
+dist/server/assets/2026-04-19-Release-v0.18.x-DXo-IGp4.js       124.69 kB
+dist/server/assets/babel-plugin-Dt3ms4dH.js                     125.61 kB
+dist/server/assets/using-styles-Dar15iLw.js                     126.09 kB
+dist/server/assets/eslint-plugin-HyijK2aW.js                    129.04 kB
+dist/server/assets/thinking-in-stylex-ClFsF2XG.js               140.39 kB
+dist/server/assets/defining-styles-1-l3qvno.js                  143.83 kB
+dist/server/assets/rss-BIXJq6nA.js                              145.07 kB
+dist/server/assets/search-CTa44h9z.js                           154.29 kB
+dist/server/assets/variants-TpWnnSqS.js                         157.30 kB
+dist/server/assets/when-DVJo2155.js                             220.43 kB
+dist/server/assets/static-types-2rX3Vhnu.js                     221.59 kB
+dist/server/assets/waku.server-BmltWLr9.js                      359.02 kB
+✓ built in 10.05s
+[4/5] build client environment...
+vite v7.3.2 building client environment for production...
+[MDX] generated files in 0.9918069999985164ms
+transforming...
+✓ 1969 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/public/index.html                                   0.03 kB │ gzip:     0.04 kB
+dist/public/assets/nmn-B2JWaNf2.jpg                     17.24 kB
+dist/public/assets/necolas-D_9YEUI7.jpg                 19.31 kB
+dist/public/assets/stylex-cover-photo-BWp08ZxO.png      73.36 kB
+dist/public/assets/mellyeliu-CCOt2mL7.jpg               96.39 kB
+dist/public/assets/vincentriemer-OXz-58Lb.png          239.86 kB
+dist/public/assets/_layout-Dox5lVp4.css                 32.22 kB │ gzip:     9.96 kB
+dist/public/assets/chevron-down-D308V52m.js              0.14 kB │ gzip:     0.15 kB
+dist/public/assets/chevron-right-BHfIr1EV.js             0.14 kB │ gzip:     0.15 kB
+dist/public/assets/link-CMDJYWgl.js                      0.17 kB │ gzip:     0.15 kB
+dist/public/assets/client-Cv6zcaMB.js                    0.21 kB │ gzip:     0.19 kB
+dist/public/assets/chunk-ZMWYLUDP-oajMeTFk.js            0.22 kB │ gzip:     0.17 kB
+dist/public/assets/chunk-SH7BNTG7-DjHxpe_X.js            0.38 kB │ gzip:     0.29 kB
+dist/public/assets/fetch-2XFMBLBA-F2YKbHTa.js            0.44 kB │ gzip:     0.29 kB
+dist/public/assets/SidebarToggle-DjDEcL2i.js             0.48 kB │ gzip:     0.33 kB
+dist/public/assets/chunk-K4WNLOVQ-BRrm6TFD.js            0.66 kB │ gzip:     0.38 kB
+dist/public/assets/chunk-OTD7MV33-qJr9DjGl.js            0.67 kB │ gzip:     0.38 kB
+dist/public/assets/index-DT_-XO24.js                     0.68 kB │ gzip:     0.47 kB
+dist/public/assets/algolia-IZEDLPHE-2120h3C3.js          0.80 kB │ gzip:     0.51 kB
+dist/public/assets/createLucideIcon-ByzqTeCy.js          1.17 kB │ gzip:     0.69 kB
+dist/public/assets/tree-D1V4KrJL.js                      1.19 kB │ gzip:     0.68 kB
+dist/public/assets/orama-cloud-UZAPMPFV-DSsy8tIc.js      1.22 kB │ gzip:     0.60 kB
+dist/public/assets/_root-Ccr1tEqU.js                     1.60 kB │ gzip:     0.87 kB
+dist/public/assets/base-80a1f760--izZcyUG.js             1.64 kB │ gzip:     0.68 kB
+dist/public/assets/playground-CVHfrrAw.js                2.63 kB │ gzip:     1.28 kB
+dist/public/assets/stylex-CrYq5BGZ.js                    3.61 kB │ gzip:     1.60 kB
+dist/public/assets/mixedbread-RAHDVXGJ-DWAJ-1Nh.js      11.78 kB │ gzip:     5.03 kB
+dist/public/assets/Dial-ZUjrXdP-.js                     14.63 kB │ gzip:     5.96 kB
+dist/public/assets/SidebarContext-B814gBgh.js           15.48 kB │ gzip:     5.84 kB
+dist/public/assets/consoleHook-59e792cb-NYiqILpa.js     19.70 kB │ gzip:     6.04 kB
+dist/public/assets/SidebarToggle-B_R1eeQV.js            23.26 kB │ gzip:     8.32 kB
+dist/public/assets/docs-CnpUi--l.js                     26.63 kB │ gzip:     9.79 kB
+dist/public/assets/index-B1dXgN34.js                    27.82 kB │ gzip:     8.78 kB
+dist/public/assets/search-default-B-KG7Yd1.js           41.72 kB │ gzip:    14.32 kB
+dist/public/assets/_layout-_K58s6Re.js                  46.71 kB │ gzip:    17.10 kB
+dist/public/assets/static-A2YJ5TXV-Bxb1_3vc.js          63.89 kB │ gzip:    22.32 kB
+dist/public/assets/index-599aeaf7-fzvEGoaE.js          144.42 kB │ gzip:    24.48 kB
+dist/public/assets/index-4J1vdWxI.js                   162.88 kB │ gzip:    27.13 kB
+dist/public/assets/index-zGCZQ_D0.js                   237.12 kB │ gzip:    75.63 kB
+dist/public/assets/index-BD95MuxK.js                 4,232.36 kB │ gzip: 1,001.26 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 17.79s
+[5/5] build ssr environment...
+vite v7.3.2 building ssr environment for production...
+[MDX] generated files in 0.8741530000042985ms
+src/components/Playground/index.tsx (35:30): "default" is not exported by "../@stylexjs/babel-plugin/lib/index.js", imported by "src/components/Playground/index.tsx".
+"equal" is imported from external module "assert" but never used in "node_modules/prettier/index.mjs".
+✓ 1979 modules transformed.
+dist/server/ssr/assets/chevron-down-Ii3Uy696.js              0.24 kB
+dist/server/ssr/assets/chevron-right-VqsQr_9b.js             0.24 kB
+dist/server/ssr/assets/link-B4P6CqCG.js                      0.27 kB
+dist/server/ssr/assets/client-BEXr39Np.js                    0.42 kB
+dist/server/ssr/assets/chunk-ZMWYLUDP-DsjLwjNJ.js            0.46 kB
+dist/server/ssr/assets/fetch-2XFMBLBA-uKSSbneq.js            0.64 kB
+dist/server/ssr/assets/SidebarToggle-BOA1kGsf.js             0.74 kB
+dist/server/ssr/assets/chunk-SH7BNTG7-D-rw2P_N.js            0.77 kB
+dist/server/ssr/assets/index-B1-qA55Y.js                     1.07 kB
+dist/server/ssr/assets/chunk-OTD7MV33-8NxzDOm0.js            1.31 kB
+dist/server/ssr/assets/chunk-K4WNLOVQ-D-9FRR2P.js            1.41 kB
+dist/server/ssr/assets/algolia-IZEDLPHE-ChBqEtpU.js          1.45 kB
+dist/server/ssr/assets/createLucideIcon-B0FgqIvn.js          2.25 kB
+dist/server/ssr/assets/orama-cloud-UZAPMPFV-erisgui8.js      2.32 kB
+dist/server/ssr/assets/tree-QFdYm5Ca.js                      2.40 kB
+dist/server/ssr/assets/_root-DZkdLSng.js                     3.00 kB
+dist/server/ssr/assets/base-80a1f760-DOfzm1W-.js             3.29 kB
+dist/server/ssr/assets/stylex-CtTCSF8E.js                    4.97 kB
+dist/server/ssr/assets/playground-WNdzE7fR.js                5.13 kB
+dist/server/ssr/assets/client-uZ_IoaLw.js                    9.26 kB
+dist/server/ssr/assets/mixedbread-RAHDVXGJ-SJBIz_4I.js      15.31 kB
+dist/server/ssr/assets/consoleHook-59e792cb-qlfk03bZ.js     23.52 kB
+dist/server/ssr/assets/Dial-BzViPGrU.js                     26.46 kB
+dist/server/ssr/assets/SidebarContext-Bm7BtfGz.js           33.35 kB
+dist/server/ssr/assets/docs-BIOb0ynd.js                     37.14 kB
+dist/server/ssr/assets/SidebarToggle-BvBgSOC4.js            51.85 kB
+dist/server/ssr/assets/graphql-Cx6A4xbM.js                  55.22 kB
+dist/server/ssr/assets/index-CKOmctVZ.js                    56.96 kB
+dist/server/ssr/assets/_layout-C3lCk07H.js                  99.38 kB
+dist/server/ssr/assets/angular-Rg2yZ01U.js                 115.71 kB
+dist/server/ssr/assets/search-default-D2vJiFTE.js          117.19 kB
+dist/server/ssr/assets/static-A2YJ5TXV-8agFmRb4.js         135.50 kB
+dist/server/ssr/assets/glimmer-BoZLExB5.js                 160.17 kB
+dist/server/ssr/assets/meriyah-Bb1GBPD7.js                 162.61 kB
+dist/server/ssr/assets/yaml-D06FaHfQ.js                    165.32 kB
+dist/server/ssr/assets/acorn-CS7NizVC.js                   181.09 kB
+dist/server/ssr/assets/markdown-DjHMnn8w.js                186.52 kB
+dist/server/ssr/assets/html-mvIajK3C.js                    191.76 kB
+dist/server/ssr/assets/postcss-sE6YzxJH.js                 205.55 kB
+dist/server/ssr/assets/index-DnGBEjo6.js                   206.19 kB
+dist/server/ssr/assets/index-599aeaf7-sP39i8XJ.js          245.45 kB
+dist/server/ssr/assets/estree-vzvnmFiJ.js                  253.02 kB
+dist/server/ssr/assets/babel-H26r2Ax_.js                   388.48 kB
+dist/server/ssr/assets/typescript-CaxjCQfh.js              590.89 kB
+dist/server/ssr/index.js                                   601.17 kB
+dist/server/ssr/assets/flow-CYUlbtN3.js                  1,150.23 kB
+dist/server/ssr/assets/index-BLPe08MZ.js                 7,927.04 kB
+✓ built in 25.25s
+[ssg] processing static generation...
+✓ 173 files generated in 3352ms
+
+> example-sveltekit@0.19.1 build
+> vite build
+
+vite v7.3.2 building ssr environment for production...
+transforming...
+✓ 148 modules transformed.
+rendering chunks...
+vite v7.3.2 building client environment for production...
+transforming...
+✓ 158 modules transformed.
+rendering chunks...
+computing gzip size...
+.svelte-kit/output/client/_app/version.json                        0.03 kB │ gzip:  0.05 kB
+.svelte-kit/output/client/.vite/manifest.json                      3.40 kB │ gzip:  0.64 kB
+.svelte-kit/output/client/_app/immutable/assets/0.zhSdvcBu.css     1.31 kB │ gzip:  0.55 kB
+.svelte-kit/output/client/_app/immutable/entry/start.BT-jZPVR.js   0.08 kB │ gzip:  0.09 kB
+.svelte-kit/output/client/_app/immutable/chunks/DRxAnFJQ.js        0.23 kB │ gzip:  0.20 kB
+.svelte-kit/output/client/_app/immutable/nodes/1.BUdlmpC3.js       0.51 kB │ gzip:  0.33 kB
+.svelte-kit/output/client/_app/immutable/nodes/2.UTtua9HA.js       0.81 kB │ gzip:  0.51 kB
+.svelte-kit/output/client/_app/immutable/chunks/wbPk3Yxo.js        1.37 kB │ gzip:  0.66 kB
+.svelte-kit/output/client/_app/immutable/chunks/DLlnVVXC.js        1.82 kB │ gzip:  0.84 kB
+.svelte-kit/output/client/_app/immutable/nodes/0.DJorDiy0.js       3.02 kB │ gzip:  1.36 kB
+.svelte-kit/output/client/_app/immutable/chunks/BFg-DnNH.js        3.29 kB │ gzip:  1.67 kB
+.svelte-kit/output/client/_app/immutable/chunks/C03aV7jn.js        5.19 kB │ gzip:  2.33 kB
+.svelte-kit/output/client/_app/immutable/chunks/CMTJW8bU.js        6.82 kB │ gzip:  3.17 kB
+.svelte-kit/output/client/_app/immutable/entry/app.B-TK-2st.js     6.95 kB │ gzip:  3.28 kB
+.svelte-kit/output/client/_app/immutable/chunks/BPA8z3FK.js       24.49 kB │ gzip:  9.57 kB
+.svelte-kit/output/client/_app/immutable/chunks/BtEpuSnP.js       27.48 kB │ gzip: 10.72 kB
+✓ built in 915ms
+.svelte-kit/output/server/.vite/manifest.json                           2.98 kB
+.svelte-kit/output/server/_app/immutable/assets/_layout.zhSdvcBu.css    1.31 kB
+.svelte-kit/output/server/chunks/false.js                               0.05 kB
+.svelte-kit/output/server/env.js                                        0.23 kB
+.svelte-kit/output/server/internal.js                                   0.35 kB
+.svelte-kit/output/server/chunks/internal.js                            0.62 kB
+.svelte-kit/output/server/entries/pages/_page.svelte.js                 0.73 kB
+.svelte-kit/output/server/chunks/utils.js                               1.09 kB
+.svelte-kit/output/server/entries/fallbacks/error.svelte.js             1.38 kB
+.svelte-kit/output/server/entries/pages/_layout.svelte.js               2.64 kB
+.svelte-kit/output/server/chunks/internal2.js                           3.21 kB
+.svelte-kit/output/server/chunks/exports.js                             7.02 kB
+.svelte-kit/output/server/chunks/shared.js                             33.59 kB
+.svelte-kit/output/server/remote-entry.js                              36.79 kB
+.svelte-kit/output/server/chunks/index.js                              38.08 kB
+.svelte-kit/output/server/chunks/root.js                               86.62 kB
+.svelte-kit/output/server/index.js                                    130.76 kB
+✓ built in 5.13s
+
+Run npm run preview to preview your production build locally.
+
+> Using @sveltejs/adapter-auto
+  Could not detect a supported production environment. See https://svelte.dev/docs/kit/adapters to learn how to configure your app to run on the platform of your choosing
+  ✔ done
+$ husky install tools/husky
+husky - Git hooks installed
+Done in 173.24s.
