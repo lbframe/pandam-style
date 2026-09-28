@@ -86,6 +86,20 @@ excludes `__tests__/pandamstyle/`, so a suite is never counted twice. The
 887 snapshots are identical to the historical baseline, which is the strongest
 available signal that no upstream behaviour changed.
 
+### Reproducibility, measured
+
+`./verify-pms.sh` was run twice, in two independent clean worktrees, on two
+different commits (`717cdb3c` and `68c30b47`, which differ only by documentation
+and evidence files). Both runs exited **0** with the same suite counts.
+
+Comparing the 23 artifact digests of the two runs: **22 are byte-identical**.
+The single difference is `valid-fixture-generation/build-report.json`, and the
+only differing field is `coveredRoots`, which embeds the absolute path of the
+worktree. The registry digest (`1d58021beceabbd4`), every compiled JS file, the
+CSS, the manifest, the packed `lib/` and the pilot stylesheet are identical
+across the two machines' runs. Absolute paths are deliberately kept out of the
+registry digest, which is why it is stable.
+
 ### Exclusions and skips, kept visible
 
 - 64 tests and 1 suite are skipped upstream. That is pre-existing and identical
