@@ -750,10 +750,15 @@ test(
   { timeout: 900000 },
   () => {
     // The oracle spawns BOTH engines' real CLIs, and each CLI requires its own
-    // built bundle. `lib/` is gitignored, so a fresh checkout has none, and the
-    // variant engine then exits 2 ("usage or environment error") - which reads
-    // as a divergence rather than as a missing build. Failing here with the
-    // actual cause is worth more than a confusing diff downstream.
+    // built bundle. `lib/` is gitignored, so a fresh checkout has none and each
+    // engine exits 2 ("usage or environment error") - which reads as a
+    // divergence rather than as a missing build. Naming the actual cause is
+    // worth more than a confusing diff downstream.
+    //
+    // Both halves are needed, and they fail differently: the variant engine
+    // missing its bundle shows up as a `build-verdict` divergence, while the
+    // reference engine missing altogether is caught first by the expectation
+    // gate, which correctly refuses to treat it as an equivalence result.
     const variantLib = path.join(
       REPO_ROOT,
       'packages',
@@ -765,8 +770,20 @@ test(
     assert.ok(
       fs.existsSync(variantLib),
       `${variantLib} is missing. The oracle drives the real compiler CLI, so ` +
-        'build it first: yarn --cwd packages/@pandamstyle/compiler build ' +
-        '(./verify-pms.sh does this in its build step).',
+        'build it first: ./verify-pms.sh (its build step), or the 5-package ' +
+        'build it runs.',
+    );
+    const baselineRoot =
+      process.env.PMS_BASELINE_ROOT ??
+      path.join(REPO_ROOT, '..', 'pms-baseline');
+    assert.ok(
+      fs.existsSync(
+        path.join(baselineRoot, 'packages', '@stylexjs', 'babel-plugin'),
+      ),
+      `the reference engine at ${baselineRoot} is missing or unbuilt. The ` +
+        'oracle compares this repo against a checked-out reference engine; ' +
+        'set PMS_BASELINE_ROOT to its path, then build it with ' +
+        './verify-pms.sh (its build step).',
     );
     const dir = tmpdir('oracle');
     const res = spawnSync(
