@@ -30,11 +30,65 @@ const SOURCE_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.cjs'];
 
 const parseCache = new Map();
 
+/**
+ * In-memory modules: absolute path -> source text.
+ *
+ * This exists for ONE reason. The generated design-system module must be
+ * resolvable by module path while the pages are compiled, because that is how
+ * the compiler recognizes a design system. The obvious way to arrange that is to
+ * write it to disk first - and that is precisely what makes a failed build
+ * observable as a mixed generation: the file on disk is generation N+1 while the
+ * manifest next to it is still generation N.
+ *
+ * A bundler also cannot be relied on to tell us that it failed. Vite calls the
+ * `buildEnd` hook at the end of the BUILD phase, which is before the output
+ * phase: an error thrown from `generateBundle` - by a later plugin, or by the
+ * bundler itself - never reaches `buildEnd` or `closeBundle`. A plugin that
+ * writes during the build therefore has no reliable moment at which to undo it.
+ *
+ * So nothing is written during the build. The generated module is served from
+ * this overlay, and it is published with the rest of the generation, atomically,
+ * only after the bundler has succeeded.
+ */
+let moduleOverlay = new Map();
+
+/** Installs the in-memory modules and invalidates the parse cache. */
+export function setModuleOverlay(map) {
+  moduleOverlay = map == null ? new Map() : map;
+  parseCache.clear();
+}
+
+export function clearModuleOverlay() {
+  setModuleOverlay(null);
+}
+
 export function parseModuleFile(absolutePath) {
   const cached = parseCache.get(absolutePath);
   if (cached !== undefined) return cached;
   let ast = null;
   let code = null;
+  const overlaid = moduleOverlay.get(absolutePath);
+  if (overlaid != null) {
+    code = overlaid;
+    try {
+      ast = parseModule(code, {
+        sourceType: 'module',
+        allowReturnOutsideFunction: true,
+        errorRecovery: true,
+        plugins: [
+          'jsx',
+          'typescript',
+          'importAttributes',
+          'explicitResourceManagement',
+        ],
+      });
+    } catch {
+      ast = null;
+    }
+    const result = { ast, code, overlaid: true };
+    parseCache.set(absolutePath, result);
+    return result;
+  }
   try {
     code = fs.readFileSync(absolutePath, 'utf8');
     ast = parseModule(code, {
@@ -51,7 +105,7 @@ export function parseModuleFile(absolutePath) {
   } catch {
     ast = null;
   }
-  const result = { ast, code };
+  const result = { ast, code, overlaid: false };
   parseCache.set(absolutePath, result);
   return result;
 }
@@ -87,6 +141,9 @@ export function resolveRelativeFile(fromFile, request) {
   }
 
   for (const candidate of candidates) {
+    // An in-memory module resolves without existing on disk: that is the whole
+    // point of the overlay for the generated design-system module.
+    if (moduleOverlay.has(candidate)) return candidate;
     try {
       if (fs.statSync(candidate).isFile()) return candidate;
     } catch {
@@ -180,6 +237,148 @@ function collectReexports(ast) {
     }
   }
   return out;
+}
+
+/**
+ * A dynamic `import(...)` request, in either AST shape.
+ *
+ * @babel/parser represents a dynamic import as `CallExpression` with an
+ * `Import` callee; `ImportExpression` is the shape used by ESTree and by the
+ * ES2020 proposal. Both are handled, because relying on one of them is how a
+ * dynamic edge silently disappears from the graph.
+ */
+function dynamicImportRequest(node) {
+  if (node == null) return null;
+  if (node.type === 'ImportExpression') {
+    return { form: 'dynamic-import', source: node.source ?? null };
+  }
+  if (node.type === 'CallExpression' && node.callee?.type === 'Import') {
+    return {
+      form: 'dynamic-import',
+      source: node.arguments?.[0] ?? null,
+    };
+  }
+  return null;
+}
+
+/** A CommonJS `require(...)` request with a single argument. */
+function requireRequest(node) {
+  if (node == null) return null;
+  if (node.type !== 'CallExpression') return null;
+  if (node.callee?.type !== 'Identifier' || node.callee.name !== 'require') {
+    return null;
+  }
+  if (node.arguments?.length !== 1) return null;
+  return { form: 'require', source: node.arguments[0] };
+}
+
+const STYLESHEET_RE = /\.(css|scss|sass|less|styl)$/;
+
+/**
+ * Every LOCAL module edge leaving `file`, whatever syntax carries it.
+ *
+ * Coverage that only walks `ImportDeclaration` is not the real module graph of
+ * an application. A file must not be able to step outside the policy just
+ * because it is reached through a re-export, so the closure follows:
+ *
+ *   import ... from '...'
+ *   export { ... } from '...'
+ *   export * from '...'
+ *   export * as ns from '...'
+ *   import('...')            (literal local request)
+ *   require('...')           (literal local request)
+ *
+ * Each edge reports how it was found, so a coverage report can show a relay.
+ */
+export function moduleEdgesOf(file) {
+  const parsed = parseModuleFile(file);
+  if (parsed.ast == null) return { edges: [], unreadable: true };
+
+  const edges = [];
+  const add = (request, form, node) => {
+    if (request == null || typeof request !== 'string') return;
+    const isStylesheet = STYLESHEET_RE.test(request);
+    const local = request.startsWith('.');
+    edges.push({
+      request,
+      form,
+      local,
+      isStylesheet,
+      // A stylesheet is not a compilable module: the plugin's style-channel
+      // check owns it, so the closure must not try to analyse it as one.
+      resolved:
+        local && !isStylesheet ? resolveRelativeFile(file, request) : null,
+      line: node?.loc?.start?.line ?? null,
+    });
+  };
+
+  const body = parsed.ast.program.body;
+
+  for (const node of body) {
+    if (
+      (node.type === 'ImportDeclaration' ||
+        node.type === 'ExportNamedDeclaration' ||
+        node.type === 'ExportAllDeclaration') &&
+      node.source != null
+    ) {
+      if (node.importKind === 'type') continue;
+      // `export * as ns from '...'` is a NAMED declaration carrying a namespace
+      // specifier. It is still a module edge, and it is labelled distinctly so
+      // the coverage report can show which re-export form carried a file.
+      const isNamespaceReexport =
+        node.type === 'ExportNamedDeclaration' &&
+        (node.specifiers ?? []).some(
+          (s) => s.type === 'ExportNamespaceSpecifier',
+        );
+      add(
+        node.source.value,
+        node.type === 'ImportDeclaration'
+          ? 'import'
+          : node.type === 'ExportAllDeclaration'
+            ? 'export-star'
+            : isNamespaceReexport
+              ? 'export-namespace'
+              : 'export-named',
+        node,
+      );
+    }
+  }
+
+  // Dynamic edges anywhere in the body, not only at the top level.
+  const visit = (node) => {
+    if (node == null || typeof node !== 'object') return;
+    if (Array.isArray(node)) {
+      for (const child of node) visit(child);
+      return;
+    }
+    const dynamic = dynamicImportRequest(node) ?? requireRequest(node);
+    if (dynamic != null) {
+      if (dynamic.source?.type === 'StringLiteral') {
+        add(dynamic.source.value, dynamic.form, node);
+      } else {
+        // No static string: the module this will load is unknown, so it cannot
+        // be analysed. Reported as a gap rather than dropped.
+        edges.push({
+          request: null,
+          form: dynamic.form,
+          local: true,
+          isStylesheet: false,
+          resolved: null,
+          computed: true,
+          line: node.loc?.start?.line ?? null,
+        });
+      }
+      return;
+    }
+    for (const key of Object.keys(node)) {
+      if (key === 'loc' || key === 'leadingComments') continue;
+      const value = node[key];
+      if (value != null && typeof value === 'object') visit(value);
+    }
+  };
+  visit(body);
+
+  return { edges, unreadable: false };
 }
 
 /**

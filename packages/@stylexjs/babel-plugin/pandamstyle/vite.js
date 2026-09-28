@@ -21,10 +21,15 @@
  *  - a policy or coverage failure THROWS, so the bundler exits non-zero.
  */
 
-import * as fs from 'fs';
 import * as path from 'path';
 import { pathToFileURL } from 'node:url';
-import { createCompilerSession, collectCoveredFiles } from './build';
+import {
+  assertCoverageConsistency,
+  createCompilerSession,
+  collectCoveredFiles,
+} from './build';
+import { beginGeneration } from './generation';
+import { clearModuleOverlay } from './module-graph';
 import { PmsError, Codes, diagnostic, formatDiagnostic } from './diagnostics';
 
 const SOURCE_RE = /\.(jsx?|tsx?|mjs|cjs)$/;
@@ -53,7 +58,10 @@ async function loadDefinition(designSystemOption, root) {
 const CSS_ASSET_RE = /\.css$/i;
 
 export function pandamstyle(userOptions = {}) {
-  const root = process.cwd();
+  // `process.cwd()` is only a bootstrap default: Vite's resolved root is
+  // authoritative, because `outDir` and the covered roots are resolved against
+  // it and a project whose root differs from the cwd must still work.
+  let root = process.cwd();
   const options = { ...userOptions };
   const rulesById = new Map();
   const coverage = [];
@@ -61,6 +69,11 @@ export function pandamstyle(userOptions = {}) {
   let sessionPromise = null;
   let coveredFiles = null;
   let css = '';
+  // The transaction spans the whole bundler run. Every artifact is staged and
+  // published in closeBundle(), so a build that fails after this plugin started
+  // generating leaves the previous generation current, byte for byte.
+  let gen = null;
+  let settled = false;
 
   async function ensureSession() {
     if (session != null) return session;
@@ -75,31 +88,50 @@ export function pandamstyle(userOptions = {}) {
         engineOptions: options.engineOptions,
         useCSSLayers: options.useCSSLayers === true,
         role: options.role ?? 'page',
+        // The generated module is provided at its final path: the pages import
+        // it by path and the compiler resolves the design system through the
+        // module graph. The transaction snapshots it, so a rollback restores it.
+        generation: gen,
       });
-
-      // The generated design system module must exist for module resolution.
-      const outDir = path.resolve(root, options.outDir ?? '.pandamstyle');
-      fs.mkdirSync(outDir, { recursive: true });
-      const dsFile = path.join(outDir, session.designSystemFile);
-      fs.writeFileSync(dsFile, session.designSystemSource, 'utf8');
-
-      if (session.unresolved.length > 0) {
-        throw new PmsError(
-          session.unresolved.map((u) =>
-            diagnostic({
-              code: Codes.COVERAGE_GAP,
-              phase: 'coverage',
-              message: `Unresolved local import "${u.request}" from covered file ${u.from}.`,
-              source: u.from,
-              rule: 'coverage.local-imports',
-              context: { request: u.request, from: u.from },
-            }),
-          ),
-        );
-      }
       return session;
     })();
     return sessionPromise;
+  }
+
+  function outDir() {
+    return path.resolve(root, options.outDir ?? '.pandamstyle');
+  }
+
+  /**
+   * Fails the build when a covered module the bundler actually loaded was never
+   * handed to this plugin. `transformInclude()` returning true is not evidence
+   * that a transform ran, so the sets are compared after the fact.
+   *
+   * The generated design-system module is exempt: it is the generator's own
+   * output, and re-analysing it would be meaningless.
+   */
+  function assertBundledCoverage(s) {
+    const expected = s.coveredFiles.filter((f) => rulesById.has(f) === false);
+    const consistency = assertCoverageConsistency({
+      coveredFiles: [...s.coveredFiles],
+      transformedFiles: [...rulesById.keys()],
+      exemptFiles: [path.join(outDir(), s.designSystemFile)],
+      phase: 'vite',
+    });
+    return { consistency, expected };
+  }
+
+  /**
+   * Modules the bundler demonstrably loaded. `transformInclude` is only an
+   * offer, so the graph is recorded from the `load` hook, which runs for every
+   * module the bundler really reads.
+   */
+  const bundlerModules = new Set();
+
+  function discardGeneration() {
+    if (gen == null) return;
+    gen.rollback();
+    clearModuleOverlay();
   }
 
   return {
@@ -110,22 +142,84 @@ export function pandamstyle(userOptions = {}) {
     buildStart() {
       rulesById.clear();
       coverage.length = 0;
+      bundlerModules.clear();
     },
 
     /**
-     * Ordering matters: the generated design system module must exist on disk
-     * BEFORE coverage is computed, because pages import it by module path and
-     * the compiler resolves the design system through the module graph.
+     * Opens the generation and creates the session. The generated design-system
+     * module becomes resolvable through the module overlay - NOT on disk - so
+     * coverage can be computed while the output directory is still untouched.
      */
-    async configResolved() {
+    async configResolved(config) {
+      if (config != null && config.root != null) {
+        root = path.resolve(config.root);
+      }
+      // `build.write: false` means the bundler never calls `writeBundle`, which is
+      // this plugin's only success signal. Refused here, before any work, with a
+      // message the user can act on - rather than discovered at the end of a build
+      // that silently published no stylesheet.
+      if (config?.build?.write === false) {
+        throw new PmsError([
+          diagnostic({
+            code: 'PMS_UNSUPPORTED_FEATURE',
+            phase: 'publish',
+            message:
+              "PandamStyle publishes its generation from the bundler's " +
+              '`writeBundle` hook, which `build.write: false` never calls. ' +
+              'Publishing nothing is indistinguishable from having no ' +
+              'stylesheet, so this mode is refused. Run PandamStyle from the CLI ' +
+              '(`pms-build`) when the bundler is configured not to write.',
+            rule: 'publish.output-phase',
+            context: { buildWrite: false },
+          }),
+        ]);
+      }
+      gen = beginGeneration(outDir(), { label: 'vite' });
+      settled = false;
       const s = await ensureSession();
+      // `s.coveredFiles` excludes the generated design-system module: it is the
+      // generator's output, so it is not analysed and not expected to be.
       coveredFiles = new Set(s.coveredFiles);
+
+      if (s.unresolved.length > 0) {
+        const error = new PmsError(
+          s.unresolved.map((u) =>
+            diagnostic({
+              code: Codes.COVERAGE_GAP,
+              phase: 'coverage',
+              message:
+                `Unresolved local ${u.form ?? 'import'} "${u.request}" from ` +
+                `covered file ${u.from}. P0 requires a static module graph, so ` +
+                'an unresolved edge is a coverage gap, not a skipped file.',
+              source: u.from,
+              rule: 'coverage.local-imports',
+              context: {
+                request: u.request,
+                from: u.from,
+                form: u.form ?? 'import',
+              },
+            }),
+          ),
+        );
+        // Nothing was ever written into the output directory, so discarding the
+        // generation here is only about the scratch directories.
+        discardGeneration();
+        settled = true;
+        throw error;
+      }
+    },
+
+    /** Records what the bundler really loaded, for the coverage cross-check. */
+    load(id) {
+      const file = id.split('?')[0];
+      if (SOURCE_RE.test(file)) bundlerModules.add(path.resolve(file));
+      return null;
     },
 
     /**
      * Coverage gate: a file is transformed when it lies under a declared root
-     * or inside its local import closure. This is deliberately broader than any
-     * textual import filter.
+     * or inside the local module closure of those roots (imports AND
+     * re-exports). This is deliberately broader than any textual import filter.
      */
     transformInclude(id) {
       const file = id.split('?')[0];
@@ -158,7 +252,8 @@ export function pandamstyle(userOptions = {}) {
             failed: true,
             codes: [...new Set(err.diagnostics.map((d) => d.code))],
           });
-          // Rethrow: the bundler must fail, not warn.
+          // Rethrow: the bundler must fail, not warn. The generation is
+          // discarded in buildEnd/closeBundle, so no artifact becomes current.
           const wrapped = new PmsError(err.diagnostics);
           wrapped.message = err.diagnostics.map(formatDiagnostic).join('\n');
           throw wrapped;
@@ -180,36 +275,49 @@ export function pandamstyle(userOptions = {}) {
         ruleCount: rules.length,
       });
 
-      const outDir = path.resolve(root, options.outDir ?? '.pandamstyle');
-      fs.mkdirSync(outDir, { recursive: true });
-      fs.writeFileSync(
-        path.join(outDir, 'build-report.json'),
-        JSON.stringify(
-          {
-            documentKind: 'pandamstyle-vite-build-report',
-            systemId: s.designSystem.registry.systemId,
-            registryDigest: s.registryDigest,
-            coveredRoots: s.roots,
-            coveredFileCount: s.coveredFiles.length,
-            transformedFileCount: rulesById.size,
-            coverage,
-          },
-          null,
-          2,
-        ) + '\n',
-        'utf8',
-      );
-      fs.writeFileSync(
-        path.join(outDir, 'manifest.json'),
-        JSON.stringify(
-          { ...s.designSystem.manifest, registryDigest: s.registryDigest },
-          null,
-          2,
-        ) + '\n',
-        'utf8',
-      );
-
+      // NOTHING is written here. The previous version wrote the report and the
+      // manifest during this hook, so a build failing later presented a
+      // generation that was never complete.
       return { code: result.code, map: null };
+    },
+
+    /**
+     * End-of-build coverage cross-check. This runs at the end of the BUILD phase,
+     * which is BEFORE the output phase, so it cannot observe an output-phase
+     * failure. Nothing has been written to the output directory at this point,
+     * which is what makes that acceptable: if the output phase later fails, the
+     * previous generation is still the state on disk.
+     */
+    async buildEnd(error) {
+      if (gen == null || settled) return;
+      if (error != null) {
+        discardGeneration();
+        settled = true;
+        return;
+      }
+      const s = await ensureSession();
+      const { consistency } = assertBundledCoverage(s);
+      if (!consistency.ok) {
+        const missing = new PmsError(
+          consistency.missing.map((file) =>
+            diagnostic({
+              code: Codes.COVERAGE_GAP,
+              phase: 'coverage',
+              message:
+                `Covered file was never analysed: ${file}. The bundler loaded it ` +
+                '(so it is part of the application) but this plugin did not ' +
+                'compile it. A transform hook admitting a module is not proof ' +
+                'it ran.',
+              source: file,
+              rule: 'coverage.expected-vs-analysed',
+              context: { file, phase: 'vite' },
+            }),
+          ),
+        );
+        discardGeneration();
+        settled = true;
+        throw missing;
+      }
     },
 
     async generateBundle(_options, bundle) {
@@ -232,6 +340,94 @@ export function pandamstyle(userOptions = {}) {
         const current = typeof target.source === 'string' ? target.source : '';
         target.source = `${current}\n${css}`;
       }
+    },
+
+    /**
+     * THE PUBLICATION POINT.
+     *
+     * `writeBundle` is the one output-phase hook a bundler calls only when the
+     * output phase completed. The others are not usable as a success signal:
+     *
+     *   - `buildEnd` runs at the end of the BUILD phase, before `generateBundle`,
+     *     so it always reports success, even for a build that fails later;
+     *   - `closeBundle` runs after a failed output phase too;
+     *   - `buildApp` is a Vite config-time hook, not an end-of-build one.
+     *
+     * So the commit happens here, and `closeBundle` discards the generation if it
+     * is reached without a commit.
+     */
+    writeBundle() {
+      if (gen == null || settled) return;
+      settled = true;
+      const s = session;
+      if (s == null) {
+        gen.rollback();
+        clearModuleOverlay();
+        return;
+      }
+
+      const { consistency } = assertBundledCoverage(s);
+      const report = {
+        documentKind: 'pandamstyle-vite-build-report',
+        systemId: s.designSystem.registry.systemId,
+        registryDigest: s.registryDigest,
+        coveredRoots: s.roots,
+        coveredFileCount: s.coveredFiles.length,
+        transformedFileCount: rulesById.size,
+        bundlerLoadedFileCount: bundlerModules.size,
+        coverageConsistency: {
+          expectedCount: consistency.expectedCount,
+          analysedCount: consistency.transformedCount,
+          missing: consistency.missing,
+          classification:
+            'a covered file the bundler loaded but this plugin did not compile ' +
+            'fails the build; a covered file the entry graph never reaches is ' +
+            'analysed by the CLI path and reported here, not silently dropped',
+          notInBundlerGraph: s.coveredFiles
+            .filter((f) => !rulesById.has(f))
+            .filter((f) => !bundlerModules.has(f)),
+        },
+        externalRequests: (s.externalRequests ?? []).map((e) => ({
+          request: e.request,
+          form: e.form,
+          from: e.from,
+        })),
+        relayEdges: (s.relayEdges ?? []).map((e) => ({
+          from: e.from,
+          to: e.to,
+          form: e.form,
+        })),
+        coverage,
+      };
+
+      gen.stage('styles.css', css);
+      gen.stage('build-report.json', JSON.stringify(report, null, 2) + '\n');
+      gen.stage(
+        'manifest.json',
+        JSON.stringify(
+          { ...s.designSystem.manifest, registryDigest: s.registryDigest },
+          null,
+          2,
+        ) + '\n',
+      );
+      gen.commit();
+      clearModuleOverlay();
+    },
+
+    /**
+     * Reached after `writeBundle` on success, and after a failed output phase on
+     * failure. An uncommitted generation means the output phase did not complete,
+     * so the previous generation is restored.
+     *
+     * Nothing is thrown here: the build has already failed and the caller must
+     * see the REAL cause, not a publishing complaint from a plugin that was
+     * working as designed. The `build.write: false` case, which cannot reach
+     * `writeBundle` at all, is refused up front in `configResolved` instead.
+     */
+    closeBundle() {
+      if (gen == null || settled) return;
+      settled = true;
+      discardGeneration();
     },
 
     transformIndexHtml(html) {

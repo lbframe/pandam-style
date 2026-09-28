@@ -18,7 +18,9 @@ export {
   collectCoveredFiles,
   createCompilerSession,
   compileFile,
+  assertCoverageConsistency,
 } from './build';
+export { beginGeneration, withGeneration, digestOfTree } from './generation';
 export { buildDesignSystem } from './index';
 export { buildRegistry, registryDigest } from './registry';
 export { supportedProperties, propertyKind, propertyCategory } from './policy';
@@ -28,12 +30,14 @@ export { defineRecipe, isStyleRef } from './recipe';
 export { selectRecipeRefs, makeRecipeSpec } from './recipe-select';
 export { generateDesignSystemModule } from './codegen';
 export { pandamstyleBabelPlugin } from './babel-plugin';
+export { Provenance, isAdmitted, provenanceOf } from './provenance';
 export { conformanceDefinition } from './conformance';
 export { PmsError, Codes, diagnostic, formatDiagnostic } from './diagnostics';
 export {
   resolveDesignSystemModule,
   resolveRelativeFile,
   clearModuleCache,
+  moduleEdgesOf,
   DESIGN_SYSTEM_MARKER,
 } from './module-graph';
 export { REQUIRED_HELPERS } from './evaluate-usage';

@@ -29,7 +29,14 @@ import {
   isCreateCall,
   isPropsCall,
   readModuleFacts,
+  resolvePmsAccess,
 } from './evaluate-usage';
+import {
+  analyzeProvenanceEscapes,
+  checkPropsProvenance,
+  Provenance,
+  provenanceOf,
+} from './provenance';
 import { transformResidualTokens, transformUsage } from './transform';
 
 /** Engine/author APIs a consumer page may never reach. */
@@ -54,56 +61,91 @@ const ENGINE_EXPORT_NAMES = new Set([
   'unstable_conditional',
 ]);
 
-/** Records identifiers bound to a recognized PMS call, before transforming. */
-function collectDerivedBindings(programPath, ctx) {
-  const propsDerived = new Set();
-  const createDerived = new Set();
+/** Reserved authority fields, namespaced so no business key can collide. */
+const RESERVED_AUTHORITY_KEYS = new Set([
+  '__pmsRole',
+  '__pmsTrusted',
+  '__pmsRoleOverride',
+]);
 
+/** Authority-looking keys that only matter INSIDE a PandamStyle call. */
+const AUTHORITY_KEYS_IN_PMS_CONTEXT = new Set(['role', 'trusted']);
+
+/**
+ * Records which local constants hold a recognized PMS result.
+ *
+ * The record is keyed by BINDING, not by name. `const x = props(...)` and a
+ * function parameter `x` are different bindings, so the parameter cannot inherit
+ * the provenance of the module-level constant of the same spelling.
+ *
+ * A REASSIGNED binding is not recorded at all:
+ *
+ *     let x = props(styles.root)
+ *     x = userInput
+ *     <div {...x} />
+ *
+ * Here `x` is whatever the last assignment made, so the fact that its
+ * initializer was a props() call carries no information about its value.
+ */
+function collectDerivedBindings(programPath, ctx) {
   programPath.traverse({
     VariableDeclarator(p) {
       const id = p.node.id;
       if (id.type !== 'Identifier') return;
       const init = p.get('init');
       if (init == null || init.node == null) return;
+      const binding = p.scope.getBinding(id.name);
+      if (binding == null) return;
+      if (binding.constantViolations.length > 0) return;
       if (isPropsCall(init, ctx)) {
-        propsDerived.add(id.name);
-        ctx.derived.set(id.name, 'props');
+        ctx.propsResults.add(binding);
+        // Tracked for mutation/escape too: a proven value that can still be
+        // written to or handed to an unknown function has no durable
+        // provenance (see provenance.js).
+        ctx.provenance.set(binding, {
+          kind: Provenance.PROPS_RESULT,
+          reason: null,
+        });
       } else if (isCreateCall(init, ctx)) {
-        createDerived.add(id.name);
-        ctx.derived.set(id.name, 'create');
+        ctx.createResults.add(binding);
+        ctx.provenance.set(binding, {
+          kind: Provenance.CREATE_CONTAINER,
+          reason: null,
+        });
       }
     },
   });
-
-  return { propsDerived, createDerived };
 }
 
 /**
- * Resolves a JSX expression to "is it a PMS-composed value?".
- * A spread of `props(...)` (or of an identifier bound to one) is admitted; the
- * spec's own example is exactly that form.
+ * Resolves a JSX expression to the KIND of value it is, through bindings.
+ *
+ * `derived.get(name)` could not exist here: a name-keyed map would let a
+ * parameter shadowing a module-level `props` result be admitted.
  */
-function jsxValueKind(nodePath, ctx, derived) {
+function jsxValueKind(nodePath, ctx) {
   if (nodePath == null || nodePath.node == null) return 'unknown';
   if (isPropsCall(nodePath, ctx)) return 'props';
   if (isCreateCall(nodePath, ctx)) return 'create';
   if (nodePath.isIdentifier()) {
-    const kind = derived.get(nodePath.node.name);
-    if (kind != null) return kind;
+    const binding = nodePath.scope?.getBinding(nodePath.node.name) ?? null;
+    if (binding == null) return 'unknown';
+    if (ctx.propsResults.has(binding)) return 'props';
+    if (ctx.createResults.has(binding)) return 'create';
     return 'unknown';
   }
   if (
     nodePath.isTSAsExpression() ||
     nodePath.isTSSatisfiesExpression?.() ||
-    nodePath.isParenthesizedExpression()
+    nodePath.isParenthesizedExpression?.()
   ) {
-    return jsxValueKind(nodePath.get('expression'), ctx, derived);
+    return jsxValueKind(nodePath.get('expression'), ctx);
   }
   if (
     nodePath.isMemberExpression() ||
     nodePath.isOptionalMemberExpression?.()
   ) {
-    // `styles.page.className` - member of a create() result.
+    // `styles.page.className` - a member of a create() result.
     let cur = nodePath;
     while (
       cur.isMemberExpression() ||
@@ -114,20 +156,22 @@ function jsxValueKind(nodePath, ctx, derived) {
       if (cur == null || cur.node == null) return 'unknown';
     }
     if (cur.isIdentifier()) {
-      const kind = derived.get(cur.node.name);
-      if (kind != null) return kind;
+      const binding = cur.scope?.getBinding(cur.node.name) ?? null;
+      if (binding == null) return 'unknown';
+      if (ctx.propsResults.has(binding)) return 'props';
+      if (ctx.createResults.has(binding)) return 'create';
     }
     return 'unknown';
   }
   return 'unknown';
 }
 
-function checkJsxChannels(programPath, ctx, derived) {
+function checkJsxChannels(programPath, ctx) {
   programPath.traverse({
     JSXOpeningElement(p) {
       for (const attr of p.get('attributes')) {
         if (attr.isJSXSpreadAttribute()) {
-          const kind = jsxValueKind(attr.get('argument'), ctx, derived);
+          const kind = jsxValueKind(attr.get('argument'), ctx);
           if (kind !== 'props') {
             ctx.diags.push(
               makeDiag(
@@ -161,7 +205,7 @@ function checkJsxChannels(programPath, ctx, derived) {
             ),
           );
         } else if (name === 'className') {
-          const kind = jsxValueKind(attr.get('value'), ctx, derived);
+          const kind = jsxValueKind(attr.get('value'), ctx);
           if (kind === 'unknown') {
             ctx.diags.push(
               makeDiag(
@@ -236,12 +280,38 @@ function checkEngineImports(programPath, ctx) {
   }
 }
 
+/**
+ * Refuses an attempt to GRANT ITSELF authority, and nothing else.
+ *
+ * The previous rule refused any object property literally named `role`,
+ * `trusted` or `__pmsRole` anywhere in a covered file. That is not a security
+ * boundary, it is a vocabulary ban: `const user = { role: 'admin' }` and
+ * `{ trusted: true }` are ordinary application data, and a compiler that
+ * refuses them is not enforcing a profile, it is censoring a word.
+ *
+ * Authority in PandamStyle comes from the build configuration (the `role`
+ * option and the design-system definition), never from a page. So a violation
+ * requires an actual attempt to influence the compiler, and there are exactly
+ * two shapes:
+ *
+ *  1. a NAMESPACED reserved field (`__pmsRole`, `__pmsTrusted`, ...). These
+ *     cannot collide with business data, so seeing one is always an attempt;
+ *
+ *  2. an authority-looking field INSIDE a call to a recognized PandamStyle
+ *     export - `props(x, { role: 'author' })`, `recipes.button({ trusted: true })`
+ *     - which is a real attempt to configure the compiler from a page.
+ *
+ * `{ role: 'admin' }` as data, in a component prop, in a payload, in a
+ * redux-shaped object, is none of those and is accepted.
+ */
 function rejectSelfDeclaredAuthority(programPath, ctx) {
   programPath.traverse({
     ObjectProperty(p) {
       const key = p.node.key;
       const name = key.type === 'Identifier' ? key.name : key.value;
-      if (name === 'trusted' || name === '__pmsRole' || name === 'role') {
+      if (typeof name !== 'string') return;
+
+      if (RESERVED_AUTHORITY_KEYS.has(name)) {
         ctx.diags.push(
           makeDiag(
             ctx,
@@ -250,12 +320,56 @@ function rejectSelfDeclaredAuthority(programPath, ctx) {
               'build configuration, not by the source.',
             p,
             'profile.closed.roles',
-            { key: name },
+            { key: name, scope: 'reserved-namespace' },
           ),
         );
+        return;
       }
+
+      if (!AUTHORITY_KEYS_IN_PMS_CONTEXT.has(name)) return;
+
+      const call = enclosingCall(p);
+      if (call == null) return; // ordinary data: not an authority claim
+      if (resolvePmsAccess(call.get('callee'), ctx) == null) return;
+
+      ctx.diags.push(
+        makeDiag(
+          ctx,
+          'PMS_ROLE_VIOLATION',
+          `"${name}" may not be passed to a PandamStyle export: authority is ` +
+            'granted by the build configuration, not by the source.',
+          p,
+          'profile.closed.roles',
+          { key: name, scope: 'pandamstyle-call' },
+        ),
+      );
     },
   });
+}
+
+/** The nearest enclosing CallExpression whose argument subtree contains `p`. */
+function enclosingCall(p) {
+  let cur = p.parentPath;
+  while (cur != null) {
+    if (cur.isCallExpression?.()) {
+      for (const arg of cur.get('arguments')) {
+        if (arg == null || arg.node == null) continue;
+        if (isDescendant(arg, p)) return cur;
+      }
+    }
+    if (cur.isProgram?.()) return null;
+    cur = cur.parentPath;
+  }
+  return null;
+}
+
+function isDescendant(ancestor, node) {
+  let cur = node;
+  while (cur != null) {
+    if (cur === ancestor || cur.node === ancestor.node) return true;
+    cur = cur.parentPath;
+  }
+  return false;
 }
 
 export function pandamstyleBabelPlugin(api) {
@@ -295,7 +409,17 @@ export function pandamstyleBabelPlugin(api) {
           if (ctx == null) return;
 
           collectDerivedBindings(programPath, ctx);
-          checkJsxChannels(programPath, ctx, ctx.derived);
+
+          // PROVENANCE PASS - strictly before any rewrite.
+          //
+          // `checkPropsProvenance` must see the ORIGINAL tree: a `create()`
+          // result is still a call, so `styles.page` is still provably a
+          // compiled namespace. Running it after the transform would only see
+          // the emitted object literal and could no longer tell a compiled
+          // style from a raw one.
+          checkPropsProvenance(programPath, ctx);
+          checkJsxChannels(programPath, ctx);
+          analyzeProvenanceEscapes(programPath, ctx);
 
           if (ctx.diags.length === 0) {
             const ds = pluginPass.opts?.designSystem;
@@ -349,4 +473,5 @@ export function pandamstyleBabelPlugin(api) {
   };
 }
 
+export { provenanceOf, Provenance };
 export default pandamstyleBabelPlugin;

@@ -110,6 +110,96 @@ const CASES = [
     ['AC-023', 'AC-019'],
     'local helper named token gains no trust; props value is not static',
   ],
+  // --- consolidation batch -------------------------------------------------
+  // BC-1: props() admits no raw, unvalidated CSS.
+  [
+    'neg-props-raw-object',
+    'PMS_UNVERIFIED_PROPS_SOURCE',
+    ['BC-1'],
+    'an object literal handed to props(), while a create() namespace in the ' +
+      'same file compiles',
+  ],
+  [
+    'neg-props-raw-reference',
+    'PMS_UNVERIFIED_PROPS_SOURCE',
+    ['BC-1'],
+    'an arbitrary local object, and a spread of it, handed to props()',
+  ],
+  // BC-2: provenance is attached to a real binding.
+  [
+    'neg-props-shadowing',
+    'PMS_UNVERIFIED_JSX_SPREAD',
+    ['BC-2'],
+    'a parameter shadowing a module-level props() result inherits nothing',
+  ],
+  [
+    'neg-props-reassigned',
+    'PMS_UNVERIFIED_JSX_SPREAD',
+    ['BC-2'],
+    'a props() result that is then reassigned is not the proven value',
+  ],
+  [
+    'neg-props-mutated',
+    'PMS_UNVERIFIED_PROVENANCE',
+    ['BC-2'],
+    'a proven props() result whose member is written to afterwards',
+  ],
+  [
+    'neg-props-escaped',
+    'PMS_UNVERIFIED_PROVENANCE',
+    ['BC-2'],
+    'a proven value handed to an unknown function and to Object.assign',
+  ],
+  [
+    'neg-helper-shadowed',
+    'PMS_UNVERIFIED_JSX_SPREAD',
+    ['BC-2', 'BC-6'],
+    'an alias of the helper, and a nested declaration shadowing it, are not ' +
+      'the helper',
+  ],
+  // BC-3: the coverage graph follows the real local module edges.
+  [
+    'neg-relay-reexport-star',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    ['BC-3', 'BC-9'],
+    'a module outside every root, reached through `export *`',
+  ],
+  [
+    'neg-relay-reexport-named',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    ['BC-3', 'BC-9'],
+    'a module outside every root, reached through a named re-export',
+  ],
+  [
+    'neg-relay-barrel-chain',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    ['BC-3', 'BC-9'],
+    'two barrels deep, both outside every root',
+  ],
+  [
+    'neg-unresolved-import',
+    'PMS_COVERAGE_GAP',
+    ['BC-3', 'BC-4'],
+    'a local import that resolves to nothing',
+  ],
+  [
+    'neg-dynamic-import',
+    'PMS_COVERAGE_GAP',
+    ['BC-3', 'BC-4'],
+    'a dynamic request that is not a static string',
+  ],
+  [
+    'neg-dynamic-import-local',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    ['BC-3', 'BC-9'],
+    'a literal dynamic import: the target is a normal local edge and is analysed',
+  ],
+  [
+    'neg-stylesheet-via-relay',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    ['BC-3', 'BC-9'],
+    'an unapproved stylesheet reached only through a relay',
+  ],
 ];
 
 describe.each(CASES)(

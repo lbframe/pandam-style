@@ -35,16 +35,15 @@ import { PmsError, Codes, diagnostic, formatDiagnostic } from './diagnostics';
 import { buildDesignSystem } from './index';
 import { generateDesignSystemModule } from './codegen';
 import { pandamstyleBabelPlugin } from './babel-plugin';
+import { withGeneration } from './generation';
 import {
   clearModuleCache,
-  parseModuleFile,
-  resolveRelativeFile,
+  clearModuleOverlay,
+  moduleEdgesOf,
+  setModuleOverlay,
 } from './module-graph';
 
 const SOURCE_RE = /\.(jsx?|tsx?|mjs|cjs)$/;
-// Stylesheet requests are handled by the plugin's style-channel check, not by
-// the module closure: a .css file is not a compilable module.
-const STYLESHEET_RE = /\.(css|scss|sass|less|styl)$/;
 const SKIP_DIRS = new Set([
   'node_modules',
   '.git',
@@ -72,25 +71,18 @@ function walkFiles(dir, out = []) {
   return out;
 }
 
-function localImportsOf(file) {
-  const parsed = parseModuleFile(file);
-  if (parsed.ast == null) return [];
-  const out = [];
-  for (const node of parsed.ast.program.body) {
-    if (node.type !== 'ImportDeclaration') continue;
-    if (node.source == null) continue;
-    const request = node.source.value;
-    if (!request.startsWith('.')) continue;
-    if (STYLESHEET_RE.test(request)) continue;
-    const resolved = resolveRelativeFile(file, request);
-    out.push({ request, resolved });
-  }
-  return out;
-}
-
 /**
- * Declared roots + the local-import closure they pull in.
- * Every returned file must be analysed, or the build fails.
+ * Declared roots + the LOCAL MODULE CLOSURE they pull in.
+ *
+ * The closure follows every local edge of the real module graph - imports AND
+ * re-exports AND literal dynamic requests - so a file cannot step outside the
+ * policy by being reached through a barrel:
+ *
+ *     covered-root/page.tsx -> bridge/index.ts -> outside/Unsafe.tsx
+ *
+ * `Unsafe.tsx` is now covered, so it is analysed. A local edge that cannot be
+ * resolved, or a dynamic request that is not a static string, is reported as
+ * PMS_COVERAGE_GAP rather than dropped.
  */
 export function collectCoveredFiles(roots) {
   const covered = new Map();
@@ -122,23 +114,133 @@ export function collectCoveredFiles(roots) {
     }
   }
 
-  // Import closure: a page that only imports a generated recipe or a re-export
-  // is still covered.
   const unresolved = [];
+  const external = [];
+  const relayEdges = [];
   while (queue.length > 0) {
     const file = queue.pop();
-    for (const imp of localImportsOf(file)) {
-      if (imp.resolved == null) {
-        unresolved.push({ from: file, request: imp.request });
+    const { edges, unreadable } = moduleEdgesOf(file);
+    if (unreadable) {
+      unresolved.push({
+        from: file,
+        request: '<unparseable>',
+        form: 'unreadable',
+        line: null,
+      });
+      continue;
+    }
+    for (const edge of edges) {
+      if (edge.computed === true) {
+        // A dynamic request with no static string: the module it loads is
+        // unknown, and an unknown module cannot be analysed.
+        unresolved.push({
+          from: file,
+          request: '<computed>',
+          form: edge.form,
+          line: edge.line,
+        });
         continue;
       }
-      if (!covered.has(imp.resolved)) {
-        covered.set(imp.resolved, 'import-closure');
-        queue.push(imp.resolved);
+      if (!edge.local) {
+        // A package request: outside the local coverage contract, but not
+        // hidden. The plugin refuses the forbidden ones in every syntax.
+        if (edge.form !== 'import') {
+          external.push({
+            from: file,
+            request: edge.request,
+            form: edge.form,
+          });
+        }
+        continue;
+      }
+      if (edge.isStylesheet) continue;
+      if (edge.resolved == null) {
+        unresolved.push({
+          from: file,
+          request: edge.request,
+          form: edge.form,
+          line: edge.line,
+        });
+        continue;
+      }
+      if (!covered.has(edge.resolved)) {
+        covered.set(edge.resolved, `closure:${edge.form}`);
+        relayEdges.push({
+          from: file,
+          to: edge.resolved,
+          form: edge.form,
+          request: edge.request,
+        });
+        queue.push(edge.resolved);
       }
     }
   }
-  return { covered, unresolved };
+  return { covered, unresolved, external, relayEdges };
+}
+
+/**
+ * Consistency between the files a run EXPECTED to analyse and the files it
+ * ACTUALLY analysed.
+ *
+ * `transformInclude()` is not evidence: it only says a hook is willing to look
+ * at a module. A covered module that the bundler loaded and the compiler never
+ * analysed is a hole, and it must be a failure rather than a note in a report.
+ *
+ * Two sets are compared:
+ *  - `expected`  : covered files the bundler demonstrably loaded;
+ *  - `transformed`: files the transform hook really compiled.
+ *
+ * Files covered by a declared root but never reachable from the entry are
+ * reported with `classification: 'not-in-bundler-graph'`. The CLI analyses
+ * those directly, so they are not a failure; the bundler cannot, and pretending
+ * otherwise would be the lie this function exists to prevent.
+ */
+export function assertCoverageConsistency({
+  coveredFiles = [],
+  transformedFiles = [],
+  exemptFiles = [],
+  phase = 'build',
+} = {}) {
+  const exempt = new Set(exemptFiles.map((f) => path.resolve(f)));
+  const covered = new Set(coveredFiles.map((f) => path.resolve(f)));
+  const transformed = new Set(transformedFiles.map((f) => path.resolve(f)));
+
+  const missing = [];
+  for (const file of covered) {
+    if (exempt.has(file)) continue;
+    if (transformed.has(file)) continue;
+    missing.push(file);
+  }
+
+  const loadedNotCovered = [];
+  for (const file of transformed) {
+    if (!covered.has(file) && !exempt.has(file)) loadedNotCovered.push(file);
+  }
+
+  return {
+    phase,
+    expectedCount: covered.size,
+    transformedCount: transformed.size,
+    missing,
+    loadedNotCovered,
+    ok: missing.length === 0,
+  };
+}
+
+function coverageGapDiagnostics(missing, phase) {
+  return missing.map((file) =>
+    diagnostic({
+      code: Codes.COVERAGE_GAP,
+      phase: 'coverage',
+      message:
+        `Covered file was never analysed: ${file}. It is inside the declared ` +
+        'coverage and was presented to the bundler, so a real policy check was ' +
+        'skipped. A transform hook admitting a module is not proof it ran.',
+      source: file,
+      rule: 'coverage.expected-vs-analysed',
+      context: { file, phase, missingCount: missing.length },
+    }),
+  );
 }
 
 /** Deepest common directory of a list of paths. */
@@ -158,10 +260,6 @@ function commonBase(paths) {
   return joined === '' ? path.sep : joined;
 }
 
-function ensureDir(dir) {
-  fs.mkdirSync(dir, { recursive: true });
-}
-
 function relativeToCwd(file) {
   const rel = path.relative(process.cwd(), file);
   return rel.startsWith('..') ? file : rel;
@@ -173,6 +271,10 @@ function relativeToCwd(file) {
  * The Vite/Rollup adapter and `buildProject` share it so both drive the exact
  * same two-pass pipeline, the same policy and the same engine: there is only
  * one compilation circuit.
+ *
+ * `generation` is the transaction the caller opened (see generation.js). The
+ * session NEVER writes: publishing is the transaction's job, so a failed
+ * generation leaves nothing current.
  */
 export function createCompilerSession(config) {
   const {
@@ -183,14 +285,37 @@ export function createCompilerSession(config) {
     engineOptions = {},
     useCSSLayers = false,
     role = 'page',
+    generation = null,
   } = config;
 
   clearModuleCache();
   const designSystem = buildDesignSystem(definition, { ...engineOptions });
+  const designSystemSource = generateDesignSystemModule({
+    designSystem,
+    runtimeModule,
+  });
+
+  // The generated design system module must be RESOLVABLE while the pages are
+  // compiled, because that is how a design system is recognized. It is served
+  // from the module overlay rather than written to disk, so nothing exists on
+  // disk until the generation is published. See module-graph.js for why a
+  // bundler cannot be trusted to report its own failure.
+  const outDirAbs =
+    generation != null
+      ? path.resolve(generation.outDir)
+      : path.resolve(designSystemFile, '..');
+  const generatedModulePath = path.join(outDirAbs, designSystemFile);
+  setModuleOverlay(new Map([[generatedModulePath, designSystemSource]]));
+  if (generation != null) {
+    generation.stage(designSystemFile, designSystemSource);
+  }
+  // It is discovered by the closure like any other local module, but it is the
+  // GENERATOR'S OUTPUT, not a page: it is never re-analysed. Excluding it here
+  // is what lets the expected-vs-analysed cross-check mean something.
+  const isGeneratedModule = (file) => file === generatedModulePath;
 
   // Coverage is LAZY on purpose: the generated design system module must be on
-  // disk before the import closure is walked, because pages import it by module
-  // path. The bundler adapter writes it right after this call returns.
+  // disk before the module closure is walked.
   let coveredCache = null;
   const covered = () => {
     if (coveredCache == null) coveredCache = collectCoveredFiles(roots);
@@ -205,8 +330,10 @@ export function createCompilerSession(config) {
     engineOptions,
     runtimeModule,
     designSystemFile,
+    designSystemSource,
+    generatedModulePath,
     get coveredFiles() {
-      return [...covered().covered.keys()];
+      return [...covered().covered.keys()].filter((f) => !isGeneratedModule(f));
     },
     get coverage() {
       return covered().covered;
@@ -214,11 +341,13 @@ export function createCompilerSession(config) {
     get unresolved() {
       return covered().unresolved;
     },
+    get externalRequests() {
+      return covered().external;
+    },
+    get relayEdges() {
+      return covered().relayEdges;
+    },
     registryDigest: designSystem.registry.registryDigest,
-    designSystemSource: generateDesignSystemModule({
-      designSystem,
-      runtimeModule,
-    }),
     compileSource: (code, filename) =>
       compileFile(code, filename, designSystem, { ...engineOptions, role }),
     renderCss: (rules) =>
@@ -238,12 +367,31 @@ export function createCompilerSession(config) {
 /**
  * Builds a project.
  *
+ * Publication is transactional (ARC-14, P0-10). The order is fixed:
+ *
+ *   snapshot the current generation
+ *   -> provide the design-system module (pages import it BY PATH, so it must
+ *      exist while the pages are compiled; it is snapshotted, so a rollback
+ *      restores it)
+ *   -> compute the module closure of the declared roots
+ *   -> compile every covered source
+ *   -> compare expected vs analysed
+ *   -> generate CSS / manifest / report into STAGING
+ *   -> publish (manifest last)
+ *
+ * Any throw rolls the whole generation back, so the previously published
+ * artifacts stay current, byte for byte, and no N/N+1 mix can be observed.
+ *
  * @param {object} config
  * @param {object} config.definition       design system definition object
  * @param {string[]} config.roots          declared covered roots (absolute or cwd-relative)
  * @param {string}   config.outDir         output directory
  * @param {string}   [config.runtimeModule] module specifier the generated design system imports
  * @param {string}   [config.designSystemFile] filename of the generated design system module
+ * @param {Function} [config.onStage]      test seam, called once every source is
+ *                                         compiled and BEFORE anything is
+ *                                         published, so an internal failure at
+ *                                         that point can be exercised
  */
 export function buildProject(config) {
   const {
@@ -254,189 +402,238 @@ export function buildProject(config) {
     designSystemFile = 'design.pandamstyle.js',
     engineOptions = {},
     useCSSLayers = false,
+    onStage = null,
   } = config;
-
-  clearModuleCache();
-
-  const designSystem = buildDesignSystem(definition, { ...engineOptions });
-  const registryDigest = designSystem.registry.registryDigest;
 
   const absOut = path.resolve(outDir);
   const designSystemPath = path.join(absOut, designSystemFile);
 
-  ensureDir(absOut);
-  // The design system module must exist on disk before the pages are compiled:
-  // the compiler resolves the design system by module path, not by config.
-  // It is therefore snapshotted so a failing build can restore the last valid
-  // generation instead of leaving a half-published one (ARC-14).
-  const previousDesignSystem = fs.existsSync(designSystemPath)
-    ? fs.readFileSync(designSystemPath, 'utf8')
-    : null;
-  const restoreDesignSystem = () => {
-    if (previousDesignSystem == null) {
-      fs.rmSync(designSystemPath, { force: true });
-    } else {
-      fs.writeFileSync(designSystemPath, previousDesignSystem, 'utf8');
-    }
-  };
-  fs.writeFileSync(
-    designSystemPath,
-    generateDesignSystemModule({ designSystem, runtimeModule }),
-    'utf8',
-  );
-
-  const { covered, unresolved } = collectCoveredFiles(roots);
-
-  // Compiled JS is emitted next to the artifacts, never over the page sources:
-  // the build must be repeatable and must not mutate application code.
-  const sourceBase = commonBase(roots.map((r) => path.resolve(r)));
-  const outputPathFor = (file) => {
-    const rel = path.relative(sourceBase, file);
-    const safe = rel.startsWith('..') ? path.basename(file) : rel;
-    return path.join(absOut, 'js', safe);
-  };
-
-  if (unresolved.length > 0) {
-    restoreDesignSystem();
-    throw new PmsError(
-      unresolved.map((u) =>
-        diagnostic({
-          code: Codes.COVERAGE_GAP,
-          phase: 'coverage',
-          message: `Unresolved local import "${u.request}" from covered file ${u.from}.`,
-          source: u.from,
-          rule: 'coverage.local-imports',
-          context: { request: u.request, from: u.from },
-        }),
-      ),
-    );
-  }
-
-  // The generated design system module is part of the shipped application.
-  covered.set(designSystemPath, 'generated');
-
-  // The design system emits its own rules first: the `:root` variable group and
-  // the theme classes. Consumer rules join the same generation (ARC-14), so the
-  // whole stylesheet references one registry.
-  const allRules = [];
-  for (const [key, { priority, ...rest }] of Object.entries(
-    designSystem.injected,
-  )) {
-    allRules.push([key, rest, priority ?? 0]);
-  }
-  const designSystemRuleCount = allRules.length;
-
-  const coverage = [];
-  const failures = [];
-  const outputs = [];
-
-  for (const [file, origin] of covered) {
-    if (file === designSystemPath) {
-      // Emitted as-is; the generator already produced it.
-      coverage.push({
-        file: relativeToCwd(file),
-        origin,
-        role: 'design-system',
-        analysed: true,
-        diagnostics: 0,
-      });
-      continue;
-    }
-    const code = fs.readFileSync(file, 'utf8');
-    let result;
-    try {
-      result = compileFile(code, file, designSystem, engineOptions);
-    } catch (err) {
-      if (err != null && Array.isArray(err.diagnostics)) {
-        failures.push(...err.diagnostics);
-        coverage.push({
-          file: relativeToCwd(file),
-          origin,
-          role: 'page',
-          analysed: true,
-          failed: true,
-          diagnostics: err.diagnostics.length,
-          codes: [...new Set(err.diagnostics.map((d) => d.code))],
+  try {
+    return withGeneration(
+      absOut,
+      (gen) => {
+        // The session makes the design system module resolvable (through the
+        // module overlay, never on disk) and stages it with the rest of the
+        // generation.
+        const session = createCompilerSession({
+          definition,
+          roots,
+          runtimeModule,
+          designSystemFile,
+          engineOptions,
+          useCSSLayers,
+          generation: gen,
         });
-        continue;
-      }
-      throw err;
-    }
-    const rules = result.metadata.pandamstyle ?? [];
-    for (const rule of rules) allRules.push(rule);
-    const coverageEntry = result.metadata.pandamstyleCoverage ?? {};
-    coverage.push({
-      file: relativeToCwd(file),
-      origin,
-      role: 'page',
-      analysed: true,
-      usedDesignSystem: coverageEntry.usedDesignSystem === true,
-      usedPmsHelpers: coverageEntry.usedPmsHelpers === true,
-      ruleCount: rules.length,
-      relayChain: (coverageEntry.relayChain ?? []).map(relativeToCwd),
-      diagnostics: 0,
-    });
-    outputs.push({ file, code: result.code });
+        const designSystem = session.designSystem;
+        const registryDigest = session.registryDigest;
+
+        const { covered, unresolved, external, relayEdges } =
+          collectCoveredFiles(roots);
+
+        // Compiled JS is emitted next to the artifacts, never over the page
+        // sources: the build must be repeatable and must not mutate application
+        // code.
+        const sourceBase = commonBase(roots.map((r) => path.resolve(r)));
+        const outputRelFor = (file) => {
+          const rel = path.relative(sourceBase, file);
+          const safe = rel.startsWith('..') ? path.basename(file) : rel;
+          return path.posix.join('js', safe.split(path.sep).join('/'));
+        };
+
+        if (unresolved.length > 0) {
+          throw new PmsError(
+            unresolved.map((u) =>
+              diagnostic({
+                code: Codes.COVERAGE_GAP,
+                phase: 'coverage',
+                message:
+                  `Unresolved local ${u.form ?? 'import'} "${u.request}" from ` +
+                  `covered file ${u.from}. P0 requires a static module graph, so ` +
+                  'an unresolved edge is a coverage gap, not a skipped file.',
+                source: u.from,
+                rule: 'coverage.local-imports',
+                context: {
+                  request: u.request,
+                  from: u.from,
+                  form: u.form ?? 'import',
+                  line: u.line ?? null,
+                },
+              }),
+            ),
+          );
+        }
+
+        // The generated design system module is part of the shipped application.
+        covered.set(designSystemPath, 'generated');
+
+        // The design system emits its own rules first: the `:root` variable group
+        // and the theme classes. Consumer rules join the same generation
+        // (ARC-14), so the whole stylesheet references one registry.
+        const allRules = session.designSystemRules();
+        const designSystemRuleCount = allRules.length;
+
+        const coverage = [];
+        const failures = [];
+        const outputs = [];
+        const analysed = [];
+
+        for (const [file, origin] of covered) {
+          if (file === designSystemPath) {
+            // Emitted as-is; the generator already produced it.
+            coverage.push({
+              file: relativeToCwd(file),
+              origin,
+              role: 'design-system',
+              analysed: true,
+              diagnostics: 0,
+            });
+            continue;
+          }
+          const code = fs.readFileSync(file, 'utf8');
+          let result;
+          try {
+            result = compileFile(code, file, designSystem, engineOptions);
+          } catch (err) {
+            if (err != null && Array.isArray(err.diagnostics)) {
+              failures.push(...err.diagnostics);
+              coverage.push({
+                file: relativeToCwd(file),
+                origin,
+                role: 'page',
+                analysed: true,
+                failed: true,
+                diagnostics: err.diagnostics.length,
+                codes: [...new Set(err.diagnostics.map((d) => d.code))],
+              });
+              // Still counted as analysed: the policy DID run and refused it.
+              analysed.push(file);
+              continue;
+            }
+            throw err;
+          }
+          const rules = result.metadata.pandamstyle ?? [];
+          for (const rule of rules) allRules.push(rule);
+          const coverageEntry = result.metadata.pandamstyleCoverage ?? {};
+          coverage.push({
+            file: relativeToCwd(file),
+            origin,
+            role: 'page',
+            analysed: true,
+            usedDesignSystem: coverageEntry.usedDesignSystem === true,
+            usedPmsHelpers: coverageEntry.usedPmsHelpers === true,
+            ruleCount: rules.length,
+            relayChain: (coverageEntry.relayChain ?? []).map(relativeToCwd),
+            diagnostics: 0,
+          });
+          analysed.push(file);
+          outputs.push({ file, code: result.code });
+        }
+
+        // Expected vs analysed, before anything is published. The generated
+        // design-system module is exempt: it IS the generator output, and the
+        // build does not re-analyse it.
+        const consistency = assertCoverageConsistency({
+          coveredFiles: [...covered.keys()],
+          transformedFiles: analysed,
+          exemptFiles: [designSystemPath],
+          phase: 'cli',
+        });
+        if (!consistency.ok) {
+          throw new PmsError(
+            coverageGapDiagnostics(consistency.missing, 'cli'),
+          );
+        }
+
+        // A failing generation must not publish artifacts as current (ARC-14).
+        if (failures.length > 0) {
+          throw new PmsError(failures);
+        }
+
+        // Test seam: an internal failure AFTER generation, BEFORE publication.
+        if (typeof onStage === 'function') {
+          onStage({ gen, session, coverage });
+        }
+
+        // Single CSS circuit: the fork's own rule processor.
+        const css = session.renderCss(allRules);
+
+        const buildReport = {
+          documentKind: 'pandamstyle-build-report',
+          contractVersion: designSystem.manifest.compilerContractVersion,
+          systemId: designSystem.registry.systemId,
+          registryDigest,
+          coveredRoots: roots.map((r) => path.resolve(r)),
+          coveredFileCount: coverage.length,
+          analysedFileCount: analysed.length,
+          designSystemRuleCount,
+          consumerRuleCount: allRules.length - designSystemRuleCount,
+          ruleCount: allRules.length,
+          cssBytes: Buffer.byteLength(css, 'utf8'),
+          coverage,
+          coverageConsistency: {
+            expectedCount: consistency.expectedCount,
+            analysedCount: consistency.transformedCount,
+            missing: consistency.missing.map(relativeToCwd),
+            classification:
+              'a covered file that the CLI did not analyse fails the build',
+          },
+          externalRequests: external.map((e) => ({
+            request: e.request,
+            form: e.form,
+            from: relativeToCwd(e.from),
+          })),
+          relayEdges: relayEdges.map((e) => ({
+            from: relativeToCwd(e.from),
+            to: relativeToCwd(e.to),
+            form: e.form,
+          })),
+        };
+
+        const manifestWithDigest = {
+          ...designSystem.manifest,
+          registryDigest,
+          designSystemModule: relativeToCwd(designSystemPath),
+        };
+
+        for (const { file, code } of outputs) {
+          gen.stage(outputRelFor(file), code);
+        }
+        gen.stage('styles.css', css);
+        gen.stage(
+          'build-report.json',
+          JSON.stringify(buildReport, null, 2) + '\n',
+        );
+        gen.stage(
+          'manifest.json',
+          JSON.stringify(manifestWithDigest, null, 2) + '\n',
+        );
+
+        return {
+          css,
+          manifest: manifestWithDigest,
+          buildReport,
+          designSystem,
+          designSystemPath,
+          coverage,
+          outputs,
+          registryDigest,
+          // withGeneration() publishes this once the callback returns.
+          published: [
+            ...outputs.map(({ file }) => outputRelFor(file)),
+            'styles.css',
+            'build-report.json',
+            'manifest.json',
+            designSystemFile,
+          ],
+        };
+      },
+      { commitMarker: 'manifest.json' },
+    );
+  } finally {
+    // The overlay is a compile-time convenience of THIS generation; it must not
+    // leak into a later build in the same process.
+    clearModuleOverlay();
   }
-
-  // A failing generation must not publish artifacts as current (ARC-14).
-  if (failures.length > 0) {
-    restoreDesignSystem();
-    throw new PmsError(failures);
-  }
-
-  // Single CSS circuit: the fork's own rule processor.
-  const css = styleXTransform.processStylexRules(allRules, {
-    useLayers: useCSSLayers,
-  });
-
-  const buildReport = {
-    documentKind: 'pandamstyle-build-report',
-    contractVersion: designSystem.manifest.compilerContractVersion,
-    systemId: designSystem.registry.systemId,
-    registryDigest,
-    coveredRoots: roots.map((r) => path.resolve(r)),
-    coveredFileCount: coverage.length,
-    designSystemRuleCount,
-    consumerRuleCount: allRules.length - designSystemRuleCount,
-    ruleCount: allRules.length,
-    cssBytes: Buffer.byteLength(css, 'utf8'),
-    coverage,
-  };
-
-  const manifestWithDigest = {
-    ...designSystem.manifest,
-    registryDigest,
-    designSystemModule: relativeToCwd(designSystemPath),
-  };
-
-  for (const { file, code } of outputs) {
-    const target = outputPathFor(file);
-    ensureDir(path.dirname(target));
-    fs.writeFileSync(target, code, 'utf8');
-  }
-  fs.writeFileSync(path.join(absOut, 'styles.css'), css, 'utf8');
-  fs.writeFileSync(
-    path.join(absOut, 'manifest.json'),
-    JSON.stringify(manifestWithDigest, null, 2) + '\n',
-    'utf8',
-  );
-  fs.writeFileSync(
-    path.join(absOut, 'build-report.json'),
-    JSON.stringify(buildReport, null, 2) + '\n',
-    'utf8',
-  );
-
-  return {
-    css,
-    manifest: manifestWithDigest,
-    buildReport,
-    designSystem,
-    designSystemPath,
-    coverage,
-    outputs,
-    registryDigest,
-  };
 }
 
 /**

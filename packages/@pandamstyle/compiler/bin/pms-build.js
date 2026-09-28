@@ -114,6 +114,13 @@ function main() {
   }
 
   let result;
+  // Documented test seam. The transactional-publication guarantee can only be
+  // proven by failing a generation in the window between "everything was
+  // generated" and "something was published", and that window is not reachable
+  // from a real input: no source can make the compiler fail there. The flag
+  // raises a PMS diagnostic at exactly that point, so the test drives a real
+  // process and observes a real exit status.
+  const injectFailure = args['inject-failure'];
   try {
     result = build.buildProject({
       definition,
@@ -123,6 +130,22 @@ function main() {
       designSystemFile: config.designSystemFile,
       engineOptions: config.engineOptions,
       useCSSLayers: config.useCSSLayers === true,
+      onStage:
+        injectFailure === 'after-compile'
+          ? () => {
+              throw new build.PmsError([
+                build.diagnostic({
+                  code: 'PMS_INJECTED_FAILURE',
+                  phase: 'publish',
+                  message:
+                    'Injected internal failure after generation, before ' +
+                    'publication (--inject-failure=after-compile).',
+                  rule: 'test.inject-failure',
+                  context: { stage: injectFailure },
+                }),
+              ]);
+            }
+          : null,
     });
   } catch (err) {
     const diagnostics = err != null ? err.diagnostics : null;

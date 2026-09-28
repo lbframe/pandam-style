@@ -110,6 +110,15 @@ export const Codes = {
   UNVERIFIED_JSX_SPREAD: 'PMS_UNVERIFIED_JSX_SPREAD',
   ROLE_VIOLATION: 'PMS_ROLE_VIOLATION',
   COVERAGE_GAP: 'PMS_COVERAGE_GAP',
+  // Codes added by the consolidation batch.
+  //
+  // A `props()` argument whose provenance is not demonstrated. Separate from
+  // PMS_UNVERIFIED_JSX_SPREAD on purpose: the spread may be a recognized
+  // props() result whose ARGUMENT is raw, and the two need different fixes.
+  UNVERIFIED_PROPS_SOURCE: 'PMS_UNVERIFIED_PROPS_SOURCE',
+  // A value that was proven and can then still be written to or escaped into
+  // an unrecognized call, so its provenance is not durable.
+  UNVERIFIED_PROVENANCE: 'PMS_UNVERIFIED_PROVENANCE',
 };
 
 /** Stable single-line rendering of a diagnostic (used by the build report). */

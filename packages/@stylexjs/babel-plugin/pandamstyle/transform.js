@@ -29,6 +29,7 @@ import {
   locateOrigin,
   resolveDesignAccess,
 } from './evaluate-usage';
+import { isAdmitted, provenanceOf } from './provenance';
 
 const STYLEX_PROPS_LOCAL = '__pmsProps';
 
@@ -337,8 +338,35 @@ function transformThemeAccess(memberPath, ctx, ds) {
   return true;
 }
 
-/** `props(...)` becomes the call to the fork's composition runtime. */
+/**
+ * `props(...)` becomes the call to the fork's composition runtime.
+ *
+ * The rewrite happens ONLY for an argument whose provenance was already proven
+ * (pandamstyle/provenance.js, run as a pre-pass in the plugin). The re-check
+ * here is deliberate: the fork runtime accepts uncompiled objects and turns
+ * them into inline styles, so this function is the last place where a raw
+ * object could still slip through if the pass order ever changed.
+ */
 function transformPropsCall(callPath, ctx, programPath) {
+  const args = callPath.get('arguments');
+  for (const arg of args) {
+    if (arg == null || arg.node == null) continue;
+    if (arg.isSpreadElement?.()) continue;
+    const prov = provenanceOf(arg, ctx);
+    if (isAdmitted(prov.kind)) continue;
+    reject(
+      ctx,
+      Codes.UNVERIFIED_PROPS_SOURCE,
+      'props() argument has no demonstrated PandamStyle provenance ' +
+        `(${prov.reason ?? 'unknown origin'}); it was not rewritten to the ` +
+        'composition runtime.',
+      arg,
+      'provenance.props-argument',
+      { kind: prov.kind },
+    );
+    return;
+  }
+
   const local = addNamedImport(
     programPath,
     '@stylexjs/stylex',

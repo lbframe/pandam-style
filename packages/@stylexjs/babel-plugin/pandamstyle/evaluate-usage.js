@@ -94,7 +94,11 @@ function importedNameOf(specifier) {
 
 /**
  * Builds the context of one covered file: role, recognized helpers
- * (local binding -> design-system export), and boundary violations.
+ * (BINDING -> design-system export), and boundary violations.
+ *
+ * Every map is keyed by a Babel `Binding`, never by a name. A name-keyed map
+ * cannot tell a module-level import from a parameter that shadows it, and it
+ * cannot tell a `const` from a `let` that is later reassigned.
  */
 export function createUsageContext({
   state,
@@ -111,17 +115,24 @@ export function createUsageContext({
     filename,
     options,
     role,
-    // localName -> export name in the generated design system module
-    namedHelpers: new Map(),
-    // localName -> true (namespace import of the design system)
-    namespaceBindings: new Set(),
+    // Binding -> { exportName } for a named import of the design system, or
+    // { namespace: true } for `import * as ds`.
+    helperBindings: new Map(),
     pmsModule: null,
     pmsModulePath: null,
     diags: [],
     origins: new Map(),
     used: false,
-    // localName -> 'create' | 'props' (used by the JSX channel checks)
-    derived: new Map(),
+    // Binding -> provenance descriptor, computed in pandamstyle/provenance.js.
+    provenance: new Map(),
+    // Binding -> true for a local constant whose value is a `props(...)` result.
+    // Used by the JSX channel checks, so a spread of a renamed or shadowed
+    // identifier is resolved through the binding and not through its spelling.
+    propsResults: new Set(),
+    // Binding -> 'create' for a local constant whose value is a `create()` result.
+    createResults: new Set(),
+    // Local dependency requests that could not be resolved statically.
+    dynamicGaps: [],
   };
 }
 
@@ -151,11 +162,19 @@ export function readModuleFacts(programPath, ctx) {
         if (spec.type === 'ImportSpecifier') {
           const exported = importedNameOf(spec);
           const dsName = relay.get(exported) ?? exported;
-          ctx.namedHelpers.set(spec.local.name, dsName);
+          // Keyed by the BINDING: `import { props as p }` and a local
+          // `function p()` are then two different things.
+          const binding = stmt.scope?.getBinding(spec.local.name) ?? null;
+          if (binding != null)
+            ctx.helperBindings.set(binding, { exportName: dsName });
         } else if (spec.type === 'ImportNamespaceSpecifier') {
-          ctx.namespaceBindings.add(spec.local.name);
+          const binding = stmt.scope?.getBinding(spec.local.name) ?? null;
+          if (binding != null)
+            ctx.helperBindings.set(binding, { namespace: true });
         } else if (spec.type === 'ImportDefaultSpecifier') {
-          ctx.namedHelpers.set(spec.local.name, 'default');
+          const binding = stmt.scope?.getBinding(spec.local.name) ?? null;
+          if (binding != null)
+            ctx.helperBindings.set(binding, { exportName: 'default' });
         }
       }
       continue;
@@ -215,6 +234,159 @@ export function readModuleFacts(programPath, ctx) {
       }
     }
   }
+
+  readDynamicModuleFacts(programPath, ctx);
+}
+
+/**
+ * The P0 decision about `import(...)` and `require(...)`, stated explicitly so
+ * a dynamic edge is never ignored silently.
+ *
+ * P0 is a closed profile with a static module graph, so:
+ *
+ *  - a dynamic request with a LITERAL local specifier is a normal local edge:
+ *    the coverage graph follows it and the target is analysed;
+ *  - a dynamic request with a NON-static specifier cannot be resolved, so the
+ *    module it will load is unknown. That is a coverage gap, not a detail: it
+ *    fails with PMS_COVERAGE_GAP rather than being dropped;
+ *  - a dynamic request for a PACKAGE is not a local edge, so it is not part of
+ *    the local coverage contract. A literal one is still checked against the
+ *    forbidden-import table, so `await import('@pandamstyle/dev-runtime')`
+ *    cannot reach the engine by the back door.
+ */
+export function readDynamicModuleFacts(programPath, ctx) {
+  programPath.traverse({
+    // @babel/parser models a dynamic import as CallExpression with an `Import`
+    // callee; ESTree uses ImportExpression. Both are visited, because a shape
+    // this pass does not recognise is a dynamic edge nobody checked.
+    ImportExpression(nodePath) {
+      checkDynamicRequest(nodePath, nodePath.get('source'), 'import()', ctx);
+    },
+    CallExpression(nodePath) {
+      const calleeNode = nodePath.node.callee;
+      if (calleeNode != null && calleeNode.type === 'Import') {
+        const arg = nodePath.get('arguments')[0] ?? null;
+        checkDynamicRequest(nodePath, arg, 'import()', ctx);
+        return;
+      }
+      const callee = nodePath.get('callee');
+      if (!callee.isIdentifier?.() || callee.node.name !== 'require') return;
+      // Only a global, unbound `require` is the CommonJS form; a local
+      // `require` binding is ordinary application code.
+      if (nodePath.scope.getBinding('require') != null) return;
+      const args = nodePath.get('arguments');
+      checkDynamicRequest(nodePath, args[0] ?? null, 'require()', ctx);
+    },
+  });
+}
+
+function checkDynamicRequest(nodePath, argPath, form, ctx) {
+  if (argPath == null || argPath.node == null) {
+    pushDiag(
+      ctx,
+      diagnostic({
+        code: Codes.COVERAGE_GAP,
+        phase: 'imports',
+        message: `${form} without a request: the module it will load is unknown.`,
+        source: locationOf(nodePath, ctx),
+        rule: 'coverage.dynamic-modules',
+        context: { form },
+      }),
+    );
+    return;
+  }
+
+  const literal = staticStringLiteral(argPath);
+  if (literal == null) {
+    if (
+      argPath.isTemplateLiteral?.() &&
+      argPath.node.expressions.length === 0
+    ) {
+      // A quasi-static template is still resolvable.
+      const value = argPath.node.quasis[0]?.value?.cooked;
+      if (typeof value === 'string') {
+        checkDynamicLiteral(nodePath, value, form, ctx);
+        return;
+      }
+    }
+    const gap = { form, file: ctx.filename, request: '<computed>' };
+    ctx.dynamicGaps.push(gap);
+    pushDiag(
+      ctx,
+      diagnostic({
+        code: Codes.COVERAGE_GAP,
+        phase: 'imports',
+        message:
+          `${form} with a request that is not a static string. P0 supports a ` +
+          'static module graph only, so a computed request would load an ' +
+          'unknown, unanalysed module.',
+        source: locationOf(argPath, ctx),
+        rule: 'coverage.dynamic-modules',
+        context: { form },
+      }),
+    );
+    return;
+  }
+  checkDynamicLiteral(nodePath, literal, form, ctx);
+}
+
+function checkDynamicLiteral(nodePath, request, form, ctx) {
+  // The same closed-profile rules as a static import apply to a literal
+  // dynamic request: the back door is the problem, not the syntax.
+  for (const pattern of FORBIDDEN_IMPORT_PATTERNS) {
+    if (pattern.test(request)) {
+      pushDiag(
+        ctx,
+        diagnostic({
+          code: Codes.FORBIDDEN_IMPORT,
+          phase: 'imports',
+          message:
+            `Import forbidden in the closed profile: "${request}" ` +
+            `(${pattern.reason}), reached through ${form}. Styles must go ` +
+            'through the PandamStyle exports.',
+          source: locationOf(nodePath, ctx),
+          rule: 'profile.closed.imports',
+          context: { source: request, reason: pattern.reason, form },
+        }),
+      );
+      return;
+    }
+  }
+  if (FORBIDDEN_CSS_RE.test(request)) {
+    pushDiag(
+      ctx,
+      diagnostic({
+        code: Codes.FORBIDDEN_STYLE_CHANNEL,
+        phase: 'imports',
+        message: `Unapproved local stylesheet: "${request}", reached through ${form}.`,
+        source: locationOf(nodePath, ctx),
+        rule: 'profile.closed.style-channel',
+        context: { source: request, form },
+      }),
+    );
+    return;
+  }
+  if (
+    request.startsWith('.') &&
+    resolveRelativeFile(ctx.filename, request) == null
+  ) {
+    pushDiag(
+      ctx,
+      diagnostic({
+        code: Codes.COVERAGE_GAP,
+        phase: 'imports',
+        message: `Unresolved local ${form} from a covered root: "${request}".`,
+        source: locationOf(nodePath, ctx),
+        rule: 'coverage.dynamic-modules',
+        context: { request, form },
+      }),
+    );
+  }
+}
+
+function staticStringLiteral(nodePath) {
+  if (nodePath.isStringLiteral?.()) return nodePath.node.value;
+  return null;
 }
 
 /** Does this covered file reach the design system (directly or via a relay)? */
@@ -240,17 +412,21 @@ function staticPropertyName(nodePath) {
 /**
  * Resolves an expression to an export path of the design system.
  * `recipes.button` -> { exportPath: ['recipes','button'] }
- * A local identifier that is not a recognized binding -> null.
+ *
+ * A bare identifier is only recognized when its BINDING is a recognized import.
+ * A parameter, a function parameter shadowing the import, or a local variable
+ * with the same spelling resolves to a different Binding and is therefore not
+ * recognized: a name never confers trust.
  */
 export function resolvePmsAccess(nodePath, ctx) {
   if (nodePath == null) return null;
   if (nodePath.isIdentifier()) {
-    const name = nodePath.node.name;
-    if (ctx.namedHelpers.has(name)) {
-      return { exportPath: [ctx.namedHelpers.get(name)] };
-    }
-    if (ctx.namespaceBindings.has(name)) return { exportPath: [] };
-    return null;
+    const binding = nodePath.scope?.getBinding(nodePath.node.name) ?? null;
+    if (binding == null) return null;
+    const helper = ctx.helperBindings.get(binding);
+    if (helper == null) return null;
+    if (helper.namespace === true) return { exportPath: [], binding };
+    return { exportPath: [helper.exportName], binding };
   }
   if (
     nodePath.isTSAsExpression() ||
