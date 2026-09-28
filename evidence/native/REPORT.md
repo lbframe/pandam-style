@@ -21,7 +21,13 @@ It does **not** declare P0 complete. §7 lists what stays unmet.
 | Batch base (this branch's fork point) | `71fcc045b18eb215f0c3a815bb8c8d15a9f99489` |
 | StyleX upstream merge base | `fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2` |
 | Panda donor | no Git metadata in this checkout; pinned SHA lives in `docs/pandamstyle-specification-v0.1/specs/01-ARCHITECTURE.md` |
-| Delivered commit (this report) | recorded in the follow-up commit that adds `evidence/native/` |
+| Delivered commit (this report) | the descendant commits that add `evidence/native/` and `PANDAMSTYLE.md` |
+
+`git diff --name-only 717cdb3c..HEAD` touches only `PANDAMSTYLE.md`,
+`evidence/native/**` and `.gitignore`. **No compiler, test, fixture, pilot or
+verification code changed after the tested commit**, so the tested code is
+byte-identical to the delivered code. No file refers to the commit that
+contains it.
 
 The StyleX merge base was **measured** with `git merge-base HEAD upstream/main`,
 not copied from a document. It matches the base the specification names, which
