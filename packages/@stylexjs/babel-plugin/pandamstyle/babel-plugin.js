@@ -38,6 +38,8 @@ import {
   provenanceOf,
 } from './provenance';
 import { transformResidualTokens, transformUsage } from './transform';
+// Benchmark-only measurement hooks (Spike 1).
+import { count, phase as perfPhase } from './perf';
 
 /** Engine/author APIs a consumer page may never reach. */
 const ENGINE_EXPORT_NAMES = new Set([
@@ -391,6 +393,7 @@ export function pandamstyleBabelPlugin(api) {
           // resolver; it is the same object the StyleX visitors use.
           const state = new StateManager(pluginPass);
 
+          count('semantic_builds');
           const ctx = createUsageContext({
             state,
             pluginPass,
@@ -400,26 +403,32 @@ export function pandamstyleBabelPlugin(api) {
           });
           pluginPass.__pandamstyle = ctx;
 
-          readModuleFacts(programPath, ctx);
-          checkEngineImports(programPath, ctx);
-          rejectSelfDeclaredAuthority(programPath, ctx);
+          perfPhase('semantic_ms', () => {
+            readModuleFacts(programPath, ctx);
+            checkEngineImports(programPath, ctx);
+            rejectSelfDeclaredAuthority(programPath, ctx);
+          });
         },
         exit(programPath, pluginPass) {
           const ctx = pluginPass.__pandamstyle;
           if (ctx == null) return;
 
-          collectDerivedBindings(programPath, ctx);
+          perfPhase('semantic_ms', () => {
+            collectDerivedBindings(programPath, ctx);
+          });
 
           // PROVENANCE PASS - strictly before any rewrite.
           //
           // `checkPropsProvenance` must see the ORIGINAL tree: a `create()`
-          // result is still a call, so `styles.page` is still provably a
-          // compiled namespace. Running it after the transform would only see
-          // the emitted object literal and could no longer tell a compiled
-          // style from a raw one.
-          checkPropsProvenance(programPath, ctx);
-          checkJsxChannels(programPath, ctx);
-          analyzeProvenanceEscapes(programPath, ctx);
+          // result is still a call, so `styles.page` is still provably a compiled
+          // namespace. Running it after the transform would only see the emitted
+          // object literal and could no longer tell a compiled style from a raw
+          // one.
+          perfPhase('semantic_ms', () => {
+            checkPropsProvenance(programPath, ctx);
+            checkJsxChannels(programPath, ctx);
+            analyzeProvenanceEscapes(programPath, ctx);
+          });
 
           if (ctx.diags.length === 0) {
             const ds = pluginPass.opts?.designSystem;
@@ -431,24 +440,28 @@ export function pandamstyleBabelPlugin(api) {
               // "each route is refused" could not be proven from one build.
               // A failing call is left untransformed, so nothing downstream
               // consumes a half-compiled subtree.
-              programPath.traverse({
-                CallExpression: (p) => {
-                  transformUsage({ path: p, ctx, ds, programPath });
-                },
-                'MemberExpression|OptionalMemberExpression': (p) => {
-                  transformUsage({ path: p, ctx, ds, programPath });
-                },
+              perfPhase('ir_lower_ms', () => {
+                programPath.traverse({
+                  CallExpression: (p) => {
+                    transformUsage({ path: p, ctx, ds, programPath });
+                  },
+                  'MemberExpression|OptionalMemberExpression': (p) => {
+                    transformUsage({ path: p, ctx, ds, programPath });
+                  },
+                });
               });
 
               // Pass 2 runs afterwards on purpose: a token() hoisted into a
               // module-level constant is only lowerable once every create()
               // has consumed its own references.
               if (ctx.diags.length === 0) {
-                programPath.traverse({
-                  CallExpression: (p) => {
-                    if (ctx.diags.length > 0) return;
-                    transformResidualTokens({ path: p, ctx, ds });
-                  },
+                perfPhase('ir_lower_ms', () => {
+                  programPath.traverse({
+                    CallExpression: (p) => {
+                      if (ctx.diags.length > 0) return;
+                      transformResidualTokens({ path: p, ctx, ds });
+                    },
+                  });
                 });
               }
             }
@@ -464,6 +477,7 @@ export function pandamstyleBabelPlugin(api) {
             diagnosticCount: ctx.diags.length,
           };
 
+          count('diagnostics', ctx.diags.length);
           if (ctx.diags.length > 0) {
             throw new PmsError(ctx.diags);
           }

@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pandamstyle.dev/schemas/benchmark-corpus-manifest-v1.json",
+  "title": "PandamStyle benchmark corpus manifest",
+  "description": "The identity of one generated corpus. Written next to the corpus it describes. Two runs are comparable only when their contentHash matches. Everything in `files` is hashed, so the manifest cannot claim a corpus it did not produce.",
+  "type": "object",
+  "required": [
+    "documentKind",
+    "schemaVersion",
+    "generator",
+    "parameters",
+    "name",
+    "contentHash",
+    "designSystemHash",
+    "counts",
+    "expectedGraph",
+    "expectedState",
+    "files"
+  ],
+  "properties": {
+    "documentKind": { "const": "pandamstyle-benchmark-corpus-manifest" },
+    "schemaVersion": { "const": 1 },
+    "generator": {
+      "type": "object",
+      "required": ["version", "commit"],
+      "description": "The generator that produced the corpus. `commit` is the only field excluded from the determinism comparison.",
+      "properties": {
+        "version": { "type": "string" },
+        "commit": { "type": ["string", "null"] }
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "required": ["components", "tokens", "recipes", "seed", "fanout"],
+      "description": "The complete input to the generator. Given these five integers, the corpus is determined."
+    },
+    "name": { "type": "string" },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "sha256 over every generated file, path and content hash, in path order. This is the corpus identity."
+    },
+    "designSystemHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "sha256 of the design-system definition alone, so a token-only change is distinguishable from a page-only change."
+    },
+    "counts": {
+      "type": "object",
+      "description": "What the corpus actually contains, counted by the generator rather than assumed. A corpus that cannot compile measures nothing, and these are the numbers that say whether it can.",
+      "required": [
+        "sourceFiles",
+        "componentFiles",
+        "styleSites",
+        "tokenReferences",
+        "recipeCalls",
+        "conditions",
+        "tokenPaths"
+      ],
+      "properties": {
+        "sourceFiles": { "type": "integer" },
+        "componentFiles": { "type": "integer" },
+        "aliasModules": { "type": "integer" },
+        "fanoutModules": { "type": "integer" },
+        "bridgeModules": { "type": "integer" },
+        "definitionModules": { "type": "integer" },
+        "invalidTraces": { "type": "integer" },
+        "styleSites": { "type": "integer" },
+        "tokenReferences": { "type": "integer" },
+        "recipeCalls": { "type": "integer" },
+        "conditions": { "type": "integer" },
+        "themes": { "type": "integer" },
+        "recipeDefinitions": { "type": "integer" },
+        "tokenCategories": { "type": "integer" },
+        "tokenPaths": { "type": "integer" },
+        "privateTokenPaths": { "type": "integer" }
+      }
+    },
+    "expectedGraph": {
+      "type": "object",
+      "description": "The module-graph shape the generator INTENDED. The MEASURED graph is recorded by the harness after a real build; the two are kept apart so a generator bug is visible instead of being confirmed by its own output.",
+      "properties": {
+        "rootDepth": { "type": "integer" },
+        "maxRelayDepth": { "type": "integer" },
+        "fanout": { "type": "integer" },
+        "shapes": { "type": "array", "items": { "type": "string" } },
+        "shapeDistribution": { "type": "integer" }
+      }
+    },
+    "expectedState": {
+      "type": "object",
+      "description": "What the corpus is FOR. The positive project compiles and publishes; each negative trace must fail closed. The exact codes are asserted by the negative scenarios, not here, so a policy change cannot silently move the goalposts in the fixture.",
+      "properties": {
+        "positive": { "type": "string" },
+        "negative": { "type": "string" }
+      }
+    },
+    "files": {
+      "type": "array",
+      "description": "Every generated file, sorted by path, with its byte length and content hash.",
+      "items": {
+        "type": "object",
+        "required": ["path", "bytes", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "bytes": { "type": "integer" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  }
+}

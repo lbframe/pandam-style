@@ -1,164 +1,372 @@
 fatal: not a git repository (or any of the parent directories): .git
 PASS __tests__/pandamstyle/artifacts-test.js
   pandamstyle: artefacts
-    ✓ build de la fixture conformance + page exemple + rejet 17px (75 ms)
+    ✓ build de la fixture conformance + page exemple + rejet 17px (23 ms)
 
 PASS __tests__/pandamstyle/chain-test.js
   pandamstyle: registre
-    ✓ références résolues, catégories et visibilité conservées (31 ms)
-    ✓ référence vers un identifiant absent -> PMS_UNKNOWN_TOKEN (2 ms)
-    ✓ cycle de références -> PMS_TOKEN_CYCLE avec chemin (2 ms)
+    ✓ références résolues, catégories et visibilité conservées (16 ms)
+    ✓ référence vers un identifiant absent -> PMS_UNKNOWN_TOKEN (1 ms)
+    ✓ cycle de références -> PMS_TOKEN_CYCLE avec chemin (1 ms)
   pandamstyle: tokens -> CSS
-    ✓ un token compilé devient var(--…) et les variables sont émises (12 ms)
-    ✓ condition nommée -> bloc canonique @media (4 ms)
-    ✓ deux thèmes partagent les mêmes identités de variables (5 ms)
+    ✓ un token compilé devient var(--…) et les variables sont émises (2 ms)
+    ✓ condition nommée -> bloc canonique @media (3 ms)
+    ✓ deux thèmes partagent les mêmes identités de variables (3 ms)
   pandamstyle: rejets de politique (sans TypeScript)
-    ✓ valeur brute '17px' rejetée avec candidats admis (4 ms)
-    ✓ token de mauvaise catégorie -> PMS_INVALID_TOKEN_CATEGORY (4 ms)
-    ✓ token privé côté consommateur -> PMS_TOKEN_NOT_PUBLIC (5 ms)
-    ✓ forme composite border -> PMS_UNSUPPORTED_PROPERTY_FORM (5 ms)
-    ✓ propriété hors profil -> PMS_UNSUPPORTED_PROPERTY (5 ms)
-    ✓ condition inconnue -> PMS_UNKNOWN_CONDITION (5 ms)
+    ✓ valeur brute '17px' rejetée avec candidats admis (2 ms)
+    ✓ token de mauvaise catégorie -> PMS_INVALID_TOKEN_CATEGORY (3 ms)
+    ✓ token privé côté consommateur -> PMS_TOKEN_NOT_PUBLIC (7 ms)
+    ✓ forme composite border -> PMS_UNSUPPORTED_PROPERTY_FORM (3 ms)
+    ✓ propriété hors profil -> PMS_UNSUPPORTED_PROPERTY (1 ms)
+    ✓ condition inconnue -> PMS_UNKNOWN_CONDITION (1 ms)
   pandamstyle: recipe -> CSS
-    ✓ sélection bornée : base + branches par axe selon axisOrder (7 ms)
-    ✓ défauts appliqués quand la prop est absente ou undefined (5 ms)
-    ✓ valeur hors domaine rejetée de façon déterministe au runtime (40 ms)
-    ✓ clé inconnue et null rejetés (4 ms)
-    ✓ conflit base/hover : la variante gagne hors condition, hover conservé (4 ms)
+    ✓ sélection bornée : base + branches par axe selon axisOrder (2 ms)
+    ✓ défauts appliqués quand la prop est absente ou undefined (2 ms)
+    ✓ valeur hors domaine rejetée de façon déterministe au runtime (13 ms)
+    ✓ clé inconnue et null rejetés (2 ms)
+    ✓ conflit base/hover : la variante gagne hors condition, hover conservé (2 ms)
   pandamstyle: manifeste
-    ✓ projection consommateur : publics seulement, capacités P1 à false (5 ms)
+    ✓ projection consommateur : publics seulement, capacités P1 à false (2 ms)
 
 PASS __tests__/pandamstyle/recipe-contract-test.js
   the consumer runtime is dependency-light
-    ✓ the shipped runtime has no import at all (9 ms)
-    ✓ it imports no Babel, no loader, no registry, no CSS interpreter (4 ms)
-    ✓ it is finite: a small module, not a second engine (2 ms)
+    ✓ the shipped runtime has no import at all (5 ms)
+    ✓ it imports no Babel, no loader, no registry, no CSS interpreter (1 ms)
+    ✓ it is finite: a small module, not a second engine
   recipe selection follows axisOrder and defaults
-    ✓ base first, then one branch per axis, in declaration order (4 ms)
-    ✓ absent and undefined both take the default (2 ms)
-    ✓ the key order of the props object has no effect (2 ms)
-    ✓ false is a value, not an absence (2 ms)
-    ✓ null, unknown key and unknown value fail deterministically (35 ms)
-    ✓ the error carries the admitted domain (2 ms)
+    ✓ base first, then one branch per axis, in declaration order (2 ms)
+    ✓ absent and undefined both take the default (1 ms)
+    ✓ the key order of the props object has no effect (1 ms)
+    ✓ false is a value, not an absence
+    ✓ null, unknown key and unknown value fail deterministically (13 ms)
+    ✓ the error carries the admitted domain (1 ms)
     ✓ no cartesian product is generated (1 ms)
   composition contract: base + hover, then a base variant
-    ✓ the hover branch of the variant survives in the emitted CSS (1 ms)
-    ✓ changing the base color does not remove the hover branch (2 ms)
-    ✓ the fork composition runtime composes the compiled refs (8 ms)
+    ✓ the hover branch of the variant survives in the emitted CSS
+    ✓ changing the base color does not remove the hover branch (1 ms)
+    ✓ the fork composition runtime composes the compiled refs (3 ms)
   props-dependent selection keeps the runtime guard
-    ✓ the TSX page emits an uncompiled selector call, not a baked literal (1 ms)
-    ✓ that call goes through the bounded selector (2 ms)
+    ✓ the TSX page emits an uncompiled selector call, not a baked literal
+    ✓ that call goes through the bounded selector (3 ms)
 
 PASS __tests__/pandamstyle/native-compile-test.js
   valid project builds through real files
-    ✓ the build process exits 0 (13 ms)
-    ✓ CSS is not empty and carries the expected declarations (4 ms)
-    ✓ the emitted JS imports no compiler, loader or registry (21 ms)
-    ✓ the runtime import of the page is the fork composition runtime only (4 ms)
+    ✓ the build process exits 0 (4 ms)
+    ✓ CSS is not empty and carries the expected declarations (1 ms)
+    ✓ the emitted JS imports no compiler, loader or registry (6 ms)
+    ✓ the runtime import of the page is the fork composition runtime only (1 ms)
     ✓ page sources are not mutated by the build (1 ms)
-    ✓ the build is repeatable and yields the same digest (836 ms)
+    ✓ the build is repeatable and yields the same digest (358 ms)
   helper resolution follows binding and module
-    ✓ renamed imports reached through a barrel are compiled (1 ms)
+    ✓ renamed imports reached through a barrel are compiled
     ✓ a page importing only a recipe is covered and compiled (1 ms)
-    ✓ a namespace import is recognized (1 ms)
+    ✓ a namespace import is recognized
     ✓ a hoisted token constant is lowered, not left for the runtime (1 ms)
   generated design system module
     ✓ carries the generation marker and the same digest as the manifest (1 ms)
-    ✓ exposes the documented consumption surface (1 ms)
+    ✓ exposes the documented consumption surface
     ✓ create() and token() throw if ever reached at runtime (1 ms)
-    ✓ recipe selectors carry finite data, not a cartesian product (2 ms)
+    ✓ recipe selectors carry finite data, not a cartesian product (1 ms)
   generation coherence and coverage report
-    ✓ every artifact references the same registryDigest (1 ms)
+    ✓ every artifact references the same registryDigest
     ✓ coverage lists the declared roots and the analysed files (2 ms)
-    ✓ the barrel relay is recorded in the coverage chain (1 ms)
+    ✓ the barrel relay is recorded in the coverage chain
     ✓ the stylesheet is non-empty and rules were collected (1 ms)
 
-PASS __tests__/pandamstyle/staleness-test.js (5.381 s)
+PASS __tests__/pandamstyle/staleness-test.js
   removing a token invalidates its stale usages
-    ✓ the first build is valid and records its digest (10 ms)
+    ✓ the first build is valid and records its digest (2 ms)
     second build after removing spacing.md, pages untouched
-      ✓ the second build fails with a non-zero status (1 ms)
-      ✓ the stale usage is detected as an unknown token (1 ms)
+      ✓ the second build fails with a non-zero status
+      ✓ the stale usage is detected as an unknown token
       ✓ the diagnostic points at the page that still uses it (1 ms)
-      ✓ no artifact is presented as the new current generation (3 ms)
-      ✓ the previous stylesheet is not overwritten by a false current one (1 ms)
+      ✓ no artifact is presented as the new current generation
+      ✓ the previous stylesheet is not overwritten by a false current one
     restoring the token yields a valid build again
-      ✓ the third build succeeds and the digest matches the first one (791 ms)
+      ✓ the third build succeeds and the digest matches the first one (405 ms)
   changing a token value updates the digest but preserves identity
-    ✓ the build still succeeds and the digest changed (6 ms)
-    ✓ the logical variable identity of spacing.md is preserved (1 ms)
+    ✓ the build still succeeds and the digest changed
+    ✓ the logical variable identity of spacing.md is preserved
 
-PASS __tests__/pandamstyle/negative-builds-test.js (13.145 s)
+PASS __tests__/pandamstyle/runner-status-test.js
+  BC-7: an unexecuted step is never reported as passed
+    ✓ the runner itself succeeded, so only the bookkeeping is under test (4 ms)
+    ✓ a skipped pilot is reported as skipped (1 ms)
+    ✓ a skipped install is reported as skipped
+    ✓ a skipped step has NO exit code
+    ✓ the acceptance vocabulary says not_run, not passed
+    ✓ no step is marked passed in this run (1 ms)
+    ✓ the run is explicitly not complete
+    ✓ the console says INCOMPLETE and names the skipped steps (1 ms)
+    ✓ the raw step table records the status too
+  the skip flag is not the only way a step goes unrun
+    ✓ a step excluded by the filter is skipped, with the reason (1 ms)
+    ✓ the reason distinguishes a skip from a filter exclusion
+  the working tree is measured before the runner writes anything
+    ✓ the fixture really was a clean checkout before the run
+    ✓ a clean checkout is reported clean in env.json
+    ✓ a clean checkout is reported clean in summary.json (1 ms)
+    ✓ the run really did change the checkout after measuring (3 ms)
+    ✓ the console names the measurement as taken before the run (1 ms)
+  a checkout that is already dirty is still reported dirty
+    ✓ the fixture was genuinely dirty before the run (4 ms)
+    ✓ a pre-existing modification is not laundered into clean
+  the batch base is a Git relation, not a commit count
+    ✓ the base is the merge base with the source branch (4 ms)
+    ✓ the base is the fork point, not a recent ancestor
+    ✓ the ref the base was derived from is recorded
+    ✓ the base is a real ancestor of both tips (6 ms)
+  growing the batch does not move the base
+    ✓ the same base is reported after two more commits (637 ms)
+  an unverifiable base is refused rather than invented
+    ✓ the runner fails instead of reporting a fallback SHA (1 ms)
+    ✓ the refusal names the ref and says why
+    ✓ no evidence is written, so no unverifiable SHA is left behind (1 ms)
+
+PASS __tests__/pandamstyle/provenance-props-test.js
+  BC-1: props() admits no raw CSS object
+    an object literal is refused while a compiled style compiles
+      ✓ the build process fails with the provenance code (3 ms)
+      ✓ every raw route is listed, none silently accepted
+      ✓ the diagnostic names the reason rather than saying "invalid"
+      ✓ nothing is published as current (259 ms)
+    an arbitrary local object is not provenance either
+      ✓ passing the object and spreading it are both refused (1 ms)
+      ✓ a variable is not excused by having a name
+    every admitted form still compiles
+      ✓ a create() namespace is admitted (1 ms)
+      ✓ a theme plus a namespace is admitted
+      ✓ a compiled style member is admitted
+      ✓ a statically folded recipe selection is admitted (1 ms)
+      ✓ the compiled output holds composition, not a raw object (1 ms)
+      ✓ the whole theme of a props() call survives compilation (1 ms)
+  BC-2: provenance follows the binding
+    ✓ a shadowing parameter inherits nothing from the module constant (254 ms)
+    ✓ a reassigned binding is not the value that was proven (255 ms)
+    ✓ writing to a proven value is refused (254 ms)
+    ✓ a value escaped into an unknown call is refused (256 ms)
+    ✓ an alias of the helper, and a nested shadow, are not the helper (242 ms)
+  BC-6: authority is a build concern, not a vocabulary ban
+    ✓ a reserved __pms* field is refused even in ordinary data (223 ms)
+    ordinary business data is not rejected
+      ✓ a file full of role/trusted fields still builds
+      ✓ the data file is covered and compiled like any other (1 ms)
+      ✓ no role diagnostic is raised for data
+    a real attempt to self-grant authority is still refused
+      ✓ an authority field inside a recognized PandamStyle call is refused
+      ✓ the diagnostic says where the claim was made (1 ms)
+      ✓ the author engine entry point stays unreachable
+  buildProject is the same entry point the CLI drives
+    ✓ it is exported from the built package
+
+PASS __tests__/pandamstyle/coverage-graph-test.js
+  BC-3: the closure follows re-exports
+    ✓ export * from pulls the target into the covered set (14 ms)
+    ✓ export { x } from pulls the target into the covered set (2 ms)
+    ✓ a two-hop barrel chain pulls the target into the covered set (2 ms)
+    ✓ the closure records how each file was reached (1 ms)
+    ✓ a named re-export is an edge, not just `export *` (1 ms)
+    ✓ every edge syntax is discovered from a real file (4 ms)
+    ✓ a stylesheet is not treated as a compilable module (1 ms)
+  BC-3: dynamic requests are decided, not ignored
+    ✓ a computed dynamic request is a coverage gap (211 ms)
+    ✓ the plugin refuses the same edge on its own, with its own rule (55 ms)
+    ✓ a literal local dynamic request is a normal local edge (274 ms)
+    ✓ a forbidden engine entry cannot be reached through import() (4 ms)
+  BC-3/BC-9: every relay escape is caught by a real build
+    ✓ neg-relay-reexport-star fails with PMS_FORBIDDEN_STYLE_CHANNEL (export *) (275 ms)
+    ✓ neg-relay-reexport-named fails with PMS_FORBIDDEN_STYLE_CHANNEL (named re-export) (274 ms)
+    ✓ neg-relay-barrel-chain fails with PMS_FORBIDDEN_STYLE_CHANNEL (two-hop barrel chain) (257 ms)
+    ✓ neg-stylesheet-via-relay fails with PMS_FORBIDDEN_STYLE_CHANNEL (stylesheet through a relay) (265 ms)
+    ✓ neg-unresolved-import fails with PMS_COVERAGE_GAP (unresolved local import) (209 ms)
+    ✓ neg-dynamic-import fails with PMS_COVERAGE_GAP (computed dynamic import) (207 ms)
+    ✓ the diagnostic points at the module outside every root (271 ms)
+    ✓ the report names the relays, so the closure is auditable (353 ms)
+  BC-4: a covered file that was never analysed is a failure
+    ✓ a fully analysed set is consistent (1 ms)
+    ✓ a covered file the bundler loaded but never compiled is missing
+    ✓ the generated design-system module is exempt, with a reason (1 ms)
+    ✓ paths are compared canonically, so a query suffix cannot hide a file
+    ✓ a file loaded but not covered is reported separately (2 ms)
+  the CLI cross-checks expected vs analysed before publishing
+    ✓ the published report carries the cross-check
+    ✓ a covered file that fails the policy still counts as analysed (582 ms)
+
+PASS __tests__/pandamstyle/transactional-generation-test.js (8.63 s)
+  BC-5: the transaction itself
+    ✓ a rollback on a first build leaves nothing published (16 ms)
+    ✓ a rollback restores the previous generation byte for byte (134 ms)
+    ✓ a crash between snapshot and commit is recovered by the next run (11 ms)
+    ✓ a rollback restores a file the failed generation deleted (3 ms)
+    ✓ the commit marker is published last (2 ms)
+    ✓ withGeneration publishes on success (2 ms)
+    ✓ withGeneration rolls back on a throw, and rethrows (3 ms)
+    ✓ withGeneration rolls back when the callback rejects (2 ms)
+    ✓ a committed transaction cannot be reused (1 ms)
+  BC-5/BC-9: a failing CLI build publishes no mix
+    ✓ a valid build publishes the full artifact set (426 ms)
+    ✓ a policy error leaves generation N byte-identical (729 ms)
+    ✓ a coverage error leaves generation N byte-identical (578 ms)
+    ✓ a provenance error leaves generation N byte-identical (702 ms)
+    ✓ a parse error leaves generation N byte-identical (576 ms)
+    ✓ an internal error injected after the design-system module leaves generation N byte-identical (689 ms)
+    ✓ a changed design system plus an internal failure after generation leaves generation N byte-identical (669 ms)
+    ✓ the injected failure is a real diagnostic on a real process (1091 ms)
+    ✓ after a failed generation every artifact still carries the same digest (624 ms)
+    ✓ a failing FIRST build publishes nothing at all (249 ms)
+    ✓ a failing build leaves no staging or backup directory behind (236 ms)
+    ✓ a successful build leaves no staging or backup directory behind (332 ms)
+    ✓ two consecutive valid builds are byte-identical (667 ms)
+
+PASS __tests__/pandamstyle/negative-builds-test.js (8.958 s)
   neg-forbidden-value fails with PMS_FORBIDDEN_VALUE
-    ✓ build process exits non-zero (AC AC-011, AC-016, AC-018: raw value, forged var(), forged ref object, alias, computed key, spread) (6 ms)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ build process exits non-zero (AC AC-011, AC-016, AC-018: raw value, forged var(), forged ref object, alias, computed key, spread) (3 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current (1 ms)
   neg-forbidden-value-ts fails with PMS_FORBIDDEN_VALUE
     ✓ build process exits non-zero (AC AC-017: same error in TSX with `as any` and a double cast, no tsc involved) (1 ms)
-    ✓ the failure is the expected policy code, not a crash (5 ms)
-    ✓ no artifact is published as current (1 ms)
-  neg-unknown-token fails with PMS_UNKNOWN_TOKEN
-    ✓ build process exits non-zero (AC AC-012: token absent from the registry)
     ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-unknown-token fails with PMS_UNKNOWN_TOKEN
+    ✓ build process exits non-zero (AC AC-012: token absent from the registry) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current (1 ms)
   neg-private-token fails with PMS_TOKEN_NOT_PUBLIC
     ✓ build process exits non-zero (AC AC-020: private primitive selected from a consumer page) (1 ms)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
-    ✓ no artifact is published as current
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
   neg-token-category fails with PMS_INVALID_TOKEN_CATEGORY
-    ✓ build process exits non-zero (AC AC-013: spacing token used for fontSize) (1 ms)
+    ✓ build process exits non-zero (AC AC-013: spacing token used for fontSize)
     ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current (1 ms)
   neg-composite-form fails with PMS_UNSUPPORTED_PROPERTY_FORM
     ✓ build process exits non-zero (AC AC-015: composite border shorthand)
     ✓ the failure is the expected policy code, not a crash
-    ✓ no artifact is published as current (1 ms)
+    ✓ no artifact is published as current
   neg-unsupported-property fails with PMS_UNSUPPORTED_PROPERTY
-    ✓ build process exits non-zero (AC AC-012: property outside the closed profile)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ build process exits non-zero (AC AC-012: property outside the closed profile) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current (1 ms)
   neg-unknown-condition fails with PMS_UNKNOWN_CONDITION
     ✓ build process exits non-zero (AC AC-024: condition outside the P0 matrix)
     ✓ the failure is the expected policy code, not a crash (1 ms)
     ✓ no artifact is published as current
   neg-forbidden-import fails with PMS_FORBIDDEN_IMPORT
-    ✓ build process exits non-zero (AC AC-051, AC-052: direct engine entries and the atoms path in a covered page)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ build process exits non-zero (AC AC-051, AC-052: direct engine entries and the atoms path in a covered page) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-style-channel fails with PMS_FORBIDDEN_STYLE_CHANNEL
-    ✓ build process exits non-zero (AC AC-054: inline style attribute and unapproved local stylesheet) (1 ms)
+    ✓ build process exits non-zero (AC AC-054: inline style attribute and unapproved local stylesheet)
     ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current (1 ms)
   neg-jsx-spread fails with PMS_UNVERIFIED_JSX_SPREAD
     ✓ build process exits non-zero (AC AC-054: JSX spread that cannot be proven free of style/className) (1 ms)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-invalid-variant fails with PMS_INVALID_VARIANT_VALUE
-    ✓ build process exits non-zero (AC AC-039: literal invalid variant rejected at build, before any style is emitted)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ build process exits non-zero (AC AC-039: literal invalid variant rejected at build, before any style is emitted) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-non-static fails with PMS_NON_STATIC_VALUE
     ✓ build process exits non-zero (AC AC-023, AC-019: local helper named token gains no trust; props value is not static) (1 ms)
-    ✓ the failure is the expected policy code, not a crash (9 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
+  neg-props-raw-object fails with PMS_UNVERIFIED_PROPS_SOURCE
+    ✓ build process exits non-zero (AC BC-1: an object literal handed to props(), while a create() namespace in the same file compiles)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-props-raw-reference fails with PMS_UNVERIFIED_PROPS_SOURCE
+    ✓ build process exits non-zero (AC BC-1: an arbitrary local object, and a spread of it, handed to props())
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
+  neg-props-shadowing fails with PMS_UNVERIFIED_JSX_SPREAD
+    ✓ build process exits non-zero (AC BC-2: a parameter shadowing a module-level props() result inherits nothing)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-props-reassigned fails with PMS_UNVERIFIED_JSX_SPREAD
+    ✓ build process exits non-zero (AC BC-2: a props() result that is then reassigned is not the proven value)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
+  neg-props-mutated fails with PMS_UNVERIFIED_PROVENANCE
+    ✓ build process exits non-zero (AC BC-2: a proven props() result whose member is written to afterwards) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-props-escaped fails with PMS_UNVERIFIED_PROVENANCE
+    ✓ build process exits non-zero (AC BC-2: a proven value handed to an unknown function and to Object.assign)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-helper-shadowed fails with PMS_UNVERIFIED_JSX_SPREAD
+    ✓ build process exits non-zero (AC BC-2, BC-6: an alias of the helper, and a nested declaration shadowing it, are not the helper)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-relay-reexport-star fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: a module outside every root, reached through `export *`) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-relay-reexport-named fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: a module outside every root, reached through a named re-export)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-relay-barrel-chain fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: two barrels deep, both outside every root) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-unresolved-import fails with PMS_COVERAGE_GAP
+    ✓ build process exits non-zero (AC BC-3, BC-4: a local import that resolves to nothing)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-dynamic-import fails with PMS_COVERAGE_GAP
+    ✓ build process exits non-zero (AC BC-3, BC-4: a dynamic request that is not a static string)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-dynamic-import-local fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: a literal dynamic import: the target is a normal local edge and is analysed)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-stylesheet-via-relay fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: an unapproved stylesheet reached only through a relay)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
   role violation is reported on its own code
     ✓ a page cannot self-declare authority (1 ms)
     ✓ the engine entry point is refused too
   PMS_FORBIDDEN_VALUE diagnostic content
     ✓ names the offending property
-    ✓ points at the location inside the page (2 ms)
+    ✓ points at the location inside the page (1 ms)
     ✓ names the violated rule and the system identity
-    ✓ lists only admissible public candidates (2 ms)
+    ✓ lists only admissible public candidates (1 ms)
     ✓ keeps autofix null: 17px is not a proven visual equivalent of 16px
     ✓ the proximity to spacing.md does not authorize a rewrite (1 ms)
   every forbidden-value route is refused, none silently
-    ✓ all six routes report PMS_FORBIDDEN_VALUE (673 ms)
+    ✓ all six routes report PMS_FORBIDDEN_VALUE (236 ms)
   a global runner may pass only when the negative builds really failed
-    ✓ the runner fails if a negative build unexpectedly succeeds (621 ms)
-    ✓ the runner fails if a negative build fails for another reason (609 ms)
+    ✓ the runner fails if a negative build unexpectedly succeeds (233 ms)
+    ✓ the runner fails if a negative build fails for another reason (230 ms)
 
-Test Suites: 6 passed, 6 total
-Tests:       111 passed, 111 total
+PASS __tests__/pandamstyle/vite-build-test.js (8.972 s)
+  BC-3/BC-5: a real vite build publishes one coherent generation
+    ✓ the build exits 0 (1240 ms)
+    ✓ the manifest, the module and the stylesheet are all published
+    ✓ the stylesheet is also emitted into the bundle (1 ms)
+    ✓ every artifact references the same registryDigest
+    ✓ the report shows the expected-vs-analysed cross-check as clean (1 ms)
+    ✓ the generated design-system module is not expected to be analysed
+  BC-3/BC-4/BC-9: a relay escape fails a real vite build
+    ✓ the build exits non-zero
+    ✓ the relayed module is the one refused (1 ms)
+    ✓ no generation is published (1 ms)
+  BC-5: a late bundler failure publishes no new generation
+    ✓ the failing build exits non-zero (1394 ms)
+    ✓ the design system changes, so a partial publish would be visible (1044 ms)
+    ✓ every artifact is still byte-identical to generation N
+    ✓ no staging or backup directory is left behind
+    ✓ the same design system then builds cleanly and does publish (1013 ms)
+  a build that cannot publish is refused up front
+    ✓ the build fails with a configuration diagnostic (331 ms)
+    ✓ no generation is left behind by the refusal
+
+Test Suites: 11 passed, 11 total
+Tests:       268 passed, 268 total
 Snapshots:   0 total
-Time:        13.801 s, estimated 18 s
+Time:        9.189 s, estimated 11 s
 Ran all test suites matching __tests__/pandamstyle/.*-test.js.

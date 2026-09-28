@@ -1,30 +1,38 @@
 {
   "documentKind": "pandamstyle-run-summary",
-  "testedCommit": "717cdb3c0e72620281ebd64518539763e5bfe46a",
-  "testedTree": "fccf990ae62c439f4852e5a6b69c5ac66838aed9",
-  "workingTree": "clean",
-  "outDir": "/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/evidence/native",
+  "testedCommit": "d5702374ac5a685499d14a53bf323d8533e6982d",
+  "testedTree": "836a24ec91239e148547a9c686041a6f65fe0099",
+  "workingTree": "dirty",
+  "pandamstyleBatchBaseRef": "refs/remotes/origin/feat/pandamstyle-native-compiler",
+  "pandamstyleBatchBase": "e5ff62b4a925405dcf9fb415faa00df4b68aeaa9",
+  "outDir": "/home/kyle/work/pandam-style/evidence/native",
   "toolchain": {
-    "node": "v22.23.2",
+    "node": "v22.22.0",
     "yarn": "1.22.22",
-    "npm": "10.9.8"
+    "npm": "11.11.1"
   },
+  "complete": true,
+  "skippedSteps": [],
+  "failedSteps": [],
   "steps": {
     "install": {
       "status": "passed",
       "exitCode": 0,
+      "acceptance": "passed",
       "note": null,
       "counts": null
     },
     "build": {
       "status": "passed",
       "exitCode": 0,
+      "acceptance": "passed",
       "note": null,
       "counts": null
     },
     "upstream-babel-plugin": {
       "status": "passed",
       "exitCode": 0,
+      "acceptance": "passed",
       "note": null,
       "counts": {
         "tests": {
@@ -42,6 +50,7 @@
     "upstream-stylex": {
       "status": "passed",
       "exitCode": 0,
+      "acceptance": "passed",
       "note": null,
       "counts": {
         "tests": {
@@ -59,16 +68,17 @@
     "pandamstyle": {
       "status": "passed",
       "exitCode": 0,
+      "acceptance": "passed",
       "note": null,
       "counts": {
         "tests": {
-          "passed": 111,
-          "total": 111,
+          "passed": 268,
+          "total": 268,
           "skipped": null
         },
         "suites": {
-          "passed": 6,
-          "total": 6,
+          "passed": 11,
+          "total": 11,
           "skipped": null
         }
       }
@@ -76,12 +86,14 @@
     "pilot": {
       "status": "passed",
       "exitCode": 0,
+      "acceptance": "passed",
       "note": null,
       "counts": null
     },
     "artifacts": {
       "status": "passed",
       "exitCode": 0,
+      "acceptance": "passed",
       "note": null,
       "counts": null
     }

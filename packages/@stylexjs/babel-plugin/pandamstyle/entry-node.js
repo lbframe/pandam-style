@@ -42,3 +42,15 @@ export {
 } from './module-graph';
 export { REQUIRED_HELPERS } from './evaluate-usage';
 export { defaultOptions as engineDefaultOptions } from '../src/shared/utils/default-options';
+// Benchmark-only measurement surface (Spike 1). Exported so a benchmark driver
+// can install a collector; a consumer that ignores it runs the exact same
+// compilation, because every hook is a null check when no collector is set.
+export {
+  installPerfCollector,
+  perfCollector,
+  perfSnapshot,
+  perfNow,
+  workEliminated,
+  setPerfEngineName,
+  perfMetricNames,
+} from './perf';

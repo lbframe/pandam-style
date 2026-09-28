@@ -19,6 +19,15 @@ import { createShortHash } from './hash';
 import { defaultOptions } from './utils/default-options';
 import { flattenRawStyleObject } from './preprocess-rules/flatten-raw-style-obj';
 import { validateNamespace } from './preprocess-rules/basic-validation';
+// Benchmark-only measurement hooks. No collector installed -> one null check
+// per hook and the work below is byte-for-byte the work that was there before.
+//
+// `atomic_lower_ms` is deliberately NOT measured here: pandamstyle/compiler.js
+// times the `styleXCreateSet` call that reaches this function, which is the same
+// interval and does not include the policy work that precedes it. Two timers on
+// one interval would double-count it, and a phase that is counted twice is worse
+// than a phase that is counted once.
+import { count } from '../../pandamstyle/perf';
 
 type TPropTuple = [+key: string, +styles: $ReadOnlyArray<ComputedStyle>];
 
@@ -77,6 +86,9 @@ export default function styleXCreateSet(
       flattenedNamespace.map(([key, value]) => {
         // Skip variables-as-keys to avoid regression to dynamic styles output
         if (options.enableMinifiedKeys === true && !key.startsWith('--')) {
+          // Minified keys are off by default, so this branch is not on the hot
+          // path of this corpus; it stays uninstrumented rather than carrying a
+          // timer that would only ever measure itself.
           const hashedKey = createShortHash('<>' + key);
           const displayKey =
             options.debug === true ? `${key}-k${hashedKey}` : `k${hashedKey}`;
@@ -108,7 +120,9 @@ export default function styleXCreateSet(
       for (const [className, injectable] of classNameTuples) {
         if (injectedStyles[className] == null) {
           injectedStyles[className] = injectable;
+          count('atoms');
         }
+        count('atom_contributions');
       }
     }
     resolvedNamespaces[namespaceName] = { ...namespaceObj, $$css: true };

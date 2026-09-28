@@ -23,3 +23,10 @@ pilot/vite-react/.pandamstyle/
 pilot/vite-react/dist/
 pilot/vite-react/node_modules/
 packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/*/generated/
+
+# PandamStyle benchmark scratch: generated corpora, per-job project copies and
+# the raw observation stream. Everything here is REGENERABLE from the committed
+# corpus manifests and the harness, and the corpora are benchmark INPUT whose
+# byte content is the identity of every number taken against it. The committed
+# evidence lives in evidence/performance/spike-1/.
+.pms-bench/

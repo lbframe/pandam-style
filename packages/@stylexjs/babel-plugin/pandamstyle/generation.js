@@ -56,6 +56,8 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
+// Benchmark-only measurement hooks (Spike 1).
+import { perfCollector, perfNow } from './perf';
 
 function rmrf(target) {
   fs.rmSync(target, { recursive: true, force: true });
@@ -175,10 +177,20 @@ export function beginGeneration(outDir, options = {}) {
      */
     stage(rel, content) {
       ensureOpen();
+      const start = perfNow();
       const target = path.join(stagingDir, rel);
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.writeFileSync(target, content, 'utf8');
       staged.set(rel, target);
+      const collector = perfCollector();
+      if (collector != null) {
+        collector.addDuration('publish_ms', perfNow() - start);
+        collector.addCount('write_calls', 1);
+        collector.addCount(
+          'written_bytes',
+          typeof content === 'string' ? Buffer.byteLength(content, 'utf8') : 0,
+        );
+      }
       return target;
     },
 
@@ -197,6 +209,7 @@ export function beginGeneration(outDir, options = {}) {
      */
     commit() {
       ensureOpen();
+      const start = perfNow();
       const ordered = [...staged.keys()].sort((a, b) => {
         if (a === commitMarker) return 1;
         if (b === commitMarker) return -1;
@@ -211,6 +224,10 @@ export function beginGeneration(outDir, options = {}) {
       rmrf(backupDir);
       rmrf(stagingDir);
       state = 'committed';
+      const collector = perfCollector();
+      if (collector != null) {
+        collector.addDuration('publish_ms', perfNow() - start);
+      }
       return { published: ordered };
     },
 

@@ -1,0 +1,18 @@
+{
+  "documentKind": "pandamstyle-spike1-parse-accounting",
+  "note": "Aggregated over every job in the run. 'real parses' counts only parse events; a module-cache hit is a LOOKUP and is counted separately, because conflating the two would answer a different question under the same name.",
+  "real_parses_total": 1680384,
+  "module_cache_lookups_total": 373492,
+  "events_total": 2053876,
+  "real_parses_by_corpus_and_pipeline": {
+    "c10000-t1000-r100-s307|module-graph": 560168,
+    "c10000-t1000-r100-s307|babel:pass1": 560108,
+    "c10000-t1000-r100-s307|babel:pass2": 560108
+  },
+  "max_real_parses_of_one_file_by_corpus": {
+    "c10000-t1000-r100-s307": 3
+  },
+  "max_module_cache_lookups_of_one_file_by_corpus": {
+    "c10000-t1000-r100-s307": 10001
+  }
+}

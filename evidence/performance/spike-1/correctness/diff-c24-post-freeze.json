@@ -1,0 +1,27 @@
+{
+  "documentKind": "pandamstyle-differential-oracle",
+  "corpus": {
+    "name": "c24-t120-r6-s101-f3",
+    "contentHash": "03177507c966101a8623772169bfef5c8299c305b79ddb6392df1fc03100a679",
+    "sourceFiles": 39
+  },
+  "reference": "babel_current",
+  "variant": "babel_work_eliminated",
+  "scenariosCompared": 28,
+  "checksPerScenario": [
+    "build-verdict",
+    "negative-diagnostics (codes, locations, rules, context)",
+    "css-bytes (byte identical, ordering preserved)",
+    "css-text",
+    "registry-digest",
+    "system-id",
+    "manifest",
+    "build-report (coverage, consistency, external requests, relay edges)",
+    "generated-design-system-module",
+    "compiled-js-bytes",
+    "runtime-composition-structure"
+  ],
+  "expectationsChecked": 28,
+  "verdict": "equivalent",
+  "errors": []
+}

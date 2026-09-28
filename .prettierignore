@@ -38,3 +38,8 @@ pilot/vite-react/.pandamstyle/
 # output (fixtures/*/generated/).
 upstream/panda/
 packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/
+
+# PandamStyle benchmark scratch root. The generated corpora are fixtures whose
+# byte content IS the benchmark input: reformatting them would change the
+# corpus content hash and invalidate every measurement taken against it.
+.pms-bench/

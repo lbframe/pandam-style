@@ -30,6 +30,8 @@ import {
   resolveDesignAccess,
 } from './evaluate-usage';
 import { isAdmitted, provenanceOf } from './provenance';
+// Benchmark-only measurement hooks (Spike 1).
+import { phase as perfPhase } from './perf';
 
 const STYLEX_PROPS_LOCAL = '__pmsProps';
 
@@ -97,17 +99,19 @@ function registerRules(pluginPass, injected) {
  * Provenance locates each diagnostic inside the page.
  */
 function compileNamespaces(namespaces, ctx, ds) {
-  return compileStyles({
-    registry: ds.registry,
-    varsByToken: ds.varsByToken,
-    namespaces,
-    role: 'consumer',
-    allowPrivateTokens: false,
-    source: ctx.filename,
-    refKind: 'compiler',
-    locate: (ns, prop, cond) => locateOrigin(ctx, ns, prop, cond),
-    options: ctx.options.engineOptions ?? {},
-  });
+  return perfPhase('policy_ms', () =>
+    compileStyles({
+      registry: ds.registry,
+      varsByToken: ds.varsByToken,
+      namespaces,
+      role: 'consumer',
+      allowPrivateTokens: false,
+      source: ctx.filename,
+      refKind: 'compiler',
+      locate: (ns, prop, cond) => locateOrigin(ctx, ns, prop, cond),
+      options: ctx.options.engineOptions ?? {},
+    }),
+  );
 }
 
 function reject(ctx, code, message, nodePath, rule, context = {}) {
@@ -258,7 +262,9 @@ function transformRecipeCall(callPath, ctx, ds) {
 
   let refs;
   try {
-    refs = selectRecipeRefs(recipe.spec, staticSelection);
+    refs = perfPhase('recipe_ms', () =>
+      selectRecipeRefs(recipe.spec, staticSelection),
+    );
   } catch (err) {
     if (err != null && Array.isArray(err.diagnostics)) {
       for (const d of err.diagnostics) {

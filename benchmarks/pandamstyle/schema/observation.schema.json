@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pandamstyle.dev/schemas/benchmark-observation-v1.json",
+  "title": "PandamStyle benchmark observation",
+  "description": "One row of the observation stream. The first ten properties are the Benchmark Kit's required fields and are never renamed or reinterpreted; everything after them is additive. A row describes ONE metric for ONE (engine, corpus, scenario, cache state, session, iteration). It is never an aggregate: aggregation is summarize.py's job, and a harness that averaged would destroy the session structure the raw data exists to preserve.",
+  "type": "object",
+  "required": [
+    "engine",
+    "corpus",
+    "scenario",
+    "cache_state",
+    "session_id",
+    "iteration",
+    "metric",
+    "unit",
+    "status",
+    "value"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "engine": {
+      "type": "string",
+      "enum": ["babel_current", "babel_work_eliminated"],
+      "description": "Which compiler produced the value. babel_current is anchored to the official hygiene baseline d5702374; babel_work_eliminated is the same compiler with the measured redundant work removed."
+    },
+    "corpus": {
+      "type": "string",
+      "pattern": "^c[0-9]+-t[0-9]+-r[0-9]+-s[0-9]+(-f[0-9]+)?$",
+      "description": "Corpus cell identity: c<components>-t<tokens>-r<recipes>-s<seed>. The seed is in the name because it is what makes the corpus deterministic. The optional -f<fanout> suffix is present when a cell's fanout differs from the value derived from its component count; fanout is always in the corpus manifest and the campaign metadata either way."
+    },
+    "scenario": {
+      "type": "string",
+      "description": "Scenario name from the protocol vocabulary. A scenario is a real content revision except where its name or kind says otherwise."
+    },
+    "cache_state": {
+      "type": "string",
+      "enum": [
+        "process_cold_cache_empty",
+        "process_cold_cache_warm",
+        "process_warm_no_edit",
+        "process_warm_edit"
+      ],
+      "description": "The state the process was in. os_cold is not a value here: the OS page cache was never dropped, so every row is a warm-OS-cache row."
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Independent session block. Preserved so warm events inside one session are not mistaken for independent samples."
+    },
+    "iteration": { "type": "integer", "minimum": 0 },
+    "metric": {
+      "type": "string",
+      "description": "Metric name. The Benchmark Kit phase names are used where they exist; engine-specific sub-phases are additionally allowed, and a parse metric may be suffixed with ':<pipeline>'."
+    },
+    "unit": { "type": "string", "enum": ["ms", "count", "bytes"] },
+    "status": {
+      "type": "string",
+      "enum": ["ok", "error", "timeout", "unsupported"],
+      "description": "ok includes a negative case that correctly REFUSED the program: a compiler failing a build it should fail is the correct outcome, and recording it as an error would make a correct engine look broken. unsupported means the phase could not be isolated honestly; it is never a zero."
+    },
+    "value": {
+      "type": ["number", "null"],
+      "description": "Null whenever status is not ok. There is no placeholder value: a number that was not measured is null, and the reason is in detail."
+    },
+    "schema_version": { "type": "integer", "const": 1 },
+    "harness_version": { "type": "string" },
+    "engine_variant_commit": {
+      "type": ["string", "null"],
+      "description": "The commit the engine was built from. Null when unknown, never a placeholder."
+    },
+    "corpus_manifest_hash": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "sha256 over every generated file, path and content, in path order. Two runs are comparable only when this matches."
+    },
+    "run_kind": {
+      "type": "string",
+      "enum": ["debug", "qualification"],
+      "description": "Debug runs prove the harness and publish no performance conclusion. They are never mixed with a qualification summary."
+    },
+    "detail": {
+      "type": ["object", "null"],
+      "description": "Why a row is ok-with-a-caveat, or why it is not ok. For unsupported metrics this carries the reason the phase could not be isolated. For parse counts it carries the most consulted module."
+    }
+  },
+  "examples": [
+    {
+      "engine": "babel_current",
+      "corpus": "c100-t100-r10-s101",
+      "scenario": "one_file_new_atom",
+      "cache_state": "process_warm_edit",
+      "session_id": "s01",
+      "iteration": 3,
+      "metric": "filesystem_to_diagnostics_ms",
+      "unit": "ms",
+      "status": "ok",
+      "value": 421.28,
+      "schema_version": 1,
+      "harness_version": "pms-bench-harness/1.0.0",
+      "engine_variant_commit": null,
+      "corpus_manifest_hash": "54b220f78e9fec85",
+      "run_kind": "qualification",
+      "detail": null
+    },
+    {
+      "engine": "babel_current",
+      "corpus": "c100-t100-r10-s101",
+      "scenario": "forbidden_value",
+      "cache_state": "process_warm_edit",
+      "session_id": "s01",
+      "iteration": 0,
+      "metric": "filesystem_to_diagnostics_ms",
+      "unit": "ms",
+      "status": "ok",
+      "value": 399.64,
+      "detail": {
+        "expected": "fail",
+        "codes": ["PMS_FORBIDDEN_VALUE"]
+      }
+    },
+    {
+      "engine": "babel_work_eliminated",
+      "corpus": "c100-t100-r10-s101",
+      "scenario": "one_file_new_atom",
+      "cache_state": "process_warm_edit",
+      "session_id": "s01",
+      "iteration": 0,
+      "metric": "sourcemap_ms",
+      "unit": "ms",
+      "status": "unsupported",
+      "value": null,
+      "detail": {
+        "reason": "source maps are not requested by either the CLI or the adapter, so there is no source-map work to time; reporting 0 would understate the build."
+      }
+    }
+  ]
+}

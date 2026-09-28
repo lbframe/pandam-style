@@ -23,6 +23,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { parse as parseModule } from '@babel/parser';
+import {
+  count,
+  phase,
+  recordParse,
+  withParseOwner,
+  workEliminated,
+} from './perf';
 
 export const DESIGN_SYSTEM_MARKER = '__PMS_DESIGN_SYSTEM__';
 
@@ -52,46 +59,47 @@ const parseCache = new Map();
  */
 let moduleOverlay = new Map();
 
-/** Installs the in-memory modules and invalidates the parse cache. */
+/**
+ * WORK-ELIMINATED ONLY.
+ *
+ * Two caches of derivations that are pure functions of the overlay plus the
+ * files already in `parseCache`. Both are dropped by exactly the same
+ * operations that drop `parseCache`, so neither outlives a build any longer
+ * than the parse cache the baseline already keeps. A stale hit is therefore
+ * never more stale than a stale parse.
+ *
+ * - `resolutionCache`    (fromDir, request) -> resolved path | null
+ * - `designSystemCache`  (fromDir, request) -> resolved design-system info
+ *
+ * The negative entries are the reason the lifetime matters: a `null` for
+ * `./foo` is only correct while `foo.tsx` does not exist. It is therefore NOT
+ * cached across `setModuleOverlay()` / `clearModuleCache()`, both of which run
+ * at every generation boundary, and a resolved `null` is recomputed as soon as
+ * the containing directory's own entry is invalidated, which the existing parse
+ * cache already forces.
+ */
+const resolutionCache = new Map();
+const designSystemCache = new Map();
+
+function resolutionKey(fromFile, request) {
+  return `${path.dirname(fromFile)}\u0000${request}`;
+}
+
+/** Installs the in-memory modules and invalidates every derived cache. */
 export function setModuleOverlay(map) {
   moduleOverlay = map == null ? new Map() : map;
   parseCache.clear();
+  resolutionCache.clear();
+  designSystemCache.clear();
 }
 
 export function clearModuleOverlay() {
   setModuleOverlay(null);
 }
 
-export function parseModuleFile(absolutePath) {
-  const cached = parseCache.get(absolutePath);
-  if (cached !== undefined) return cached;
-  let ast = null;
-  let code = null;
-  const overlaid = moduleOverlay.get(absolutePath);
-  if (overlaid != null) {
-    code = overlaid;
-    try {
-      ast = parseModule(code, {
-        sourceType: 'module',
-        allowReturnOutsideFunction: true,
-        errorRecovery: true,
-        plugins: [
-          'jsx',
-          'typescript',
-          'importAttributes',
-          'explicitResourceManagement',
-        ],
-      });
-    } catch {
-      ast = null;
-    }
-    const result = { ast, code, overlaid: true };
-    parseCache.set(absolutePath, result);
-    return result;
-  }
-  try {
-    code = fs.readFileSync(absolutePath, 'utf8');
-    ast = parseModule(code, {
+function parseWith(code) {
+  return withParseOwner('module-graph', () =>
+    parseModule(code, {
       sourceType: 'module',
       allowReturnOutsideFunction: true,
       errorRecovery: true,
@@ -101,10 +109,81 @@ export function parseModuleFile(absolutePath) {
         'importAttributes',
         'explicitResourceManagement',
       ],
-    });
-  } catch {
-    ast = null;
+    }),
+  );
+}
+
+export function parseModuleFile(absolutePath) {
+  const cached = parseCache.get(absolutePath);
+  if (cached !== undefined) {
+    // A cache HIT is a lookup, not a parse. Recording it as a parse would make
+    // "how many times is a file parsed" answer a different question, and the
+    // question the brief asks is the one about parses.
+    count('parse_lookups');
+    count('parse_cache_hits');
+    recordParse(absolutePath, 'module-graph:cache-hit');
+    return cached;
   }
+  const start = process.hrtime.bigint();
+  let ast = null;
+  let code = null;
+  const overlaid = moduleOverlay.get(absolutePath);
+  if (overlaid != null) {
+    code = overlaid;
+    try {
+      ast = parseWith(code);
+    } catch (err) {
+      // Same distinction as below: a syntax error is an unparseable module, an
+      // error inside the parse helper is a defect in this compiler.
+      if (!(err instanceof SyntaxError)) throw err;
+      ast = null;
+    }
+    count('parse_calls');
+    count('parsed_files');
+    recordParse(
+      absolutePath,
+      'module-graph',
+      Number(process.hrtime.bigint() - start),
+    );
+    const result = { ast, code, overlaid: true };
+    parseCache.set(absolutePath, result);
+    return result;
+  }
+  // The read and the parse are failed separately, because they mean different
+  // things. A file that cannot be READ is `null`, and the coverage graph reports
+  // that as a gap - which is exactly what the baseline did, and narrowing it
+  // would change a policy verdict into an unexpected exception. A file that
+  // cannot be PARSED is also `null`. Anything else - a `ReferenceError` from a
+  // missing import in this file, say - is a defect in this compiler, and
+  // reporting it as "unparseable module" would hide a bug behind a policy
+  // verdict, so it is re-thrown.
+  try {
+    code = fs.readFileSync(absolutePath, 'utf8');
+  } catch {
+    code = null;
+  }
+  if (code != null) {
+    try {
+      ast = parseWith(code);
+    } catch (err) {
+      if (!(err instanceof SyntaxError)) throw err;
+      ast = null;
+    }
+    // Only a parse that actually ran is recorded as a parse. A file that could
+    // not even be read is a coverage gap, and counting it as a parse would put a
+    // number in the parse statistics for work that never happened.
+    count('parse_calls');
+    count('parsed_files');
+    recordParse(
+      absolutePath,
+      'module-graph',
+      Number(process.hrtime.bigint() - start),
+    );
+  } else {
+    count('unreadable_modules');
+  }
+  count('read_calls');
+  count('read_bytes', code == null ? 0 : Buffer.byteLength(code, 'utf8'));
   const result = { ast, code, overlaid: false };
   parseCache.set(absolutePath, result);
   return result;
@@ -113,14 +192,15 @@ export function parseModuleFile(absolutePath) {
 /** Reset the cache (used between two builds inside one process). */
 export function clearModuleCache() {
   parseCache.clear();
+  resolutionCache.clear();
+  designSystemCache.clear();
 }
 
 /**
  * Relative path resolution, in the spirit of Node/Vite but restricted to the
  * explicit extension forms the spec allows a page to write.
  */
-export function resolveRelativeFile(fromFile, request) {
-  if (!request.startsWith('.')) return null;
+function probeRelativeFile(fromFile, request) {
   const base = path.resolve(path.dirname(fromFile), request);
   const candidates = [base];
 
@@ -145,12 +225,32 @@ export function resolveRelativeFile(fromFile, request) {
     // point of the overlay for the generated design-system module.
     if (moduleOverlay.has(candidate)) return candidate;
     try {
+      count('stat_calls');
+      count('resolution_probes');
       if (fs.statSync(candidate).isFile()) return candidate;
     } catch {
       /* keep probing */
     }
   }
   return null;
+}
+
+export function resolveRelativeFile(fromFile, request) {
+  if (!request.startsWith('.')) return null;
+  if (!workEliminated()) return probeRelativeFile(fromFile, request);
+
+  const key = resolutionKey(fromFile, request);
+  if (resolutionCache.has(key)) {
+    count('resolution_probes');
+    if (resolutionCache.get(key) == null) count('resolution_negative_hits');
+    else count('resolution_positive_hits');
+    return resolutionCache.get(key);
+  }
+  const resolved = phase('resolve_ms', () =>
+    probeRelativeFile(fromFile, request),
+  );
+  resolutionCache.set(key, resolved);
+  return resolved;
 }
 
 function collectOwnExports(ast) {
@@ -388,6 +488,22 @@ export function moduleEdgesOf(file) {
  * `chain` lists the files traversed so coverage can report them.
  */
 export function resolveDesignSystemModule(fromFile, request, config = {}) {
+  if (workEliminated()) {
+    const key = `${resolutionKey(fromFile, request)}\u0000${config.maxDepth ?? 16}`;
+    if (designSystemCache.has(key)) {
+      count('ds_module_walk_hits');
+      return designSystemCache.get(key);
+    }
+    count('ds_module_walks');
+    const computed = walkToDesignSystem(fromFile, request, config);
+    designSystemCache.set(key, computed);
+    return computed;
+  }
+  count('ds_module_walks');
+  return walkToDesignSystem(fromFile, request, config);
+}
+
+function walkToDesignSystem(fromFile, request, config = {}) {
   const seen = new Set();
   const chain = [];
   const budget = config.maxDepth ?? 16;

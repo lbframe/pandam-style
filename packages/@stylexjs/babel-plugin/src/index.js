@@ -15,6 +15,9 @@ import * as t from '@babel/types';
 import { MediaQuery } from 'style-value-parser';
 import type { MediaQueryRule } from 'style-value-parser';
 import StateManager from './utils/state-manager';
+// Benchmark-only measurement hooks (Spike 1). Absent a collector these are one
+// null check each; compilation order and output are unaffected.
+import { phase as pandamstylePerfPhase } from '../pandamstyle/perf';
 import {
   EXTENSIONS,
   filePathResolver,
@@ -694,6 +697,31 @@ function processStylexRules(
         ...
       },
 ): string {
+  // Benchmark-only measurement hooks (Spike 1). With no collector installed the
+  // wrapper collapses to a direct call and the body below is unchanged.
+  return pandamstylePerfPhase('css_serialize_ms', () =>
+    processStylexRulesInner(rules, config),
+  );
+}
+
+function processStylexRulesInner(
+  rules: Array<Rule>,
+  config?:
+    | boolean
+    | {
+        useLayers?:
+          | boolean
+          | $ReadOnly<{
+              before?: $ReadOnlyArray<string>,
+              after?: $ReadOnlyArray<string>,
+              prefix?: string,
+            }>,
+        enableLTRRTLComments?: boolean,
+        legacyDisableLayers?: boolean,
+        useLegacyClassnamesSort?: boolean,
+        ...
+      },
+): string {
   const rawConfig =
     typeof config === 'boolean' ? { useLayers: config } : (config ?? {});
   const {
@@ -781,62 +809,64 @@ function processStylexRules(
     return key;
   };
 
-  const sortedRules: Array<Rule> = nonConstantRules
-    .map(([key, { ...styleObj }, priority]): Rule => {
-      Object.keys(styleObj).forEach((dir) => {
-        let original = styleObj[dir];
-        for (const [varRef, constValue] of constsMap.entries()) {
-          if (typeof original !== 'string') continue;
-          const replacement = String(constValue);
-          original = original.replaceAll(varRef, () => replacement);
-          if (replacement.startsWith('var(') && replacement.endsWith(')')) {
-            const inside = replacement.slice(4, -1).trim();
-            const commaIdx = inside.indexOf(',');
-            const targetName = (
-              commaIdx >= 0 ? inside.slice(0, commaIdx) : inside
-            ).trim();
-            const constName = varRef.slice(4, -1);
-            original = original.replaceAll(`${constName}:`, `${targetName}:`);
+  const sortedRules: Array<Rule> = pandamstylePerfPhase('rule_sort_ms', () =>
+    nonConstantRules
+      .map(([key, { ...styleObj }, priority]): Rule => {
+        Object.keys(styleObj).forEach((dir) => {
+          let original = styleObj[dir];
+          for (const [varRef, constValue] of constsMap.entries()) {
+            if (typeof original !== 'string') continue;
+            const replacement = String(constValue);
+            original = original.replaceAll(varRef, () => replacement);
+            if (replacement.startsWith('var(') && replacement.endsWith(')')) {
+              const inside = replacement.slice(4, -1).trim();
+              const commaIdx = inside.indexOf(',');
+              const targetName = (
+                commaIdx >= 0 ? inside.slice(0, commaIdx) : inside
+              ).trim();
+              const constName = varRef.slice(4, -1);
+              original = original.replaceAll(`${constName}:`, `${targetName}:`);
+            }
+            styleObj[dir] = original;
           }
-          styleObj[dir] = original;
-        }
-      });
-      return [key, styleObj, priority];
-    })
-    .sort(
-      (
-        [classname1, { ltr: rule1 }, firstPriority]: [string, any, number],
-        [classname2, { ltr: rule2 }, secondPriority]: [string, any, number],
-      ) => {
-        const priorityComparison = firstPriority - secondPriority;
-        if (priorityComparison !== 0) return priorityComparison;
+        });
+        return [key, styleObj, priority];
+      })
+      .sort(
+        (
+          [classname1, { ltr: rule1 }, firstPriority]: [string, any, number],
+          [classname2, { ltr: rule2 }, secondPriority]: [string, any, number],
+        ) => {
+          const priorityComparison = firstPriority - secondPriority;
+          if (priorityComparison !== 0) return priorityComparison;
 
-        if (useLegacyClassnamesSort) {
-          return classname1.localeCompare(classname2);
-        } else {
-          const nameComparison = declaredPropertyName(rule1).localeCompare(
-            declaredPropertyName(rule2),
-          );
-          if (nameComparison !== 0) return nameComparison;
+          if (useLegacyClassnamesSort) {
+            return classname1.localeCompare(classname2);
+          } else {
+            const nameComparison = declaredPropertyName(rule1).localeCompare(
+              declaredPropertyName(rule2),
+            );
+            if (nameComparison !== 0) return nameComparison;
 
-          // Only rules for the same property compete in the cascade, so the
-          // breakpoint order applies within a property, after it. Ordering by
-          // width first would decide some pairs by width and others by
-          // declaration text, which is not a consistent ordering.
-          const mqComparison = compareWidthSortKeys(
-            getWidthSortKey(rule1),
-            getWidthSortKey(rule2),
-          );
-          if (mqComparison !== 0) return mqComparison;
+            // Only rules for the same property compete in the cascade, so the
+            // breakpoint order applies within a property, after it. Ordering by
+            // width first would decide some pairs by width and others by
+            // declaration text, which is not a consistent ordering.
+            const mqComparison = compareWidthSortKeys(
+              getWidthSortKey(rule1),
+              getWidthSortKey(rule2),
+            );
+            if (mqComparison !== 0) return mqComparison;
 
-          const property1 = rule1.slice(rule1.lastIndexOf('{'));
-          const property2 = rule2.slice(rule2.lastIndexOf('{'));
-          const propertyComparison = property1.localeCompare(property2);
-          if (propertyComparison !== 0) return propertyComparison;
-          return rule1.localeCompare(rule2);
-        }
-      },
-    );
+            const property1 = rule1.slice(rule1.lastIndexOf('{'));
+            const property2 = rule2.slice(rule2.lastIndexOf('{'));
+            const propertyComparison = property1.localeCompare(property2);
+            if (propertyComparison !== 0) return propertyComparison;
+            return rule1.localeCompare(rule2);
+          }
+        },
+      ),
+  );
 
   let lastKPri = -1;
   const grouped = sortedRules.reduce((acc: Array<Array<Rule>>, rule) => {
@@ -853,7 +883,9 @@ function processStylexRules(
     return acc;
   }, []);
 
-  const logicalFloatVars = getLogicalFloatVars(sortedRules);
+  const logicalFloatVars = pandamstylePerfPhase('styleq_ms', () =>
+    getLogicalFloatVars(sortedRules),
+  );
 
   const layerName = (index: number): string =>
     layerPrefix
@@ -911,34 +943,36 @@ function processStylexRules(
       })
       .join('\n');
 
-  const collectedCSS = grouped
-    .map((group, index) => {
-      // A `priorityLevel` (Math.floor(priority / 1000)) can mix rules that must
-      // stay outside layers (`@property`, `@keyframes`, `@position-try` are all
-      // priority 0) with rules that belong inside them (CSS custom properties
-      // are priority 1). Deciding based on `group[0][2]` alone would let the
-      // first rule's priority pull the whole group out of its layer, so we
-      // partition the group by whether each rule is layerable (priority > 0).
-      if (!useLayers) {
-        return collectRules(group, index);
-      }
+  const collectedCSS = pandamstylePerfPhase('css_join_ms', () =>
+    grouped
+      .map((group, index) => {
+        // A `priorityLevel` (Math.floor(priority / 1000)) can mix rules that must
+        // stay outside layers (`@property`, `@keyframes`, `@position-try` are all
+        // priority 0) with rules that belong inside them (CSS custom properties
+        // are priority 1). Deciding based on `group[0][2]` alone would let the
+        // first rule's priority pull the whole group out of its layer, so we
+        // partition the group by whether each rule is layerable (priority > 0).
+        if (!useLayers) {
+          return collectRules(group, index);
+        }
 
-      const layerable = group.filter(([, , pri]) => pri > 0);
-      const unlayered = group.filter(([, , pri]) => pri === 0);
+        const layerable = group.filter(([, , pri]) => pri > 0);
+        const unlayered = group.filter(([, , pri]) => pri === 0);
 
-      const parts = [];
-      if (unlayered.length > 0) {
-        parts.push(collectRules(unlayered, index));
-      }
-      // Don't put @property, @keyframe, @position-try in layers
-      if (layerable.length > 0) {
-        parts.push(
-          `@layer ${layerName(index)}{\n${collectRules(layerable, index)}\n}`,
-        );
-      }
-      return parts.join('\n');
-    })
-    .join('\n');
+        const parts = [];
+        if (unlayered.length > 0) {
+          parts.push(collectRules(unlayered, index));
+        }
+        // Don't put @property, @keyframe, @position-try in layers
+        if (layerable.length > 0) {
+          parts.push(
+            `@layer ${layerName(index)}{\n${collectRules(layerable, index)}\n}`,
+          );
+        }
+        return parts.join('\n');
+      })
+      .join('\n'),
+  );
 
   return logicalFloatVars + header + collectedCSS;
 }

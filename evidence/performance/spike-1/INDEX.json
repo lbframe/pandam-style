@@ -1,0 +1,307 @@
+{
+  "documentKind": "pandamstyle-spike1-evidence-index",
+  "schemaVersion": 1,
+  "storage_policy": {
+    "committed": [
+      "corpus manifests (the identity of every number)",
+      "campaign metadata (environment, engines, commits, policy, every job)",
+      "summaries (median, p95, variance, status counts, sessions)",
+      "phase and counter tables",
+      "parse evidence, in aggregated form: counts per file and per pipeline",
+      "profile summaries",
+      "differential-oracle verdicts"
+    ],
+    "not_committed": [
+      "the raw observation JSONL",
+      "the per-parse event files (every parse, every module-cache lookup, in order)"
+    ],
+    "not_committed_reason": "The raw stream is hundreds of megabytes of repeated timings. It is NOT deleted; its sha256 is recorded below and its location is recorded, so a reader can verify that the summaries were computed from exactly these bytes.",
+    "raw_retention_location": "archive-off-repo"
+  },
+  "raw": [
+    {
+      "name": "c100",
+      "path": "/home/kyle/work/pandam-style/.pms-bench/qualification/c100.jsonl",
+      "sha256": "9f6ae5c9fd4c48c1b255ef78f7f37caadf5d951be92a889e288cce8df37ef6f2",
+      "bytes": 23836996,
+      "observations": 47061,
+      "committed": false,
+      "retained_at": "archive-off-repo"
+    },
+    {
+      "name": "c1000",
+      "path": "/home/kyle/work/pandam-style/.pms-bench/qualification/c1000.jsonl",
+      "sha256": "4cd8b1040c7474c1c17dbce2a58f07b0aa75234eb9abc888be6ca12aeb460fd2",
+      "bytes": 10283200,
+      "observations": 20169,
+      "committed": false,
+      "retained_at": "archive-off-repo"
+    },
+    {
+      "name": "c10000",
+      "path": "/home/kyle/work/pandam-style/.pms-bench/qualification/c10000.jsonl",
+      "sha256": "378e409d52018229cb1154379418a6a0fde51f3eb8d85bc5ab8638af9af55746",
+      "bytes": 1750777,
+      "observations": 3416,
+      "committed": false,
+      "retained_at": "archive-off-repo"
+    }
+  ],
+  "summaries": [
+    {
+      "name": "c100",
+      "file": "evidence/performance/spike-1/campaigns/c100-summary.json",
+      "observations": 47061,
+      "jobs": {
+        "jobs_total": 742,
+        "jobs_ok": 742,
+        "jobs_error": 0,
+        "jobs_timeout": 0,
+        "wall_seconds": 930.801
+      }
+    },
+    {
+      "name": "c100-parse-accounting",
+      "file": "evidence/performance/spike-1/campaigns/c100-parse-accounting.json",
+      "event_files": 742,
+      "note": "aggregated from every parse event of every job in this run; the raw event files are not committed"
+    },
+    {
+      "name": "c1000",
+      "file": "evidence/performance/spike-1/campaigns/c1000-summary.json",
+      "observations": 20169,
+      "jobs": {
+        "jobs_total": 318,
+        "jobs_ok": 318,
+        "jobs_error": 0,
+        "jobs_timeout": 0,
+        "wall_seconds": 2274.543
+      }
+    },
+    {
+      "name": "c1000-parse-accounting",
+      "file": "evidence/performance/spike-1/campaigns/c1000-parse-accounting.json",
+      "event_files": 318,
+      "note": "aggregated from every parse event of every job in this run; the raw event files are not committed"
+    },
+    {
+      "name": "c10000",
+      "file": "evidence/performance/spike-1/campaigns/c10000-summary.json",
+      "observations": 3416,
+      "jobs": {
+        "jobs_total": 56,
+        "jobs_ok": 56,
+        "jobs_error": 0,
+        "jobs_timeout": 0,
+        "wall_seconds": 3159.611
+      }
+    },
+    {
+      "name": "c10000-parse-accounting",
+      "file": "evidence/performance/spike-1/campaigns/c10000-parse-accounting.json",
+      "event_files": 56,
+      "note": "aggregated from every parse event of every job in this run; the raw event files are not committed"
+    }
+  ],
+  "profiles": [
+    {
+      "source": "/tmp/opencode/prof-c100",
+      "file": "evidence/performance/spike-1/profiles/prof-c100.json",
+      "runs": [
+        {
+          "corpus": "c100-t100-r10",
+          "engine": "babel_current",
+          "status": "ok",
+          "wall_ms": 1155.352,
+          "samples": 3354
+        },
+        {
+          "corpus": "c100-t100-r10",
+          "engine": "babel_work_eliminated",
+          "status": "ok",
+          "wall_ms": 797.832,
+          "samples": 3020
+        }
+      ],
+      "note": "A sampling profiler perturbs what it observes. These were taken in separate invocations from the latency campaign and nothing in them is a latency measurement."
+    },
+    {
+      "source": "/tmp/opencode/prof-c1000",
+      "file": "evidence/performance/spike-1/profiles/prof-c1000.json",
+      "runs": [
+        {
+          "corpus": "c1000-t1000-r100",
+          "engine": "babel_current",
+          "status": "ok",
+          "wall_ms": 6239.946,
+          "samples": 8904
+        },
+        {
+          "corpus": "c1000-t1000-r100",
+          "engine": "babel_work_eliminated",
+          "status": "ok",
+          "wall_ms": 5634.973,
+          "samples": 8386
+        }
+      ],
+      "note": "A sampling profiler perturbs what it observes. These were taken in separate invocations from the latency campaign and nothing in them is a latency measurement."
+    }
+  ],
+  "differentials": [
+    {
+      "file": "evidence/performance/spike-1/correctness/diff-v4.json",
+      "corpus": {
+        "name": "c100-t100-r10-s101-f3",
+        "contentHash": "bbfa80faf2a8d00d93ce4202791117a86f0024b03451999bf2eb69347378f7af",
+        "sourceFiles": 115
+      },
+      "verdict": "equivalent",
+      "scenarios_compared": 28,
+      "errors": 0,
+      "checks": [
+        "build-verdict",
+        "negative-diagnostics (codes, locations, rules, context)",
+        "css-bytes (byte identical, ordering preserved)",
+        "css-text",
+        "registry-digest",
+        "system-id",
+        "manifest",
+        "build-report (coverage, consistency, external requests, relay edges)",
+        "generated-design-system-module",
+        "compiled-js-bytes",
+        "runtime-composition-structure"
+      ]
+    },
+    {
+      "file": "evidence/performance/spike-1/correctness/diff5.json",
+      "corpus": {
+        "name": "c24-t120-r6-s101-f3",
+        "contentHash": "03177507c966101a8623772169bfef5c8299c305b79ddb6392df1fc03100a679",
+        "sourceFiles": 39
+      },
+      "verdict": "equivalent",
+      "scenarios_compared": 28,
+      "errors": 0,
+      "checks": [
+        "build-verdict",
+        "negative-diagnostics (codes, locations, rules, context)",
+        "css-bytes (byte identical, ordering preserved)",
+        "css-text",
+        "registry-digest",
+        "system-id",
+        "manifest",
+        "build-report (coverage, consistency, external requests, relay edges)",
+        "generated-design-system-module",
+        "compiled-js-bytes",
+        "runtime-composition-structure"
+      ]
+    }
+  ],
+  "corpus_manifests": [
+    {
+      "name": "c100-t100-r10-s101-f4",
+      "content_hash": "54b220f78e9fec85e16d0d36c34b63cb2271b074c45e120ac92346787e402135",
+      "design_system_hash": "4c05ce9cf6e69dd466f4261baa74ccbc0e51227a501b525219be607607d1311b",
+      "parameters": {
+        "components": 100,
+        "tokens": 100,
+        "recipes": 10,
+        "seed": 101,
+        "fanout": 4
+      },
+      "counts": {
+        "sourceFiles": 116,
+        "componentFiles": 100,
+        "aliasModules": 4,
+        "fanoutModules": 4,
+        "bridgeModules": 1,
+        "definitionModules": 1,
+        "invalidTraces": 4,
+        "styleSites": 703,
+        "tokenReferences": 429,
+        "recipeCalls": 41,
+        "conditions": 8,
+        "themes": 2,
+        "recipeDefinitions": 10,
+        "tokenCategories": 2,
+        "tokenPaths": 100,
+        "privateTokenPaths": 20
+      },
+      "expected_state": {
+        "positive": "ok",
+        "negative": "fail-closed"
+      },
+      "file": "evidence/performance/spike-1/corpora/c100-t100-r10-s101/corpus-manifest.json"
+    },
+    {
+      "name": "c1000-t1000-r100-s809-f8",
+      "content_hash": "34090021532a305715ecb412887a0192fbb09fb31565243bc7008f33f4004955",
+      "design_system_hash": "a084fad1eab8129fcc6a13825c452e2f15332b35021cf98bb574588c4a0334f0",
+      "parameters": {
+        "components": 1000,
+        "tokens": 1000,
+        "recipes": 100,
+        "seed": 809,
+        "fanout": 8
+      },
+      "counts": {
+        "sourceFiles": 1020,
+        "componentFiles": 1000,
+        "aliasModules": 4,
+        "fanoutModules": 8,
+        "bridgeModules": 1,
+        "definitionModules": 1,
+        "invalidTraces": 4,
+        "styleSites": 7078,
+        "tokenReferences": 4329,
+        "recipeCalls": 401,
+        "conditions": 8,
+        "themes": 2,
+        "recipeDefinitions": 100,
+        "tokenCategories": 2,
+        "tokenPaths": 132,
+        "privateTokenPaths": 30
+      },
+      "expected_state": {
+        "positive": "ok",
+        "negative": "fail-closed"
+      },
+      "file": "evidence/performance/spike-1/corpora/c1000-t1000-r100-s809/corpus-manifest.json"
+    },
+    {
+      "name": "c10000-t1000-r100-s307-f8",
+      "content_hash": "65856fb5efe80da3e161ac16495df2cd74a1d71e86145a332ccfdd40e22509d3",
+      "design_system_hash": "f171f4f645d13b063d500a98a838e10e8efe4f044ff0ff8ae0e86cd20df2acc1",
+      "parameters": {
+        "components": 10000,
+        "tokens": 1000,
+        "recipes": 100,
+        "seed": 307,
+        "fanout": 8
+      },
+      "counts": {
+        "sourceFiles": 10020,
+        "componentFiles": 10000,
+        "aliasModules": 4,
+        "fanoutModules": 8,
+        "bridgeModules": 1,
+        "definitionModules": 1,
+        "invalidTraces": 4,
+        "styleSites": 70828,
+        "tokenReferences": 43329,
+        "recipeCalls": 4001,
+        "conditions": 8,
+        "themes": 2,
+        "recipeDefinitions": 100,
+        "tokenCategories": 2,
+        "tokenPaths": 132,
+        "privateTokenPaths": 30
+      },
+      "expected_state": {
+        "positive": "ok",
+        "negative": "fail-closed"
+      },
+      "file": "evidence/performance/spike-1/corpora/c10000-t1000-r100-s307/corpus-manifest.json"
+    }
+  ]
+}

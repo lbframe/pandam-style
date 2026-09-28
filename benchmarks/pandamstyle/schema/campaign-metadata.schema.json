@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pandamstyle.dev/schemas/benchmark-campaign-metadata-v1.json",
+  "title": "PandamStyle benchmark campaign metadata",
+  "description": "Everything needed to decide whether two observation files are comparable, and to reproduce a number. Stored SEPARATELY from the observations, because an observation row carries no ambient context and a campaign that only records 'MacBook' cannot be re-checked.",
+  "type": "object",
+  "required": [
+    "documentKind",
+    "run_kind",
+    "plan",
+    "engines",
+    "environment",
+    "policy",
+    "matrix",
+    "jobs"
+  ],
+  "properties": {
+    "documentKind": { "const": "pandamstyle-benchmark-campaign-metadata" },
+    "schemaVersion": { "const": 1 },
+    "run_kind": { "enum": ["debug", "qualification"] },
+    "started_at": { "type": "string" },
+    "finished_at": { "type": "string" },
+    "plan": {
+      "type": "object",
+      "required": ["file", "version", "baseline_commit", "sha256"],
+      "properties": {
+        "file": { "type": "string" },
+        "version": { "type": "string" },
+        "baseline_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "The commit every number in this campaign is relative to."
+        },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "engines": {
+      "type": "object",
+      "description": "One entry per engine: what it is, where its code lives, the exact commit and tree, and whether the working tree was clean when the run started. A dirty tree disqualifies the run as qualification evidence.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description", "repo_root", "commit", "tree", "working_tree"],
+        "properties": {
+          "description": { "type": "string" },
+          "repo_root": { "type": "string" },
+          "commit": { "type": ["string", "null"] },
+          "tree": { "type": ["string", "null"] },
+          "working_tree": {
+            "type": ["string", "null"],
+            "enum": ["clean", "dirty", null],
+            "description": "Reported as found, not as the runner leaves it."
+          },
+          "work_elimination_env": { "type": "string" }
+        }
+      }
+    },
+    "this_branch": { "type": "object" },
+    "environment": {
+      "type": "object",
+      "description": "Hardware identity precise enough to re-check a number: CPU model and core count, total RAM, kernel, filesystem type, Node/V8/ICU versions, package manager versions, lockfile digest, and the build settings (source maps, minification, target).",
+      "required": ["machine", "cpu", "memory", "runtime", "storage", "build_settings"]
+    },
+    "policy": {
+      "type": "object",
+      "required": ["warmup_iterations", "engine_order_randomisation", "timer", "os_cache_state"],
+      "properties": {
+        "warmup_iterations": {
+          "type": "integer",
+          "description": "Recorded rather than hidden. Warmup iterations are excluded from measurement explicitly, and the same count applies to every engine. A process-cold scenario is never warmed."
+        },
+        "warmup_kept_out_of_measurement": { "type": "boolean" },
+        "cold_scenarios_warmed": { "type": "boolean" },
+        "engine_order_randomisation": {
+          "type": "string",
+          "description": "How execution order was decided, and that it is seeded so the same command reproduces the same order."
+        },
+        "repetition_blocks": { "type": "integer" },
+        "timer": {
+          "type": "object",
+          "required": ["api", "resolution", "scope", "monotonic"],
+          "properties": {
+            "api": { "const": "process.hrtime.bigint()" },
+            "resolution": { "type": "string" },
+            "scope": { "type": "string" },
+            "monotonic": { "const": true },
+            "wall_clock_used_for": {
+              "type": "string",
+              "description": "Wall-clock timestamps are used for event ordering metadata only, never as a duration."
+            }
+          }
+        },
+        "os_cache_state": {
+          "type": "string",
+          "enum": ["not_run"],
+          "description": "The OS page cache was never dropped: this environment does not grant the privileges, and simulating it would not reproduce a cold cache. Every number is a warm-OS-cache number."
+        },
+        "os_cache_state_reason": { "type": "string" }
+      }
+    },
+    "matrix": {
+      "type": "object",
+      "required": ["cells", "scenarios", "cache_states", "iterations", "engines"],
+      "description": "What was asked for. Cells and scenarios that produced no job because a scenario does not declare that cache state are absent here and are listed as not_run in the report."
+    },
+    "jobs": {
+      "type": "array",
+      "description": "One entry per job, INCLUDING the failures. A job that crashed or timed out is here with its status, its child's exit code and the observation it produced; it is never removed to improve an average.",
+      "items": {
+        "type": "object",
+        "required": ["corpus", "scenario", "cacheState", "engineName", "status", "wall_ms"],
+        "properties": {
+          "status": { "enum": ["ok", "error", "timeout"] },
+          "child_exit": { "type": ["integer", "null"] },
+          "child_signal": { "type": ["string", "null"] },
+          "wall_ms": {
+            "type": "number",
+            "description": "Whole child process INCLUDING spawn. Recorded separately from startup_ms, which the child measures internally, so the two are never added together."
+          },
+          "observations": { "type": "integer" },
+          "error_observations": { "type": "integer" },
+          "error_detail": {},
+          "stderr_tail": { "type": "string" },
+          "parse_evidence": {
+            "type": "string",
+            "description": "Relative path to the per-parse evidence document for this job."
+          },
+          "parse_evidence_sha256": { "type": "string" }
+        }
+      }
+    },
+    "summary": { "type": "object" },
+    "observations_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Digest of the observation stream this metadata describes."
+    }
+  }
+}

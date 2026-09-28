@@ -1,8 +1,8 @@
 yarn install v1.22.22
 [1/4] Resolving packages...
 [2/4] Fetching packages...
-warning Pattern ["@vitejs/plugin-react@latest"] is trying to unpack in the same destination "/Users/leonardoballand/Library/Caches/Yarn/v6/npm-@vitejs-plugin-react-5.1.1-integrity/node_modules/@vitejs/plugin-react" as pattern ["@vitejs/plugin-react@^5.0.3","@vitejs/plugin-react@^5.0.4"]. This could result in non-deterministic behavior, skipping.
-warning Pattern ["@vitejs/plugin-rsc@latest"] is trying to unpack in the same destination "/Users/leonardoballand/Library/Caches/Yarn/v6/npm-@vitejs-plugin-rsc-0.5.26-integrity/node_modules/@vitejs/plugin-rsc" as pattern ["@vitejs/plugin-rsc@^0.5.24","@vitejs/plugin-rsc@^0.5.9"]. This could result in non-deterministic behavior, skipping.
+warning Pattern ["@vitejs/plugin-react@latest"] is trying to unpack in the same destination "/home/kyle/.cache/yarn/v6/npm-@vitejs-plugin-react-5.1.1-integrity/node_modules/@vitejs/plugin-react" as pattern ["@vitejs/plugin-react@^5.0.3","@vitejs/plugin-react@^5.0.4"]. This could result in non-deterministic behavior, skipping.
+warning Pattern ["@vitejs/plugin-rsc@latest"] is trying to unpack in the same destination "/home/kyle/.cache/yarn/v6/npm-@vitejs-plugin-rsc-0.5.26-integrity/node_modules/@vitejs/plugin-rsc" as pattern ["@vitejs/plugin-rsc@^0.5.24","@vitejs/plugin-rsc@^0.5.9"]. This could result in non-deterministic behavior, skipping.
 warning svelte-eslint-parser@1.8.0: The engine "pnpm" appears to be invalid.
 warning bare-fs@4.5.1: The engine "bare" appears to be invalid.
 warning bare-os@3.6.2: The engine "bare" appears to be invalid.
@@ -10,59 +10,69 @@ warning bare-os@3.6.2: The engine "bare" appears to be invalid.
 warning "@typescript-eslint/parser > @typescript-eslint/typescript-estree > ts-api-utils@1.4.3" has unmet peer dependency "typescript@>=4.2.0".
 warning " > @stylexjs/unplugin@0.19.1" has unmet peer dependency "unplugin@^2.3.11".
 warning " > @stylexjs/shared-ui@0.19.1" has unmet peer dependency "react@>=18".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > @stylexjs/devtools-extension > @babel/plugin-transform-flow-strip-types@7.27.1" has unmet peer dependency "@babel/core@^7.0.0-0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > docs-new > @monaco-editor/react@4.7.0" has unmet peer dependency "monaco-editor@>= 0.25.0 < 1".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react@^19.2.6".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react-dom@^19.2.6".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > docs-new > react-server-dom-webpack@19.2.6" has unmet peer dependency "webpack@^5.59.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-nextjs > autoprefixer@10.4.23" has unmet peer dependency "postcss@^8.1.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "vite@^5.0.0 || ^6.0.0 || ^7.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @typescript-eslint/eslint-plugin@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @typescript-eslint/parser@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @vitejs/plugin-react@5.1.1" has unmet peer dependency "vite@^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @vitest/browser@4.0.18" has incorrect peer dependency "vitest@4.0.18".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @vitest/coverage-v8@4.0.18" has incorrect peer dependency "vitest@4.0.18".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > autoprefixer@10.4.22" has unmet peer dependency "postcss@^8.1.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > postcss-nesting@13.0.2" has unmet peer dependency "postcss@^8.4".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "@rollup/pluginutils@>=5.1".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "astring@>=1.9.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "estree-walker@>=3.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "vite@>=5.2".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > rollup-plugin-node-externals@8.1.2" has unmet peer dependency "rollup@^4.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > typescript-eslint@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > vite-plugin-dts@4.5.4" has unmet peer dependency "typescript@*".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > vitest@4.1.11" has unmet peer dependency "vite@^6.0.0 || ^7.0.0 || ^8.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-waku > @vitejs/plugin-react@5.1.0" has unmet peer dependency "vite@^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @storybook/addon-docs > @mdx-js/react@3.1.1" has unmet peer dependency "@types/react@>=16".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @storybook/react-vite > @joshwooding/vite-plugin-react-docgen-typescript@0.6.1" has unmet peer dependency "vite@^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @storybook/react-vite > @storybook/builder-vite@9.1.16" has unmet peer dependency "vite@^5.0.0 || ^6.0.0 || ^7.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @storybook/react-vite > @storybook/react@9.1.16" has unmet peer dependency "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @storybook/react-vite > @storybook/react@9.1.16" has unmet peer dependency "react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @typescript-eslint/eslint-plugin > @typescript-eslint/type-utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @typescript-eslint/eslint-plugin > @typescript-eslint/utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @typescript-eslint/eslint-plugin > ts-api-utils@2.5.0" has unmet peer dependency "typescript@>=4.8.4".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > storybook > @testing-library/user-event@14.6.1" has unmet peer dependency "@testing-library/dom@>=7.21.4".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > typescript-eslint > @typescript-eslint/eslint-plugin@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > typescript-eslint > @typescript-eslint/utils@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @storybook/react-vite > @joshwooding/vite-plugin-react-docgen-typescript > react-docgen-typescript@2.4.0" has unmet peer dependency "typescript@>= 4.3.x".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree > @typescript-eslint/project-service@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree > @typescript-eslint/tsconfig-utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-storybook > typescript-eslint > @typescript-eslint/eslint-plugin > @typescript-eslint/type-utils@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > example-react-router > react-router@8.3.0" has incorrect peer dependency "react@>=19.2.7".
-warning "workspace-aggregator-99c9ede6-ae14-49e5-8b62-ed7f29801eaf > @redwoodjs/starter > react-server-dom-webpack@19.2.8" has unmet peer dependency "webpack@^5.59.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > @stylexjs/devtools-extension > @babel/plugin-transform-flow-strip-types@7.27.1" has unmet peer dependency "@babel/core@^7.0.0-0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > docs-new > @monaco-editor/react@4.7.0" has unmet peer dependency "monaco-editor@>= 0.25.0 < 1".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react@^19.2.6".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react-dom@^19.2.6".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > docs-new > react-server-dom-webpack@19.2.6" has unmet peer dependency "webpack@^5.59.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-nextjs > autoprefixer@10.4.23" has unmet peer dependency "postcss@^8.1.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "vite@^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @typescript-eslint/eslint-plugin@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @typescript-eslint/parser@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @vitejs/plugin-react@5.1.1" has unmet peer dependency "vite@^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @vitest/browser@4.0.18" has incorrect peer dependency "vitest@4.0.18".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @vitest/coverage-v8@4.0.18" has incorrect peer dependency "vitest@4.0.18".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > autoprefixer@10.4.22" has unmet peer dependency "postcss@^8.1.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > postcss-nesting@13.0.2" has unmet peer dependency "postcss@^8.4".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "@rollup/pluginutils@>=5.1".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "astring@>=1.9.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "estree-walker@>=3.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "vite@>=5.2".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > rollup-plugin-node-externals@8.1.2" has unmet peer dependency "rollup@^4.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > typescript-eslint@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > vite-plugin-dts@4.5.4" has unmet peer dependency "typescript@*".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > vitest@4.1.11" has unmet peer dependency "vite@^6.0.0 || ^7.0.0 || ^8.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-waku > @vitejs/plugin-react@5.1.0" has unmet peer dependency "vite@^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @storybook/addon-docs > @mdx-js/react@3.1.1" has unmet peer dependency "@types/react@>=16".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @storybook/react-vite > @joshwooding/vite-plugin-react-docgen-typescript@0.6.1" has unmet peer dependency "vite@^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @storybook/react-vite > @storybook/builder-vite@9.1.16" has unmet peer dependency "vite@^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @storybook/react-vite > @storybook/react@9.1.16" has unmet peer dependency "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @storybook/react-vite > @storybook/react@9.1.16" has unmet peer dependency "react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @typescript-eslint/eslint-plugin > @typescript-eslint/type-utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @typescript-eslint/eslint-plugin > @typescript-eslint/utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @typescript-eslint/eslint-plugin > ts-api-utils@2.5.0" has unmet peer dependency "typescript@>=4.8.4".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > storybook > @testing-library/user-event@14.6.1" has unmet peer dependency "@testing-library/dom@>=7.21.4".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > typescript-eslint > @typescript-eslint/eslint-plugin@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > typescript-eslint > @typescript-eslint/utils@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @storybook/react-vite > @joshwooding/vite-plugin-react-docgen-typescript > react-docgen-typescript@2.4.0" has unmet peer dependency "typescript@>= 4.3.x".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree > @typescript-eslint/project-service@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree > @typescript-eslint/tsconfig-utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-storybook > typescript-eslint > @typescript-eslint/eslint-plugin > @typescript-eslint/type-utils@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > example-react-router > react-router@8.3.0" has incorrect peer dependency "react@>=19.2.7".
+warning "workspace-aggregator-d453957b-0cfa-416f-be57-d1f0195de10c > @redwoodjs/starter > react-server-dom-webpack@19.2.8" has unmet peer dependency "webpack@^5.59.0".
 warning Workspaces can only be enabled in private projects.
 warning Workspaces can only be enabled in private projects.
 warning Workspaces can only be enabled in private projects.
 warning Workspaces can only be enabled in private projects.
 [4/4] Building fresh packages...
 $ npm run build
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > stylex-monorepo@0.0.0 build
 > npm run build --workspaces --if-present
 
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > style-value-parser@0.19.1 prebuild
 > gen-types -i src/ -o lib/
@@ -72,7 +82,7 @@ Successfully generated type definitions
 > style-value-parser@0.19.1 build
 > babel src --out-dir lib --ignore "**/__tests__/**","**/__benchmarks__/**"
 
-Successfully compiled 33 files with Babel (2139ms).
+Successfully compiled 33 files with Babel (529ms).
 
 > @stylexjs/shared@0.19.1 prebuild
 > gen-types -i src/ -o lib/
@@ -82,7 +92,7 @@ Successfully generated type definitions
 > @stylexjs/shared@0.19.1 build
 > babel src/ --out-dir lib/
 
-Successfully compiled 2 files with Babel (832ms).
+Successfully compiled 2 files with Babel (294ms).
 
 > @stylexjs/stylex@0.19.1 prebuild
 > shx rm -rf lib && gen-types -i src/ -o lib/cjs && shx cp -r lib/cjs lib/es
@@ -92,20 +102,30 @@ Successfully generated type definitions
 > @stylexjs/stylex@0.19.1 build
 > npm run build:cjs && npm run build:esm
 
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > @stylexjs/stylex@0.19.1 build:cjs
 > cross-env BABEL_ENV=cjs rollup -c ./rollup.config.mjs
 
 [36m
 [1m./src/stylex.js, ./src/inject.js[22m → [1m./lib/cjs[22m...[39m
-[32mcreated [1m./lib/cjs[22m in [1m1.2s[22m[39m
+[32mcreated [1m./lib/cjs[22m in [1m534ms[22m[39m
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > @stylexjs/stylex@0.19.1 build:esm
 > cross-env BABEL_ENV=esm rollup -c ./rollup.config.mjs
 
 [36m
 [1m./src/stylex.js, ./src/inject.js[22m → [1m./lib/es/[22m...[39m
-[32mcreated [1m./lib/es/[22m in [1m1.3s[22m[39m
+[32mcreated [1m./lib/es/[22m in [1m453ms[22m[39m
 
 > @stylexjs/babel-plugin@0.19.1 prebuild
 > gen-types -i src/ -o lib/
@@ -117,7 +137,7 @@ Successfully generated type definitions
 
 [36m
 [1m./src/index.js[22m → [1m./lib/index.js[22m...[39m
-[32mcreated [1m./lib/index.js[22m in [1m3.9s[22m[39m
+[32mcreated [1m./lib/index.js[22m in [1m1.3s[22m[39m
 [36m
 [1m./src/index.js[22m → [1m./lib/index.browser.js[22m...[39m
 [1m[33m(!) Missing exports[39m[22m
@@ -156,27 +176,37 @@ isLiteral is not exported by @babel/types
 532:     }[39m
 [1msrc/index.js[22m
 importNamespaceSpecifier is not exported by @babel/types
-[90m446:     'body',
-447:     t.importDeclaration(
-448:       [t.importNamespaceSpecifier(t.identifier(stylexLocalName))],
+[90m449:     'body',
+450:     t.importDeclaration(
+451:       [t.importNamespaceSpecifier(t.identifier(stylexLocalName))],
               ^
-449:       t.stringLiteral(importSource),
-450:     ),[39m
-[32mcreated [1m./lib/index.browser.js[22m in [1m2.5s[22m[39m
+452:       t.stringLiteral(importSource),
+453:     ),[39m
+[32mcreated [1m./lib/index.browser.js[22m in [1m796ms[22m[39m
 
 > @stylexjs/unplugin@0.19.1 build
 > npm run build:cjs && npm run build:esm
 
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > @stylexjs/unplugin@0.19.1 build:cjs
 > cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files
 
-Successfully compiled 13 files with Babel (1081ms).
+Successfully compiled 13 files with Babel (331ms).
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > @stylexjs/unplugin@0.19.1 build:esm
 > cross-env BABEL_ENV=esm babel src/ --out-dir lib/es --out-file-extension .mjs
 
-Successfully compiled 13 files with Babel (939ms).
+Successfully compiled 13 files with Babel (306ms).
 
 > @stylexjs/cli@0.19.1 prebuild
 > gen-types -i src/ -o lib/
@@ -186,38 +216,48 @@ Successfully generated type definitions
 > @stylexjs/cli@0.19.1 build
 > npm run build:cjs && npm run build:esm
 
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > @stylexjs/cli@0.19.1 build:cjs
 > cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files
 
-Successfully compiled 11 files with Babel (1282ms).
+Successfully compiled 11 files with Babel (332ms).
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > @stylexjs/cli@0.19.1 build:esm
 > cross-env BABEL_ENV=esm babel src/ --out-dir lib/es --out-file-extension .mjs
 
-Successfully compiled 11 files with Babel (1332ms).
+Successfully compiled 11 files with Babel (332ms).
 
 > @stylexjs/cli@0.19.1 postbuild:esm
 > rollup -c ./rollup.config.mjs
 
 [36m
 [1m./src/index.js[22m → [1m./lib/index.js[22m...[39m
-[32mcreated [1m./lib/index.js[22m in [1m2.1s[22m[39m
+[32mcreated [1m./lib/index.js[22m in [1m472ms[22m[39m
 
 > create-stylex-app@0.19.1 build
 > cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files && chmod +x lib/index.js
 
-Successfully compiled 5 files with Babel (881ms).
+Successfully compiled 5 files with Babel (238ms).
 
 > @stylexjs/devtools-extension@0.19.1 build
 > rollup -c
 
 [36m
-[1m/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/packages/@stylexjs/devtools-extension/src/inspected/runtimeEntry.js[22m → [1mdist/.shared/runtime[22m...[39m
-[32mcreated [1mdist/.shared/runtime[22m in [1m2.8s[22m[39m
+[1m/home/kyle/work/pandam-style/packages/@stylexjs/devtools-extension/src/inspected/runtimeEntry.js[22m → [1mdist/.shared/runtime[22m...[39m
+[32mcreated [1mdist/.shared/runtime[22m in [1m703ms[22m[39m
 [36m
-[1m/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/packages/@stylexjs/devtools-extension/src/devtools/main.js, /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/packages/@stylexjs/devtools-extension/src/panel/main.js[22m → [1mdist/.shared/app[22m...[39m
-[32mcreated [1mdist/.shared/app[22m in [1m4.3s[22m[39m
+[1m/home/kyle/work/pandam-style/packages/@stylexjs/devtools-extension/src/devtools/main.js, /home/kyle/work/pandam-style/packages/@stylexjs/devtools-extension/src/panel/main.js[22m → [1mdist/.shared/app[22m...[39m
+[32mcreated [1mdist/.shared/app[22m in [1m951ms[22m[39m
 
 > @stylexjs/eslint-plugin@0.19.1 prebuild
 > gen-types -i src/ -o lib/
@@ -227,7 +267,7 @@ Successfully generated type definitions
 > @stylexjs/eslint-plugin@0.19.1 build
 > babel src/ --out-dir lib/
 
-Successfully compiled 42 files with Babel (2358ms).
+Successfully compiled 42 files with Babel (592ms).
 
 > @stylexjs/rollup-plugin@0.19.1 prebuild
 > gen-types -i src/ -o lib/
@@ -237,16 +277,26 @@ Successfully generated type definitions
 > @stylexjs/rollup-plugin@0.19.1 build
 > npm run build:cjs && npm run build:esm
 
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > @stylexjs/rollup-plugin@0.19.1 build:cjs
 > cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files
 
-Successfully compiled 1 file with Babel (1118ms).
+Successfully compiled 1 file with Babel (271ms).
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > @stylexjs/rollup-plugin@0.19.1 build:esm
 > cross-env BABEL_ENV=esm babel src/ --out-dir lib/es --out-file-extension .mjs
 
-Successfully compiled 1 file with Babel (868ms).
+Successfully compiled 1 file with Babel (236ms).
 
 > @pandamstyle/compiler@0.1.0 prebuild
 > node -e "require('fs').rmSync('lib',{recursive:true,force:true})"
@@ -257,188 +307,159 @@ Successfully compiled 1 file with Babel (868ms).
 
 [36m
 [1m../../@stylexjs/babel-plugin/pandamstyle/entry-node.js[22m → [1m./lib/index.js[22m...[39m
-[32mcreated [1m./lib/index.js[22m in [1m5.9s[22m[39m
+[32mcreated [1m./lib/index.js[22m in [1m1.4s[22m[39m
 [36m
 [1m../../@stylexjs/babel-plugin/pandamstyle/entry-node.js[22m → [1m./lib/index.mjs[22m...[39m
-[32mcreated [1m./lib/index.mjs[22m in [1m4s[22m[39m
+[32mcreated [1m./lib/index.mjs[22m in [1m885ms[22m[39m
 [36m
 [1m../../@stylexjs/babel-plugin/pandamstyle/vite.js[22m → [1m./lib/vite.js[22m...[39m
-[32mcreated [1m./lib/vite.js[22m in [1m3.4s[22m[39m
+[32mcreated [1m./lib/vite.js[22m in [1m847ms[22m[39m
 [36m
 [1m../../@stylexjs/babel-plugin/pandamstyle/vite.js[22m → [1m./lib/vite.mjs[22m...[39m
-[32mcreated [1m./lib/vite.mjs[22m in [1m3.5s[22m[39m
+[32mcreated [1m./lib/vite.mjs[22m in [1m866ms[22m[39m
 [36m
 [1m../../@stylexjs/babel-plugin/pandamstyle/runtime.js[22m → [1m./lib/runtime.mjs[22m...[39m
-[32mcreated [1m./lib/runtime.mjs[22m in [1m97ms[22m[39m
+[32mcreated [1m./lib/runtime.mjs[22m in [1m19ms[22m[39m
 [36m
 [1m../../@stylexjs/babel-plugin/pandamstyle/runtime.js[22m → [1m./lib/runtime.cjs[22m...[39m
-[32mcreated [1m./lib/runtime.cjs[22m in [1m83ms[22m[39m
+[32mcreated [1m./lib/runtime.cjs[22m in [1m17ms[22m[39m
 
 > docs-new@0.19.1 build
 > waku build
 
-[tsconfig-paths] An error occurred while parsing "/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/examples/example-sveltekit/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
-TSConfckParseError: failed to resolve "extends":"./.svelte-kit/tsconfig.json" in /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/examples/example-sveltekit/tsconfig.json
-    at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:262:8)
-    at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
+[tsconfig-paths] An error occurred while parsing "/home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"astro/tsconfigs/base" in /home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json
+    at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
     ... 5 lines matching cause stack trace ...
-    at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19)
-    at async cli (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
-    at async run (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/cli.js:43:9) {
-  code: 'EXTENDS_RESOLVE',
-  cause: Error: Cannot find module './.svelte-kit/tsconfig.json'
-  Require stack:
-  - /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/examples/example-sveltekit/tsconfig.json
-      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
-      at Function.resolve (node:internal/modules/helpers:157:19)
-      at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:250:14)
-      at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
-      at Module.parse (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:54:23)
-      at async Promise.all (index 7)
-      at async BasicMinimalPluginContext.configResolved (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
-      at async Promise.all (index 1)
-      at async resolveConfig (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:35686:2)
-      at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19) {
-    code: 'MODULE_NOT_FOUND',
-    requireStack: [
-      '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/examples/example-sveltekit/tsconfig.json'
-    ]
-  },
-  tsconfigFile: '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/examples/example-sveltekit/tsconfig.json'
-}
-[tsconfig-paths] An error occurred while parsing "/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/docusaurus-ts/tsconfig.json". See below for details.
-TSConfckParseError: failed to resolve "extends":"@docusaurus/tsconfig" in /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/docusaurus-ts/tsconfig.json
-    at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:262:8)
-    at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
-    ... 5 lines matching cause stack trace ...
-    at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19)
-    at async cli (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
-    at async run (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/cli.js:43:9) {
-  code: 'EXTENDS_RESOLVE',
-  cause: Error: Cannot find module '@docusaurus/tsconfig/tsconfig.json'
-  Require stack:
-  - /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/docusaurus-ts/tsconfig.json
-      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
-      at Function.resolve (node:internal/modules/helpers:157:19)
-      at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:256:15)
-      at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
-      at Module.parse (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:54:23)
-      at async Promise.all (index 39)
-      at async BasicMinimalPluginContext.configResolved (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
-      at async Promise.all (index 1)
-      at async resolveConfig (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:35686:2)
-      at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19) {
-    code: 'MODULE_NOT_FOUND',
-    requireStack: [
-      '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/docusaurus-ts/tsconfig.json'
-    ]
-  },
-  tsconfigFile: '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/docusaurus-ts/tsconfig.json'
-}
-[tsconfig-paths] An error occurred while parsing "/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/astro/tsconfig.json". See below for details.
-TSConfckParseError: failed to resolve "extends":"astro/tsconfigs/base" in /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/astro/tsconfig.json
-    at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:262:8)
-    at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
-    ... 5 lines matching cause stack trace ...
-    at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19)
-    at async cli (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
-    at async run (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/cli.js:43:9) {
+    at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///home/kyle/work/pandam-style/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///home/kyle/work/pandam-style/node_modules/waku/dist/cli.js:43:9) {
   code: 'EXTENDS_RESOLVE',
   cause: Error: Cannot find module 'astro/tsconfigs/base/tsconfig.json'
   Require stack:
-  - /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/astro/tsconfig.json
-      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+  - /home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
       at Function.resolve (node:internal/modules/helpers:157:19)
-      at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:256:15)
-      at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
-      at Module.parse (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:54:23)
-      at async Promise.all (index 40)
-      at async BasicMinimalPluginContext.configResolved (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:256:15)
+      at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 39)
+      at async BasicMinimalPluginContext.configResolved (file:///home/kyle/work/pandam-style/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
       at async Promise.all (index 1)
-      at async resolveConfig (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:35686:2)
-      at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+      at async resolveConfig (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19) {
     code: 'MODULE_NOT_FOUND',
     requireStack: [
-      '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/astro/tsconfig.json'
+      '/home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json'
     ]
   },
-  tsconfigFile: '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/astro/tsconfig.json'
+  tsconfigFile: '/home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json'
 }
-[tsconfig-paths] An error occurred while parsing "/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/nuxt/tsconfig.json". See below for details.
-TSConfckParseError: failed to resolve "extends":"./.nuxt/tsconfig.json" in /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/nuxt/tsconfig.json
-    at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:262:8)
-    at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
+[tsconfig-paths] An error occurred while parsing "/home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json". See below for details.
+TSConfckParseError: failed to resolve "extends":"@docusaurus/tsconfig" in /home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json
+    at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
     ... 5 lines matching cause stack trace ...
-    at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19)
-    at async cli (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
-    at async run (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/cli.js:43:9) {
+    at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///home/kyle/work/pandam-style/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///home/kyle/work/pandam-style/node_modules/waku/dist/cli.js:43:9) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '@docusaurus/tsconfig/tsconfig.json'
+  Require stack:
+  - /home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+      at Function.resolve (node:internal/modules/helpers:157:19)
+      at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:256:15)
+      at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 41)
+      at async BasicMinimalPluginContext.configResolved (file:///home/kyle/work/pandam-style/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1)
+      at async resolveConfig (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json". See below for details.
+TSConfckParseError: failed to resolve "extends":"./.nuxt/tsconfig.json" in /home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json
+    at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+    ... 5 lines matching cause stack trace ...
+    at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///home/kyle/work/pandam-style/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///home/kyle/work/pandam-style/node_modules/waku/dist/cli.js:43:9) {
   code: 'EXTENDS_RESOLVE',
   cause: Error: Cannot find module './.nuxt/tsconfig.json'
   Require stack:
-  - /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/nuxt/tsconfig.json
-      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+  - /home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
       at Function.resolve (node:internal/modules/helpers:157:19)
-      at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:250:14)
-      at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
-      at Module.parse (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:54:23)
-      at async Promise.all (index 43)
-      at async BasicMinimalPluginContext.configResolved (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 45)
+      at async BasicMinimalPluginContext.configResolved (file:///home/kyle/work/pandam-style/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
       at async Promise.all (index 1)
-      at async resolveConfig (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:35686:2)
-      at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+      at async resolveConfig (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19) {
     code: 'MODULE_NOT_FOUND',
     requireStack: [
-      '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/nuxt/tsconfig.json'
+      '/home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json'
     ]
   },
-  tsconfigFile: '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/nuxt/tsconfig.json'
+  tsconfigFile: '/home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json'
 }
-[tsconfig-paths] An error occurred while parsing "/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json". See below for details.
-TSConfckParseError: failed to resolve "extends":"./.nuxt/tsconfig.json" in /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json
-    at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:262:8)
-    at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
+[tsconfig-paths] An error occurred while parsing "/home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json". See below for details.
+TSConfckParseError: failed to resolve "extends":"./.nuxt/tsconfig.json" in /home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json
+    at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
     ... 5 lines matching cause stack trace ...
-    at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19)
-    at async cli (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
-    at async run (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/waku/dist/cli.js:43:9) {
+    at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///home/kyle/work/pandam-style/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///home/kyle/work/pandam-style/node_modules/waku/dist/cli.js:43:9) {
   code: 'EXTENDS_RESOLVE',
   cause: Error: Cannot find module './.nuxt/tsconfig.json'
   Require stack:
-  - /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json
-      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+  - /home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
       at Function.resolve (node:internal/modules/helpers:157:19)
-      at resolveExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:250:14)
-      at parseExtends (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:197:24)
-      at Module.parse (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/tsconfck/src/parse.js:54:23)
-      at async Promise.all (index 61)
-      at async BasicMinimalPluginContext.configResolved (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 62)
+      at async BasicMinimalPluginContext.configResolved (file:///home/kyle/work/pandam-style/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
       at async Promise.all (index 1)
-      at async resolveConfig (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:35686:2)
-      at async Module.createBuilder (file:///private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+      at async resolveConfig (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19) {
     code: 'MODULE_NOT_FOUND',
     requireStack: [
-      '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json'
+      '/home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json'
     ]
   },
-  tsconfigFile: '/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json'
+  tsconfigFile: '/home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json'
 }
 [1/5] analyze client references...
 vite v7.3.2 building rsc environment for production...
-[MDX] generated files in 5.546553000000131ms
+[MDX] generated files in 2.0787260000000742ms
 transforming...
 ✓ 1994 modules transformed.
 rendering chunks...
-✓ built in 19.09s
+✓ built in 4.66s
 [2/5] analyze server references...
 vite v7.3.2 building ssr environment for production...
-[MDX] generated files in 2.5263820000000123ms
+[MDX] generated files in 0.4295929999998407ms
 transforming...
 ✓ 1970 modules transformed.
 rendering chunks...
-✓ built in 13.40s
+✓ built in 3.21s
 [3/5] build rsc environment...
 vite v7.3.2 building rsc environment for production...
-[MDX] generated files in 1.3658050000012736ms
+[MDX] generated files in 0.390492999998969ms
 ✓ 1994 modules transformed.
 dist/server/assets/nmn-B2JWaNf2.jpg                              17.24 kB
 dist/server/assets/necolas-D_9YEUI7.jpg                          19.31 kB
@@ -566,10 +587,10 @@ dist/server/assets/variants-TpWnnSqS.js                         157.30 kB
 dist/server/assets/when-DVJo2155.js                             220.43 kB
 dist/server/assets/static-types-2rX3Vhnu.js                     221.59 kB
 dist/server/assets/waku.server-BmltWLr9.js                      359.02 kB
-✓ built in 18.92s
+✓ built in 4.81s
 [4/5] build client environment...
 vite v7.3.2 building client environment for production...
-[MDX] generated files in 1.3229340000034426ms
+[MDX] generated files in 0.3564920000007987ms
 transforming...
 ✓ 1969 modules transformed.
 rendering chunks...
@@ -581,48 +602,48 @@ dist/public/assets/stylex-cover-photo-BWp08ZxO.png      73.36 kB
 dist/public/assets/mellyeliu-CCOt2mL7.jpg               96.39 kB
 dist/public/assets/vincentriemer-OXz-58Lb.png          239.86 kB
 dist/public/assets/_layout-Dox5lVp4.css                 32.22 kB │ gzip:     9.96 kB
-dist/public/assets/chevron-down-D308V52m.js              0.14 kB │ gzip:     0.15 kB
-dist/public/assets/chevron-right-BHfIr1EV.js             0.14 kB │ gzip:     0.15 kB
-dist/public/assets/link-CMDJYWgl.js                      0.17 kB │ gzip:     0.15 kB
-dist/public/assets/client-Cv6zcaMB.js                    0.21 kB │ gzip:     0.19 kB
+dist/public/assets/chevron-down-DZJUI5YS.js              0.14 kB │ gzip:     0.15 kB
+dist/public/assets/chevron-right-DL71Ga6-.js             0.14 kB │ gzip:     0.15 kB
+dist/public/assets/link-C3U9Z3tS.js                      0.17 kB │ gzip:     0.15 kB
+dist/public/assets/client-DRjW6n64.js                    0.21 kB │ gzip:     0.19 kB
 dist/public/assets/chunk-ZMWYLUDP-oajMeTFk.js            0.22 kB │ gzip:     0.17 kB
-dist/public/assets/chunk-SH7BNTG7-DjHxpe_X.js            0.38 kB │ gzip:     0.29 kB
+dist/public/assets/chunk-SH7BNTG7-CRGf_dM4.js            0.38 kB │ gzip:     0.28 kB
 dist/public/assets/fetch-2XFMBLBA-F2YKbHTa.js            0.44 kB │ gzip:     0.29 kB
-dist/public/assets/SidebarToggle-DjDEcL2i.js             0.48 kB │ gzip:     0.33 kB
-dist/public/assets/chunk-K4WNLOVQ-BRrm6TFD.js            0.66 kB │ gzip:     0.38 kB
+dist/public/assets/SidebarToggle-CwXqYROG.js             0.48 kB │ gzip:     0.33 kB
+dist/public/assets/chunk-K4WNLOVQ-DNZTTuLv.js            0.66 kB │ gzip:     0.38 kB
 dist/public/assets/chunk-OTD7MV33-qJr9DjGl.js            0.67 kB │ gzip:     0.38 kB
-dist/public/assets/index-DT_-XO24.js                     0.68 kB │ gzip:     0.47 kB
+dist/public/assets/index-Dl7Xs6EP.js                     0.68 kB │ gzip:     0.46 kB
 dist/public/assets/algolia-IZEDLPHE-2120h3C3.js          0.80 kB │ gzip:     0.51 kB
-dist/public/assets/createLucideIcon-ByzqTeCy.js          1.17 kB │ gzip:     0.69 kB
-dist/public/assets/tree-D1V4KrJL.js                      1.19 kB │ gzip:     0.68 kB
+dist/public/assets/createLucideIcon-DBLsCsL8.js          1.17 kB │ gzip:     0.68 kB
+dist/public/assets/tree-Bx-4oQuV.js                      1.19 kB │ gzip:     0.67 kB
 dist/public/assets/orama-cloud-UZAPMPFV-DSsy8tIc.js      1.22 kB │ gzip:     0.60 kB
-dist/public/assets/_root-Ccr1tEqU.js                     1.60 kB │ gzip:     0.87 kB
+dist/public/assets/_root-BibGzayK.js                     1.60 kB │ gzip:     0.87 kB
 dist/public/assets/base-80a1f760--izZcyUG.js             1.64 kB │ gzip:     0.68 kB
-dist/public/assets/playground-CVHfrrAw.js                2.63 kB │ gzip:     1.28 kB
+dist/public/assets/playground-D-Igz0bx.js                2.63 kB │ gzip:     1.28 kB
 dist/public/assets/stylex-CrYq5BGZ.js                    3.61 kB │ gzip:     1.60 kB
 dist/public/assets/mixedbread-RAHDVXGJ-DWAJ-1Nh.js      11.78 kB │ gzip:     5.03 kB
-dist/public/assets/Dial-ZUjrXdP-.js                     14.63 kB │ gzip:     5.96 kB
-dist/public/assets/SidebarContext-B814gBgh.js           15.48 kB │ gzip:     5.84 kB
-dist/public/assets/consoleHook-59e792cb-NYiqILpa.js     19.70 kB │ gzip:     6.04 kB
-dist/public/assets/SidebarToggle-B_R1eeQV.js            23.26 kB │ gzip:     8.32 kB
-dist/public/assets/docs-CnpUi--l.js                     26.63 kB │ gzip:     9.79 kB
-dist/public/assets/index-B1dXgN34.js                    27.82 kB │ gzip:     8.78 kB
-dist/public/assets/search-default-B-KG7Yd1.js           41.72 kB │ gzip:    14.32 kB
-dist/public/assets/_layout-_K58s6Re.js                  46.71 kB │ gzip:    17.10 kB
+dist/public/assets/Dial-CDkAd2SP.js                     14.63 kB │ gzip:     5.96 kB
+dist/public/assets/SidebarContext-BbCp0k7S.js           15.48 kB │ gzip:     5.84 kB
+dist/public/assets/consoleHook-59e792cb-I0LmcaGg.js     19.70 kB │ gzip:     6.04 kB
+dist/public/assets/SidebarToggle-CDBEnjBt.js            23.26 kB │ gzip:     8.32 kB
+dist/public/assets/docs-aRPnMhp-.js                     26.63 kB │ gzip:     9.79 kB
+dist/public/assets/index-C82WSIpP.js                    27.82 kB │ gzip:     8.77 kB
+dist/public/assets/search-default-CPpKslX1.js           41.72 kB │ gzip:    14.32 kB
+dist/public/assets/_layout-IhSycsxB.js                  46.71 kB │ gzip:    17.10 kB
 dist/public/assets/static-A2YJ5TXV-Bxb1_3vc.js          63.89 kB │ gzip:    22.32 kB
-dist/public/assets/index-599aeaf7-fzvEGoaE.js          144.42 kB │ gzip:    24.48 kB
-dist/public/assets/index-4J1vdWxI.js                   162.88 kB │ gzip:    27.13 kB
-dist/public/assets/index-zGCZQ_D0.js                   237.12 kB │ gzip:    75.63 kB
-dist/public/assets/index-BD95MuxK.js                 4,232.36 kB │ gzip: 1,001.26 kB
+dist/public/assets/index-599aeaf7-X35QkdCU.js          144.42 kB │ gzip:    24.48 kB
+dist/public/assets/index-CMS6ygE5.js                   162.88 kB │ gzip:    27.12 kB
+dist/public/assets/index-BhxerwjX.js                   237.12 kB │ gzip:    75.63 kB
+dist/public/assets/index-BhmocMXj.js                 4,232.60 kB │ gzip: 1,001.49 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 21.53s
+✓ built in 8.57s
 [5/5] build ssr environment...
 vite v7.3.2 building ssr environment for production...
-[MDX] generated files in 1.7620889999961946ms
+[MDX] generated files in 0.44277299999885145ms
 src/components/Playground/index.tsx (35:30): "default" is not exported by "../@stylexjs/babel-plugin/lib/index.js", imported by "src/components/Playground/index.tsx".
 "equal" is imported from external module "assert" but never used in "node_modules/prettier/index.mjs".
 ✓ 1979 modules transformed.
@@ -644,16 +665,16 @@ dist/server/ssr/assets/tree-QFdYm5Ca.js                      2.40 kB
 dist/server/ssr/assets/_root-DZkdLSng.js                     3.00 kB
 dist/server/ssr/assets/base-80a1f760-DOfzm1W-.js             3.29 kB
 dist/server/ssr/assets/stylex-CtTCSF8E.js                    4.97 kB
-dist/server/ssr/assets/playground-WNdzE7fR.js                5.13 kB
+dist/server/ssr/assets/playground-CIWwcz-Z.js                5.13 kB
 dist/server/ssr/assets/client-uZ_IoaLw.js                    9.26 kB
 dist/server/ssr/assets/mixedbread-RAHDVXGJ-SJBIz_4I.js      15.31 kB
-dist/server/ssr/assets/consoleHook-59e792cb-qlfk03bZ.js     23.52 kB
+dist/server/ssr/assets/consoleHook-59e792cb-D3Evo_Kr.js     23.52 kB
 dist/server/ssr/assets/Dial-BzViPGrU.js                     26.46 kB
 dist/server/ssr/assets/SidebarContext-Bm7BtfGz.js           33.35 kB
 dist/server/ssr/assets/docs-BIOb0ynd.js                     37.14 kB
 dist/server/ssr/assets/SidebarToggle-BvBgSOC4.js            51.85 kB
 dist/server/ssr/assets/graphql-Cx6A4xbM.js                  55.22 kB
-dist/server/ssr/assets/index-CKOmctVZ.js                    56.96 kB
+dist/server/ssr/assets/index-CYpT39Cl.js                    56.96 kB
 dist/server/ssr/assets/_layout-C3lCk07H.js                  99.38 kB
 dist/server/ssr/assets/angular-Rg2yZ01U.js                 115.71 kB
 dist/server/ssr/assets/search-default-D2vJiFTE.js          117.19 kB
@@ -665,26 +686,20 @@ dist/server/ssr/assets/acorn-CS7NizVC.js                   181.09 kB
 dist/server/ssr/assets/markdown-DjHMnn8w.js                186.52 kB
 dist/server/ssr/assets/html-mvIajK3C.js                    191.76 kB
 dist/server/ssr/assets/postcss-sE6YzxJH.js                 205.55 kB
-dist/server/ssr/assets/index-DnGBEjo6.js                   206.19 kB
-dist/server/ssr/assets/index-599aeaf7-sP39i8XJ.js          245.45 kB
+dist/server/ssr/assets/index-D00gn8Tf.js                   206.19 kB
+dist/server/ssr/assets/index-599aeaf7-DlV-NSfv.js          245.45 kB
 dist/server/ssr/assets/estree-vzvnmFiJ.js                  253.02 kB
 dist/server/ssr/assets/babel-H26r2Ax_.js                   388.48 kB
 dist/server/ssr/assets/typescript-CaxjCQfh.js              590.89 kB
 dist/server/ssr/index.js                                   601.17 kB
 dist/server/ssr/assets/flow-CYUlbtN3.js                  1,150.23 kB
-dist/server/ssr/assets/index-BLPe08MZ.js                 7,927.04 kB
-✓ built in 23.91s
+dist/server/ssr/assets/index-DhhltXVH.js                 7,927.47 kB
+✓ built in 12.26s
 [ssg] processing static generation...
-✓ 173 files generated in 2895ms
+✓ 173 files generated in 1464ms
 
 > example-sveltekit@0.19.1 build
 > vite build
-
-▲ [WARNING] Cannot find base config file "./.svelte-kit/tsconfig.json" [tsconfig.json]
-
-    tsconfig.json:2:12:
-      2 │   "extends": "./.svelte-kit/tsconfig.json",
-        ╵              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 vite v7.3.2 building ssr environment for production...
 transforming...
@@ -696,11 +711,11 @@ transforming...
 rendering chunks...
 computing gzip size...
 .svelte-kit/output/client/_app/version.json                        0.03 kB │ gzip:  0.05 kB
-.svelte-kit/output/client/.vite/manifest.json                      3.40 kB │ gzip:  0.65 kB
+.svelte-kit/output/client/.vite/manifest.json                      3.40 kB │ gzip:  0.64 kB
 .svelte-kit/output/client/_app/immutable/assets/0.zhSdvcBu.css     1.31 kB │ gzip:  0.55 kB
-.svelte-kit/output/client/_app/immutable/entry/start.Cjfuk0cM.js   0.08 kB │ gzip:  0.09 kB
+.svelte-kit/output/client/_app/immutable/entry/start.NV_UxsJq.js   0.08 kB │ gzip:  0.09 kB
 .svelte-kit/output/client/_app/immutable/chunks/DRxAnFJQ.js        0.23 kB │ gzip:  0.20 kB
-.svelte-kit/output/client/_app/immutable/nodes/1.DHuH8LFh.js       0.51 kB │ gzip:  0.33 kB
+.svelte-kit/output/client/_app/immutable/nodes/1.awN0mZel.js       0.51 kB │ gzip:  0.33 kB
 .svelte-kit/output/client/_app/immutable/nodes/2.UTtua9HA.js       0.81 kB │ gzip:  0.51 kB
 .svelte-kit/output/client/_app/immutable/chunks/wbPk3Yxo.js        1.37 kB │ gzip:  0.66 kB
 .svelte-kit/output/client/_app/immutable/chunks/DLlnVVXC.js        1.82 kB │ gzip:  0.84 kB
@@ -708,10 +723,10 @@ computing gzip size...
 .svelte-kit/output/client/_app/immutable/chunks/BFg-DnNH.js        3.29 kB │ gzip:  1.67 kB
 .svelte-kit/output/client/_app/immutable/chunks/C03aV7jn.js        5.19 kB │ gzip:  2.33 kB
 .svelte-kit/output/client/_app/immutable/chunks/CMTJW8bU.js        6.82 kB │ gzip:  3.17 kB
-.svelte-kit/output/client/_app/immutable/entry/app.vT4XndL1.js     6.95 kB │ gzip:  3.29 kB
+.svelte-kit/output/client/_app/immutable/entry/app.DotbeVCo.js     6.95 kB │ gzip:  3.28 kB
 .svelte-kit/output/client/_app/immutable/chunks/BPA8z3FK.js       24.49 kB │ gzip:  9.57 kB
-.svelte-kit/output/client/_app/immutable/chunks/Re6F5sHD.js       27.48 kB │ gzip: 10.71 kB
-✓ built in 867ms
+.svelte-kit/output/client/_app/immutable/chunks/CkvVsG5W.js       27.48 kB │ gzip: 10.72 kB
+✓ built in 420ms
 .svelte-kit/output/server/.vite/manifest.json                           2.98 kB
 .svelte-kit/output/server/_app/immutable/assets/_layout.zhSdvcBu.css    1.31 kB
 .svelte-kit/output/server/chunks/false.js                               0.05 kB
@@ -729,7 +744,7 @@ computing gzip size...
 .svelte-kit/output/server/chunks/index.js                              38.08 kB
 .svelte-kit/output/server/chunks/root.js                               86.62 kB
 .svelte-kit/output/server/index.js                                    130.76 kB
-✓ built in 5.35s
+✓ built in 2.56s
 
 Run npm run preview to preview your production build locally.
 
@@ -738,4 +753,4 @@ Run npm run preview to preview your production build locally.
   ✔ done
 $ husky install tools/husky
 husky - Git hooks installed
-Done in 282.54s.
+Done in 66.15s.

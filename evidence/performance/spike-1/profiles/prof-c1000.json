@@ -1,0 +1,381 @@
+{
+  "documentKind": "pandamstyle-benchmark-profiles",
+  "note": "DEDICATED PROFILING RUNS. A profiler perturbs what it observes, so these were taken in separate invocations from the latency campaign and nothing here is a latency measurement. Sample counts are self-time: a frame is charged for the samples that landed in it, not for the samples of its callees.",
+  "generated_at": "2026-09-28T15:10:44.449Z",
+  "results": [
+    {
+      "corpus": "c1000-t1000-r100",
+      "engine": "babel_current",
+      "status": "ok",
+      "samples": 8904,
+      "wall_ms": 6239.946,
+      "byModule": [
+        {
+          "module": "@babel/traverse",
+          "samples": 2517,
+          "self_pct": 28.26819407008086
+        },
+        {
+          "module": "@babel/core",
+          "samples": 1530,
+          "self_pct": 17.183288409703504
+        },
+        {
+          "module": "pandamstyle-compiler-bundle",
+          "samples": 1014,
+          "self_pct": 11.388140161725067
+        },
+        {
+          "module": "@babel/parser",
+          "samples": 1009,
+          "self_pct": 11.331985624438454
+        },
+        {
+          "module": "native/vm",
+          "samples": 919,
+          "self_pct": 10.321203953279424
+        },
+        {
+          "module": "other-node-modules",
+          "samples": 540,
+          "self_pct": 6.064690026954178
+        },
+        {
+          "module": "node-internal",
+          "samples": 482,
+          "self_pct": 5.4132973944294696
+        },
+        {
+          "module": "@babel/generator",
+          "samples": 461,
+          "self_pct": 5.177448337825696
+        },
+        {
+          "module": "@babel/types",
+          "samples": 417,
+          "self_pct": 4.683288409703504
+        },
+        {
+          "module": "other",
+          "samples": 15,
+          "self_pct": 0.1684636118598383
+        }
+      ],
+      "compilerFunctions": [
+        {
+          "function": "literal",
+          "self_pct": 1.3589398023360288
+        },
+        {
+          "function": "checkValue",
+          "self_pct": 0.8535489667565139
+        },
+        {
+          "function": "visit",
+          "self_pct": 0.5615453728661276
+        },
+        {
+          "function": "constName",
+          "self_pct": 0.52785265049416
+        },
+        {
+          "function": "styleXCreateSet",
+          "self_pct": 0.5166217430368374
+        },
+        {
+          "function": "compileStyles",
+          "self_pct": 0.42677448337825696
+        },
+        {
+          "function": "probeRelativeFile",
+          "self_pct": 0.40431266846361186
+        },
+        {
+          "function": "unsortedAtRules",
+          "self_pct": 0.24707996406109614
+        },
+        {
+          "function": "convertObjectToAST",
+          "self_pct": 0.2358490566037736
+        },
+        {
+          "function": "ctx",
+          "self_pct": 0.17969451931716085
+        },
+        {
+          "function": "generateCSSRule",
+          "self_pct": 0.1684636118598383
+        },
+        {
+          "function": "convertStyleToClassName",
+          "self_pct": 0.1684636118598383
+        },
+        {
+          "function": "_flattenRawStyleObject",
+          "self_pct": 0.15723270440251574
+        },
+        {
+          "function": "phase",
+          "self_pct": 0.1460017969451932
+        },
+        {
+          "function": "admitted",
+          "self_pct": 0.1460017969451932
+        },
+        {
+          "function": "DEFAULT_INJECT_PATH",
+          "self_pct": 0.13477088948787064
+        },
+        {
+          "function": "designSystemPath",
+          "self_pct": 0.12353998203054807
+        },
+        {
+          "function": "evaluateValue",
+          "self_pct": 0.12353998203054807
+        },
+        {
+          "function": "murmurhash2_32_gc",
+          "self_pct": 0.11230907457322552
+        },
+        {
+          "function": "dashify",
+          "self_pct": 0.11230907457322552
+        },
+        {
+          "function": "hash",
+          "self_pct": 0.11230907457322552
+        },
+        {
+          "function": "transformUsage",
+          "self_pct": 0.11230907457322552
+        },
+        {
+          "function": "provenanceOf",
+          "self_pct": 0.11230907457322552
+        },
+        {
+          "function": "declaredPropertyName",
+          "self_pct": 0.11230907457322552
+        },
+        {
+          "function": "compiledNamespaceTuples",
+          "self_pct": 0.10107816711590296
+        },
+        {
+          "function": "resolvePmsAccess",
+          "self_pct": 0.10107816711590296
+        },
+        {
+          "function": "flattenRawStyleObject",
+          "self_pct": 0.08984725965858043
+        },
+        {
+          "function": "walk",
+          "self_pct": 0.08984725965858043
+        },
+        {
+          "function": "evaluateObject",
+          "self_pct": 0.08984725965858043
+        },
+        {
+          "function": "sortedRules",
+          "self_pct": 0.08984725965858043
+        }
+      ],
+      "stats": {
+        "registryDigest": "73f689c4c7289ce7",
+        "coveredFileCount": 1003,
+        "cssBytes": 27027
+      },
+      "profileFile": "c1000-t1000-r100-babel_current.cpuprofile"
+    },
+    {
+      "corpus": "c1000-t1000-r100",
+      "engine": "babel_work_eliminated",
+      "status": "ok",
+      "samples": 8386,
+      "wall_ms": 5634.973,
+      "byModule": [
+        {
+          "module": "@babel/traverse",
+          "samples": 2510,
+          "self_pct": 29.93083710946816
+        },
+        {
+          "module": "@babel/core",
+          "samples": 1552,
+          "self_pct": 18.50703553541617
+        },
+        {
+          "module": "@babel/parser",
+          "samples": 946,
+          "self_pct": 11.280705938468877
+        },
+        {
+          "module": "pandamstyle-compiler-bundle",
+          "samples": 906,
+          "self_pct": 10.80372048652516
+        },
+        {
+          "module": "native/vm",
+          "samples": 870,
+          "self_pct": 10.374433579775816
+        },
+        {
+          "module": "other-node-modules",
+          "samples": 468,
+          "self_pct": 5.580729787741474
+        },
+        {
+          "module": "@babel/generator",
+          "samples": 454,
+          "self_pct": 5.413784879561173
+        },
+        {
+          "module": "@babel/types",
+          "samples": 388,
+          "self_pct": 4.626758883854042
+        },
+        {
+          "module": "node-internal",
+          "samples": 275,
+          "self_pct": 3.279274982113046
+        },
+        {
+          "module": "other",
+          "samples": 17,
+          "self_pct": 0.2027188170760792
+        }
+      ],
+      "compilerFunctions": [
+        {
+          "function": "literal",
+          "self_pct": 1.8602432625804912
+        },
+        {
+          "function": "constName",
+          "self_pct": 0.7035535416169807
+        },
+        {
+          "function": "visit",
+          "self_pct": 0.5604579060338659
+        },
+        {
+          "function": "styleXCreateSet",
+          "self_pct": 0.42928690674934417
+        },
+        {
+          "function": "unsortedAtRules",
+          "self_pct": 0.3815883615549726
+        },
+        {
+          "function": "convertObjectToAST",
+          "self_pct": 0.3100405437634152
+        },
+        {
+          "function": "compileStyles",
+          "self_pct": 0.2742666348676365
+        },
+        {
+          "function": "generateCSSRule",
+          "self_pct": 0.25041736227045075
+        },
+        {
+          "function": "dashify",
+          "self_pct": 0.2027188170760792
+        },
+        {
+          "function": "_flattenRawStyleObject",
+          "self_pct": 0.19079418077748628
+        },
+        {
+          "function": "convertStyleToClassName",
+          "self_pct": 0.1788695444788934
+        },
+        {
+          "function": "resolvePmsAccess",
+          "self_pct": 0.1669449081803005
+        },
+        {
+          "function": "evaluateValue",
+          "self_pct": 0.14309563558311472
+        },
+        {
+          "function": "compileStyleObject",
+          "self_pct": 0.13117099928452183
+        },
+        {
+          "function": "phase",
+          "self_pct": 0.13117099928452183
+        },
+        {
+          "function": "DEFAULT_INJECT_PATH",
+          "self_pct": 0.1311709992845218
+        },
+        {
+          "function": "designSystemPath",
+          "self_pct": 0.11924636298592892
+        },
+        {
+          "function": "murmurhash2_32_gc",
+          "self_pct": 0.11924636298592892
+        },
+        {
+          "function": "evaluateObject",
+          "self_pct": 0.11924636298592892
+        },
+        {
+          "function": "transformCreateCall",
+          "self_pct": 0.10732172668733604
+        },
+        {
+          "function": "readModuleFacts",
+          "self_pct": 0.10732172668733604
+        },
+        {
+          "function": "declaredPropertyName",
+          "self_pct": 0.10732172668733604
+        },
+        {
+          "function": "evaluateCached",
+          "self_pct": 0.09539709038874314
+        },
+        {
+          "function": "transformUsage",
+          "self_pct": 0.09539709038874314
+        },
+        {
+          "function": "classNameTuples",
+          "self_pct": 0.09539709038874314
+        },
+        {
+          "function": "checkValue",
+          "self_pct": 0.08347245409015025
+        },
+        {
+          "function": "provenanceOf",
+          "self_pct": 0.08347245409015025
+        },
+        {
+          "function": "analyzeProvenanceEscapes",
+          "self_pct": 0.08347245409015025
+        },
+        {
+          "function": "sortedRules",
+          "self_pct": 0.08347245409015025
+        },
+        {
+          "function": "api",
+          "self_pct": 0.08347245409015025
+        }
+      ],
+      "stats": {
+        "registryDigest": "73f689c4c7289ce7",
+        "coveredFileCount": 1003,
+        "cssBytes": 27027
+      },
+      "profileFile": "c1000-t1000-r100-babel_work_eliminated.cpuprofile"
+    }
+  ]
+}

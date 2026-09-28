@@ -42,6 +42,15 @@ import {
   moduleEdgesOf,
   setModuleOverlay,
 } from './module-graph';
+// Benchmark-only measurement hooks (Spike 1).
+import {
+  count,
+  perfCollector,
+  perfNow,
+  phase,
+  recordParse,
+  withParseOwner,
+} from './perf';
 
 const SOURCE_RE = /\.(jsx?|tsx?|mjs|cjs)$/;
 const SKIP_DIRS = new Set([
@@ -85,6 +94,18 @@ function walkFiles(dir, out = []) {
  * PMS_COVERAGE_GAP rather than dropped.
  */
 export function collectCoveredFiles(roots) {
+  const start = perfNow();
+  try {
+    return collectCoveredFilesInner(roots);
+  } finally {
+    const collector = perfCollector();
+    if (collector != null) {
+      collector.addDuration('coverage_graph_ms', perfNow() - start);
+    }
+  }
+}
+
+function collectCoveredFilesInner(roots) {
   const covered = new Map();
   const queue = [];
   for (const root of roots) {
@@ -177,7 +198,6 @@ export function collectCoveredFiles(roots) {
   }
   return { covered, unresolved, external, relayEdges };
 }
-
 /**
  * Consistency between the files a run EXPECTED to analyse and the files it
  * ACTUALLY analysed.
@@ -289,11 +309,15 @@ export function createCompilerSession(config) {
   } = config;
 
   clearModuleCache();
-  const designSystem = buildDesignSystem(definition, { ...engineOptions });
-  const designSystemSource = generateDesignSystemModule({
-    designSystem,
-    runtimeModule,
-  });
+  const designSystem = phase('boundary_ms', () =>
+    buildDesignSystem(definition, { ...engineOptions }),
+  );
+  const designSystemSource = phase('ds_module_codegen_ms', () =>
+    generateDesignSystemModule({
+      designSystem,
+      runtimeModule,
+    }),
+  );
 
   // The generated design system module must be RESOLVABLE while the pages are
   // compiled, because that is how a design system is recognized. It is served
@@ -351,7 +375,9 @@ export function createCompilerSession(config) {
     compileSource: (code, filename) =>
       compileFile(code, filename, designSystem, { ...engineOptions, role }),
     renderCss: (rules) =>
-      styleXTransform.processStylexRules(rules, { useLayers: useCSSLayers }),
+      phase('css_serialize_ms', () =>
+        styleXTransform.processStylexRules(rules, { useLayers: useCSSLayers }),
+      ),
     designSystemRules: () => {
       const rules = [];
       for (const [key, { priority, ...rest }] of Object.entries(
@@ -489,7 +515,14 @@ export function buildProject(config) {
             });
             continue;
           }
+          const readStart = perfNow();
           const code = fs.readFileSync(file, 'utf8');
+          const collector = perfCollector();
+          if (collector != null) {
+            collector.addDuration('io_ms', perfNow() - readStart);
+            collector.addCount('read_bytes', Buffer.byteLength(code, 'utf8'));
+            collector.addCount('read_calls');
+          }
           let result;
           try {
             result = compileFile(code, file, designSystem, engineOptions);
@@ -646,28 +679,50 @@ export function buildProject(config) {
  * only lowers syntax; it cannot introduce a style channel.
  */
 export function compileFile(code, filename, designSystem, engineOptions = {}) {
-  const pass1 = babel.transformSync(code, {
-    filename,
-    babelrc: false,
-    configFile: false,
-    sourceType: 'module',
-    parserOpts: { plugins: ['jsx', 'typescript'] },
-    plugins: [
-      [pandamstyleBabelPlugin, { designSystem, role: 'page', engineOptions }],
-    ],
-  });
+  // Pass 1 parses the ORIGINAL source (TS/JSX intact). Pass 2 parses the TEXT
+  // pass 1 emitted. Both are real parses of real bytes, performed by Babel's
+  // own parser, and each is recorded ONCE, with the duration of the transform
+  // that owns the parse. The brief forbids inferring duplicate parsing from
+  // code structure, and it also forbids inflating the count: one event per
+  // parse, not one per phase boundary.
+  const pass1Start = perfNow();
+  const pass1 = withParseOwner('babel:pass1', () =>
+    babel.transformSync(code, {
+      filename,
+      babelrc: false,
+      configFile: false,
+      sourceType: 'module',
+      parserOpts: { plugins: ['jsx', 'typescript'] },
+      plugins: [
+        [pandamstyleBabelPlugin, { designSystem, role: 'page', engineOptions }],
+      ],
+    }),
+  );
+  recordParse(filename, 'babel:pass1', perfNow() - pass1Start);
+  count('parse_calls');
+  count('parsed_files');
   if (pass1 == null) throw new Error(`No output for ${filename}`);
+  count('pass1_calls');
 
-  const pass2 = babel.transformSync(pass1.code, {
-    filename: filename.replace(/\.tsx?$/, '.jsx'),
-    babelrc: false,
-    configFile: false,
-    sourceType: 'module',
-    presets: [
-      [tsPreset, { allExtensions: true, isTSX: true }],
-      [reactPreset, { runtime: 'automatic', development: false }],
-    ],
-  });
+  // The intermediate text is a real serialization of pass 1's AST, and pass 2
+  // re-parses it. That is measured, not assumed.
+  const pass2Start = perfNow();
+  const pass2 = withParseOwner('babel:pass2', () =>
+    babel.transformSync(pass1.code, {
+      filename: filename.replace(/\.tsx?$/, '.jsx'),
+      babelrc: false,
+      configFile: false,
+      sourceType: 'module',
+      presets: [
+        [tsPreset, { allExtensions: true, isTSX: true }],
+        [reactPreset, { runtime: 'automatic', development: false }],
+      ],
+    }),
+  );
+  recordParse(filename, 'babel:pass2', perfNow() - pass2Start);
+  count('parse_calls');
+  count('parsed_files');
+  count('pass2_calls');
   const out = pass2 ?? pass1;
   return { code: out.code, metadata: { ...out.metadata, ...pass1.metadata } };
 }

@@ -1,0 +1,381 @@
+{
+  "documentKind": "pandamstyle-benchmark-profiles",
+  "note": "DEDICATED PROFILING RUNS. A profiler perturbs what it observes, so these were taken in separate invocations from the latency campaign and nothing here is a latency measurement. Sample counts are self-time: a frame is charged for the samples that landed in it, not for the samples of its callees.",
+  "generated_at": "2026-09-28T15:01:09.616Z",
+  "results": [
+    {
+      "corpus": "c100-t100-r10",
+      "engine": "babel_current",
+      "status": "ok",
+      "samples": 3354,
+      "wall_ms": 1155.352,
+      "byModule": [
+        {
+          "module": "@babel/traverse",
+          "samples": 640,
+          "self_pct": 19.08169350029815
+        },
+        {
+          "module": "@babel/parser",
+          "samples": 576,
+          "self_pct": 17.173524150268335
+        },
+        {
+          "module": "node-internal",
+          "samples": 521,
+          "self_pct": 15.533691115086464
+        },
+        {
+          "module": "@babel/core",
+          "samples": 446,
+          "self_pct": 13.297555158020275
+        },
+        {
+          "module": "pandamstyle-compiler-bundle",
+          "samples": 409,
+          "self_pct": 12.194394752534288
+        },
+        {
+          "module": "other-node-modules",
+          "samples": 238,
+          "self_pct": 7.0960047704233755
+        },
+        {
+          "module": "native/vm",
+          "samples": 210,
+          "self_pct": 6.261180679785331
+        },
+        {
+          "module": "@babel/generator",
+          "samples": 178,
+          "self_pct": 5.307096004770424
+        },
+        {
+          "module": "@babel/types",
+          "samples": 128,
+          "self_pct": 3.8163387000596303
+        },
+        {
+          "module": "other",
+          "samples": 8,
+          "self_pct": 0.2385211687537269
+        }
+      ],
+      "compilerFunctions": [
+        {
+          "function": "constName",
+          "self_pct": 0.9838998211091234
+        },
+        {
+          "function": "visit",
+          "self_pct": 0.8050089445438283
+        },
+        {
+          "function": "checkValue",
+          "self_pct": 0.5963029218843172
+        },
+        {
+          "function": "literal",
+          "self_pct": 0.5664877757901013
+        },
+        {
+          "function": "designSystemPath",
+          "self_pct": 0.2981514609421586
+        },
+        {
+          "function": "output",
+          "self_pct": 0.26833631484794274
+        },
+        {
+          "function": "unresolved (bundle line 1)",
+          "self_pct": 0.2385211687537269
+        },
+        {
+          "function": "generateCSSRule",
+          "self_pct": 0.2385211687537269
+        },
+        {
+          "function": "admitted",
+          "self_pct": 0.2385211687537269
+        },
+        {
+          "function": "evaluateValue",
+          "self_pct": 0.2385211687537269
+        },
+        {
+          "function": "_flattenRawStyleObject",
+          "self_pct": 0.20870602265951102
+        },
+        {
+          "function": "unsortedAtRules",
+          "self_pct": 0.17889087656529518
+        },
+        {
+          "function": "styleXCreateSet",
+          "self_pct": 0.17889087656529518
+        },
+        {
+          "function": "convertStyleToClassName",
+          "self_pct": 0.17889087656529518
+        },
+        {
+          "function": "probeRelativeFile",
+          "self_pct": 0.17889087656529518
+        },
+        {
+          "function": "resolvePmsAccess",
+          "self_pct": 0.17889087656529518
+        },
+        {
+          "function": "output2",
+          "self_pct": 0.17889087656529518
+        },
+        {
+          "function": "compileStyleObject",
+          "self_pct": 0.1490757304710793
+        },
+        {
+          "function": "phase",
+          "self_pct": 0.1490757304710793
+        },
+        {
+          "function": "declaredPropertyName",
+          "self_pct": 0.1490757304710793
+        },
+        {
+          "function": "DEFAULT_INJECT_PATH",
+          "self_pct": 0.1490757304710793
+        },
+        {
+          "function": "withGeneration",
+          "self_pct": 0.11926058437686345
+        },
+        {
+          "function": "compileStyles",
+          "self_pct": 0.11926058437686345
+        },
+        {
+          "function": "walk",
+          "self_pct": 0.11926058437686345
+        },
+        {
+          "function": "collectOwnExports",
+          "self_pct": 0.11926058437686345
+        },
+        {
+          "function": "evaluateCached",
+          "self_pct": 0.11926058437686345
+        },
+        {
+          "function": "normalizeValue",
+          "self_pct": 0.11926058437686345
+        },
+        {
+          "function": "token",
+          "self_pct": 0.11926058437686345
+        },
+        {
+          "function": "buildRegistry",
+          "self_pct": 0.08944543828264759
+        },
+        {
+          "function": "canonicalize",
+          "self_pct": 0.08944543828264759
+        }
+      ],
+      "stats": {
+        "registryDigest": "204cb71f3ccef5fe",
+        "coveredFileCount": 103,
+        "cssBytes": 13095
+      },
+      "profileFile": "c100-t100-r10-babel_current.cpuprofile"
+    },
+    {
+      "corpus": "c100-t100-r10",
+      "engine": "babel_work_eliminated",
+      "status": "ok",
+      "samples": 3020,
+      "wall_ms": 797.832,
+      "byModule": [
+        {
+          "module": "@babel/traverse",
+          "samples": 613,
+          "self_pct": 20.29801324503311
+        },
+        {
+          "module": "@babel/parser",
+          "samples": 505,
+          "self_pct": 16.721854304635762
+        },
+        {
+          "module": "@babel/core",
+          "samples": 434,
+          "self_pct": 14.370860927152318
+        },
+        {
+          "module": "node-internal",
+          "samples": 390,
+          "self_pct": 12.91390728476821
+        },
+        {
+          "module": "pandamstyle-compiler-bundle",
+          "samples": 380,
+          "self_pct": 12.582781456953644
+        },
+        {
+          "module": "other-node-modules",
+          "samples": 211,
+          "self_pct": 6.986754966887417
+        },
+        {
+          "module": "native/vm",
+          "samples": 196,
+          "self_pct": 6.490066225165562
+        },
+        {
+          "module": "@babel/generator",
+          "samples": 161,
+          "self_pct": 5.331125827814569
+        },
+        {
+          "module": "@babel/types",
+          "samples": 122,
+          "self_pct": 4.039735099337748
+        },
+        {
+          "module": "other",
+          "samples": 8,
+          "self_pct": 0.26490066225165565
+        }
+      ],
+      "compilerFunctions": [
+        {
+          "function": "constName",
+          "self_pct": 1.1589403973509933
+        },
+        {
+          "function": "visit",
+          "self_pct": 0.8609271523178808
+        },
+        {
+          "function": "literal",
+          "self_pct": 0.6622516556291391
+        },
+        {
+          "function": "checkValue",
+          "self_pct": 0.4304635761589404
+        },
+        {
+          "function": "generateCSSRule",
+          "self_pct": 0.33112582781456956
+        },
+        {
+          "function": "admitted",
+          "self_pct": 0.33112582781456956
+        },
+        {
+          "function": "styleXCreateSet",
+          "self_pct": 0.26490066225165565
+        },
+        {
+          "function": "unsortedAtRules",
+          "self_pct": 0.26490066225165565
+        },
+        {
+          "function": "output",
+          "self_pct": 0.2317880794701987
+        },
+        {
+          "function": "convertObjectToAST",
+          "self_pct": 0.2317880794701987
+        },
+        {
+          "function": "DEFAULT_INJECT_PATH",
+          "self_pct": 0.19867549668874174
+        },
+        {
+          "function": "output2",
+          "self_pct": 0.19867549668874174
+        },
+        {
+          "function": "ctx",
+          "self_pct": 0.19867549668874174
+        },
+        {
+          "function": "logAndDefault",
+          "self_pct": 0.1986754966887417
+        },
+        {
+          "function": "unresolved (bundle line 1)",
+          "self_pct": 0.16556291390728478
+        },
+        {
+          "function": "phase",
+          "self_pct": 0.16556291390728478
+        },
+        {
+          "function": "compileStyles",
+          "self_pct": 0.16556291390728478
+        },
+        {
+          "function": "convertStyleToClassName",
+          "self_pct": 0.16556291390728478
+        },
+        {
+          "function": "analyzeProvenanceEscapes",
+          "self_pct": 0.16556291390728478
+        },
+        {
+          "function": "evaluateObject",
+          "self_pct": 0.16556291390728478
+        },
+        {
+          "function": "evaluateValue",
+          "self_pct": 0.16556291390728478
+        },
+        {
+          "function": "requireDist",
+          "self_pct": 0.16556291390728478
+        },
+        {
+          "function": "hash",
+          "self_pct": 0.13245033112582782
+        },
+        {
+          "function": "transformCreateCall",
+          "self_pct": 0.13245033112582782
+        },
+        {
+          "function": "evaluateCached",
+          "self_pct": 0.13245033112582782
+        },
+        {
+          "function": "rtlDecls",
+          "self_pct": 0.13245033112582782
+        },
+        {
+          "function": "ds",
+          "self_pct": 0.09933774834437087
+        },
+        {
+          "function": "_flattenRawStyleObject",
+          "self_pct": 0.09933774834437085
+        },
+        {
+          "function": "murmurhash2_32_gc",
+          "self_pct": 0.09933774834437085
+        },
+        {
+          "function": "designSystemPath",
+          "self_pct": 0.09933774834437085
+        }
+      ],
+      "stats": {
+        "registryDigest": "204cb71f3ccef5fe",
+        "coveredFileCount": 103,
+        "cssBytes": 13095
+      },
+      "profileFile": "c100-t100-r10-babel_work_eliminated.cpuprofile"
+    }
+  ]
+}

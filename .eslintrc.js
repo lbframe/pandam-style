@@ -45,6 +45,12 @@ module.exports = {
     // The patterns are per-directory, so a run that does not exist yet is
     // treated exactly like one that does.
     'out-pandamstyle/',
+    // The benchmark laboratory's scratch root. The corpora under it are
+    // GENERATED third-party-shaped fixtures, not repository source: they are
+    // deliberately not formatted and not linted, exactly as the
+    // `__tests__/pandamstyle/fixtures` tree above is not, and they are
+    // regenerable from their committed manifests.
+    '.pms-bench/',
     'evidence/*/artifacts/',
     'evidence/*/pilot/',
     'build',

@@ -25,6 +25,8 @@ import {
   structuralAllowed,
   structuralDomain,
 } from './policy';
+// Benchmark-only measurement hooks (Spike 1).
+import { perfCollector, workEliminated } from './perf';
 
 // Stable variable identity: systemId + tokenId (D-03). The upstream hash
 // is computed over `${exportId}.${key}`, independent of the checkout path.
@@ -80,6 +82,33 @@ export function compileTokens(registry, options = {}) {
 }
 
 const BASE_CONDITION = 'default';
+
+/**
+ * Memoised admissible-token lists, keyed on the REGISTRY OBJECT.
+ *
+ * Keyed on the object rather than on a string, so a second design system in the
+ * same process cannot read the first one's list: the cache dies with the
+ * registry it describes, and there is no invalidation key to get wrong.
+ */
+const admittedCache = new WeakMap();
+
+function admittedTokens(registry, category, allowPrivateTokens) {
+  let byKey = admittedCache.get(registry);
+  if (byKey == null) {
+    byKey = new Map();
+    admittedCache.set(registry, byKey);
+  }
+  const key = `${category}|${allowPrivateTokens ? 'all' : 'public'}`;
+  const hit = byKey.get(key);
+  if (hit !== undefined) return hit;
+  const list = Object.keys(registry.tokens).filter(
+    (id) =>
+      registry.tokens[id].category === category &&
+      (allowPrivateTokens || registry.tokens[id].visibility === 'public'),
+  );
+  byKey.set(key, list);
+  return list;
+}
 
 /**
  * Normalizes a declaration value into { condition, tokenRef|literal } entries.
@@ -197,11 +226,31 @@ function checkValue({
 
   // kind === 'category': a TokenRef of the right category is mandatory.
   const category = propertyCategory(property);
-  const admitted = Object.keys(registry.tokens).filter(
-    (id) =>
-      registry.tokens[id].category === category &&
-      (allowPrivateTokens || registry.tokens[id].visibility === 'public'),
-  );
+
+  // The admissible-token list, DERIVED FROM THE REGISTRY ALREADY IN HAND.
+  //
+  // The baseline rebuilt this array with a full `Object.keys(registry.tokens)`
+  // scan for EVERY declaration it checked, and used it for exactly one thing:
+  // the `candidates` field of a diagnostic that is raised only when the value
+  // was refused. The scan is O(tokens) per declaration, so a registry of 10,000
+  // tokens and a file of 12 declarations costs 120,000 comparisons to produce
+  // zero diagnostics.
+  //
+  // The work-eliminated variant computes it once per (category,
+  // allowPrivateTokens) pair and memoises it on the registry object. The RESULT
+  // is identical: same members, same order, same diagnostic text. Only the
+  // number of times it is computed changes.
+  //
+  // The baseline branch is left in place, not deleted: `babel_current` must
+  // remain the code it is, and a benchmark that "optimises" the reference engine
+  // has nothing left to compare against.
+  const admitted = workEliminated()
+    ? admittedTokens(registry, category, allowPrivateTokens)
+    : Object.keys(registry.tokens).filter(
+        (id) =>
+          registry.tokens[id].category === category &&
+          (allowPrivateTokens || registry.tokens[id].visibility === 'public'),
+      );
 
   // The `compiler` mode accepts ONLY compiler-stamped TokenRefs: a page object
   // imitating the internal shape is not proof.
@@ -313,6 +362,7 @@ export function compileStyles({
   const diagnostics = [];
   const normalized = {};
   const systemId = registry.systemId;
+  const policyStart = process.hrtime.bigint();
 
   for (const nsName of Object.keys(namespaces)) {
     const ns = namespaces[nsName];
@@ -433,10 +483,24 @@ export function compileStyles({
   }
 
   const engineOptions = { ...defaultOptions, ...options };
+  // Atomic lowering is timed separately, so the policy figure EXCLUDES it.
+  // Two nested numbers that are added by a reader is one number reported wrong;
+  // the two phases are disjoint here, which makes the split exact rather than
+  // an estimate.
+  const lowerStart = process.hrtime.bigint();
   const [compiled, injected, classPaths] = styleXCreateSet(
     normalized,
     engineOptions,
   );
+  const lowerNs = Number(process.hrtime.bigint() - lowerStart);
+  const collector = perfCollector();
+  if (collector != null) {
+    collector.addDuration('atomic_lower_ms', lowerNs);
+    collector.addDuration(
+      'policy_ms',
+      Number(process.hrtime.bigint() - policyStart) - lowerNs,
+    );
+  }
   return { compiled, injected, classPaths };
 }
 

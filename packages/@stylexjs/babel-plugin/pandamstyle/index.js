@@ -19,19 +19,27 @@ import { defineRecipe, isStyleRef } from './recipe';
 import { token } from './token';
 import { supportedProperties } from './policy';
 import { PmsError } from './diagnostics';
+// Benchmark-only measurement hooks (Spike 1).
+import { count, phase as perfPhase } from './perf';
 
 export function buildDesignSystem(definition, options = {}) {
-  const registry = buildRegistry(definition);
+  count('design_system_builds');
+  const registry = perfPhase('ds_build_registry_ms', () =>
+    buildRegistry(definition),
+  );
   if (registry.diagnostics.some((d) => d.severity === 'error')) {
     throw new PmsError(registry.diagnostics);
   }
 
+  const tokenCompilation = perfPhase('ds_token_compile_ms', () =>
+    compileTokens(registry, options),
+  );
   const {
     varsByToken,
     themeClasses,
     varGroupHash,
     injected: tokenStyles,
-  } = compileTokens(registry, options);
+  } = tokenCompilation;
 
   const injected = { ...tokenStyles };
   const recipeInjected = {};
@@ -51,12 +59,14 @@ export function buildDesignSystem(definition, options = {}) {
   };
 
   const recipes = {};
-  for (const recipeId of Object.keys(registry.recipes)) {
-    recipes[recipeId] = defineRecipe(
-      { recipeId, ...registry.recipes[recipeId] },
-      compileStyleObject,
-    );
-  }
+  perfPhase('ds_recipe_compile_ms', () => {
+    for (const recipeId of Object.keys(registry.recipes)) {
+      recipes[recipeId] = defineRecipe(
+        { recipeId, ...registry.recipes[recipeId] },
+        compileStyleObject,
+      );
+    }
+  });
   Object.assign(injected, recipeInjected);
 
   const create = (namespaces, callOptions = {}) => {
@@ -92,7 +102,7 @@ export function buildDesignSystem(definition, options = {}) {
     (id) => registry.tokens[id].visibility === 'public',
   );
 
-  const manifest = {
+  const manifest = perfPhase('ds_manifest_ms', () => ({
     schemaVersion: 1,
     systemId: registry.systemId,
     registryDigest: registry.registryDigest,
@@ -122,7 +132,7 @@ export function buildDesignSystem(definition, options = {}) {
       ]),
     ),
     supportedProperties: supportedProperties(),
-  };
+  }));
 
   return {
     registry,

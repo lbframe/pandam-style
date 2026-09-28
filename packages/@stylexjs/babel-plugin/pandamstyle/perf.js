@@ -1,0 +1,223 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * PandamStyle - measurement hooks (Spike 1, benchmark-only surface).
+ *
+ * WHAT THIS IS
+ *
+ * A zero-cost-when-unused collection point. Every compiler phase calls
+ * `phase()` and `count()` here; when no collector is installed each call is one
+ * null check and returns. Nothing about compilation depends on this module, so
+ * a build that never installs a collector executes the same work in the same
+ * order as a build that does not.
+ *
+ * WHY IT EXISTS AS SOURCE AND NOT AS A MONKEY PATCH
+ *
+ * A monkey patch could time `resolveRelativeFile`, but it could not time
+ * `buildRegistry` separately from `compileTokens`, could not say which pipeline
+ * performed a parse, and could not attribute a diagnostic to the phase that
+ * raised it. The architecture study asked for phase boundaries that are not
+ * fabricated. A boundary that only the compiler itself can report honestly is
+ * therefore a compiler concern.
+ *
+ * THE TIMER
+ *
+ * `process.hrtime.bigint()`: a monotonic, nanosecond-resolution clock scoped to
+ * the process. It is immune to wall-clock adjustment, so a duration measured
+ * here is a duration and not a pair of timestamps that disagree. Wall-clock
+ * timestamps remain available to the harness for event ordering only.
+ *
+ * WORK-ELIMINATION GATE
+ *
+ * `workEliminated()` is the single switch that turns the measured redundant
+ * work off. It is read from the environment ONCE, so a process cannot change
+ * engines half way through a campaign. Production keeps the default (`false`):
+ * a measurement must never be able to change what a user's build does.
+ */
+
+const RESERVED = Object.freeze({
+  // Durations, milliseconds.
+  startup_ms: 0,
+  io_ms: 0,
+  resolve_ms: 0,
+  parse_ms: 0,
+  semantic_ms: 0,
+  ir_lower_ms: 0,
+  policy_ms: 0,
+  recipe_ms: 0,
+  atomic_lower_ms: 0,
+  hash_dedup_ms: 0,
+  rule_sort_ms: 0,
+  js_codegen_ms: 0,
+  sourcemap_ms: 0,
+  css_serialize_ms: 0,
+  cache_validate_ms: 0,
+  cache_hydrate_ms: 0,
+  boundary_ms: 0,
+  publish_ms: 0,
+  // Sub-phase durations that have no Benchmark Kit name.
+  ds_build_registry_ms: 0,
+  ds_token_compile_ms: 0,
+  ds_theme_compile_ms: 0,
+  ds_recipe_compile_ms: 0,
+  ds_manifest_ms: 0,
+  ds_module_codegen_ms: 0,
+  coverage_graph_ms: 0,
+  css_lower_ms: 0,
+  css_dedup_ms: 0,
+  css_sort_ms: 0,
+  css_join_ms: 0,
+  styleq_ms: 0,
+  // Counters.
+  parsed_files: 0,
+  parse_calls: 0,
+  parse_lookups: 0,
+  parse_cache_hits: 0,
+  unreadable_modules: 0,
+  semantic_builds: 0,
+  ast_clones: 0,
+  read_bytes: 0,
+  written_bytes: 0,
+  read_calls: 0,
+  write_calls: 0,
+  stat_calls: 0,
+  atoms: 0,
+  atom_contributions: 0,
+  diagnostics: 0,
+  covered_files: 0,
+  design_system_builds: 0,
+  design_system_cache_hits: 0,
+  resolution_probes: 0,
+  resolution_positive_hits: 0,
+  resolution_negative_hits: 0,
+  ds_module_walks: 0,
+  ds_module_walk_hits: 0,
+  rule_invocations: 0,
+  pass1_calls: 0,
+  pass2_calls: 0,
+});
+
+let collector = null;
+let engine = 'babel_current';
+let workEliminatedFlag = false;
+
+try {
+  workEliminatedFlag = process.env.PMS_WORK_ELIMINATED === '1';
+} catch {
+  workEliminatedFlag = false;
+}
+
+/** Is the work-elimination variant active in this process? */
+export function workEliminated() {
+  return workEliminatedFlag;
+}
+
+/** Installs a collector. Returns the teardown function. */
+export function installPerfCollector(next) {
+  collector = next ?? null;
+  return () => {
+    collector = null;
+  };
+}
+
+export function perfCollector() {
+  return collector;
+}
+
+export function perfEngineName() {
+  return engine;
+}
+
+export function setPerfEngineName(name) {
+  engine = name;
+}
+
+export function perfSnapshot() {
+  if (collector == null) return null;
+  return collector.snapshot();
+}
+
+/** Monotonic nanoseconds. Never a wall-clock timestamp. */
+export function perfNow() {
+  return Number(process.hrtime.bigint());
+}
+
+/**
+ * Labels the pipeline that is about to parse.
+ *
+ * The compiler cannot time Babel's internal parse from the inside, so a driver
+ * that wants that number hooks `@babel/parser` itself. This label is how the
+ * hooked parser knows WHICH pipeline it is serving, so a parse is attributed to
+ * `module-graph`, `babel:pass1` or `babel:pass2` rather than to "somebody".
+ *
+ * It is a global rather than an argument because the hook lives in a different
+ * module instance from the compiler: the compiler is a bundle, the hook is the
+ * driver. Passing it through `require` would couple the driver to the bundle's
+ * internals; a global says the same thing without the coupling.
+ */
+export function withParseOwner(label, fn) {
+  const previous = globalThis.__PMS_PARSE_OWNER__;
+  globalThis.__PMS_PARSE_OWNER__ = label;
+  try {
+    return fn();
+  } finally {
+    globalThis.__PMS_PARSE_OWNER__ = previous;
+  }
+}
+
+export function parseOwner() {
+  return globalThis.__PMS_PARSE_OWNER__ ?? 'unattributed';
+}
+
+/**
+ * Times `fn` and adds the elapsed duration to `metric`.
+ * A throw is still accounted for: an aborted phase consumed time.
+ */
+export function phase(metric, fn) {
+  if (collector == null) return fn();
+  const start = perfNow();
+  try {
+    return fn();
+  } finally {
+    collector.addDuration(metric, perfNow() - start);
+  }
+}
+
+/** Same as `phase`, for an async `fn`. */
+export function phaseAsync(metric, fn) {
+  if (collector == null) return fn();
+  const start = perfNow();
+  return Promise.resolve()
+    .then(fn)
+    .finally(() => {
+      collector.addDuration(metric, perfNow() - start);
+    });
+}
+
+export function count(metric, n = 1) {
+  if (collector == null) return;
+  collector.addCount(metric, n);
+}
+
+/**
+ * Records one parse of `file` by `pipeline`, with its own duration when the
+ * caller measured one. Parse ownership is reported, never inferred.
+ */
+export function recordParse(file, pipeline, durationNs = null) {
+  if (collector == null) return;
+  collector.addParse(file, pipeline, durationNs);
+}
+
+/** The metric names this build can produce, for schema documentation. */
+export function perfMetricNames() {
+  return Object.keys(RESERVED);
+}
+
+export function perfCounterNames() {
+  return Object.keys(RESERVED).filter((k) => k.endsWith('_ms') === false);
+}
