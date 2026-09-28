@@ -10,6 +10,10 @@
 #   PMS_SKIP_INSTALL=1 ./verify-pms.sh  # reuse an existing node_modules (dev only)
 #   PMS_SKIP_PILOT=1 ./verify-pms.sh    # skip the Vite pilot
 #   PMS_OUT_DIR=<path> ./verify-pms.sh  # override the run directory
+#   PMS_BATCH_BASE_REF=<ref> ./verify-pms.sh
+#                                       # override the ref the batch base is
+#                                       # derived from (default
+#                                       # feat/pandamstyle-native-compiler)
 #   PMS_ONLY_STEPS=a,b ./verify-pms.sh  # run a subset of steps (used by the
 #                                       # runner's own test; a partial run is
 #                                       # reported as incomplete, never as passed)
@@ -43,24 +47,93 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(resolve_repo_root "${SCRIPT_DIR}")"
 cd "$REPO_ROOT"
 
+# ---------------------------------------------------- initial git state ---
+# The order here is the contract: resolve the repository, capture the Git state,
+# and only THEN create the run directory.
+#
+# Measuring the working tree after `mkdir -p "$PMS_OUT_DIR"` made the runner
+# dirty the checkout itself and then report that self-inflicted state as
+# evidence: the committed consolidation run recorded `workingTree: "dirty"` on a
+# tree that was clean when the run started. Nothing is written before the
+# measurement below.
+GIT_IN_WORK_TREE=no
+if [ "$(git -C "$REPO_ROOT" rev-parse --is-inside-work-tree 2>/dev/null || true)" = "true" ]; then
+  GIT_IN_WORK_TREE=yes
+fi
+# env.json is JSON: the flag is emitted as a JSON boolean, not as a shell word.
+if [ "$GIT_IN_WORK_TREE" = "yes" ]; then
+  GIT_IN_WORK_TREE_JSON=true
+else
+  GIT_IN_WORK_TREE_JSON=false
+fi
+
+TESTED_COMMIT="$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+TESTED_TREE="$(git -C "$REPO_ROOT" rev-parse 'HEAD^{tree}' 2>/dev/null || echo unknown)"
+TESTED_BRANCH="$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"
+
+# Reported as found, not as the runner leaves it. A checkout that is genuinely
+# dirty before the run still reports dirty; outside a work tree nothing was
+# measured, and "clean" would be a claim about a state never observed.
+if [ "$GIT_IN_WORK_TREE" = "yes" ]; then
+  if [ -n "$(git -C "$REPO_ROOT" status --porcelain 2>/dev/null)" ]; then
+    DIRTY="dirty"
+  else
+    DIRTY="clean"
+  fi
+else
+  DIRTY="unknown (not a git work tree)"
+fi
+
+# The batch base is a Git relation, never a commit count. `rev-parse HEAD~4`
+# returned the right SHA only for as long as the batch stayed exactly four
+# commits long: the committed evidence was generated when it resolved to
+# 38b2e459 instead of the real base. The merge base with the source branch is a
+# relation, so it does not move when the batch grows.
+PANDAMSTYLE_BASE_REF="${PMS_BATCH_BASE_REF:-feat/pandamstyle-native-compiler}"
+PANDAMSTYLE_BASE_RESOLVED=""
+for base_candidate in "$PANDAMSTYLE_BASE_REF" "refs/remotes/origin/$PANDAMSTYLE_BASE_REF"; do
+  if git -C "$REPO_ROOT" rev-parse --verify --quiet "$base_candidate^{commit}" >/dev/null 2>&1; then
+    PANDAMSTYLE_BASE_RESOLVED="$base_candidate"
+    break
+  fi
+done
+if [ -z "$PANDAMSTYLE_BASE_RESOLVED" ]; then
+  echo "Cannot verify the PandamStyle batch base: ref '$PANDAMSTYLE_BASE_REF' does not exist in $REPO_ROOT." >&2
+  echo "Set PMS_BATCH_BASE_REF to the branch this batch was started from." >&2
+  echo "Refusing to report a batch base that is not a verified Git relation." >&2
+  exit 2
+fi
+PANDAMSTYLE_BASE="$(git -C "$REPO_ROOT" merge-base HEAD "$PANDAMSTYLE_BASE_RESOLVED" 2>/dev/null || true)"
+if [ -z "$PANDAMSTYLE_BASE" ]; then
+  echo "HEAD and '$PANDAMSTYLE_BASE_RESOLVED' share no common ancestor: the batch base is undefined." >&2
+  echo "Refusing to report a batch base that is not a verified Git relation." >&2
+  exit 2
+fi
+
 # ------------------------------------------------------------------- output ---
 PMS_OUT_DIR="${PMS_OUT_DIR:-$REPO_ROOT/evidence/native}"
+
+# Refuse to write outside the repository: an accidental escape would make the
+# evidence untraceable. Checked before any directory is created, and again on
+# the canonical path below.
+refuse_outside_repo() {
+  case "$1" in
+    "$REPO_ROOT"/*) ;;
+    *)
+      echo "PMS_OUT_DIR must stay inside the repository ($REPO_ROOT)." >&2
+      echo "Refusing to write to: $1" >&2
+      exit 2
+      ;;
+  esac
+}
+refuse_outside_repo "$PMS_OUT_DIR"
+
 mkdir -p "$PMS_OUT_DIR"
 PMS_OUT_DIR="$(cd "$PMS_OUT_DIR" && pwd)"
+refuse_outside_repo "$PMS_OUT_DIR"
 LOG_DIR="$PMS_OUT_DIR"
 ARTIFACT_DIR="$PMS_OUT_DIR/artifacts"
 mkdir -p "$ARTIFACT_DIR"
-
-# Refuse to write outside the repository: an accidental escape would make the
-# evidence untraceable.
-case "$PMS_OUT_DIR" in
-  "$REPO_ROOT"/*) ;;
-  *)
-    echo "PMS_OUT_DIR must stay inside the repository ($REPO_ROOT)." >&2
-    echo "Refusing to write to: $PMS_OUT_DIR" >&2
-    exit 2
-    ;;
-esac
 
 RUN_LOG="$LOG_DIR/run.log"
 : > "$RUN_LOG"
@@ -177,15 +250,7 @@ else
   exit 2
 fi
 
-TESTED_COMMIT="$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
-TESTED_TREE="$(git -C "$REPO_ROOT" rev-parse 'HEAD^{tree}' 2>/dev/null || echo unknown)"
-TESTED_BRANCH="$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"
-if [ -n "$(git -C "$REPO_ROOT" status --porcelain 2>/dev/null)" ]; then
-  DIRTY="dirty"
-else
-  DIRTY="clean"
-fi
-PANDAMSTYLE_BASE="$(git -C "$REPO_ROOT" rev-parse HEAD~4 2>/dev/null || echo unknown)"
+# The Git state was captured above, before the run directory existed.
 # The fork base is the merge base with the real StyleX upstream, not a string
 # copied out of a document.
 STYLEX_FORK_BASE="$(git -C "$REPO_ROOT" merge-base HEAD upstream/main 2>/dev/null || echo unknown)"
@@ -205,6 +270,8 @@ cat > "$PMS_OUT_DIR/env.json" <<EOF
   "testedTree": "$TESTED_TREE",
   "testedBranch": "$TESTED_BRANCH",
   "workingTree": "$DIRTY",
+  "gitWorkTree": $GIT_IN_WORK_TREE_JSON,
+  "pandamstyleBatchBaseRef": "$PANDAMSTYLE_BASE_RESOLVED",
   "pandamstyleBatchBase": "$PANDAMSTYLE_BASE",
   "stylexUpstreamMergeBase": "$STYLEX_FORK_BASE",
   "pandaDonorCommit": "$PANDA_DONOR_SHA",
@@ -223,7 +290,10 @@ log "PandamStyle native verification"
 log "  repo root      : $REPO_ROOT"
 log "  tested commit  : $TESTED_COMMIT"
 log "  tested tree    : $TESTED_TREE"
-log "  branch         : $TESTED_BRANCH ($DIRTY)"
+log "  branch         : $TESTED_BRANCH"
+log "  working tree   : $DIRTY (as found, before this run wrote anything)"
+log "  batch base ref : $PANDAMSTYLE_BASE_RESOLVED"
+log "  batch base     : $PANDAMSTYLE_BASE"
 log "  out dir        : $PMS_OUT_DIR"
 log ""
 
@@ -337,11 +407,11 @@ for i in "${!STEP_NAMES[@]}"; do
     >> "$PMS_OUT_DIR/steps.tsv"
 done
 
-node - "$PMS_OUT_DIR" "$TESTED_COMMIT" "$TESTED_TREE" "$DIRTY" <<'NODE'
+node - "$PMS_OUT_DIR" "$TESTED_COMMIT" "$TESTED_TREE" "$DIRTY" "$PANDAMSTYLE_BASE_RESOLVED" "$PANDAMSTYLE_BASE" <<'NODE'
 const fs = require('fs');
 const path = require('path');
 const out = process.argv[2];
-const [commit, tree, dirty] = process.argv.slice(3);
+const [commit, tree, dirty, baseRef, base] = process.argv.slice(3);
 const env = JSON.parse(fs.readFileSync(path.join(out, 'env.json'), 'utf8'));
 
 const rows = fs
@@ -402,6 +472,10 @@ const summary = {
   testedCommit: commit,
   testedTree: tree,
   workingTree: dirty,
+  // The base and the ref it was derived from travel together: a SHA without the
+  // relation that produced it is not re-checkable by a reader.
+  pandamstyleBatchBaseRef: baseRef,
+  pandamstyleBatchBase: base,
   outDir: out,
   toolchain: env.toolchain,
   // A run with a skipped step is NOT a complete run. This flag exists so a
