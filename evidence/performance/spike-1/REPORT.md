@@ -27,8 +27,9 @@ The measured answer to "where does the time go":
 > And the structural finding, which no amount of inner-loop tuning reaches:
 > **a one-file edit costs 13.5% more than resubmitting identical bytes**
 > (3,460.7 ms vs 3,050.5 ms at 1,000 components). The compiler recompiles the
-> entire covered root either way, so ~88% of an agent's edit latency is spent
-> on files that did not change.
+> entire covered root either way, so **~88% of one-file edit latency is shared
+> with a no-change rebuild** — it is the cost of the full rebuild, not the cost
+> of the edit.
 >
 > **c1000 is the decision-bearing scale.** The 100-component cell is reported
 > but is noise-dominated and carries no conclusion (§15, item 8).
@@ -62,7 +63,7 @@ That is the input to the Spike 2 decision in §12.
 | CPU | AMD Ryzen 7 5800X3D, 8 cores / 16 threads |
 | RAM | 31 GiB |
 | OS | Ubuntu 24.04.4 LTS, kernel 6.8.0-138-generic |
-| Filesystem | ext2/ext3 on `/dev/mapper/ubuntu--vg-ubuntu--lv` |
+| Filesystem | **ext4** on `/dev/mapper/ubuntu--vg-ubuntu--lv` |
 | Node | v22.22.0 (the repository's `.nvmrc` pin) |
 | npm / yarn | 11.11.1 / 1.22.22 |
 | `yarn.lock` sha256 | `6e6fb0735f5222f9…` |
@@ -76,6 +77,19 @@ not reproduce a cold cache, so it is reported as `not_run` rather than
 approximated.
 
 Recorded in full in `campaigns/*-metadata.json`.
+
+**A note on the filesystem field, because the committed metadata disagrees with
+this table.** The campaign collector read the filesystem with
+`stat -f -c %T`, which returned `ext2/ext3`; that string is committed in every
+`*‑metadata.json`. It is not a wrong answer about the filesystem — it is the
+`stat(2)` *family* label (magic `0xEF53`), which ext2, ext3 and ext4 all report
+identically, so the collector was structurally incapable of distinguishing
+them. The authoritative answer, from `findmnt -no FSTYPE`, is **ext4** and is
+what this table states. The committed `ext2/ext3` value is left as recorded
+rather than rewritten, because the metadata is evidence of what the run observed
+and editing it would make the evidence disagree with the run that produced it.
+The collector has been fixed to prefer `findmnt`; a future run will record
+`ext4` directly.
 
 ---
 
@@ -321,19 +335,44 @@ caches are the direct cause of the time saving the same section claims.
 | `c1000-t1000-r100-s809` | 1,003 | 3,007 | **3** | 1,001 → 3 |
 | `c10000-t1000-r100-s307` | 10,003 | 30,007 | **3** | 10,001 → 3 |
 
-**Q1 — how many times is one source file parsed? Exactly 3**, in both engines:
+**Q1 — how many times is one source file parsed? Three, for every file the
+compiler actually compiles.** Precisely, at each scale:
+
+| cell | graph files | graph parses | pass1 | pass2 | total parses | compiled files | parses per compiled file |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `c100-t100-r10-s101` | 103 | 103 | 102 | 102 | 307 | 102 | **3** |
+| `c1000-t1000-r100-s809` | 1,003 | 1,003 | 1,002 | 1,002 | 3,007 | 1,002 | **3** |
+| `c10000-t1000-r100-s307` | 10,003 | 10,003 | 10,002 | 10,002 | 30,007 | 10,002 | **3** |
+
+The three parses of a compiled file are:
 
 1. **the coverage graph** (`module-graph.js`, `@babel/parser` with
-   `errorRecovery: true`) — 10,003 parses at 10,000 components;
+   `errorRecovery: true`);
 2. **Babel pass 1** — parses the original TS/TSX with the PandamStyle plugin;
 3. **Babel pass 2** — parses the *text pass 1 emitted*, to strip TS and lower JSX.
 
+**The counts do not divide evenly, and the residue is meaningful.** At
+`c10000` the coverage graph sees **10,003** distinct files but only **10,002**
+are compiled. The extra one is the **generated design-system module**
+(`.pandamstyle/design.pandamstyle.js`): the local-import closure discovers it
+and the module graph parses it, because that is how the compiler reads its
+`__PMS_DESIGN_SYSTEM__` marker and recognises a design system. It is then
+**exempt from analysis** — `buildProject` marks it `origin: 'generated'` and
+`continue`s before `compileFile` — so it is never handed to pass 1 or pass 2.
+
+Hence the arithmetic at c10000: `10,002 × 3 + 1 = 30,007`. The same identity
+holds at the other two scales: `102 × 3 + 1 = 307` and `1,002 × 3 + 1 = 3,007`.
+**The correct claim is therefore "every compiled source file is parsed exactly
+three times, and the generated design-system module is parsed once, by the
+coverage graph only"** — not "every distinct file is parsed three times", which
+the totals do not support and which is 30,009 rather than 30,007.
+
 The measurement is a `@babel/parser` hook installed in the worker before the
 engine is loaded, and the compiler labels which pipeline is about to parse, so
-each parse is attributed to a pipeline at the parse site. **A module-cache hit is
-a lookup, not a parse**, and is counted separately — the first version of this
-harness conflated them and reported 102 parses per file, which was a true number
-about the wrong question.
+each parse is attributed to a pipeline at the parse site. **A module-cache hit
+is a lookup, not a parse**, and is counted separately — the first version of
+this harness conflated them and reported 102 parses per file, which was a true
+number about the wrong question.
 
 **Q2 — parsing is 9.2% of the 10,000-component cold build and 8.1% of the
 1,000-component warm edit.** Split by pipeline at 1,000 components:
@@ -587,8 +626,9 @@ that order, and should NOT open with a Rust rewrite of the StyleX backend.**
    registry digest, the module graph edges, and the CSS generation.
 2. **Second: eliminate the third parse.** Share one parse between the coverage
    graph and pass 1, or drop `errorRecovery` from the coverage parse and prove
-   the coverage guarantee survives. Measured prize: 906 ms at 10,000 components,
-   ~2,600 ms of the 9% parse share overall.
+   the coverage guarantee survives. Measured prize: **918 ms** at 10,000
+   components — the `module-graph` parse median of that build's 29,799.8 ms cold
+   build, i.e. 3.1% of it (§9, §11 R1).
 3. **Third: an Oxc or SWC frontend comparison, scoped to traversal and
    configuration, not to parsing.** Parsing is 8–12%; traversal plus
    configuration is ~48%. A frontend swap that only replaces the parser buys at
@@ -622,8 +662,8 @@ The research's numbers are **exploratory, not pass/fail**. Reported as asked.
 None of this is a failure claim. The point of the numbers is the *shape* they
 make visible: at 1,000 components the build is 3.5 s, and a single-file edit
 costs 13.5% more than no edit at all. The distance to the targets is not a
-constant factor that a faster inner loop closes — it is the cost of recompiling
-files that did not change.
+constant factor that a faster inner loop closes — it is the cost of the full rebuild
+rather than of the edit.
 
 ---
 
@@ -742,6 +782,7 @@ reproduces the same order; the seed is recorded in the campaign metadata.
 | | |
 | --- | --- |
 | raw observations | 70,646 rows, 36 MB, **not committed**; sha256 and location in `INDEX.json` |
+| raw retention | `ignored-local-scratch` — the raw bytes live in the gitignored `.pms-bench/` tree, on the **same physical volume as the repository** (`findmnt`: `/dev/mapper/ubuntu--vg-ubuntu--lv` at `/`). They are **NOT an archive and NOT durable**; they survive as long as this workspace does. What is durable is the committed evidence below, together with the sha256 of every raw stream the summaries were computed from. |
 | committed | corpus manifests, campaign metadata (every job), summaries, phase/counter tables, aggregated parse accounting, profile summaries, differential verdicts, this report |
-| parse evidence | every parse and every module-cache lookup, in order, per job — **1 GB, not committed**; the per-corpus/per-pipeline distribution is |
+| parse evidence | every parse and every module-cache lookup, in order, per job — **~1 GB, not committed**, same retention as above; the per-corpus/per-pipeline distribution **is** committed (`campaigns/*-parse-accounting.json`) |
 | `.pms-bench/` | scratch: generated corpora, per-job project copies, raw streams. Regenerable from the corpus manifests. |

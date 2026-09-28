@@ -591,14 +591,40 @@ function captureEnvironment(repoRoot) {
   } catch {
     lockfileDigest = null;
   }
+  // `findmnt` first, `stat` only as a fallback.
+  //
+  // `stat -f -c %T` reports the ext FAMILY label (`ext2/ext3`) for ext2, ext3
+  // and ext4 alike - all three share magic 0xEF53 - so it cannot answer the
+  // question this field is asking. An earlier run of this campaign recorded
+  // `ext2/ext3` on what is in fact an ext4 volume; `findmnt -no FSTYPE` gives
+  // the real type, so it is preferred and the stat label is kept only as a
+  // fallback with the limitation recorded next to it.
   let fsType = 'unknown';
+  let fsSource = 'none';
   try {
-    const out = spawnSync('stat', ['-f', '-c', '%T', repoRoot], {
+    const out = spawnSync('findmnt', ['-no', 'FSTYPE', '--target', repoRoot], {
       encoding: 'utf8',
     });
-    if (out.status === 0) fsType = out.stdout.trim();
+    if (out.status === 0 && out.stdout.trim() !== '') {
+      fsType = out.stdout.trim();
+      fsSource = 'findmnt -no FSTYPE';
+    }
   } catch {
-    /* not fatal; recorded as unknown rather than guessed */
+    /* fall through to stat */
+  }
+  if (fsType === 'unknown') {
+    try {
+      const out = spawnSync('stat', ['-f', '-c', '%T', repoRoot], {
+        encoding: 'utf8',
+      });
+      if (out.status === 0) {
+        fsType = out.stdout.trim();
+        fsSource =
+          'stat -f -c %T (ext-family label; cannot distinguish ext2/ext3/ext4)';
+      }
+    } catch {
+      /* recorded as unknown rather than guessed */
+    }
   }
   let powerMode = null;
   try {
@@ -643,6 +669,7 @@ function captureEnvironment(repoRoot) {
     },
     storage: {
       filesystem: fsType,
+      filesystem_source: fsSource,
       repo_root: repoRoot,
       lockfile_sha256: lockfileDigest,
     },

@@ -69,8 +69,15 @@ def main():
     )
     parser.add_argument(
         "--raw-retention",
-        default="archive-off-repo",
-        help="where the raw observation stream is kept; recorded verbatim in the index",
+        default="ignored-local-scratch",
+        help=(
+            "Retention class of the raw observation stream, recorded verbatim in "
+            "the index. The default is the honest one for this batch: the raw "
+            "data stays in the gitignored .pms-bench/ scratch tree on the same "
+            "volume as the repository, and is NOT durable. Use 'archived-<path>' "
+            "only when the bytes have actually been copied somewhere that "
+            "survives the workspace."
+        ),
     )
     args = parser.parse_args()
 
@@ -96,12 +103,22 @@ def main():
                 "the per-parse event files (every parse, every module-cache lookup, in order)",
             ],
             "not_committed_reason": (
-                "The raw stream is hundreds of megabytes of repeated timings. It is "
+                "The raw stream is tens of megabytes of repeated timings. It is "
                 "NOT deleted; its sha256 is recorded below and its location is "
                 "recorded, so a reader can verify that the summaries were computed "
                 "from exactly these bytes."
             ),
             "raw_retention_location": args.raw_retention,
+            "raw_retention_durability": (
+                "NOT DURABLE. The raw bytes live in the gitignored .pms-bench/ "
+                "scratch tree, on the SAME physical volume as the repository "
+                "(findmnt: /dev/mapper/ubuntu--vg-ubuntu--lv mounted at /). They "
+                "survive as long as this workspace does and are NOT an archive. "
+                "What is durable is the committed evidence: corpus manifests "
+                "(which regenerate the corpora byte for byte), campaign metadata, "
+                "and the summaries, together with the sha256 of every raw stream "
+                "they were computed from."
+            ),
         },
         "raw": [],
         "summaries": [],

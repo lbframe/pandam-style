@@ -15,8 +15,9 @@
       "the raw observation JSONL",
       "the per-parse event files (every parse, every module-cache lookup, in order)"
     ],
-    "not_committed_reason": "The raw stream is hundreds of megabytes of repeated timings. It is NOT deleted; its sha256 is recorded below and its location is recorded, so a reader can verify that the summaries were computed from exactly these bytes.",
-    "raw_retention_location": "archive-off-repo"
+    "not_committed_reason": "The raw stream is tens of megabytes of repeated timings. It is NOT deleted; its sha256 is recorded below and its location is recorded, so a reader can verify that the summaries were computed from exactly these bytes.",
+    "raw_retention_location": "ignored-local-scratch",
+    "raw_retention_durability": "NOT DURABLE. The raw bytes live in the gitignored .pms-bench/ scratch tree, on the SAME physical volume as the repository (findmnt: /dev/mapper/ubuntu--vg-ubuntu--lv mounted at /). They survive as long as this workspace does and are NOT an archive. What is durable is the committed evidence: corpus manifests (which regenerate the corpora byte for byte), campaign metadata, and the summaries, together with the sha256 of every raw stream they were computed from."
   },
   "raw": [
     {
@@ -26,7 +27,7 @@
       "bytes": 23836996,
       "observations": 47061,
       "committed": false,
-      "retained_at": "archive-off-repo"
+      "retained_at": "ignored-local-scratch"
     },
     {
       "name": "c1000",
@@ -35,7 +36,7 @@
       "bytes": 10283200,
       "observations": 20169,
       "committed": false,
-      "retained_at": "archive-off-repo"
+      "retained_at": "ignored-local-scratch"
     },
     {
       "name": "c10000",
@@ -44,7 +45,7 @@
       "bytes": 1750777,
       "observations": 3416,
       "committed": false,
-      "retained_at": "archive-off-repo"
+      "retained_at": "ignored-local-scratch"
     }
   ],
   "summaries": [
@@ -149,7 +150,7 @@
   ],
   "differentials": [
     {
-      "file": "evidence/performance/spike-1/correctness/diff-v4.json",
+      "file": "evidence/performance/spike-1/correctness/diff-c100-post-freeze.json",
       "corpus": {
         "name": "c100-t100-r10-s101-f3",
         "contentHash": "bbfa80faf2a8d00d93ce4202791117a86f0024b03451999bf2eb69347378f7af",
@@ -173,7 +174,7 @@
       ]
     },
     {
-      "file": "evidence/performance/spike-1/correctness/diff5.json",
+      "file": "evidence/performance/spike-1/correctness/diff-c24-post-freeze.json",
       "corpus": {
         "name": "c24-t120-r6-s101-f3",
         "contentHash": "03177507c966101a8623772169bfef5c8299c305b79ddb6392df1fc03100a679",
