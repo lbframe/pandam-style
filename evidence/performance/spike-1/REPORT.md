@@ -20,7 +20,7 @@ The measured answer to "where does the time go":
 > inside Babel itself — `@babel/traverse` 30%, `@babel/core` configuration 18%,
 > `@babel/parser` 11%, `@babel/generator` 5%.** The PandamStyle compiler bundle
 > is 11%; the StyleX atomic backend is 2.4%. Parsing is 8–12% of a build
-> depending on cache state, and **each source file is parsed exactly 3 times**,
+> depending on cache state, and **each compiled source file is parsed exactly 3 times**,
 > of which one parse — the coverage graph's — costs 1.6× a full Babel parse of
 > the same file because it runs with `errorRecovery`.
 >
@@ -617,13 +617,15 @@ Hottest functions in the baseline compiler bundle: `literal` / `convertObjectToA
 **Spike 2 should attack the frontend and the absence of incremental reuse, in
 that order, and should NOT open with a Rust rewrite of the StyleX backend.**
 
-1. **First: make the build incremental at the file level.** A one-file edit costs
-   3,195 ms; the same process resubmitting identical bytes costs 3,215 ms. The
-   compiler recompiles the entire covered root either way. This is the largest
-   single win available and it needs no new frontend. Its prerequisite is an
-   explicit invalidation key per covered file, and Spike 1 has established what
-   those keys must cover: the design system (every file depends on it), the
-   registry digest, the module graph edges, and the CSS generation.
+1. **First: make the build incremental at the file level.** At c1000, a real
+   one-file edit takes 3,460.7 ms versus 3,050.5 ms for a no-change rebuild in
+   the same warm process, a +13.5% delta. Therefore ~88% of one-file edit
+   latency is shared with a no-change rebuild. The dominant cost is the full
+   covered-root rebuild, not the edit-specific work. This is the largest single
+   win available and it needs no new frontend. Its prerequisite is an explicit
+   invalidation key per covered file, and Spike 1 has established what those
+   keys must cover: the design system (every file depends on it), the registry
+   digest, the module graph edges, and the CSS generation.
 2. **Second: eliminate the third parse.** Share one parse between the coverage
    graph and pass 1, or drop `errorRecovery` from the coverage parse and prove
    the coverage guarantee survives. Measured prize: **918 ms** at 10,000
