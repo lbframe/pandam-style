@@ -10,6 +10,61 @@ narrative record of what was required, what was run, and what the numbers were.
 
 ---
 
+## What was verified, and against exactly which commit
+
+The evidence above was produced from a **clean checkout**, so the numbers below
+describe the tree that is committed rather than a working copy that happened to
+resemble it.
+
+| | |
+| --- | --- |
+| tested commit | `32cf2e6aa681aa192880a80dc83a20ac564a4529` |
+| tested tree | `c84607f7596d35db20e9dfd3b3d2457c40d6a7f5` |
+| working tree at start | `clean` |
+| batch base | `e5ff62b4a925405dcf9fb415faa00df4b68aeaa9` |
+| reference engine | `d5702374ac5a685499d14a53bf323d8533e6982d` |
+
+`evidence/native/summary.json` records the same commit, tree and `workingTree:
+clean`, so the identity is checkable from the machine-written evidence rather
+than only asserted here.
+
+An earlier run of this record is superseded. It was executed against a working
+tree that was already dirty and against an earlier commit, and it cannot
+identify what it actually tested; the values in this file are from the run
+above and from no other.
+
+### Required checks, all run from the clean checkout
+
+| check | command | result |
+| --- | --- | --- |
+| lint | `npm run lint:report` | clean, exit 0 |
+| format | `npm run prettier:report` | clean, exit 0 |
+| benchmark suite | `node --test benchmarks/pandamstyle/tests/bench.test.js` | 29/29 |
+| summariser self-test | `python3 benchmarks/pandamstyle/summarize.py --self-test` | ok |
+| full verification | `./verify-pms.sh` (no skip flags) | `VERIFICATION OK` |
+
+### Two ordering requirements the benchmark suite does not state
+
+Found by running the suite in a fresh checkout, where both failed before either
+was built. The suite now asserts both by name.
+
+- The differential-oracle test spawns **both** engines' real CLIs, and each
+  needs its own build. The variant engine is
+  `packages/@pandamstyle/compiler/lib/index.js`; the reference engine is the
+  separate checkout at `PMS_BASELINE_ROOT` (default `../pms-baseline`).
+- These fail differently, and only one of them reads as a build problem. A
+  missing variant build surfaces as a `build-verdict` divergence
+  (`work_eliminated=2`). A missing reference engine is caught first by the
+  **expectation gate**, which reports "the reference engine rejected a program
+  the scenario expects to be accepted" — a correct refusal, since equivalence
+  cannot be assessed if the reference never ran, but one that points at the
+  scenario rather than at the checkout.
+
+`./verify-pms.sh`'s build step satisfies both. Run before the suite, the tests
+are 29/29; run in a fresh checkout, 28/29 with a misleading message.
+
+---
+
 ## Regression suites
 
 Counts are from `evidence/native/summary.json`, produced by the repository's own
