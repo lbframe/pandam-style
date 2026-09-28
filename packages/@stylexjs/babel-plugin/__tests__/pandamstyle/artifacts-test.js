@@ -1,4 +1,11 @@
 /**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
  * PandamStyle — production des artefacts de preuve.
  * Écrit dans PMS_OUT_DIR (défaut: ./out-pandamstyle) :
  * styles.css, manifest.json, diagnostics-17px.json, page.example.json,

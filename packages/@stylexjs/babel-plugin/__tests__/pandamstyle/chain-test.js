@@ -1,4 +1,11 @@
 /**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
  * PandamStyle — démonstration de la chaîne tokens -> recipe -> CSS
  * sur la machinerie réelle du fork (styleXDefineVars / styleXCreateTheme /
  * styleXCreateSet de src/shared, props/styleq de @stylexjs/stylex).
@@ -20,9 +27,13 @@ describe('pandamstyle: registre', () => {
   test('références résolues, catégories et visibilité conservées', () => {
     const ds = build();
     expect(ds.registry.resolvedValues['colors.action.primary']).toBe('#2563eb');
-    expect(ds.registry.resolvedValues['colors.surface.primary']).toBe('#f8fafc');
+    expect(ds.registry.resolvedValues['colors.surface.primary']).toBe(
+      '#f8fafc',
+    );
     expect(ds.registry.tokens['colors.blue.500'].visibility).toBe('private');
-    expect(ds.registry.tokens['colors.action.primary'].visibility).toBe('public');
+    expect(ds.registry.tokens['colors.action.primary'].visibility).toBe(
+      'public',
+    );
     expect(ds.registry.registryDigest).toMatch(/^[0-9a-f]{16}$/);
   });
 
@@ -205,7 +216,10 @@ describe('pandamstyle: recipe -> CSS', () => {
       ds.recipes.button({ variant: 'huge' });
     } catch (e) {
       expect(e.diagnostics[0].code).toBe('PMS_INVALID_VARIANT_VALUE');
-      expect(e.diagnostics[0].context.admitted).toEqual(['primary', 'secondary']);
+      expect(e.diagnostics[0].context.admitted).toEqual([
+        'primary',
+        'secondary',
+      ]);
     }
   });
 

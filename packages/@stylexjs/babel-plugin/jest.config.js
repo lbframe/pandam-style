@@ -26,6 +26,10 @@ module.exports = {
   snapshotFormat: {
     printBasicPrototype: false,
   },
-  testPathIgnorePatterns: ['/__fixtures__/'],
+  // Every test file in this package is named `*-test.js`; shared modules and
+  // fixture projects live next to them and must not be collected as suites.
+  testMatch: ['**/__tests__/**/*-test.js'],
+  // Fixture projects are real application sources read by the build, not tests.
+  testPathIgnorePatterns: ['/__fixtures__/', '/pandamstyle/fixtures/'],
   verbose: true,
 };
