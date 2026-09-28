@@ -1,0 +1,21 @@
+{
+  "name": "pandamstyle-pilot-vite-react",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PandamStyle pilot: a Vite + React application consuming the locally packed PandamStyle packages.",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@pandamstyle/compiler": "0.1.0",
+    "@stylexjs/stylex": "0.19.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "5.1.0",
+    "vite": "7.3.2"
+  }
+}
