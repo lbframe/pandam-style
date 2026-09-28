@@ -16,6 +16,8 @@ out-pandamstyle/
 evidence/native/artifacts/
 evidence/native/pilot/
 evidence/native/run.log
+# Raw step logs are evidence and stay tracked, like the historical ones.
+!evidence/native/*.log
 pilot/vite-react/.pandamstyle/
 pilot/vite-react/dist/
 pilot/vite-react/node_modules/

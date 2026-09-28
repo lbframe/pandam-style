@@ -1,0 +1,98 @@
+== 1/6 pack the PandamStyle compiler and the fork stylex runtime ==
+packed pandamstyle-compiler-0.1.0.tgz
+packed stylexjs-stylex-0.19.1.tgz
+== 2/6 verify the tarball contents and exports ==
+--- pandamstyle-compiler-0.1.0.tgz
+    package/bin/pms-build.js
+    package/lib/index.js
+    package/lib/index.mjs
+    package/lib/runtime.cjs
+    package/lib/runtime.mjs
+    package/lib/vite.js
+    package/lib/vite.mjs
+    package/package.json
+--- stylexjs-stylex-0.19.1.tgz
+    package/lib/cjs/inject.d.ts
+    package/lib/cjs/inject.js
+    package/lib/cjs/inject.js.flow
+    package/lib/cjs/stylesheet/createCSSStyleSheet.d.ts
+    package/lib/cjs/stylesheet/createCSSStyleSheet.js.flow
+    package/lib/cjs/stylesheet/createOrderedCSSStyleSheet.d.ts
+    package/lib/cjs/stylesheet/createOrderedCSSStyleSheet.js.flow
+    package/lib/cjs/stylesheet/createSheet.d.ts
+    package/lib/cjs/stylesheet/createSheet.js.flow
+    package/lib/cjs/stylesheet/utils.d.ts
+    package/lib/cjs/stylesheet/utils.js.flow
+    package/lib/cjs/stylex.d.ts
+    package/lib/cjs/stylex.js
+    package/lib/cjs/stylex.js.flow
+    package/lib/cjs/types/StyleXCSSTypes.d.ts
+    package/lib/cjs/types/StyleXCSSTypes.js.flow
+    package/lib/cjs/types/StyleXOpaqueTypes.d.ts
+    package/lib/cjs/types/StyleXOpaqueTypes.js.flow
+    package/lib/cjs/types/StyleXTypes.d.ts
+    package/lib/cjs/types/StyleXTypes.js.flow
+    package/lib/cjs/types/StyleXUtils.d.ts
+    package/lib/cjs/types/StyleXUtils.js.flow
+    package/lib/cjs/types/VarTypes.d.ts
+    package/lib/cjs/types/VarTypes.js.flow
+    package/lib/es/inject.d.ts
+    package/lib/es/inject.js.flow
+    package/lib/es/inject.mjs
+    package/lib/es/stylesheet/createCSSStyleSheet.d.ts
+    package/lib/es/stylesheet/createCSSStyleSheet.js.flow
+    package/lib/es/stylesheet/createOrderedCSSStyleSheet.d.ts
+    package/lib/es/stylesheet/createOrderedCSSStyleSheet.js.flow
+    package/lib/es/stylesheet/createSheet.d.ts
+    package/lib/es/stylesheet/createSheet.js.flow
+    package/lib/es/stylesheet/utils.d.ts
+    package/lib/es/stylesheet/utils.js.flow
+    package/lib/es/stylex.d.ts
+    package/lib/es/stylex.js.flow
+    package/lib/es/stylex.mjs
+    package/lib/es/types/StyleXCSSTypes.d.ts
+    package/lib/es/types/StyleXCSSTypes.js.flow
+    package/lib/es/types/StyleXOpaqueTypes.d.ts
+    package/lib/es/types/StyleXOpaqueTypes.js.flow
+    package/lib/es/types/StyleXTypes.d.ts
+    package/lib/es/types/StyleXTypes.js.flow
+    package/lib/es/types/StyleXUtils.d.ts
+    package/lib/es/types/StyleXUtils.js.flow
+    package/lib/es/types/VarTypes.d.ts
+    package/lib/es/types/VarTypes.js.flow
+    package/package.json
+    package/README.md
+packed exports ok: ., ./vite, ./runtime, ./package.json
+== 3/6 copy the pilot app outside the workspace ==
+== 4/6 install the packed tarballs into the app ==
+dependencies pinned to local tarballs
+
+added 89 packages in 11s
+== 5/6 prove the app resolves the INSTALLED package, not the sources ==
+resolved tarball at: /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/evidence/native/pilot/app/node_modules/@pandamstyle/compiler
+version: 0.1.0
+shipped runtime is self-contained
+== 6/6 run the real Vite production build ==
+
+== pilot artifacts ==
+  /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/evidence/native/pilot/app/dist/assets/index-CdrllhL-.js
+  /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/evidence/native/pilot/app/dist/assets/index-Ch9eZn3x.css
+  /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/evidence/native/pilot/app/dist/index.html
+  /private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/evidence/native/pilot/app/dist/pandamstyle.css
+
+== extracted PandamStyle stylesheet (head) ==
+:root, .x1l4zqxa{--x1fv6ce:0;--x1aadcii:8px;--x13fe11z:16px;--xjjlyln:24px;--x1amw00r:8px;--xhcaqmv:16px;--x5i1nq6:#0b1120;--x1f01h7p:#e2e8f0;--x19xuu6u:#4f46e5;--x15974ic:#4338ca;--xnj5jc6:#e2e8f0;--x7xs9y3:#0b1120;--x3kn7hp:#e2e8f0;--xae11qa:#4f46e5;--x1mhybtg:#4338ca;--xefbuix:system-ui, sans-serif;--x1rwe26f:14px;--xcikt3x:16px;--x1r9hq20:700;--x31p3ob:1.5;--xwcyf10:0 1px 3px rgba(11,17,32,0.12);--x1iqgym4:120ms;--x1gg224o:ease-in-out;}
+.x1s95fkv.x1s95fkv, .x1s95fkv.x1s95fkv:root{--xnj5jc6:#0b1120;--x7xs9y3:#e2e8f0;}
+.x1h360yn:not(#\#){padding:var(--x13fe11z)}
+.xr3lqr2:not(#\#){padding:var(--x1aadcii)}
+.x1q2psia:not(#\#){padding:var(--xjjlyln)}
+@media (min-width: 768px){.x115uys8.x115uys8:not(#\#){padding:var(--xjjlyln)}}
+.x1jz6qqi:not(#\#):not(#\#){border-radius:var(--x1amw00r)}
+.xwdtlqu:not(#\#):not(#\#){border-radius:var(--xhcaqmv)}
+.x12xt4yv:not(#\#):not(#\#){gap:var(--x1aadcii)}
+.x6s0dn4:not(#\#):not(#\#):not(#\#){align-items:center}
+.x11icek9:not(#\#):not(#\#):not(#\#){background-color:var(--xae11qa)}
+.x1jmjebl:not(#\#):not(#\#):not(#\#){background-color:var(--xnj5jc6)}
+.x1dvffy4:not(#\#):not(#\#):not(#\#){box-shadow:var(--xwcyf10)}
+.x11jb0vl:not(#\#):not(#\#):not(#\#){co
+PILOT OK
