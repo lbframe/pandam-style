@@ -1,0 +1,89 @@
+{
+  "documentKind": "pandamstyle-run-summary",
+  "testedCommit": "717cdb3c0e72620281ebd64518539763e5bfe46a",
+  "testedTree": "fccf990ae62c439f4852e5a6b69c5ac66838aed9",
+  "workingTree": "clean",
+  "outDir": "/private/var/folders/4r/tzlygl9x13l6rvgs9t4kvn3r0000gn/T/opencode/pms-final/evidence/native",
+  "toolchain": {
+    "node": "v22.23.2",
+    "yarn": "1.22.22",
+    "npm": "10.9.8"
+  },
+  "steps": {
+    "install": {
+      "status": "passed",
+      "exitCode": 0,
+      "note": null,
+      "counts": null
+    },
+    "build": {
+      "status": "passed",
+      "exitCode": 0,
+      "note": null,
+      "counts": null
+    },
+    "upstream-babel-plugin": {
+      "status": "passed",
+      "exitCode": 0,
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 1007,
+          "total": 1071,
+          "skipped": 64
+        },
+        "suites": {
+          "passed": 42,
+          "total": 43,
+          "skipped": 1
+        }
+      }
+    },
+    "upstream-stylex": {
+      "status": "passed",
+      "exitCode": 0,
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 99,
+          "total": 99,
+          "skipped": null
+        },
+        "suites": {
+          "passed": 4,
+          "total": 4,
+          "skipped": null
+        }
+      }
+    },
+    "pandamstyle": {
+      "status": "passed",
+      "exitCode": 0,
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 111,
+          "total": 111,
+          "skipped": null
+        },
+        "suites": {
+          "passed": 6,
+          "total": 6,
+          "skipped": null
+        }
+      }
+    },
+    "pilot": {
+      "status": "passed",
+      "exitCode": 0,
+      "note": null,
+      "counts": null
+    },
+    "artifacts": {
+      "status": "passed",
+      "exitCode": 0,
+      "note": null,
+      "counts": null
+    }
+  }
+}
