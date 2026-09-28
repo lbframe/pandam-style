@@ -1,10 +1,49 @@
 /**
- * PandamStyle — diagnostics structurés (ARC-16).
- * Codes stables PMS_* ; chaque erreur remonte à la source auteur/consommateur.
- * Aucun autofix en P0 (D-10) : `autofix` reste null.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * PandamStyle - structured diagnostics (ARC-16).
+ * Stable PMS_* codes; every error points back to the author/consumer source.
+ * No autofix in P0 (D-10): `autofix` stays null.
+ *
+ * A diagnostic carries two distinct locators:
+ *  - `source`   : the responsible module (file path, or phase label);
+ *  - `location` : the exact position inside the page (file, line, column).
+ * `source` accepts a string (back-compat) or a location object.
  */
 
 export const DIAG_SCHEMA_VERSION = 1;
+
+function normalizeLocation(source) {
+  if (source == null) return { source: null, location: null };
+  if (typeof source === 'string') {
+    return { source, location: null };
+  }
+  if (typeof source === 'object') {
+    const { file = null, line = null, column = null, role = null } = source;
+    if (file == null && line == null) {
+      return { source: null, location: null };
+    }
+    return {
+      source: role != null ? `${file} (${role})` : file,
+      location: { file, line, column, role },
+    };
+  }
+  return { source: null, location: null };
+}
+
+function renderLocation(diag) {
+  if (diag.location == null) return '';
+  const { file, line, column } = diag.location;
+  if (file == null) return '';
+  if (line == null) return ` (${file})`;
+  if (column == null) return ` (${file}:${line})`;
+  return ` (${file}:${line}:${column})`;
+}
 
 export function diagnostic({
   code,
@@ -12,16 +51,27 @@ export function diagnostic({
   phase,
   message,
   source = null,
+  location = null,
   rule = null,
   context = {},
 }) {
+  // An explicit `location` wins over a `source` object.
+  const normalizedSource = normalizeLocation(source);
+  let normalizedLocation = normalizedSource.location;
+  let normalizedLabel = normalizedSource.source;
+  if (location != null) {
+    const n = normalizeLocation(location);
+    normalizedLocation = n.location ?? normalizedLocation;
+    normalizedLabel = n.source ?? normalizedLabel;
+  }
   return {
     schemaVersion: DIAG_SCHEMA_VERSION,
     code,
     severity,
     phase,
     message,
-    source,
+    source: normalizedLabel,
+    location: normalizedLocation,
     rule,
     context,
     autofix: null,
@@ -30,7 +80,11 @@ export function diagnostic({
 
 export class PmsError extends Error {
   constructor(diagnostics) {
-    super(diagnostics.map((d) => `${d.code}: ${d.message}`).join('\n'));
+    super(
+      diagnostics
+        .map((d) => `${d.code}: ${d.message}${renderLocation(d)}`)
+        .join('\n'),
+    );
     this.name = 'PmsError';
     this.diagnostics = diagnostics;
   }
@@ -49,4 +103,18 @@ export const Codes = {
   INVALID_VARIANT_KEY: 'PMS_INVALID_VARIANT_KEY',
   INVALID_VARIANT_VALUE: 'PMS_INVALID_VARIANT_VALUE',
   UNSUPPORTED_FEATURE: 'PMS_UNSUPPORTED_FEATURE',
+  // Codes added by this batch (build boundaries and non-static values).
+  NON_STATIC_VALUE: 'PMS_NON_STATIC_VALUE',
+  FORBIDDEN_IMPORT: 'PMS_FORBIDDEN_IMPORT',
+  FORBIDDEN_STYLE_CHANNEL: 'PMS_FORBIDDEN_STYLE_CHANNEL',
+  UNVERIFIED_JSX_SPREAD: 'PMS_UNVERIFIED_JSX_SPREAD',
+  ROLE_VIOLATION: 'PMS_ROLE_VIOLATION',
+  COVERAGE_GAP: 'PMS_COVERAGE_GAP',
 };
+
+/** Stable single-line rendering of a diagnostic (used by the build report). */
+export function formatDiagnostic(diag) {
+  const loc = renderLocation(diag);
+  const rule = diag.rule ? ` [${diag.rule}]` : '';
+  return `${diag.code}${rule}: ${diag.message}${loc}`;
+}

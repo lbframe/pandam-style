@@ -1,7 +1,14 @@
 /**
- * PandamStyle — fixture « conformance » (P0 §6).
- * Valeurs pédagogiques : ce n'est pas un thème livré aux utilisateurs.
- * Primitives de couleurs privées, sémantiques publiques, espacements publics.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * PandamStyle - the "conformance" fixture (P0 section 6).
+ * Teaching values: this is not a theme shipped to users.
+ * Private color primitives, public semantic colors, public spacing.
  */
 
 import { token } from './token';

@@ -9,3 +9,13 @@ dist
 lib
 node_modules
 storybook-static
+# PandamStyle: regenerable run output.
+# The committed part of a run (env.json, summary.json, REPORT.md, per-step logs)
+# stays tracked; the heavy artifacts and the pilot work tree do not.
+out-pandamstyle/
+evidence/native/artifacts/
+evidence/native/pilot/
+evidence/native/run.log
+examples/pilot-vite-react/.pandamstyle/
+packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/*/generated/
+examples/pilot-vite-react/dist/

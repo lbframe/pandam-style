@@ -31,6 +31,13 @@ module.exports = {
     node: true,
   },
   ignorePatterns: [
+    // PandamStyle fixture projects stand in for third-party application code,
+    // so they deliberately do not carry this repository's copyright header.
+    'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures',
+    // Vendored third-party donors are not linted with this repository's config.
+    'upstream/panda',
+    // Regenerable run output is not source.
+    'evidence/native',
     'build',
     'coverage',
     'dist',

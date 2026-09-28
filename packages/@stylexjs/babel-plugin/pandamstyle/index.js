@@ -1,5 +1,12 @@
 /**
- * PandamStyle — assemblage du démonstrateur (ARC-02/ARC-03).
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * PandamStyle - demonstrator assembly (ARC-02/ARC-03).
  * Un seul registre alimente politique, compilation et manifeste ;
  * les styles passent tous par le moteur du fork.
  */
@@ -19,8 +26,12 @@ export function buildDesignSystem(definition, options = {}) {
     throw new PmsError(registry.diagnostics);
   }
 
-  const { varsByToken, themeClasses, varGroupHash, injected: tokenStyles } =
-    compileTokens(registry, options);
+  const {
+    varsByToken,
+    themeClasses,
+    varGroupHash,
+    injected: tokenStyles,
+  } = compileTokens(registry, options);
 
   const injected = { ...tokenStyles };
   const recipeInjected = {};
@@ -58,7 +69,7 @@ export function buildDesignSystem(definition, options = {}) {
       source: callOptions.source ?? 'consumer',
       options,
     });
-    // Les règles du consommateur rejoignent la même génération (ARC-14).
+    // Consumer rules join the same generation (ARC-14).
     Object.assign(injected, result.injected);
     return result;
   };

@@ -1,8 +1,15 @@
 /**
- * PandamStyle — pipeline de compilation (ARC-05).
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * PandamStyle - compilation pipeline (ARC-05).
  * Registre -> validation de politique -> abaissement vers le moteur du fork
  * (styleXDefineVars / styleXCreateTheme / styleXCreateSet de src/shared).
- * Aucune émission CSS parallèle : toutes les règles sortent du moteur.
+ * No parallel CSS emission: every rule comes out of the engine.
  */
 
 import styleXCreateSet from '../src/shared/stylex-create';
@@ -11,7 +18,7 @@ import styleXCreateTheme from '../src/shared/stylex-create-theme';
 import { defaultOptions } from '../src/shared/utils/default-options';
 
 import { diagnostic, PmsError, Codes } from './diagnostics';
-import { isTokenRef, tokenRefPath } from './token';
+import { tokenPathOf } from './token';
 import {
   propertyKind,
   propertyCategory,
@@ -19,14 +26,14 @@ import {
   structuralDomain,
 } from './policy';
 
-// Identité de variable stable : systemId + tokenId (D-03). Le hash upstream
-// porte sur `${exportId}.${key}` ; indépendant du chemin de checkout.
+// Stable variable identity: systemId + tokenId (D-03). The upstream hash
+// is computed over `${exportId}.${key}`, independent of the checkout path.
 function varKeyOf(tokenId) {
-  return tokenId.replace(/[.\-]/g, '_');
+  return tokenId.replace(/[.-]/g, '_');
 }
 
 /**
- * Compile les tokens du registre en variables CSS + classes de thème.
+ * Compiles the registry tokens into CSS variables + theme classes.
  * Retourne { varsByToken, themeClasses, injected }.
  */
 export function compileTokens(registry, options = {}) {
@@ -64,40 +71,53 @@ export function compileTokens(registry, options = {}) {
     Object.assign(injected, themeStyles);
     themeClasses[themeName] = themeClassObj[varsObj.__varGroupHash__];
   }
-  return { varsByToken, themeClasses, varGroupHash: varsObj.__varGroupHash__, injected };
+  return {
+    varsByToken,
+    themeClasses,
+    varGroupHash: varsObj.__varGroupHash__,
+    injected,
+  };
 }
 
 const BASE_CONDITION = 'default';
 
 /**
- * Normalise une valeur de déclaration en entrées { condition, tokenRef|literal }.
- * Forme publique orientée propriété ({ base, <cond> }) normalisée en blocs (D-05).
+ * Normalizes a declaration value into { condition, tokenRef|literal } entries.
+ * Property-oriented public form ({ base, <cond> }) normalized into blocks (D-05).
  */
-function expandValue(property, value, registry, source, diagnostics) {
+function expandValue(property, value, registry, source, refKind, diagnostics) {
   if (
     value !== null &&
     typeof value === 'object' &&
-    !isTokenRef(value) &&
+    tokenPathOf(value, refKind) == null &&
     !Array.isArray(value)
   ) {
+    // An object with no statically named key is not a condition map: it is a
+    // raw value (an object imitating an internal reference, for instance).
+    // Treating it as an empty condition map would silently drop the
+    // declaration, which is exactly the silent exemption P0 forbids.
+    if (Object.keys(value).length === 0) {
+      return [[null, value]];
+    }
     const entries = [];
     for (const condName of Object.keys(value)) {
       const cond =
         condName === 'base' || condName === 'default'
           ? BASE_CONDITION
           : condName;
-      if (
-        cond !== BASE_CONDITION &&
-        registry.conditions[cond] == null
-      ) {
+      if (cond !== BASE_CONDITION && registry.conditions[cond] == null) {
         diagnostics.push(
           diagnostic({
             code: Codes.UNKNOWN_CONDITION,
             phase: 'policy',
-            message: `Condition inconnue « ${cond} » sur ${property}.`,
+            message: `Unknown condition "${cond}" on ${property}.`,
             source,
             rule: 'conditions.named-only',
-            context: { property, condition: condName, admitted: Object.keys(registry.conditions) },
+            context: {
+              property,
+              condition: condName,
+              admitted: Object.keys(registry.conditions),
+            },
           }),
         );
         continue;
@@ -114,12 +134,17 @@ function checkValue({
   value,
   role,
   allowPrivateTokens,
+  refKind = 'author',
   registry,
   varsByToken,
   source,
+  systemId,
+  locate,
   conditionPath,
   diagnostics,
 }) {
+  // Provenance: the location of the declaration inside the page, when known.
+  const where = locate?.() ?? source;
   const kind = propertyKind(property);
 
   if (kind === 'composite-form') {
@@ -127,8 +152,8 @@ function checkValue({
       diagnostic({
         code: Codes.UNSUPPORTED_PROPERTY_FORM,
         phase: 'policy',
-        message: `La forme composite « ${property} » est refusée en P0 ; utiliser les propriétés longues.`,
-        source,
+        message: `The composite form "${property}" is refused in P0; use longhand properties.`,
+        source: where,
         rule: 'supported-properties.composite-forms',
         context: { property },
       }),
@@ -140,8 +165,8 @@ function checkValue({
       diagnostic({
         code: Codes.UNSUPPORTED_PROPERTY,
         phase: 'policy',
-        message: `Propriété non couverte par le profil : ${property}.`,
-        source,
+        message: `Property not covered by the profile: ${property}.`,
+        source: where,
         rule: 'supported-properties',
         context: { property },
       }),
@@ -155,7 +180,7 @@ function checkValue({
           code: Codes.FORBIDDEN_VALUE,
           phase: 'policy',
           message: `Valeur structurelle interdite : ${property} = ${JSON.stringify(value)}.`,
-          source,
+          source: where,
           rule: 'structural-domain',
           context: {
             property,
@@ -170,7 +195,7 @@ function checkValue({
     return value;
   }
 
-  // kind === 'category' : TokenRef obligatoire, de la bonne catégorie.
+  // kind === 'category': a TokenRef of the right category is mandatory.
   const category = propertyCategory(property);
   const admitted = Object.keys(registry.tokens).filter(
     (id) =>
@@ -178,21 +203,30 @@ function checkValue({
       (allowPrivateTokens || registry.tokens[id].visibility === 'public'),
   );
 
-  if (!isTokenRef(value)) {
+  // The `compiler` mode accepts ONLY compiler-stamped TokenRefs: a page object
+  // imitating the internal shape is not proof.
+  const tokenId = tokenPathOf(value, refKind);
+  if (tokenId == null) {
     diagnostics.push(
       diagnostic({
         code: Codes.FORBIDDEN_VALUE,
         phase: 'policy',
         message: `Valeur interdite pour ${property} : ${JSON.stringify(value)}. Un token ${category} est requis.`,
-        source,
+        source: where,
         rule: 'category-strict',
-        context: { property, category, value, candidates: admitted, conditionPath },
+        context: {
+          property,
+          category,
+          value,
+          systemId,
+          candidates: admitted,
+          conditionPath,
+        },
       }),
     );
     return null;
   }
 
-  const tokenId = tokenRefPath(value);
   const entry = registry.tokens[tokenId];
   if (entry == null) {
     diagnostics.push(
@@ -200,9 +234,17 @@ function checkValue({
         code: Codes.UNKNOWN_TOKEN,
         phase: 'policy',
         message: `Token inconnu : ${tokenId}.`,
-        source,
+        source: where,
         rule: 'registry.tokens',
-        context: { property, tokenId, candidates: admitted, conditionPath },
+        context: {
+          property,
+          tokenId,
+          systemId,
+          category: entry?.category ?? null,
+          visibility: entry?.visibility ?? null,
+          candidates: admitted,
+          conditionPath,
+        },
       }),
     );
     return null;
@@ -213,9 +255,17 @@ function checkValue({
         code: Codes.INVALID_TOKEN_CATEGORY,
         phase: 'policy',
         message: `${property} exige un token ${category} ; ${tokenId} est ${entry.category}.`,
-        source,
+        source: where,
         rule: 'category-strict',
-        context: { property, expected: category, actual: entry.category, tokenId, conditionPath },
+        context: {
+          property,
+          systemId,
+          expected: category,
+          actual: entry.category,
+          tokenId,
+          visibility: entry.visibility,
+          conditionPath,
+        },
       }),
     );
     return null;
@@ -225,10 +275,18 @@ function checkValue({
       diagnostic({
         code: Codes.TOKEN_NOT_PUBLIC,
         phase: 'policy',
-        message: `Le token ${tokenId} n'est pas sélectionnable côté consommateur.`,
-        source,
+        message: `Token ${tokenId} is not selectable from the consumer side.`,
+        source: where,
         rule: 'visibility.consumer',
-        context: { property, tokenId, candidates: admitted, conditionPath },
+        context: {
+          property,
+          tokenId,
+          systemId,
+          category: entry.category,
+          visibility: entry.visibility,
+          candidates: admitted,
+          conditionPath,
+        },
       }),
     );
     return null;
@@ -237,9 +295,9 @@ function checkValue({
 }
 
 /**
- * Compile des namespaces de déclarations PandamStyle.
+ * Compiles PandamStyle declaration namespaces.
  * signature : compileStyles({ registry, varsByToken, namespaces, role, source, options })
- * Retourne { compiled, injected, classPaths } ou lève PmsError.
+ * Returns { compiled, injected, classPaths } or throws PmsError.
  */
 export function compileStyles({
   registry,
@@ -248,18 +306,21 @@ export function compileStyles({
   role = 'consumer',
   allowPrivateTokens = false,
   source = null,
+  refKind = 'author',
+  locate = null,
   options = {},
 }) {
   const diagnostics = [];
   const normalized = {};
+  const systemId = registry.systemId;
 
   for (const nsName of Object.keys(namespaces)) {
     const ns = namespaces[nsName];
     const outNs = {};
     for (const key of Object.keys(ns)) {
       const value = ns[key];
-      // Syntaxe auteur `_hover` (portée de Panda) : condition nommée résolue
-      // vers sa définition canonique avant abaissement.
+      // Author syntax `_hover` (carried over from Panda): named condition resolved
+      // to its canonical definition before lowering.
       if (key.startsWith('_') && value !== null && typeof value === 'object') {
         const condName = key.slice(1);
         const condDef = registry.conditions[condName]?.definition;
@@ -268,8 +329,8 @@ export function compileStyles({
             diagnostic({
               code: Codes.UNKNOWN_CONDITION,
               phase: 'policy',
-              message: `Condition inconnue « ${condName} » (bloc ${key}).`,
-              source,
+              message: `Unknown condition "${condName}" (block ${key}).`,
+              source: locate?.(nsName, key, null) ?? source,
               rule: 'conditions.named-only',
               context: {
                 condition: condName,
@@ -289,6 +350,9 @@ export function compileStyles({
             registry,
             varsByToken,
             source,
+            refKind,
+            systemId,
+            locate: locate && (() => locate(nsName, key, null)),
             conditionPath: [condName],
             diagnostics,
           });
@@ -303,9 +367,9 @@ export function compileStyles({
       const isConditionBlock =
         key.startsWith(':') || key.startsWith('@') || key.startsWith('[');
       if (isConditionBlock) {
-        // Bloc conditionnel moteur : seuls les noms enregistrés sont admis
-        // côté consommateur ; ici la forme normalisée interne porte déjà la
-        // définition canonique — les entrées publiques passent par expandValue.
+        // Engine condition block: only registered names are admitted
+        // on the consumer side; here the internal normalized form already carries the
+        // canonical definition - public entries go through expandValue.
         for (const prop of Object.keys(value)) {
           const lowered = checkValue({
             property: prop,
@@ -315,6 +379,9 @@ export function compileStyles({
             registry,
             varsByToken,
             source,
+            refKind,
+            systemId,
+            locate: locate && (() => locate(nsName, key, null)),
             conditionPath: [key],
             diagnostics,
           });
@@ -330,6 +397,7 @@ export function compileStyles({
         value,
         registry,
         source,
+        refKind,
         diagnostics,
       )) {
         const condDef =
@@ -342,6 +410,9 @@ export function compileStyles({
           registry,
           varsByToken,
           source,
+          refKind,
+          systemId,
+          locate: locate && (() => locate(nsName, key, condName)),
           conditionPath: condName == null ? [] : [condName],
           diagnostics,
         });
@@ -369,7 +440,7 @@ export function compileStyles({
   return { compiled, injected, classPaths };
 }
 
-/** Collecte et trie les règles injectables par priorité -> texte CSS. */
+/** Collects and sorts injectable rules by priority -> CSS text. */
 export function renderCss(injectedByKey) {
   const entries = Object.entries(injectedByKey).map(([key, s]) => ({
     key,

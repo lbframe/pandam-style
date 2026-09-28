@@ -1,12 +1,19 @@
 /**
- * PandamStyle — recipes compilées (ARC-10/ARC-11, D-06).
- * Sélection/défauts portés de @pandacss cva
- * (chakra-ui/panda @ 1a310482, packages/generator/src/artifacts/js/cva.ts)
- * avec restrictions P0 : pas de compoundVariants, pas de .raw/.merge,
- * branches précompilées et sélecteur runtime borné.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
-import { diagnostic, PmsError, Codes } from './diagnostics';
+/**
+ * PandamStyle - compiled recipes (ARC-10/ARC-11, D-06).
+ * Selection/defaults carried over from @pandacss cva
+ * (chakra-ui/panda @ 1a310482, packages/generator/src/artifacts/js/cva.ts)
+ * avec restrictions P0 : pas de compoundVariants, pas de .raw/.merge,
+ * precompiled branches and a bounded runtime selector.
+ */
+
+import { selectRecipeRefs } from './recipe-select';
 
 function compact(obj) {
   const out = {};
@@ -19,10 +26,10 @@ function compact(obj) {
 export function defineRecipe(config, compileStyleObject) {
   const { base = {}, variants = {}, defaultVariants = {} } = config;
   const recipeId = config.recipeId ?? 'anonymous';
-  const axisOrder = Object.keys(variants); // ordre capturé à la déclaration
+  const axisOrder = Object.keys(variants); // order captured at declaration time
 
-  // Compilation de chaque branche : base + une entrée par (axe, valeur).
-  // Somme des branches, pas produit cartésien (ARC-11).
+  // Compiles each branch: base + one entry per (axis, value).
+  // Sum of the branches, not a cartesian product (ARC-11).
   const compiledBase = compileStyleObject(base, `${recipeId}.base`);
   const compiledBranches = {};
   for (const axis of axisOrder) {
@@ -40,60 +47,25 @@ export function defineRecipe(config, compileStyleObject) {
   );
   const variantKeys = axisOrder;
 
-  const domainError = (code, message, context) =>
-    new PmsError([
-      diagnostic({
-        code,
-        severity: 'error',
-        phase: 'runtime-selection',
-        message,
-        rule: 'recipe.bounded-domain',
-        context: { recipeId, ...context },
-      }),
-    ]);
+  // Finite data exposed to the runtime and to the build: no CSS object
+  // interpretation, only already-compiled references.
+  const spec = {
+    recipeId,
+    axisOrder,
+    variantMap,
+    defaultVariants,
+    base: compiledBase,
+    branches: compiledBranches,
+  };
 
-  function resolve(props = {}) {
-    // Clés inconnues : erreur, jamais sélection implicite (D-06).
-    for (const key of Object.keys(props)) {
-      if (!axisOrder.includes(key)) {
-        throw domainError(
-          Codes.INVALID_VARIANT_KEY,
-          `Axe de variant inconnu « ${key} » pour ${recipeId}.`,
-          { axis: key, admitted: variantKeys },
-        );
-      }
-    }
-    const refs = [compiledBase];
-    for (const axis of axisOrder) {
-      let value = props[axis];
-      if (value === undefined) {
-        value = defaultVariants[axis];
-        if (value === undefined) continue; // pas de défaut : aucune branche
-      }
-      if (value === null) {
-        throw domainError(
-          Codes.INVALID_VARIANT_VALUE,
-          `null n'est pas une sélection valide pour ${recipeId}.${axis}.`,
-          { axis, value, admitted: variantMap[axis] },
-        );
-      }
-      const key = String(value);
-      const branch = compiledBranches[axis][key];
-      if (branch == null) {
-        throw domainError(
-          Codes.INVALID_VARIANT_VALUE,
-          `Valeur « ${key} » hors domaine pour ${recipeId}.${axis}.`,
-          { axis, value: key, admitted: variantMap[axis] },
-        );
-      }
-      refs.push(branch);
-    }
-    return refs;
+  // One single selection implementation, shared with the runtime.
+  function resolve(props) {
+    return selectRecipeRefs(spec, props);
   }
 
   function cvaFn(props) {
-    // StyleRef opaque : liste ordonnée de refs compilées ; seul le runtime
-    // du fork (props) les compose. Aucune chaîne CSS ni fusion brute.
+    // Opaque StyleRef: ordered list of compiled refs; only the fork runtime
+    // (props) composes them. No CSS string, no free-form merge.
     return Object.freeze({ __pmsStyleRef: true, refs: resolve(props) });
   }
 
@@ -118,6 +90,8 @@ export function defineRecipe(config, compileStyleObject) {
     variantMap,
     variantKeys,
     axisOrder,
+    defaultVariants,
+    spec,
     splitVariantProps,
     getVariantProps,
     // ARC-11 : pas de .raw (CSS brut), pas de .merge (fusion libre).
@@ -126,8 +100,6 @@ export function defineRecipe(config, compileStyleObject) {
 
 export function isStyleRef(value) {
   return (
-    value !== null &&
-    typeof value === 'object' &&
-    value.__pmsStyleRef === true
+    value !== null && typeof value === 'object' && value.__pmsStyleRef === true
   );
 }

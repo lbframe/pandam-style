@@ -1,9 +1,16 @@
 /**
- * PandamStyle — registre canonique (ARC-07/ARC-08, D-03/D-04).
- * Sémantique des tokens portée de @pandacss/token-dictionary
- * (chakra-ui/panda @ 1a310482, packages/token-dictionary) : identité par chemin
- * `categorie.segment`, références entre tokens, vues par thème.
- * Émission Panda remplacée : le registre produit des entrées pour le moteur
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * PandamStyle - canonical registry (ARC-07/ARC-08, D-03/D-04).
+ * Token semantics carried over from @pandacss/token-dictionary
+ * (chakra-ui/panda @ 1a310482, packages/token-dictionary): identity by path
+ * `category.segment`, references between tokens, per-theme views.
+ * Panda emission replaced: the registry produces inputs for the fork
  * du fork (defineVars/createTheme), pas de CSS propre.
  */
 
@@ -12,7 +19,7 @@ import { diagnostic, PmsError, Codes } from './diagnostics';
 
 function canonicalize(value) {
   if (Array.isArray(value)) {
-    // Ordre sémantique conservé (axisOrder, chemins de cycle…)
+    // Semantic order preserved (axisOrder, cycle paths...)
     return value.map(canonicalize);
   }
   if (value !== null && typeof value === 'object') {
@@ -58,7 +65,7 @@ function flattenTokens(category, node, prefix, out, diagnostics, source) {
           diagnostic({
             code: Codes.DUPLICATE_TOKEN,
             phase: 'registry',
-            message: `Identifiant de token dupliqué : ${tokenId}.`,
+            message: `Duplicate token identifier: ${tokenId}.`,
             source,
             context: { tokenId },
           }),
@@ -80,7 +87,7 @@ function flattenTokens(category, node, prefix, out, diagnostics, source) {
         diagnostic({
           code: Codes.FORBIDDEN_VALUE,
           phase: 'registry',
-          message: `Définition de token invalide à ${category}.${path}.`,
+          message: `Invalid token definition at ${category}.${path}.`,
           source,
           context: { tokenId: `${category}.${path}` },
         }),
@@ -91,8 +98,13 @@ function flattenTokens(category, node, prefix, out, diagnostics, source) {
 
 export function buildRegistry(definition) {
   const diagnostics = [];
-  const { systemId, tokens = {}, themes = {}, conditions = {}, recipes = {} } =
-    definition;
+  const {
+    systemId,
+    tokens = {},
+    themes = {},
+    conditions = {},
+    recipes = {},
+  } = definition;
   const tokensOut = {};
 
   for (const category of Object.keys(tokens)) {
@@ -106,7 +118,7 @@ export function buildRegistry(definition) {
     );
   }
 
-  // Résolution des références + cycles (ARC-08). Pas de fallback silencieux.
+  // Reference and cycle resolution (ARC-08). No silent fallback.
   const resolved = {};
   const visiting = [];
   const resolveToken = (tokenId) => {
@@ -117,7 +129,7 @@ export function buildRegistry(definition) {
         diagnostic({
           code: Codes.UNKNOWN_TOKEN,
           phase: 'registry',
-          message: `Référence de token inconnue : ${tokenId}.`,
+          message: `Unknown token reference: ${tokenId}.`,
           context: { tokenId, visiting: [...visiting] },
         }),
       ]);
@@ -127,7 +139,7 @@ export function buildRegistry(definition) {
         diagnostic({
           code: Codes.TOKEN_CYCLE,
           phase: 'registry',
-          message: `Cycle de références de tokens : ${[
+          message: `Token reference cycle: ${[
             ...visiting.slice(visiting.indexOf(tokenId)),
             tokenId,
           ].join(' -> ')}.`,
@@ -144,7 +156,7 @@ export function buildRegistry(definition) {
           diagnostic({
             code: Codes.UNKNOWN_TOKEN,
             phase: 'registry',
-            message: `Le token ${tokenId} référence ${t.ref}, absent du registre.`,
+            message: `Token ${tokenId} references ${t.ref}, which is absent from the registry.`,
             context: { tokenId, missingRef: t.ref },
           }),
         ]);
@@ -154,8 +166,13 @@ export function buildRegistry(definition) {
           diagnostic({
             code: Codes.INVALID_TOKEN_CATEGORY,
             phase: 'registry',
-            message: `Le token ${tokenId} (${t.category}) référence ${t.ref} (${target.category}).`,
-            context: { tokenId, ref: t.ref, expected: t.category, actual: target.category },
+            message: `Token ${tokenId} (${t.category}) references ${t.ref} (${target.category}).`,
+            context: {
+              tokenId,
+              ref: t.ref,
+              expected: t.category,
+              actual: target.category,
+            },
           }),
         ]);
       }
@@ -169,7 +186,7 @@ export function buildRegistry(definition) {
     resolveToken(tokenId);
   }
 
-  // Thèmes : base complète + surcharges partielles (D-04). Référence inconnue
+  // Themes: complete base + partial overrides (D-04). An unknown reference
   // dans une surcharge = erreur, jamais de fallback.
   const themeDefs = {};
   for (const themeName of Object.keys(themes)) {
@@ -193,7 +210,7 @@ export function buildRegistry(definition) {
           diagnostic({
             code: Codes.UNKNOWN_TOKEN,
             phase: 'registry',
-            message: `La surcharge ${themeName}/${tokenId} ne correspond à aucun token.`,
+            message: `The ${themeName}/${tokenId} override matches no token.`,
             context: { themeName, tokenId },
           }),
         ]);
@@ -205,12 +222,13 @@ export function buildRegistry(definition) {
             diagnostic({
               code: Codes.UNKNOWN_TOKEN,
               phase: 'registry',
-              message: `La surcharge ${themeName}/${tokenId} référence ${o.ref}, absent.`,
+              message: `The ${themeName}/${tokenId} override references ${o.ref}, which is absent.`,
               context: { themeName, tokenId, missingRef: o.ref },
             }),
           ]);
         }
-        resolved[tokenId] = resolved[tokenId]; // identité conservée
+        // The override reuses an already-resolved identity: the value below is
+        // the referenced token's own value, not a re-resolution of this one.
         themeDefs[themeName][tokenId] = resolveToken(o.ref);
       } else if (o.value != null) {
         themeDefs[themeName][tokenId] = o.value;
@@ -218,17 +236,17 @@ export function buildRegistry(definition) {
     }
   }
 
-  // Conditions : nom -> définition canonique, sous-ensemble P0 (D-14).
+  // Conditions: name -> canonical definition, P0 subset (D-14).
   const conds = {};
   for (const name of Object.keys(conditions)) {
     const c = conditions[name];
-    const def = typeof c === 'string' ? c : c?.selector ?? c?.atRule;
+    const def = typeof c === 'string' ? c : (c?.selector ?? c?.atRule);
     if (typeof def !== 'string' || def === '') {
       diagnostics.push(
         diagnostic({
           code: Codes.UNKNOWN_CONDITION,
           phase: 'registry',
-          message: `Condition ${name} sans définition.`,
+          message: `Condition ${name} has no definition.`,
           context: { condition: name },
         }),
       );
@@ -237,7 +255,7 @@ export function buildRegistry(definition) {
     conds[name] = { name, definition: def };
   }
 
-  // Recipes : base + axes + défauts ; axisOrder = ordre de déclaration (ARC-10).
+  // Recipes: base + axes + defaults; axisOrder = declaration order (ARC-10).
   const recs = {};
   for (const recipeId of Object.keys(recipes)) {
     const r = recipes[recipeId];
@@ -249,7 +267,7 @@ export function buildRegistry(definition) {
         diagnostic({
           code: Codes.UNSUPPORTED_FEATURE,
           phase: 'registry',
-          message: `Recipe ${recipeId} : capacité non livrée en P0 (${unsupported.join(', ')}).`,
+          message: `Recipe ${recipeId}: capability not delivered in P0 (${unsupported.join(', ')}).`,
           context: { recipeId, unsupported },
         }),
       ]);
@@ -265,7 +283,14 @@ export function buildRegistry(definition) {
     };
   }
 
-  const payload = { systemId, tokens: tokensOut, resolved, themeDefs, conds, recs };
+  const payload = {
+    systemId,
+    tokens: tokensOut,
+    resolved,
+    themeDefs,
+    conds,
+    recs,
+  };
   return {
     systemId,
     tokens: tokensOut,
