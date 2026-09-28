@@ -12,7 +12,10 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 WORK_DIR="${1:-${PMS_PILOT_DIR:-/tmp/pandamstyle-pilot}}"
-PILOT_SRC="${REPO_ROOT}/examples/pilot-vite-react"
+# The pilot lives outside every workspace glob on purpose: as a workspace
+# member, the root install would try to resolve @pandamstyle/compiler from
+# the registry instead of linking the local workspace copy.
+PILOT_SRC="${REPO_ROOT}/pilot/vite-react"
 
 echo "== 1/6 pack the PandamStyle compiler and the fork stylex runtime =="
 rm -rf "${WORK_DIR}"
