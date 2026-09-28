@@ -10,14 +10,15 @@ lib
 node_modules
 storybook-static
 # PandamStyle: regenerable run output.
-# The committed part of a run (env.json, summary.json, REPORT.md, per-step logs)
-# stays tracked; the heavy artifacts and the pilot work tree do not.
+# The committed part of a run (env.json, summary.json, REPORT.md, per-step logs,
+# artifact-digests.txt) stays tracked; the heavy artifacts and the pilot work
+# tree do not. The pattern is per-directory so every run directory is treated
+# the same way, including the ones that do not exist yet.
 out-pandamstyle/
-evidence/native/artifacts/
-evidence/native/pilot/
-evidence/native/run.log
+evidence/*/artifacts/
+evidence/*/pilot/
 # Raw step logs are evidence and stay tracked, like the historical ones.
-!evidence/native/*.log
+!evidence/*/*.log
 pilot/vite-react/.pandamstyle/
 pilot/vite-react/dist/
 pilot/vite-react/node_modules/

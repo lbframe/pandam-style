@@ -379,3 +379,43 @@ module.exports = def;
     expect(manifest.registryDigest).toMatch(/^[0-9a-f]{16}$/);
   });
 });
+
+describe('a build that cannot publish is refused up front', () => {
+  let app;
+
+  beforeAll(() => {
+    app = makeApp();
+    // `build.write: false` means the bundler never calls `writeBundle`, which is
+    // the plugin's only success signal. Publishing nothing would be
+    // indistinguishable from having no stylesheet, so it is refused before any
+    // work rather than discovered at the end of a green-looking build.
+    const config = path.join(app, 'vite.config.mjs');
+    fs.writeFileSync(
+      config,
+      fs
+        .readFileSync(config, 'utf8')
+        .replace(
+          '    emptyOutDir: true,',
+          '    emptyOutDir: true,\n    write: false,',
+        ),
+      'utf8',
+    );
+  });
+
+  afterAll(() => {
+    fs.rmSync(app, { recursive: true, force: true });
+  });
+
+  test('the build fails with a configuration diagnostic', () => {
+    const result = runViteBuild(app);
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('PMS_UNSUPPORTED_FEATURE');
+    expect(result.output).toContain('build.write: false');
+  });
+
+  test('no generation is left behind by the refusal', () => {
+    expect(
+      fs.existsSync(path.join(app, PANDAMSTYLE_DIR, 'manifest.json')),
+    ).toBe(false);
+  });
+});
