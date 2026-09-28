@@ -1,18 +1,24 @@
 # PandamStyle — native compiler consolidation batch
 
 Corrective batch on `feat/pandamstyle-native-compiler`. Four classes of
-bypass and two secondary defects are closed. **P0 is not complete**; see
-[Limitations](#limitations) and the case table.
+bypass, two secondary defects and two evidence-integrity defects are closed.
+**P0 is not complete**; see [Limitations](#limitations) and the case table.
 
 ## Identity of the tested code
 
+Five facts are kept apart on purpose, because a reader has to be able to tell
+them apart: what was tested, what is delivered, and which relation the base came
+from.
+
 | | |
 |---|---|
-| testedCommit | `9dfb48b7bd4dfca7a051e8d41c0350bdfab87301` |
-| testedTree | `8bbd5012c8b853ee2515250c0120a316dde02626` |
-| testedBranch | `fix/pandamstyle-consolidation-2026-09` |
-| workingTree | `clean` (recorded in `env.json` by the runner, before the evidence directory existed) |
-| base commit | `e5ff62b4a925405dcf9fb415faa00df4b68aeaa9` — the remote head of `feat/pandamstyle-native-compiler`, i.e. the branch point |
+| **tested commit** | `83371af8e64e7b87553cee75f1e8aff90794e3c6` |
+| **tested tree** | `5246e29d4c4d36618e1a7d6546c3839fe202f184` |
+| **tested branch** | `fix/pandamstyle-consolidation-2026-09` |
+| **working tree at start** | `clean` — measured by the runner **before** it created anything |
+| **delivered head** | the one commit that follows the tested commit; it contains only `evidence/consolidation-2026-09/**` |
+| **batch base ref** | `feat/pandamstyle-native-compiler` (`PMS_BATCH_BASE_REF`) |
+| **batch base** | `e5ff62b4a925405dcf9fb415faa00df4b68aeaa9` = `git merge-base HEAD feat/pandamstyle-native-compiler` |
 | StyleX fork merge base | `fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2` (`git merge-base HEAD upstream/main`) |
 | Panda donor | no Git metadata in this checkout; the pinned SHA lives in `docs/pandamstyle-specification-v0.1/specs/01-ARCHITECTURE.md` |
 | Node | `v22.23.2` (the major pinned by `.nvmrc`) |
@@ -20,32 +26,60 @@ bypass and two secondary defects are closed. **P0 is not complete**; see
 | npm | `10.9.8` |
 | lockfile | `yarn.lock`, sha256 `6e6fb0735f5222f98f03cee369401cd91b239d2f5f661582c9dd02d495507179` |
 
-Commits on this branch, both on top of the base:
+The run directory was verified empty of pending changes immediately before the
+run:
 
 ```
+$ git status --porcelain
+$ PMS_OUT_DIR="$PWD/evidence/consolidation-2026-09" ./verify-pms.sh
+…
+  working tree   : clean (as found, before this run wrote anything)
+VERIFICATION OK
+```
+
+`env.json` and `summary.json` both record `workingTree: "clean"`, and
+`env.json` also records `gitWorkTree: true`, so the claim is "a clean Git work
+tree was measured", not "nothing could be observed".
+
+> **Correction to the previous revision of this report.** The previous text read
+> `workingTree | clean (recorded in env.json by the runner, before the evidence
+> directory existed)`. That was false. `env.json` recorded `"dirty"`, and the
+> runner was the reason: it created the run directory and truncated the tracked
+> `run.log` *before* running `git status --porcelain`, then reported the state it
+> had caused itself. Both defects are fixed here and proven by
+> [the runner's own tests](#7-the-runner-no-longer-reports-its-own-writes);
+> see criterion 10 and 11.
+
+Commits on this branch, all on top of the base:
+
+```
+83371af8 [pandamstyle] Measure the tree before the run writes, and derive the batch base from a merge base
+976c82f5 [pandamstyle] State the tested-commit vs delivered-head difference in the report
+fd00bae3 [pandamstyle] Record the consolidation batch evidence
 9dfb48b7 [pandamstyle] Refuse a bundler build that cannot publish, and collect evidence facts
 131ea132 [pandamstyle] Consolidate the native compiler: provenance, bindings, coverage, publication
 ```
 
 ### Tested commit vs delivered branch head — they differ, and only in this report
 
-The tested commit is `9dfb48b7…`. The delivered branch head is one commit
-ahead of it, and that commit contains **only this evidence directory**:
+The tested commit is `83371af8…`. The delivered branch head is one commit ahead
+of it, and that commit contains **only this evidence directory**:
 
 ```
-$ git diff --name-only 9dfb48b7..HEAD -- packages/ tools/ verify-pms.sh .gitignore | wc -l
+$ git diff --name-only 83371af8..HEAD -- packages/ tools/ verify-pms.sh .gitignore | wc -l
 0
 ```
 
 No compiler source, no test, no tool, no script and no fixture differs between
 the tested commit and the delivered head. The full file list of that one commit
 is `evidence/consolidation-2026-09/**`. A reader who needs the tested tree
-byte-for-byte should check out `9dfb48b7bd4dfca7a051e8d41c0350bdfab87301`
-(tree `8bbd5012c8b853ee2515250c0120a316dde02626`); a reader who wants the code
+byte-for-byte should check out `83371af8e64e7b87553cee75f1e8aff90794e3c6`
+(tree `5246e29d4c4d36618e1a7d6546c3839fe202f184`); a reader who wants the code
 plus its evidence should take the branch head.
 
-66 files changed, 4800 insertions(+), 348 deletions(-). Two new compiler
-modules (`pandamstyle/provenance.js`, `pandamstyle/generation.js`), five new test
+Relative to the base, the tested commit is 66 files / 5202 insertions / 371
+deletions outside this evidence directory. Two new compiler modules
+(`pandamstyle/provenance.js`, `pandamstyle/generation.js`), five new test
 files, 15 new negative fixture projects, two new files in the valid fixture.
 
 ## Commands and real exit codes
@@ -59,7 +93,7 @@ There is no `|| true` and no output filtering.
 | build | `rollup -c` for stylex (cjs+esm), babel-plugin, `@pandamstyle/compiler`; `babel src --out-dir lib` for style-value-parser and shared | 0 | passed |
 | upstream-babel-plugin | `jest --ci --testPathIgnorePatterns '/__tests__/pandamstyle/'` | 0 | **1007 passed**, 64 skipped, 1071 total, 887 snapshots |
 | upstream-stylex | `BABEL_ENV=test jest --ci` | 0 | **99 passed**, 74 snapshots |
-| pandamstyle | `jest --ci '__tests__/pandamstyle/.*-test.js'` | 0 | **253 passed** (was 111) |
+| pandamstyle | `jest --ci '__tests__/pandamstyle/.*-test.js'` | 0 | **268 passed** (was 253; the 15 new ones are runner tests) |
 | pilot | `tools/pilot/run-pilot.sh` | 0 | PILOT OK |
 | artifacts | artifact collection + sha256 of every file | 0 | passed |
 
@@ -76,11 +110,15 @@ build CLI once per fixture:
 
 ## Test counts, before and after
 
-| suite | base `e5ff62b4` | tested `9dfb48b7` |
+| suite | base `e5ff62b4` | tested `83371af8` |
 |---|---|---|
 | `@stylexjs/babel-plugin` upstream | 1007 passed / 64 skipped | **1007 passed / 64 skipped** (unchanged) |
 | `@stylexjs/stylex` upstream | 99 passed | **99 passed** (unchanged) |
-| PandamStyle | 111 passed | **253 passed** |
+| PandamStyle | 111 passed | **268 passed** |
+
+The PandamStyle figure moved from 253 to 268 because this batch adds 15 runner
+tests. No compiler behaviour was touched to obtain it: the two fixes in this
+revision are confined to `verify-pms.sh` and its test.
 
 No upstream regression is hidden: both upstream counts are byte-identical to the
 baseline, and the PandamStyle suite is excluded from the upstream run by
@@ -99,6 +137,8 @@ baseline, and the PandamStyle suite is excluded from the upstream run by
 | 7 | an unexecuted runner step appears as `skipped` / `not_run`, never `passed` | demonstrated | `verify-pms.sh`, `runner-status-test.js` |
 | 8 | the upstream suites stay green | demonstrated | `summary.json` |
 | 9 | every regression case goes through the real compile/build process | demonstrated | `regression-cases.json`, `vite-build-test.js` |
+| 10 | the reported working tree is the state found **before** the run wrote anything | demonstrated | `verify-pms.sh`, `runner-status-test.js` — [below](#7-the-runner-no-longer-reports-its-own-writes) |
+| 11 | the batch base is a Git relation, never `HEAD~N` | demonstrated | `verify-pms.sh`, `runner-status-test.js` — [below](#the-batch-base-is-a-relation-not-a-commit-count) |
 
 ### Limit on criterion 4
 
@@ -293,6 +333,79 @@ Now:
 paying for an install, a build, four suites and a pilot. A filtered-out step is
 `skipped` with a reason that distinguishes it from a `PMS_SKIP_*` skip.
 
+### 7. The runner no longer reports its own writes
+
+The runner used to create the run directory, truncate `run.log`, and only then
+run `git status --porcelain`. Since `run.log` is a **tracked** file, truncating
+it makes the checkout dirty, and `.gitignore` does not apply to tracked files —
+so the runner manufactured the very state it was about to report. The recorded
+run was honest about the value and wrong about the cause:
+
+```json
+"workingTree": "dirty"
+```
+
+The order is now the contract: resolve the repository, capture commit, tree,
+branch, status and batch base, and only **then** create the run directory. The
+out-of-repository guard was kept and is now applied twice — to the requested
+path before any directory exists, and again to the canonical path.
+
+Two things follow:
+
+- a clean checkout records `clean` in `env.json` and `summary.json`;
+- a checkout that is genuinely dirty before the run still records `dirty`.
+
+Outside a Git work tree nothing was measured, so the runner now records
+`"unknown (not a git work tree)"` and `"gitWorkTree": false` rather than
+claiming `clean` about a state it never observed.
+
+### The batch base is a relation, not a commit count
+
+`pandamstyleBatchBase` came from `git rev-parse HEAD~4`. A commit count is not a
+contract: the value is only right while the batch stays exactly that long. The
+evidence committed in `fd00bae3` was generated at `9dfb48b7`, where `HEAD~4`
+resolved to `38b2e459` — three commits before the real base. The report still
+named the right base, so the number and the prose disagreed.
+
+The base is now the merge base with the source branch:
+
+```
+$ git merge-base HEAD feat/pandamstyle-native-compiler
+e5ff62b4a925405dcf9fb415faa00df4b68aeaa9
+```
+
+`PMS_BATCH_BASE_REF` selects the ref (default
+`feat/pandamstyle-native-compiler`); the ref actually used is recorded next to
+the SHA in both `env.json` and `summary.json`, so a reader can re-derive the
+value. The ref is resolved against the local branch first, then
+`refs/remotes/origin/<ref>`, and it is verified with
+`git rev-parse --verify <ref>^{commit}` before use. If the ref does not exist, or
+if the two tips share no common ancestor, the runner **exits 2 and writes no
+evidence at all**. There is no fallback to an arbitrary parent: a run that
+cannot prove its base leaves nothing behind rather than a plausible SHA.
+
+## What the runner tests prove
+
+`runner-status-test.js` runs the real script against a throwaway Git repository
+built for the purpose, because both properties are about the state the runner
+*finds* — a checkout in which the state is not controlled cannot test them. The
+fixture commits every file, including its `evidence/run.log`, because an
+untracked run directory is invisible to `git status` until real files land in it
+and would hide the very defect under test.
+
+The tests were checked against the code they replace, by re-introducing each
+defect and confirming the suite fails:
+
+| re-introduced defect | result |
+|---|---|
+| measure the tree after truncating `run.log` (the original order) | **3 tests fail** — the two `clean` assertions and the no-evidence assertion |
+| derive the base with `rev-parse HEAD~4` | **4 tests fail** — the merge-base, fork-point, ancestor and stability assertions |
+
+The stability test is the one that matters for the batch base: it runs the
+runner, adds two more commits, runs it again, and requires the same base. A
+`HEAD~N` implementation shifts under that, whichever `N` is chosen; a merge base
+does not.
+
 ## New regression cases
 
 All 26 rows below come from `regression-cases.json`, generated by spawning the
@@ -432,18 +545,25 @@ from the named `wide` condition, and rule values expressed as
    This is the safe direction, but it means an admitted value cannot be passed
    through an ordinary application helper without a diagnostic. That is a
    deliberate cost of not being able to prove absence of mutation.
-6. `evidence/consolidation-2026-09/side-effect-artifacts-test/` is not part of
-   this batch's story. `artifacts-test.js` honours `PMS_OUT_DIR`, so the
-   historical demo artifacts were regenerated into the run directory. They were
-   moved aside rather than deleted, and `evidence/demo/` is untouched.
+6. `evidence/consolidation-2026-09/side-effect-artifacts-test/` is not produced
+   by `./verify-pms.sh`. `artifacts-test.js` honours `PMS_OUT_DIR`, so running
+   it with `PMS_OUT_DIR=…/side-effect-artifacts-test` regenerates those six
+   files; that is how the copy in this directory was produced, at the tested
+   commit. For the same reason the `pandamstyle` step also wrote
+   `styles.css`, `manifest.json`, `diagnostics-17px.json`, `page.example.json`,
+   `demo.html` and `build-report.json` at the top of the run directory — those
+   are run output, not curated evidence, and they are byte-identical to the
+   historical `evidence/demo/` set. `evidence/demo/` itself is untouched.
 
 ## Verdict
 
-> Native compiler consolidation demonstrated on the tested scope.
+> Native compiler consolidation batch closed on the tested scope.
 
 **P0 is not complete.** The four bypass classes and both secondary defects named
 in the brief are closed on the tested scope, with every build guarantee proven
 through a real compile or build process, and the upstream suites unchanged. The
-P0 items listed under Limitations were not executed and are not claimed.
+two evidence-integrity defects of the runner are closed too, and the evidence in
+this directory is attached to the exact commit that was tested. The P0 items
+listed under Limitations were not executed and are not claimed.
 
 No merge and no publication was performed.
