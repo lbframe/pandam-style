@@ -77,8 +77,7 @@
   "lint-staged": {
     "**/*.js": [
       "prettier --write",
-      "git update-index --again",
-      "npm run lint"
+      "eslint --fix"
     ]
   },
   "resolutions": {

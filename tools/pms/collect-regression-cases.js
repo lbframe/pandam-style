@@ -40,36 +40,166 @@ const BUILD_BIN = path.join(
 /** criterion -> fixture, grouped by the batch criterion it demonstrates. */
 const CASES = [
   // BC-1  props() admits no raw CSS
-  ['BC-1', 'neg-props-raw-object', 'PMS_UNVERIFIED_PROPS_SOURCE', 'object literal: padding, color, multi-property'],
-  ['BC-1', 'neg-props-raw-reference', 'PMS_UNVERIFIED_PROPS_SOURCE', 'arbitrary local object, and a spread of it'],
+  [
+    'BC-1',
+    'neg-props-raw-object',
+    'PMS_UNVERIFIED_PROPS_SOURCE',
+    'object literal: padding, color, multi-property',
+  ],
+  [
+    'BC-1',
+    'neg-props-raw-reference',
+    'PMS_UNVERIFIED_PROPS_SOURCE',
+    'arbitrary local object, and a spread of it',
+  ],
   // BC-2  provenance is bound to a real Babel binding
-  ['BC-2', 'neg-props-shadowing', 'PMS_UNVERIFIED_JSX_SPREAD', 'parameter shadowing a module-level props() result'],
-  ['BC-2', 'neg-props-reassigned', 'PMS_UNVERIFIED_JSX_SPREAD', 'props() result then reassigned'],
-  ['BC-2', 'neg-props-mutated', 'PMS_UNVERIFIED_PROVENANCE', 'member written to after the value was proven'],
-  ['BC-2', 'neg-props-escaped', 'PMS_UNVERIFIED_PROVENANCE', 'value passed to an unknown call and to Object.assign'],
-  ['BC-2', 'neg-helper-shadowed', 'PMS_UNVERIFIED_JSX_SPREAD', 'alias of the helper, and a nested shadow of it'],
+  [
+    'BC-2',
+    'neg-props-shadowing',
+    'PMS_UNVERIFIED_JSX_SPREAD',
+    'parameter shadowing a module-level props() result',
+  ],
+  [
+    'BC-2',
+    'neg-props-reassigned',
+    'PMS_UNVERIFIED_JSX_SPREAD',
+    'props() result then reassigned',
+  ],
+  [
+    'BC-2',
+    'neg-props-mutated',
+    'PMS_UNVERIFIED_PROVENANCE',
+    'member written to after the value was proven',
+  ],
+  [
+    'BC-2',
+    'neg-props-escaped',
+    'PMS_UNVERIFIED_PROVENANCE',
+    'value passed to an unknown call and to Object.assign',
+  ],
+  [
+    'BC-2',
+    'neg-helper-shadowed',
+    'PMS_UNVERIFIED_JSX_SPREAD',
+    'alias of the helper, and a nested shadow of it',
+  ],
   // BC-3  the coverage graph is the real local module graph
-  ['BC-3', 'neg-relay-reexport-star', 'PMS_FORBIDDEN_STYLE_CHANNEL', 'module outside every root, via `export *`'],
-  ['BC-3', 'neg-relay-reexport-named', 'PMS_FORBIDDEN_STYLE_CHANNEL', 'module outside every root, via a named re-export'],
-  ['BC-3', 'neg-relay-barrel-chain', 'PMS_FORBIDDEN_STYLE_CHANNEL', 'two barrels deep, both outside every root'],
-  ['BC-3', 'neg-stylesheet-via-relay', 'PMS_FORBIDDEN_STYLE_CHANNEL', 'unapproved stylesheet reached only through a relay'],
-  ['BC-3', 'neg-dynamic-import', 'PMS_COVERAGE_GAP', 'dynamic request that is not a static string'],
-  ['BC-3', 'neg-dynamic-import-local', 'PMS_FORBIDDEN_STYLE_CHANNEL', 'literal dynamic import: a normal local edge, analysed'],
-  ['BC-3', 'neg-unresolved-import', 'PMS_COVERAGE_GAP', 'local import that resolves to nothing'],
+  [
+    'BC-3',
+    'neg-relay-reexport-star',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    'module outside every root, via `export *`',
+  ],
+  [
+    'BC-3',
+    'neg-relay-reexport-named',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    'module outside every root, via a named re-export',
+  ],
+  [
+    'BC-3',
+    'neg-relay-barrel-chain',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    'two barrels deep, both outside every root',
+  ],
+  [
+    'BC-3',
+    'neg-stylesheet-via-relay',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    'unapproved stylesheet reached only through a relay',
+  ],
+  [
+    'BC-3',
+    'neg-dynamic-import',
+    'PMS_COVERAGE_GAP',
+    'dynamic request that is not a static string',
+  ],
+  [
+    'BC-3',
+    'neg-dynamic-import-local',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    'literal dynamic import: a normal local edge, analysed',
+  ],
+  [
+    'BC-3',
+    'neg-unresolved-import',
+    'PMS_COVERAGE_GAP',
+    'local import that resolves to nothing',
+  ],
   // BC-6  authority is a build concern
-  ['BC-6', 'neg-reserved-authority', 'PMS_ROLE_VIOLATION', 'reserved __pms* field in ordinary data'],
-  ['BC-6', 'neg-role-violation', 'PMS_ROLE_VIOLATION', 'authority field inside a recognized PandamStyle call'],
+  [
+    'BC-6',
+    'neg-reserved-authority',
+    'PMS_ROLE_VIOLATION',
+    'reserved __pms* field in ordinary data',
+  ],
+  [
+    'BC-6',
+    'neg-role-violation',
+    'PMS_ROLE_VIOLATION',
+    'authority field inside a recognized PandamStyle call',
+  ],
   // Pre-existing cases, kept so the table shows no regression
-  ['AC-011', 'neg-forbidden-value', 'PMS_FORBIDDEN_VALUE', 'raw 17px, forged var(), forged ref, alias, computed key, spread'],
-  ['AC-012', 'neg-unknown-token', 'PMS_UNKNOWN_TOKEN', 'token absent from the registry'],
-  ['AC-020', 'neg-private-token', 'PMS_TOKEN_NOT_PUBLIC', 'private primitive from a consumer page'],
-  ['AC-015', 'neg-composite-form', 'PMS_UNSUPPORTED_PROPERTY_FORM', 'composite border shorthand'],
-  ['AC-051', 'neg-forbidden-import', 'PMS_FORBIDDEN_IMPORT', 'engine entries and the atoms path'],
-  ['AC-054', 'neg-style-channel', 'PMS_FORBIDDEN_STYLE_CHANNEL', 'inline style attribute and local stylesheet'],
-  ['AC-054', 'neg-jsx-spread', 'PMS_UNVERIFIED_JSX_SPREAD', 'JSX spread not provably free of style/className'],
-  ['AC-039', 'neg-invalid-variant', 'PMS_INVALID_VARIANT_VALUE', 'literal invalid variant refused at build'],
-  ['AC-023', 'neg-non-static', 'PMS_NON_STATIC_VALUE', 'a local helper named token gains no trust'],
-  ['AC-017', 'neg-forbidden-value-ts', 'PMS_FORBIDDEN_VALUE', 'same error in TSX, no tsc involved'],
+  [
+    'AC-011',
+    'neg-forbidden-value',
+    'PMS_FORBIDDEN_VALUE',
+    'raw 17px, forged var(), forged ref, alias, computed key, spread',
+  ],
+  [
+    'AC-012',
+    'neg-unknown-token',
+    'PMS_UNKNOWN_TOKEN',
+    'token absent from the registry',
+  ],
+  [
+    'AC-020',
+    'neg-private-token',
+    'PMS_TOKEN_NOT_PUBLIC',
+    'private primitive from a consumer page',
+  ],
+  [
+    'AC-015',
+    'neg-composite-form',
+    'PMS_UNSUPPORTED_PROPERTY_FORM',
+    'composite border shorthand',
+  ],
+  [
+    'AC-051',
+    'neg-forbidden-import',
+    'PMS_FORBIDDEN_IMPORT',
+    'engine entries and the atoms path',
+  ],
+  [
+    'AC-054',
+    'neg-style-channel',
+    'PMS_FORBIDDEN_STYLE_CHANNEL',
+    'inline style attribute and local stylesheet',
+  ],
+  [
+    'AC-054',
+    'neg-jsx-spread',
+    'PMS_UNVERIFIED_JSX_SPREAD',
+    'JSX spread not provably free of style/className',
+  ],
+  [
+    'AC-039',
+    'neg-invalid-variant',
+    'PMS_INVALID_VARIANT_VALUE',
+    'literal invalid variant refused at build',
+  ],
+  [
+    'AC-023',
+    'neg-non-static',
+    'PMS_NON_STATIC_VALUE',
+    'a local helper named token gains no trust',
+  ],
+  [
+    'AC-017',
+    'neg-forbidden-value-ts',
+    'PMS_FORBIDDEN_VALUE',
+    'same error in TSX, no tsc involved',
+  ],
 ];
 
 const POSITIVE = ['valid'];
@@ -101,7 +231,8 @@ function runBuild(projectDir) {
   for (const line of stderr.split('\n')) {
     if (!line.startsWith('PMS_JSON:')) continue;
     try {
-      diagnostics = JSON.parse(line.slice('PMS_JSON:'.length)).diagnostics ?? [];
+      diagnostics =
+        JSON.parse(line.slice('PMS_JSON:'.length)).diagnostics ?? [];
     } catch {
       diagnostics = [];
     }

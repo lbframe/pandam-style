@@ -108,12 +108,7 @@ export default [
   {
     // Bundler adapter for Vite/Rollup.
     input: `${PANDAMSTYLE}/vite.js`,
-    external: [
-      ...external,
-      'vite',
-      'rollup',
-      '@rollup/pluginutils',
-    ],
+    external: [...external, 'vite', 'rollup', '@rollup/pluginutils'],
     output: [{ file: './lib/vite.js', format: 'cjs', exports: 'named' }],
     plugins: plugins(),
   },

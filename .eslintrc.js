@@ -33,11 +33,20 @@ module.exports = {
   ignorePatterns: [
     // PandamStyle fixture projects stand in for third-party application code,
     // so they deliberately do not carry this repository's copyright header.
+    // This covers each fixture's build output too (fixtures/*/generated/).
     'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures',
     // Vendored third-party donors are not linted with this repository's config.
     'upstream/panda',
-    // Regenerable run output is not source.
-    'evidence/native',
+    // PandamStyle regenerable run output is not source. These are the run
+    // directories described in .gitignore. Only the rebuildable outputs are
+    // skipped: the run directory itself keeps its durable evidence (REPORT.md,
+    // env.json, summary.json, manifest.json, artifact-digests.txt, steps.tsv
+    // and the per-step logs), and only the heavy artifacts below it do not.
+    // The patterns are per-directory, so a run that does not exist yet is
+    // treated exactly like one that does.
+    'out-pandamstyle/',
+    'evidence/*/artifacts/',
+    'evidence/*/pilot/',
     'build',
     'coverage',
     'dist',
