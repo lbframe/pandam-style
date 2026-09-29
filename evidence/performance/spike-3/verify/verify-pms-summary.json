@@ -1,0 +1,101 @@
+{
+  "documentKind": "pandamstyle-run-summary",
+  "testedCommit": "18618117f8cdcbb1aa21e4b1fcfa8cab981a642d",
+  "testedTree": "f3d623b8db64042176eff14bfcb302f23e4ae7d8",
+  "workingTree": "dirty",
+  "pandamstyleBatchBaseRef": "refs/remotes/origin/feat/pandamstyle-native-compiler",
+  "pandamstyleBatchBase": "e5ff62b4a925405dcf9fb415faa00df4b68aeaa9",
+  "outDir": "/home/kyle/work/pandam-style/evidence/native",
+  "toolchain": {
+    "node": "v22.22.0",
+    "yarn": "1.22.22",
+    "npm": "11.11.1"
+  },
+  "complete": true,
+  "skippedSteps": [],
+  "failedSteps": [],
+  "steps": {
+    "install": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null
+    },
+    "build": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null
+    },
+    "upstream-babel-plugin": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 1007,
+          "total": 1071,
+          "skipped": 64
+        },
+        "suites": {
+          "passed": 42,
+          "total": 43,
+          "skipped": 1
+        }
+      }
+    },
+    "upstream-stylex": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 99,
+          "total": 99,
+          "skipped": null
+        },
+        "suites": {
+          "passed": 4,
+          "total": 4,
+          "skipped": null
+        }
+      }
+    },
+    "pandamstyle": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 333,
+          "total": 333,
+          "skipped": null
+        },
+        "suites": {
+          "passed": 14,
+          "total": 14,
+          "skipped": null
+        }
+      }
+    },
+    "pilot": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null
+    },
+    "artifacts": {
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null
+    }
+  }
+}

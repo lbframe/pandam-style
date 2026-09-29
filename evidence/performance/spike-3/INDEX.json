@@ -1,0 +1,201 @@
+{
+ "documentKind": "pandamstyle-performance-evidence-index",
+ "batch": "spike-3",
+ "title": "Incremental publication and incremental CSS aggregation",
+ "branch": "perf/pandamstyle-spike-3-publication-css-2026-09",
+ "base": "f01bdb953990270d1a08f846e15480a8f7102592",
+ "head": "18618117f8cdcbb1aa21e4b1fcfa8cab981a642d",
+ "tree": "f3d623b8db64042176eff14bfcb302f23e4ae7d8",
+ "commits": {
+  "phase-a-incremental-publication": "395e160e0fcab3a2923aa6fc26cb5d8ccf8d70eb",
+  "phase-b-incremental-css-aggregation": "a279d3ebecf919d79a70f8e959ad187e714865f4",
+  "phase-c-combined-and-evidence": "18618117f8cdcbb1aa21e4b1fcfa8cab981a642d"
+ },
+ "acceptance": {
+  "verified": "VERIFICATION OK, 8/8 steps, no skips",
+  "testedCommit": "18618117f8cdcbb1aa21e4b1fcfa8cab981a642d",
+  "testedTree": "f3d623b8db64042176eff14bfcb302f23e4ae7d8",
+  "pandamstyleTestsPassed": 333,
+  "pandamstyleTestsBaseline": 283,
+  "upstreamBabelPluginPassed": 1007,
+  "upstreamBabelPluginSkipped": 64,
+  "upstreamStylexPassed": 99,
+  "benchmarkHarnessTestsPassed": 34
+ },
+ "headline": {
+  "c1000": {
+   "corpus": "c1000-t1000-r100-s809",
+   "oneFileEditRevisionMs": {
+    "session_full_publish": 360.21,
+    "session_incremental_publish": 116.4,
+    "session_incremental_publish_css": 93.35
+   },
+   "oneFileEditOutputFilesWritten": {
+    "session_full_publish": 1006,
+    "session_incremental_publish_css": 2
+   },
+   "oneFileEditCssMs": {
+    "full": 26.66,
+    "incremental": 0.25
+   }
+  },
+  "c10000": {
+   "corpus": "c10000-t1000-r100-s307",
+   "oneFileEditRevisionMs": {
+    "session_full_publish": 3100.1,
+    "session_incremental_publish": 935.57,
+    "session_incremental_publish_css": 739.06
+   },
+   "oneFileEditOutputFilesWritten": {
+    "session_full_publish": 10006,
+    "session_incremental_publish_css": 2
+   },
+   "oneFileEditOutputFilesReused": 10004,
+   "oneFileEditBytesWritten": {
+    "session_full_publish": 15094204,
+    "session_incremental_publish_css": 6241028
+   },
+   "oneFileEditCssMs": {
+    "full": 210.92,
+    "incremental": 1.02
+   }
+  }
+ },
+ "oracle": {
+  "session_full_publish": "equivalent",
+  "session_incremental_publish": "equivalent",
+  "session_incremental_publish_css": "equivalent"
+ },
+ "campaigns": {
+  "c1000": {
+   "jobs_total": 144,
+   "jobs_ok": 144,
+   "jobs_error": 0,
+   "jobs_timeout": 0,
+   "wall_seconds": 649.161
+  },
+  "c10000": {
+   "jobs_total": 72,
+   "jobs_ok": 72,
+   "jobs_error": 0,
+   "jobs_timeout": 0,
+   "wall_seconds": 2582.054
+  }
+ },
+ "retention": {
+  "revisions": 1000,
+  "variant": "session_incremental_publish_css",
+  "cssRuleRecords": {
+   "first": 326,
+   "last": 326
+  },
+  "cssOwnerMemberships": {
+   "first": 4096,
+   "last": 4097
+  },
+  "fileStates": {
+   "first": 1003,
+   "last": 1004
+  },
+  "heapGrowthBytes": 60600000,
+  "heapGrowthIsPreExisting": true,
+  "spike2HeapGrowthBytes": 54600000
+ },
+ "durableEvidence": {
+  "spike-3/REPORT.md": {
+   "sha256": "3ceb87b06e3b57a6f97b2dde832d028a17a8416cbf163d864d6d763dd95e60e9",
+   "bytes": 34962
+  },
+  "spike-3/VERIFICATION.md": {
+   "sha256": "ed758ed4dbdc71f161500ed80eccc68f3adcafb4be73ad78d7653df759cbd1a1",
+   "bytes": 4552
+  },
+  "spike-3/memory/long-session-1000-css-variant.json": {
+   "sha256": "d91a7e3e9f4375042531b04fdae2709ec995e4cb1d5f718f19035d59b8070a16",
+   "bytes": 62206
+  },
+  "spike-3/memory/spike2-long-session-baseline.json": {
+   "sha256": "392cdba726487fcad3bd3d162046836f26fc87d2351dd3028a446dcd5456646c",
+   "bytes": 51713
+  },
+  "spike-3/verify/verify-pms-summary.json": {
+   "sha256": "e2933af263059bbfcb1e4b28b5451dcabe387183c8cb2d2e5f8520573222bd6f",
+   "bytes": 2231
+  },
+  "spike-3/verify/verify-pms.log": {
+   "sha256": "2f7bde289c0146e4020961efad58ff79dc429d32ce4371dee6228593520fc3ac",
+   "bytes": 1137
+  },
+  "spike-3/correctness/oracle-session_full_publish.json": {
+   "sha256": "4f32ff8c29cea1e97b646e90d552d88643f97f9637cddb9113eb28963d8fe413",
+   "bytes": 41502
+  },
+  "spike-3/correctness/oracle-session_incremental_publish.json": {
+   "sha256": "4cfab7acc8eeaf3c9ae3420b32d2bb279e879905d4d198b3007cef9cf0c6f917",
+   "bytes": 41516
+  },
+  "spike-3/correctness/oracle-session_incremental_publish_css.json": {
+   "sha256": "82f21291d73300f23788db7ec2009df048d78e7bbb2c1cb82ac35b3efea63f55",
+   "bytes": 41524
+  },
+  "spike-3/campaigns/c1000-all-variants-summary.json": {
+   "sha256": "a942718609f771c76e1b3df88d36347045bd25741921c24ccf8f61580a02272f",
+   "bytes": 75113
+  },
+  "spike-3/campaigns/c1000-campaign-metadata.json": {
+   "sha256": "636290afaf53a827fb9f4b68672e1dd5247fd59a0f48a366b51c5523e90d257a",
+   "bytes": 131801
+  },
+  "spike-3/campaigns/c10000-all-variants-summary.json": {
+   "sha256": "0a8cf2bee534f62e8ef37fa288553067b89828232ccb53ceeeb73d14ab7ea041",
+   "bytes": 51403
+  },
+  "spike-3/campaigns/c10000-campaign-metadata.json": {
+   "sha256": "5d4539eb2630d4cd85a165bb4259a842738bef38dae78604f32dd691aa732d3b",
+   "bytes": 68705
+  },
+  "spike-3/corpora/c10000-capacity-and-scenario-plan.md": {
+   "sha256": "fb0cf092ad56718a00dd2c00362c40708ffcf91c5d7efaf70bec86b4ef151ee6",
+   "bytes": 1646
+  }
+ },
+ "rawScratch": {
+  "path": ".pms-bench/qualification/spike3",
+  "durability": "ignored-local-scratch, NOT DURABLE, not an archive",
+  "totalBytes": 6419351,
+  "files": {
+   "c10000-plan.md": {
+    "sha256": "fb0cf092ad56718a00dd2c00362c40708ffcf91c5d7efaf70bec86b4ef151ee6",
+    "bytes": 1646
+   },
+   "campaign-c1000-all-variants.json": {
+    "sha256": "316c72d51d20f5adcc51885737fe33ce8f9387b8ea4585e0adc1f20974f8bb3f",
+    "bytes": 6082991
+   },
+   "campaign-c1000-all-variants.json-metadata.json": {
+    "sha256": "636290afaf53a827fb9f4b68672e1dd5247fd59a0f48a366b51c5523e90d257a",
+    "bytes": 131801
+   },
+   "long-session-1000-css.json": {
+    "sha256": "d91a7e3e9f4375042531b04fdae2709ec995e4cb1d5f718f19035d59b8070a16",
+    "bytes": 62206
+   },
+   "oracle-session_full_publish.json": {
+    "sha256": "4f32ff8c29cea1e97b646e90d552d88643f97f9637cddb9113eb28963d8fe413",
+    "bytes": 41502
+   },
+   "oracle-session_incremental_publish.json": {
+    "sha256": "4cfab7acc8eeaf3c9ae3420b32d2bb279e879905d4d198b3007cef9cf0c6f917",
+    "bytes": 41516
+   },
+   "oracle-session_incremental_publish_css.json": {
+    "sha256": "82f21291d73300f23788db7ec2009df048d78e7bbb2c1cb82ac35b3efea63f55",
+    "bytes": 41524
+   },
+   "oracle-smoke-delta.json": {
+    "sha256": "4b86294fc2efb826f52964151b64d865bfb3ef3ba795df2de29115b602702a02",
+    "bytes": 16165
+   }
+  }
+ }
+}
