@@ -199,6 +199,35 @@ export function parseModuleFile(absolutePath) {
   return result;
 }
 
+/**
+ * The size of each module-level cache.
+ *
+ * These are process-wide and are NOT part of any session's state, so a long
+ * session's memory trace cannot attribute growth to them without this. Kept
+ * because the alternative is reporting "the heap grew" and not saying which of
+ * the compiler's own structures grew with it.
+ */
+export function moduleGraphCacheStats() {
+  const sizeOf = (map) => {
+    // The retained cost of a cache is its VALUES, not its key count: a module
+    // summary is a few hundred bytes of strings, a design system is not.
+    let bytes = 0;
+    for (const value of map.values()) {
+      try {
+        bytes += Buffer.byteLength(JSON.stringify(value) ?? '', 'utf8');
+      } catch {
+        bytes += 0;
+      }
+    }
+    return { entries: map.size, approxBytes: bytes };
+  };
+  return {
+    parseCache: sizeOf(parseCache),
+    resolutionCache: sizeOf(resolutionCache),
+    designSystemCache: sizeOf(designSystemCache),
+  };
+}
+
 /** Reset the cache (used between two builds inside one process). */
 export function clearModuleCache() {
   parseCache.clear();

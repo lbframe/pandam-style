@@ -84,6 +84,7 @@ const RESERVED = Object.freeze({
   // Publication sub-phases (Spike 3). `publish_ms` stays the aggregate, so the
   // Spike 2 series remains comparable; these say WHERE it went. The sub-phases
   // overlap `publish_ms` and must not be summed against it.
+  publish_io_ms: 0,
   publish_prepare_ms: 0,
   publish_materialize_ms: 0,
   publish_metadata_ms: 0,

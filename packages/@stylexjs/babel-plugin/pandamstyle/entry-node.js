@@ -38,6 +38,7 @@ export { Provenance, isAdmitted, provenanceOf } from './provenance';
 export { conformanceDefinition } from './conformance';
 export { PmsError, Codes, diagnostic, formatDiagnostic } from './diagnostics';
 export {
+  moduleGraphCacheStats,
   resolveDesignSystemModule,
   resolveRelativeFile,
   clearModuleCache,

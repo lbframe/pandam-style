@@ -112,10 +112,18 @@ function linkCompiler(projectDir) {
 
 const CAN_COLLECT = typeof global.gc === 'function';
 
-function sample(session, label, revision) {
+function sample(session, label, revision, compiler) {
   if (CAN_COLLECT) global.gc();
   const mem = process.memoryUsage();
   const stats = session.stats();
+  // The Phase B state, when this session has one. A long session that grows its
+  // rule records, its owner index or its owner SETS without bound is the failure
+  // this trace exists to catch, and none of it is visible in RSS.
+  const css = session.cssState?.() ?? null;
+  // The module graph's process-wide caches. Not session state, so they are the
+  // first place to look when a long session's heap grows and none of the
+  // session's own structures do.
+  const cacheStats = compiler?.moduleGraphCacheStats?.() ?? null;
   return {
     label,
     revision,
@@ -125,6 +133,27 @@ function sample(session, label, revision) {
     externalBytes: mem.external,
     collected: CAN_COLLECT,
     ...stats,
+    ...(cacheStats == null
+      ? {}
+      : {
+          parseCacheEntries: cacheStats.parseCache.entries,
+          parseCacheBytes: cacheStats.parseCache.approxBytes,
+          resolutionCacheEntries: cacheStats.resolutionCache.entries,
+          resolutionCacheBytes: cacheStats.resolutionCache.approxBytes,
+          designSystemCacheEntries: cacheStats.designSystemCache.entries,
+          designSystemCacheBytes: cacheStats.designSystemCache.approxBytes,
+        }),
+    ...(css == null
+      ? {}
+      : {
+          cssRuleRecords: css.stats.ruleRecords,
+          cssOwners: css.stats.ownerCount,
+          cssOwnerMemberships: Object.values(css.ownership).reduce(
+            (n, v) => n + v.length,
+            0,
+          ),
+          cssOrdered: css.orderedClassNames.length,
+        }),
   };
 }
 
@@ -157,6 +186,9 @@ async function main() {
     designSystemFile: config.designSystemFile,
     engineOptions: config.engineOptions,
     useCSSLayers: config.useCSSLayers === true,
+    // Which publication strategy this long session drives, and therefore
+    // whether it has a CSS state whose retention is part of the question.
+    publishVariant: args.variant ?? 'session_incremental_publish',
   });
 
   let definition = await loadDefinition();
@@ -207,9 +239,16 @@ async function main() {
   session.validate();
   session.compile();
   counters.published += 1;
-  samples.push(sample(session, 'cold', 1));
+  samples.push(sample(session, 'cold', 1, compiler));
+  // Sampled periodically, not only at the end: "the state is flat at revision
+  // 1000" and "the state is flat throughout" are different claims, and only the
+  // second one says a session does not grow without bound.
+  const SAMPLE_EVERY = Number(args['sample-every'] ?? 100);
 
   for (let i = 0; i < edits; i++) {
+    if (i > 0 && i % SAMPLE_EVERY === 0) {
+      samples.push(sample(session, `revision-${i}`, i + 1, compiler));
+    }
     const kind = i % 10;
     let label;
     let sessionChanges = {};
@@ -344,7 +383,7 @@ async function main() {
       });
     }
   }
-  samples.push(sample(session, 'warm-after-1000', edits + 1));
+  samples.push(sample(session, 'warm-after-1000', edits + 1, compiler));
   // A no-change revision at the end, sampled on its own: the number that says
   // what a session costs when nothing happened, after a thousand revisions.
   const t0 = nowNs();
@@ -352,13 +391,14 @@ async function main() {
   const finalValidation = session.validate();
   session.compile();
   const finalMs = (nowNs() - t0) / 1e6;
-  samples.push(sample(session, 'final-no-change', edits + 2));
+  samples.push(sample(session, 'final-no-change', edits + 2, compiler));
 
   const cold = samples[0];
   const warm = samples[samples.length - 1];
   const report = {
     documentKind: 'pandamstyle-long-session-memory-trace',
-    batch: 'spike-2',
+    batch: 'spike-3',
+    publishVariant: args.variant ?? 'session_incremental_publish',
     corpus: path.basename(corpusDir),
     corpusManifestHash: (() => {
       try {
@@ -382,6 +422,58 @@ async function main() {
       heapGrowthBytes: warm.heapUsedBytes - cold.heapUsedBytes,
       peakRssBytes: Math.max(...samples.map((s) => s.rssBytes)),
     },
+    // The retention question, stated as a first/last comparison rather than a
+    // growth rate: a session that churns for a thousand revisions must end with
+    // about the state it started with, and the trend is what says whether it
+    // does.
+    retention: (() => {
+      const first = samples[0];
+      const last = samples[samples.length - 1];
+      const mid = samples[Math.floor(samples.length / 2)];
+      const hasCss = first.cssRuleRecords != null;
+      return {
+        samples: samples.length,
+        rss: {
+          firstBytes: first.rssBytes,
+          midBytes: mid?.rssBytes ?? null,
+          lastBytes: last.rssBytes,
+          growthBytes: last.rssBytes - first.rssBytes,
+        },
+        heapUsed: {
+          firstBytes: first.heapUsedBytes,
+          midBytes: mid?.heapUsedBytes ?? null,
+          lastBytes: last.heapUsedBytes,
+          growthBytes: last.heapUsedBytes - first.heapUsedBytes,
+        },
+        fileStates: {
+          first: first.fileStates ?? null,
+          last: last.fileStates ?? null,
+        },
+        ...(hasCss
+          ? {
+              cssRuleRecords: {
+                first: first.cssRuleRecords,
+                mid: mid?.cssRuleRecords ?? null,
+                last: last.cssRuleRecords,
+              },
+              cssOwners: {
+                first: first.cssOwners,
+                mid: mid?.cssOwners ?? null,
+                last: last.cssOwners,
+              },
+              // The total number of (owner, rule) memberships. This is the one
+              // that can leak: dropping a file has to decrement the owners of
+              // every rule it held, and a missed decrement is invisible in the
+              // rule count.
+              cssOwnerMemberships: {
+                first: first.cssOwnerMemberships,
+                mid: mid?.cssOwnerMemberships ?? null,
+                last: last.cssOwnerMemberships,
+              },
+            }
+          : {}),
+      };
+    })(),
     structural: {
       coldFileStateCount: cold.fileStateCount,
       warmFileStateCount: warm.fileStateCount,

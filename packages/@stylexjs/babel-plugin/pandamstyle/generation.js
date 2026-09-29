@@ -364,8 +364,46 @@ export function beginGeneration(outDir, options = {}) {
   // the question Spike 2 could not answer because its aggregate excluded the
   // snapshot entirely.
   const openStart = perfNow();
-  const closeAggregate = () => addDuration('publish_ms', openStart);
+  // Two aggregates, because they answer different questions and only one of them
+  // is comparable with the Spike 2 series.
+  //
+  //   publish_ms     the whole transaction: everything from opening it to the
+  //                  commit. It includes whatever the CALLER does inside the
+  //                  callback, and the session generates the stylesheet there,
+  //                  so a variant that aggregates CSS in full carries that cost
+  //                  inside this number.
+  //   publish_io_ms  the transaction's own work: prepare, materialize, metadata,
+  //                  commit, cleanup. The caller's work is excluded, and this is
+  //                  the number comparable with Spike 2's `publish_ms`, which
+  //                  measured staging and commit only.
+  let ioStart = null;
+  let ioNs = 0;
+  const closeAggregate = () => {
+    const now = perfNow();
+    addDuration('publish_ms', openStart);
+    if (ioStart != null) {
+      ioNs += now - ioStart;
+      ioStart = null;
+    }
+    if (ioNs > 0) collectorDuration('publish_io_ms', ioNs);
+  };
+  const collectorDuration = (name, ns) => {
+    const c = perfCollector();
+    if (c != null) c.addDuration(name, ns);
+  };
+  const markIoEnd = () => {
+    if (ioStart == null) return;
+    ioNs += perfNow() - ioStart;
+    ioStart = null;
+  };
+  // An I/O segment is OPEN only while the transaction is doing its own work.
+  // Between two artifacts the caller is running - compiling, aggregating CSS -
+  // and that time is deliberately not this number's.
+  const markIoStart = () => {
+    ioStart = perfNow();
+  };
   const prepareStart = perfNow();
+  ioStart = prepareStart;
 
   fs.mkdirSync(path.dirname(absOut), { recursive: true });
 
@@ -411,6 +449,9 @@ export function beginGeneration(outDir, options = {}) {
   } else {
     if (hasStaging) rmrf(stagingDir);
   }
+  // The reconciliation above is real work this transaction did, so it counts
+  // towards the I/O aggregate; the segment that follows it is the caller's.
+  markIoEnd();
 
   // ---- the previous generation ---------------------------------------------
   const hadOutDir = isDir(absOut);
@@ -601,6 +642,7 @@ export function beginGeneration(outDir, options = {}) {
      */
     stage(rel, content, meta = {}) {
       ensureOpen();
+      markIoStart();
       const start = perfNow();
       const { size, kind, digest } = registerRecord(rel, content, meta);
       writeStaged(rel, content);
@@ -643,6 +685,7 @@ export function beginGeneration(outDir, options = {}) {
      */
     stageArtifact(rel, content, meta = {}) {
       ensureOpen();
+      markIoStart();
       const start = perfNow();
       const record = registerRecord(rel, content, meta);
       const previous = deltaActive ? previousRecords[rel] : null;
@@ -657,6 +700,7 @@ export function beginGeneration(outDir, options = {}) {
         addCount('output_files_reused', 1);
         addCount('output_bytes_reused', previous.size ?? record.size);
         addDuration('publish_materialize_ms', start);
+        markIoEnd();
         return { rel, reused: true, size: record.size };
       }
 
@@ -676,6 +720,7 @@ export function beginGeneration(outDir, options = {}) {
       addCount('write_calls', 1);
       addCount('written_bytes', record.size);
       addDuration('publish_materialize_ms', start);
+      markIoEnd();
       return { rel, reused: false, size: record.size };
     },
 
@@ -741,6 +786,8 @@ export function beginGeneration(outDir, options = {}) {
       addCount('output_files_removed', removed.length);
       addCount('output_bytes_deleted', bytesDeleted);
 
+      markIoEnd();
+      markIoStart();
       maybeFail('after-removals-computed');
 
       if (deltaActive) {
