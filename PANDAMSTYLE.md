@@ -11,6 +11,7 @@ vocabulary instead of reinventing micro-decisions.
 | `packages/@stylexjs/*` | StyleX fork code (upstream remote → facebook/stylex) |
 | `packages/@stylexjs/babel-plugin/pandamstyle/` | PandamStyle modules: registry, policy, compiler, recipe, plus the native Babel plugin, build pipeline, codegen and bundler adapter |
 | `packages/@pandamstyle/compiler/` | Installable package: the fork engine bundled with the PandamStyle modules. Exposes `.`, `./runtime`, `./vite` and the `pms-build` bin |
+| `benchmarks/pandamstyle/` | The benchmark laboratory: corpus generator, campaign runner, the engine-vs-engine oracle, the incremental-vs-fresh-rebuild oracle and the long-session memory trace |
 | `packages/@stylexjs/babel-plugin/__tests__/pandamstyle/` | Tests and fixture projects: one valid project (JS/TS/TSX) and 14 negative projects, each built by a real process |
 | `pilot/vite-react/` | Vite + React pilot application, installed from local `npm pack` tarballs |
 | `docs/pandamstyle-specification-v0.1/` | Specification v0.1 (architecture, P0 scope, acceptance, decisions) |
@@ -42,6 +43,53 @@ step; both are recorded in `summary.json` rather than hidden.
 Reference results: 1007 upstream babel-plugin tests (64 skipped, 887 snapshots),
 99 upstream stylex tests, 111 PandamStyle tests, plus a green pilot build. See
 `evidence/native/REPORT.md`.
+
+## Incremental compilation (project session)
+
+`buildProject` is a **full rebuild**: every covered file is read, parsed and
+compiled on every invocation. `@pandamstyle/compiler` also exports
+`createProjectSession`, a reusable session over one project that keeps the state
+a build produces — per-file compiled results, per-file rule contributions,
+per-file coverage certificates, the forward and reverse module graphs and the
+resolution state — and reuses it across revisions.
+
+```js
+const { createProjectSession } = require('@pandamstyle/compiler');
+
+const session = createProjectSession({ definition, roots, outDir });
+session.initialize();          // revision 1: the full analysis
+session.validate();            // the verdict for the active revision
+session.compile();             // transactional publication of that revision
+
+// later, in the same process:
+session.applyChanges({ addedFiles: [...], removedFiles: [...] });
+session.validate();
+session.compile();
+session.close();
+```
+
+The contract is exact equivalence:
+
+> `incremental(revision N) == fresh_full_rebuild(revision N)`
+
+for every externally meaningful compiler semantic — the same bytes, the same
+diagnostics with the same locations, the same coverage set, the same stylesheet
+in the same cascade-relevant order. Reuse is decided by a **validity key** per
+file (source content hash, role, compiler contract version, project semantic
+epoch, engine options, local edge resolutions, design-system view), never by
+path, never by mtime, and never by "the file is still there". A file's
+compiled result depends on its own source, on the design system, and on what
+its own module edges resolve to — not on the content of any other covered file,
+which is what makes reuse possible at all.
+
+A change the session cannot yet reason about locally — the design system, the
+policy, the roots, the compiler or resolution configuration — is an explicit,
+**counted** full fallback, and the reason is reported on the revision and in
+`build-report.json`. Publication stays transactional: a refused revision returns
+its diagnostics, publishes nothing, and leaves the previous generation current.
+
+The measurements, the oracle and the known limits are in
+`evidence/performance/spike-2/`.
 
 ## Status
 

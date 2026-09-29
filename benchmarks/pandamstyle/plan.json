@@ -1,20 +1,23 @@
 {
   "documentKind": "pandamstyle-benchmark-plan",
-  "planVersion": "1.1.0",
+  "planVersion": "1.2.0",
   "plan_version_note": [
     "1.0.0 -> 1.1.0 is a BINDING change, not a protocol change: the official",
     "baseline moved from the superseded SHA e5ff62b4a925405dcf9fb415faa00df4b68aeaa9",
     "to the hygiene baseline d5702374ac5a685499d14a53bf323d8533e6982d (tree 836a24ec...).",
-    "The version is bumped rather than the value silently edited, because a plan",
-    "that changes the thing its numbers are relative to has changed meaning.",
-    "No metric, unit, status or scenario name changed."
+    "1.1.0 -> 1.2.0 ADDS the Spike 2 incremental comparison and the revision",
+    "counters it needs, and adds the `file_rename` scenario. It renames nothing",
+    "and reinterprets nothing: `filesystem_to_diagnostics_ms` still means the",
+    "same interval, and every Spike 1 metric keeps its meaning. The new counters",
+    "are emitted only by the session engine, and only when a revision exists, so",
+    "no row is ever a fabricated zero for an engine with no such concept."
   ],
   "baseline_commit": "d5702374ac5a685499d14a53bf323d8533e6982d",
   "baseline_tree": "836a24ec91239e148547a9c686041a6f65fe0099",
   "superseded_baseline_commit": "e5ff62b4a925405dcf9fb415faa00df4b68aeaa9",
   "baseline_reason": "The older SHA predates native JS/TS/TSX compilation, binding-based provenance, props() provenance enforcement, complete local module coverage, transactional publication, the real Vite pilot, the evidence integrity fixes and the repository hygiene fixes. Benchmarking it as 'current' would measure a compiler that no longer exists.",
-  "batch": "spike-1",
-  "batch_scope": "Babel-only: instrument the current compiler, remove confirmed redundant work, measure again. No Rust, no Oxc, no SWC, no Salsa, no daemon.",
+  "batch": "spike-2",
+  "batch_scope": "Babel-only: keep the existing compiler, add a project session that reuses a file's compiled result while its validity key holds, and measure. No Oxc, no SWC, no Rust, no Salsa, no daemon, no new CSS backend.",
   "qualification_matrix": {
     "note": "The full 27-cell Cartesian product of the protocol. It is the qualification matrix, NOT a promise that all 27 ran. Cells not executed are reported as not_run.",
     "components": [
@@ -167,18 +170,39 @@
   },
   "engines": [
     {
-      "name": "babel_current",
+      "name": "babel_full",
       "status": "in_scope",
+      "anchor": "this branch, driven through buildProject",
+      "work_elimination": "off",
+      "rationale": "The existing full-rebuild semantics: every covered file is re-read, re-parsed and recompiled on every revision. It is the SEMANTICAL REFERENCE the incremental session is measured against, and it runs the SAME tree as the incremental engine so the difference cannot be a tree difference."
+    },
+    {
+      "name": "babel_incremental",
+      "status": "in_scope",
+      "anchor": "this branch, driven through createProjectSession",
+      "work_elimination": "off",
+      "rationale": "Adds project-session reuse and nothing else. PMS_WORK_ELIMINATED is not involved, so the measured difference is attributable to invalidation rather than to Spike 1 memoization."
+    },
+    {
+      "name": "babel_incremental_work_eliminated",
+      "status": "secondary",
+      "anchor": "this branch, session + PMS_WORK_ELIMINATED=1",
+      "work_elimination": "on",
+      "rationale": "The factorial variant. Reported separately and never as the headline, so the two sources of saving are never conflated."
+    },
+    {
+      "name": "babel_current",
+      "status": "spike-1-baseline",
       "anchor": "git worktree at baseline_commit, plus the inert measurement hooks",
       "work_elimination": "off",
-      "rationale": "Represents the compiler at the official baseline. The hooks are additive and inert without a collector, and the 268-test PandamStyle suite is run against both trees to show the hooks changed nothing."
+      "rationale": "Retained from Spike 1 for continuity. The Spike 2 decision-bearing comparison is babel_full vs babel_incremental, both on this tree."
     },
     {
       "name": "babel_work_eliminated",
-      "status": "in_scope",
-      "anchor": "this branch, PMS_WORK_ELIMINATED=1",
+      "status": "spike-1-baseline",
+      "anchor": "this branch at Spike 1, PMS_WORK_ELIMINATED=1",
       "work_elimination": "on",
-      "rationale": "The same compiler with measured redundant work removed. Production keeps the default: the gate is a process environment variable read once, and it defaults to off."
+      "rationale": "Retained from Spike 1 for continuity."
     }
   ],
   "out_of_scope_engines": [
@@ -215,6 +239,7 @@
     "module_remove",
     "config_change",
     "resolution_config_change",
+    "file_rename",
     "cancel_and_retry",
     "crash_during_publication"
   ],
@@ -275,7 +300,14 @@
       "css_dedup_ms",
       "css_sort_ms",
       "css_join_ms",
-      "styleq_ms"
+      "styleq_ms",
+      "session_scan_ms",
+      "session_resolve_ms",
+      "session_closure_ms",
+      "session_dsv_view_ms",
+      "session_compile_files_ms",
+      "session_aggregate_ms",
+      "session_incremental_ms"
     ],
     "counters": [
       "parsed_files",
@@ -304,7 +336,23 @@
       "pass1_calls",
       "pass2_calls",
       "parse_distinct_files",
-      "parse_max_per_file"
+      "parse_max_per_file",
+      "session_revisions",
+      "files_changed",
+      "files_added",
+      "files_removed",
+      "files_reparsed",
+      "files_recompiled",
+      "files_reused",
+      "coverage_summaries_reused",
+      "coverage_summaries_rebuilt",
+      "reverse_dependents_invalidated",
+      "negative_resolutions_invalidated",
+      "negative_resolutions",
+      "full_fallback",
+      "session_file_states",
+      "session_resolution_keys",
+      "session_resolution_dirs"
     ],
     "counters_not_applicable": [
       "recomputed_queries",
@@ -320,6 +368,21 @@
     ],
     "phases_declared_but_not_emitted": {
       "hash_dedup_ms": "The fork's class-name hashing only runs on the `enableMinifiedKeys` path, which is off by default and is therefore not on this corpus's hot path. The branch carries no timer rather than a timer that would only ever measure itself. Dedup is still measured where it is actually hot: the deduplication of injected rules happens inside `styleXCreateSet`, whose total is reported as `atomic_lower_ms`."
+    },
+    "spike2_revision_counters": {
+      "note": "Emitted ONLY by babel_incremental and its factorial variant, and only when a revision exists. They count REUSE, which is not work: a reused file cost one content-hash comparison and no parse.",
+      "metrics": [
+        "affected_file_count",
+        "reparsed_file_count",
+        "recompiled_file_count",
+        "reused_file_count",
+        "removed_file_count",
+        "coverage_summaries_reused",
+        "coverage_summaries_rebuilt",
+        "reverse_dependents_invalidated",
+        "negative_resolutions_invalidated",
+        "full_fallback_count"
+      ]
     }
   },
   "statuses": [

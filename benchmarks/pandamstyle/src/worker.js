@@ -221,12 +221,19 @@ async function main() {
     scenarioName: job.scenario,
   };
 
+  // The engine NAME selects the compilation path, and only that. Both paths
+  // load the same bundle and call the same public API; `babel_incremental`
+  // adds the project session and nothing else, so the difference between the
+  // two engines is reuse and cannot be attributed to a different compiler.
+  const mode = job.engine === 'babel_incremental' ? 'incremental' : 'full';
+
   const driver = new CompileDriver({
     engineModule,
     corpus,
     projectDir,
     engineName: job.engine,
     engineVariantCommit: job.engineVariantCommit ?? null,
+    mode,
   });
 
   const scenario = getScenario(job.scenario);
@@ -337,11 +344,13 @@ async function main() {
       index: driver.eventIndex++,
       verdict: r.verdict,
       parses: r.snapshot.parses,
+      reuse: driver.lastRevisionCounters(),
     });
     trace.push({
       index: driver.eventIndex,
       verdict: r.verdict,
       parses: r.snapshot.parses.total,
+      reuse: driver.lastRevisionCounters(),
     });
   };
 
@@ -424,7 +433,10 @@ async function main() {
         runKind: job.runKind,
       });
       pendingParser = null;
-      driver.resetSources();
+      // The warmup ran on the PRISTINE corpus, so restoring the sources is a
+      // no-op on disk and the session is still warm. It is kept on purpose:
+      // dropping it here would measure a cold build and label it a cache hit.
+      driver.resetSources({ dropSession: false });
       // The measured event: the SAME bytes, submitted again, with NO edit
       // applied. This is a cache hit and is labelled as one, forever. A
       // scenario that only declares this state does so because its measured

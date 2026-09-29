@@ -17,6 +17,12 @@ storybook-static
 out-pandamstyle/
 evidence/*/artifacts/
 evidence/*/pilot/
+# A verification run directory can be nested one level deeper than the patterns
+# above (evidence/performance/<batch>/verify/...), and the same rule applies to
+# it: the committed part of a run is env.json, summary.json, steps.tsv and the
+# per-step logs; the pilot work tree and the generated artifacts are not.
+evidence/**/artifacts/
+evidence/**/pilot/
 # Raw step logs are evidence and stay tracked, like the historical ones.
 !evidence/*/*.log
 pilot/vite-react/.pandamstyle/

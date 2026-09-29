@@ -35,6 +35,16 @@ export const DESIGN_SYSTEM_MARKER = '__PMS_DESIGN_SYSTEM__';
 
 const SOURCE_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.cjs'];
 
+/**
+ * The explicit extension forms a page is allowed to write (or to omit).
+ *
+ * Exported because the project session resolves edges with the SAME candidate
+ * order. Two resolvers with two candidate orders are how a file becomes
+ * "resolvable" in one code path and "unresolvable" in the other, and the
+ * resulting coverage verdict would depend on which one ran.
+ */
+export { SOURCE_EXTENSIONS };
+
 const parseCache = new Map();
 
 /**
@@ -393,8 +403,38 @@ const STYLESHEET_RE = /\.(css|scss|sass|less|styl)$/;
 export function moduleEdgesOf(file) {
   const parsed = parseModuleFile(file);
   if (parsed.ast == null) return { edges: [], unreadable: true };
+  const { edges, importSources } = extractModuleFacts(parsed.ast);
+  // Resolution is DERIVED here rather than stored, so an edge that a caller
+  // wants resolved later can be re-resolved without re-parsing. A computed
+  // dynamic request has no request to resolve at all, which is exactly why it
+  // is a coverage gap.
+  return {
+    edges: edges.map((edge) => ({
+      ...edge,
+      resolved:
+        edge.computed === true || !edge.local || edge.isStylesheet
+          ? null
+          : resolveRelativeFile(file, edge.request),
+    })),
+    importSources,
+    unreadable: false,
+  };
+}
 
+/**
+ * The owned, compact module summary of ALREADY PARSED source.
+ *
+ * This is the whole persistent state an incremental session needs about a
+ * module's edges. It contains plain data only - no `NodePath`, no AST, no
+ * borrowed reference into a parse that a later phase is free to mutate.
+ *
+ * `importSources` is kept separately because it is a different question with a
+ * different consumer: the Babel plugin asks "which of my import declarations
+ * reach the design system", and only static import declarations are asked that.
+ */
+function extractModuleFacts(ast) {
   const edges = [];
+  const importSources = [];
   const add = (request, form, node) => {
     if (request == null || typeof request !== 'string') return;
     const isStylesheet = STYLESHEET_RE.test(request);
@@ -404,15 +444,11 @@ export function moduleEdgesOf(file) {
       form,
       local,
       isStylesheet,
-      // A stylesheet is not a compilable module: the plugin's style-channel
-      // check owns it, so the closure must not try to analyse it as one.
-      resolved:
-        local && !isStylesheet ? resolveRelativeFile(file, request) : null,
       line: node?.loc?.start?.line ?? null,
     });
   };
 
-  const body = parsed.ast.program.body;
+  const body = ast.program.body;
 
   for (const node of body) {
     if (
@@ -422,6 +458,9 @@ export function moduleEdgesOf(file) {
       node.source != null
     ) {
       if (node.importKind === 'type') continue;
+      if (node.type === 'ImportDeclaration') {
+        importSources.push(node.source.value);
+      }
       // `export * as ns from '...'` is a NAMED declaration carrying a namespace
       // specifier. It is still a module edge, and it is labelled distinctly so
       // the coverage report can show which re-export form carried a file.
@@ -463,7 +502,6 @@ export function moduleEdgesOf(file) {
           form: dynamic.form,
           local: true,
           isStylesheet: false,
-          resolved: null,
           computed: true,
           line: node.loc?.start?.line ?? null,
         });
@@ -478,7 +516,40 @@ export function moduleEdgesOf(file) {
   };
   visit(body);
 
-  return { edges, unreadable: false };
+  return { edges, importSources };
+}
+
+/**
+ * The module summary of SOURCE TEXT, without caching and without resolution.
+ *
+ * The incremental session owns the decision about when a module is parsed, so it
+ * parses the bytes it has already read and keeps the summary. The resolution of
+ * each edge stays OUT of the summary on purpose: resolution is a property of
+ * the filesystem at a revision, not of the source, and a summary that froze it
+ * would be a permanent negative resolution - the exact defect this module
+ * already documents for its own resolution cache.
+ */
+export function moduleSummaryOfCode(code) {
+  if (code == null) return { unreadable: true, edges: [], importSources: [] };
+  let ast = null;
+  try {
+    ast = parseWith(code);
+  } catch (err) {
+    // Same distinction as `parseModuleFile`: a syntax error is an unparseable
+    // module, anything else is a defect in this compiler.
+    if (!(err instanceof SyntaxError)) throw err;
+  }
+  if (ast == null) return { unreadable: true, edges: [], importSources: [] };
+  const { edges, importSources } = extractModuleFacts(ast);
+  return { unreadable: false, edges, importSources };
+}
+
+/** The module summary of a file already in the in-memory parse cache. */
+export function moduleSummaryOfFile(file) {
+  const parsed = parseModuleFile(file);
+  if (parsed.ast == null) return moduleSummaryOfCode(parsed.code);
+  const { edges, importSources } = extractModuleFacts(parsed.ast);
+  return { unreadable: false, edges, importSources };
 }
 
 /**

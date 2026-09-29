@@ -1,0 +1,57 @@
+{
+  "documentKind": "pandamstyle-evidence-index",
+  "batch": "spike-2",
+  "generated_by": "benchmarks/pandamstyle/src/collect-spike2-evidence.js",
+  "durability_policy": {
+    "committed": "Everything under evidence/performance/spike-2/ is committed and is the durable record. It is small on purpose: corpus manifests, campaign metadata, summaries, oracle verdicts, the long-session trace, and the report.",
+    "ignored-local-scratch": "The raw observation streams (JSONL), the per-job parse traces and the generated corpora live under the gitignored .pms-bench/ tree, on the SAME physical volume as the repository. They are NOT an archive and NOT durable. Each is listed below with its size and sha256 so a later run can prove whether it is looking at the same bytes; what survives them is the committed evidence."
+  },
+  "corpora": [
+    {
+      "name": "corpus-manifest.json",
+      "bytes": 20307,
+      "sha256": "9d1031395b9168be2b586311beb922727c6b129f5bc8255d891e73ddfb1391d8",
+      "durability": "committed",
+      "note": "corpus identity and content hash",
+      "identical_to_spike_1": true
+    },
+    {
+      "name": "corpus-manifest.json",
+      "bytes": 169517,
+      "sha256": "73673682de9a3bde71ba39458d7efdd16866771972ef903d5493b77323e8d192",
+      "durability": "committed",
+      "note": "corpus identity and content hash",
+      "identical_to_spike_1": true
+    },
+    {
+      "name": "corpus-manifest.json",
+      "bytes": 1664411,
+      "sha256": "a260fabe1981fc1457d1fbbb48b96583c1600de413b047cdc0d27265d4953cbe",
+      "durability": "committed",
+      "note": "corpus identity and content hash",
+      "identical_to_spike_1": true
+    }
+  ],
+  "campaigns": [],
+  "correctness": [
+    {
+      "name": "oracle-c100.json",
+      "bytes": 41641,
+      "sha256": "927ba4c4ac96b011071bcae77a3648fbd2796115f8abfbf33852fba52be18877",
+      "durability": "committed",
+      "note": "the incremental-vs-fresh-rebuild differential verdict, per revision",
+      "committed_copy": "evidence/performance/spike-2/correctness/oracle-c100.json"
+    }
+  ],
+  "memory": [
+    {
+      "name": "long-session-c1000.json",
+      "bytes": 51713,
+      "sha256": "392cdba726487fcad3bd3d162046836f26fc87d2351dd3028a446dcd5456646c",
+      "durability": "committed",
+      "note": "the 1,000-revision memory and reuse trace",
+      "committed_copy": "evidence/performance/spike-2/memory/long-session-c1000.json"
+    }
+  ],
+  "raw": []
+}

@@ -52,7 +52,7 @@ import {
   withParseOwner,
 } from './perf';
 
-const SOURCE_RE = /\.(jsx?|tsx?|mjs|cjs)$/;
+export const SOURCE_RE = /\.(jsx?|tsx?|mjs|cjs)$/;
 const SKIP_DIRS = new Set([
   'node_modules',
   '.git',
@@ -61,7 +61,7 @@ const SKIP_DIRS = new Set([
   'coverage',
 ]);
 
-function walkFiles(dir, out = []) {
+export function walkFiles(dir, out = []) {
   let entries;
   try {
     entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -247,7 +247,7 @@ export function assertCoverageConsistency({
   };
 }
 
-function coverageGapDiagnostics(missing, phase) {
+export function coverageGapDiagnostics(missing, phase) {
   return missing.map((file) =>
     diagnostic({
       code: Codes.COVERAGE_GAP,
@@ -264,7 +264,7 @@ function coverageGapDiagnostics(missing, phase) {
 }
 
 /** Deepest common directory of a list of paths. */
-function commonBase(paths) {
+export function commonBase(paths) {
   if (paths.length === 0) return process.cwd();
   const dirLists = paths.map((p) => {
     const abs = path.resolve(p);
@@ -280,7 +280,7 @@ function commonBase(paths) {
   return joined === '' ? path.sep : joined;
 }
 
-function relativeToCwd(file) {
+export function relativeToCwd(file) {
   const rel = path.relative(process.cwd(), file);
   return rel.startsWith('..') ? file : rel;
 }

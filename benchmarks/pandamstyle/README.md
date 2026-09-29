@@ -1,50 +1,109 @@
 # PandamStyle benchmark laboratory
 
-**Batch: Spike 1 — performance baseline, benchmark harness, and measured work
-elimination.**
+**Batch: Spike 2 — incremental file-level compilation.**
 
-This directory is the benchmark laboratory for PandamStyle. It exists to answer
-one question with reproducible measurements:
+This directory is the benchmark laboratory for PandamStyle. Spike 2 asks one
+question with reproducible measurements:
 
-> Where does PandamStyle actually spend time today, how much of that work is
-> structurally unnecessary, and how far can the existing Babel compiler get
-> before anyone replaces its frontend or its core?
+> On a local one-file edit, can PandamStyle avoid recompiling the files that did
+> not change — and produce a result **exactly equal** to a fresh full rebuild of
+> the same revision?
 
-It does **not** contain a Rust port, an Oxc frontend, an SWC frontend, a Salsa
-database, a daemon, or a rewrite of the StyleX backend. Those are Spike 2 and
-Spike 3. Adding one here would make it impossible to attribute a change to
-removed work rather than to a port.
+It does **not** contain an Oxc frontend, an SWC frontend, a Rust compiler core,
+a Salsa database, a daemon, a Node-API addon, or a new CSS backend. Those are
+Spike 3 or later phases. Adding one here would make it impossible to attribute a
+change to removed work rather than to a port.
+
+Spike 1's harness, engines and evidence live here unchanged and are still
+runnable; the Spike 2 additions are additive.
 
 ---
 
-## The two engines
+## The Spike 2 engines
 
 | engine | what it is | how it is anchored |
 | --- | --- | --- |
-| `babel_current` | the compiler at the official hygiene baseline `d5702374ac5a685499d14a53bf323d8533e6982d` | a git worktree at that SHA, plus the inert measurement hooks |
-| `babel_work_eliminated` | the same compiler with the measured redundant work removed | this branch, `PMS_WORK_ELIMINATED=1` |
+| `babel_full` | the full rebuild, through `buildProject`: every covered file is re-read, re-parsed and recompiled on every revision | this branch |
+| `babel_incremental` | the project session, through `createProjectSession`: a revision re-scans and re-hashes the covered set, rebuilds the coverage closure from persistent module summaries, and recompiles only the files whose validity key changed | this branch |
+| `babel_incremental_work_eliminated` | the factorial variant: the session **and** the Spike 1 work-elimination caches (`PMS_WORK_ELIMINATED=1`) | this branch |
 
-`babel_current` is **not** the superseded `e5ff62b4`. That SHA predates native
-JS/TS/TSX compilation, binding-based provenance, `props()` provenance
-enforcement, complete local module coverage, transactional publication, the Vite
-pilot and the evidence-integrity fixes. Benchmarking it as "current" would
-measure a compiler that no longer exists.
+**Both decision-bearing engines run the SAME tree.** That is deliberate: a
+`babel_full` anchored to a different worktree would make a tree difference
+indistinguishable from an incrementality difference, and this batch has exactly
+one attribution to get right. The only difference between `babel_full` and
+`babel_incremental` is which public API of the same bundle is driven.
 
-### Why the baseline carries the measurement hooks
+`babel_incremental` does **not** set `PMS_WORK_ELIMINATED`, so the benefit of
+invalidation is never conflated with the benefit of Spike 1 memoization. The
+factorial variant exists so the two can be measured apart, and it is reported
+separately.
+
+`babel_current` and `babel_work_eliminated` — the Spike 1 pair — remain
+available for continuity. `babel_current` is **not** the superseded
+`e5ff62b4`: that SHA predates native JS/TS/TSX compilation, binding-based
+provenance, `props()` provenance enforcement, complete local module coverage,
+transactional publication, the Vite pilot and the evidence-integrity fixes, and
+benchmarking it as "current" would measure a compiler that no longer exists.
+
+### Why the compiler carries the measurement hooks
 
 A monkey patch could time `resolveRelativeFile`. It could not time
 `buildRegistry` separately from `compileTokens`, could not say which pipeline
 performed a parse, and could not attribute a diagnostic to the phase that
-raised it. The architecture study asked for phase boundaries that are not
-fabricated, and a boundary only the compiler can report honestly is a compiler
-concern.
+raised it. A phase boundary only the compiler itself can report honestly is a
+compiler concern, so the hooks live in
+`packages/@stylexjs/babel-plugin/pandamstyle/perf.js`. They are additive and
+inert without a collector: every call is one null check, and a build that
+installs no collector executes the same work in the same order.
 
-So the hooks (`packages/@stylexjs/babel-plugin/pandamstyle/perf.js`) are added
-to **both** trees. They are additive and inert without a collector: every call
-is one null check. The baseline's copy of `perf.js` additionally hard-codes the
-work-elimination gate to `false`, so no value of `PMS_WORK_ELIMINATED` can change
-the baseline's behaviour — the baseline is the baseline *by construction*, not
-by the absence of a flag.
+---
+
+## The incremental differential oracle
+
+`src/incremental-oracle.js` is the authoritative correctness gate for the
+session. For every revision of every scenario, in one project whose revisions are
+cumulative:
+
+1. apply the revision to the source tree;
+2. drive the project session and capture what it **published**;
+3. rebuild the same bytes from scratch, **in a fresh process**, with the
+   unchanged full rebuild, and capture what it published;
+4. require the two to be identical.
+
+Step 3 is a separate process on purpose. A "fresh full rebuild" in the same
+process as the session would share the module registry, the compiler's caches
+and the design system the session built, and would therefore not be a fresh
+rebuild at all — it would be a second opinion from the same memory, and the
+whole question is whether that memory is sound.
+
+Compared, per revision: the verdict; diagnostics (code, phase, rule, severity,
+line, column, role, source, context); every published artifact byte for byte;
+the runtime composition structure; the CSS bytes **and** the CSS text, with
+cascade-relevant ordering never normalised; the generated design-system module;
+the manifest; and the build report's semantic state.
+
+The one normalisation, applied to **both** sides by the same rule, removes the
+session's own additive `incremental` block from `build-report.json` — the block
+that states *how* the generation was produced rather than *what* it contains.
+
+```bash
+node src/incremental-oracle.js --corpus /tmp/c --components 24 --tokens 120 \
+  --recipes 6
+```
+
+---
+
+## The long-session memory trace
+
+`src/long-session.js` runs a hostile mix of revisions — local edits, invalid
+edits, repairs, module adds and removes, a rename, global fallbacks and
+no-change revisions — and records memory together with the structural counts
+(file states, resolution keys, design-system consumers), because those are the
+quantities a leak would move and RSS is a noisy witness.
+
+```bash
+node --expose-gc src/long-session.js --corpus /tmp/c --edits 1000
+```
 
 ---
 
@@ -61,14 +120,18 @@ benchmarks/pandamstyle/
 │   ├── worker.js          one job in one process (a cache state is a process)
 │   ├── run-campaign.js    the matrix runner
 │   ├── scenarios.js       the scenario vocabulary: real content revisions
-│   └── differential.js    the semantic oracle
+│   ├── differential.js    the Spike 1 semantic oracle (engine vs engine)
+│   ├── incremental-oracle.js  the Spike 2 oracle: session vs fresh rebuild
+│   ├── long-session.js    the 1,000-revision memory and reuse trace
+│   └── make-spike2-report.py  the Spike 2 evidence tables
 ├── tests/bench.test.js    the harness's own tests
 └── traces/                per-parse evidence, written by a run
 ```
 
 Scratch output (corpora, per-job projects, raw observations) goes to
 `.pms-bench/` at the repository root and is **not** committed. Committed
-evidence goes to `evidence/performance/spike-1/`.
+evidence goes to `evidence/performance/spike-1/` and
+`evidence/performance/spike-2/`.
 
 ---
 

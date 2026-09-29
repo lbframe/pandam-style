@@ -231,6 +231,11 @@ class CompileDriver {
     projectDir,
     engineName,
     engineVariantCommit,
+    // 'full' drives the unchanged full rebuild; 'incremental' drives the
+    // project session. Both go through the SAME public API of the SAME bundle,
+    // so the difference between the two engines is project-session reuse and
+    // nothing else - which is the only way the comparison can be attributed.
+    mode = 'full',
   }) {
     // The engine bundle exposes the compiler API AND the perf surface directly;
     // there is no separate `compiler` sub-object.
@@ -240,17 +245,40 @@ class CompileDriver {
     this.projectDir = projectDir;
     this.engineName = engineName;
     this.engineVariantCommit = engineVariantCommit ?? null;
+    this.mode = mode;
+    this.session = null;
+    this.sessionRevision = null;
     this.collector = makeCollector();
     this.perf.setPerfEngineName(engineName);
     this.perf.installPerfCollector(this.collector);
   }
 
   dispose() {
+    this.closeSession();
     this.perf.installPerfCollector(null);
   }
 
+  closeSession() {
+    if (this.session == null) return;
+    try {
+      this.session.close();
+    } catch {
+      /* a session that is already closed is not a measurement problem */
+    }
+    this.session = null;
+    this.sessionRevision = null;
+  }
+
   /** Restores every corpus file to its generated content. */
-  resetSources() {
+  resetSources({ dropSession = true } = {}) {
+    // A session holds per-file results for the bytes it last saw. Restoring the
+    // corpus underneath a live session would leave it believing the project
+    // changed when nothing did, so the session is dropped with the sources -
+    // UNLESS the caller knows the corpus is already pristine, in which case
+    // keeping the session is the entire point of the measurement. Dropping it
+    // after a warmup would turn `process_warm_no_edit` into a cold build and
+    // report the full-rebuild latency under an incremental engine's name.
+    if (dropSession) this.closeSession();
     // EVERY generated file is restored, including the design system. Skipping
     // the definition would let one scenario's token edit survive into the next
     // job, which shares nothing but the corpus directory.
@@ -388,6 +416,7 @@ class CompileDriver {
         iteration,
         runKind,
       );
+      this.emitRevisionCounters(emit);
       return { observations, snapshot, verdict: isPms ? 'rejected' : 'error' };
     }
 
@@ -413,6 +442,7 @@ class CompileDriver {
         iteration,
         runKind,
       );
+      this.emitRevisionCounters(emit);
       return { observations, snapshot, verdict: 'unexpected-success' };
     }
 
@@ -445,7 +475,40 @@ class CompileDriver {
       iteration,
       runKind,
     );
+    this.emitRevisionCounters(emit);
     return { observations, snapshot, verdict: 'accepted' };
+  }
+
+  /**
+   * The project's own revision accounting, as observations.
+   *
+   * These are REUSE counters, not work counters: a reused file cost one hash
+   * comparison and no parse. They are emitted only for the session engine, and
+   * only when the session produced a revision, so a row is never a fabricated
+   * zero for an engine that has no such concept.
+   */
+  emitRevisionCounters(emit) {
+    if (this.mode !== 'incremental') return;
+    const counters = this.lastRevisionCounters();
+    if (counters == null) return;
+    const map = {
+      affected_file_count: counters.filesChanged + counters.filesAdded,
+      reparsed_file_count: counters.filesReparsed,
+      recompiled_file_count: counters.filesRecompiled,
+      reused_file_count: counters.filesReused,
+      removed_file_count: counters.filesRemoved,
+      coverage_summaries_reused: counters.coverageSummariesReused,
+      coverage_summaries_rebuilt: counters.coverageSummariesRebuilt,
+      reverse_dependents_invalidated: counters.reverseDependentsInvalidated,
+      negative_resolutions_invalidated: counters.negativeResolutionsInvalidated,
+      full_fallback_count: counters.fullFallback,
+    };
+    for (const [metric, value] of Object.entries(map)) {
+      emit(metric, value, 'count', STATUS.OK, {
+        revisionId: this.sessionRevision.revisionId,
+        fullFallbackReason: counters.fullFallbackReason ?? null,
+      });
+    }
   }
 
   emitPhaseMetrics(emit, snapshot) {
@@ -539,6 +602,7 @@ class CompileDriver {
   }
 
   compileOnce() {
+    if (this.mode === 'incremental') return this.compileOnceIncremental();
     const compiler = this.compiler;
     const config = this.config;
     const definition = this.definition;
@@ -577,6 +641,81 @@ class CompileDriver {
     timings.committedMs = (nowNs() - this.t0) / 1e6;
     this.lastBuild = result;
     return { timings, result };
+  }
+
+  /**
+   * One revision through the PROJECT SESSION.
+   *
+   * The same three calls a build tool makes - applyChanges, validate, compile -
+   * against the same public API the full rebuild uses. The only substitution
+   * the harness makes is the clock: `validate()` returning is
+   * `pms_generation_ready` (every artifact computed, nothing published yet) and
+   * `compile()` returning is `pms_generation_committed`.
+   */
+  compileOnceIncremental() {
+    const compiler = this.compiler;
+    const config = this.config;
+    const definition = this.definition;
+    if (config == null || definition == null) {
+      throw new Error(
+        'compileOnceIncremental() was called before loadConfig() resolved.',
+      );
+    }
+    const rootDir = this.projectDir;
+    const resolveRoot = (r) => (path.isAbsolute(r) ? r : path.join(rootDir, r));
+    const outDirAbs = path.resolve(resolveRoot(config.outDir));
+    const options = {
+      definition,
+      roots: (config.roots ?? []).map(resolveRoot),
+      outDir: outDirAbs,
+      runtimeModule: config.runtimeModule,
+      designSystemFile: config.designSystemFile,
+      engineOptions: config.engineOptions,
+      useCSSLayers: config.useCSSLayers === true,
+    };
+
+    const initial = this.session == null;
+    if (initial) this.session = compiler.createProjectSession(options);
+
+    this.session.applyChanges(
+      initial
+        ? { initial: true }
+        : {
+            config: {
+              roots: options.roots,
+              outDir: options.outDir,
+              runtimeModule: options.runtimeModule,
+              designSystemFile: options.designSystemFile,
+              engineOptions: options.engineOptions,
+              useCSSLayers: options.useCSSLayers,
+            },
+            definition,
+          },
+    );
+    const validation = this.session.validate();
+    this.sessionRevision = validation;
+
+    const timings = { readyMs: (nowNs() - this.t0) / 1e6, committedMs: null };
+    let result = null;
+    let error = null;
+    if (validation.ok) {
+      result = this.session.compile();
+      timings.committedMs = (nowNs() - this.t0) / 1e6;
+      this.lastBuild = result;
+    } else {
+      // A refused revision does not publish. The driver reports the refusal
+      // through the SAME error shape the full rebuild produces, so the
+      // observation layer cannot tell the two engines apart by their failure
+      // path - only by their latency.
+      error = new Error('pms incremental revision refused');
+      error.diagnostics = validation.diagnostics;
+    }
+    return { timings, result, error, revision: validation };
+  }
+
+  /** The counters of the last session revision, for the observation layer. */
+  lastRevisionCounters() {
+    return this.sessionRevision == null ? null : this.sessionRevision.counters;
   }
 }
 

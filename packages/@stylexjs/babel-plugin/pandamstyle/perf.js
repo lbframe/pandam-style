@@ -73,6 +73,14 @@ const RESERVED = Object.freeze({
   css_sort_ms: 0,
   css_join_ms: 0,
   styleq_ms: 0,
+  // Project-session phases (Spike 2).
+  session_scan_ms: 0,
+  session_resolve_ms: 0,
+  session_closure_ms: 0,
+  session_dsv_view_ms: 0,
+  session_compile_files_ms: 0,
+  session_aggregate_ms: 0,
+  session_incremental_ms: 0,
   // Counters.
   parsed_files: 0,
   parse_calls: 0,
@@ -100,6 +108,26 @@ const RESERVED = Object.freeze({
   rule_invocations: 0,
   pass1_calls: 0,
   pass2_calls: 0,
+  // Project-session counters (Spike 2). These count REUSE, which is a
+  // different quantity from work done: a file that is reused costs one hash
+  // comparison and no parse, and counting it as work would be counting the
+  // wrong thing.
+  session_revisions: 0,
+  files_changed: 0,
+  files_added: 0,
+  files_removed: 0,
+  files_reparsed: 0,
+  files_recompiled: 0,
+  files_reused: 0,
+  coverage_summaries_reused: 0,
+  coverage_summaries_rebuilt: 0,
+  reverse_dependents_invalidated: 0,
+  negative_resolutions_invalidated: 0,
+  negative_resolutions: 0,
+  full_fallback: 0,
+  session_file_states: 0,
+  session_resolution_keys: 0,
+  session_resolution_dirs: 0,
 });
 
 let collector = null;

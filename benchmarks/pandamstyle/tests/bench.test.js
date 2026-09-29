@@ -36,9 +36,12 @@ const REPO_ROOT = path.resolve(HERE, '..', '..', '..');
 const { generate, GENERATOR_VERSION, splitmix32 } = require(
   path.join(SRC, 'generate-corpus.js'),
 );
-const { getScenario, allScenarioNames, SCENARIOS } = require(
-  path.join(SRC, 'scenarios.js'),
-);
+const {
+  getScenario,
+  allScenarioNames,
+  resetScenarioState,
+  SCENARIOS,
+} = require(path.join(SRC, 'scenarios.js'));
 const { observation, makeCollector, nowNs, CACHE_STATES, STATUS } = require(
   path.join(SRC, 'harness.js'),
 );
@@ -686,7 +689,31 @@ test('the plan keeps the out-of-scope engines out', () => {
     fs.readFileSync(path.join(HERE, '..', 'plan.json'), 'utf8'),
   );
   const inScope = plan.engines.map((e) => e.name).sort();
-  assert.deepStrictEqual(inScope, ['babel_current', 'babel_work_eliminated']);
+  assert.deepStrictEqual(inScope, [
+    'babel_current',
+    'babel_full',
+    'babel_incremental',
+    'babel_incremental_work_eliminated',
+    'babel_work_eliminated',
+  ]);
+  // The two engines the Spike 2 decision rests on must be IN SCOPE, must run
+  // the same tree (so the difference is reuse and not a tree difference), and
+  // the incremental one must not have the Spike 1 memoization switched on.
+  const full = plan.engines.find((e) => e.name === 'babel_full');
+  const incremental = plan.engines.find((e) => e.name === 'babel_incremental');
+  assert.ok(full != null && incremental != null);
+  assert.strictEqual(incremental.work_elimination, 'off');
+  assert.ok(
+    /this branch/.test(incremental.anchor) && /this branch/.test(full.anchor),
+    'babel_full and babel_incremental must be anchored to the SAME tree, or a ' +
+      'tree difference is indistinguishable from an incrementality difference',
+  );
+  assert.ok(
+    plan.engines.some((e) => e.name === 'babel_incremental_work_eliminated'),
+    'the factorial variant must exist and be reported separately, so the ' +
+      'benefit of invalidation is never conflated with the benefit of ' +
+      'Spike 1 memoization',
+  );
   for (const name of plan.out_of_scope_engines) {
     assert.ok(
       !inScope.includes(name),
@@ -907,4 +934,256 @@ test('a malformed observation line is reported rather than skipped', () => {
   const out = JSON.parse(res.stdout);
   assert.strictEqual(out.malformed_lines, 1);
   assert.strictEqual(out.observation_count, 1);
+});
+
+// ---------------------------------------------------------------------------
+// Spike 2: the incremental session, its scenarios and its oracle
+// ---------------------------------------------------------------------------
+
+test('file_rename is a real content revision of the covered set', () => {
+  const scenario = getScenario('file_rename');
+  assert.ok(
+    scenario != null,
+    'file_rename is a required scenario and is absent',
+  );
+  assert.ok(
+    allScenarioNames().includes('file_rename'),
+    'file_rename must be in the scenario vocabulary',
+  );
+  const project = tmpdir('rename');
+  generate({
+    components: 12,
+    tokens: 80,
+    recipes: 4,
+    seed: 211,
+    fanout: 2,
+    outDir: project,
+    negative: false,
+  });
+  // A multi-revision scenario carries state between its revisions, and that
+  // state is process-global on purpose. A test that inherits another test's
+  // state would silently measure the wrong revision.
+  resetScenarioState('file_rename');
+  const dir = path.join(project, 'src', 'components');
+  const before = fs
+    .readdirSync(dir)
+    .filter((n) => n.endsWith('.tsx'))
+    .sort();
+  const edits = scenario.edit(project, { revision: 0, iteration: 0 });
+  assert.ok(edits.length >= 2, 'a rename is a removal AND an addition');
+  assert.ok(
+    edits.some((e) => e.delete === true),
+    'a rename that never deletes leaves two covered files with one name',
+  );
+  for (const e of edits) {
+    if (e.delete === true) fs.rmSync(e.path, { force: true });
+    else fs.writeFileSync(e.path, e.content, 'utf8');
+  }
+  const after = fs
+    .readdirSync(dir)
+    .filter((n) => n.endsWith('.tsx'))
+    .sort();
+  assert.notDeepStrictEqual(after, before, 'the file set did not change');
+  assert.strictEqual(after.length, before.length);
+  fs.rmSync(project, { recursive: true, force: true });
+});
+
+test('the incremental oracle compares what it claims to compare', () => {
+  const src = fs.readFileSync(path.join(SRC, 'incremental-oracle.js'), 'utf8');
+  for (const check of [
+    'published artifacts, byte for byte, per file',
+    'runtime-composition-structure',
+    'css-bytes',
+    'css-text',
+    'generated-design-system-module',
+    'manifest',
+    'build-report-semantic-state',
+    'diagnostics',
+    'verdict',
+  ]) {
+    assert.ok(
+      src.includes(check),
+      `the incremental oracle does not check ${check}`,
+    );
+  }
+  // The reference build must be a genuinely FRESH build. A fresh rebuild in
+  // the same process as the session would share its module registry, its
+  // caches and its design system, and would not be a fresh rebuild at all.
+  assert.ok(
+    src.includes('spawnSync') && src.includes('BUILD_BIN'),
+    'the reference build must run the real CLI in another process',
+  );
+  assert.ok(
+    src.includes('fresh process'),
+    'the oracle must state the isolation it claims for its reference build',
+  );
+  // Exactly one normalisation, and it must be the session's own additive block.
+  const strip = src.match(/function stripIncrementalBlock[\s\S]*?\n}/);
+  assert.ok(strip != null, 'the oracle has no normalisation function at all');
+  assert.ok(
+    strip[0].includes('"incremental"'),
+    "the only normalisation must remove the session's additive block",
+  );
+});
+
+test(
+  'the incremental oracle runs green on a small corpus',
+  { timeout: 900000 },
+  () => {
+    const lib = path.join(
+      REPO_ROOT,
+      'packages',
+      '@pandamstyle',
+      'compiler',
+      'lib',
+      'index.js',
+    );
+    assert.ok(
+      fs.existsSync(lib),
+      `${lib} is missing. The incremental oracle drives the real compiler, so ` +
+        'build it first: ./verify-pms.sh (its build step).',
+    );
+    const corpus = tmpdir('inc-oracle');
+    const out = path.join(corpus, 'report.json');
+    const res = spawnSync(
+      process.execPath,
+      [
+        path.join(SRC, 'incremental-oracle.js'),
+        '--corpus',
+        path.join(corpus, 'corpus'),
+        '--components',
+        '12',
+        '--tokens',
+        '80',
+        '--recipes',
+        '4',
+        '--scenarios',
+        'no_change,one_file_new_atom,forbidden_value,module_add,module_remove,file_rename',
+        '--out',
+        out,
+      ],
+      { encoding: 'utf8', timeout: 880000 },
+    );
+    assert.ok(
+      fs.existsSync(out),
+      `the incremental oracle produced no report:\n${res.stderr ?? ''}`,
+    );
+    const report = JSON.parse(fs.readFileSync(out, 'utf8'));
+    assert.strictEqual(
+      report.verdict,
+      'equivalent',
+      `the incremental session diverged from a fresh full rebuild:\n${JSON.stringify(
+        report.revisions.filter((r) => !r.equivalent),
+        null,
+        2,
+      )}`,
+    );
+    assert.ok(report.revisionsCompared >= 6);
+    // Reuse must actually have happened, or "equivalent" would be a statement
+    // about two full builds.
+    const localEdit = report.revisions.find(
+      (r) => r.scenario === 'one_file_new_atom' && r.revision === 0,
+    );
+    assert.ok(localEdit != null);
+    assert.ok(
+      localEdit.sessionCounters.filesRecompiled <= 2,
+      'a one-file edit recompiled ' +
+        `${localEdit.sessionCounters.filesRecompiled} files, so this is not an ` +
+        'incremental result',
+    );
+    assert.ok(
+      localEdit.sessionCounters.filesReused >= 10,
+      'a one-file edit reused ' +
+        `${localEdit.sessionCounters.filesReused} files, so the session is not ` +
+        'reusing anything',
+    );
+    fs.rmSync(corpus, { recursive: true, force: true });
+  },
+);
+
+test(
+  'the long-session trace is bounded and mixes the hard cases',
+  { timeout: 900000 },
+  () => {
+    const corpus = tmpdir('long-session');
+    generate({
+      components: 12,
+      tokens: 80,
+      recipes: 4,
+      seed: 211,
+      fanout: 2,
+      outDir: path.join(corpus, 'corpus'),
+      negative: false,
+    });
+    const out = path.join(corpus, 'trace.json');
+    const res = spawnSync(
+      process.execPath,
+      [
+        path.join(SRC, 'long-session.js'),
+        '--corpus',
+        path.join(corpus, 'corpus'),
+        '--edits',
+        '120',
+        '--out',
+        out,
+      ],
+      { encoding: 'utf8', timeout: 880000 },
+    );
+    assert.ok(
+      fs.existsSync(out),
+      `the long-session trace produced no report:\n${res.stderr ?? ''}`,
+    );
+    const report = JSON.parse(fs.readFileSync(out, 'utf8'));
+    assert.ok(
+      report.stable,
+      `the session grew with the revision count: ${JSON.stringify(report.structural)}`,
+    );
+    // A trace of valid one-file edits only would grow nothing and prove nothing.
+    assert.ok(report.mix.refused > 0, 'the trace refused nothing');
+    assert.ok(
+      report.mix.fullFallbacks > 0,
+      'the trace never hit a global fallback',
+    );
+    assert.ok(
+      report.mix.adds > 0 && report.mix.removes > 0,
+      'the trace never churned a module',
+    );
+    assert.ok(report.mix.renames > 0, 'the trace never renamed a file');
+    assert.ok(
+      report.mix.noChange > 0,
+      'the trace never submitted a no-change revision',
+    );
+    fs.rmSync(corpus, { recursive: true, force: true });
+  },
+);
+
+test('the plan declares the revision counters the session emits', () => {
+  const plan = JSON.parse(
+    fs.readFileSync(path.join(HERE, '..', 'plan.json'), 'utf8'),
+  );
+  const declared = plan.metrics.spike2_revision_counters.metrics;
+  for (const metric of [
+    'affected_file_count',
+    'reparsed_file_count',
+    'recompiled_file_count',
+    'reused_file_count',
+    'full_fallback_count',
+    'negative_resolutions_invalidated',
+    'reverse_dependents_invalidated',
+  ]) {
+    assert.ok(declared.includes(metric), `the plan does not declare ${metric}`);
+  }
+  assert.ok(
+    /REUSE, which is not work/.test(plan.metrics.spike2_revision_counters.note),
+    'the plan must say that these counters count reuse, not work, or a reader ' +
+      'will read a reused file as a cheap file rather than as an absent one',
+  );
+  assert.ok(
+    plan.planVersion.startsWith('1.2.'),
+    'the plan version must record that metric semantics were extended',
+  );
+  assert.ok(
+    plan.scenarios.includes('file_rename'),
+    'the plan scenario list must include file_rename',
+  );
 });

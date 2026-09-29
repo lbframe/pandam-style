@@ -794,6 +794,37 @@ const SCENARIOS = [
     },
   },
 
+  {
+    name: 'file_rename',
+    // A covered file moves. The NEW name must be analysed before the revision
+    // is valid, the OLD name's contribution must be gone, and the build report
+    // must name the new path. A session that keeps the renamed file's rules
+    // because it recognises the content would publish a stylesheet for a file
+    // that no longer exists.
+    expect: 'ok',
+    cacheStates: WARM_ONLY,
+    revisions: 1,
+    kind: 'edit',
+    edit: (projectDir) => {
+      const dir = path.join(projectDir, 'src', 'components');
+      const names = fs
+        .readdirSync(dir)
+        .filter((n) => n.endsWith('.tsx'))
+        .sort();
+      const from = path.join(dir, names[names.length - 1]);
+      const to = path.join(dir, 'RenamedTail.tsx');
+      const state = st('file_rename');
+      if (state.done !== true) {
+        state.done = true;
+        return [
+          { path: from, delete: true },
+          { path: to, content: read(from) },
+        ];
+      }
+      return [];
+    },
+  },
+
   // ---------------------------------------------------------------- config --
   {
     name: 'config_change',

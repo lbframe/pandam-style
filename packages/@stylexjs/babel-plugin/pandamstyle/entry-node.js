@@ -21,6 +21,7 @@ export {
   assertCoverageConsistency,
 } from './build';
 export { beginGeneration, withGeneration, digestOfTree } from './generation';
+export { createProjectSession } from './session';
 export { buildDesignSystem } from './index';
 export { buildRegistry, registryDigest } from './registry';
 export { supportedProperties, propertyKind, propertyCategory } from './policy';
@@ -38,6 +39,7 @@ export {
   resolveRelativeFile,
   clearModuleCache,
   moduleEdgesOf,
+  moduleSummaryOfCode,
   DESIGN_SYSTEM_MARKER,
 } from './module-graph';
 export { REQUIRED_HELPERS } from './evaluate-usage';

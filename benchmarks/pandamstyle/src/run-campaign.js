@@ -105,6 +105,45 @@ function resolveEngines(names) {
         'PMS_WORK_ELIMINATED=1; production keeps the default',
       workEliminated: true,
     },
+    // Spike 2 engines. Both run THIS tree, so the only difference between them
+    // is which public API of the same bundle is driven: `buildProject` (a full
+    // rebuild, every file every time) or `createProjectSession` (the project
+    // session, which reuses every file whose validity key still holds).
+    // Anchoring `babel_full` to a separate worktree would make a tree
+    // difference indistinguishable from an incrementality difference, which is
+    // the one attribution this batch has to get right.
+    babel_full: {
+      name: 'babel_full',
+      root: REPO_ROOT,
+      description:
+        'the full rebuild, through buildProject: every covered file is ' +
+        're-read, re-parsed and recompiled on every revision. This is the ' +
+        'existing compiler semantics and the semantic reference.',
+      workEliminated: false,
+      mode: 'full',
+    },
+    babel_incremental: {
+      name: 'babel_incremental',
+      root: REPO_ROOT,
+      description:
+        'the project session: a revision re-scans and re-hashes the covered ' +
+        'set, rebuilds the coverage closure from persistent module summaries, ' +
+        'and recompiles only the files whose validity key changed. No ' +
+        'Spike 1 work-elimination flag is involved.',
+      workEliminated: false,
+      mode: 'incremental',
+    },
+    babel_incremental_work_eliminated: {
+      name: 'babel_incremental_work_eliminated',
+      root: REPO_ROOT,
+      description:
+        'the factorial variant: the project session AND the Spike 1 ' +
+        'work-elimination caches. Reported separately, never as the headline, ' +
+        'so the benefit of invalidation is never conflated with the benefit ' +
+        'of memoization.',
+      workEliminated: true,
+      mode: 'incremental',
+    },
   };
   const out = {};
   for (const n of names) {
@@ -233,6 +272,16 @@ function main() {
     schemaVersion: 1,
     run_kind: runKind,
     started_at: new Date().toISOString(),
+    // Recorded, not hidden: a run that removed each job's copy of the corpus
+    // to stay inside the filesystem says so, and a reader who wants to know
+    // whether a per-job tree still exists on disk does not have to guess.
+    retention: {
+      discard_job_project_copy: process.env.PMS_DISCARD_JOB_PROJECT === '1',
+      note:
+        'the per-job project copy is a regenerable input: the corpus is ' +
+        'byte-identical for every job of a cell and is identified by its ' +
+        'content hash. Observations, traces and per-parse evidence are kept.',
+    },
     plan: {
       file: path.relative(REPO_ROOT, planFile),
       version: plan.planVersion,
@@ -248,6 +297,7 @@ function main() {
           commit: gitCommit(v.root),
           tree: gitTree(v.root),
           working_tree: gitDirty(v.root),
+          mode: v.mode ?? 'full',
           work_elimination_env: v.workEliminated
             ? 'PMS_WORK_ELIMINATED=1'
             : 'unset',
@@ -422,6 +472,19 @@ function main() {
     if (res.status !== 0 || res.signal != null) {
       jobRecord.status = res.signal === 'SIGTERM' ? 'timeout' : 'error';
       jobRecord.stderr_tail = String(res.stderr ?? '').slice(-1500);
+    }
+
+    // The per-job directory holds a FULL COPY of the corpus, which is the
+    // single largest thing this runner writes: at 10,000 components that is
+    // tens of megabytes per job, and a campaign of ninety of them will fill a
+    // filesystem. The copy exists only to be read by the worker, and the
+    // worker is finished with it, so `PMS_DISCARD_JOB_PROJECT=1` removes the
+    // copy and keeps everything the run actually produces: the observations,
+    // the trace and the per-parse evidence. The flag is recorded in the
+    // campaign metadata, so a run that used it says so rather than looking
+    // like a run that never wrote it.
+    if (process.env.PMS_DISCARD_JOB_PROJECT === '1') {
+      fs.rmSync(path.join(jobDir, 'project'), { recursive: true, force: true });
     }
 
     // The per-parse evidence is kept beside the observations. It is large, so
