@@ -2,7 +2,7 @@
 
 Branch `perf/pandamstyle-spike-3-publication-css-2026-09`
 Base `f01bdb953990270d1a08f846e15480a8f7102592` (delivered Spike 2 head)
-Tested commit `18618117f8cdcbb1aa21e4b1fcfa8cab981a642d`, tree `f3d623b8db64042176eff14bfcb302f23e4ae7d8`
+Tested commit `c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a`, tree `45464df4c840133ad7a2f6f0b4867469315ed6d6`
 
 Three commits: Phase A (`395e160e`), Phase B (`a279d3eb`), Phase C (`18618117`).
 `main` is untouched, nothing was merged, no PR was opened, nothing was published.
@@ -601,8 +601,8 @@ structural (the filesystem re-scan) is not the compiler's.
 `./verify-pms.sh` → **VERIFICATION OK**, 8 of 8 steps passed, `complete: true`,
 `skippedSteps: []`, `failedSteps: []`, no skip flags.
 
-Tested commit `18618117f8cdcbb1aa21e4b1fcfa8cab981a642d`, tree
-`f3d623b8db64042176eff14bfcb302f23e4ae7d8`, branch
+Tested commit `c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a`, tree
+`45464df4c840133ad7a2f6f0b4867469315ed6d6`, branch
 `perf/pandamstyle-spike-3-publication-css-2026-09`.
 
 | suite | result | baseline | delta |

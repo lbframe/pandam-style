@@ -4,17 +4,18 @@
  "title": "Incremental publication and incremental CSS aggregation",
  "branch": "perf/pandamstyle-spike-3-publication-css-2026-09",
  "base": "f01bdb953990270d1a08f846e15480a8f7102592",
- "head": "e0adbf191e4c70bc078783a11e55903fa910184c",
- "tree": "483315d66bb8a96f495da798078e3cadb52d5535",
+ "head": "c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a",
+ "tree": "45464df4c840133ad7a2f6f0b4867469315ed6d6",
  "commits": {
   "phase-a-incremental-publication": "395e160e0fcab3a2923aa6fc26cb5d8ccf8d70eb",
   "phase-b-incremental-css-aggregation": "a279d3ebecf919d79a70f8e959ad187e714865f4",
-  "phase-c-combined-and-evidence": "e0adbf191e4c70bc078783a11e55903fa910184c"
+  "phase-c-combined-and-evidence": "18618117f8cdcbb1aa21e4b1fcfa8cab981a642d",
+  "evidence-and-verification-record": "c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a"
  },
  "acceptance": {
   "verified": "VERIFICATION OK, 8/8 steps, no skips",
-  "testedCommit": "18618117f8cdcbb1aa21e4b1fcfa8cab981a642d",
-  "testedTree": "f3d623b8db64042176eff14bfcb302f23e4ae7d8",
+  "testedCommit": "c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a",
+  "testedTree": "45464df4c840133ad7a2f6f0b4867469315ed6d6",
   "pandamstyleTestsPassed": 333,
   "pandamstyleTestsBaseline": 283,
   "upstreamBabelPluginPassed": 1007,
@@ -103,11 +104,11 @@
  },
  "durableEvidence": {
   "spike-3/REPORT.md": {
-   "sha256": "f105e6157d0c9751051fc2b34c984162a9f841f9f7c1385eb61df67a07583f47",
+   "sha256": "725bc086825b50b571637cb737130184f5e69281a2c8fafc73304c98df4c880a",
    "bytes": 35017
   },
   "spike-3/VERIFICATION.md": {
-   "sha256": "ed758ed4dbdc71f161500ed80eccc68f3adcafb4be73ad78d7653df759cbd1a1",
+   "sha256": "e7f2816f336f4ee25ba075ea2f5e4aba74bfcf36d59675baa9e522ab4a0c5ef2",
    "bytes": 4552
   },
   "spike-3/memory/long-session-1000-css-variant.json": {
@@ -119,12 +120,12 @@
    "bytes": 51713
   },
   "spike-3/verify/verify-pms-summary.json": {
-   "sha256": "e2933af263059bbfcb1e4b28b5451dcabe387183c8cb2d2e5f8520573222bd6f",
+   "sha256": "8d9f0bdbd7550e977a469eb0570d5bd1a5e587089f74cf95f27c7c0bfe5fbd2f",
    "bytes": 2231
   },
   "spike-3/verify/verify-pms.log": {
-   "sha256": "2f7bde289c0146e4020961efad58ff79dc429d32ce4371dee6228593520fc3ac",
-   "bytes": 1137
+   "sha256": "3ef359580bb3affe307b045acf4a5b4e03e5dd5035d0ed43c0d9f87839b36257",
+   "bytes": 1139
   },
   "spike-3/correctness/oracle-session_full_publish.json": {
    "sha256": "4f32ff8c29cea1e97b646e90d552d88643f97f9637cddb9113eb28963d8fe413",

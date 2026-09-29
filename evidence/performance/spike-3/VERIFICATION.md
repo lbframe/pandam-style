@@ -5,8 +5,8 @@
 `./verify-pms.sh` → **VERIFICATION OK**
 
 ```
-tested commit  : 18618117f8cdcbb1aa21e4b1fcfa8cab981a642d
-tested tree    : f3d623b8db64042176eff14bfcb302f23e4ae7d8
+tested commit  : c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a
+tested tree    : 45464df4c840133ad7a2f6f0b4867469315ed6d6
 branch         : perf/pandamstyle-spike-3-publication-css-2026-09
 working tree   : dirty (as found, before this run wrote anything)
 batch base     : e5ff62b4a925405dcf9fb415faa00df4b68aeaa9  (refs/remotes/origin/feat/pandamstyle-native-compiler)
@@ -15,9 +15,12 @@ batch base     : e5ff62b4a925405dcf9fb415faa00df4b68aeaa9  (refs/remotes/origin/
 `complete: true`, `skippedSteps: []`, `failedSteps: []`. **No skip flags were used** —
 `PMS_SKIP_INSTALL` and `PMS_SKIP_PILOT` were both left unset and both steps ran.
 
-The "working tree: dirty" line is the record of the state as this run found it, which
-is Spike 3's own uncommitted evidence at the time. It is reported, not corrected: the
-run measured the tree, and the tree was subsequently committed.
+This is the SECOND full run of Spike 3's verification, at the final commit, with a
+clean working tree. The first ran at `18618117` and is retained in the git history;
+this one supersedes it, because two evidence commits landed after it and one of them
+changed source (a literal NUL byte in a string literal was replaced by its escape
+sequence in `css-state.js`). A verification record that describes a tree other than
+the one delivered would be the wrong record to deliver.
 
 ## Steps
 
