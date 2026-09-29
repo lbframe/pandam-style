@@ -25,6 +25,18 @@ export { createProjectSession } from './session';
 // The incremental CSS state, exported so its ownership and ordering semantics
 // can be tested directly rather than only through a whole project build.
 export { createCssState } from './css-state';
+export {
+  createChangeJournal,
+  createFilesystemWatcher,
+  generationScratchPaths,
+} from './watcher';
+export {
+  DIRTY_INPUT_MODES,
+  normalizeMutationTransaction,
+  explicitAgentProvider,
+  fullScanProvider,
+  resolveProvider,
+} from './dirty-input';
 export { buildDesignSystem } from './index';
 export { buildRegistry, registryDigest } from './registry';
 export { supportedProperties, propertyKind, propertyCategory } from './policy';

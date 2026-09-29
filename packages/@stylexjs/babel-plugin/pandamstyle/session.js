@@ -94,6 +94,7 @@ import {
   normalizeMutationTransaction,
   touchedPaths,
 } from './dirty-input';
+import { createFilesystemWatcher } from './watcher';
 import { buildDesignSystem } from './index';
 import { generateDesignSystemModule } from './codegen';
 import { PmsError, Codes, diagnostic } from './diagnostics';
@@ -2254,6 +2255,71 @@ export function createProjectSession(config) {
         discrepancies,
         declared: declared.size,
       };
+    },
+
+    /**
+     * The watcher route, for a host that cannot declare its mutations.
+     *
+     * It is a THIN wrapper over the same transaction type, deliberately: a
+     * watched revision and a declared revision go through identical code, so
+     * there is no second implementation of what a mutation means and nothing to
+     * keep in step. What differs is only where the paths came from, and the
+     * trust that is attached to them.
+     *
+     * An overflow is not an error to swallow: it returns null and says why, and
+     * the caller is expected to fall back to full discovery, which it can do by
+     * submitting `{ forceFullDiscovery: true }` or simply by not using the
+     * watcher for that revision.
+     */
+    applyWatchedChanges(provider) {
+      const transaction = provider?.pending?.() ?? null;
+      count('watch_events_seen', provider?.stats?.().events ?? 0);
+      count('watch_events_coalesced', provider?.stats?.().coalesced ?? 0);
+      count('watch_ignored_events', provider?.stats?.().ignored ?? 0);
+      count('watch_journal_depth', provider?.stats?.().pending ?? 0);
+      if (transaction == null) {
+        if (provider?.journal?.resyncRequired === true) {
+          count('watch_resyncs', 1);
+          return applyChanges({
+            mutation: normalizeMutationTransaction({
+              mode: 'full-discovery',
+              forceFullDiscovery: true,
+            }),
+          });
+        }
+        return applyChanges({});
+      }
+      return applyChanges({
+        mutation: normalizeMutationTransaction({
+          ...transaction,
+          mode: 'watcher',
+        }),
+      });
+    },
+
+    /**
+     * Starts a watcher over this session's roots, seeded from what the session
+     * already knows.
+     *
+     * The digests matter more than the paths. Recognising a rename needs the
+     * content of the file as it was BEFORE it moved, and the session is the
+     * only party that kept it: a watcher that tried to work it out afterwards
+     * would find the old path gone, which is the whole difficulty. So the
+     * watcher inherits the evidence rather than re-deriving it.
+     */
+    watch(options = {}) {
+      const digests = [];
+      for (const [file, fileState] of state.fileStates) {
+        const digest = fileState?.sourceHash;
+        if (digest != null) digests.push([file, digest]);
+      }
+      return createFilesystemWatcher({
+        roots: state.config.roots,
+        outDir: state.config.outDir,
+        digests,
+        known: [...state.fileStates.keys()],
+        ...options,
+      });
     },
 
     /** The provenance mode this session is currently accepting input from. */
