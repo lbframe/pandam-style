@@ -7,31 +7,38 @@
 ```
 tested commit  : c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a
 tested tree    : 45464df4c840133ad7a2f6f0b4867469315ed6d6
+working tree   : clean (as found, before this run wrote anything)
 branch         : perf/pandamstyle-spike-3-publication-css-2026-09
-working tree   : dirty (as found, before this run wrote anything)
 batch base     : e5ff62b4a925405dcf9fb415faa00df4b68aeaa9  (refs/remotes/origin/feat/pandamstyle-native-compiler)
 ```
 
 `complete: true`, `skippedSteps: []`, `failedSteps: []`. **No skip flags were used** —
 `PMS_SKIP_INSTALL` and `PMS_SKIP_PILOT` were both left unset and both steps ran.
 
-The final delivered commit is one commit later, `0576ee68`, and it changes **evidence
-documents only**. `git diff c34c8623..HEAD -- packages/ benchmarks/` is empty, so the
-compiler source and the benchmark harness are byte-identical to the tree verified
-here:
+Every line above is read from the machine-written
+`verify/verify-pms-summary.json`, which is the authoritative record of this run.
 
-    $ git diff --name-only c34c8623..HEAD
-    evidence/native/{build,env,install,pandamstyle,pilot,run,upstream-babel-plugin,upstream-stylex}.log
-    evidence/native/summary.json
-    evidence/performance/spike-3/{INDEX.json,REPORT.md,VERIFICATION.md}
-    evidence/performance/spike-3/verify/verify-pms-summary.json
+### What this record identifies, and what it deliberately does not
 
-This is the SECOND full run of Spike 3's verification, with a
-clean working tree. The first ran at `18618117` and is retained in the git history;
-this one supersedes it, because two evidence commits landed after it and one of them
-changed source (a literal NUL byte in a string literal was replaced by its escape
-sequence in `css-state.js`). A verification record that describes a tree other than
-the one delivered would be the wrong record to deliver.
+The verified source tree is `c34c8623…` / `45464df4…`. Any commits after that source
+tree are **evidence-only**: the compiler source, the tests, the benchmark harness and
+the tooling are byte-identical to the tree verified here, which is provable with
+
+```bash
+git diff --name-only c34c8623..<delivered head> -- packages/ benchmarks/   # empty
+```
+
+The delivered branch head is **not** embedded in this file. A file that changes
+whenever the evidence is corrected cannot meaningfully state its own commit, so the
+live head is established from Git and this record names only the stable identity: the
+base, the verified source commit and tree, and the verification result.
+
+An earlier verification run was made at `18618117` with a dirty working tree. It is
+**superseded and is not the delivered verification**: two commits landed after it, and
+one of them changed source (a literal NUL byte in a string literal was replaced by its
+escape sequence in `css-state.js`). It is retained only in the git history, and this
+paragraph is the only place it is mentioned, so that no reader can mistake it for the
+run reported above.
 
 ## Steps
 

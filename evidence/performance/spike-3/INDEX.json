@@ -4,18 +4,28 @@
  "title": "Incremental publication and incremental CSS aggregation",
  "branch": "perf/pandamstyle-spike-3-publication-css-2026-09",
  "base": "f01bdb953990270d1a08f846e15480a8f7102592",
- "head": "0576ee68583771316dc14a5290b631a00be15cfb",
- "tree": "c1ff91a074070954912ac1d844d7e8a91a6a3ba0",
- "commits": {
+ "verifiedSourceCommit": "c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a",
+ "verifiedSourceTree": "45464df4c840133ad7a2f6f0b4867469315ed6d6",
+ "provenance": {
+  "note": "This index deliberately does NOT record the delivered branch head. An index that is itself corrected whenever the evidence changes cannot meaningfully embed its own commit; the live head is established from Git. What is recorded here is the stable identity of the spike: the base, the verified source commit and tree, and the result of verifying that tree.",
+  "postVerifiedSourceCommits": "evidence-only. `git diff --name-only c34c8623..<delivered head> -- packages/ benchmarks/` is empty, so compiler source, tests, benchmark harness and tooling are byte-identical to the verified tree.",
+  "howToCheck": [
+   "git rev-parse <branch>",
+   "git diff --name-only c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a..<delivered head>",
+   "git diff --name-only c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a..<delivered head> -- packages/ benchmarks/"
+  ]
+ },
+ "sourcePhaseCommits": {
   "phase-a-incremental-publication": "395e160e0fcab3a2923aa6fc26cb5d8ccf8d70eb",
   "phase-b-incremental-css-aggregation": "a279d3ebecf919d79a70f8e959ad187e714865f4",
-  "phase-c-combined-and-evidence": "18618117f8cdcbb1aa21e4b1fcfa8cab981a642d",
-  "evidence-and-verification-record": "0576ee68583771316dc14a5290b631a00be15cfb"
+  "phase-c-combined-and-evidence": "18618117f8cdcbb1aa21e4b1fcfa8cab981a642d"
  },
  "acceptance": {
   "verified": "VERIFICATION OK, 8/8 steps, no skips",
-  "testedCommit": "c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a",
-  "testedTree": "45464df4c840133ad7a2f6f0b4867469315ed6d6",
+  "workingTreeAtVerificationStart": "clean",
+  "complete": true,
+  "skippedSteps": [],
+  "failedSteps": [],
   "pandamstyleTestsPassed": 333,
   "pandamstyleTestsBaseline": 283,
   "upstreamBabelPluginPassed": 1007,
@@ -108,36 +118,8 @@
    "bytes": 35017
   },
   "spike-3/VERIFICATION.md": {
-   "sha256": "8f7eb212d8e220c2d8727de19b078ac7fccc6e854a5a6a092e6e801fa91aba9c",
-   "bytes": 5346
-  },
-  "spike-3/memory/long-session-1000-css-variant.json": {
-   "sha256": "d91a7e3e9f4375042531b04fdae2709ec995e4cb1d5f718f19035d59b8070a16",
-   "bytes": 62206
-  },
-  "spike-3/memory/spike2-long-session-baseline.json": {
-   "sha256": "392cdba726487fcad3bd3d162046836f26fc87d2351dd3028a446dcd5456646c",
-   "bytes": 51713
-  },
-  "spike-3/verify/verify-pms-summary.json": {
-   "sha256": "8d9f0bdbd7550e977a469eb0570d5bd1a5e587089f74cf95f27c7c0bfe5fbd2f",
-   "bytes": 2231
-  },
-  "spike-3/verify/verify-pms.log": {
-   "sha256": "3ef359580bb3affe307b045acf4a5b4e03e5dd5035d0ed43c0d9f87839b36257",
-   "bytes": 1139
-  },
-  "spike-3/correctness/oracle-session_full_publish.json": {
-   "sha256": "4f32ff8c29cea1e97b646e90d552d88643f97f9637cddb9113eb28963d8fe413",
-   "bytes": 41502
-  },
-  "spike-3/correctness/oracle-session_incremental_publish.json": {
-   "sha256": "4cfab7acc8eeaf3c9ae3420b32d2bb279e879905d4d198b3007cef9cf0c6f917",
-   "bytes": 41516
-  },
-  "spike-3/correctness/oracle-session_incremental_publish_css.json": {
-   "sha256": "82f21291d73300f23788db7ec2009df048d78e7bbb2c1cb82ac35b3efea63f55",
-   "bytes": 41524
+   "sha256": "7fd66870de97dff6a69aa32212d8010bc97dd2c55b35dd971db17263350d0161",
+   "bytes": 5641
   },
   "spike-3/campaigns/c1000-all-variants-summary.json": {
    "sha256": "a942718609f771c76e1b3df88d36347045bd25741921c24ccf8f61580a02272f",
@@ -158,6 +140,34 @@
   "spike-3/corpora/c10000-capacity-and-scenario-plan.md": {
    "sha256": "fb0cf092ad56718a00dd2c00362c40708ffcf91c5d7efaf70bec86b4ef151ee6",
    "bytes": 1646
+  },
+  "spike-3/correctness/oracle-session_full_publish.json": {
+   "sha256": "4f32ff8c29cea1e97b646e90d552d88643f97f9637cddb9113eb28963d8fe413",
+   "bytes": 41502
+  },
+  "spike-3/correctness/oracle-session_incremental_publish.json": {
+   "sha256": "4cfab7acc8eeaf3c9ae3420b32d2bb279e879905d4d198b3007cef9cf0c6f917",
+   "bytes": 41516
+  },
+  "spike-3/correctness/oracle-session_incremental_publish_css.json": {
+   "sha256": "82f21291d73300f23788db7ec2009df048d78e7bbb2c1cb82ac35b3efea63f55",
+   "bytes": 41524
+  },
+  "spike-3/memory/long-session-1000-css-variant.json": {
+   "sha256": "d91a7e3e9f4375042531b04fdae2709ec995e4cb1d5f718f19035d59b8070a16",
+   "bytes": 62206
+  },
+  "spike-3/memory/spike2-long-session-baseline.json": {
+   "sha256": "392cdba726487fcad3bd3d162046836f26fc87d2351dd3028a446dcd5456646c",
+   "bytes": 51713
+  },
+  "spike-3/verify/verify-pms-summary.json": {
+   "sha256": "8d9f0bdbd7550e977a469eb0570d5bd1a5e587089f74cf95f27c7c0bfe5fbd2f",
+   "bytes": 2231
+  },
+  "spike-3/verify/verify-pms.log": {
+   "sha256": "3ef359580bb3affe307b045acf4a5b4e03e5dd5035d0ed43c0d9f87839b36257",
+   "bytes": 1139
   }
  },
  "rawScratch": {
