@@ -72,8 +72,8 @@ Both are the output directory itself, which is the published contract.
 - **Retired generation** during the commit's instant: `.<out>.pms-backup`, removed on
   success. A process that dies leaves it, and the next `beginGeneration` reconciles.
 
-`generation.js:322` (state file), `generation.js:520` (reuse decision),
-`generation.js:640` (commit).
+`generation.js:506` (the record set), `generation.js:479` (reuse requires the
+previous generation to exist), `generation.js:686` (the reuse decision itself).
 
 ### 2.3 Output ownership and the deletion fix
 
@@ -114,7 +114,7 @@ a real project:
 
 `digest: sha256(content)`, taken **when the file is compiled**, not at publication.
 The session hashes each compiled file once and keeps the digest with its contribution
-(`session.js:1247`), so the publisher's "unchanged?" answer is O(changed), not
+(`session.js:1290`), so the publisher's "unchanged?" answer is O(changed), not
 O(project). For metadata artifacts the digest is computed at staging, which is also
 O(changed) because only changed metadata is staged.
 
@@ -267,7 +267,7 @@ The first c10000 campaign produced 33 errors in 150 jobs, all the same failure:
 The cause was real and is now fixed. The record file could outlive its generation —
 whenever something cleared the output directory between builds — and reuse then
 trusted it and tried to link from files that were not there. Reuse now requires the
-generation to exist (`generation.js:390`), and the hole is pinned by
+generation to exist (`generation.js:479`), and the hole is pinned by
 `a record file that outlived its generation does not claim a reuse`.
 
 This is exactly the class of bug that only appears once publication can reuse, and it
@@ -327,7 +327,7 @@ position the aggregator's own comparator gives it, and a removed rule is spliced
 
 The comparator is the aggregator's, not a copy of it. The comparator, the specificity
 bump, the theme-selector rewrite, the RTL wrapping and the layer grouping were
-**extracted** from `src/index.js` and shared (`src/index.js:1030` onward), because a
+**extracted** from `src/index.js` and shared (`src/index.js:945` onward), because a
 second implementation of cascade semantics is one that agrees today and disagrees
 later.
 
@@ -343,7 +343,7 @@ system hands to a page does `Object.assign(injected, result.injected)` on it
 same array it appended page rules into, so the incremental layer believed the design
 system owned **every rule in the project** and no page rule could ever be retired.
 
-The two arrays are now distinct (`session.js:1182`), and the design system correctly
+The two arrays are now distinct (`session.js:1180`), and the design system correctly
 owns its own 17 rules rather than all 33. The full-aggregation path's output is
 byte-identical either way, because the aggregator deduplicates by class name — which
 is precisely why the bug was invisible to it and visible only to something that
