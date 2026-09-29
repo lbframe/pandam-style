@@ -81,6 +81,14 @@ const RESERVED = Object.freeze({
   session_compile_files_ms: 0,
   session_aggregate_ms: 0,
   session_incremental_ms: 0,
+  // Publication sub-phases (Spike 3). `publish_ms` stays the aggregate, so the
+  // Spike 2 series remains comparable; these say WHERE it went. The sub-phases
+  // overlap `publish_ms` and must not be summed against it.
+  publish_prepare_ms: 0,
+  publish_materialize_ms: 0,
+  publish_metadata_ms: 0,
+  publish_commit_ms: 0,
+  publish_cleanup_ms: 0,
   // Counters.
   parsed_files: 0,
   parse_calls: 0,
@@ -128,6 +136,35 @@ const RESERVED = Object.freeze({
   session_file_states: 0,
   session_resolution_keys: 0,
   session_resolution_dirs: 0,
+  // Publication delta (Spike 3). These count WORK, not projection: a file is
+  // `output_files_written` because a byte was written for it, `reused` because a
+  // link was made for it, `removed` because a record existed and no longer does.
+  output_files_added: 0,
+  output_files_changed: 0,
+  output_files_reused: 0,
+  output_files_removed: 0,
+  output_bytes_written: 0,
+  output_bytes_reused: 0,
+  output_bytes_deleted: 0,
+  // 1 when a new generation directory was installed, 1 when the current one was
+  // already byte-identical and was kept.
+  generation_materialized: 0,
+  generation_reused: 0,
+  // Which reuse strategy actually ran. A filesystem without link support is
+  // correct but O(total bytes), and a run on it must say so.
+  publication_hardlinks: 0,
+  publication_copies: 0,
+  // Incremental CSS (Spike 3, Phase B).
+  css_incremental_update_ms: 0,
+  css_order_maintenance_ms: 0,
+  css_final_serialize_ms: 0,
+  css_rules_added: 0,
+  css_rules_removed: 0,
+  css_rules_reused: 0,
+  css_rules_refcount_changed: 0,
+  css_bytes_written: 0,
+  css_generation_reused: 0,
+  css_full_fallback: 0,
 });
 
 let collector = null;

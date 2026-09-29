@@ -236,6 +236,11 @@ class CompileDriver {
     // so the difference between the two engines is project-session reuse and
     // nothing else - which is the only way the comparison can be attributed.
     mode = 'full',
+    // Spike 3: the publication strategy. The three variants share this bundle,
+    // this session and this compilation, and differ ONLY in how the result is
+    // written to disk. That is what makes the attribution between publication
+    // and CSS aggregation possible at all.
+    publishVariant = 'session_full_publish',
   }) {
     // The engine bundle exposes the compiler API AND the perf surface directly;
     // there is no separate `compiler` sub-object.
@@ -246,6 +251,7 @@ class CompileDriver {
     this.engineName = engineName;
     this.engineVariantCommit = engineVariantCommit ?? null;
     this.mode = mode;
+    this.publishVariant = publishVariant ?? 'session_full_publish';
     this.session = null;
     this.sessionRevision = null;
     this.collector = makeCollector();
@@ -269,8 +275,19 @@ class CompileDriver {
     this.sessionRevision = null;
   }
 
-  /** Restores every corpus file to its generated content. */
-  resetSources({ dropSession = true } = {}) {
+  /**
+   * Restores every corpus file to its generated content.
+   *
+   * @param dropSession       discard the session's per-file results with the
+   *                          sources they described.
+   * @param preservePublished leave the PUBLISHED GENERATION alone. Sources and
+   *                          output are different things: restoring the sources
+   *                          is this function's job, and deleting the output
+   *                          directory as a side effect of it means a "warm"
+   *                          measurement is taken against a generation that has
+   *                          been thrown away.
+   */
+  resetSources({ dropSession = true, preservePublished = false } = {}) {
     // A session holds per-file results for the bytes it last saw. Restoring the
     // corpus underneath a live session would leave it believing the project
     // changed when nothing did, so the session is dropped with the sources -
@@ -293,10 +310,17 @@ class CompileDriver {
       fs.mkdirSync(path.dirname(abs), { recursive: true });
       fs.writeFileSync(abs, content, 'utf8');
     }
-    // The published generation AND the transaction's scratch directories. The
-    // scratch names are the ones `generation.js` derives from the output
-    // directory (`.pms-staging`, `.pms-backup`); clearing a differently-named
-    // path would leave them behind and only look like it worked.
+    if (preservePublished) return;
+
+    // The published generation, the transaction's scratch directories, AND the
+    // record of the current generation. The names are the ones `generation.js`
+    // derives from the output directory; clearing a differently-named path would
+    // leave them behind and only look like it worked.
+    //
+    // The state file matters here for the same reason the others do. It is the
+    // record of a generation that is about to be deleted, so leaving it behind
+    // would describe a generation that no longer exists - and the next job
+    // would start by trying to reuse artifacts that are gone.
     const absOut = path.join(this.projectDir, '.pandamstyle');
     const parent = path.dirname(absOut);
     const base = path.basename(absOut);
@@ -304,6 +328,8 @@ class CompileDriver {
       absOut,
       path.join(parent, `.${base}.pms-staging`),
       path.join(parent, `.${base}.pms-backup`),
+      path.join(parent, `.${base}.pms-state.json`),
+      path.join(parent, `.${base}.pms-state.pending.json`),
     ]) {
       fs.rmSync(target, { recursive: true, force: true });
     }
@@ -672,6 +698,10 @@ class CompileDriver {
       designSystemFile: config.designSystemFile,
       engineOptions: config.engineOptions,
       useCSSLayers: config.useCSSLayers === true,
+      // Which publication strategy this engine drives. The three Spike 3
+      // variants differ ONLY here: same bundle, same session, same compilation,
+      // different publication. Nothing else selects the path.
+      publishVariant: this.publishVariant ?? 'session_full_publish',
     };
 
     const initial = this.session == null;

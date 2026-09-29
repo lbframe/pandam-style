@@ -179,8 +179,79 @@ function normalizeConfig(input) {
     designSystemFile: input.designSystemFile ?? 'design.pandamstyle.js',
     engineOptions: input.engineOptions ?? {},
     useCSSLayers: input.useCSSLayers === true,
+    // Spike 3. Which publication strategy this session uses. It is a config
+    // field and NOT a semantic one: it changes how the same result is written
+    // to disk, never what the result is, so it is deliberately absent from
+    // SEMANTIC_CONFIG_KEYS and does not bump the semantic epoch.
+    publishVariant: resolvePublishVariant(input.publishVariant),
+    // Test seam, exactly like the CLI's `--inject-failure`: a point name (or a
+    // `(point) => void` that throws) at which publication must fail. It is how
+    // "a failure at any point leaves generation N current" is proved rather
+    // than asserted. Never set by a caller that is not a test.
+    publishFailAt: input.publishFailAt ?? null,
   };
 }
+
+/**
+ * The publication variants, and what each one is allowed to skip.
+ *
+ *   session_full_publish        incremental compilation, FULL generation
+ *                               publication, FULL CSS aggregation. The Spike 2
+ *                               reference; it is the default so that no caller
+ *                               changes behaviour, and it is the number every
+ *                               Spike 3 result is measured against.
+ *
+ *   session_incremental_publish incremental compilation, DELTA output
+ *                               publication (unchanged artifacts are reused, not
+ *                               rewritten), FULL CSS aggregation.
+ *
+ *   session_incremental_publish_css
+ *                               as above, plus INCREMENTAL CSS aggregation.
+ *
+ * The three are separate because the whole point of the spike is attribution:
+ * collapsing them would make it impossible to say which change bought what.
+ */
+const PUBLISH_VARIANTS = Object.freeze([
+  'session_full_publish',
+  'session_incremental_publish',
+  'session_incremental_publish_css',
+]);
+
+function resolvePublishVariant(name) {
+  if (name == null) return 'session_full_publish';
+  if (typeof name === 'string') {
+    const trimmed = name.trim();
+    if (trimmed === '') return 'session_full_publish';
+    if (!PUBLISH_VARIANTS.includes(trimmed)) {
+      throw new Error(
+        `pandamstyle: unknown publishVariant ${JSON.stringify(name)}; expected one of ${PUBLISH_VARIANTS.join(', ')}.`,
+      );
+    }
+    return trimmed;
+  }
+  // An object form, so a caller can name the two axes separately instead of
+  // memorising the three combinations above.
+  if (typeof name === 'object') {
+    const incrementalPublish = name.incrementalPublish === true;
+    const incrementalCss = name.incrementalCss === true;
+    if (incrementalPublish) {
+      return incrementalCss
+        ? 'session_incremental_publish_css'
+        : 'session_incremental_publish';
+    }
+    if (incrementalCss) {
+      throw new Error(
+        'pandamstyle: incrementalCss requires incrementalPublish; incremental CSS without incremental publication has nothing to be incremental about.',
+      );
+    }
+    return 'session_full_publish';
+  }
+  throw new Error('pandamstyle: publishVariant must be a string or an object.');
+}
+
+const publishesDelta = (variant) => variant !== 'session_full_publish';
+const usesIncrementalCss = (variant) =>
+  variant === 'session_incremental_publish_css';
 
 export function createProjectSession(config) {
   const state = {
@@ -203,6 +274,7 @@ export function createProjectSession(config) {
     closed: false,
     supersededRevisions: 0,
     lastFallbackReason: null,
+    lastPublication: null,
     definitionDigest: null,
   };
 
@@ -1040,6 +1112,10 @@ export function createProjectSession(config) {
       active.outputs = analysis.outputs;
       active.analysed = analysis.analysed;
       active.allRules = analysis.allRules;
+      // How many rule contributions the whole project produced. This is the
+      // number a full CSS aggregation runs over, and the number an incremental
+      // one reduces from, so it belongs on the revision.
+      active.ruleCount = analysis.ruleCount;
       active.consistency = analysis.consistency;
       active.designSystemRuleCount = analysis.designSystemRuleCount;
       active.ok = true;
@@ -1173,6 +1249,13 @@ export function createProjectSession(config) {
         const coverageEntry = result.metadata.pandamstyleCoverage ?? {};
         fileState.contribution = {
           code: result.code,
+          // The CONTENT identity of this file's published output, taken here -
+          // once, when the file is compiled, which is O(changed) work - rather
+          // than at publication time, which would be O(project size). The
+          // publisher needs it to answer "unchanged?" without reading the
+          // previous generation.
+          codeDigest: sha256(result.code),
+          codeBytes: Buffer.byteLength(result.code, 'utf8'),
           rules,
           coverage: {
             file: relativeToCwd(file),
@@ -1195,7 +1278,12 @@ export function createProjectSession(config) {
       for (const rule of fileState.contribution.rules) allRules.push(rule);
       coverage.push(fileState.contribution.coverage);
       analysed.push(file);
-      outputs.push({ file, code: fileState.contribution.code });
+      outputs.push({
+        file,
+        code: fileState.contribution.code,
+        codeDigest: fileState.contribution.codeDigest,
+        codeBytes: fileState.contribution.codeBytes,
+      });
     }
 
     const consistency = assertCoverageConsistency({
@@ -1207,6 +1295,11 @@ export function createProjectSession(config) {
 
     return {
       allRules,
+      // What the CSS aggregation actually consumed, for the report. Kept as a
+      // number so the report is not recomputed from the rule array at publish
+      // time, and so a Phase B reader can see the contribution total that the
+      // ordered output was reduced from.
+      ruleCount: allRules.length,
       designSystemRuleCount,
       coverage,
       failures,
@@ -1242,6 +1335,37 @@ export function createProjectSession(config) {
     };
   }
 
+  /**
+   * The project's stylesheet, for the revision being published.
+   *
+   * `session_full_publish` and `session_incremental_publish` both take the full
+   * route: every per-file contribution is handed to the StyleX aggregator, which
+   * re-derives the whole cascade-relevant order and serialises the whole
+   * stylesheet. That is the behaviour Spike 2 measured at 28ms (c1000) and
+   * 220ms (c10000), and it is what Phase A is measured against - publication
+   * and CSS are changed and attributed separately, never together.
+   */
+  function aggregateCssFull(closureRules, cfg) {
+    return phase('session_aggregate_ms', () =>
+      styleXTransform.processStylexRules(closureRules, {
+        useLayers: cfg.useCSSLayers,
+      }),
+    );
+  }
+
+  function aggregateCss(active, cfg, variant) {
+    if (!usesIncrementalCss(variant)) {
+      return aggregateCssFull(active.allRules, cfg);
+    }
+    // Phase B. Until the incremental CSS state exists, saying so is the correct
+    // behaviour: silently aggregating in full would make the Phase A numbers
+    // look like Phase B numbers, which is the one mistake this spike cannot
+    // afford.
+    throw new Error(
+      'pandamstyle: session_incremental_publish_css is not available in this build; Phase B is not implemented.',
+    );
+  }
+
   function designSystemRules() {
     const rules = [];
     for (const [key, { priority, ...rest }] of Object.entries(
@@ -1274,26 +1398,45 @@ export function createProjectSession(config) {
     const cfg = state.config;
     const absOut = path.resolve(cfg.outDir);
     const sourceBase = commonBase(cfg.roots);
+    const variant = cfg.publishVariant;
+    const incremental = publishesDelta(variant);
     const outputRelFor = (file) => {
       const rel = path.relative(sourceBase, file);
       const safe = rel.startsWith('..') ? path.basename(file) : rel;
       return path.posix.join('js', safe.split(path.sep).join('/'));
     };
 
+    // One staging call for the whole generation, and the place where "did this
+    // artifact change?" is decided.
+    //
+    //   full   every artifact is written. That is the Spike 2 reference.
+    //   delta  an artifact whose content digest equals the one the previous
+    //          generation published is REUSED - linked into the new generation
+    //          without writing a byte - and only a new or changed one is
+    //          written. An artifact the previous generation published and this
+    //          one does not claim is removed, which is what makes a deleted
+    //          source take its output with it.
+    const put = (gen, rel, content, meta) =>
+      incremental
+        ? gen.stageArtifact(rel, content, meta)
+        : gen.stage(rel, content, meta);
+
+    let committed = null;
+
     const result = withGeneration(
       absOut,
       (gen) => {
         const designSystem = state.designSystem;
         const registryDigest = designSystem.registry.registryDigest;
+        const nextGenerationId = state.generationId + 1;
 
-        gen.stage(cfg.designSystemFile, state.designSystemSource);
+        put(gen, cfg.designSystemFile, state.designSystemSource, {
+          owner: 'design-system',
+          kind: 'metadata',
+        });
 
-        const allRules = active.allRules;
-        const css = phase('session_aggregate_ms', () =>
-          styleXTransform.processStylexRules(allRules, {
-            useLayers: cfg.useCSSLayers,
-          }),
-        );
+        const css = aggregateCss(active, cfg, variant);
+        count('css_bytes_written', Buffer.byteLength(css, 'utf8'));
 
         const buildReport = {
           documentKind: 'pandamstyle-build-report',
@@ -1304,8 +1447,8 @@ export function createProjectSession(config) {
           coveredFileCount: active.coverage.length,
           analysedFileCount: active.analysed.length,
           designSystemRuleCount: active.designSystemRuleCount,
-          consumerRuleCount: allRules.length - active.designSystemRuleCount,
-          ruleCount: allRules.length,
+          consumerRuleCount: active.ruleCount - active.designSystemRuleCount,
+          ruleCount: active.ruleCount,
           cssBytes: Buffer.byteLength(css, 'utf8'),
           coverage: active.coverage,
           coverageConsistency: {
@@ -1331,7 +1474,8 @@ export function createProjectSession(config) {
           // generation can never be mistaken for a complete one.
           incremental: {
             revisionId: active.revisionId,
-            generationId: state.generationId + 1,
+            generationId: nextGenerationId,
+            publishVariant: variant,
             projectSemanticEpoch: state.semanticEpoch,
             incrementalAnalysisMs: active.incrementalMs / 1e6,
             ...active.counters,
@@ -1344,27 +1488,43 @@ export function createProjectSession(config) {
           designSystemModule: relativeToCwd(state.generatedModulePath),
         };
 
-        for (const { file, code } of active.outputs) {
-          gen.stage(outputRelFor(file), code);
+        for (const { file, code, codeDigest, codeBytes } of active.outputs) {
+          put(gen, outputRelFor(file), code, {
+            // The owner is the source file that produced this output. It is
+            // what lets a removed or renamed source take exactly its own
+            // artifact with it, and nothing else.
+            owner: relativeToCwd(file),
+            kind: 'js',
+            digest: codeDigest,
+            size: codeBytes,
+          });
         }
-        gen.stage('styles.css', css);
-        gen.stage(
+        put(gen, 'styles.css', css, { owner: 'styles', kind: 'css' });
+        put(
+          gen,
           'build-report.json',
           JSON.stringify(buildReport, null, 2) + '\n',
+          {
+            owner: 'metadata',
+            kind: 'metadata',
+          },
         );
-        gen.stage(
+        put(
+          gen,
           'manifest.json',
           JSON.stringify(manifestWithDigest, null, 2) + '\n',
+          {
+            owner: 'metadata',
+            kind: 'metadata',
+          },
         );
 
-        return {
-          css,
-          manifest: manifestWithDigest,
-          buildReport,
-          coverage: active.coverage,
-          outputs: active.outputs,
-          registryDigest,
-          revisionId: active.revisionId,
+        // Everything the caller needs to describe WHAT was published, collected
+        // before the commit so a failure cannot lose it.
+        const publication = {
+          mode: incremental ? 'delta' : 'full',
+          variant,
+          outputs: active.outputs.map(({ file }) => outputRelFor(file)),
           published: [
             ...active.outputs.map(({ file }) => outputRelFor(file)),
             'styles.css',
@@ -1372,23 +1532,79 @@ export function createProjectSession(config) {
             'manifest.json',
             cfg.designSystemFile,
           ],
+          css,
+          manifest: manifestWithDigest,
+          buildReport,
+          coverage: active.coverage,
+          registryDigest,
+          revisionId: active.revisionId,
+          nextGenerationId,
         };
+        // `withGeneration` commits after this returns, so the delta is picked up
+        // from the transaction rather than reconstructed here.
+        gen.onCommitted = (outcome) => {
+          committed = outcome;
+        };
+        return publication;
       },
-      { commitMarker: 'manifest.json' },
+      {
+        commitMarker: 'manifest.json',
+        mode: incremental ? 'delta' : 'full',
+        generationId: state.generationId + 1,
+        revisionId: active.revisionId,
+        failAt: cfg.publishFailAt ?? null,
+      },
     );
 
-    state.generationId += 1;
+    // A generation can be REUSED: when every record is byte-identical to the one
+    // already published, the current generation already is that content and is
+    // left in place. A revision is not a generation - a revision can be
+    // recorded without forcing new published bytes to exist.
+    const generationReused = committed?.generationReused === true;
+    if (!generationReused) {
+      state.generationId += 1;
+    }
     active.published = true;
     state.published = {
       revisionId: active.revisionId,
       generationId: state.generationId,
       registryDigest: result.registryDigest,
     };
-    return {
+
+    const delta = committed?.delta ?? {
+      added: 0,
+      changed: 0,
+      reused: 0,
+      removed: 0,
+      bytesWritten: 0,
+      bytesReused: 0,
+      bytesDeleted: 0,
+      byKind: {},
+    };
+    const publication = {
       ...result,
       generationId: state.generationId,
+      generationReused,
+      publication: {
+        mode: result.mode,
+        variant,
+        outputsAdded: delta.added,
+        outputsChanged: delta.changed,
+        outputsReused: delta.reused,
+        outputsRemoved: delta.removed,
+        bytesWritten: delta.bytesWritten,
+        bytesReused: delta.bytesReused,
+        bytesDeleted: delta.bytesDeleted,
+        hardlinks: delta.hardlinks,
+        copies: delta.copies,
+        byKind: delta.byKind,
+        removed: committed?.removed ?? [],
+      },
       incremental: active.counters,
     };
+    active.publication = publication.publication;
+    state.lastPublication = publication.publication;
+    return publication;
   }
 
   // ------------------------------------------------------------- reports ----
@@ -1460,6 +1676,18 @@ export function createProjectSession(config) {
     /** The last published generation, or null if none was ever published. */
     current() {
       return state.published;
+    },
+
+    /**
+     * What the LAST publication actually did.
+     *
+     * The counters describe work performed - artifacts written, reused,
+     * removed, and the bytes behind them - so a caller can see that a
+     * one-file edit did not rewrite a project. They are read from the
+     * transaction's own outcome, not recomputed here.
+     */
+    lastPublication() {
+      return state.lastPublication ?? null;
     },
 
     stats() {

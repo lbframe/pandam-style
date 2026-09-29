@@ -225,7 +225,12 @@ async function main() {
   // load the same bundle and call the same public API; `babel_incremental`
   // adds the project session and nothing else, so the difference between the
   // two engines is reuse and cannot be attributed to a different compiler.
-  const mode = job.engine === 'babel_incremental' ? 'incremental' : 'full';
+  // The engine DECLARES its mode, and the job carries the declaration through.
+  // This used to be a string equality against exactly one engine name, so every
+  // other engine silently ran a full rebuild while its metadata claimed
+  // `mode: 'incremental'`.
+  const mode = job.mode ?? 'full';
+  const publishVariant = job.publishVariant ?? 'session_full_publish';
 
   const driver = new CompileDriver({
     engineModule,
@@ -234,6 +239,7 @@ async function main() {
     engineName: job.engine,
     engineVariantCommit: job.engineVariantCommit ?? null,
     mode,
+    publishVariant,
   });
 
   const scenario = getScenario(job.scenario);
@@ -436,7 +442,18 @@ async function main() {
       // The warmup ran on the PRISTINE corpus, so restoring the sources is a
       // no-op on disk and the session is still warm. It is kept on purpose:
       // dropping it here would measure a cold build and label it a cache hit.
-      driver.resetSources({ dropSession: false });
+      //
+      // The published generation is kept too, and that is the point of this
+      // state. "Warm, no edit" means the generation already exists and the same
+      // bytes are being submitted again; discarding the output first would
+      // measure the cost of building generation N+1 from nothing, which is a
+      // different question and the one `process_cold_cache_empty` answers.
+      //
+      // Full-publish engines are unaffected by this either way: they rewrite
+      // every artifact whether or not the previous one is there. It is the
+      // delta publisher that depends on it, and it would be measuring nothing
+      // if the generation were removed underneath it.
+      driver.resetSources({ dropSession: false, preservePublished: true });
       // The measured event: the SAME bytes, submitted again, with NO edit
       // applied. This is a cache hit and is labelled as one, forever. A
       // scenario that only declares this state does so because its measured

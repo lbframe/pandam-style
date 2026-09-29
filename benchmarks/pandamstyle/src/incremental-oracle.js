@@ -311,8 +311,21 @@ function parseArgs(argv) {
   return out;
 }
 
+const PUBLISH_VARIANTS = [
+  'session_full_publish',
+  'session_incremental_publish',
+  'session_incremental_publish_css',
+];
+
 async function main() {
   const args = parseArgs(process.argv);
+  const variant = args.variant ?? 'session_full_publish';
+  if (!PUBLISH_VARIANTS.includes(variant)) {
+    process.stderr.write(
+      `unknown --variant ${variant}; expected one of ${PUBLISH_VARIANTS.join(', ')}\n`,
+    );
+    process.exit(2);
+  }
   const corpusDir = path.resolve(args.corpus ?? '/tmp/pms-incremental-oracle');
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-inc-oracle-'));
   const previousCwd = process.cwd();
@@ -380,6 +393,10 @@ async function main() {
         designSystemFile: config.designSystemFile,
         engineOptions: config.engineOptions,
         useCSSLayers: config.useCSSLayers === true,
+        // Which publication strategy the subject drives. The fresh rebuild
+        // below NEVER receives this: it is the reference, and it must publish
+        // the way a fresh rebuild publishes.
+        publishVariant: variant,
       });
 
       const session = compiler.createProjectSession(options());
@@ -526,6 +543,15 @@ async function main() {
         }
         if (validation.ok && full.ok) {
           const checks = [
+            // The whole point of a separate check: comparing only the files the
+            // reference expects cannot see a STALE file the reference does not
+            // have. This one compares the two SETS, so a leftover from an older
+            // generation is a difference and not an absence.
+            [
+              'generation-file-set',
+              Object.keys(incremental.files).sort(),
+              Object.keys(fullPrint.files).sort(),
+            ],
             ['published-artifacts', incremental.files, fullPrint.files],
             [
               'runtime-composition-structure',
@@ -613,13 +639,14 @@ async function main() {
 
   const report = {
     documentKind: 'pandamstyle-incremental-differential-oracle',
-    batch: 'spike-2',
+    batch: 'spike-3',
+    publishVariant: variant,
     corpus: {
       name: manifest.name,
       contentHash: manifest.contentHash,
       sourceFiles: manifest.files.length,
     },
-    subject: 'createProjectSession (incremental)',
+    subject: `createProjectSession (incremental), ${variant}`,
     reference: 'buildProject (full rebuild), in a fresh process, same bytes',
     freshRebuildIsolation:
       'the reference build runs in a child process, so it shares neither the ' +
@@ -632,6 +659,7 @@ async function main() {
     checksPerRevision: [
       'verdict (accepted / rejected)',
       'diagnostics (code, phase, rule, severity, line, column, role, source, context)',
+      'generation file set, as a set difference (a stale extra file fails)',
       'published artifacts, byte for byte, per file',
       'runtime composition structure (class literals, recipe references, import specifiers)',
       'css bytes and css text (ordering preserved)',

@@ -133,6 +133,51 @@ function resolveEngines(names) {
       workEliminated: false,
       mode: 'incremental',
     },
+    // Spike 3 engines. These are NOT another compiler: they are the SAME
+    // project session, driving three publication strategies, so every
+    // difference between their rows is publication work and nothing else.
+    //
+    //   session_full_publish          Spike 2 behaviour: full generation
+    //                                 publication, full CSS aggregation.
+    //   session_incremental_publish   delta output publication (unchanged
+    //                                 artifacts reused, not rewritten), full
+    //                                 CSS aggregation.
+    //   session_incremental_publish_css
+    //                                 as above, plus incremental CSS.
+    session_full_publish: {
+      name: 'session_full_publish',
+      root: REPO_ROOT,
+      description:
+        'the project session with Spike 2 publication: every artifact is ' +
+        'rewritten on every revision and CSS is re-aggregated from every ' +
+        'contribution. The reference the other two are measured against.',
+      workEliminated: false,
+      mode: 'incremental',
+      publishVariant: 'session_full_publish',
+    },
+    session_incremental_publish: {
+      name: 'session_incremental_publish',
+      root: REPO_ROOT,
+      description:
+        'the project session publishing only the output delta: an artifact ' +
+        'whose content digest matches the published one is reused rather ' +
+        'than rewritten, and an artifact no longer claimed is removed. CSS ' +
+        'is still aggregated in full, so this row isolates publication.',
+      workEliminated: false,
+      mode: 'incremental',
+      publishVariant: 'session_incremental_publish',
+    },
+    session_incremental_publish_css: {
+      name: 'session_incremental_publish_css',
+      root: REPO_ROOT,
+      description:
+        'the project session with delta publication AND incremental CSS ' +
+        'aggregation: the stylesheet is re-derived from the changed rule ' +
+        'contributions rather than from the whole atom population.',
+      workEliminated: false,
+      mode: 'incremental',
+      publishVariant: 'session_incremental_publish_css',
+    },
     babel_incremental_work_eliminated: {
       name: 'babel_incremental_work_eliminated',
       root: REPO_ROOT,
@@ -253,6 +298,24 @@ function main() {
 
   const requestedScenarios =
     csv(args.scenarios).length > 0 ? csv(args.scenarios) : allScenarioNames();
+
+  // `--cache-states` is applied HERE, to the job list, and not only recorded in
+  // the metadata. Recording a filter in the metadata while building the matrix
+  // from the plan anyway means a campaign that says it measured warm states has
+  // in fact also run cold ones - and doubles its cost doing it.
+  const selectedCacheStates =
+    csv(args['cache-states'] ?? '').length > 0
+      ? csv(args['cache-states'])
+      : plan.cacheStates;
+  const unknownCacheStates = selectedCacheStates.filter(
+    (c) => !plan.cacheStates.includes(c),
+  );
+  if (unknownCacheStates.length > 0) {
+    throw new Error(
+      `unknown --cache-states ${unknownCacheStates.join(', ')}; the plan declares ${plan.cacheStates.join(', ')}`,
+    );
+  }
+
   const iterations = Number(
     args.iterations ?? plan.iterations?.qualification ?? 7,
   );
@@ -298,6 +361,7 @@ function main() {
           tree: gitTree(v.root),
           working_tree: gitDirty(v.root),
           mode: v.mode ?? 'full',
+          publishVariant: v.publishVariant ?? 'session_full_publish',
           work_elimination_env: v.workEliminated
             ? 'PMS_WORK_ELIMINATED=1'
             : 'unset',
@@ -337,10 +401,7 @@ function main() {
     matrix: {
       cells: cells.map(cellName),
       scenarios: requestedScenarios,
-      cache_states:
-        csv(args['cache-states'] ?? '').length > 0
-          ? csv(args['cache-states'])
-          : plan.cacheStates,
+      cache_states: selectedCacheStates,
       iterations,
       repetitions,
       engines: engineNames,
@@ -363,12 +424,13 @@ function main() {
   }
 
   // The job list, built first so the ordering decision is auditable.
+  //
   const jobs = [];
   for (const cell of cells) {
     const corpus = cellName(cell);
     for (const scenarioName of requestedScenarios) {
       const scenario = getScenario(scenarioName);
-      for (const cacheState of plan.cacheStates) {
+      for (const cacheState of selectedCacheStates) {
         if (!scenario.cacheStates.includes(cacheState)) continue;
         for (let rep = 0; rep < repetitions; rep++) {
           for (let it = 0; it < iterations; it++) {
@@ -429,6 +491,10 @@ function main() {
       engineRoot: engine.root,
       engine: job.engineName,
       engineVariantCommit: gitCommit(engine.root),
+      // Carried onto the job so the child selects its path from the ENGINE's
+      // declaration rather than from a name comparison.
+      mode: engine.mode ?? 'full',
+      publishVariant: engine.publishVariant ?? 'session_full_publish',
       corpus: job.corpus,
       corpusDir: corpusInfo.dir,
       projectDir: path.join(jobDir, 'project'),

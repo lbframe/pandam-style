@@ -127,9 +127,30 @@ function diffFingerprints(a, b) {
  * `session` is the incremental one; `full()` is the unchanged full rebuild,
  * which is the semantic reference every assertion is made against.
  */
-function openProject(projectName = 'valid') {
+/**
+ * @param projectName  which fixture project to copy
+ * @param options      session-only options. The fresh rebuild deliberately does
+ *                     NOT receive these: it is the semantic reference, and it
+ *                     must publish the way a fresh rebuild publishes, which is
+ *                     always in full. Comparing an incrementally published
+ *                     generation against a reference that was itself given the
+ *                     variant under test would compare nothing.
+ */
+function openProject(projectName = 'valid', options = {}) {
+  return openExistingProject(freshCopyOf(projectName), options);
+}
+
+/**
+ * The same harness, over a project directory that already exists.
+ *
+ * `openProject` copies the pristine fixture, so a second harness built with it
+ * would start from the ORIGINAL sources and silently compare an edited project
+ * against an unedited one. Anything that needs two sessions over the same bytes
+ * - "does the reference publisher and the delta publisher agree?" - has to go
+ * through this.
+ */
+function openExistingProject(project, options = {}) {
   const compiler = loadCompiler();
-  const project = freshCopyOf(projectName);
   const config = require(path.join(project, 'pandamstyle.config.js'));
   const configDir = path.dirname(path.join(project, 'pandamstyle.config.js'));
   const definitionPath = path.resolve(configDir, config.definition);
@@ -178,7 +199,7 @@ function openProject(projectName = 'valid') {
     ...overrides,
   });
 
-  const session = compiler.createProjectSession(args());
+  const session = compiler.createProjectSession({ ...args(), ...options });
 
   return {
     compiler,
@@ -304,6 +325,7 @@ module.exports = {
   fingerprint,
   loadCompiler,
   makeParseCounter,
+  openExistingProject,
   openProject,
   readTree,
   stripIncrementalBlock,
