@@ -166,6 +166,42 @@ const RESERVED = Object.freeze({
   css_bytes_written: 0,
   css_generation_reused: 0,
   css_full_fallback: 0,
+  // Dirty-file input (Spike 4). The three mode counters are named rather than
+  // encoded so a row says WHICH provenance produced it, and
+  // `dirty_input_mode` in the build report says the same thing in words.
+  dirty_input_mode_verified_explicit: 0,
+  dirty_input_mode_watcher: 0,
+  dirty_input_mode_full_discovery: 0,
+  dirty_files_declared: 0,
+  dirty_files_read: 0,
+  dirty_files_hashed: 0,
+  dirty_files_unchanged: 0,
+  project_files_scanned: 0,
+  project_files_skipped: 0,
+  resolution_keys_rechecked: 0,
+  resolution_keys_scoped: 0,
+  negative_resolution_keys_rechecked: 0,
+  full_discovery_fallback: 0,
+  mutation_set_audits: 0,
+  mutation_set_discrepancies: 0,
+  // Agent-loop metadata (Spike 4, Phase C).
+  agent_result_bytes: 0,
+  agent_result_serialize_ms: 0,
+  full_report_bytes: 0,
+  full_report_serialize_ms: 0,
+  full_report_write_ms: 0,
+  full_report_requested: 0,
+  full_report_deferred: 0,
+  metadata_bytes_written: 0,
+  dirty_input_apply_ms: 0,
+  filesystem_discovery_ms: 0,
+  metadata_hotpath_ms: 0,
+  // Watcher (Spike 4, Phase B).
+  watch_events_seen: 0,
+  watch_events_coalesced: 0,
+  watch_resyncs: 0,
+  watch_ignored_events: 0,
+  watch_journal_depth: 0,
 });
 
 let collector = null;

@@ -64,6 +64,55 @@ function makeParseCounter() {
   };
 }
 
+/**
+ * A collector that records BOTH durations and counters.
+ *
+ * Spike 4's whole claim is that a revision does less work, and "less work" is
+ * only a fact if the counters are read from the same place every time. This is
+ * that place, and `counters` is the object a test asserts on.
+ */
+function makeCounter() {
+  const durations = {};
+  const counts = {};
+  return {
+    durations,
+    counts,
+    addDuration(name, value) {
+      durations[name] = (durations[name] ?? 0) + value;
+    },
+    addCount(name, value) {
+      counts[name] = (counts[name] ?? 0) + value;
+    },
+    addParse() {},
+    sampleMemory() {},
+    reset() {
+      for (const key of Object.keys(durations)) delete durations[key];
+      for (const key of Object.keys(counts)) delete counts[key];
+    },
+    snapshot() {
+      return { durations, counts };
+    },
+  };
+}
+
+/** Installs a counter for the duration of `fn`, and returns what it saw. */
+function measure(fn) {
+  const collector = makeCounter();
+  const teardown = loadCompiler().installPerfCollector(collector);
+  try {
+    const value = fn();
+    return {
+      value,
+      counters: { ...collector.counts },
+      durationsMs: Object.fromEntries(
+        Object.entries(collector.durations).map(([k, v]) => [k, v / 1e6]),
+      ),
+    };
+  } finally {
+    teardown();
+  }
+}
+
 function readTree(dir) {
   const out = new Map();
   const walk = (d, base = dir) => {
@@ -324,7 +373,9 @@ module.exports = {
   differential,
   fingerprint,
   loadCompiler,
+  makeCounter,
   makeParseCounter,
+  measure,
   openExistingProject,
   openProject,
   readTree,

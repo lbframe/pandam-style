@@ -88,6 +88,12 @@ import * as path from 'path';
 
 import styleXTransform from '../src/index';
 import { createCssState } from './css-state';
+import {
+  DEFAULT_DIRTY_INPUT_MODE,
+  existenceChangedPaths,
+  normalizeMutationTransaction,
+  touchedPaths,
+} from './dirty-input';
 import { buildDesignSystem } from './index';
 import { generateDesignSystemModule } from './codegen';
 import { PmsError, Codes, diagnostic } from './diagnostics';
@@ -276,6 +282,9 @@ export function createProjectSession(config) {
     supersededRevisions: 0,
     lastFallbackReason: null,
     lastPublication: null,
+    dirtyInputMode: DEFAULT_DIRTY_INPUT_MODE,
+    lastMutation: null,
+    auditDue: false,
     definitionDigest: null,
   };
 
@@ -336,6 +345,43 @@ export function createProjectSession(config) {
   // and a negative result is never stale.
   let dirListings = new Map();
   let resolutionKeys = new Map();
+
+  // root absolute path -> the source files that were under it last time it was
+  // walked. Maintained incrementally in `verified-explicit` mode, and rebuilt by
+  // the walk in `full-discovery` mode. It exists because a root walk is O(project)
+  // and the agent already told us which paths moved.
+  const rootFileSets = new Map();
+
+  // candidate absolute path -> the resolution keys whose answer depends on
+  // whether that path EXISTS. This is the reverse of the forward index the
+  // resolver keeps, and it is what makes "a file appeared" observable without
+  // re-probing every key the session has ever formed. See `probeResolution`.
+  const negativeCandidates = new Map();
+
+  /** The declared root that contains `dir`, or null if none does. */
+  function rootOwning(dir) {
+    for (const root of state.config.roots) {
+      const abs = path.resolve(root);
+      if (dir === abs || isUnderDir(dir, abs)) return abs;
+      // A root that is a FILE contains nothing.
+      const stat = statOrNull(abs);
+      if (stat != null && stat.isFile()) continue;
+    }
+    return null;
+  }
+
+  function isUnderDir(file, dir) {
+    const rel = path.relative(dir, file);
+    return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
+  }
+
+  function statOrNull(file) {
+    try {
+      return fs.statSync(file);
+    } catch {
+      return null;
+    }
+  }
   // The project's incremental CSS state. Null until a variant asks for it.
   let cssState = null;
   let cssStateKey = null;
@@ -403,6 +449,87 @@ export function createProjectSession(config) {
     return null;
   }
 
+  /**
+   * Remembers which resolution keys' answers depend on WHICH paths existing.
+   *
+   * A resolution answer is a function of the EXISTENCE of the key's candidate
+   * set and of nothing else. So the set of keys a given path can possibly change
+   * the answer of is exactly the keys that list it as a candidate - and a fully
+   * negative key lists nineteen of them (the bare base, six extensions, six
+   * stem-swapped extensions, six directory indices).
+   *
+   * Without this index, "a file appeared somewhere in the project" can only be
+   * observed by re-probing every key the session has ever formed, which is
+   * O(project) per revision and defeats the entire point of an explicit
+   * mutation set. With it, an `added` path costs one map lookup and a re-probe
+   * of the keys that actually mention it.
+   *
+   * The index is maintained, not merely built: a key's candidate registration
+   * is replaced when its answer changes, and removed when its origin file leaves
+   * the project, so it cannot grow without bound.
+   */
+  function indexNegativeKey(key, entry) {
+    unindexNegativeKey(key);
+    const base = path.resolve(path.dirname(entry.fromFile), entry.request);
+    for (const candidate of candidatesOf(base)) {
+      let set = negativeCandidates.get(candidate);
+      if (set === undefined) {
+        set = new Set();
+        negativeCandidates.set(candidate, set);
+      }
+      set.add(key);
+    }
+    entry.candidatesIndexed = true;
+  }
+
+  function unindexNegativeKey(key) {
+    const entry = resolutionKeys.get(key);
+    if (entry == null || entry.candidatesIndexed !== true) return;
+    const base = path.resolve(path.dirname(entry.fromFile), entry.request);
+    for (const candidate of candidatesOf(base)) {
+      const set = negativeCandidates.get(candidate);
+      if (set === undefined) continue;
+      set.delete(key);
+      if (set.size === 0) negativeCandidates.delete(candidate);
+    }
+    entry.candidatesIndexed = false;
+  }
+
+  /**
+   * WHICH resolution keys this revision has to re-probe.
+   *
+   * `null` means all of them, and that is the only answer that can be correct
+   * without knowing the complete mutation set. An explicit or watched mutation
+   * knows which paths moved, so it knows which negative keys could possibly have
+   * a different answer: the keys that list one of those paths as a candidate.
+   *
+   * A path whose CONTENT changed but whose EXISTENCE did not is not in this set,
+   * and that is correct rather than an omission: a resolution answer is a
+   * function of existence, so rewriting a file that already resolved cannot
+   * change any answer.
+   */
+  function resolutionScopeFor(active) {
+    const mode = active.dirtyInputMode;
+    if (mode !== 'verified-explicit' && mode !== 'watcher') return null;
+    if (active.fullDiscoveryReason != null) return null;
+    const paths = active.mutationTouched;
+    if (paths == null) return null;
+    const scope = affectedNegativeKeys(existenceChangedPaths(active.mutation));
+    count('resolution_keys_scoped', scope.size);
+    return scope;
+  }
+
+  /** The negative keys a declared existence change could have repaired. */
+  function affectedNegativeKeys(paths) {
+    const keys = new Set();
+    for (const file of paths) {
+      const set = negativeCandidates.get(file);
+      if (set === undefined) continue;
+      for (const key of set) keys.add(key);
+    }
+    return keys;
+  }
+
   function resolutionKeyOf(fromFile, request) {
     return `${path.dirname(fromFile)}\u0000${request}`;
   }
@@ -415,8 +542,15 @@ export function createProjectSession(config) {
     const resolved = phase('session_resolve_ms', () =>
       probeResolution(fromFile, request),
     );
-    resolutionKeys.set(key, { fromFile, request, resolved });
-    if (resolved === null) bump('negative_resolutions');
+    const entry = { fromFile, request, resolved, candidatesIndexed: false };
+    resolutionKeys.set(key, entry);
+    if (resolved === null) {
+      bump('negative_resolutions');
+      // Index it immediately. A key that is born negative is the common case -
+      // an import of a module that does not exist yet is how a project is
+      // written - and it has to be findable the moment the module appears.
+      indexNegativeKey(key, entry);
+    }
     count('resolution_probes');
     return resolved;
   }
@@ -430,15 +564,39 @@ export function createProjectSession(config) {
    * smallest question that covers every candidate of every key - including the
    * ones that were negative, which is the whole point.
    */
-  function revalidateResolution() {
+  /**
+   * @param scope `null` re-probes EVERY key, which is what `full-discovery` has
+   *   always done and the only thing that can be correct without a complete
+   *   mutation set. A set of keys re-probes only those, which is what an
+   *   explicit mutation set can justify.
+   */
+  function revalidateResolution(scope) {
     const repaired = [];
-    for (const entry of resolutionKeys.values()) {
+    const keys =
+      scope === null
+        ? [...resolutionKeys.keys()]
+        : [...scope].filter((key) => resolutionKeys.has(key));
+    count('resolution_keys_rechecked', keys.length);
+    for (const key of keys) {
+      const entry = resolutionKeys.get(key);
+      if (entry == null) continue;
       const before = entry.resolved;
       const after = phase('session_resolve_ms', () =>
         probeResolution(entry.fromFile, entry.request),
       );
-      if (before === null && after !== null) repaired.push(entry.fromFile);
+      if (before === null && after !== null) {
+        repaired.push(entry.fromFile);
+        count('negative_resolution_keys_rechecked', 1);
+      }
       entry.resolved = after;
+      if (after === null) {
+        if (entry.candidatesIndexed !== true) indexNegativeKey(key, entry);
+      } else {
+        // It resolves now, so it is no longer a negative key and its candidate
+        // registration is dead weight. Dropping it here is what keeps the index
+        // proportional to the number of CURRENTLY unresolvable edges.
+        unindexNegativeKey(key);
+      }
     }
     return repaired;
   }
@@ -695,17 +853,78 @@ export function createProjectSession(config) {
    * order would emit a differently ordered stylesheet, which is exactly the
    * class of regression the differential oracle exists to catch.
    */
-  function refreshClosure() {
-    const cfg = state.config;
+  function refreshClosure(active) {
     const covered = new Map();
     const queue = [];
 
-    for (const root of cfg.roots) {
+    // WHICH FILES ARE UNDER THE ROOTS is a question with two very different
+    // costs, and Spike 4 is about the difference between them.
+    //
+    //   full-discovery     ask the filesystem: one `readdir` per directory per
+    //                      revision. Always correct, O(project).
+    //   verified-explicit  take the previous answer and apply the declared
+    //                      mutation to it. O(declared), and the answer is the
+    //                      same one the filesystem would have given.
+    //
+    // The second is only sound because the caller performed the write. That is
+    // the whole content of the `verified-explicit` contract, and a host that
+    // cannot make that claim uses `full-discovery` and pays for it.
+    const trustRoots =
+      active?.dirtyInputMode === 'verified-explicit' ||
+      active?.dirtyInputMode === 'watcher';
+    const applied = trustRoots ? active.rootDelta : null;
+
+    // The cached root lists have to keep the EXACT order `walkFiles` would have
+    // produced, because the traversal order is a function of the coverage array
+    // and of the stylesheet's cascade order. So a declared mutation is applied
+    // by RE-READING THE DIRECTORY IT CHANGED, not by splicing the path into a
+    // list we are guessing about.
+    //
+    // A file whose CONTENT changed is not in this set at all: its path, its
+    // position and its neighbours are all unchanged, and there is nothing to
+    // re-derive. That is the one-file agent edit, and it costs no directory read
+    // whatsoever.
+    //
+    // A file that APPEARED or DISAPPEARED does change the order the walk would
+    // produce, so its parent directory is re-read. One `readdir` of one
+    // directory, not a walk of the tree - and in the pathological shape of a
+    // project with ten thousand files in one directory, that is the same
+    // `readdir` a walk would have done anyway, while the ten thousand file
+    // READS and HASHES the walk also implied are what is actually saved.
+    if (applied != null && rootFileSets.size > 0) {
+      const dirsToRefresh = new Set();
+      let shapeMoved = false;
+      for (const abs of [...applied.added, ...applied.removed]) {
+        const owner = rootOwning(path.dirname(abs));
+        if (owner === null) {
+          // The parent is not under any walked root: the tree's shape moved in
+          // a way an incremental update cannot describe. A walk is the honest
+          // answer, and it is counted.
+          shapeMoved = true;
+          break;
+        }
+        dirsToRefresh.add(owner);
+      }
+      if (shapeMoved) {
+        active.fullDiscoveryReason =
+          active.fullDiscoveryReason ?? 'root-shape-changed';
+        rootFileSets.clear();
+      } else {
+        for (const dir of dirsToRefresh) {
+          rootFileSets.set(dir, walkFiles(dir));
+          count('discovery_directory_rereads', 1);
+        }
+      }
+    }
+
+    // Seed from each declared root. In full-discovery mode, and on a session's
+    // first revision, the answer comes from the filesystem and is CACHED. In
+    // verified-explicit mode the answer is reused from the cache and corrected
+    // below, which is where the declared mutation is applied.
+    for (const root of state.config.roots) {
       const abs = path.resolve(root);
-      let stat;
-      try {
-        stat = fs.statSync(abs);
-      } catch {
+      const stat = statOrNull(abs);
+      if (stat == null) {
         throw new PmsError([
           diagnostic({
             code: Codes.COVERAGE_GAP,
@@ -719,11 +938,14 @@ export function createProjectSession(config) {
       if (stat.isFile()) {
         covered.set(abs, 'root');
         queue.push(abs);
-      } else {
-        for (const f of walkFiles(abs)) {
-          covered.set(f, 'root');
-          queue.push(f);
-        }
+        continue;
+      }
+      const cached = trustRoots ? rootFileSets.get(abs) : undefined;
+      const found = cached ?? walkFiles(abs);
+      if (cached === undefined) rootFileSets.set(abs, found);
+      for (const f of found) {
+        covered.set(f, 'root');
+        queue.push(f);
       }
     }
 
@@ -932,6 +1154,27 @@ export function createProjectSession(config) {
         }
       }
       dirListings = new Map();
+      // The mutation transaction, if the caller supplied one. `full-discovery` -
+      // the default - leaves this null and every cost below is re-derived.
+      active.mutation = changes.mutation ?? null;
+      state.lastMutation = active.mutation;
+      if (
+        active.mutation != null &&
+        Number.isInteger(active.mutation.auditInterval) &&
+        active.mutation.auditInterval > 0 &&
+        active.revisionId % active.mutation.auditInterval === 0
+      ) {
+        state.auditDue = true;
+      }
+      if (active.mutation != null) {
+        state.dirtyInputMode = active.mutation.mode;
+      }
+      active.mutationTouched =
+        changes.mutation == null
+          ? null
+          : new Set(
+              [...touchedPaths(changes.mutation)].map((p) => path.resolve(p)),
+            );
       phase('session_scan_ms', () => scanPreviousAndRoots(active, changes));
     } catch (err) {
       active.scanError = err;
@@ -954,24 +1197,120 @@ export function createProjectSession(config) {
     }
     for (const file of state.fileStates.keys()) known.add(file);
 
+    const declared = changes.mutation;
+    // Three independent reasons to stop trusting the declared set, and all three
+    // land in the same place: re-derive everything and say so.
+    const forcedFullDiscovery =
+      declared != null &&
+      (declared.forceFullDiscovery === true || state.auditDue === true);
+    const trustDeclared =
+      declared != null &&
+      declared.mode !== 'full-discovery' &&
+      !forcedFullDiscovery;
+
+    count(
+      'dirty_input_mode_' +
+        (declared?.mode ?? 'full-discovery').replace(/-/g, '_'),
+      1,
+    );
+    if (declared != null) {
+      count('dirty_files_declared', touchedPaths(declared).size);
+    }
+
+    // -------------------------------------------------------------- declared
+    //
+    // The agent's transaction IS the mutation set. Only the declared paths are
+    // read, and only they are hashed; everything else keeps the state it has.
+    // At 10,000 files the previous path re-read and re-hashed every one of them
+    // to be told that one had changed.
+    if (trustDeclared) {
+      const delta = { added: new Set(), removed: new Set() };
+      for (const raw of touchedPaths(declared)) {
+        const file = path.resolve(raw);
+        const declaredRemoval =
+          declared.removed.some((p) => path.resolve(p) === file) ||
+          declared.renamed.some((r) => path.resolve(r.from) === file);
+        if (declaredRemoval) {
+          if (!active.removedFiles.has(file)) {
+            active.removedFiles.add(file);
+            active.dirty.add(file);
+            active.invalid.add(file);
+            if (known.has(file)) bump('files_removed');
+          }
+          delta.removed.add(file);
+          continue;
+        }
+        const entry = scanEntryFor(file);
+        count('dirty_files_read', 1);
+        if (!entry.readable) {
+          // Declared as changed and gone. A removal the caller did not label,
+          // handled as one rather than ignored.
+          if (known.has(file) && !active.removedFiles.has(file)) {
+            active.removedFiles.add(file);
+            active.dirty.add(file);
+            active.invalid.add(file);
+            bump('files_removed');
+          }
+          delta.removed.add(file);
+          continue;
+        }
+        count('dirty_files_hashed', 1);
+        if (!entry.known) {
+          bump('files_added');
+          active.newFiles.add(file);
+          delta.added.add(file);
+        } else if (entry.changed) {
+          bump('files_changed');
+        } else {
+          // Declared dirty and hashed identical. An agent that reformatted a
+          // file without changing it should cost nothing downstream, and
+          // saying so is how a host can find out it is over-declaring.
+          count('dirty_files_unchanged', 1);
+        }
+        active.dirty.add(file);
+        active.invalid.add(file);
+      }
+      active.rootDelta = delta;
+      active.dirtyInputMode = declared.mode;
+      count('project_files_scanned', 0);
+      return;
+    }
+
+    // -------------------------------------------------------- full discovery
+    if (declared != null && declared.forceFullDiscovery === true) {
+      bump('full_discovery_fallback');
+      active.fullDiscoveryReason = 'caller-requested';
+      state.auditDue = false;
+    } else if (declared != null && state.auditDue === true) {
+      // The standing completeness audit fired, so this revision re-derives
+      // everything. It is O(project) by construction, which is exactly why it is
+      // an interval a host opts into and not a default.
+      state.auditDue = false;
+      bump('full_discovery_fallback');
+      active.fullDiscoveryReason = 'mutation-set-audit-interval';
+    }
+    active.dirtyInputMode = 'full-discovery';
+    active.rootDelta = null;
+
     const rootFiles = new Set();
     for (const root of state.config.roots) {
       const abs = path.resolve(root);
-      let stat;
-      try {
-        stat = fs.statSync(abs);
-      } catch {
+      const stat = statOrNull(abs);
+      if (stat == null) {
         // The coverage walk reports a missing declared root with a diagnostic.
-        // The scan simply cannot read it, and the walk runs in `validate()`.
+        // The scan cannot read it, and the walk runs in `validate()`.
         continue;
       }
       if (stat.isFile()) rootFiles.add(abs);
       else for (const f of walkFiles(abs)) rootFiles.add(f);
     }
+    count('project_files_scanned', known.size + rootFiles.size);
 
     const counted = new Set();
     for (const file of known) {
       const entry = scanEntryFor(file);
+      count('dirty_files_read', 1);
+      if (entry.readable) count('dirty_files_hashed', 1);
       if (!entry.readable) {
         if (entry.known) {
           active.dirty.add(file);
@@ -995,7 +1334,9 @@ export function createProjectSession(config) {
     for (const file of rootFiles) {
       if (known.has(file)) continue;
       const entry = scanEntryFor(file);
+      count('dirty_files_read', 1);
       if (!entry.readable) continue;
+      if (entry.readable) count('dirty_files_hashed', 1);
       if (!counted.has(file)) bump('files_added');
       counted.add(file);
       active.newFiles.add(file);
@@ -1026,8 +1367,6 @@ export function createProjectSession(config) {
     }
   }
 
-  // ------------------------------------------------------------ validate ----
-
   function validate() {
     const active = state.active;
     if (active == null) {
@@ -1050,12 +1389,12 @@ export function createProjectSession(config) {
       // sufficient.
       clearModuleCache();
 
-      for (const key of revalidateResolution()) {
-        void key;
+      for (const file of revalidateResolution(resolutionScopeFor(active))) {
+        void file;
         bump('negative_resolutions_invalidated');
       }
 
-      const closure = phase('session_closure_ms', () => refreshClosure());
+      const closure = phase('session_closure_ms', () => refreshClosure(active));
       state.covered = closure;
 
       // Files that left the covered set lose EVERYTHING they owned. This is the
@@ -1169,6 +1508,7 @@ export function createProjectSession(config) {
   function pruneResolution() {
     for (const [key, entry] of [...resolutionKeys]) {
       if (state.fileStates.has(entry.fromFile)) continue;
+      unindexNegativeKey(key);
       resolutionKeys.delete(key);
     }
   }
@@ -1798,6 +2138,130 @@ export function createProjectSession(config) {
     /** The last published generation, or null if none was ever published. */
     current() {
       return state.published;
+    },
+
+    /**
+     * An AI agent's mutation transaction, and the reason this method exists.
+     *
+     * The ordinary `applyChanges` asks the FILESYSTEM what changed. This one
+     * asks the CALLER, because the caller is the party that just performed the
+     * write and is therefore authoritative about WHICH paths moved - and which
+     * is the only fact a 10,000-file project was being made to rediscover.
+     *
+     * One call is ONE revision boundary, however many files it names: an agent
+     * that extracts a component across seven files gets one revision, not seven.
+     *
+     * The transaction narrows WHERE the session looks. It never supplies WHAT
+     * is at those paths: every declared path is read and content-hashed, mtime
+     * is never consulted, and a caller that lies about which paths changed is
+     * violating a documented contract rather than bypassing a check.
+     *
+     * See `dirty-input.js` for the trust model and the incomplete-set contract.
+     */
+    applyAgentChanges(mutation) {
+      // Reaching for THIS method is itself a provenance claim. A caller that
+      // wants the session to go and look has `applyChanges`, and its default is
+      // `full-discovery`; a caller that comes here is saying it performed the
+      // write and knows the path. It may still pass an explicit `mode`, and
+      // `mode: 'full-discovery'` here is honoured - so the method is a route,
+      // not a promise.
+      const transaction = normalizeMutationTransaction({
+        ...mutation,
+        mode: mutation?.mode ?? 'verified-explicit',
+      });
+      state.dirtyInputMode = transaction.mode;
+      return applyChanges({ mutation: transaction });
+    },
+
+    /**
+     * Audits the caller's mutation set against the filesystem.
+     *
+     * The incomplete-set contract says a `verified-explicit` transaction cannot
+     * be checked for completeness without the walk it exists to avoid. This is
+     * that walk, on demand, and it answers the question an integration needs to
+     * be able to ask: "were you right?" A host that wants a standing check sets
+     * `auditInterval` and gets this called for it.
+     */
+    verifyMutationSet() {
+      const mode = state.dirtyInputMode;
+      const before = new Set(state.fileStates.keys());
+      const applied = state.lastMutation;
+      const discrepancies = [];
+
+      // The filesystem's own answer, computed without disturbing the session.
+      //
+      // PandamStyle's OWN OUTPUT is excluded, by ownership rather than by string
+      // matching: the generated design-system module lives under the output
+      // directory, and the output directory is the compiler's, not the
+      // project's. Counting it as a source that "disappeared" would report a
+      // discrepancy on every revision of a correct session - and, worse, would
+      // invite a host to "fix" it by declaring the compiler's own output as a
+      // source mutation, which is exactly the feedback loop this rule prevents.
+      const outDir = path.resolve(state.config.outDir);
+      const onDisk = new Set();
+      for (const root of state.config.roots) {
+        const abs = path.resolve(root);
+        const stat = statOrNull(abs);
+        if (stat == null) continue;
+        if (stat.isFile()) {
+          onDisk.add(abs);
+          continue;
+        }
+        for (const f of walkFiles(abs)) {
+          if (isUnderDir(f, outDir) || f.startsWith(outDir + path.sep))
+            continue;
+          onDisk.add(f);
+        }
+      }
+      for (const file of before) {
+        if (isUnderDir(file, outDir) || file.startsWith(outDir + path.sep))
+          continue;
+      }
+
+      if (applied == null) {
+        return {
+          mode,
+          audited: true,
+          discrepancies,
+          declared: 0,
+          note: 'no declared transaction; nothing to check against',
+        };
+      }
+      const declared = touchedPaths(applied);
+      count('mutation_set_audits', 1);
+      for (const file of onDisk) {
+        if (before.has(file)) continue;
+        if (declared.has(path.resolve(file))) continue;
+        discrepancies.push({
+          file: relativeToCwd(file),
+          kind: 'undeclared-new',
+        });
+      }
+      for (const file of before) {
+        if (isUnderDir(file, outDir) || file.startsWith(outDir + path.sep))
+          continue;
+        if (onDisk.has(file)) continue;
+        if (declared.has(path.resolve(file))) continue;
+        discrepancies.push({
+          file: relativeToCwd(file),
+          kind: 'undeclared-removed',
+        });
+      }
+      count('mutation_set_discrepancies', discrepancies.length);
+      return {
+        mode,
+        audited: true,
+        discrepancies,
+        declared: declared.size,
+      };
+    },
+
+    /** The provenance mode this session is currently accepting input from. */
+    dirtyInput() {
+      return {
+        mode: state.dirtyInputMode,
+        lastTransaction: state.lastMutation,
+      };
     },
 
     /**
