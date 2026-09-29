@@ -45,6 +45,13 @@ module.exports = {
     // The patterns are per-directory, so a run that does not exist yet is
     // treated exactly like one that does.
     'out-pandamstyle/',
+    // A run directory may be nested deeper than `evidence/<batch>/` (the
+    // benchmark laboratory keeps its verification runs under
+    // `evidence/performance/<batch>/verify/`). Same rule: the run directory
+    // keeps its durable evidence, the rebuildable payloads below it do not, and
+    // a pilot work tree is not repository source.
+    'evidence/**/artifacts/',
+    'evidence/**/pilot/',
     // The benchmark laboratory's scratch root. The corpora under it are
     // GENERATED third-party-shaped fixtures, not repository source: they are
     // deliberately not formatted and not linted, exactly as the

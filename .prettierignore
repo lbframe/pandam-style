@@ -30,6 +30,9 @@ examples/example-sveltekit/.svelte-kit/**
 out-pandamstyle/
 evidence/*/artifacts/
 evidence/*/pilot/
+# A run directory can be nested deeper than `evidence/<batch>/`; same rule.
+evidence/**/artifacts/
+evidence/**/pilot/
 pilot/vite-react/.pandamstyle/
 
 # Mirrors .eslintrc.js: the vendored third-party donor and the PandamStyle
