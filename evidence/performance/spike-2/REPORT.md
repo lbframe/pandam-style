@@ -16,9 +16,11 @@ pilot green.
 **PandamStyle Spike 2 incremental compilation demonstrated on the tested scope.**
 
 Local revisions reuse valid unchanged-file results, incremental outputs are
-equivalent to fresh full rebuilds across the tested revision traces, project
-state remains bounded, and the remaining compiler costs are measured well enough
-to decide whether a native frontend experiment is justified.
+equivalent to fresh full rebuilds across the tested revision traces, structural
+session state remains bounded across the tested 1,000-revision trace, and the
+remaining compiler costs are measured well enough to decide whether a native
+frontend experiment is justified. Process RSS increased during that trace and is
+not claimed to be proven bounded indefinitely (§6, §9).
 
 The measured answer to the question Spike 1 was built to ask:
 
@@ -460,7 +462,7 @@ before that is claimed.
 | 6 | one-file edit latency at c1000? | **307.6 ms**, from 3,287.8 ms |
 | 7 | and at c10000? | **4,073.7 ms**, from 31,558.0 ms |
 | 8 | does edit latency still scale with project size? | **the analysis does not** — 42.9 ms → 222.9 ms for 10× the files, sub-linear. **the revision still does**, because publication writes every compiled artifact: 307.6 ms → 4,073.7 ms. The scaling is now in the publisher, not in the compiler |
-| 9 | what remains after file-level compilation disappears? | publication (40% at c1000, 53% at c1000), CSS aggregation (9% / 5%), the source scan (4% / 3%), the closure walk (1% / 1%), the design-system view walk (4% / 0.2%) |
+| 9 | what remains after file-level compilation disappears? | publication (40% at c1000, 53% at c10000), CSS aggregation (9% / 5%), the source scan (4% / 3%), the closure walk (1% / 1%), the design-system view walk (4% / 0.2%) |
 | 10 | how much time remains in CSS aggregation and publication? | `css_serialize_ms` 28.0 ms + `publish_ms` 122.4 ms = **150 ms of 308 ms (49%)** at c1000; 219.5 + 2,141.7 = **2,361 ms of 4,074 ms (58%)** at c10000 |
 | 11 | did eliminating the coverage parse matter after incrementality? | **no, and it is already eliminated.** The coverage parse costs 12.9 ms of a 308 ms revision at c1000 (4.2%) and 9.7 ms of 4,074 ms at c10000 (0.2%), because the session reuses the module summary. The remaining prize is on the one-time cold path |
 | 12 | what is the memory cost of the session? | +55 MB of retained heap for 1,004 file states at c1000 (compiled JS plus every file's rule contribution, retained because a publication must be able to emit them) |
