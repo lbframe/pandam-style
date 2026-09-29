@@ -15,7 +15,18 @@ batch base     : e5ff62b4a925405dcf9fb415faa00df4b68aeaa9  (refs/remotes/origin/
 `complete: true`, `skippedSteps: []`, `failedSteps: []`. **No skip flags were used** —
 `PMS_SKIP_INSTALL` and `PMS_SKIP_PILOT` were both left unset and both steps ran.
 
-This is the SECOND full run of Spike 3's verification, at the final commit, with a
+The final delivered commit is one commit later, `0576ee68`, and it changes **evidence
+documents only**. `git diff c34c8623..HEAD -- packages/ benchmarks/` is empty, so the
+compiler source and the benchmark harness are byte-identical to the tree verified
+here:
+
+    $ git diff --name-only c34c8623..HEAD
+    evidence/native/{build,env,install,pandamstyle,pilot,run,upstream-babel-plugin,upstream-stylex}.log
+    evidence/native/summary.json
+    evidence/performance/spike-3/{INDEX.json,REPORT.md,VERIFICATION.md}
+    evidence/performance/spike-3/verify/verify-pms-summary.json
+
+This is the SECOND full run of Spike 3's verification, with a
 clean working tree. The first ran at `18618117` and is retained in the git history;
 this one supersedes it, because two evidence commits landed after it and one of them
 changed source (a literal NUL byte in a string literal was replaced by its escape
