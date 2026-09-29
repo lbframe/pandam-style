@@ -3,6 +3,11 @@
 **Branch:** `perf/pandamstyle-spike-2-incremental-2026-09`
 **Base SHA:** `cffab61fc2d66dbd94a3fdf42c1088f0da9da847` (Spike 1 head)
 **Plan version:** `1.2.0` (metrics extended, nothing renamed or reinterpreted)
+**Verification record:** [`VERIFICATION.md`](./VERIFICATION.md) —
+`./verify-pms.sh` green on the tested tree, `eslint` and `prettier` clean, 1,290
+package tests (283 PandamStyle, 1,007 + 64 upstream babel-plugin, 99 upstream
+stylex), 34 benchmark-harness tests, `summarize.py --self-test` green, Vite
+pilot green.
 
 ---
 
