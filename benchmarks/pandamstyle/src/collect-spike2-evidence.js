@@ -154,9 +154,12 @@ function main() {
     return d;
   };
 
+  // `parseArgs` strips the leading dashes, so the lookup keys are bare. Using
+  // the dashed spelling here would silently collect nothing and produce an
+  // index that looks complete and is empty.
   for (const [flag, label] of [
-    ['--c1000', 'c1000-t1000-r100-s809'],
-    ['--c10000', 'c10000-t1000-r100-s307'],
+    ['c1000', 'c1000-t1000-r100-s809'],
+    ['c10000', 'c10000-t1000-r100-s307'],
   ]) {
     if (args[flag] == null) continue;
     const stream = path.resolve(args[flag]);

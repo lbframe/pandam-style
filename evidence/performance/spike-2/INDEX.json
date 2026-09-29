@@ -32,7 +32,26 @@
       "identical_to_spike_1": true
     }
   ],
-  "campaigns": [],
+  "campaigns": [
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "name": "c1000-metadata.json",
+      "bytes": 282677,
+      "sha256": "86911c77b37939d1314270008f908800820c07847240686a8e230421f665eb19",
+      "durability": "committed",
+      "note": "every job, its engine anchor, the run kind and the order seed",
+      "committed_copy": "evidence/performance/spike-2/campaigns/c1000-metadata.json"
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307",
+      "name": "c10000-metadata.json",
+      "bytes": 55286,
+      "sha256": "5b21f85de85f697731dcaa674be7a4f4c61b6afb0183f9ffefa1f5c9029862fa",
+      "durability": "committed",
+      "note": "every job, its engine anchor, the run kind and the order seed",
+      "committed_copy": "evidence/performance/spike-2/campaigns/c10000-metadata.json"
+    }
+  ],
   "correctness": [
     {
       "name": "oracle-c100.json",
@@ -53,5 +72,20 @@
       "committed_copy": "evidence/performance/spike-2/memory/long-session-c1000.json"
     }
   ],
-  "raw": []
+  "raw": [
+    {
+      "name": "c1000.jsonl",
+      "bytes": 11505072,
+      "sha256": "6c4b2943423669cc146234179f137f43f1dd8fd0728afc4ce5e4c81d479d39c6",
+      "durability": "ignored-local-scratch",
+      "note": "raw observation stream, c1000-t1000-r100-s809"
+    },
+    {
+      "name": "c10000.jsonl",
+      "bytes": 2028419,
+      "sha256": "206f37a18aca4989a7e2cf5e4e8fb0d3c06e8b67ca2b0d950cdd9ab1752b58a3",
+      "durability": "ignored-local-scratch",
+      "note": "raw observation stream, c10000-t1000-r100-s307"
+    }
+  ]
 }
