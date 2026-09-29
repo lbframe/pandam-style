@@ -22,6 +22,9 @@ export {
 } from './build';
 export { beginGeneration, withGeneration, digestOfTree } from './generation';
 export { createProjectSession } from './session';
+// The incremental CSS state, exported so its ownership and ordering semantics
+// can be tested directly rather than only through a whole project build.
+export { createCssState } from './css-state';
 export { buildDesignSystem } from './index';
 export { buildRegistry, registryDigest } from './registry';
 export { supportedProperties, propertyKind, propertyCategory } from './policy';

@@ -87,6 +87,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import styleXTransform from '../src/index';
+import { createCssState } from './css-state';
 import { buildDesignSystem } from './index';
 import { generateDesignSystemModule } from './codegen';
 import { PmsError, Codes, diagnostic } from './diagnostics';
@@ -335,6 +336,10 @@ export function createProjectSession(config) {
   // and a negative result is never stale.
   let dirListings = new Map();
   let resolutionKeys = new Map();
+  // The project's incremental CSS state. Null until a variant asks for it.
+  let cssState = null;
+  let cssStateKey = null;
+  let cssStateLastCss = null;
 
   function listingOf(dir) {
     let names = dirListings.get(dir);
@@ -1118,6 +1123,12 @@ export function createProjectSession(config) {
       active.ruleCount = analysis.ruleCount;
       active.consistency = analysis.consistency;
       active.designSystemRuleCount = analysis.designSystemRuleCount;
+      // The three inputs the incremental CSS state consumes. They are properties
+      // of THIS revision and are recomputed with it.
+      active.designSystemRules = analysis.designSystemRules;
+      active.recompiledRules = analysis.recompiledRules;
+      active.liveRuleOwners = analysis.liveRuleOwners;
+      active.coveredFiles = analysis.coveredFiles;
       active.ok = true;
     } catch (err) {
       active.ok = false;
@@ -1166,12 +1177,34 @@ export function createProjectSession(config) {
     const cfg = state.config;
     const designSystemPath = state.generatedModulePath;
 
-    const allRules = designSystemRules();
-    const designSystemRuleCount = allRules.length;
+    // TWO arrays, and the difference matters.
+    //
+    // `designSystemRules()` reads `state.designSystem.injected`, which is a
+    // MUTABLE ACCUMULATOR: every `create()` call the design system hands to a
+    // page does `Object.assign(injected, result.injected)` on it. So the array
+    // taken here is the design system's own rules, and it stops being that the
+    // moment the pages below are compiled.
+    //
+    // Aliasing one array to both roles - which is what this did, and what made
+    // the incremental CSS state believe the design system owned every rule in
+    // the project, which made every page rule immortal - is the kind of aliasing
+    // that is invisible until something needs to attribute a rule to an owner.
+    const designSystemRulesForRevision = designSystemRules();
+    const allRules = [...designSystemRulesForRevision];
+    const designSystemRuleCount = designSystemRulesForRevision.length;
     const coverage = [];
     const failures = [];
     const outputs = [];
     const analysed = [];
+    // The two sets the incremental CSS state consumes: the files whose rule
+    // contribution this revision replaced, and the files that left. Everything
+    // else keeps the contribution it already had, which is what makes a CSS
+    // update a function of the changed set rather than of the project size.
+    // An EMPTY map means "no file was recompiled", which is the case
+    // incremental CSS exists for. `null` means "this caller did not supply a
+    // delta", which is a different statement entirely and the only one that
+    // forces a rebuild - so the two must not be the same value.
+    const recompiledRules = new Map();
 
     // The generated design-system module is the generator's own output, not a
     // page: it is staged as-is and never re-analysed. Relabelling it here,
@@ -1277,6 +1310,9 @@ export function createProjectSession(config) {
       }
       for (const rule of fileState.contribution.rules) allRules.push(rule);
       coverage.push(fileState.contribution.coverage);
+      if (fileState.compiledRevision === active.revisionId) {
+        recompiledRules.set(file, fileState.contribution.rules);
+      }
       analysed.push(file);
       outputs.push({
         file,
@@ -1293,6 +1329,18 @@ export function createProjectSession(config) {
       phase: 'cli',
     });
 
+    // Every file that currently owns a rule contribution. A file stops owning
+    // one by being deleted, by leaving the covered set, or by failing to compile
+    // - three different paths that all end in the same place here, and that a
+    // list of "files that were removed" would only catch one of.
+    const liveRuleOwners = new Set();
+    for (const file of closure.covered.keys()) {
+      if (file === designSystemPath) continue;
+      const fileState = state.fileStates.get(file);
+      if (fileState?.contribution == null) continue;
+      liveRuleOwners.add(file);
+    }
+
     return {
       allRules,
       // What the CSS aggregation actually consumed, for the report. Kept as a
@@ -1301,6 +1349,10 @@ export function createProjectSession(config) {
       // ordered output was reduced from.
       ruleCount: allRules.length,
       designSystemRuleCount,
+      designSystemRules: designSystemRulesForRevision,
+      recompiledRules,
+      liveRuleOwners,
+      coveredFiles: [...closure.covered.keys()],
       coverage,
       failures,
       outputs,
@@ -1353,17 +1405,83 @@ export function createProjectSession(config) {
     );
   }
 
+  /**
+   * The project's stylesheet, owned incrementally.
+   *
+   * `cssState` is session state, not per-revision state: it survives revisions
+   * exactly as the per-file contributions do, because the question it answers -
+   * "which files own which rule, and in what order do they cascade" - is a
+   * question about the project, not about a revision.
+   *
+   * The full route is still the default and is still what the two publication
+   * variants use: Phase A measured publication with CSS held constant, and
+   * holding it constant is the only way that measurement means anything.
+   */
   function aggregateCss(active, cfg, variant) {
     if (!usesIncrementalCss(variant)) {
       return aggregateCssFull(active.allRules, cfg);
     }
-    // Phase B. Until the incremental CSS state exists, saying so is the correct
-    // behaviour: silently aggregating in full would make the Phase A numbers
-    // look like Phase B numbers, which is the one mistake this spike cannot
-    // afford.
-    throw new Error(
-      'pandamstyle: session_incremental_publish_css is not available in this build; Phase B is not implemented.',
-    );
+    // The state caches the aggregator's CONFIG - the comparator, the layer
+    // naming, the RTL wrapping, the specificity bump. A configuration change
+    // therefore invalidates the whole of it, not just its contributions, and
+    // reusing it would emit a stylesheet shaped by the previous configuration.
+    // A config change is already a full fallback, so the cost of starting again
+    // is paid exactly when everything else is being paid for.
+    const cssConfigKey = `${cfg.useCSSLayers}`;
+    if (cssState == null || cssStateKey !== cssConfigKey) {
+      cssState = createCssState({ useLayers: cfg.useCSSLayers });
+      cssStateKey = cssConfigKey;
+      cssStateLastCss = null;
+    }
+
+    // A change the session cannot reason about locally is a global CSS rebuild.
+    // It is counted and NAMED, so a run that leans on it says so rather than
+    // looking incremental.
+    const semanticFallback = active.fallbackReason != null;
+    const outcome = cssState.apply({
+      fileRules: ruleContributionsOf(active),
+      designSystemRules: active.designSystemRules,
+      changedFiles: active.recompiledRules,
+      liveOwners: active.liveRuleOwners,
+      fallback: semanticFallback ? active.fallbackReason : null,
+    });
+
+    const result = cssState.serialize();
+    const stats = cssState.stats();
+    const report = {
+      incremental: !outcome.fallback,
+      fallbackReason: outcome.reason,
+      ruleRecords: stats.ruleRecords,
+      ownerCount: stats.ownerCount,
+      groupCount: result.groupCount,
+      rulesAdded: stats.rulesAdded,
+      rulesRemoved: stats.rulesRemoved,
+      rulesReused: orderedReusedOf(result, stats),
+      refcountChanged: stats.refcountChanged,
+    };
+    active.cssReport = report;
+    count('css_incremental_update_ms', outcome.ns / 1e6);
+    count('css_order_maintenance_ms', result.orderNs / 1e6);
+    count('css_final_serialize_ms', result.serializeNs / 1e6);
+    count('css_bytes_written', Buffer.byteLength(result.css, 'utf8'));
+    count('css_generation_reused', result.css === cssStateLastCss ? 1 : 0);
+    cssStateLastCss = result.css;
+    return result.css;
+  }
+
+  function orderedReusedOf(result, stats) {
+    return Math.max(0, result.ruleCount - stats.rulesAdded);
+  }
+
+  /** Every covered file's rule contribution, for a full CSS rebuild. */
+  function ruleContributionsOf(active) {
+    const out = new Map();
+    for (const file of active.coveredFiles) {
+      const fileState = state.fileStates.get(file);
+      if (fileState?.contribution == null) continue;
+      out.set(file, fileState.contribution.rules);
+    }
+    return out;
   }
 
   function designSystemRules() {
@@ -1479,6 +1597,10 @@ export function createProjectSession(config) {
             projectSemanticEpoch: state.semanticEpoch,
             incrementalAnalysisMs: active.incrementalMs / 1e6,
             ...active.counters,
+            // What the stylesheet cost, and whether it was re-derived or
+            // updated. Present only for the variant that owns CSS state; the
+            // other two report the same generation without it.
+            ...(active.cssReport == null ? {} : { css: active.cssReport }),
           },
         };
 
@@ -1688,6 +1810,24 @@ export function createProjectSession(config) {
      */
     lastPublication() {
       return state.lastPublication ?? null;
+    },
+
+    /**
+     * The incremental CSS state, for the variant that owns it.
+     *
+     * Exposed so ownership, rule counts and refcounts can be asserted directly
+     * rather than inferred from which rules happened to survive into the
+     * stylesheet, and so a long session can be shown not to grow without bound.
+     * `null` for the variants that aggregate CSS in full, which have no such
+     * state to report.
+     */
+    cssState() {
+      if (cssState == null) return null;
+      return {
+        stats: cssState.stats(),
+        ownership: cssState.ownership(),
+        orderedClassNames: cssState.orderedClassNames(),
+      };
     },
 
     stats() {

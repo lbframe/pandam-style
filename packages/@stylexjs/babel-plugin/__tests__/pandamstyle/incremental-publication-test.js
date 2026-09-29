@@ -1047,10 +1047,38 @@ describe('Spike 3 Phase A: the publication variants are selectable and separate'
     ).toThrow(/incrementalCss requires incrementalPublish/);
   });
 
-  test('the Phase B variant refuses rather than quietly aggregating in full', () => {
+  test('the Phase B variant is a real third path, not a relabelled one', () => {
+    // Until Phase B existed this variant threw rather than quietly aggregating
+    // in full, which was the correct behaviour then and is pinned in
+    // incremental-css-test.js. Now it exists, and it has to be a DISTINCT path:
+    // the same published bytes as the other two, reached by a different amount
+    // of work, and it must say in its own report that CSS was updated rather
+    // than re-derived.
     const h = openProject('valid', {
       publishVariant: 'session_incremental_publish_css',
     });
-    expect(() => publish(h)).toThrow(/Phase B is not implemented/);
+    const first = publish(h);
+    expect(first.publication.variant).toBe('session_incremental_publish_css');
+    expect(first.publication.mode).toBe('delta');
+    // The first revision has no CSS state to update, so it builds one and says
+    // so rather than reporting an update it did not perform.
+    const firstReport = JSON.parse(
+      fs.readFileSync(path.join(h.outDir, 'build-report.json'), 'utf8'),
+    );
+    expect(firstReport.incremental.css.incremental).toBe(false);
+    expect(firstReport.incremental.css.fallbackReason).toBe('initial');
+
+    // The second one has one, and the no-change revision updates it with
+    // nothing - which is the whole point of the variant.
+    const second = publish(h);
+    const secondReport = JSON.parse(
+      fs.readFileSync(path.join(h.outDir, 'build-report.json'), 'utf8'),
+    );
+    expect(second.publication.mode).toBe('delta');
+    expect(secondReport.incremental.css.incremental).toBe(true);
+    expect(secondReport.incremental.css.fallbackReason).toBe(null);
+    expect(secondReport.incremental.css.rulesAdded).toBe(0);
+    expect(secondReport.incremental.css.rulesRemoved).toBe(0);
+    expect(secondReport.incremental.css.ruleRecords).toBeGreaterThan(0);
   });
 });

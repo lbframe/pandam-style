@@ -724,11 +724,10 @@ function processStylexRulesInner(
 ): string {
   const rawConfig =
     typeof config === 'boolean' ? { useLayers: config } : (config ?? {});
-  const {
-    enableLTRRTLComments = false,
-    legacyDisableLayers = false,
-    useLegacyClassnamesSort = false,
-  } = rawConfig;
+  // `enableLTRRTLComments` and `legacyDisableLayers` are read inside
+  // `transformRuleEntry`, which the full aggregator now shares with the
+  // incremental one, so they are not destructured here any more.
+  const { useLegacyClassnamesSort = false } = rawConfig;
 
   const rawUseLayers = rawConfig.useLayers ?? false;
   const useLayers = rawUseLayers !== false;
@@ -887,10 +886,9 @@ function processStylexRulesInner(
     getLogicalFloatVars(sortedRules),
   );
 
-  const layerName = (index: number): string =>
-    layerPrefix
-      ? `${layerPrefix}.priority${index + 1}`
-      : `priority${index + 1}`;
+  // Delegates to the shared implementation rather than restating it, so the
+  // full aggregator and the incremental one cannot name layers differently.
+  const layerName = (index: number): string => layerNameFor(index, layerPrefix);
 
   const header = useLayers
     ? '\n@layer ' +
@@ -904,43 +902,7 @@ function processStylexRulesInner(
 
   const collectRules = (rules: Array<Rule>, index: number): string =>
     Array.from(new Map(rules.map(([a, b]) => [a, b])).values())
-      .flatMap((rule) => {
-        const { ltr, rtl } = rule;
-        let ltrRule = ltr,
-          rtlRule = rtl;
-
-        if (!useLayers && !legacyDisableLayers) {
-          ltrRule = addSpecificityLevel(ltrRule, index);
-          rtlRule = rtlRule && addSpecificityLevel(rtlRule, index);
-        }
-
-        // check if the selector looks like .xtrlmmh, .xtrlmmh:root
-        // if so, turn it into .xtrlmmh.xtrlmmh, .xtrlmmh.xtrlmmh:root
-        // This is to ensure the themes always have precedence over the
-        // default variable values
-        ltrRule = ltrRule.replace(
-          /\.([a-zA-Z0-9]+), \.([a-zA-Z0-9]+):root/g,
-          '.$1.$1, .$1.$1:root',
-        );
-        if (rtlRule) {
-          rtlRule = rtlRule.replace(
-            /\.([a-zA-Z0-9]+), \.([a-zA-Z0-9]+):root/g,
-            '.$1.$1, .$1.$1:root',
-          );
-        }
-
-        return rtlRule
-          ? enableLTRRTLComments
-            ? [
-                `/* @ltr begin */${ltrRule}/* @ltr end */`,
-                `/* @rtl begin */${rtlRule}/* @rtl end */`,
-              ]
-            : [
-                addAncestorSelector(ltrRule, "html:not([dir='rtl'])"),
-                addAncestorSelector(rtlRule, "html[dir='rtl']"),
-              ]
-          : [ltrRule];
-      })
+      .flatMap((rule) => transformRuleEntry(rule, index, rawConfig))
       .join('\n');
 
   const collectedCSS = pandamstylePerfPhase('css_join_ms', () =>
@@ -978,6 +940,176 @@ function processStylexRulesInner(
 }
 
 styleXTransform.processStylexRules = processStylexRules;
+
+/**
+ * SPIKE 3 - primitives the incremental CSS aggregator reuses.
+ *
+ * These are EXTRACTED from the functions above, not reimplemented. The cascade
+ * order of a stylesheet is a correctness property of this file, and an
+ * incremental aggregator that carried its own copy of the comparator, the
+ * specificity bump, the theme-selector rewrite or the RTL ancestor wrapping
+ * would be a second implementation of those semantics that could agree with this
+ * one today and disagree tomorrow. There is one of each, and both callers use it.
+ */
+
+/**
+ * The cascade comparator, exactly as the full aggregator uses it.
+ *
+ * Returns a function over `Array<Rule>`. The returned function is the whole
+ * ordering contract: an incremental caller that maintains a sorted array by
+ * binary-searching with it gets the same order a full `.sort()` produces,
+ * because the ordering is total - the final tiebreak is the whole rule text,
+ * which contains a class name, and class names are unique.
+ */
+function createRuleComparator(config) {
+  const { useLegacyClassnamesSort = false } =
+    typeof config === 'boolean' ? {} : (config ?? {});
+  const widthSortKeys: Map<string, WidthSortKey | null> = new Map();
+  const getWidthSortKey = (rule: string): WidthSortKey | null => {
+    if (rule[0] !== '@') {
+      return null;
+    }
+    const preludes = atRulePreludes(rule);
+    const chain = preludes.join('{');
+    const cached = widthSortKeys.get(chain);
+    if (cached !== undefined) {
+      return cached;
+    }
+    const key = widthSortKeyForChain(preludes);
+    widthSortKeys.set(chain, key);
+    return key;
+  };
+  return (
+    [classname1, { ltr: rule1 }, firstPriority]: [string, any, number],
+    [classname2, { ltr: rule2 }, secondPriority]: [string, any, number],
+  ) => {
+    const priorityComparison = firstPriority - secondPriority;
+    if (priorityComparison !== 0) return priorityComparison;
+
+    if (useLegacyClassnamesSort) {
+      return classname1.localeCompare(classname2);
+    }
+    const nameComparison = declaredPropertyName(rule1).localeCompare(
+      declaredPropertyName(rule2),
+    );
+    if (nameComparison !== 0) return nameComparison;
+
+    const mqComparison = compareWidthSortKeys(
+      getWidthSortKey(rule1),
+      getWidthSortKey(rule2),
+    );
+    if (mqComparison !== 0) return mqComparison;
+
+    const property1 = rule1.slice(rule1.lastIndexOf('{'));
+    const property2 = rule2.slice(rule2.lastIndexOf('{'));
+    const propertyComparison = property1.localeCompare(property2);
+    if (propertyComparison !== 0) return propertyComparison;
+    return rule1.localeCompare(rule2);
+  };
+}
+
+/** One rule's final text for one layer group. The body of `collectRules`. */
+function transformRuleEntry(rule, index, config) {
+  const { enableLTRRTLComments = false, legacyDisableLayers = false } =
+    typeof config === 'boolean' ? {} : (config ?? {});
+  const rawUseLayers =
+    typeof config === 'boolean' ? config : ((config ?? {}).useLayers ?? false);
+  const useLayers = rawUseLayers !== false;
+
+  // `rule` is the VALUE of `new Map(rules.map(([a, b]) => [a, b]))`, i.e. the
+  // InjectableStyle `{ltr, rtl}`, not the rule tuple. `a` is the class name the
+  // map was keyed by, which is where the deduplication happens.
+  const { ltr, rtl } = rule;
+  let ltrRule = ltr,
+    rtlRule = rtl;
+
+  if (!useLayers && !legacyDisableLayers) {
+    ltrRule = addSpecificityLevel(ltrRule, index);
+    rtlRule = rtlRule && addSpecificityLevel(rtlRule, index);
+  }
+
+  // check if the selector looks like .xtrlmmh, .xtrlmmh:root
+  // if so, turn it into .xtrlmmh.xtrlmmh, .xtrlmmh.xtrlmmh:root
+  // This is to ensure the themes always have precedence over the
+  // default variable values
+  ltrRule = ltrRule.replace(
+    /\.([a-zA-Z0-9]+), \.([a-zA-Z0-9]+):root/g,
+    '.$1.$1, .$1.$1:root',
+  );
+  if (rtlRule) {
+    rtlRule = rtlRule.replace(
+      /\.([a-zA-Z0-9]+), \.([a-zA-Z0-9]+):root/g,
+      '.$1.$1, .$1.$1:root',
+    );
+  }
+
+  return rtlRule
+    ? enableLTRRTLComments
+      ? [
+          `/* @ltr begin */${ltrRule}/* @ltr end */`,
+          `/* @rtl begin */${rtlRule}/* @rtl end */`,
+        ]
+      : [
+          addAncestorSelector(ltrRule, "html:not([dir='rtl'])"),
+          addAncestorSelector(rtlRule, "html[dir='rtl']"),
+        ]
+    : [ltrRule];
+}
+
+/** The `@layer` preamble for a stylesheet with `groupCount` groups. */
+function layerHeader(config, groupCount) {
+  const rawConfig =
+    typeof config === 'boolean' ? { useLayers: config } : (config ?? {});
+  const rawUseLayers = rawConfig.useLayers ?? false;
+  const useLayers = rawUseLayers !== false;
+  const layersBefore =
+    typeof rawUseLayers === 'object' ? (rawUseLayers.before ?? []) : [];
+  const layersAfter =
+    typeof rawUseLayers === 'object' ? (rawUseLayers.after ?? []) : [];
+  const layerPrefix =
+    typeof rawUseLayers === 'object' ? (rawUseLayers.prefix ?? '') : '';
+  if (!useLayers) return '';
+  return (
+    '\n@layer ' +
+    [
+      ...layersBefore,
+      ...Array.from({ length: groupCount }, (_, i) =>
+        layerNameFor(i, layerPrefix),
+      ),
+      ...layersAfter,
+    ].join(', ') +
+    ';\n'
+  );
+}
+
+function layerNameFor(index, layerPrefix) {
+  return layerPrefix
+    ? `${layerPrefix}.priority${index + 1}`
+    : `priority${index + 1}`;
+}
+
+/**
+ * The logical-float preamble, and the constant substitution that has to happen
+ * BEFORE ordering, because the comparator reads the substituted text.
+ */
+function splitConstantRules(rules) {
+  const constantRules = rules.filter(
+    ([, ruleObj]) => ruleObj?.constKey != null && ruleObj?.constVal != null,
+  );
+  const nonConstantRules = rules.filter(
+    ([, ruleObj]) => !(ruleObj?.constKey != null && ruleObj?.constVal != null),
+  );
+  return { constantRules, nonConstantRules };
+}
+
+styleXTransform.createRuleComparator = createRuleComparator;
+styleXTransform.transformRuleEntry = transformRuleEntry;
+styleXTransform.layerHeader = layerHeader;
+styleXTransform.logicalFloatVars = getLogicalFloatVars;
+styleXTransform.splitConstantRules = splitConstantRules;
+styleXTransform.addSpecificityLevel = addSpecificityLevel;
+styleXTransform.addAncestorSelector = addAncestorSelector;
+styleXTransform.declaredPropertyName = declaredPropertyName;
 
 /**
  * Adds an ancestor selector in a media-query-aware way.
