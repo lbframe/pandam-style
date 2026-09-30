@@ -1,0 +1,74 @@
+Successfully compiled 33 files with Babel (492ms).
+Successfully compiled 2 files with Babel (289ms).
+
+./src/stylex.js, ./src/inject.js → ./lib/cjs...
+created ./lib/cjs in 441ms
+
+./src/stylex.js, ./src/inject.js → ./lib/es/...
+created ./lib/es/ in 568ms
+
+./src/index.js → ./lib/index.js...
+created ./lib/index.js in 1.4s
+
+./src/index.js → ./lib/index.browser.js...
+(!) Missing exports
+https://rollupjs.org/troubleshooting/#error-name-is-not-exported-by-module
+src/visitors/stylex-create.js
+logicalExpression is not exported by @babel/types
+475: 
+476:               const guardedObjs = guardedProps.map(({ prop, expr }) =>
+477:                 t.logicalExpression(
+                       ^
+478:                   '&&',
+479:                   t.binaryExpression(
+src/visitors/stylex-create.js
+cloneNode is not exported by @babel/types
+479:                   t.binaryExpression(
+480:                     '!==',
+481:                     t.cloneNode(expr),
+                           ^
+482:                     t.identifier('undefined'),
+483:                   ),
+src/visitors/stylex-create.js
+cloneNode is not exported by @babel/types
+486:                     t.objectProperty(
+487:                       t.identifier('$$css'),
+488:                       t.cloneNode(cssTagValue),
+                             ^
+489:                     ),
+490:                   ]),
+src/visitors/stylex-props.js
+isLiteral is not exported by @babel/types
+528:         return false;
+529:       }
+530:     } else if (!t.isLiteral(val)) {
+                       ^
+531:       return false;
+532:     }
+src/index.js
+importNamespaceSpecifier is not exported by @babel/types
+449:     'body',
+450:     t.importDeclaration(
+451:       [t.importNamespaceSpecifier(t.identifier(stylexLocalName))],
+              ^
+452:       t.stringLiteral(importSource),
+453:     ),
+created ./lib/index.browser.js in 859ms
+
+../../@stylexjs/babel-plugin/pandamstyle/entry-node.js → ./lib/index.js...
+created ./lib/index.js in 1.7s
+
+../../@stylexjs/babel-plugin/pandamstyle/entry-node.js → ./lib/index.mjs...
+created ./lib/index.mjs in 1.1s
+
+../../@stylexjs/babel-plugin/pandamstyle/vite.js → ./lib/vite.js...
+created ./lib/vite.js in 889ms
+
+../../@stylexjs/babel-plugin/pandamstyle/vite.js → ./lib/vite.mjs...
+created ./lib/vite.mjs in 853ms
+
+../../@stylexjs/babel-plugin/pandamstyle/runtime.js → ./lib/runtime.mjs...
+created ./lib/runtime.mjs in 17ms
+
+../../@stylexjs/babel-plugin/pandamstyle/runtime.js → ./lib/runtime.cjs...
+created ./lib/runtime.cjs in 18ms

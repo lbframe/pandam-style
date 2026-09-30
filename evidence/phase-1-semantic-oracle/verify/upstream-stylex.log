@@ -1,0 +1,125 @@
+PASS __tests__/stylex-test.js
+  stylex
+    error handling
+      ✓ stylex.create (12 ms)
+      ✓ stylex.createTheme
+      ✓ stylex.defineConsts (1 ms)
+      ✓ stylex.defineVars
+      ✓ stylex.firstThatWorks
+      ✓ stylex.keyframes (1 ms)
+      ✓ stylex.positionTry (2 ms)
+      ✓ stylex.viewTransitionClass
+      ✓ stylex.defaultMarker (1 ms)
+      ✓ stylex.defineMarker (1 ms)
+      ✓ stylex.unstable_conditional
+      ✓ stylex.unstable_defineVarsNested (1 ms)
+      ✓ stylex.unstable_defineConstsNested
+      ✓ stylex.unstable_createThemeNested (1 ms)
+      ✓ stylex.typesangle
+      ✓ stylex.typescolor (1 ms)
+      ✓ stylex.typesurl
+      ✓ stylex.typesimage
+      ✓ stylex.typesinteger
+      ✓ stylex.typeslengthPercentage (1 ms)
+      ✓ stylex.typeslength
+      ✓ stylex.typespercentage (1 ms)
+      ✓ stylex.typesnumber
+      ✓ stylex.typesresolution (1 ms)
+      ✓ stylex.typestime
+      ✓ stylex.typestransformFunction
+      ✓ stylex.typestransformList
+      ✓ stylex.whenancestor
+      ✓ stylex.whendescendant (1 ms)
+      ✓ stylex.whensiblingBefore
+      ✓ stylex.whensiblingAfter (1 ms)
+      ✓ stylex.whenanySibling
+    props
+      ✓ basic resolve (1 ms)
+      ✓ merge order
+      ✓ with a top-level array of simple overridden classes (1 ms)
+      ✓ with nested arrays and pseudoClasses overriding things
+      ✓ with just pseudoclasses (1 ms)
+      ✓ with complicated set of arguments
+      ✓ with dynamic styles (2 ms)
+      ✓ data prop for source map data
+    attrs
+      ✓ basic resolve
+      ✓ with dynamic styles (1 ms)
+      ✓ legacyMerge merges classNames
+      ✓ legacyMerge exposes attrs (1 ms)
+
+PASS __tests__/inject-test.js
+  inject
+    ✓ @keyframes (2 ms)
+    ✓ @positionTry
+    ✓ ::view-transition (1 ms)
+    ✓ @media
+    ✓ ::before (1 ms)
+    ✓ :hover
+    ✓ ::before:hover
+    defineConsts runtime injection
+      ✓ registers a constant
+      ✓ inlines constant in CSS rule
+      ✓ inlines multiple constants in one rule (1 ms)
+      ✓ handles numeric constants
+      ✓ leaves unreferenced constants unchanged in CSS (1 ms)
+      ✓ handles constants in media queries
+      ✓ handles nested at-rules with constants
+      ✓ handles constants for container queries (1 ms)
+      ✓ handles constants for supports queries
+      ✓ handles constants in CSS variable definitions
+      ✓ handles constants with special characters in values (1 ms)
+      ✓ preserves other var() references that are not constants
+      ✓ updates dependent rules when constant changes (1 ms)
+      ✓ handles constants with zero values
+      ✓ handles constants in complex selectors
+      ✓ updates multiple dependent rules when constant changes (1 ms)
+      ✓ does not update dependent rules if constant value stays the same
+      ✓ updates dependent at-rules when constant changes
+      ✓ prevents duplicate dependency tracking
+      ✓ tracks dependencies for multiple constants in one rule (1 ms)
+      ✓ correctly updates stylesheet when constant value changes
+      ✓ handles constant updates with at-rules and regular properties (1 ms)
+      ✓ handles mixed constant and non-constant values
+
+PASS __tests__/createSheet-test.js
+  createSheet
+    client side
+      ✓ creates a sheet (1 ms)
+      ✓ creates multiple sheets
+      ✓ reuses existing sheet for given root
+      ✓ supports updating styles across multiple documents (8 ms)
+      ✓ update method updates rules across all sheets (5 ms)
+    server side
+      ✓ creates a sheet
+      ✓ creates multiple sheets
+
+PASS __tests__/createOrderedCSSStyleSheet-test.js
+  createOrderedCSSStyleSheet
+    #insert
+      ✓ does not throw on invalid rule
+      ✓ insertion of CSSStyleRule
+      ✓ insertion of CSSMediaRule
+      ✓ insertion of CSSMediaRule within CSSConditionRule
+      ✓ insertion order for same group (1 ms)
+      ✓ deduplication for same group
+      ✓ order for same group
+      ✓ insertion order for different groups (1 ms)
+    #update
+      ✓ updates an existing rule with same selector
+      ✓ updates a media query rule
+      ✓ updates multiple properties in a rule (1 ms)
+      ✓ inserts new rule if old rule does not exist
+      ✓ inserts new rule if selectors are different
+      ✓ updates rule in different group (1 ms)
+      ✓ updates nested at-rules
+      ✓ handles update when rule has specificity selectors
+    client-side hydration
+      ✓ from SSR CSS (2 ms)
+      ✓ works when the group marker is in single quotes (1 ms)
+
+Test Suites: 4 passed, 4 total
+Tests:       99 passed, 99 total
+Snapshots:   74 passed, 74 total
+Time:        0.774 s, estimated 1 s
+Ran all test suites.

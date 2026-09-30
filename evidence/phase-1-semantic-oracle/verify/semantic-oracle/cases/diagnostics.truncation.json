@@ -1,0 +1,359 @@
+{
+  "id": "diagnostics.truncation",
+  "area": "diagnostics",
+  "status": "MUST_PRESERVE",
+  "gapId": null,
+  "fresh": null,
+  "incremental": {
+    "applicable": true
+  },
+  "freshMatchesExpected": null,
+  "incrementalMatchesExpected": true,
+  "freshMatchesIncremental": null,
+  "revisions": [
+    {
+      "revision": 1,
+      "label": "initial",
+      "fresh": null,
+      "incremental": {
+        "accepted": false,
+        "codes": [
+          "PMS_FORBIDDEN_VALUE"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_FORBIDDEN_VALUE",
+            "severity": "error",
+            "phase": "policy",
+            "source": "src/page.js (page)",
+            "location": {
+              "file": "src/page.js",
+              "line": 2,
+              "column": 30,
+              "role": "page"
+            },
+            "rule": "category-strict",
+            "context": {
+              "property": "gap",
+              "category": "spacing",
+              "value": "9px",
+              "systemId": "oracle-ui",
+              "candidates": [
+                "spacing.sm",
+                "spacing.md",
+                "spacing.lg",
+                "spacing.v00",
+                "spacing.v01",
+                "spacing.v02",
+                "spacing.v03",
+                "spacing.v04",
+                "spacing.v05",
+                "spacing.v06",
+                "spacing.v07",
+                "spacing.v08",
+                "spacing.v09",
+                "spacing.v10",
+                "spacing.v11",
+                "spacing.v12",
+                "spacing.v13",
+                "spacing.v14",
+                "spacing.v15",
+                "spacing.v16",
+                "spacing.v17",
+                "spacing.v18",
+                "spacing.v19",
+                "spacing.v20",
+                "spacing.v21",
+                "spacing.v22",
+                "spacing.v23",
+                "spacing.v24",
+                "spacing.v25",
+                "spacing.v26",
+                "spacing.v27",
+                "spacing.v28",
+                "spacing.v29",
+                "spacing.v30",
+                "spacing.v31",
+                "spacing.v32",
+                "spacing.v33"
+              ],
+              "conditionPath": []
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": 1,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": {
+          "filesChanged": 0,
+          "filesAdded": 1,
+          "filesRemoved": 0,
+          "filesReparsed": 2,
+          "filesRecompiled": 0,
+          "filesCompiled": 1,
+          "filesReused": 0,
+          "coverageSummariesReused": 0,
+          "coverageSummariesRebuilt": 2,
+          "reverseDependentsInvalidated": 0,
+          "negativeResolutionsInvalidated": 0,
+          "fullFallback": 1,
+          "fullFallbackReason": "design-system-definition",
+          "newlyCoveredFiles": 1,
+          "coveredFileCount": 2,
+          "fileStateCount": 2,
+          "dirtyFilesDeclared": 0,
+          "dirtyFilesRead": 1,
+          "dirtyFilesHashed": 1,
+          "dirtyFilesUnchanged": 0
+        },
+        "protocol": {
+          "documentKind": "pandamstyle-agent-result",
+          "schemaVersion": 1,
+          "revisionId": 1,
+          "ok": false,
+          "projectSemanticEpoch": 2,
+          "diagnostics": [
+            {
+              "schemaVersion": 1,
+              "code": "PMS_FORBIDDEN_VALUE",
+              "severity": "error",
+              "phase": "policy",
+              "rule": "category-strict",
+              "message": "Valeur interdite pour gap : \"9px\". Un token spacing est requis.",
+              "source": {
+                "file": "src/page.js",
+                "line": 2,
+                "column": 30,
+                "role": "page",
+                "label": "src/page.js (page)"
+              },
+              "context": {
+                "property": "gap",
+                "value": "9px",
+                "systemId": "oracle-ui",
+                "conditionPath": []
+              },
+              "expected": {
+                "category": "spacing",
+                "admitted": null
+              },
+              "repair": {
+                "kind": "substitute-token",
+                "applicable": true,
+                "property": "gap",
+                "value": "9px",
+                "expected": {
+                  "category": "spacing"
+                },
+                "candidatesFrom": "diagnostic.candidates",
+                "how": "replace the value with a token reference drawn from diagnostic.candidates, whose category is the expected one; P0 admits no other form for this property"
+              },
+              "autofix": null,
+              "candidates": [
+                "spacing.sm",
+                "spacing.md",
+                "spacing.lg",
+                "spacing.v00",
+                "spacing.v01",
+                "spacing.v02",
+                "spacing.v03",
+                "spacing.v04",
+                "spacing.v05",
+                "spacing.v06",
+                "spacing.v07",
+                "spacing.v08",
+                "spacing.v09",
+                "spacing.v10",
+                "spacing.v11",
+                "spacing.v12",
+                "spacing.v13",
+                "spacing.v14",
+                "spacing.v15",
+                "spacing.v16",
+                "spacing.v17",
+                "spacing.v18",
+                "spacing.v19",
+                "spacing.v20",
+                "spacing.v21",
+                "spacing.v22",
+                "spacing.v23",
+                "spacing.v24",
+                "spacing.v25",
+                "spacing.v26",
+                "spacing.v27",
+                "spacing.v28"
+              ],
+              "candidatesTotal": 37,
+              "candidatesTruncated": true,
+              "candidatesQuery": "session.candidateTokens({ category, limit, offset })",
+              "file": {
+                "file": "src/page.js",
+                "origin": "root",
+                "role": "page",
+                "analysed": true,
+                "usedDesignSystem": false,
+                "usedPmsHelpers": false,
+                "ruleCount": null,
+                "relayChain": [],
+                "failed": true,
+                "codes": [
+                  "PMS_FORBIDDEN_VALUE"
+                ]
+              }
+            }
+          ],
+          "mutation": {
+            "mode": "full-discovery",
+            "declared": 0,
+            "read": 1,
+            "hashed": 1,
+            "contentChanged": 0,
+            "contentUnchanged": 0,
+            "changed": 0,
+            "added": 1,
+            "removed": 0,
+            "renamed": 0,
+            "noOp": false
+          },
+          "incremental": {
+            "filesChanged": 0,
+            "filesAdded": 1,
+            "filesRemoved": 0,
+            "filesCompiled": 1,
+            "filesRecompiled": 0,
+            "filesReused": 0,
+            "coveredFiles": 2,
+            "dirtyInputMode": "full-discovery",
+            "fullDiscovery": true,
+            "fullFallback": true,
+            "fullFallbackReason": "design-system-definition"
+          },
+          "coverage": {
+            "coveredSetChanged": true,
+            "affectedCount": 1,
+            "affectedEntryLimit": 64,
+            "affectedTruncated": false,
+            "projectEntries": 2,
+            "affectedEntries": [
+              {
+                "file": "src/page.js",
+                "origin": "root",
+                "role": "page",
+                "analysed": true,
+                "failed": true,
+                "diagnostics": 1,
+                "codes": [
+                  "PMS_FORBIDDEN_VALUE"
+                ]
+              }
+            ]
+          },
+          "generation": {
+            "published": false,
+            "generationId": null,
+            "generationReused": false,
+            "mode": null,
+            "outputsWritten": 0,
+            "outputsReused": 0,
+            "bytesWritten": 0
+          },
+          "audit": {
+            "requested": false,
+            "ready": false,
+            "document": null,
+            "bytes": null,
+            "reason": "not requested; project-wide coverage is available on demand",
+            "request": "session.requestFullAudit()"
+          },
+          "timings": {
+            "diagnosticsReady": true,
+            "generationReady": false,
+            "generationCommitted": false,
+            "auditReportReady": false
+          }
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "freshChecks": null,
+      "incrementalChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_FORBIDDEN_VALUE"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "protocol/diagnostics/0/candidates",
+          "value": 32,
+          "op": "length",
+          "matches": true
+        },
+        {
+          "path": "protocol/diagnostics/0/candidatesTotal",
+          "value": 37,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "protocol/diagnostics/0/candidatesTruncated",
+          "value": true,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "protocol/diagnostics/0/autofix",
+          "value": null,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "protocol/revisionId",
+          "value": 1,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "revisionId",
+          "value": 1,
+          "matches": true
+        }
+      ],
+      "freshMatchesExpected": null,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": null
+    }
+  ],
+  "contractReferences": [
+    "docs/architecture/public-api-v0.1.md",
+    "docs/architecture/generated-design-system-abi-v1.md"
+  ],
+  "classificationVerified": true
+}

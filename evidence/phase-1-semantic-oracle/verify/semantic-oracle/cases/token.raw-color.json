@@ -1,0 +1,338 @@
+{
+  "id": "token.raw-color",
+  "area": "tokens",
+  "status": "MUST_PRESERVE",
+  "gapId": null,
+  "fresh": {
+    "applicable": true
+  },
+  "incremental": {
+    "applicable": true
+  },
+  "freshMatchesExpected": true,
+  "incrementalMatchesExpected": true,
+  "freshMatchesIncremental": true,
+  "revisions": [
+    {
+      "revision": 1,
+      "label": "initial",
+      "fresh": {
+        "accepted": false,
+        "codes": [
+          "PMS_FORBIDDEN_VALUE"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_FORBIDDEN_VALUE",
+            "severity": "error",
+            "phase": "policy",
+            "source": "src/page.js (page)",
+            "location": {
+              "file": "src/page.js",
+              "line": 2,
+              "column": 32,
+              "role": "page"
+            },
+            "rule": "category-strict",
+            "context": {
+              "property": "color",
+              "category": "colors",
+              "value": "#112233",
+              "systemId": "oracle-ui",
+              "candidates": [
+                "colors.text",
+                "colors.surface"
+              ],
+              "conditionPath": []
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": null,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": null,
+        "protocol": null,
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "incremental": {
+        "accepted": false,
+        "codes": [
+          "PMS_FORBIDDEN_VALUE"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_FORBIDDEN_VALUE",
+            "severity": "error",
+            "phase": "policy",
+            "source": "src/page.js (page)",
+            "location": {
+              "file": "src/page.js",
+              "line": 2,
+              "column": 32,
+              "role": "page"
+            },
+            "rule": "category-strict",
+            "context": {
+              "property": "color",
+              "category": "colors",
+              "value": "#112233",
+              "systemId": "oracle-ui",
+              "candidates": [
+                "colors.text",
+                "colors.surface"
+              ],
+              "conditionPath": []
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": 1,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": {
+          "filesChanged": 0,
+          "filesAdded": 1,
+          "filesRemoved": 0,
+          "filesReparsed": 2,
+          "filesRecompiled": 0,
+          "filesCompiled": 1,
+          "filesReused": 0,
+          "coverageSummariesReused": 0,
+          "coverageSummariesRebuilt": 2,
+          "reverseDependentsInvalidated": 0,
+          "negativeResolutionsInvalidated": 0,
+          "fullFallback": 1,
+          "fullFallbackReason": "design-system-definition",
+          "newlyCoveredFiles": 1,
+          "coveredFileCount": 2,
+          "fileStateCount": 2,
+          "dirtyFilesDeclared": 0,
+          "dirtyFilesRead": 1,
+          "dirtyFilesHashed": 1,
+          "dirtyFilesUnchanged": 0
+        },
+        "protocol": {
+          "documentKind": "pandamstyle-agent-result",
+          "schemaVersion": 1,
+          "revisionId": 1,
+          "ok": false,
+          "projectSemanticEpoch": 2,
+          "diagnostics": [
+            {
+              "schemaVersion": 1,
+              "code": "PMS_FORBIDDEN_VALUE",
+              "severity": "error",
+              "phase": "policy",
+              "rule": "category-strict",
+              "message": "Valeur interdite pour color : \"#112233\". Un token colors est requis.",
+              "source": {
+                "file": "src/page.js",
+                "line": 2,
+                "column": 32,
+                "role": "page",
+                "label": "src/page.js (page)"
+              },
+              "context": {
+                "property": "color",
+                "value": "#112233",
+                "systemId": "oracle-ui",
+                "conditionPath": []
+              },
+              "expected": {
+                "category": "colors",
+                "admitted": null
+              },
+              "repair": {
+                "kind": "substitute-token",
+                "applicable": true,
+                "property": "color",
+                "value": "#112233",
+                "expected": {
+                  "category": "colors"
+                },
+                "candidatesFrom": "diagnostic.candidates",
+                "how": "replace the value with a token reference drawn from diagnostic.candidates, whose category is the expected one; P0 admits no other form for this property"
+              },
+              "autofix": null,
+              "candidates": [
+                "colors.text",
+                "colors.surface"
+              ],
+              "candidatesTotal": 2,
+              "candidatesTruncated": false,
+              "candidatesQuery": "session.candidateTokens({ category, limit, offset })",
+              "file": {
+                "file": "src/page.js",
+                "origin": "root",
+                "role": "page",
+                "analysed": true,
+                "usedDesignSystem": false,
+                "usedPmsHelpers": false,
+                "ruleCount": null,
+                "relayChain": [],
+                "failed": true,
+                "codes": [
+                  "PMS_FORBIDDEN_VALUE"
+                ]
+              }
+            }
+          ],
+          "mutation": {
+            "mode": "full-discovery",
+            "declared": 0,
+            "read": 1,
+            "hashed": 1,
+            "contentChanged": 0,
+            "contentUnchanged": 0,
+            "changed": 0,
+            "added": 1,
+            "removed": 0,
+            "renamed": 0,
+            "noOp": false
+          },
+          "incremental": {
+            "filesChanged": 0,
+            "filesAdded": 1,
+            "filesRemoved": 0,
+            "filesCompiled": 1,
+            "filesRecompiled": 0,
+            "filesReused": 0,
+            "coveredFiles": 2,
+            "dirtyInputMode": "full-discovery",
+            "fullDiscovery": true,
+            "fullFallback": true,
+            "fullFallbackReason": "design-system-definition"
+          },
+          "coverage": {
+            "coveredSetChanged": true,
+            "affectedCount": 1,
+            "affectedEntryLimit": 64,
+            "affectedTruncated": false,
+            "projectEntries": 2,
+            "affectedEntries": [
+              {
+                "file": "src/page.js",
+                "origin": "root",
+                "role": "page",
+                "analysed": true,
+                "failed": true,
+                "diagnostics": 1,
+                "codes": [
+                  "PMS_FORBIDDEN_VALUE"
+                ]
+              }
+            ]
+          },
+          "generation": {
+            "published": false,
+            "generationId": null,
+            "generationReused": false,
+            "mode": null,
+            "outputsWritten": 0,
+            "outputsReused": 0,
+            "bytesWritten": 0
+          },
+          "audit": {
+            "requested": false,
+            "ready": false,
+            "document": null,
+            "bytes": null,
+            "reason": "not requested; project-wide coverage is available on demand",
+            "request": "session.requestFullAudit()"
+          },
+          "timings": {
+            "diagnosticsReady": true,
+            "generationReady": false,
+            "generationCommitted": false,
+            "auditReportReady": false
+          }
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "freshChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_FORBIDDEN_VALUE"
+          ],
+          "op": "equal",
+          "matches": true
+        }
+      ],
+      "incrementalChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_FORBIDDEN_VALUE"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "revisionId",
+          "value": 1,
+          "matches": true
+        }
+      ],
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    }
+  ],
+  "contractReferences": [
+    "docs/architecture/public-api-v0.1.md",
+    "docs/architecture/generated-design-system-abi-v1.md"
+  ],
+  "classificationVerified": true
+}
