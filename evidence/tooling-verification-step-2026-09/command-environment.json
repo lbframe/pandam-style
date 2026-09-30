@@ -1,0 +1,9 @@
+{
+  "command": "env -u PMS_SKIP_INSTALL -u PMS_SKIP_PILOT -u PMS_ONLY_STEPS TMPDIR=/dev/shm npm_config_cache=/dev/shm/pms-tooling-verification-npm-cache PMS_PILOT_DIR=/dev/shm/pms-tooling-verification-pilot PMS_OUT_DIR=/home/kyle/work/pandam-style/evidence/tooling-verification-step-2026-09 PMS_BATCH_BASE_REF=73b10666a9440d86fb92721da8ff597916b80b16 ./verify-pms.sh",
+  "scope": "Environment overrides apply only to this verifier process and its child commands; no persistent machine configuration was changed.",
+  "reason": "The root filesystem had approximately 106 MB free before this batch. Temporary files, npm cache and the pilot workspace use /dev/shm to avoid exhausting it. TMPDIR is an environment accommodation, not a PandamStyle semantic requirement.",
+  "skipFlags": [],
+  "toolingCommand": "node tools/pms/run-tooling-tests.js <run-directory>",
+  "toolingJestCommand": "node node_modules/jest/bin/jest.js --runInBand --ci tools/pms/__tests__ --json --outputFile <run-directory>/tooling-jest-results.json",
+  "toolingDiscoveryCommand": "node node_modules/jest/bin/jest.js --runInBand --ci tools/pms/__tests__ --listTests --json"
+}

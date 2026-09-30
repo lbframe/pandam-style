@@ -1,0 +1,3128 @@
+PandamStyle native verification
+  repo root      : /home/kyle/work/pandam-style
+  tested commit  : 70fdf83096e0dc7bf0cc9d1c92b797114c8edc70
+  tested tree    : 8f372622808c8bbd432465b823e0e1ecfc10398f
+  branch         : fix/pandamstyle-tooling-verification-step-2026-09
+  working tree   : clean (as found, before this run wrote anything)
+  batch base ref : 73b10666a9440d86fb92721da8ff597916b80b16
+  batch base     : 73b10666a9440d86fb92721da8ff597916b80b16
+  out dir        : /home/kyle/work/pandam-style/evidence/tooling-verification-step-2026-09
+
+== install ==
+$ env NODE_OPTIONS= yarn install --frozen-lockfile --non-interactive
+yarn install v1.22.22
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+warning Pattern ["@vitejs/plugin-react@latest"] is trying to unpack in the same destination "/home/kyle/.cache/yarn/v6/npm-@vitejs-plugin-react-5.1.1-integrity/node_modules/@vitejs/plugin-react" as pattern ["@vitejs/plugin-react@^5.0.3","@vitejs/plugin-react@^5.0.4"]. This could result in non-deterministic behavior, skipping.
+warning Pattern ["@vitejs/plugin-rsc@latest"] is trying to unpack in the same destination "/home/kyle/.cache/yarn/v6/npm-@vitejs-plugin-rsc-0.5.26-integrity/node_modules/@vitejs/plugin-rsc" as pattern ["@vitejs/plugin-rsc@^0.5.24","@vitejs/plugin-rsc@^0.5.9"]. This could result in non-deterministic behavior, skipping.
+warning svelte-eslint-parser@1.8.0: The engine "pnpm" appears to be invalid.
+warning bare-fs@4.5.1: The engine "bare" appears to be invalid.
+warning bare-os@3.6.2: The engine "bare" appears to be invalid.
+[3/4] Linking dependencies...
+warning "@typescript-eslint/parser > @typescript-eslint/typescript-estree > ts-api-utils@1.4.3" has unmet peer dependency "typescript@>=4.2.0".
+warning " > @stylexjs/unplugin@0.19.1" has unmet peer dependency "unplugin@^2.3.11".
+warning " > @stylexjs/shared-ui@0.19.1" has unmet peer dependency "react@>=18".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > @stylexjs/devtools-extension > @babel/plugin-transform-flow-strip-types@7.27.1" has unmet peer dependency "@babel/core@^7.0.0-0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > docs-new > @monaco-editor/react@4.7.0" has unmet peer dependency "monaco-editor@>= 0.25.0 < 1".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react@^19.2.6".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react-dom@^19.2.6".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > docs-new > react-server-dom-webpack@19.2.6" has unmet peer dependency "webpack@^5.59.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-nextjs > autoprefixer@10.4.23" has unmet peer dependency "postcss@^8.1.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "vite@^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @typescript-eslint/eslint-plugin@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @typescript-eslint/parser@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @vitejs/plugin-react@5.1.1" has unmet peer dependency "vite@^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @vitest/browser@4.0.18" has incorrect peer dependency "vitest@4.0.18".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @vitest/coverage-v8@4.0.18" has incorrect peer dependency "vitest@4.0.18".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > autoprefixer@10.4.22" has unmet peer dependency "postcss@^8.1.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > postcss-nesting@13.0.2" has unmet peer dependency "postcss@^8.4".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "@rollup/pluginutils@>=5.1".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "astring@>=1.9.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "estree-walker@>=3.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > rollup-plugin-jsx-remove-attributes@3.1.2" has unmet peer dependency "vite@>=5.2".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > rollup-plugin-node-externals@8.1.2" has unmet peer dependency "rollup@^4.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > typescript-eslint@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > vite-plugin-dts@4.5.4" has unmet peer dependency "typescript@*".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > vitest@4.1.11" has unmet peer dependency "vite@^6.0.0 || ^7.0.0 || ^8.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-waku > @vitejs/plugin-react@5.1.0" has unmet peer dependency "vite@^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @storybook/addon-docs > @mdx-js/react@3.1.1" has unmet peer dependency "@types/react@>=16".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @storybook/react-vite > @joshwooding/vite-plugin-react-docgen-typescript@0.6.1" has unmet peer dependency "vite@^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @storybook/react-vite > @storybook/builder-vite@9.1.16" has unmet peer dependency "vite@^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @storybook/react-vite > @storybook/react@9.1.16" has unmet peer dependency "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @storybook/react-vite > @storybook/react@9.1.16" has unmet peer dependency "react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @typescript-eslint/eslint-plugin > @typescript-eslint/type-utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @typescript-eslint/eslint-plugin > @typescript-eslint/utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @typescript-eslint/eslint-plugin > ts-api-utils@2.5.0" has unmet peer dependency "typescript@>=4.8.4".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > storybook > @testing-library/user-event@14.6.1" has unmet peer dependency "@testing-library/dom@>=7.21.4".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > typescript-eslint > @typescript-eslint/eslint-plugin@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > typescript-eslint > @typescript-eslint/utils@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @storybook/react-vite > @joshwooding/vite-plugin-react-docgen-typescript > react-docgen-typescript@2.4.0" has unmet peer dependency "typescript@>= 4.3.x".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree > @typescript-eslint/project-service@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > @typescript-eslint/parser > @typescript-eslint/typescript-estree > @typescript-eslint/tsconfig-utils@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-storybook > typescript-eslint > @typescript-eslint/eslint-plugin > @typescript-eslint/type-utils@8.61.1" has unmet peer dependency "typescript@>=4.8.4 <6.1.0".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > example-react-router > react-router@8.3.0" has incorrect peer dependency "react@>=19.2.7".
+warning "workspace-aggregator-0cee6e0a-0495-4df2-ab69-1658f254f6e0 > @redwoodjs/starter > react-server-dom-webpack@19.2.8" has unmet peer dependency "webpack@^5.59.0".
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+[4/4] Building fresh packages...
+$ npm run build
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> stylex-monorepo@0.0.0 build
+> npm run build --workspaces --if-present
+
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> style-value-parser@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> style-value-parser@0.19.1 build
+> babel src --out-dir lib --ignore "**/__tests__/**","**/__benchmarks__/**"
+
+Successfully compiled 33 files with Babel (554ms).
+
+> @stylexjs/shared@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/shared@0.19.1 build
+> babel src/ --out-dir lib/
+
+Successfully compiled 2 files with Babel (290ms).
+
+> @stylexjs/stylex@0.19.1 prebuild
+> shx rm -rf lib && gen-types -i src/ -o lib/cjs && shx cp -r lib/cjs lib/es
+
+Successfully generated type definitions
+
+> @stylexjs/stylex@0.19.1 build
+> npm run build:cjs && npm run build:esm
+
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> @stylexjs/stylex@0.19.1 build:cjs
+> cross-env BABEL_ENV=cjs rollup -c ./rollup.config.mjs
+
+
+./src/stylex.js, ./src/inject.js → ./lib/cjs...
+created ./lib/cjs in 430ms
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> @stylexjs/stylex@0.19.1 build:esm
+> cross-env BABEL_ENV=esm rollup -c ./rollup.config.mjs
+
+
+./src/stylex.js, ./src/inject.js → ./lib/es/...
+created ./lib/es/ in 433ms
+
+> @stylexjs/babel-plugin@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/babel-plugin@0.19.1 build
+> rollup --config ./rollup.config.mjs
+
+
+./src/index.js → ./lib/index.js...
+created ./lib/index.js in 1.3s
+
+./src/index.js → ./lib/index.browser.js...
+(!) Missing exports
+https://rollupjs.org/troubleshooting/#error-name-is-not-exported-by-module
+src/visitors/stylex-create.js
+logicalExpression is not exported by @babel/types
+475: 
+476:               const guardedObjs = guardedProps.map(({ prop, expr }) =>
+477:                 t.logicalExpression(
+                       ^
+478:                   '&&',
+479:                   t.binaryExpression(
+src/visitors/stylex-create.js
+cloneNode is not exported by @babel/types
+479:                   t.binaryExpression(
+480:                     '!==',
+481:                     t.cloneNode(expr),
+                           ^
+482:                     t.identifier('undefined'),
+483:                   ),
+src/visitors/stylex-create.js
+cloneNode is not exported by @babel/types
+486:                     t.objectProperty(
+487:                       t.identifier('$$css'),
+488:                       t.cloneNode(cssTagValue),
+                             ^
+489:                     ),
+490:                   ]),
+src/visitors/stylex-props.js
+isLiteral is not exported by @babel/types
+528:         return false;
+529:       }
+530:     } else if (!t.isLiteral(val)) {
+                       ^
+531:       return false;
+532:     }
+src/index.js
+importNamespaceSpecifier is not exported by @babel/types
+449:     'body',
+450:     t.importDeclaration(
+451:       [t.importNamespaceSpecifier(t.identifier(stylexLocalName))],
+              ^
+452:       t.stringLiteral(importSource),
+453:     ),
+created ./lib/index.browser.js in 797ms
+
+> @stylexjs/unplugin@0.19.1 build
+> npm run build:cjs && npm run build:esm
+
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> @stylexjs/unplugin@0.19.1 build:cjs
+> cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files
+
+Successfully compiled 13 files with Babel (325ms).
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> @stylexjs/unplugin@0.19.1 build:esm
+> cross-env BABEL_ENV=esm babel src/ --out-dir lib/es --out-file-extension .mjs
+
+Successfully compiled 13 files with Babel (283ms).
+
+> @stylexjs/cli@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/cli@0.19.1 build
+> npm run build:cjs && npm run build:esm
+
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> @stylexjs/cli@0.19.1 build:cjs
+> cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files
+
+Successfully compiled 11 files with Babel (327ms).
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> @stylexjs/cli@0.19.1 build:esm
+> cross-env BABEL_ENV=esm babel src/ --out-dir lib/es --out-file-extension .mjs
+
+Successfully compiled 11 files with Babel (322ms).
+
+> @stylexjs/cli@0.19.1 postbuild:esm
+> rollup -c ./rollup.config.mjs
+
+
+./src/index.js → ./lib/index.js...
+created ./lib/index.js in 444ms
+
+> create-stylex-app@0.19.1 build
+> cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files && chmod +x lib/index.js
+
+Successfully compiled 5 files with Babel (231ms).
+
+> @stylexjs/devtools-extension@0.19.1 build
+> rollup -c
+
+
+/home/kyle/work/pandam-style/packages/@stylexjs/devtools-extension/src/inspected/runtimeEntry.js → dist/.shared/runtime...
+created dist/.shared/runtime in 679ms
+
+/home/kyle/work/pandam-style/packages/@stylexjs/devtools-extension/src/devtools/main.js, /home/kyle/work/pandam-style/packages/@stylexjs/devtools-extension/src/panel/main.js → dist/.shared/app...
+created dist/.shared/app in 911ms
+
+> @stylexjs/eslint-plugin@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/eslint-plugin@0.19.1 build
+> babel src/ --out-dir lib/
+
+Successfully compiled 42 files with Babel (691ms).
+
+> @stylexjs/rollup-plugin@0.19.1 prebuild
+> gen-types -i src/ -o lib/
+
+Successfully generated type definitions
+
+> @stylexjs/rollup-plugin@0.19.1 build
+> npm run build:cjs && npm run build:esm
+
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> @stylexjs/rollup-plugin@0.19.1 build:cjs
+> cross-env BABEL_ENV=cjs babel src/ --out-dir lib/ --copy-files
+
+Successfully compiled 1 file with Babel (245ms).
+npm warn Unknown env config "version-commit-hooks". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-tag-prefix". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-message". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "argv". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "version-git-tag". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> @stylexjs/rollup-plugin@0.19.1 build:esm
+> cross-env BABEL_ENV=esm babel src/ --out-dir lib/es --out-file-extension .mjs
+
+Successfully compiled 1 file with Babel (231ms).
+
+> @pandamstyle/compiler@0.1.0 prebuild
+> node -e "require('fs').rmSync('lib',{recursive:true,force:true})"
+
+
+> @pandamstyle/compiler@0.1.0 build
+> rollup --config ./rollup.config.mjs
+
+
+../../@stylexjs/babel-plugin/pandamstyle/entry-node.js → ./lib/index.js...
+created ./lib/index.js in 1.6s
+
+../../@stylexjs/babel-plugin/pandamstyle/entry-node.js → ./lib/index.mjs...
+created ./lib/index.mjs in 1.1s
+
+../../@stylexjs/babel-plugin/pandamstyle/vite.js → ./lib/vite.js...
+created ./lib/vite.js in 901ms
+
+../../@stylexjs/babel-plugin/pandamstyle/vite.js → ./lib/vite.mjs...
+created ./lib/vite.mjs in 842ms
+
+../../@stylexjs/babel-plugin/pandamstyle/runtime.js → ./lib/runtime.mjs...
+created ./lib/runtime.mjs in 20ms
+
+../../@stylexjs/babel-plugin/pandamstyle/runtime.js → ./lib/runtime.cjs...
+created ./lib/runtime.cjs in 17ms
+
+> docs-new@0.19.1 build
+> waku build
+
+[tsconfig-paths] An error occurred while parsing "/home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"astro/tsconfigs/base" in /home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json
+    at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+    ... 5 lines matching cause stack trace ...
+    at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///home/kyle/work/pandam-style/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///home/kyle/work/pandam-style/node_modules/waku/dist/cli.js:43:9) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module 'astro/tsconfigs/base/tsconfig.json'
+  Require stack:
+  - /home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+      at Function.resolve (node:internal/modules/helpers:157:19)
+      at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:256:15)
+      at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 39)
+      at async BasicMinimalPluginContext.configResolved (file:///home/kyle/work/pandam-style/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1)
+      at async resolveConfig (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/home/kyle/work/pandam-style/upstream/panda/sandbox/astro/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json". See below for details.
+TSConfckParseError: failed to resolve "extends":"@docusaurus/tsconfig" in /home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json
+    at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+    ... 5 lines matching cause stack trace ...
+    at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///home/kyle/work/pandam-style/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///home/kyle/work/pandam-style/node_modules/waku/dist/cli.js:43:9) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '@docusaurus/tsconfig/tsconfig.json'
+  Require stack:
+  - /home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+      at Function.resolve (node:internal/modules/helpers:157:19)
+      at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:256:15)
+      at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 42)
+      at async BasicMinimalPluginContext.configResolved (file:///home/kyle/work/pandam-style/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1)
+      at async resolveConfig (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/home/kyle/work/pandam-style/upstream/panda/sandbox/docusaurus-ts/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json". See below for details.
+TSConfckParseError: failed to resolve "extends":"./.nuxt/tsconfig.json" in /home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json
+    at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+    ... 5 lines matching cause stack trace ...
+    at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///home/kyle/work/pandam-style/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///home/kyle/work/pandam-style/node_modules/waku/dist/cli.js:43:9) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module './.nuxt/tsconfig.json'
+  Require stack:
+  - /home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+      at Function.resolve (node:internal/modules/helpers:157:19)
+      at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 46)
+      at async BasicMinimalPluginContext.configResolved (file:///home/kyle/work/pandam-style/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1)
+      at async resolveConfig (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/home/kyle/work/pandam-style/upstream/panda/sandbox/nuxt/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json". See below for details.
+TSConfckParseError: failed to resolve "extends":"./.nuxt/tsconfig.json" in /home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json
+    at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+    ... 5 lines matching cause stack trace ...
+    at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19)
+    at async cli (file:///home/kyle/work/pandam-style/node_modules/waku/dist/lib/vite-rsc/cli.js:60:25)
+    at async run (file:///home/kyle/work/pandam-style/node_modules/waku/dist/cli.js:43:9) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module './.nuxt/tsconfig.json'
+  Require stack:
+  - /home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+      at Function.resolve (node:internal/modules/helpers:157:19)
+      at resolveExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///home/kyle/work/pandam-style/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 62)
+      at async BasicMinimalPluginContext.configResolved (file:///home/kyle/work/pandam-style/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1)
+      at async resolveConfig (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:35686:2)
+      at async Module.createBuilder (file:///home/kyle/work/pandam-style/node_modules/vite/dist/node/chunks/config.js:33879:19) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/home/kyle/work/pandam-style/upstream/panda/sandbox/component-lib/nuxt-lib-source/packages/nuxt-app/tsconfig.json'
+}
+[1/5] analyze client references...
+vite v7.3.2 building rsc environment for production...
+[MDX] generated files in 1.995315000000005ms
+transforming...
+✓ 1994 modules transformed.
+rendering chunks...
+✓ built in 4.58s
+[2/5] analyze server references...
+vite v7.3.2 building ssr environment for production...
+[MDX] generated files in 0.3588629999994737ms
+transforming...
+✓ 1970 modules transformed.
+rendering chunks...
+✓ built in 3.05s
+[3/5] build rsc environment...
+vite v7.3.2 building rsc environment for production...
+[MDX] generated files in 0.4130729999997129ms
+✓ 1994 modules transformed.
+dist/server/assets/nmn-B2JWaNf2.jpg                              17.24 kB
+dist/server/assets/necolas-D_9YEUI7.jpg                          19.31 kB
+dist/server/assets/stylex-cover-photo-BWp08ZxO.png               73.36 kB
+dist/server/assets/mellyeliu-CCOt2mL7.jpg                        96.39 kB
+dist/server/assets/vincentriemer-OXz-58Lb.png                   239.86 kB
+dist/server/assets/_layout-Dox5lVp4.css                          32.22 kB
+dist/server/assets/meta-BrN0B9YI.js                               0.17 kB
+dist/server/assets/meta-DHzYRmyU.js                               0.17 kB
+dist/server/assets/meta-Cpa2BUIq.js                               0.17 kB
+dist/server/assets/meta-C5S3_jlz.js                               0.23 kB
+dist/server/assets/meta-J5Gwxvr0.js                               0.23 kB
+dist/server/assets/meta-Cc7tccUB.js                               0.23 kB
+dist/server/assets/meta-CqpRXoUI.js                               0.25 kB
+dist/server/assets/meta-D1EzAEzm.js                               0.25 kB
+dist/server/assets/meta-Cmi-Dw0r.js                               0.26 kB
+dist/server/assets/link-CEkarDPT.js                               0.29 kB
+dist/server/assets/docs-wi723a8l.js                               0.31 kB
+dist/server/assets/blog-date-4u9OcVqU.js                          0.37 kB
+dist/server/assets/meta-Dh38GiSY.js                               0.39 kB
+dist/server/index.js                                              0.53 kB
+dist/server/assets/_layout-x4wKNA7U.js                            0.69 kB
+dist/server/assets/blog-rss.xml-DW8yoX3E.js                       0.71 kB
+dist/server/assets/blog-atom.xml-BscYF7e6.js                      0.71 kB
+dist/server/assets/_layout-BZolpxzb.js                            0.72 kB
+dist/server/assets/index-BMzkidlQ.js                              0.76 kB
+dist/server/assets/_layout-LQJ08bqn.js                            0.77 kB
+dist/server/assets/llms-full.txt-yjVyEmOs.js                      1.04 kB
+dist/server/assets/_layout-DDQdNITt.js                            1.16 kB
+dist/server/assets/index-BZL-ttAf.js                              1.22 kB
+dist/server/build.js                                              1.23 kB
+dist/server/assets/playground-DnvzG8n-.js                         1.38 kB
+dist/server/assets/2024-06-28-Release-v0.7.3-LpotBGx9.js          2.18 kB
+dist/server/assets/_...slugs_-PMZaga2z.js                         2.24 kB
+dist/server/assets/_root-Baren68Z.js                              2.31 kB
+dist/server/assets/createLucideIcon-K72H_i6x.js                   2.33 kB
+dist/server/assets/index-Ban8xIuR.js                              3.07 kB
+dist/server/assets/_...slugs_-Cn5LHeT8.js                         4.37 kB
+dist/server/assets/_layout-DRKxL6Aw.js                            4.50 kB
+dist/server/assets/llm-resources-t59XmSkU.js                      4.70 kB
+dist/server/assets/stylex-CtTCSF8E.js                             4.97 kB
+dist/server/assets/index-Dq5Eb9Ok.js                              5.14 kB
+dist/server/assets/layout.shared-6QuZf2I5.js                      5.50 kB
+dist/server/assets/index-CSUHU1HM.js                              8.18 kB
+dist/server/assets/acknowledgements-CbwtGItl.js                   9.63 kB
+dist/server/assets/ecosystem-C2z3JQ-i.js                         11.40 kB
+dist/server/assets/reset-themes-O3Ttpo3_.js                      13.53 kB
+dist/server/assets/2025-01-17-Release-v0.10.1-CeaR29oK.js        13.55 kB
+dist/server/assets/index-DQgY9XCq.js                             14.29 kB
+dist/server/assets/vite-react-BuepbuCY.js                        16.99 kB
+dist/server/assets/index-VCgY5wnD.js                             17.53 kB
+dist/server/assets/firstThatWorks-D_A3JnnV.js                    17.79 kB
+dist/server/assets/2023-12-29-Release-v0.4.1-Qz03TE3k.js         17.84 kB
+dist/server/assets/esbuild-ugVLyayk.js                           18.45 kB
+dist/server/assets/merge-themes-C3iEg17M.js                      22.49 kB
+dist/server/assets/create-CNLYa6T2.js                            23.29 kB
+dist/server/assets/bun--uDC5HQS.js                               23.29 kB
+dist/server/assets/cli-BhOkRvcv.js                               24.46 kB
+dist/server/assets/StyleXStyles-CiXSOeqN.js                      24.57 kB
+dist/server/assets/2024-06-25-Release-v0.7.0-CjfCSqih.js         24.65 kB
+dist/server/assets/StaticStyles-DoOSYED6.js                      24.86 kB
+dist/server/assets/rspack-wT-IDxC6.js                            26.86 kB
+dist/server/assets/create-eMNwJPAl.js                            27.12 kB
+dist/server/assets/2026-01-01-new-year-new-website-DeX503f5.js   27.54 kB
+dist/server/assets/attrs-q5ObItwH.js                             27.79 kB
+dist/server/assets/createTheme-nn519JAV.js                       28.52 kB
+dist/server/assets/2025-04-10-Release-v0.12.0-C4LU0TSO.js        28.96 kB
+dist/server/assets/Footer-dt4MF_E_.js                            29.02 kB
+dist/server/assets/2025-02-27-Release-v0.11.0-DB3faAki.js        30.95 kB
+dist/server/assets/source-B_eo5-Jc.js                            34.18 kB
+dist/server/assets/2024-01-25-Release-v0.5.0-B_x_eCus.js         35.54 kB
+dist/server/assets/sveltekit-CB9Fse8Q.js                         36.13 kB
+dist/server/assets/webpack-BWOgejrh.js                           38.56 kB
+dist/server/assets/creating-themes-fvt_3URx.js                   39.90 kB
+dist/server/assets/StyleXStylesWithout-Dmb1grO3.js               40.59 kB
+dist/server/assets/positionTry-BU8KYBK_.js                       41.14 kB
+dist/server/assets/Theme-DWuoeDKW.js                             42.47 kB
+dist/server/assets/postcss-CFaOBuVm.js                           43.19 kB
+dist/server/assets/2026-06-14-Release-v0.19.0-TJaVvB0M.js        43.86 kB
+dist/server/assets/using-variables-BXJft1My.js                   44.58 kB
+dist/server/assets/light-dark-themes-DXl2Bb_a.js                 45.05 kB
+dist/server/assets/defineVars-B0HRTaRV.js                        45.42 kB
+dist/server/assets/2025-01-02-Release-v0.10.0-D3BOWxnW.js        45.94 kB
+dist/server/assets/descendant-styles-ByGaJw7c.js                 46.73 kB
+dist/server/assets/viewTransitionClass-CdgA2K9M.js               48.59 kB
+dist/server/assets/nextjs-Di9lAGyn.js                            50.16 kB
+dist/server/assets/props-C76Joo6o.js                             50.47 kB
+dist/server/assets/2025-07-31-Release-v0.15.0-B-8vqQ89.js        51.05 kB
+dist/server/assets/defineConsts-C5HOSAXy.js                      52.57 kB
+dist/server/assets/postcss-plugin-DqUVQP42.js                    53.79 kB
+dist/server/assets/types-DnhIUo2n.js                             55.53 kB
+dist/server/assets/index-8hl8nDHh.js                             57.41 kB
+dist/server/assets/react-router-C9bAw3B5.js                      58.01 kB
+dist/server/assets/context-driven-styles-BK6Rr0ut.js             59.32 kB
+dist/server/assets/2023-12-05-introducing-stylex-CWs3fr8i.js     59.49 kB
+dist/server/assets/2025-06-30-Release-v0.14.0-C0g1V2lC.js        60.41 kB
+dist/server/assets/waku-CLWGkvSd.js                              62.99 kB
+dist/server/assets/keyframes-CuIxQh37.js                         63.47 kB
+dist/server/assets/redwoodsdk-5EQx6085.js                        66.46 kB
+dist/server/assets/atoms-rCuA4gia.js                             67.15 kB
+dist/server/assets/vite-rsc-Dtqw1ccP.js                          70.32 kB
+dist/server/assets/index-rEY4xnni.js                             70.33 kB
+dist/server/assets/index-DE2A9OeV.js                             70.34 kB
+dist/server/assets/2025-05-19-Release-v0.13.0-C4b6Hz66.js        79.79 kB
+dist/server/assets/env-BxYoVJDq.js                               84.14 kB
+dist/server/assets/2024-04-16-Release-v0.6.1-DMVfSXXb.js         84.89 kB
+dist/server/assets/defining-variables-ByfAv9i5.js                88.79 kB
+dist/server/assets/VarGroup-Ddm0AcQC.js                          94.10 kB
+dist/server/assets/shareable-tokens-BfTfcfyB.js                  97.67 kB
+dist/server/assets/2024-10-06-Release-v0.8.0-BqsfJCBB.js         99.39 kB
+dist/server/assets/2025-09-25-Release-v0.16.0-CQXs_2L6.js        99.69 kB
+dist/server/assets/2025-11-25-Release-v0.17.1-r1AT9niu.js        99.96 kB
+dist/server/assets/unplugin-CdF57cVq.js                         103.68 kB
+dist/server/assets/variable-types-BSGVU-1B.js                   107.01 kB
+dist/server/assets/2024-11-01-Release-v0.9.3-Bs5BTlN8.js        113.85 kB
+dist/server/assets/2026-04-19-Release-v0.18.x-DXo-IGp4.js       124.69 kB
+dist/server/assets/babel-plugin-Dt3ms4dH.js                     125.61 kB
+dist/server/assets/using-styles-Dar15iLw.js                     126.09 kB
+dist/server/assets/eslint-plugin-HyijK2aW.js                    129.04 kB
+dist/server/assets/thinking-in-stylex-ClFsF2XG.js               140.39 kB
+dist/server/assets/defining-styles-1-l3qvno.js                  143.83 kB
+dist/server/assets/rss-BIXJq6nA.js                              145.07 kB
+dist/server/assets/search-CTa44h9z.js                           154.29 kB
+dist/server/assets/variants-TpWnnSqS.js                         157.30 kB
+dist/server/assets/when-DVJo2155.js                             220.43 kB
+dist/server/assets/static-types-2rX3Vhnu.js                     221.59 kB
+dist/server/assets/waku.server-BmltWLr9.js                      359.02 kB
+✓ built in 4.60s
+[4/5] build client environment...
+vite v7.3.2 building client environment for production...
+[MDX] generated files in 0.34901299999910407ms
+transforming...
+✓ 1969 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/public/index.html                                   0.03 kB │ gzip:     0.04 kB
+dist/public/assets/nmn-B2JWaNf2.jpg                     17.24 kB
+dist/public/assets/necolas-D_9YEUI7.jpg                 19.31 kB
+dist/public/assets/stylex-cover-photo-BWp08ZxO.png      73.36 kB
+dist/public/assets/mellyeliu-CCOt2mL7.jpg               96.39 kB
+dist/public/assets/vincentriemer-OXz-58Lb.png          239.86 kB
+dist/public/assets/_layout-Dox5lVp4.css                 32.22 kB │ gzip:     9.96 kB
+dist/public/assets/chevron-down-dnVJf-92.js              0.14 kB │ gzip:     0.15 kB
+dist/public/assets/chevron-right-BysovNDy.js             0.14 kB │ gzip:     0.15 kB
+dist/public/assets/link-BLGwtUs-.js                      0.17 kB │ gzip:     0.15 kB
+dist/public/assets/client-eVCR2i9a.js                    0.21 kB │ gzip:     0.19 kB
+dist/public/assets/chunk-ZMWYLUDP-oajMeTFk.js            0.22 kB │ gzip:     0.17 kB
+dist/public/assets/chunk-SH7BNTG7-DlrRv2tK.js            0.38 kB │ gzip:     0.28 kB
+dist/public/assets/fetch-2XFMBLBA-F2YKbHTa.js            0.44 kB │ gzip:     0.29 kB
+dist/public/assets/SidebarToggle-BEPtqz-Z.js             0.48 kB │ gzip:     0.33 kB
+dist/public/assets/chunk-K4WNLOVQ-BWTlcall.js            0.66 kB │ gzip:     0.38 kB
+dist/public/assets/chunk-OTD7MV33-qJr9DjGl.js            0.67 kB │ gzip:     0.38 kB
+dist/public/assets/index-DGWftzRC.js                     0.68 kB │ gzip:     0.47 kB
+dist/public/assets/algolia-IZEDLPHE-2120h3C3.js          0.80 kB │ gzip:     0.51 kB
+dist/public/assets/createLucideIcon-Cq89W4wN.js          1.17 kB │ gzip:     0.69 kB
+dist/public/assets/tree-DFD9icep.js                      1.19 kB │ gzip:     0.67 kB
+dist/public/assets/orama-cloud-UZAPMPFV-DSsy8tIc.js      1.22 kB │ gzip:     0.60 kB
+dist/public/assets/_root-CpwmeqoI.js                     1.60 kB │ gzip:     0.87 kB
+dist/public/assets/base-80a1f760--izZcyUG.js             1.64 kB │ gzip:     0.68 kB
+dist/public/assets/playground-_e-_nqS1.js                2.63 kB │ gzip:     1.28 kB
+dist/public/assets/stylex-CrYq5BGZ.js                    3.61 kB │ gzip:     1.60 kB
+dist/public/assets/mixedbread-RAHDVXGJ-DWAJ-1Nh.js      11.78 kB │ gzip:     5.03 kB
+dist/public/assets/Dial-BDs88nUr.js                     14.63 kB │ gzip:     5.96 kB
+dist/public/assets/SidebarContext-De9TP-cw.js           15.48 kB │ gzip:     5.84 kB
+dist/public/assets/consoleHook-59e792cb-CVKyUnk6.js     19.70 kB │ gzip:     6.04 kB
+dist/public/assets/SidebarToggle-DmH6NFMW.js            23.26 kB │ gzip:     8.32 kB
+dist/public/assets/docs-xGPTbiLI.js                     26.63 kB │ gzip:     9.79 kB
+dist/public/assets/index-CC-6luyf.js                    27.82 kB │ gzip:     8.78 kB
+dist/public/assets/search-default-DJUBT5jf.js           41.72 kB │ gzip:    14.32 kB
+dist/public/assets/_layout-ChhrX01S.js                  46.71 kB │ gzip:    17.10 kB
+dist/public/assets/static-A2YJ5TXV-Bxb1_3vc.js          63.89 kB │ gzip:    22.32 kB
+dist/public/assets/index-599aeaf7-_GfN8l8V.js          144.42 kB │ gzip:    24.48 kB
+dist/public/assets/index-ejsHO1Qy.js                   162.88 kB │ gzip:    27.13 kB
+dist/public/assets/index-hqQSPBIh.js                   237.12 kB │ gzip:    75.63 kB
+dist/public/assets/index-DsKFR7Rm.js                 4,233.93 kB │ gzip: 1,001.75 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 8.33s
+[5/5] build ssr environment...
+vite v7.3.2 building ssr environment for production...
+[MDX] generated files in 0.4166030000014871ms
+src/components/Playground/index.tsx (35:30): "default" is not exported by "../@stylexjs/babel-plugin/lib/index.js", imported by "src/components/Playground/index.tsx".
+"equal" is imported from external module "assert" but never used in "node_modules/prettier/index.mjs".
+✓ 1979 modules transformed.
+dist/server/ssr/assets/chevron-down-Ii3Uy696.js              0.24 kB
+dist/server/ssr/assets/chevron-right-VqsQr_9b.js             0.24 kB
+dist/server/ssr/assets/link-B4P6CqCG.js                      0.27 kB
+dist/server/ssr/assets/client-BEXr39Np.js                    0.42 kB
+dist/server/ssr/assets/chunk-ZMWYLUDP-DsjLwjNJ.js            0.46 kB
+dist/server/ssr/assets/fetch-2XFMBLBA-uKSSbneq.js            0.64 kB
+dist/server/ssr/assets/SidebarToggle-BOA1kGsf.js             0.74 kB
+dist/server/ssr/assets/chunk-SH7BNTG7-D-rw2P_N.js            0.77 kB
+dist/server/ssr/assets/index-B1-qA55Y.js                     1.07 kB
+dist/server/ssr/assets/chunk-OTD7MV33-8NxzDOm0.js            1.31 kB
+dist/server/ssr/assets/chunk-K4WNLOVQ-D-9FRR2P.js            1.41 kB
+dist/server/ssr/assets/algolia-IZEDLPHE-ChBqEtpU.js          1.45 kB
+dist/server/ssr/assets/createLucideIcon-B0FgqIvn.js          2.25 kB
+dist/server/ssr/assets/orama-cloud-UZAPMPFV-erisgui8.js      2.32 kB
+dist/server/ssr/assets/tree-QFdYm5Ca.js                      2.40 kB
+dist/server/ssr/assets/_root-DZkdLSng.js                     3.00 kB
+dist/server/ssr/assets/base-80a1f760-DOfzm1W-.js             3.29 kB
+dist/server/ssr/assets/stylex-CtTCSF8E.js                    4.97 kB
+dist/server/ssr/assets/playground-DJBpN4PW.js                5.13 kB
+dist/server/ssr/assets/client-uZ_IoaLw.js                    9.26 kB
+dist/server/ssr/assets/mixedbread-RAHDVXGJ-SJBIz_4I.js      15.31 kB
+dist/server/ssr/assets/consoleHook-59e792cb-huZ7-QMR.js     23.52 kB
+dist/server/ssr/assets/Dial-BzViPGrU.js                     26.46 kB
+dist/server/ssr/assets/SidebarContext-Bm7BtfGz.js           33.35 kB
+dist/server/ssr/assets/docs-BIOb0ynd.js                     37.14 kB
+dist/server/ssr/assets/SidebarToggle-BvBgSOC4.js            51.85 kB
+dist/server/ssr/assets/graphql-Cx6A4xbM.js                  55.22 kB
+dist/server/ssr/assets/index-l_4uLhN0.js                    56.96 kB
+dist/server/ssr/assets/_layout-C3lCk07H.js                  99.38 kB
+dist/server/ssr/assets/angular-Rg2yZ01U.js                 115.71 kB
+dist/server/ssr/assets/search-default-D2vJiFTE.js          117.19 kB
+dist/server/ssr/assets/static-A2YJ5TXV-8agFmRb4.js         135.50 kB
+dist/server/ssr/assets/glimmer-BoZLExB5.js                 160.17 kB
+dist/server/ssr/assets/meriyah-Bb1GBPD7.js                 162.61 kB
+dist/server/ssr/assets/yaml-D06FaHfQ.js                    165.32 kB
+dist/server/ssr/assets/acorn-CS7NizVC.js                   181.09 kB
+dist/server/ssr/assets/markdown-DjHMnn8w.js                186.52 kB
+dist/server/ssr/assets/html-mvIajK3C.js                    191.76 kB
+dist/server/ssr/assets/postcss-sE6YzxJH.js                 205.55 kB
+dist/server/ssr/assets/index-Cnwdm4cU.js                   206.19 kB
+dist/server/ssr/assets/index-599aeaf7-DHT-YrNb.js          245.45 kB
+dist/server/ssr/assets/estree-vzvnmFiJ.js                  253.02 kB
+dist/server/ssr/assets/babel-H26r2Ax_.js                   388.48 kB
+dist/server/ssr/assets/typescript-CaxjCQfh.js              590.89 kB
+dist/server/ssr/index.js                                   601.17 kB
+dist/server/ssr/assets/flow-CYUlbtN3.js                  1,150.23 kB
+dist/server/ssr/assets/index-DSidc1e3.js                 7,930.81 kB
+✓ built in 11.67s
+[ssg] processing static generation...
+✓ 173 files generated in 1440ms
+
+> example-sveltekit@0.19.1 build
+> vite build
+
+vite v7.3.2 building ssr environment for production...
+transforming...
+✓ 148 modules transformed.
+rendering chunks...
+vite v7.3.2 building client environment for production...
+transforming...
+✓ 158 modules transformed.
+rendering chunks...
+computing gzip size...
+.svelte-kit/output/client/_app/version.json                        0.03 kB │ gzip:  0.05 kB
+.svelte-kit/output/client/.vite/manifest.json                      3.40 kB │ gzip:  0.65 kB
+.svelte-kit/output/client/_app/immutable/assets/0.zhSdvcBu.css     1.31 kB │ gzip:  0.55 kB
+.svelte-kit/output/client/_app/immutable/entry/start.DQfqJ0q7.js   0.08 kB │ gzip:  0.09 kB
+.svelte-kit/output/client/_app/immutable/chunks/DRxAnFJQ.js        0.23 kB │ gzip:  0.20 kB
+.svelte-kit/output/client/_app/immutable/nodes/1.Bl_kt81Q.js       0.51 kB │ gzip:  0.33 kB
+.svelte-kit/output/client/_app/immutable/nodes/2.UTtua9HA.js       0.81 kB │ gzip:  0.51 kB
+.svelte-kit/output/client/_app/immutable/chunks/wbPk3Yxo.js        1.37 kB │ gzip:  0.66 kB
+.svelte-kit/output/client/_app/immutable/chunks/DLlnVVXC.js        1.82 kB │ gzip:  0.84 kB
+.svelte-kit/output/client/_app/immutable/nodes/0.DJorDiy0.js       3.02 kB │ gzip:  1.36 kB
+.svelte-kit/output/client/_app/immutable/chunks/BFg-DnNH.js        3.29 kB │ gzip:  1.67 kB
+.svelte-kit/output/client/_app/immutable/chunks/C03aV7jn.js        5.19 kB │ gzip:  2.33 kB
+.svelte-kit/output/client/_app/immutable/chunks/CMTJW8bU.js        6.82 kB │ gzip:  3.17 kB
+.svelte-kit/output/client/_app/immutable/entry/app.DYcZVpdu.js     6.95 kB │ gzip:  3.28 kB
+.svelte-kit/output/client/_app/immutable/chunks/BPA8z3FK.js       24.49 kB │ gzip:  9.57 kB
+.svelte-kit/output/client/_app/immutable/chunks/BXq1Xt7H.js       27.48 kB │ gzip: 10.72 kB
+✓ built in 417ms
+.svelte-kit/output/server/.vite/manifest.json                           2.98 kB
+.svelte-kit/output/server/_app/immutable/assets/_layout.zhSdvcBu.css    1.31 kB
+.svelte-kit/output/server/chunks/false.js                               0.05 kB
+.svelte-kit/output/server/env.js                                        0.23 kB
+.svelte-kit/output/server/internal.js                                   0.35 kB
+.svelte-kit/output/server/chunks/internal.js                            0.62 kB
+.svelte-kit/output/server/entries/pages/_page.svelte.js                 0.73 kB
+.svelte-kit/output/server/chunks/utils.js                               1.09 kB
+.svelte-kit/output/server/entries/fallbacks/error.svelte.js             1.38 kB
+.svelte-kit/output/server/entries/pages/_layout.svelte.js               2.64 kB
+.svelte-kit/output/server/chunks/internal2.js                           3.21 kB
+.svelte-kit/output/server/chunks/exports.js                             7.02 kB
+.svelte-kit/output/server/chunks/shared.js                             33.59 kB
+.svelte-kit/output/server/remote-entry.js                              36.79 kB
+.svelte-kit/output/server/chunks/index.js                              38.08 kB
+.svelte-kit/output/server/chunks/root.js                               86.62 kB
+.svelte-kit/output/server/index.js                                    130.76 kB
+✓ built in 2.48s
+
+Run npm run preview to preview your production build locally.
+
+> Using @sveltejs/adapter-auto
+  Could not detect a supported production environment. See https://svelte.dev/docs/kit/adapters to learn how to configure your app to run on the platform of your choosing
+  ✔ done
+npm notice
+npm notice New minor version of npm available! 11.11.1 -> 11.20.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.20.0
+npm notice To update run: npm install -g npm@11.20.0
+npm notice
+$ husky install tools/husky
+husky - Git hooks installed
+Done in 65.11s.
+   ok (exit 0)
+== build ==
+$ build_delivered_packages
+Successfully compiled 33 files with Babel (533ms).
+Successfully compiled 2 files with Babel (290ms).
+
+./src/stylex.js, ./src/inject.js → ./lib/cjs...
+created ./lib/cjs in 438ms
+
+./src/stylex.js, ./src/inject.js → ./lib/es/...
+created ./lib/es/ in 470ms
+
+./src/index.js → ./lib/index.js...
+created ./lib/index.js in 1.3s
+
+./src/index.js → ./lib/index.browser.js...
+(!) Missing exports
+https://rollupjs.org/troubleshooting/#error-name-is-not-exported-by-module
+src/visitors/stylex-create.js
+logicalExpression is not exported by @babel/types
+475: 
+476:               const guardedObjs = guardedProps.map(({ prop, expr }) =>
+477:                 t.logicalExpression(
+                       ^
+478:                   '&&',
+479:                   t.binaryExpression(
+src/visitors/stylex-create.js
+cloneNode is not exported by @babel/types
+479:                   t.binaryExpression(
+480:                     '!==',
+481:                     t.cloneNode(expr),
+                           ^
+482:                     t.identifier('undefined'),
+483:                   ),
+src/visitors/stylex-create.js
+cloneNode is not exported by @babel/types
+486:                     t.objectProperty(
+487:                       t.identifier('$$css'),
+488:                       t.cloneNode(cssTagValue),
+                             ^
+489:                     ),
+490:                   ]),
+src/visitors/stylex-props.js
+isLiteral is not exported by @babel/types
+528:         return false;
+529:       }
+530:     } else if (!t.isLiteral(val)) {
+                       ^
+531:       return false;
+532:     }
+src/index.js
+importNamespaceSpecifier is not exported by @babel/types
+449:     'body',
+450:     t.importDeclaration(
+451:       [t.importNamespaceSpecifier(t.identifier(stylexLocalName))],
+              ^
+452:       t.stringLiteral(importSource),
+453:     ),
+created ./lib/index.browser.js in 835ms
+
+../../@stylexjs/babel-plugin/pandamstyle/entry-node.js → ./lib/index.js...
+created ./lib/index.js in 1.7s
+
+../../@stylexjs/babel-plugin/pandamstyle/entry-node.js → ./lib/index.mjs...
+created ./lib/index.mjs in 1s
+
+../../@stylexjs/babel-plugin/pandamstyle/vite.js → ./lib/vite.js...
+created ./lib/vite.js in 881ms
+
+../../@stylexjs/babel-plugin/pandamstyle/vite.js → ./lib/vite.mjs...
+created ./lib/vite.mjs in 853ms
+
+../../@stylexjs/babel-plugin/pandamstyle/runtime.js → ./lib/runtime.mjs...
+created ./lib/runtime.mjs in 18ms
+
+../../@stylexjs/babel-plugin/pandamstyle/runtime.js → ./lib/runtime.cjs...
+created ./lib/runtime.cjs in 17ms
+   ok (exit 0)
+== upstream-babel-plugin ==
+$ bash -c cd '/home/kyle/work/pandam-style/packages/@stylexjs/babel-plugin' && '/home/kyle/work/pandam-style/node_modules/.bin/jest' --ci --testPathIgnorePatterns '/__tests__/pandamstyle/'
+PASS src/shared/preprocess-rules/__tests__/flatten-raw-style-obj-test.js
+  Flatten Style Object with legacy shorthand expansion
+    Simple Objects
+      ✓ should create PreRule objects for simple style values (7 ms)
+      ✓ should expand simple gap values (1 ms)
+      ✓ should expand simple containIntrinsicSize values (1 ms)
+      ✓ should expand simple shorthands (2 ms)
+      ✓ should expand shorthands with space-separated values (2 ms)
+      ✓ should expand simple gap with space-separated values (1 ms)
+      ✓ should expand simple containIntrinsicSize with space-separated values (2 ms)
+      ✓ should expand shorthands with fallbacks (1 ms)
+    Nested Objects
+      ✓ Legacy Pseudo classes (1 ms)
+      ✓ Modern Pseudo classes (1 ms)
+      ✓ Modern Pseudo classes with shorthands (1 ms)
+      ✓ Modern Pseudo classes with complex shorthands (2 ms)
+      ✓ Modern pseudo and at-rules (3 ms)
+      ✓ Attribute selector conditions (1 ms)
+    Multiple levels of nesting
+      ✓ Fallback styles within nested objects (1 ms)
+      ✓ pseudo within a media query - legacy syntax (3 ms)
+      ✓ pseudo with a pseudo within a media query - legacy syntax (1 ms)
+      ✓ pseudo within a media query - modern syntax (1 ms)
+      ✓ extra deep, pseudo within a media query - modern syntax (1 ms)
+
+PASS src/utils/__tests__/state-manager-test.js
+  StateManager config parsing
+    "classNamePrefix" option
+      ✓ logs errors if invalid (8 ms)
+      ✓ default value (1 ms)
+      ✓ empty string value (1 ms)
+      ✓ provided value (15 ms)
+    "debug" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value (1 ms)
+      ✓ false value (1 ms)
+      ✓ true value (3 ms)
+    "dev" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value (1 ms)
+      ✓ false value
+      ✓ true value (1 ms)
+    "enableDebugDataProp" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "enableDevClassNames" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value (7 ms)
+    "enableInlinedConditionalMerge" option (boolean)
+      ✓ logs errors if invalid
+      ✓ default value (1 ms)
+      ✓ false value (1 ms)
+      ✓ true value
+    "enableMinifiedKeys" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "importSources" option
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ empty value (1 ms)
+      ✓ provided value (4 ms)
+    "runtimeInjection" option
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+      ✓ "true" value (1 ms)
+    "styleResolution" option
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ valid values (1 ms)
+    "test" option (boolean)
+      ✓ logs errors if invalid
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "treeshakeCompensation" option (boolean)
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ false value (1 ms)
+      ✓ true value
+    "unstable_moduleResolution" option
+      ✓ default value
+      ✓ "commonJS" type (1 ms)
+      ✓ "haste" type (1 ms)
+      ✓ "custom" type (1 ms)
+      ✓ "rootDir" option (1 ms)
+    "enableFontSizePxToRem" option (boolean)
+      ✓ logs errors if invalid
+      ✓ default value
+      ✓ false value
+      ✓ true value (1 ms)
+    "propertyValidationMode" option
+      ✓ logs errors if invalid (1 ms)
+      ✓ default value
+      ✓ valid values
+
+PASS src/utils/__tests__/evaluate-path-test.js
+  custom path evaluation works as expected
+    ✓ Evaluates Primitive Value expressions (37 ms)
+    ✓ Evaluates Simple Arrays and Objects (5 ms)
+    ✓ Evaluates Objects with spreads (9 ms)
+    ✓ Evaluates built-in functions (11 ms)
+    ✓ Evaluates built-in functions without the Node global alias (1 ms)
+    ✓ Evaluates custom functions (1 ms)
+    ✓ Evaluates custom functions that return non-static values
+    ✓ Evaluates custom functions used as spread values (1 ms)
+    ✓ Evaluates custom functions that take paths (1 ms)
+    evaluating function expressions
+      ✓ function with a single params (3 ms)
+      ✓ function with a two params (1 ms)
+      ✓ Array map (1 ms)
+      ✓ Array filter (1 ms)
+      ✓ Array map and filter (1 ms)
+      ✓ Object entries (2 ms)
+      ✓ Methods called by string should be bind (1 ms)
+    evaluate-path prototype-chain escape prevention
+      ✓ blocks reading .constructor off an object literal
+      ✓ blocks walking to Function via .constructor.constructor (8 ms)
+      ✓ blocks arbitrary code execution via Function constructor (1 ms)
+      ✓ blocks constructor calls on allowlisted globals
+      ✓ blocks computed-property access to constructor
+      ✓ blocks computed-property access after property-key coercion (1 ms)
+      ✓ blocks __proto__ traversal (4 ms)
+      ✓ blocks prototype traversal
+      ✓ blocks .constructor off a string literal (6 ms)
+      ✓ blocks .constructor reached through a bound variable (1 ms)
+      ✓ blocks Function reached through reflection (4 ms)
+      ✓ blocks Function reached through inherited config properties (1 ms)
+      ✓ blocks reflective Object methods (2 ms)
+      ✓ still allows built-in methods that return plain data (2 ms)
+      ✓ still deopts on non-deterministic and mutating methods (6 ms)
+      ✓ still allows legitimate member access (1 ms)
+      ✓ a payload is never executed, however it is reached (26 ms)
+    evaluate-path mutation detection
+      ✓ evaluates constant array correctly (1 ms)
+      ✓ should bail out when array is mutated via push (1 ms)
+      ✓ should bail out when array is mutated via assignment (1 ms)
+      ✓ should bail out when object is mutated via Object.assign (1 ms)
+
+PASS __tests__/transform-value-normalization-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS value normalization
+      ✓ normalize whitespace in CSS values (83 ms)
+      ✓ no dimensions for 0 values (5 ms)
+      ✓ preserves zero units inside a non-first function (5 ms)
+      ✓ 0 timings are all "0s" (4 ms)
+      ✓ 0 angles are all "0deg" (8 ms)
+      ✓ calc() preserves spaces around "+" and "-" (4 ms)
+      ✓ strip leading zeros (4 ms)
+      ✓ use double quotes in empty strings (6 ms)
+      ✓ timing values are converted to seconds unless < 10ms (9 ms)
+      ✓ transforms non-unitless property values (13 ms)
+      ✓ number values rounded down to four decimal points (5 ms)
+      ✓ "content" property values are wrapped in quotes (17 ms)
+      ✓ "content" property values containing quotes are wrapped in quotes (7 ms)
+      ✓ "content" property values keep their CSS escape sequences (16 ms)
+      ✓ [legacy] no space before "!important" (3 ms)
+    [transform] fontSize with:
+      enableFontSizePxToRem: true
+        ✓ transforms font size from px to rem (4 ms)
+        ✓ transforms font size from px to rem even with calc (9 ms)
+      enableFontSizePxToRem: false
+        ✓ ignores px font size (4 ms)
+        ✓ ignores px font size within calc (4 ms)
+
+PASS __tests__/transform-stylex-defineConsts-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.defineConsts()
+      ✓ constants are unique (87 ms)
+      ✓ constants object (7 ms)
+      ✓ constants object (haste) (5 ms)
+      ✓ constant names: special characters (4 ms)
+      ✓ constant names: number (3 ms)
+      ✓ constant names: -- prefix preserves user-authored name (4 ms)
+    [transform] stylex.defineConsts() in stylex.create() 
+      ✓ adds placeholder for constant value from constants.stylex (12 ms)
+      ✓ adds media query placeholder from constants.stylex (6 ms)
+      ✓ resolves /ROOT/ placeholder alias paths for defineConsts imports (6 ms)
+      ✓ resolves aliased absolute paths for defineConsts imports (5 ms)
+      ✓ works with dynamic styles constants (21 ms)
+      ✓ works with dynamic styles at-rules (10 ms)
+      ✓ adds multiple media query placeholders from constants.stylex (6 ms)
+      ✓ adds nested media query placeholders from constants.stylex (5 ms)
+      ○ skipped works with firstThatWorks
+    [transform] stylex.defineConsts() with runtimeInjection
+      ✓ constants object with runtimeInjection: true (9 ms)
+      ✓ numeric constants with runtimeInjection: true (8 ms)
+      ✓ string constants with runtimeInjection: true (14 ms)
+      ✓ mixed string and numeric constants with runtimeInjection: true (4 ms)
+      ✓ constants with special characters with runtimeInjection: true (2 ms)
+      ✓ constants with custom inject path with runtimeInjection (3 ms)
+      ✓ haste module with runtimeInjection: true (4 ms)
+      ✓ constants with numeric keys with runtimeInjection: true (6 ms)
+      ✓ multiple defineConsts calls with runtimeInjection: true (6 ms)
+
+PASS __tests__/legacy/transform-legacy-polyfills-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS property polyfills (styleResolution: application-order)
+      ✓ [non-standard] "end" (aka "insetInlineEnd") (89 ms)
+      ✓ [non-standard] "marginEnd" (aka "marginInlineEnd") (7 ms)
+      ✓ [non-standard] "marginHorizontal" (aka "marginInline") (4 ms)
+      ✓ [non-standard] "marginStart" (aka "marginInlineStart") (4 ms)
+      ✓ [non-standard] "marginVertical" (aka "marginBlock") (7 ms)
+      ✓ [non-standard] "paddingEnd" (aka "paddingInlineEnd") (4 ms)
+      ✓ [non-standard] "paddingHorizontal" (aka "paddingInline") (4 ms)
+      ✓ [non-standard] "paddingStart" (aka "paddingInlineStart") (3 ms)
+      ✓ [non-standard] "paddingVertical" (aka "paddingBlock") (7 ms)
+      ✓ [non-standard] "start" (aka "insetInlineStart") (4 ms)
+    [transform] CSS value polyfills (styleResolution: application-order)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "clear" property (3 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "clear" property (3 ms)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "float" property (4 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "float" property (4 ms)
+    [transform] CSS property polyfills (styleResolution: legacy-expand-shorthands and enableLogicalStylesPolyfill: true)
+      ✓ [non-standard] "end" (aka "insetInlineEnd") (16 ms)
+      ✓ [non-standard] "marginEnd" (aka "marginInlineEnd") (4 ms)
+      ✓ [non-standard] "marginHorizontal" (aka "marginInline") (9 ms)
+      ✓ [non-standard] "marginStart" (aka "marginInlineStart") (3 ms)
+      ✓ [non-standard] "marginVertical" (aka "marginBlock") (2 ms)
+      ✓ [non-standard] "paddingEnd" (aka "paddingInlineEnd") (4 ms)
+      ✓ [non-standard] "paddingHorizontal" (aka "paddingInline") (3 ms)
+      ✓ [non-standard] "paddingStart" (aka "paddingInlineStart") (2 ms)
+      ✓ [non-standard] "paddingVertical" (aka "paddingBlock") (2 ms)
+      ✓ [non-standard] "start" (aka "insetInlineStart") (4 ms)
+    [transform] CSS value polyfills (styleResolution: legacy-expand-shorthands and enableLogicalStylesPolyfill: true)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "clear" property (2 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "clear" property (2 ms)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "float" property (2 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "float" property (2 ms)
+    [transform] CSS property polyfills (styleResolution: legacy-expand-shorthands and enableLogicalStylesPolyfill: false)
+      ✓ [non-standard] "end" (aka "insetInlineEnd") (2 ms)
+      ✓ [non-standard] "marginEnd" (aka "marginInlineEnd") (3 ms)
+      ✓ [non-standard] "marginHorizontal" (aka "marginInline") (2 ms)
+      ✓ [non-standard] "marginStart" (aka "marginInlineStart") (2 ms)
+      ✓ [non-standard] "marginVertical" (aka "marginBlock") (2 ms)
+      ✓ [non-standard] "paddingEnd" (aka "paddingInlineEnd") (2 ms)
+      ✓ [non-standard] "paddingHorizontal" (aka "paddingInline") (2 ms)
+      ✓ [non-standard] "paddingStart" (aka "paddingInlineStart") (7 ms)
+      ✓ [non-standard] "paddingVertical" (aka "paddingBlock") (2 ms)
+      ✓ [non-standard] "start" (aka "insetInlineStart") (5 ms)
+    [transform] CSS value polyfills (styleResolution: legacy-expand-shorthands and enableLogicalStylesPolyfill: false)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "clear" property (1 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "clear" property (2 ms)
+      ✓ [non-standard] value "end" (aka "inlineEnd") for "float" property (2 ms)
+      ✓ [non-standard] value "start" (aka "inlineStart") for "float" property (3 ms)
+
+PASS __tests__/legacy/transform-logical-values-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS logical values
+      ✓ value "inline-end" for "clear" property (96 ms)
+      ✓ value "inline-start" for "clear" property (7 ms)
+      ✓ value "inline-end" for "float" property (6 ms)
+      ✓ value "inline-start" for "float" property (5 ms)
+      ✓ value "end" for "textAlign" property (6 ms)
+      ✓ value "start" for "textAlign" property (5 ms)
+      ✓ [legacy] value "e-resize" for "cursor" property (4 ms)
+      ✓ [legacy] value "w-resize" for "cursor" property (4 ms)
+      ✓ [legacy] value "ne-resize" for "cursor" property (9 ms)
+      ✓ [legacy] value "nw-resize" for "cursor" property (4 ms)
+      ✓ [legacy] value "se-resize" for "cursor" property (6 ms)
+      ✓ [legacy] value "sw-resize" for "cursor" property (4 ms)
+      ✓ [legacy] value of "animationName" property (4 ms)
+      ✓ [legacy] value of "backgroundPosition" property (29 ms)
+      ✓ [legacy] value of "paddingInline" property (20 ms)
+      ✓ [legacy] value of "boxShadow" property (51 ms)
+      ✓ [legacy] value of "textShadow" property (9 ms)
+
+PASS __tests__/transform-stylex-defineVars-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.defineVars()
+      ✓ tokens as null (92 ms)
+      ✓ tokens object (6 ms)
+      ✓ tokens object (haste) (5 ms)
+      ✓ tokens object deep in file tree (4 ms)
+      ✓ tokens object with nested @-rules (5 ms)
+      ✓ literal tokens object (4 ms)
+      ✓ local variable tokens object (5 ms)
+      ✓ local variables used in tokens objects (4 ms)
+      ✓ template literals used in tokens objects (10 ms)
+      ✓ expressions used in tokens objects (4 ms)
+      ✓ stylex.types used in tokens object (3 ms)
+      ✓ same-group references inside function values (6 ms)
+      ✓ same-group references can point to later keys (2 ms)
+      ✓ nested function leaves resolve same-group refs inside at-rules (10 ms)
+      ✓ function values can mix same-group and same-file references (6 ms)
+      ✓ function values can reference typed vars (3 ms)
+      ✓ function values can return stylex.types (6 ms)
+      ✓ function values can return nested objects (3 ms)
+      ✓ multiple variables objects (same file) (3 ms)
+      ✓ multiple variables objects (dependency) (4 ms)
+      ✓ multiple variables objects (different files) (7 ms)
+      options `debug:true`
+        ✓ tokens object uses hashed variable names (10 ms)
+        ✓ tokens with special-character keys use hashed variable names (17 ms)
+      options `dev:true`
+        ✓ tokens object (10 ms)
+      options `runtimeInjection:true`
+        ✓ tokens object (22 ms)
+      options `themeFileExtension`
+        ✓ processes tokens in files with configured extension (2 ms)
+
+PASS __tests__/transform-stylex-defineVarsNested-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.unstable_defineVarsNested()
+      ✓ basic nested tokens (91 ms)
+      ✓ deeply nested tokens (3 levels) (6 ms)
+      ✓ conditional @media values inside nesting (5 ms)
+      ✓ mixed flat and nested values (4 ms)
+      ✓ works with named import (6 ms)
+      ✓ works with renamed named import (3 ms)
+      ✓ produces different hashes for different nested keys (3 ms)
+      ✓ deeply nested conditional with @supports (4 ms)
+      ✓ throws: must be a named export (65 ms)
+      ✓ throws: must have exactly 1 argument (5 ms)
+      ✓ throws: must have an argument (11 ms)
+      ✓ works with stylex.unstable_conditional for @media values (6 ms)
+      ✓ works with named import of unstable_conditional (4 ms)
+      ✓ unstable_conditional is backward compatible — heuristic still works without it (5 ms)
+      ✓ unstable_conditional works in flat defineVars too (6 ms)
+    [cross-file] nested tokens used in stylex.create()
+      ✓ cross-file: nested token access in stylex.create (15 ms)
+      ✓ cross-file: deeply nested token access (3+ levels) (9 ms)
+      ✓ cross-file: mixed flat and nested access (12 ms)
+      ✓ cross-file: nested tokens used in createTheme (flat key format) (10 ms)
+    [cross-package] nested tokens from node_modules (commonJS)
+      ✓ cross-package: nested token access from node_modules in stylex.create (17 ms)
+      ✓ cross-package: deeply nested token access (3+ levels) from node_modules (10 ms)
+      ✓ cross-package: createThemeNested overriding tokens from node_modules (9 ms)
+
+PASS __tests__/transform-stylex-createTheme-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.createTheme()
+      ✓ theme object (97 ms)
+      ✓ theme object (haste) (10 ms)
+      ✓ theme object deep in file tree (10 ms)
+      ✓ literal tokens theme object (8 ms)
+      ✓ local variable theme object (22 ms)
+      ✓ local variables used in theme objects (6 ms)
+      ✓ stylex.env.override for partial theme overrides (6 ms)
+      ✓ template literals used in theme objects (17 ms)
+      ✓ expressions used in theme objects (13 ms)
+      ✓ stylex.types used in theme object (18 ms)
+      ✓ multiple theme objects (same vars) (11 ms)
+      ✓ multiple theme objects (different vars) (17 ms)
+      ✓ themes are indifferent to order of keys (9 ms)
+      options `debug:true`
+        ✓ adds debug data (8 ms)
+        ✓ adds debug data for npm packages (7 ms)
+        ✓ adds debug data (haste) (9 ms)
+        ✓ adds debug data for npm packages (haste) (13 ms)
+      options `dev:true`
+        ✓ adds dev data (5 ms)
+      options `runtimeInjection:true`
+        ✓ adds style injection (9 ms)
+
+PASS __tests__/legacy/stylex-transform-legacy-shorthands-test.js
+  legacy-shorthand-expansion style resolution (enableLogicalStylesPolyfill: true)
+    while using RN non-standard properties
+      ✓ padding: with longhand property collisions (93 ms)
+      ✓ padding: with null longhand property collisions (7 ms)
+      ✓ borderColor: basic shorthand (4 ms)
+      ✓ borderWidth: basic shorthand (5 ms)
+    while using standard logical properties
+      ✓ padding: basic shorthand (6 ms)
+      ✓ margin: basic shorthand (6 ms)
+      ✓ paddingInline: basic shorthand (3 ms)
+      ✓ paddingInline: basic multivalue shorthand (4 ms)
+      ✓ padding: with longhand property collisions (11 ms)
+      ✓ padding: with longhand directional and logical property collisions (8 ms)
+      ✓ padding: with null longhand property collisions (22 ms)
+      ✓ marginInline: basic shorthand (3 ms)
+      ✓ marginInline: basic multivalue shorthand (2 ms)
+      ✓ marginBlock: basic multivalue shorthand (3 ms)
+      ✓ margin: with longhand property collisions (2 ms)
+      ✓ margin: with null longhand property collisions (4 ms)
+      ✓ border: basic shorthand (2 ms)
+      ✓ borderInlineColor: basic shorthand (2 ms)
+      ✓ borderInlineWidth: basic shorthand (2 ms)
+      ✓ inset: basic shorthand (3 ms)
+      ✓ inset: multivalue shorthand (3 ms)
+      ✓ insetInline: basic shorthand (3 ms)
+      ✓ insetInline: multivalue shorthand (2 ms)
+      ✓ insetBlock: basic shorthand (6 ms)
+      ✓ insetBlock: multivalue shorthand (3 ms)
+      ✓ listStyle: basic shorthand (5 ms)
+      ✓ listStyle: multi-value shorthand (5 ms)
+      ✓ listStyle: with longhand collisions (5 ms)
+      ✓ listStyle: invalid values (93 ms)
+  legacy-shorthand-expansion resolution (enableLogicalStylesPolyfill: false)
+    while using RN non-standard properties
+      ✓ padding: with longhand property collisions (5 ms)
+      ✓ padding: with null longhand property collisions (4 ms)
+      ✓ borderColor: basic shorthand (3 ms)
+      ✓ borderWidth: basic shorthand (3 ms)
+    while using standard logical properties
+      ✓ padding: basic shorthand (3 ms)
+      ✓ margin: basic shorthand (5 ms)
+      ✓ paddingInline: basic shorthand (4 ms)
+      ✓ padding: with longhand property collisions (6 ms)
+      ✓ paddingBlock: basic multivalue shorthand (5 ms)
+      ✓ padding: with null longhand property collisions (4 ms)
+      ✓ marginInline: basic shorthand (4 ms)
+      ✓ margin: with longhand property collisions (8 ms)
+      ✓ margin: with null longhand property collisions (11 ms)
+      ✓ border: basic shorthand (8 ms)
+      ✓ borderInlineColor: basic shorthand (13 ms)
+      ✓ borderInlineWidth: basic shorthand (2 ms)
+
+PASS __tests__/stylex-nested-utils-test.js
+  stylex-nested-utils
+    flattenNestedVarsConfig
+      ✓ flattens a simple one-level nested object (1 ms)
+      ✓ flattens a deeply nested object (3+ levels) (1 ms)
+      ✓ flattens 4 levels deep (1 ms)
+      ✓ keeps top-level string values as-is
+      ✓ stops at objects with a "default" key (conditional @-rule values) (2 ms)
+      ✓ stops at deeply nested conditional @-rule values
+      ✓ handles mixed namespaces and conditional values at the same level (1 ms)
+      ✓ handles multiple branches at the same level (3 ms)
+      ✓ returns empty object for empty input
+      ✓ throws on keys containing dots (28 ms)
+      ✓ throws on nested keys containing dots (1 ms)
+      ✓ handles object with only top-level leaves (no nesting) (1 ms)
+      ✓ preserves conditional value objects
+      ✓ object with default key set to a nested conditional is still a leaf (1 ms)
+    flattenNestedConstsConfig
+      ✓ treats objects with "default" key as namespaces (NOT conditional leaves) (1 ms)
+      ✓ still treats strings and numbers as leaves (1 ms)
+      ✓ flattens the full j-malt PR #1303 three-tiered structure (1 ms)
+      ✓ differs from flattenNestedVarsConfig for objects with "default" key (1 ms)
+      ✓ handles empty object
+      ✓ throws on keys containing dots
+    flattenNestedStringConfig
+      ✓ throws on keys containing dots (1 ms)
+    unflattenObject
+      ✓ unflattens a single dot-separated key
+      ✓ merges multiple keys into the same branch (3 ms)
+      ✓ preserves __varGroupHash__ at top level without splitting
+      ✓ preserves $$css at top level without splitting
+      ✓ preserves non-dotted keys at top level
+      ✓ handles deeply nested keys (4 levels)
+      ✓ returns empty object for empty input (1 ms)
+      ✓ handles only special keys
+      ✓ handles only non-dotted keys
+      ✓ handles keys that share a common prefix (1 ms)
+    flattenNestedVarsConfig and unflattenObject round-trip
+      ✓ round-trips a simple nested object (2 ms)
+      ✓ round-trips with conditional values preserved
+      ✓ round-trips a complex multi-branch structure
+      ✓ round-trips with string values
+      ✓ round-trips a flat object unchanged (1 ms)
+
+PASS __tests__/shared-stylex-nested-transforms-test.js
+  shared nested transforms
+    styleXDefineVarsNested
+      ✓ returns nested JS output with var() references (2 ms)
+      ✓ produces same CSS as flat defineVars with equivalent keys (1 ms)
+      ✓ produces same __varGroupHash__ as flat defineVars (1 ms)
+      ✓ handles deeply nested tokens (3 levels) (1 ms)
+      ✓ handles conditional @-rule values inside nesting (1 ms)
+      ✓ handles mixed flat and nested values (1 ms)
+      ✓ different nested keys produce different var() hashes (1 ms)
+    styleXDefineConstsNested
+      ✓ returns nested JS output with original values preserved (1 ms)
+      ✓ generates empty CSS (consts do not emit CSS variables) (1 ms)
+      ✓ preserves number values
+      ✓ handles deeply nested constants (1 ms)
+      ✓ produces same const metadata as flat defineConsts with equivalent keys
+      ✓ j-malt PR #1303 use case: three-tiered design system tokens with state namespaces (1 ms)
+      ✓ handles mixed string and number values (4 ms)
+    styleXCreateThemeNested
+      ✓ creates theme override from nested vars and nested overrides (4 ms)
+      ✓ supports partial overrides (only some leaves)
+      ✓ produces same output as flat createTheme with equivalent flattened inputs (1 ms)
+      ✓ handles conditional overrides with @media (1 ms)
+      ✓ throws when first arg lacks __varGroupHash__ (31 ms)
+
+PASS __tests__/legacy/transform-logical-properties-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS logical properties (styleResolution: "application-order")
+      ✓ "borderBlockColor" (83 ms)
+      ✓ "borderBlockStartColor" (6 ms)
+      ✓ "borderBlockEndColor" (6 ms)
+      ✓ "borderInlineColor" (14 ms)
+      ✓ "borderInlineStartColor" (6 ms)
+      ✓ "borderInlineEndColor" (4 ms)
+      ✓ "borderBlockStyle" (4 ms)
+      ✓ "borderBlockStartStyle" (4 ms)
+      ✓ "borderBlockEndStyle" (11 ms)
+      ✓ "borderInlineStyle" (4 ms)
+      ✓ "borderInlineStartStyle" (7 ms)
+      ✓ "borderInlineEndStyle" (4 ms)
+      ✓ "borderBlockWidth" (3 ms)
+      ✓ "borderBlockStartWidth" (9 ms)
+      ✓ "borderBlockEndWidth" (6 ms)
+      ✓ "borderInlineWidth" (8 ms)
+      ✓ "borderInlineStartWidth" (3 ms)
+      ✓ "borderInlineEndWidth" (3 ms)
+      ✓ "borderTopStartRadius" (5 ms)
+      ✓ "borderBottomStartRadius" (3 ms)
+      ✓ "borderTopEndRadius" (9 ms)
+      ✓ "borderBottomEndRadius" (8 ms)
+      ✓ "cornerShape" (6 ms)
+      ✓ "cornerStartStartShape" (3 ms)
+      ✓ "cornerTopLeftShape" (6 ms)
+      ✓ "insetBlock" (3 ms)
+      ✓ "insetBlockEnd" (5 ms)
+      ✓ "insetBlockStart" (15 ms)
+      ✓ "insetInline" (6 ms)
+      ✓ "insetInlineEnd" (13 ms)
+      ✓ "insetInlineStart" (6 ms)
+      ✓ "marginBlock" (5 ms)
+      ✓ "marginBlockEnd" (4 ms)
+      ✓ "marginBlockStart" (2 ms)
+      ✓ "marginInline" (3 ms)
+      ✓ "marginInlineEnd" (2 ms)
+      ✓ "marginInlineStart" (2 ms)
+      ✓ "paddingBlock" (2 ms)
+      ✓ "paddingBlockEnd" (2 ms)
+      ✓ "paddingBlockStart" (2 ms)
+      ✓ "paddingInline" (5 ms)
+      ✓ "paddingInlineEnd" (4 ms)
+      ✓ "paddingInlineStart" (3 ms)
+      ✓ [legacy] short-form property value flipping (7 ms)
+    [transform] CSS logical properties  (styleResolution: "legacy-expand-shorthands")
+      with enableLogicalStylesPolyfill: true
+        ✓ marginInline (3 ms)
+        ✓ marginInlineStart (2 ms)
+        ✓ marginInlineEnd (1 ms)
+        ✓ paddingInline (1 ms)
+        ✓ paddingInlineStart (1 ms)
+        ✓ paddingInlineEnd (2 ms)
+        ✓ borderInlineColor (1 ms)
+        ✓ borderInlineStartColor (1 ms)
+        ✓ borderInlineStyle (2 ms)
+        ✓ borderInlineWidth (3 ms)
+        ✓ borderBlockColor (2 ms)
+        ✓ borderBlockStyle (2 ms)
+        ✓ borderBlockWidth (5 ms)
+        ✓ insetBlock (2 ms)
+        ✓ insetBlockStart (2 ms)
+        ✓ insetBlockEnd (2 ms)
+        ✓ insetInline (3 ms)
+        ✓ insetInlineStart (1 ms)
+        ✓ insetInlineEnd (1 ms)
+        ✓ borderTopStartRadius (6 ms)
+        ✓ borderBottomStartRadius (2 ms)
+        ✓ borderTopEndRadius (2 ms)
+        ✓ borderBottomEndRadius (1 ms)
+      with enableLogicalStylesPolyfill: false
+        ✓ marginInline (2 ms)
+        ✓ marginInlineStart (3 ms)
+        ✓ marginInlineEnd (2 ms)
+        ✓ paddingInline (2 ms)
+        ✓ paddingInlineStart (2 ms)
+        ✓ paddingInlineEnd (1 ms)
+        ✓ borderInlineColor (2 ms)
+        ✓ borderInlineStartColor (1 ms)
+        ✓ borderInlineStyle (1 ms)
+        ✓ borderInlineWidth (4 ms)
+        ✓ borderBlockColor (2 ms)
+        ✓ borderBlockStyle (2 ms)
+        ✓ borderBlockWidth (2 ms)
+        ✓ insetBlock (2 ms)
+        ✓ insetBlockStart (1 ms)
+        ✓ insetBlockEnd (2 ms)
+        ✓ insetInline (1 ms)
+        ✓ insetInlineStart (2 ms)
+        ✓ insetInlineEnd (2 ms)
+        ✓ borderTopStartRadius (2 ms)
+        ✓ borderBottomStartRadius (2 ms)
+        ✓ borderTopEndRadius (3 ms)
+        ✓ borderBottomEndRadius (2 ms)
+
+PASS __tests__/validation-stylex-create-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.create()
+      ✓ invalid use: not bound (149 ms)
+      ✓ invalid argument: none (6 ms)
+      ✓ invalid argument: too many (4 ms)
+      ✓ invalid argument: non-static (4 ms)
+      ✓ valid argument: object (10 ms)
+      style rules
+        ✓ invalid key: non-static (6 ms)
+        ✓ invalid rule: non-object (8 ms)
+        ✓ invalid rule: spread (6 ms)
+        ✓ valid rule: object (6 ms)
+        ✓ invalid dynamic rule: default object value (8 ms)
+        ✓ invalid dynamic rule: default string value (7 ms)
+        ✓ invalid dynamic rule: destructuring  (8 ms)
+        ✓ invalid dynamic rule: rest param  (20 ms)
+        ✓ valid dynamic rule (11 ms)
+      style declarations
+        ✓ invalid property: non-static value (3 ms)
+        ✓ invalid value: boolean (7 ms)
+        ✓ invalid value: non-static (7 ms)
+        ✓ invalid value: array of objects (2 ms)
+        ✓ valid value: number (3 ms)
+        ✓ valid value: string (5 ms)
+        ✓ valid value: array of numbers (2 ms)
+        ✓ valid value: array of strings (3 ms)
+        ✓ valid value: single-expr function call (4 ms)
+        ✓ valid value: single-expr function call in object (10 ms)
+        ✓ valid value: local variable (2 ms)
+        ✓ valid value: pure complex expression (3 ms)
+        ✓ valid value: template literal expressions (2 ms)
+        ✓ valid object value: key is "default" (5 ms)
+        ✓ valid object value: key starts with ":" (2 ms)
+        ✓ valid object value: multiple valid keys (2 ms)
+        ✓ valid object value: nested pseudo-classes (11 ms)
+        ✓ invalid CSS variable: unclosed function (7 ms)
+        ✓ invalid value: unclosed double-quoted string (11 ms)
+        ✓ invalid value: unclosed single-quoted string (7 ms)
+        ✓ invalid value: unclosed string in multi-value property (3 ms)
+        ✓ invalid value: stray apostrophe in font-family list (4 ms)
+        ✓ valid value: properly closed strings do not throw (2 ms)
+        ✓ valid value: properly closed single-quoted string (2 ms)
+        ✓ invalid CSS variable: unprefixed custom property (3 ms)
+        ✓ valid CSS variable: defined custom properties (2 ms)
+        ✓ valid CSS variable: undefined custom properties (13 ms)
+        ✓ [legacy] pseudo-classes must start with ":" character (2 ms)
+        ○ skipped invalid value: empty object
+        ○ skipped invalid object value: contains disallowed key
+    [validation] invalid properties
+      ○ skipped invalid property: "animation"
+      ○ skipped invalid property: "background"
+      ○ skipped invalid property: "border"
+      ○ skipped invalid property: "borderBlock"
+      ○ skipped invalid property: "borderBlockEnd"
+      ○ skipped invalid property: "borderBlockStart"
+      ○ skipped invalid property: "borderBottom"
+      ○ skipped invalid property: "borderImage"
+      ○ skipped invalid property: "borderInline"
+      ○ skipped invalid property: "borderInlineEnd"
+      ○ skipped invalid property: "borderInlineStart"
+      ○ skipped invalid property: "borderLeft"
+      ○ skipped invalid property: "borderRight"
+      ○ skipped invalid property: "borderTop"
+      ○ skipped invalid property: "flexFlow"
+      ○ skipped invalid property: "font"
+      ○ skipped invalid property: "listStyle"
+      ○ skipped invalid property: "textDecoration"
+      ○ skipped invalid property: "transition"
+    [validation] invalid values
+      ○ skipped invalid value: "block !important" for "display"
+      ○ skipped invalid value: "top left" for "backgroundPosition"
+      ○ skipped invalid value: "red blue" for "borderColor"
+      ○ skipped invalid value: "1px 2px" for "borderRadius"
+      ○ skipped invalid value: "solid dashed" for "borderStyle"
+      ○ skipped invalid value: "1px 2px" for "borderWidth"
+      ○ skipped invalid value: "1px 2px" for "inset"
+      ○ skipped invalid value: "1px 2px" for "insetBlock"
+      ○ skipped invalid value: "1px 2px" for "insetInline"
+      ○ skipped invalid value: "1 1 0" for "flex"
+      ○ skipped invalid value: "1 1 0" for "grid"
+      ○ skipped invalid value: "1px 2px" for "margin"
+      ○ skipped invalid value: "1px 2px" for "marginBlock"
+      ○ skipped invalid value: "1px 2px" for "marginInline"
+      ○ skipped invalid value: "1px solid red" for "outline"
+      ○ skipped invalid value: "hidden visible" for "overflow"
+      ○ skipped invalid value: "1px 2px" for "padding"
+      ○ skipped invalid value: "1px 2px" for "paddingBlock"
+      ○ skipped invalid value: "1px 2px" for "paddingInline"
+      ○ skipped invalid value: "all" for "transitionProperty"
+      ○ skipped invalid value: "bottom" for "transitionProperty"
+      ○ skipped invalid value: "end" for "transitionProperty"
+      ○ skipped invalid value: "height" for "transitionProperty"
+      ○ skipped invalid value: "inset" for "transitionProperty"
+      ○ skipped invalid value: "inset-block" for "transitionProperty"
+      ○ skipped invalid value: "inset-inline" for "transitionProperty"
+      ○ skipped invalid value: "inset-block-end" for "transitionProperty"
+      ○ skipped invalid value: "inset-block-start" for "transitionProperty"
+      ○ skipped invalid value: "inset-inline-end" for "transitionProperty"
+      ○ skipped invalid value: "inset-inline-start" for "transitionProperty"
+      ○ skipped invalid value: "margin" for "transitionProperty"
+      ○ skipped invalid value: "left" for "transitionProperty"
+      ○ skipped invalid value: "padding" for "transitionProperty"
+      ○ skipped invalid value: "right" for "transitionProperty"
+      ○ skipped invalid value: "start" for "transitionProperty"
+      ○ skipped invalid value: "top" for "transitionProperty"
+      ○ skipped invalid value: "width" for "transitionProperty"
+    [validation] propertyValidationMode config
+      ✓ does not throw by default for disallowed properties (silent mode) (3 ms)
+      ✓ throws error when propertyValidationMode is "throw" (7 ms)
+      ✓ does not throw when propertyValidationMode is "warn" (6 ms)
+      ✓ does not throw when propertyValidationMode is "silent" (2 ms)
+      ✓ works with background property (2 ms)
+      ✓ works with animation property (2 ms)
+
+PASS src/visitors/__tests__/parse-stylex-create-arg-test.js
+  custom path evaluation works as expected
+    ✓ Evaluates Empty Object (3 ms)
+    ✓ Evaluates Static Style Object (1 ms)
+    ✓ Evaluates object with function styles (identifier) (6 ms)
+    ✓ Evaluates object with function styles (binary expression) (2 ms)
+
+PASS __tests__/evaluation-import-test.js
+  Evaluation of imported values works based on configuration
+    Theme name hashing based on fileName alone works
+      ✓ Importing file with ".stylex" suffix works (45 ms)
+      ✓ Importing file with ".stylex" and reading __varGroupHash__ returns a className (7 ms)
+      ✓ Maintains variable names that start with -- from "*.stylex" files (12 ms)
+      ✓ Importing file with ".stylex" suffix works with keyframes (6 ms)
+      ✓ Importing file with ".stylex.js" suffix works (4 ms)
+      ✓ Importing file with ".stylex.js" with an alias suffix works (4 ms)
+      ✓ Importing file without a ".stylex" suffix fails (66 ms)
+      ✓ Imported vars with ".stylex" suffix can be used as style keys (8 ms)
+      ✓ Imported vars with ".stylex" suffix can be used as style keys dynamically (12 ms)
+    Module resolution commonJS
+      ✓ Recognizes .ts stylex imports when resolving .js relative imports (4 ms)
+
+PASS src/shared/types/__tests__/stylex-types-test.js
+  stylex-types-test
+    class methods
+      ✓ angle
+      ✓ color
+      ✓ image (1 ms)
+      ✓ integer
+      ✓ length (10 ms)
+      ✓ percentage (1 ms)
+      ✓ num
+      ✓ integer (1 ms)
+      ✓ resolution
+      ✓ time (1 ms)
+      ✓ transformFunction (3 ms)
+      ✓ transformList
+      ✓ url (1 ms)
+    standalone factory functions
+      ✓ angle
+      ✓ color (1 ms)
+      ✓ image
+      ✓ integer (1 ms)
+      ✓ length
+      ✓ percentage (1 ms)
+      ✓ num (4 ms)
+      ✓ integer
+      ✓ resolution (1 ms)
+      ✓ time
+      ✓ transformFunction (1 ms)
+      ✓ transformList
+      ✓ url (1 ms)
+
+PASS __tests__/transform-stylex-viewTransitionClass-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.viewTransitionClass
+      ✓ basic object (38 ms)
+      ✓ local variables used in view transition class (4 ms)
+      ✓ using keyframes (5 ms)
+      ✓ using inline keyframes (6 ms)
+      ✓ unitless numbers (2 ms)
+      ○ skipped using contextual styles
+
+PASS __tests__/transform-stylex-defineConstsNested-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.unstable_defineConstsNested()
+      ✓ basic nested consts with original values preserved (45 ms)
+      ✓ deeply nested constants (3 levels) (7 ms)
+      ✓ j-malt PR #1303 use case: three-tiered tokens with state namespaces (5 ms)
+      ✓ handles number values (6 ms)
+      ✓ works with named import (2 ms)
+      ✓ mixed string and number values (4 ms)
+      ✓ throws: must be a named export (80 ms)
+      ✓ throws: must have exactly 1 argument (3 ms)
+
+PASS __tests__/transform-stylex-when-test.js
+  @stylexjs/babel-plugin
+    [transform] when functions
+      ✓ when.ancestor function (60 ms)
+      ✓ when.siblingBefore function (5 ms)
+      ✓ namespace imports (5 ms)
+      ✓ aliased imports (7 ms)
+    [validation] when functions
+      ✓ validates pseudo selector format (75 ms)
+      ✓ rejects pseudo-elements (5 ms)
+      ✓ validates attribute selector format (11 ms)
+      ✓ rejects invalid selector format (4 ms)
+    [transform] when functions with attribute selectors
+      ✓ when.ancestor with attribute selector (3 ms)
+      ✓ when.descendant with attribute selector (4 ms)
+    [transform] using stylex.defaultMarker
+      ✓ named import (3 ms)
+      ✓ namespace import (6 ms)
+    [transform] using custom markers
+      ✓ named import of custom marker (10 ms)
+
+PASS __tests__/transform-import-export-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex imports
+      ✓ import: none (137 ms)
+      ✓ import: non-stylex (28 ms)
+      ✓ require: non-stylex (44 ms)
+      ✓ import: wildcard (the default) (95 ms)
+      ✓ import: wildcard (non-stylex name) (57 ms)
+      ✓ import: named (56 ms)
+      ✓ import: named alias (50 ms)
+      ✓ importSources (string) (55 ms)
+      ✓ importSources (object) (51 ms)
+      ✓ [META-ONLY] import: default (49 ms)
+    [transform] stylex exports
+      ✓ export: named property (5 ms)
+      ✓ export: named declaration (3 ms)
+      ✓ export: default (9 ms)
+      ✓ module.export (4 ms)
+
+PASS __tests__/transform-stylex-keyframes-test.js
+  @stylexjs/babel-plugin
+    [transform] CSS keyframes
+      ✓ keyframes object (51 ms)
+      ✓ local variables used in keyframes object (4 ms)
+      ✓ template literals used in keyframes object (7 ms)
+      ✓ keyframes object used inline (7 ms)
+      ✓ keyframes object (3 ms)
+      ✓ unitless numbers in keyframes object (3 ms)
+      ✓ [legacy] keyframes object RTL polyfills (3 ms)
+
+PASS src/shared/utils/__tests__/transform-value-test.js
+  transformValue content property tests
+    ✓ preserves CSS functions without quotes (2 ms)
+    ✓ preserves CSS keywords without quotes (1 ms)
+    ✓ handles mixed content values (1 ms)
+    ✓ adds quotes to plain strings (1 ms)
+    ✓ adds quotes to plain strings containing quote characters
+    ✓ preserves CSS escape sequences when adding quotes (2 ms)
+    ✓ preserves quote keywords combined with strings
+    ✓ preserve units in zero values CSS variables (1 ms)
+
+PASS __tests__/transform-stylex-positionTry-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.positionTry
+      ✓ positionTry object (59 ms)
+      ✓ local constants used in positionTry object (3 ms)
+      ✓ positionTry value used within create (5 ms)
+      ✓ positionTry object used inline (8 ms)
+      ✓ processStylexRules does not inject ancestor selector into @position-try (4 ms)
+      ✓ processStylexRules does not inject specificity into @position-try (2 ms)
+
+PASS __tests__/transform-stylex-createThemeNested-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.unstable_createThemeNested()
+      ✓ creates theme override for nested vars (53 ms)
+      ✓ partial override (only some branches) (7 ms)
+      ✓ conditional override with @media (6 ms)
+      ✓ works with named import (5 ms)
+      ✓ override CSS uses correct var hashes from defineVarsNested (9 ms)
+      ✓ throws: must have exactly 2 arguments (70 ms)
+      ✓ throws: must be assigned to a variable (3 ms)
+      ✓ throws: first arg must have __varGroupHash__ (4 ms)
+
+PASS __tests__/transform-stylex-props-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.props() call
+      ✓ empty stylex.props call (99 ms)
+      ✓ basic stylex call (17 ms)
+      ✓ basic stylex attrs call (6 ms)
+      ✓ stylex.env resolves in inline objects (6 ms)
+      ✓ stylex.attrs named import resolves in inline objects (9 ms)
+      ✓ stylex.env named import resolves in inline objects (5 ms)
+      ✓ stylex call with number (8 ms)
+      ✓ stylex call with computed number (13 ms)
+      ✓ stylex call with computed string (5 ms)
+      ✓ stylex call with multiple namespaces (3 ms)
+      ✓ stylex call within variable declarations (3 ms)
+      ✓ stylex call with styles variable assignment (3 ms)
+      ✓ stylex call within export declarations (4 ms)
+      ✓ stylex call with short-form properties (2 ms)
+      ✓ stylex call with exported short-form properties (3 ms)
+      ✓ Last property wins, even if shorthand (4 ms)
+      ✓ stylex call using styles with pseudo selectors (2 ms)
+      ✓ stylex call using styles with pseudo selectors within property (3 ms)
+      ✓ stylex call using styles with Media Queries (6 ms)
+      ✓ stylex call using styles with Media Queries within property (55 ms)
+      ✓ stylex call using styles with Support Queries (3 ms)
+      ✓ stylex call using styles with Support Queries within property (3 ms)
+      props calls with jsx
+        ✓ local static styles (16 ms)
+        ✓ Test that sx attribute can be used instead of ...stylex.props (21 ms)
+        ✓ sx prop with custom sxPropName (19 ms)
+        ✓ local dynamic styles (12 ms)
+        ✓ non-local styles (4 ms)
+        sx attribute runtime binding
+          ✓ injects a value namespace import alongside a type namespace import (17 ms)
+          ✓ injects a value namespace import alongside a named type import (7 ms)
+          ✓ injects a value namespace import when there is no stylex import (9 ms)
+          ✓ injects from configured import source when there is no stylex import (7 ms)
+          ✓ injects from existing type-only custom import source (3 ms)
+          ✓ reuses an existing value namespace import (12 ms)
+          ✓ avoids a local stylex binding that would shadow the injected import (3 ms)
+          ✓ injects one value namespace import for multiple sx attributes (3 ms)
+          ✓ does not transform sx on capitalized components (2 ms)
+      props calls with atoms
+        ✓ inline static styles match stylex.create (7 ms)
+        ✓ inline static supports leading underscore value (5 ms)
+        ✓ inline static supports computed key syntax (4 ms)
+        ✓ inline css supports default imports (2 ms)
+        ✓ dedupes duplicate properties across create and atoms (10 ms)
+        ✓ dynamic style (10 ms)
+        ✓ inline static + inline dynamic coexist (5 ms)
+        ✓ inline static + create dynamic (10 ms)
+        ✓ inline dynamic + create dynamic (6 ms)
+        conditional atoms
+          ✓ atoms with && conditional (3 ms)
+          ✓ atoms with ternary conditional (3 ms)
+          ✓ atoms with conditional and create styles (3 ms)
+          ✓ dynamic atoms with ternary conditional (5 ms)
+        atoms with runtime bailout
+          ✓ atoms mixed with unknown external styles (3 ms)
+          ✓ atoms with dynamic conditional inside function (8 ms)
+          ✓ atoms with variable reference forces bailout (2 ms)
+        atoms inside functions
+          ✓ static atoms inside function declaration (2 ms)
+          ✓ dynamic atoms inside function declaration (10 ms)
+          ✓ atoms inside arrow function (3 ms)
+          ✓ multiple stylex.props calls with atoms in same function (5 ms)
+        with options
+          ✓ dev classnames and debug data for atoms (2 ms)
+      with contextual styles and collisions
+        ✓ stylex call with conditions (5 ms)
+        ✓ stylex call with conditions - skip conditional (5 ms)
+        ✓ stylex call with property collisions (3 ms)
+        ✓ stylex call with reverting by null (5 ms)
+        ✓ stylex call with short-form property collisions (4 ms)
+        ✓ stylex call with short-form property collisions with null (4 ms)
+        ✓ stylex call with conditions and collisions (3 ms)
+        ✓ stylex call with conditions and collisions - skip conditional (3 ms)
+        ✓ stylex call with conditions and null collisions (7 ms)
+        ✓ stylex call with conditions and null collisions - skip conditional (8 ms)
+      with plugin options
+        ✓ dev:true and enableInlinedConditionalMerge:false (12 ms)
+        ✓ dev:true (7 ms)
+    Keep stylex.create when needed
+      ✓ stylex call with computed key access (3 ms)
+      ✓ stylex call with composition of external styles (2 ms)
+      ✓ stylex call using exported styles with pseudo selectors, and queries (3 ms)
+      even when stylex calls come first
+        ✓ stylex call with computed key access (2 ms)
+        ✓ stylex call with mixed access (3 ms)
+        ✓ stylex call with composition of external styles (2 ms)
+        ✓ stylex call using exported styles with pseudo selectors, and queries (3 ms)
+    Setting custom import paths
+      ✓ Basic stylex call (2 ms)
+    Specific edge-case bugs
+      ✓ Basic stylex call (12 ms)
+      ✓ Basic stylex call (12 ms)
+      ✓ Stylex call with debug on (24 ms)
+      ✓ Stylex call with debug on uses hashed classnames (7 ms)
+      ✓ hoisting correctly with duplicate names (6 ms)
+      ✓ does not hoist $$css objects that reference local variables (3 ms)
+    dealing with imports
+      ✓ all local styles (4 ms)
+      ✓ local array styles (7 ms)
+      ✓ regular style import (3 ms)
+      ✓ default import from .stylex.js file (3 ms)
+      ✓ object import from .stylex.js file (4 ms)
+
+PASS src/shared/utils/__tests__/convert-to-className-test.js
+  convert-to-className test
+    ✓ converts style to className (2 ms)
+    ✓ generates the same classname in debug and production modes
+    ✓ converts margin number to px (1 ms)
+    ✓ keeps number for zIndex
+    ✓ keeps fr for 0 fraction values
+    ✓ keeps fr for 0 percentage values
+    ✓ keeps number for opacity
+    ✓ handles array of values (1 ms)
+    ✓ handles array of values with var
+    ✓ handles array with multiple vars
+    ✓ handles array with multiple vars and multiple fallbacks (1 ms)
+    ✓ handles array with variable default and multiple constant fallbacks (2 ms)
+    ✓ handles array with variable default and multiple variable and constant fallbacks (6 ms)
+    ✓ handles array of all variables (1 ms)
+
+PASS src/shared/utils/__tests__/split-css-value-test.js
+  Ensure CSS values are split correctly
+    ✓ simple space-separated numbers (5 ms)
+    ✓ simple space-separated lengths
+    ✓ simple comma-separated numbers (1 ms)
+    ✓ simple comma-separated lengths
+    ✓ Does not lists within functions (3 ms)
+    ✓ Does not lists within calc (1 ms)
+
+PASS src/shared/preprocess-rules/__tests__/PreRule-test.js
+  Converting PreRule to CSS
+    ✓ should convert a PreRule to CSS (7 ms)
+
+PASS src/utils/__tests__/js-to-ast-test.js
+  convertObjectToAST
+    ✓ converts empty object (1 ms)
+    ✓ converts object with values (1 ms)
+
+PASS __tests__/validation-stylex-defineConsts-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.defineConsts()
+      ✓ invalid export: not bound (114 ms)
+      ✓ invalid argument: none (9 ms)
+      ✓ invalid argument: too many (5 ms)
+      ✓ invalid argument: number (3 ms)
+      ✓ invalid argument: string (14 ms)
+      ✓ invalid argument: non-static (4 ms)
+      ✓ valid argument: object (3 ms)
+      ✓ valid export: separate const and export statement (4 ms)
+      ✓ invalid export: re-export from another file does not count (2 ms)
+      ✓ invalid export: renamed re-export from another file does not count (3 ms)
+      ✓ invalid export: default export does not count (3 ms)
+      ✓ invalid export: renamed export with as syntax (2 ms)
+      ✓ valid key: starts with "--" (3 ms)
+      ✓ invalid key: non-static (3 ms)
+      ✓ invalid value: non-static (9 ms)
+      ✓ valid value: number (2 ms)
+      ✓ valid value: string (2 ms)
+      ○ skipped valid value: keyframes
+
+PASS __tests__/validation-import-export-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex imports
+      ✓ valid import: non-stylex (25 ms)
+      ✓ valid import: named export of stylex.create() (3 ms)
+      ✓ valid import: default export of stylex.create() (1 ms)
+      ✓ valid import: positionTry named import (2 ms)
+      ✓ valid import: positionTry from namespace import (1 ms)
+      ✓ valid import: viewTransitionClass named import (1 ms)
+      ✓ valid import: viewTransitionClass from namespace import (1 ms)
+
+PASS __tests__/transform-stylex-defineMarker-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.defineMarker()
+      ✓ member call (39 ms)
+      ✓ named import call (2 ms)
+
+PASS __tests__/validation-stylex-defineMarker-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.defineMarker()
+      ✓ must be bound to a named export (85 ms)
+      ✓ no arguments allowed (2 ms)
+      ✓ valid export: direct named export (3 ms)
+      ✓ valid export: separate const and export statement (3 ms)
+      ✓ invalid export: re-export from another file does not count (3 ms)
+      ✓ invalid export: renamed re-export from another file does not count (3 ms)
+      ✓ invalid export: default export does not count (3 ms)
+      ✓ invalid export: renamed export with as syntax (3 ms)
+
+PASS __tests__/legacy/transform-pre-plugin-test.js
+  [transform] stylex.create()
+    ✓ transforms style object (65 ms)
+
+PASS __tests__/validation-stylex-keyframes-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.keyframes()
+      ✓ local variable keyframes object (99 ms)
+      ✓ only argument must be an object of objects (9 ms)
+      ✓ allow defined CSS variables in keyframes (1 ms)
+      ✓ allow undefined CSS variables in keyframes (1 ms)
+
+PASS __tests__/transform-stylex-create-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex.create()
+      static styles
+        ✓ unused style object (86 ms)
+        ✓ style object (8 ms)
+        ✓ stylex.env resolves compile-time constants (13 ms)
+        ✓ stylex.env named import resolves compile-time constants (5 ms)
+        ✓ stylex.env destructured import resolves compile-time constants (4 ms)
+        ✓ stylex.env function call resolves at compile time (5 ms)
+        ✓ stylex.env named import function call resolves at compile time (6 ms)
+        ✓ stylex.env function using template literals (4 ms)
+        ✓ stylex.env function with multiple properties (6 ms)
+        ✓ nested referenced style object (7 ms)
+        ✓ multiple nested referenced style object (8 ms)
+        ✓ style object (multiple) (14 ms)
+        ✓ style object with custom properties (3 ms)
+        ✓ style object with shortform properties (9 ms)
+        ✓ style object with shortform properties (styleResolution: "property-specificity") (14 ms)
+        ✓ style object requiring vendor prefixes (9 ms)
+        simple values
+          ✓ set custom property (8 ms)
+          ✓ set "transitionProperty" (28 ms)
+          ✓ set "willChange" (22 ms)
+          ✓ use "attr()" function (4 ms)
+          ✓ use array (fallbacks) (3 ms)
+          ✓ use CSS variable (6 ms)
+          ✓ use string containing CSS variables (4 ms)
+        function value: stylex.firstThatWorks()
+          ✓ args: value, value (2 ms)
+          ✓ args: value, var (2 ms)
+          ✓ args: var, value (2 ms)
+          ✓ args: var, var (3 ms)
+          ✓ args: var, var, var (2 ms)
+          ✓ args: func, var, value (4 ms)
+          ✓ args: func, var, value, value (2 ms)
+        object values: pseudo-classes
+          ✓ invalid pseudo-class (2 ms)
+          ✓ valid pseudo-class (2 ms)
+          ✓ pseudo-class generated order (1 ms)
+          ✓ pseudo-class generated order (nested, same value) (7 ms)
+          ✓ pseudo-class generated order (nested, different value) (2 ms)
+          ✓ attribute selector with pseudo-class (nested, same value) (1 ms)
+          ✓ pseudo-class with array fallbacks (2 ms)
+        object values: pseudo-elements
+          ✓ "::before" and "::after" (2 ms)
+          ✓ "::placeholder" (2 ms)
+          ✓ "::thumb" (2 ms)
+          ✓ "::before" containing pseudo-classes (3 ms)
+          ✓ legacy compound ":hover::after" selector as single key (2 ms)
+          ✓ compound ":hover::after" selector as single key (7 ms)
+          ✓ "::after" with multiple pseudo-class conditions (4 ms)
+        object values: queries
+          ✓ media queries without last query wins (81 ms)
+          ✓ media queries without last query wins (36 ms)
+          ✓ media queries without last query wins (2 ms)
+          ✓ media queries (56 ms)
+          ✓ supports queries (3 ms)
+          ✓ media query with pseudo-classes (21 ms)
+          ✓ media query with array fallbacks (19 ms)
+      dynamic styles
+        ✓ style function (11 ms)
+        ✓ style function and object (3 ms)
+        ✓ style function with custom properties (5 ms)
+        safe conditional checks
+          ✓ template literal expressions (7 ms)
+          ✓ binary expressions (6 ms)
+          ✓ unary expressions (4 ms)
+          ✓ logical expressions with safe left side (7 ms)
+          ✓ logical expressions with safe right side (3 ms)
+          ✓ nullish coalescing with safe left side (5 ms)
+          ✓ conditional expressions with safe branches (3 ms)
+          ✓ conditional expressions with safe branches (3 ms)
+          ✓ complex nested safe expressions (5 ms)
+          ✓ complex safe ternary expressions (25 ms)
+          ✓ template literal expressions (7 ms)
+          ✓ binary expressions (5 ms)
+          ✓ unary expressions (5 ms)
+          ✓ logical expressions with safe left side (3 ms)
+          ✓ logical expressions with safe right side (3 ms)
+          ✓ nullish coalescing with safe left side (5 ms)
+          ✓ conditional expressions with safe branches (9 ms)
+          ✓ complex nested safe expressions (4 ms)
+        simple values
+          ✓ set number unit (8 ms)
+          ✓ set mixed values (6 ms)
+          ✓ set custom property (8 ms)
+        object values: pseudo-classes
+          ✓ valid pseudo-class (4 ms)
+          ✓ pseudo-class generated order (4 ms)
+        object values: pseudo-elements
+          ✓ "::before" and "::after" (6 ms)
+          ✓ "::placeholder" (3 ms)
+          ✓ "::thumb" (3 ms)
+          ✓ "::before" containing pseudo-classes (3 ms)
+          ✓ dynamic style in "::after" generates valid @property with inherits (2 ms)
+        object values: queries
+          ✓ media queries (69 ms)
+          ✓ supports queries (5 ms)
+          ✓ media query with pseudo-classes (24 ms)
+          ✓ media query values with nullish coalescing (35 ms)
+      options `debug:true`
+        ✓ adds debug data (2 ms)
+        ✓ adds debug data for npm packages (2 ms)
+        ✓ adds debug data (haste) (2 ms)
+        ✓ adds debug data for npm packages (haste) (2 ms)
+      legacy / deprecated
+        ✓ transforms nested pseudo-class to CSS (3 ms)
+        ✓ transforms legacy pseudo class within a pseudo element (2 ms)
+        ✓ transforms pseudo elements within legacy pseudo class (2 ms)
+        ✓ transforms pseudo elements sandwiched within pseudo classes (2 ms)
+        ✓ transforms media queries (3 ms)
+        ✓ transforms supports queries (2 ms)
+        ✓ transforms dynamic shorthands in legacy-expand-shorthands mode (4 ms)
+        pseudo-classes
+          ✓ transforms invalid pseudo-class (2 ms)
+          ✓ transforms valid pseudo-classes in order (2 ms)
+          ✓ transforms pseudo-class with array value as fallbacks (1 ms)
+
+PASS __tests__/legacy/stylex-transform-call-test.js
+  @stylexjs/babel-plugin
+    [transform] stylex() call
+      ✓ empty stylex call (70 ms)
+      ✓ basic stylex call (16 ms)
+      ✓ stylex call with number (11 ms)
+      ✓ stylex call with computed number (12 ms)
+      ✓ stylex call with computed number (6 ms)
+      ✓ stylex call with computed string (5 ms)
+      ✓ stylex call with multiple namespaces (6 ms)
+      ✓ stylex call within variable declarations (7 ms)
+      ✓ stylex call with styles variable assignment (17 ms)
+      ✓ stylex call within export declarations (5 ms)
+      ✓ stylex call with short-form properties (7 ms)
+      ✓ stylex call with exported short-form properties (6 ms)
+      ✓ stylex call keeps only the styles that are needed (17 ms)
+      ✓ stylex keeps all null when applied after unknown (11 ms)
+      ✓ stylex call keeps only the nulls that are needed (21 ms)
+      ✓ stylex call using styles with pseudo selectors (5 ms)
+      ✓ stylex call using styles with pseudo selectors within property (12 ms)
+      ✓ stylex call using styles with Media Queries (4 ms)
+      ✓ stylex call using styles with Media Queries within property (55 ms)
+      ✓ stylex call using styles with Support Queries (3 ms)
+      ✓ stylex call using styles with Support Queries within property (3 ms)
+      with contextual styles and collisions
+        ✓ stylex call with conditions (4 ms)
+        ✓ stylex call with conditions - skip conditional (3 ms)
+        ✓ stylex call with property collisions (7 ms)
+        ✓ stylex call with reverting by null (7 ms)
+        ✓ stylex call with short-form property collisions (4 ms)
+        ✓ stylex call with short-form property collisions with null (7 ms)
+        ✓ stylex call with conditions and collisions (4 ms)
+        ✓ stylex call with conditions and collisions - skip conditional (2 ms)
+        ✓ stylex call with conditions and null collisions (2 ms)
+        ✓ stylex call with conditions and null collisions - skip conditional (6 ms)
+      with plugin options
+        ✓ dev:true and enableInlinedConditionalMerge:false (18 ms)
+        ✓ dev:true (12 ms)
+    Keep stylex.create when needed
+      ✓ stylex call with computed key access (3 ms)
+      ✓ stylex keeps spaces around operators (4 ms)
+      ✓ stylex call with composition of external styles (5 ms)
+      ✓ stylex call using exported styles with pseudo selectors, and queries (3 ms)
+      ✓ stylex call using exported styles with pseudo selectors, and queries within props (25 ms)
+      even when stylex calls come first
+        ✓ stylex call with computed key access (3 ms)
+        ✓ stylex call with mixed access (6 ms)
+        ✓ stylex call with composition of external styles (5 ms)
+        ✓ stylex call with composition border shorthands with external styles (5 ms)
+        ✓ stylex call using exported styles with pseudo selectors, and queries (11 ms)
+    Setting custom import paths
+      ✓ Basic stylex call (3 ms)
+      ✓ Named import from custom source (3 ms)
+      ✓ Named import with other name from custom source (4 ms)
+    Extreme use-cases
+      ✓ Basic stylex call (457 ms)
+      ✓ Basic exported stylex.create call (8 ms)
+      ✓ Basic stylex call - skip conditional (7 ms)
+      ✓ Basic stylex call (6 ms)
+    Accounts for edge-cases
+      ✓ Using stylex() in a for loop (2 ms)
+      ✓ Using stylex.props() in a for loop (1 ms)
+      ✓ trying to use an unknown style in stylex() (2 ms)
+      ✓ trying to use an unknown style in stylex.props() (4 ms)
+
+PASS __tests__/validation-stylex-defineVars-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.defineVars()
+      ✓ invalid export: not bound (514 ms)
+      ✓ invalid argument: none (5 ms)
+      ✓ invalid argument: too many (3 ms)
+      ✓ invalid argument: number (4 ms)
+      ✓ invalid argument: string (4 ms)
+      ✓ invalid argument: non-static (2 ms)
+      ✓ valid argument: object (22 ms)
+      ✓ valid export: separate const and export statement (7 ms)
+      ✓ invalid export: re-export from another file does not count (2 ms)
+      ✓ invalid export: renamed re-export from another file does not count (3 ms)
+      ✓ invalid export: default export does not count (2 ms)
+      ✓ invalid export: renamed export with as syntax (2 ms)
+      ✓ invalid key: non-static (3 ms)
+      ✓ invalid value: non-static (7 ms)
+      ✓ valid value: number (7 ms)
+      ✓ valid value: string (5 ms)
+      ✓ valid value: keyframes (6 ms)
+      ✓ valid value: same-group function reference (7 ms)
+      ✓ invalid function value: parameterized (2 ms)
+      ✓ invalid function value: non-static body (3 ms)
+      ✓ valid function value: returns stylex.types (7 ms)
+      ✓ valid function value: returns object (5 ms)
+      ✓ invalid same-group reference: unknown key (3 ms)
+      ✓ invalid same-group reference: direct cycle (2 ms)
+      ✓ invalid same-group reference: indirect cycle (3 ms)
+
+PASS __tests__/validation-stylex-createTheme-test.js
+  @stylexjs/babel-plugin
+    [validation] stylex.createTheme()
+      ✓ must be bound to a variable (382 ms)
+      ✓ it must have two arguments (23 ms)
+      ✓ variable keys must be a static value (2 ms)
+      ✓ values must be static number or string in stylex.createTheme() (13 ms)
+
+PASS __tests__/transform-process-test.js
+  @stylexjs/babel-plugin
+    [transform] stylexPlugin.processStylexRules
+      ✓ no rules (92 ms)
+      ✓ all rules (useLayers:false) (95 ms)
+      ✓ all rules (useLayers:true) (95 ms)
+      ✓ custom properties stay inside @layer alongside priority-0 at-rules (20 ms)
+      ✓ keeps @keyframes fade{from{opacity:0}to{opacity:1}} unlayered with and without custom properties (1 ms)
+      ✓ keeps @property --card-padding{syntax:"<length>";inherits:false;initial-value:0px} unlayered with and without custom properties (7 ms)
+      ✓ keeps @position-try --fallback{top:0} unlayered with and without custom properties
+      ✓ useLayers with before option (91 ms)
+      ✓ useLayers with after option (85 ms)
+      ✓ useLayers with both before and after (92 ms)
+      ✓ useLayers with prefix option (74 ms)
+      ✓ useLayers with prefix, before, and after combined (96 ms)
+      ✓ useLayers with multi-segment dot-notated prefix (XDS use case) (101 ms)
+      ✓ empty before/after produce standard layer declaration (73 ms)
+      ✓ all rules (legacyDisableLayers:true) (51 ms)
+      ✓ legacy-expand-shorthands with logical styles polyfill (6 ms)
+      ✓ logical float vars are emitted when the float comes from a constant
+      ✓ substitutes a constant value containing `$&` verbatim
+      ✓ substitutes a constant value containing `$&` with no alias chain (1 ms)
+      ✓ substitutes constant values containing other `$` sequences verbatim
+      ✓ legacy-expand-shorthands duplicates theme selectors for higher precedence (4 ms)
+      ✓ no mutation of rules (49 ms)
+      ✓ useLegacyClassnamesSort: false (default behavior) (51 ms)
+      ✓ useLegacyClassnamesSort: true (legacy behavior) (48 ms)
+      ✓ sorts min-width with screen and media type (7 ms)
+      ✓ does not misorder negated min-width media queries (22 ms)
+      ✓ does not sort a min-width paired with a negated max-width (13 ms)
+      ✓ sorts min-width breakpoints nested inside another at-rule (13 ms)
+      ✓ sorts max-width defineConsts breakpoints using real transform metadata (32 ms)
+      ✓ sorts min-width defineConsts breakpoints in ascending px order (9 ms)
+      ✓ sorts min-width breakpoints via template literal partial value (9 ms)
+      ✓ sorts max-width defineConsts breakpoints in descending px order (9 ms)
+      ✓ sorts CSS Level 4 range syntax (width >= Xpx) as min-width (8 ms)
+      ✓ range queries (both min and max-width) fall through to existing sort (8 ms)
+      ✓ sort is a total order across px min- and max-width rules (1 ms)
+      ✓ orders the min-width group before the max-width group (20 ms)
+      ✓ sorts unitless zero, any-unit zero, and mixed-case px (19 ms)
+      ✓ does not sort a width whose value is a ratio (14 ms)
+      ✓ does not sort a unitless non-zero width (10 ms)
+      ✓ does not sort rem breakpoints (9 ms)
+      ✓ does not sort a query with two bounds on the same side (9 ms)
+      ✓ sort is deterministic regardless of input order (30 ms)
+      ✓ sort is deterministic with duplicate rules in different input orders (1 ms)
+
+Test Suites: 1 skipped, 42 passed, 42 of 43 total
+Tests:       64 skipped, 1007 passed, 1071 total
+Snapshots:   887 passed, 887 total
+Time:        4.69 s
+Ran all test suites.
+   ok (exit 0)
+== upstream-stylex ==
+$ bash -c cd '/home/kyle/work/pandam-style/packages/@stylexjs/stylex' && '/home/kyle/work/pandam-style/node_modules/.bin/cross-env' BABEL_ENV=test '/home/kyle/work/pandam-style/node_modules/.bin/jest' --ci
+PASS __tests__/createOrderedCSSStyleSheet-test.js
+  createOrderedCSSStyleSheet
+    #insert
+      ✓ does not throw on invalid rule (3 ms)
+      ✓ insertion of CSSStyleRule (1 ms)
+      ✓ insertion of CSSMediaRule
+      ✓ insertion of CSSMediaRule within CSSConditionRule (1 ms)
+      ✓ insertion order for same group (1 ms)
+      ✓ deduplication for same group (2 ms)
+      ✓ order for same group
+      ✓ insertion order for different groups
+    #update
+      ✓ updates an existing rule with same selector
+      ✓ updates a media query rule (1 ms)
+      ✓ updates multiple properties in a rule
+      ✓ inserts new rule if old rule does not exist
+      ✓ inserts new rule if selectors are different (1 ms)
+      ✓ updates rule in different group
+      ✓ updates nested at-rules
+      ✓ handles update when rule has specificity selectors (1 ms)
+    client-side hydration
+      ✓ from SSR CSS (9 ms)
+      ✓ works when the group marker is in single quotes (2 ms)
+
+PASS __tests__/inject-test.js
+  inject
+    ✓ @keyframes (6 ms)
+    ✓ @positionTry (1 ms)
+    ✓ ::view-transition
+    ✓ @media (1 ms)
+    ✓ ::before (1 ms)
+    ✓ :hover
+    ✓ ::before:hover
+    defineConsts runtime injection
+      ✓ registers a constant (1 ms)
+      ✓ inlines constant in CSS rule (1 ms)
+      ✓ inlines multiple constants in one rule
+      ✓ handles numeric constants (1 ms)
+      ✓ leaves unreferenced constants unchanged in CSS
+      ✓ handles constants in media queries (1 ms)
+      ✓ handles nested at-rules with constants
+      ✓ handles constants for container queries (1 ms)
+      ✓ handles constants for supports queries
+      ✓ handles constants in CSS variable definitions (1 ms)
+      ✓ handles constants with special characters in values
+      ✓ preserves other var() references that are not constants (1 ms)
+      ✓ updates dependent rules when constant changes (1 ms)
+      ✓ handles constants with zero values
+      ✓ handles constants in complex selectors (1 ms)
+      ✓ updates multiple dependent rules when constant changes (1 ms)
+      ✓ does not update dependent rules if constant value stays the same
+      ✓ updates dependent at-rules when constant changes (1 ms)
+      ✓ prevents duplicate dependency tracking (1 ms)
+      ✓ tracks dependencies for multiple constants in one rule
+      ✓ correctly updates stylesheet when constant value changes (1 ms)
+      ✓ handles constant updates with at-rules and regular properties (1 ms)
+      ✓ handles mixed constant and non-constant values
+
+PASS __tests__/stylex-test.js
+  stylex
+    error handling
+      ✓ stylex.create (19 ms)
+      ✓ stylex.createTheme (1 ms)
+      ✓ stylex.defineConsts (1 ms)
+      ✓ stylex.defineVars (2 ms)
+      ✓ stylex.firstThatWorks (3 ms)
+      ✓ stylex.keyframes (1 ms)
+      ✓ stylex.positionTry (1 ms)
+      ✓ stylex.viewTransitionClass (1 ms)
+      ✓ stylex.defaultMarker (1 ms)
+      ✓ stylex.defineMarker (1 ms)
+      ✓ stylex.unstable_conditional (1 ms)
+      ✓ stylex.unstable_defineVarsNested
+      ✓ stylex.unstable_defineConstsNested (1 ms)
+      ✓ stylex.unstable_createThemeNested (1 ms)
+      ✓ stylex.typesangle (1 ms)
+      ✓ stylex.typescolor (1 ms)
+      ✓ stylex.typesurl
+      ✓ stylex.typesimage
+      ✓ stylex.typesinteger (1 ms)
+      ✓ stylex.typeslengthPercentage (1 ms)
+      ✓ stylex.typeslength
+      ✓ stylex.typespercentage
+      ✓ stylex.typesnumber (1 ms)
+      ✓ stylex.typesresolution (1 ms)
+      ✓ stylex.typestime
+      ✓ stylex.typestransformFunction (1 ms)
+      ✓ stylex.typestransformList
+      ✓ stylex.whenancestor (1 ms)
+      ✓ stylex.whendescendant
+      ✓ stylex.whensiblingBefore (1 ms)
+      ✓ stylex.whensiblingAfter
+      ✓ stylex.whenanySibling
+    props
+      ✓ basic resolve
+      ✓ merge order
+      ✓ with a top-level array of simple overridden classes (1 ms)
+      ✓ with nested arrays and pseudoClasses overriding things
+      ✓ with just pseudoclasses
+      ✓ with complicated set of arguments
+      ✓ with dynamic styles (1 ms)
+      ✓ data prop for source map data (1 ms)
+    attrs
+      ✓ basic resolve
+      ✓ with dynamic styles (1 ms)
+      ✓ legacyMerge merges classNames
+      ✓ legacyMerge exposes attrs
+
+PASS __tests__/createSheet-test.js
+  createSheet
+    client side
+      ✓ creates a sheet (15 ms)
+      ✓ creates multiple sheets (1 ms)
+      ✓ reuses existing sheet for given root (2 ms)
+      ✓ supports updating styles across multiple documents (12 ms)
+      ✓ update method updates rules across all sheets (5 ms)
+    server side
+      ✓ creates a sheet (1 ms)
+      ✓ creates multiple sheets
+
+Test Suites: 4 passed, 4 total
+Tests:       99 passed, 99 total
+Snapshots:   74 passed, 74 total
+Time:        1.038 s
+Ran all test suites.
+   ok (exit 0)
+== pandamstyle ==
+$ bash -c cd '/home/kyle/work/pandam-style/packages/@stylexjs/babel-plugin' && '/home/kyle/work/pandam-style/node_modules/.bin/jest' --ci '__tests__/pandamstyle/.*-test.js'
+PASS __tests__/pandamstyle/watcher-provider-test.js (5.277 s)
+  Spike 4 Phase B: the journal classifies events
+    ✓ a create is reported as an addition (6 ms)
+    ✓ a modify is reported as a change (1 ms)
+    ✓ a delete is reported as a removal (1 ms)
+    ✓ a create followed by a delete in one burst cancels out (2 ms)
+    ✓ a rename is detected as one rename, not a remove plus an add (1 ms)
+    ✓ two different files in one burst are two different kinds (1 ms)
+  Spike 4 Phase B: a burst is one revision
+    ✓ an editor save burst is one transaction, not six (2 ms)
+    ✓ an empty journal produces no revision (1 ms)
+    ✓ events are never merged across an explicit agent transaction (486 ms)
+  Spike 4 Phase B: a watcher that cannot be trusted says so
+    ✓ an overflow produces NO transaction, not a partial one (1 ms)
+    ✓ a resync supersedes events already in the journal (1 ms)
+    ✓ an unattributable event forces a resync
+    ✓ a resync makes the session fall back to full discovery, and counts it (350 ms)
+    ✓ a watch that never started is not a watch (5 ms)
+    ✓ a watch that started is established and closes cleanly (2 ms)
+  Spike 4 Phase B: the compiler does not watch its own output
+    ✓ events under the output directory and the generation scratch are ignored (5 ms)
+    ✓ a real source beside an ignored output still gets through (1 ms)
+    ✓ a project directory named like an output is NOT excluded
+  Spike 4 Phase B: a watched revision equals a rebuild
+    ✓ a watched mutation produces the generation a rebuild produces (275 ms)
+    ✓ a watched create and a watched delete both behave (247 ms)
+    ✓ watcher and declared input agree on the same mutation (229 ms)
+
+PASS __tests__/pandamstyle/native-compile-test.js
+  valid project builds through real files
+    ✓ the build process exits 0 (1 ms)
+    ✓ CSS is not empty and carries the expected declarations (1 ms)
+    ✓ the emitted JS imports no compiler, loader or registry (7 ms)
+    ✓ the runtime import of the page is the fork composition runtime only (9 ms)
+    ✓ page sources are not mutated by the build (2 ms)
+    ✓ the build is repeatable and yields the same digest (563 ms)
+  helper resolution follows binding and module
+    ✓ renamed imports reached through a barrel are compiled
+    ✓ a page importing only a recipe is covered and compiled (1 ms)
+    ✓ a namespace import is recognized (4 ms)
+    ✓ a hoisted token constant is lowered, not left for the runtime (1 ms)
+  generated design system module
+    ✓ carries the generation marker and the same digest as the manifest
+    ✓ exposes the documented consumption surface (1 ms)
+    ✓ create() and token() throw if ever reached at runtime
+    ✓ recipe selectors carry finite data, not a cartesian product (2 ms)
+  generation coherence and coverage report
+    ✓ every artifact references the same registryDigest
+    ✓ coverage lists the declared roots and the analysed files (2 ms)
+    ✓ the barrel relay is recorded in the coverage chain
+    ✓ the stylesheet is non-empty and rules were collected (1 ms)
+
+PASS __tests__/pandamstyle/design-system-view-test.js (6.906 s)
+  Spike 4 Phase D2: the incremental design-system view
+    ✓ the first revision derives a view for every covered file (2907 ms)
+    ✓ a style-only edit recomputes nothing at all (171 ms)
+    ✓ a style-only edit to one page recomputes no OTHER page either (200 ms)
+    ✓ a declared file whose bytes did not change recomputes nothing (167 ms)
+    ✓ a comment-only edit to the relay invalidates nothing (162 ms)
+    ✓ a relay-contract change invalidates exactly the consumers of that relay (188 ms)
+    ✓ a NAMED re-export list changes the view and invalidates its consumer (172 ms)
+    ✓ breaking the relay invalidates the files that consumed it (187 ms)
+    ✓ a namespace re-export is still followed (189 ms)
+    ✓ an export-star relay is still followed, and its renames are still renames (185 ms)
+    ✓ a deleted relay is repaired by its file reappearing (145 ms)
+    ✓ a relay that STOPS reaching the design system, and starts again (189 ms)
+    ✓ a module that ENTERS coverage through an import gets a view (137 ms)
+    ✓ a relay depth budget is part of the view (162 ms)
+    ✓ a design-system change is an explicit, named DSV fallback (229 ms)
+    ✓ the relay cache is dropped when the design system is rebuilt (200 ms)
+    ✓ after a mixed trace the incremental views equal fresh views (198 ms)
+
+PASS __tests__/pandamstyle/runner-status-test.js (7.719 s)
+  BC-7: an unexecuted step is never reported as passed
+    ✓ the runner itself succeeded, so only the bookkeeping is under test (4 ms)
+    ✓ a skipped pilot is reported as skipped
+    ✓ a skipped install is reported as skipped
+    ✓ a skipped step has NO exit code
+    ✓ the acceptance vocabulary says not_run, not passed
+    ✓ no step is marked passed in this run (1 ms)
+    ✓ the run is explicitly not complete (1 ms)
+    ✓ the console says INCOMPLETE and names the skipped steps (1 ms)
+    ✓ the raw step table records the status too (1 ms)
+  the skip flag is not the only way a step goes unrun
+    ✓ a step excluded by the filter is skipped, with the reason (1 ms)
+    ✓ the reason distinguishes a skip from a filter exclusion
+  the working tree is measured before the runner writes anything
+    ✓ the fixture really was a clean checkout before the run (1 ms)
+    ✓ a clean checkout is reported clean in env.json
+    ✓ a clean checkout is reported clean in summary.json (1 ms)
+    ✓ the run really did change the checkout after measuring (11 ms)
+    ✓ the console names the measurement as taken before the run
+  a checkout that is already dirty is still reported dirty
+    ✓ the fixture was genuinely dirty before the run (7 ms)
+    ✓ a pre-existing modification is not laundered into clean
+  the batch base is a Git relation, not a commit count
+    ✓ the base is the merge base with the source branch (4 ms)
+    ✓ the base is the fork point, not a recent ancestor
+    ✓ the ref the base was derived from is recorded
+    ✓ the base is a real ancestor of both tips (13 ms)
+  growing the batch does not move the base
+    ✓ the same base is reported after two more commits (1674 ms)
+  an unverifiable base is refused rather than invented
+    ✓ the runner fails instead of reporting a fallback SHA (1 ms)
+    ✓ the refusal names the ref and says why
+    ✓ no evidence is written, so no unverifiable SHA is left behind
+
+PASS __tests__/pandamstyle/recipe-contract-test.js
+  the consumer runtime is dependency-light
+    ✓ the shipped runtime has no import at all (2 ms)
+    ✓ it imports no Babel, no loader, no registry, no CSS interpreter (4 ms)
+    ✓ it is finite: a small module, not a second engine (4 ms)
+  recipe selection follows axisOrder and defaults
+    ✓ base first, then one branch per axis, in declaration order (2 ms)
+    ✓ absent and undefined both take the default (1 ms)
+    ✓ the key order of the props object has no effect (1 ms)
+    ✓ false is a value, not an absence
+    ✓ null, unknown key and unknown value fail deterministically (14 ms)
+    ✓ the error carries the admitted domain
+    ✓ no cartesian product is generated (6 ms)
+  composition contract: base + hover, then a base variant
+    ✓ the hover branch of the variant survives in the emitted CSS
+    ✓ changing the base color does not remove the hover branch (1 ms)
+    ✓ the fork composition runtime composes the compiled refs (1 ms)
+  props-dependent selection keeps the runtime guard
+    ✓ the TSX page emits an uncompiled selector call, not a baked literal (1 ms)
+    ✓ that call goes through the bounded selector (3 ms)
+
+fatal: not a git repository (or any of the parent directories): .git
+PASS __tests__/pandamstyle/artifacts-test.js
+  pandamstyle: artefacts
+    ✓ build de la fixture conformance + page exemple + rejet 17px (30 ms)
+
+PASS __tests__/pandamstyle/chain-test.js
+  pandamstyle: registre
+    ✓ références résolues, catégories et visibilité conservées (9 ms)
+    ✓ référence vers un identifiant absent -> PMS_UNKNOWN_TOKEN
+    ✓ cycle de références -> PMS_TOKEN_CYCLE avec chemin
+  pandamstyle: tokens -> CSS
+    ✓ un token compilé devient var(--…) et les variables sont émises (5 ms)
+    ✓ condition nommée -> bloc canonique @media (3 ms)
+    ✓ deux thèmes partagent les mêmes identités de variables (3 ms)
+  pandamstyle: rejets de politique (sans TypeScript)
+    ✓ valeur brute '17px' rejetée avec candidats admis (3 ms)
+    ✓ token de mauvaise catégorie -> PMS_INVALID_TOKEN_CATEGORY (3 ms)
+    ✓ token privé côté consommateur -> PMS_TOKEN_NOT_PUBLIC (5 ms)
+    ✓ forme composite border -> PMS_UNSUPPORTED_PROPERTY_FORM (3 ms)
+    ✓ propriété hors profil -> PMS_UNSUPPORTED_PROPERTY (4 ms)
+    ✓ condition inconnue -> PMS_UNKNOWN_CONDITION (5 ms)
+  pandamstyle: recipe -> CSS
+    ✓ sélection bornée : base + branches par axe selon axisOrder (3 ms)
+    ✓ défauts appliqués quand la prop est absente ou undefined (2 ms)
+    ✓ valeur hors domaine rejetée de façon déterministe au runtime (33 ms)
+    ✓ clé inconnue et null rejetés (4 ms)
+    ✓ conflit base/hover : la variante gagne hors condition, hover conservé (2 ms)
+  pandamstyle: manifeste
+    ✓ projection consommateur : publics seulement, capacités P1 à false (2 ms)
+
+PASS __tests__/pandamstyle/incremental-coverage-closure-test.js (8.082 s)
+  Spike 4 Phase D1: the persistent coverage graph
+    ✓ the first revision builds the graph and is not counted as a fallback (3201 ms)
+    ✓ a style-only edit examines one node and walks none of them (182 ms)
+    ✓ five style-only edits keep the fast path (287 ms)
+    ✓ a declared file whose bytes are unchanged changes no edge (215 ms)
+    ✓ a module added under a root enters coverage and shifts the order (187 ms)
+    ✓ a module added outside every root stays uncovered until something imports it (164 ms)
+    ✓ a deleted module leaves coverage and every index with it (133 ms)
+    ✓ a diamond covers the shared module through both parents (165 ms)
+    ✓ losing one parent of a diamond does not lose the shared module (208 ms)
+    ✓ a deleted module that is still imported stays covered and is reported unreadable (144 ms)
+    ✓ a second path added later keeps a module covered after the first is gone (198 ms)
+    ✓ an unresolved import becomes resolvable and its target enters coverage (175 ms)
+    ✓ repairing a broken import does not rebuild the project to do it (159 ms)
+    ✓ a rename moves the node and publishes the new path (159 ms)
+    ✓ an import change retargets an edge and nothing else (173 ms)
+    ✓ a re-export change does not move the closure and does not need to (168 ms)
+    ✓ changing the roots is a named full fallback, not a silent rebuild (232 ms)
+    ✓ a design-system change does not need to rebuild the coverage graph (197 ms)
+    ✓ full discovery re-derives the root membership instead of trusting the cache (152 ms)
+    ✓ after a mixed trace the incremental closure equals a fresh closure (311 ms)
+    ✓ the canonical order equals a fresh traversal order, and is not incidental (158 ms)
+
+PASS __tests__/pandamstyle/incremental-css-test.js (8.761 s)
+  Spike 3 Phase B: incremental CSS equals a full aggregation
+    ✓ the whole trace produces the same bytes as a full aggregation (4557 ms)
+    ✓ a no-change revision reuses the previous stylesheet byte for byte (128 ms)
+    ✓ a one-file edit touches only that file rule contributions (137 ms)
+  Spike 3 Phase B: a rule belongs to its owners
+    ✓ a shared atom survives the deletion of one owner (298 ms)
+    ✓ a rule owned only by a deleted file disappears with it (195 ms)
+  Spike 3 Phase B: cascade order is preserved, not appended to
+    ✓ edits in an order unrelated to the traversal order still match (769 ms)
+    ✓ rules for the same property are ordered by the aggregator, not by age (435 ms)
+    ✓ a condition and a theme interaction keep their order across an edit (339 ms)
+  Spike 3 Phase B: a global change falls back, visibly
+    ✓ a design-system change is a counted, named full CSS rebuild (247 ms)
+    ✓ a configuration change is a fallback too (235 ms)
+    ✓ the fallback path itself is measured as a rebuild, not hidden (164 ms)
+  Spike 3 Phase B: the incremental stylesheet equals the full one
+    ✓ over a run of mixed edits, both paths publish identical bytes (203 ms)
+
+PASS __tests__/pandamstyle/provenance-props-test.js (9.072 s)
+  BC-1: props() admits no raw CSS object
+    an object literal is refused while a compiled style compiles
+      ✓ the build process fails with the provenance code (11 ms)
+      ✓ every raw route is listed, none silently accepted (4 ms)
+      ✓ the diagnostic names the reason rather than saying "invalid"
+      ✓ nothing is published as current (415 ms)
+    an arbitrary local object is not provenance either
+      ✓ passing the object and spreading it are both refused (1 ms)
+      ✓ a variable is not excused by having a name
+    every admitted form still compiles
+      ✓ a create() namespace is admitted
+      ✓ a theme plus a namespace is admitted (1 ms)
+      ✓ a compiled style member is admitted (1 ms)
+      ✓ a statically folded recipe selection is admitted (1 ms)
+      ✓ the compiled output holds composition, not a raw object (5 ms)
+      ✓ the whole theme of a props() call survives compilation (1 ms)
+  BC-2: provenance follows the binding
+    ✓ a shadowing parameter inherits nothing from the module constant (420 ms)
+    ✓ a reassigned binding is not the value that was proven (388 ms)
+    ✓ writing to a proven value is refused (399 ms)
+    ✓ a value escaped into an unknown call is refused (428 ms)
+    ✓ an alias of the helper, and a nested shadow, are not the helper (418 ms)
+  BC-6: authority is a build concern, not a vocabulary ban
+    ✓ a reserved __pms* field is refused even in ordinary data (389 ms)
+    ordinary business data is not rejected
+      ✓ a file full of role/trusted fields still builds (2 ms)
+      ✓ the data file is covered and compiled like any other (2 ms)
+      ✓ no role diagnostic is raised for data
+    a real attempt to self-grant authority is still refused
+      ✓ an authority field inside a recognized PandamStyle call is refused
+      ✓ the diagnostic says where the claim was made (1 ms)
+      ✓ the author engine entry point stays unreachable
+  buildProject is the same entry point the CLI drives
+    ✓ it is exported from the built package
+
+PASS __tests__/pandamstyle/agent-dirty-input-test.js (9.56 s)
+  Spike 4 Phase A: an explicit mutation set does not cause a project scan
+    ✓ one changed path reads and hashes exactly one file and scans none (3003 ms)
+    ✓ the discovery scan disappears from the analysis entirely (175 ms)
+    ✓ a full-discovery session still reads the whole project (217 ms)
+    ✓ five changed paths read five files and no unrelated ones (313 ms)
+    ✓ a declared file whose bytes are identical is reported as unchanged (236 ms)
+    ✓ one agent call is one revision, however many files it names (219 ms)
+  Spike 4 Phase A: explicit input equals full discovery equals a rebuild
+    ✓ agent input, full discovery and a fresh rebuild agree: one file, existing atoms (302 ms)
+    ✓ agent input, full discovery and a fresh rebuild agree: a new file (286 ms)
+    ✓ agent input, full discovery and a fresh rebuild agree: a deleted file (258 ms)
+    ✓ agent input, full discovery and a fresh rebuild agree: a renamed file (278 ms)
+    ✓ agent input, full discovery and a fresh rebuild agree: an import change (302 ms)
+    ✓ the whole mixed trace stays fresh-build equivalent (748 ms)
+  Spike 4 Phase A: addition, deletion and rename
+    ✓ creating a file repairs an import that did not resolve (235 ms)
+    ✓ a creation re-probes the affected negative key and not the others (135 ms)
+    ✓ deleting a file removes its output, its rules and its coverage (257 ms)
+    ✓ a rename removes the old path and publishes the new one (196 ms)
+    ✓ an import change moves the closure (213 ms)
+  Spike 4 Phase A: the trust contract is explicit and enforced
+    ✓ an incomplete mutation set is detectable on demand (106 ms)
+    ✓ a complete mutation set audits clean (111 ms)
+    ✓ forceFullDiscovery re-derives everything and says so (235 ms)
+    ✓ a full-discovery transaction is honoured even through the agent API (93 ms)
+    ✓ the audit interval forces a periodic full discovery (101 ms)
+    ✓ an unknown mode is rejected by name (19 ms)
+    ✓ a malformed mutation is rejected rather than silently narrowed (17 ms)
+    ✓ a declared path that does not exist is handled as a removal (176 ms)
+    ✓ a path outside every root cannot be pulled into coverage (105 ms)
+  Spike 4 Phase A: the counters count work
+    ✓ the counter is installed at the source and reports what was done (83 ms)
+
+PASS __tests__/pandamstyle/coverage-graph-test.js (9.702 s)
+  BC-3: the closure follows re-exports
+    ✓ export * from pulls the target into the covered set (21 ms)
+    ✓ export { x } from pulls the target into the covered set (2 ms)
+    ✓ a two-hop barrel chain pulls the target into the covered set (3 ms)
+    ✓ the closure records how each file was reached (1 ms)
+    ✓ a named re-export is an edge, not just `export *` (1 ms)
+    ✓ every edge syntax is discovered from a real file (4 ms)
+    ✓ a stylesheet is not treated as a compilable module (1 ms)
+  BC-3: dynamic requests are decided, not ignored
+    ✓ a computed dynamic request is a coverage gap (401 ms)
+    ✓ the plugin refuses the same edge on its own, with its own rule (105 ms)
+    ✓ a literal local dynamic request is a normal local edge (472 ms)
+    ✓ a forbidden engine entry cannot be reached through import() (13 ms)
+  BC-3/BC-9: every relay escape is caught by a real build
+    ✓ neg-relay-reexport-star fails with PMS_FORBIDDEN_STYLE_CHANNEL (export *) (461 ms)
+    ✓ neg-relay-reexport-named fails with PMS_FORBIDDEN_STYLE_CHANNEL (named re-export) (413 ms)
+    ✓ neg-relay-barrel-chain fails with PMS_FORBIDDEN_STYLE_CHANNEL (two-hop barrel chain) (428 ms)
+    ✓ neg-stylesheet-via-relay fails with PMS_FORBIDDEN_STYLE_CHANNEL (stylesheet through a relay) (387 ms)
+    ✓ neg-unresolved-import fails with PMS_COVERAGE_GAP (unresolved local import) (329 ms)
+    ✓ neg-dynamic-import fails with PMS_COVERAGE_GAP (computed dynamic import) (328 ms)
+    ✓ the diagnostic points at the module outside every root (449 ms)
+    ✓ the report names the relays, so the closure is auditable (666 ms)
+  BC-4: a covered file that was never analysed is a failure
+    ✓ a fully analysed set is consistent (1 ms)
+    ✓ a covered file the bundler loaded but never compiled is missing (1 ms)
+    ✓ the generated design-system module is exempt, with a reason (6 ms)
+    ✓ paths are compared canonically, so a query suffix cannot hide a file (1 ms)
+    ✓ a file loaded but not covered is reported separately
+  the CLI cross-checks expected vs analysed before publishing
+    ✓ the published report carries the cross-check (1 ms)
+    ✓ a covered file that fails the policy still counts as analysed (921 ms)
+
+PASS __tests__/pandamstyle/incremental-publication-test.js (10.256 s)
+  Spike 3 Phase A: publication does only the required work
+    ✓ a no-change revision writes zero JavaScript artifacts (479 ms)
+    ✓ a single-file edit writes only the affected JavaScript (226 ms)
+    ✓ a genuinely new atom changes the stylesheet; a shared one does not (362 ms)
+    ✓ a whitespace-only edit reuses every artifact, including the output (184 ms)
+    ✓ a property reorder changes the JavaScript and not the stylesheet (293 ms)
+    ✓ unchanged JavaScript is reused by content, not rewritten (162 ms)
+    ✓ a five-file edit writes the affected set and no more (175 ms)
+  Spike 3 Phase A: a deleted source takes its output with it
+    ✓ a removed module leaves no stale JavaScript and no stale CSS (249 ms)
+    ✓ a removed module removes exactly its own artifact and nothing else (146 ms)
+    ✓ a file that leaves the covered set removes its output (253 ms)
+    ✓ a renamed source removes the old path and publishes the new one (193 ms)
+  Spike 3 Phase A: incremental publication equals a fresh rebuild
+    ✓ the whole trace stays equivalent to a fresh rebuild (1110 ms)
+    ✓ a global fallback produces fresh-equivalent output (313 ms)
+    ✓ a valid -> invalid -> repair trace leaves the right generation current (346 ms)
+  Spike 3 Phase A: a publication failure preserves the previous generation
+    ✓ a failure at mid-stage leaves generation N current, byte for byte (180 ms)
+    ✓ a failure at after-removals-computed leaves generation N current, byte for byte (147 ms)
+    ✓ a failure at after-css-staged leaves generation N current, byte for byte (159 ms)
+    ✓ a failure at before-manifest leaves generation N current, byte for byte (153 ms)
+    ✓ a failure at before-commit leaves generation N current, byte for byte (165 ms)
+    ✓ a retry after a publication failure publishes the delta (261 ms)
+    ✓ a failed first publication leaves no output directory at all (101 ms)
+    ✓ a committed generation leaves no scratch directory behind (104 ms)
+    ✓ a rolled-back generation leaves no scratch directory behind (105 ms)
+  Spike 3 Phase A: a revision with no output change reuses its generation
+    ✓ a byte-identical generation is not rematerialized (2 ms)
+    ✓ a revision and a generation are not the same thing (93 ms)
+  Spike 3 Phase A: unchanged artifacts are reused without being rewritten
+    ✓ a reused artifact shares an inode with the generation it came from (1 ms)
+    ✓ a changed artifact is a NEW file, never an in-place write of a linked one (1 ms)
+    ✓ a record file that outlived its generation does not claim a reuse (1 ms)
+    ✓ releasing a generation does not invalidate the one that reused it (3 ms)
+  Spike 3 Phase A: a process that dies mid-publish is recoverable
+    ✓ a crash before the commit leaves generation N current (1 ms)
+    ✓ a crash after the swap is rolled forward, never left mixed (1 ms)
+    ✓ a staging directory left by a crash is identifiable and cleanable (1 ms)
+  Spike 3 Phase A: the publication variants are selectable and separate
+    ✓ the default variant is the Spike 2 reference (117 ms)
+    ✓ the same edit under delta publication is equivalent (236 ms)
+    ✓ the variant accepts its object form (93 ms)
+    ✓ an unknown variant is rejected by name (15 ms)
+    ✓ incremental CSS without incremental publication is refused (15 ms)
+    ✓ the Phase B variant is a real third path, not a relabelled one (78 ms)
+
+PASS __tests__/pandamstyle/staleness-test.js
+  removing a token invalidates its stale usages
+    ✓ the first build is valid and records its digest (1 ms)
+    second build after removing spacing.md, pages untouched
+      ✓ the second build fails with a non-zero status (4 ms)
+      ✓ the stale usage is detected as an unknown token
+      ✓ the diagnostic points at the page that still uses it (1 ms)
+      ✓ no artifact is presented as the new current generation (2 ms)
+      ✓ the previous stylesheet is not overwritten by a false current one
+    restoring the token yields a valid build again
+      ✓ the third build succeeds and the digest matches the first one (518 ms)
+  changing a token value updates the digest but preserves identity
+    ✓ the build still succeeds and the digest changed (1 ms)
+    ✓ the logical variable identity of spacing.md is preserved
+
+PASS __tests__/pandamstyle/forwarding-semantics-test.js
+  PandamStyle independent forwarding semantic oracle
+    ✓ direct import: fresh and persistent revisions match intended semantics (499 ms)
+    ✓ named source re-export: fresh and persistent revisions match intended semantics (150 ms)
+    ✓ renamed source re-export: fresh and persistent revisions match intended semantics (57 ms)
+    ✓ local import + re-export: fresh and persistent revisions match intended semantics (54 ms)
+    ✓ local import + renamed re-export: fresh and persistent revisions match intended semantics (48 ms)
+    ✓ export star: fresh and persistent revisions match intended semantics (58 ms)
+    ✓ namespace source re-export: fresh and persistent revisions match intended semantics (55 ms)
+    ✓ namespace import + export: fresh and persistent revisions match intended semantics (47 ms)
+    ✓ multi-hop named forwarding: fresh and persistent revisions match intended semantics (50 ms)
+    ✓ multi-hop renamed forwarding: fresh and persistent revisions match intended semantics (75 ms)
+    ✓ multi-hop star forwarding: fresh and persistent revisions match intended semantics (48 ms)
+    ✓ partial forwarding: fresh and persistent revisions match intended semantics (47 ms)
+    ✓ same exported spelling before remap: fresh and persistent revisions match intended semantics (101 ms)
+    ✓ mixed source barrel: fresh and persistent revisions match intended semantics (58 ms)
+    ✓ non-PandamStyle same-name export: fresh and persistent revisions match intended semantics (49 ms)
+    ✓ relay before break: fresh and persistent revisions match intended semantics (134 ms)
+    ✓ deep negative answer: fresh and persistent revisions match intended semantics (90 ms)
+    ✓ star collision: fresh and persistent revisions match intended semantics (48 ms)
+    ✓ star explicit override: fresh and persistent revisions match intended semantics (54 ms)
+    ✓ star same-origin diamond: fresh and persistent revisions match intended semantics (70 ms)
+    ✓ star after renamed forwarding: fresh and persistent revisions match intended semantics (63 ms)
+    ✓ namespace of partial renamed barrel: fresh and persistent revisions match intended semantics (47 ms)
+    ✓ direct namespace import: fresh and persistent revisions match intended semantics (40 ms)
+    ✓ default as foo is absent: fresh and persistent revisions match intended semantics (28 ms)
+    ✓ default forwarding is absent: fresh and persistent revisions match intended semantics (34 ms)
+    ✓ metadata alias has no helper authority: fresh and persistent revisions match intended semantics (37 ms)
+    ✓ namespace partial forwarding rejects missing token: fresh and persistent revisions match intended semantics (31 ms)
+    ✓ direct token alias lowers: fresh and persistent revisions match intended semantics (33 ms)
+    ✓ transitive star collision stays ambiguous: fresh and persistent revisions match intended semantics (41 ms)
+    ✓ ordinary destructured exports collide: fresh and persistent revisions match intended semantics (37 ms)
+    ✓ unknown external star fails closed: fresh and persistent revisions match intended semantics (35 ms)
+    ✓ star cycle fails closed: fresh and persistent revisions match intended semantics (37 ms)
+    ✓ resolution candidate appears: fresh and persistent revisions match intended semantics (86 ms)
+    ✓ first-hop candidate before replacement: fresh and persistent revisions match intended semantics (81 ms)
+  Babel binding identity at forwarded API access
+    ✓ the real generated export contract contains exactly five compiler APIs and two metadata/marker exports (114 ms)
+    ✓ renamed import and shadowing use distinct Babel bindings (85 ms)
+    ✓ namespace aliases translate members and deny missing and metadata members (77 ms)
+    ✓ local declarations do not inherit provenance from an unrelated import (78 ms)
+
+PASS __tests__/pandamstyle/incremental-session-test.js (11.774 s)
+  project session: reuse is decided by content, not by path
+    ✓ revision 1 analyses the whole covered set (406 ms)
+    ✓ a no-change revision recompiles nothing and reuses everything (19 ms)
+    ✓ a changed file is recompiled and the others are not (43 ms)
+    ✓ the validity key is not the path and not a timestamp (2 ms)
+  project session: a no-change revision performs zero real parses
+    ✓ the first revision parses, the second does not (167 ms)
+  project session: an invalid revision, a repair, and the module graph
+    ✓ the whole revision trace stays equivalent to a fresh rebuild (1386 ms)
+  project session: reverse dependencies and stale state
+    ✓ a style-only edit to a relay invalidates nothing but the relay (148 ms)
+    ✓ breaking the relay invalidates the files that consumed it (128 ms)
+    ✓ a deleted file leaves no stale rule and no stale diagnostic (100 ms)
+    ✓ a design-system change is an explicit full fallback (309 ms)
+    ✓ a build-configuration change is a full fallback too (353 ms)
+  project session: publication is transactional across revisions
+    ✓ a failed revision keeps the last published generation current (123 ms)
+  project session: every result carries its revision
+    ✓ revision ids increase and are reported on the generation (139 ms)
+    ✓ a result from an older revision is never presented as current (51 ms)
+  project session: memory stays bounded over a long session
+    ✓ a thousand revisions do not grow the session without bound (4410 ms)
+
+PASS __tests__/pandamstyle/negative-builds-test.js (12.817 s)
+  neg-forbidden-value fails with PMS_FORBIDDEN_VALUE
+    ✓ build process exits non-zero (AC AC-011, AC-016, AC-018: raw value, forged var(), forged ref object, alias, computed key, spread) (8 ms)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current (1 ms)
+  neg-forbidden-value-ts fails with PMS_FORBIDDEN_VALUE
+    ✓ build process exits non-zero (AC AC-017: same error in TSX with `as any` and a double cast, no tsc involved) (1 ms)
+    ✓ the failure is the expected policy code, not a crash (5 ms)
+    ✓ no artifact is published as current (1 ms)
+  neg-unknown-token fails with PMS_UNKNOWN_TOKEN
+    ✓ build process exits non-zero (AC AC-012: token absent from the registry)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current (1 ms)
+  neg-private-token fails with PMS_TOKEN_NOT_PUBLIC
+    ✓ build process exits non-zero (AC AC-020: private primitive selected from a consumer page) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-token-category fails with PMS_INVALID_TOKEN_CATEGORY
+    ✓ build process exits non-zero (AC AC-013: spacing token used for fontSize)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
+  neg-composite-form fails with PMS_UNSUPPORTED_PROPERTY_FORM
+    ✓ build process exits non-zero (AC AC-015: composite border shorthand) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
+  neg-unsupported-property fails with PMS_UNSUPPORTED_PROPERTY
+    ✓ build process exits non-zero (AC AC-012: property outside the closed profile) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (3 ms)
+  neg-unknown-condition fails with PMS_UNKNOWN_CONDITION
+    ✓ build process exits non-zero (AC AC-024: condition outside the P0 matrix)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-forbidden-import fails with PMS_FORBIDDEN_IMPORT
+    ✓ build process exits non-zero (AC AC-051, AC-052: direct engine entries and the atoms path in a covered page) (1 ms)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-style-channel fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC AC-054: inline style attribute and unapproved local stylesheet) (1 ms)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-jsx-spread fails with PMS_UNVERIFIED_JSX_SPREAD
+    ✓ build process exits non-zero (AC AC-054: JSX spread that cannot be proven free of style/className) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
+  neg-invalid-variant fails with PMS_INVALID_VARIANT_VALUE
+    ✓ build process exits non-zero (AC AC-039: literal invalid variant rejected at build, before any style is emitted)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-non-static fails with PMS_NON_STATIC_VALUE
+    ✓ build process exits non-zero (AC AC-023, AC-019: local helper named token gains no trust; props value is not static) (9 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-props-raw-object fails with PMS_UNVERIFIED_PROPS_SOURCE
+    ✓ build process exits non-zero (AC BC-1: an object literal handed to props(), while a create() namespace in the same file compiles)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
+  neg-props-raw-reference fails with PMS_UNVERIFIED_PROPS_SOURCE
+    ✓ build process exits non-zero (AC BC-1: an arbitrary local object, and a spread of it, handed to props())
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-props-shadowing fails with PMS_UNVERIFIED_JSX_SPREAD
+    ✓ build process exits non-zero (AC BC-2: a parameter shadowing a module-level props() result inherits nothing) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
+  neg-props-reassigned fails with PMS_UNVERIFIED_JSX_SPREAD
+    ✓ build process exits non-zero (AC BC-2: a props() result that is then reassigned is not the proven value) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-props-mutated fails with PMS_UNVERIFIED_PROVENANCE
+    ✓ build process exits non-zero (AC BC-2: a proven props() result whose member is written to afterwards)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-props-escaped fails with PMS_UNVERIFIED_PROVENANCE
+    ✓ build process exits non-zero (AC BC-2: a proven value handed to an unknown function and to Object.assign)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-helper-shadowed fails with PMS_UNVERIFIED_JSX_SPREAD
+    ✓ build process exits non-zero (AC BC-2, BC-6: an alias of the helper, and a nested declaration shadowing it, are not the helper)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-relay-reexport-star fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: a module outside every root, reached through `export *`)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-relay-reexport-named fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: a module outside every root, reached through a named re-export)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-relay-barrel-chain fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: two barrels deep, both outside every root) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-unresolved-import fails with PMS_COVERAGE_GAP
+    ✓ build process exits non-zero (AC BC-3, BC-4: a local import that resolves to nothing) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  neg-dynamic-import fails with PMS_COVERAGE_GAP
+    ✓ build process exits non-zero (AC BC-3, BC-4: a dynamic request that is not a static string)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-dynamic-import-local fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: a literal dynamic import: the target is a normal local edge and is analysed)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
+  neg-stylesheet-via-relay fails with PMS_FORBIDDEN_STYLE_CHANNEL
+    ✓ build process exits non-zero (AC BC-3, BC-9: an unapproved stylesheet reached only through a relay) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current
+  role violation is reported on its own code
+    ✓ a page cannot self-declare authority (1 ms)
+    ✓ the engine entry point is refused too
+  PMS_FORBIDDEN_VALUE diagnostic content
+    ✓ names the offending property
+    ✓ points at the location inside the page (1 ms)
+    ✓ names the violated rule and the system identity
+    ✓ lists only admissible public candidates (1 ms)
+    ✓ keeps autofix null: 17px is not a proven visual equivalent of 16px
+    ✓ the proximity to spacing.md does not authorize a rewrite
+  every forbidden-value route is refused, none silently
+    ✓ all six routes report PMS_FORBIDDEN_VALUE (241 ms)
+  a global runner may pass only when the negative builds really failed
+    ✓ the runner fails if a negative build unexpectedly succeeds (239 ms)
+    ✓ the runner fails if a negative build fails for another reason (232 ms)
+
+PASS __tests__/pandamstyle/vite-build-test.js (13.639 s)
+  BC-3/BC-5: a real vite build publishes one coherent generation
+    ✓ the build exits 0 (2524 ms)
+    ✓ the manifest, the module and the stylesheet are all published
+    ✓ the stylesheet is also emitted into the bundle (1 ms)
+    ✓ every artifact references the same registryDigest (1 ms)
+    ✓ the report shows the expected-vs-analysed cross-check as clean (1 ms)
+    ✓ the generated design-system module is not expected to be analysed
+  BC-3/BC-4/BC-9: a relay escape fails a real vite build
+    ✓ the build exits non-zero (1 ms)
+    ✓ the relayed module is the one refused (1 ms)
+    ✓ no generation is published (1 ms)
+  BC-5: a late bundler failure publishes no new generation
+    ✓ the failing build exits non-zero (1506 ms)
+    ✓ the design system changes, so a partial publish would be visible (1217 ms)
+    ✓ every artifact is still byte-identical to generation N (1 ms)
+    ✓ no staging or backup directory is left behind
+    ✓ the same design system then builds cleanly and does publish (1064 ms)
+  a build that cannot publish is refused up front
+    ✓ the build fails with a configuration diagnostic (352 ms)
+    ✓ no generation is left behind by the refusal (1 ms)
+
+PASS __tests__/pandamstyle/transactional-generation-test.js (13.686 s)
+  BC-5: the transaction itself
+    ✓ a rollback on a first build leaves nothing published (8 ms)
+    ✓ a rollback restores the previous generation byte for byte (7 ms)
+    ✓ a crash between snapshot and commit is recovered by the next run (3 ms)
+    ✓ a rollback restores a file the failed generation deleted (2 ms)
+    ✓ the commit marker is published last (2 ms)
+    ✓ withGeneration publishes on success (2 ms)
+    ✓ withGeneration rolls back on a throw, and rethrows (3 ms)
+    ✓ withGeneration rolls back when the callback rejects (3 ms)
+    ✓ a committed transaction cannot be reused (1 ms)
+  BC-5/BC-9: a failing CLI build publishes no mix
+    ✓ a valid build publishes the full artifact set (610 ms)
+    ✓ a policy error leaves generation N byte-identical (1308 ms)
+    ✓ a coverage error leaves generation N byte-identical (1027 ms)
+    ✓ a provenance error leaves generation N byte-identical (1286 ms)
+    ✓ a parse error leaves generation N byte-identical (884 ms)
+    ✓ an internal error injected after the design-system module leaves generation N byte-identical (1086 ms)
+    ✓ a changed design system plus an internal failure after generation leaves generation N byte-identical (839 ms)
+    ✓ the injected failure is a real diagnostic on a real process (760 ms)
+    ✓ after a failed generation every artifact still carries the same digest (687 ms)
+    ✓ a failing FIRST build publishes nothing at all (235 ms)
+    ✓ a failing build leaves no staging or backup directory behind (241 ms)
+    ✓ a successful build leaves no staging or backup directory behind (345 ms)
+    ✓ two consecutive valid builds are byte-identical (654 ms)
+
+PASS __tests__/pandamstyle/agent-result-test.js (15.513 s)
+  Phase C: the agent result is a versioned, revision-bound document
+    ✓ the result carries its kind, its version and its revision (3091 ms)
+    ✓ every result is bound to the revision it describes, and says so (221 ms)
+    ✓ a result for a revision that is not the current one is refused (191 ms)
+    ✓ a result asked for before a revision exists is refused (38 ms)
+    ✓ the mutation block reports declared, read, hashed and changed apart (184 ms)
+    ✓ a declared file whose bytes are identical is reported as a no-op, not as an edit (147 ms)
+  Phase C: a diagnostic is a repair protocol, not a sentence
+    ✓ the refusal is PMS_FORBIDDEN_VALUE, as the reference build refuses it (131 ms)
+    ✓ the machine diagnostic names the rule without the message being read (2 ms)
+    ✓ the diagnostic carries a structured repair (1 ms)
+    ✓ a diagnostic carries the LOCAL coverage of its own file, and nothing else (2 ms)
+    ✓ a candidate list that exceeds the limit is truncated AND says so (123 ms)
+    ✓ every code the negative corpus can raise has either a repair or a stated reason (1029 ms)
+  Phase C: an invalid revision needs no publication and no audit
+    ✓ the refusal arrives with nothing published and no generation (108 ms)
+    ✓ the generation milestones are absent for a revision that did not publish (131 ms)
+    ✓ an audit of a refused revision is refused, and says why (105 ms)
+  Phase C: introduce a violation, repair it, publish
+    ✓ the two revisions are a complete agent loop, and the second is clean (244 ms)
+  Phase C: diagnostics-ready and generation-committed are two facts
+    ✓ a valid revision reports both, in order, and neither implies the other (122 ms)
+    ✓ the caller may stop at diagnostics and never publish at all (235 ms)
+    ✓ the milestone clock starts when the transaction is accepted (129 ms)
+  Phase C: the agent result does not scale with the project
+    ✓ the same diagnostics and the same affected set give the same size at 8 and 800 files (5642 ms)
+    ✓ a passing edit reports counts, not a list of the project (82 ms)
+    ✓ a GLOBAL FALLBACK still returns a small result (1727 ms)
+  Phase C: the full audit is still available, and is the same evidence
+    ✓ the published report carries counts and a reference, not the array (50 ms)
+    ✓ the coverage counts and the coverage entries are the same numbers (49 ms)
+    ✓ the requested audit is byte-for-byte what the monolithic report carried (87 ms)
+    ✓ an audit requested BEFORE publication is committed with the generation (63 ms)
+    ✓ an audit requested AFTER publication goes beside the output, not into it (49 ms)
+    ✓ the audit is deterministic for the same revision (48 ms)
+    ✓ the audit of a session equals the audit of a full rebuild of the same bytes (89 ms)
+  Phase C: nothing is generated that nobody asked for
+    ✓ a publication that was not asked for an audit writes no coverage document (50 ms)
+    ✓ the compiler reports the work it did, and only that work (48 ms)
+    ✓ a full rebuild publishes its coverage document: it writes its whole output once (87 ms)
+
+  console.log
+    LONG-SESSION {"first":{"revision":0,"nodes":14,"covered":14,"forward":10,"reverse":8,"support":14,"fileStates":14,"dsConsumers":6,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":354975744},"last":{"revision":1000,"nodes":14,"covered":14,"forward":10,"reverse":8,"support":14,"fileStates":14,"dsConsumers":6,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":521449472},"samples":11}
+
+      at Object.log (__tests__/pandamstyle/phase-d-agent-loop-test.js:384:13)
+
+PASS __tests__/pandamstyle/phase-d-agent-loop-test.js (21.95 s)
+  Spike 4 Phase D: the agent loop
+    ✓ a mixed agent trace publishes exactly what a fresh rebuild publishes (3479 ms)
+    ✓ the whole trace stays fresh-build equivalent at every revision (759 ms)
+    ✓ the agent result is still bound to its revision (163 ms)
+    ✓ the compact agent result carries counts, not the project (145 ms)
+    ✓ the diagnostics of an invalid revision are unchanged by the graph (322 ms)
+    ✓ 1 files in one transaction is one revision (113 ms)
+    ✓ 5 files in one transaction is one revision (160 ms)
+    ✓ 20 files in one transaction is one revision (233 ms)
+    ✓ a thousand revisions leave the graph and the indexes structurally bounded (15494 ms)
+
+Test Suites: 21 passed, 21 total
+Tests:       498 passed, 498 total
+Snapshots:   0 total
+Time:        22.295 s
+Ran all test suites matching __tests__/pandamstyle/.*-test.js.
+   ok (exit 0)
+== tooling-tests ==
+$ node /home/kyle/work/pandam-style/tools/pms/run-tooling-tests.js /home/kyle/work/pandam-style/evidence/tooling-verification-step-2026-09
+PASS tools/pms/__tests__/tooling-verification-test.js (9.001 s)
+PASS tools/pms/__tests__/jest-config-test.js
+PASS tools/pms/__tests__/step-contracts-test.js
+PASS tools/pms/__tests__/test-counts-test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       62 passed, 62 total
+Snapshots:   0 total
+Time:        10.938 s, estimated 11 s
+Ran all test suites matching tools/pms/__tests__.
+Test results written to: evidence/tooling-verification-step-2026-09/tooling-jest-results.json
+   ok (exit 0)
+== pilot ==
+$ bash /home/kyle/work/pandam-style/tools/pilot/run-pilot.sh /dev/shm/pms-tooling-verification-pilot
+== 1/6 pack the PandamStyle compiler and the fork stylex runtime ==
+packed pandamstyle-compiler-0.1.0.tgz
+packed stylexjs-stylex-0.19.1.tgz
+== 2/6 verify the tarball contents and exports ==
+--- pandamstyle-compiler-0.1.0.tgz
+    package/bin/pms-build.js
+    package/lib/index.js
+    package/lib/index.mjs
+    package/lib/runtime.cjs
+    package/lib/runtime.mjs
+    package/lib/vite.js
+    package/lib/vite.mjs
+    package/package.json
+--- stylexjs-stylex-0.19.1.tgz
+    package/README.md
+    package/lib/cjs/inject.d.ts
+    package/lib/cjs/inject.js
+    package/lib/cjs/inject.js.flow
+    package/lib/cjs/stylesheet/createCSSStyleSheet.d.ts
+    package/lib/cjs/stylesheet/createCSSStyleSheet.js.flow
+    package/lib/cjs/stylesheet/createOrderedCSSStyleSheet.d.ts
+    package/lib/cjs/stylesheet/createOrderedCSSStyleSheet.js.flow
+    package/lib/cjs/stylesheet/createSheet.d.ts
+    package/lib/cjs/stylesheet/createSheet.js.flow
+    package/lib/cjs/stylesheet/utils.d.ts
+    package/lib/cjs/stylesheet/utils.js.flow
+    package/lib/cjs/stylex.d.ts
+    package/lib/cjs/stylex.js
+    package/lib/cjs/stylex.js.flow
+    package/lib/cjs/types/StyleXCSSTypes.d.ts
+    package/lib/cjs/types/StyleXCSSTypes.js.flow
+    package/lib/cjs/types/StyleXOpaqueTypes.d.ts
+    package/lib/cjs/types/StyleXOpaqueTypes.js.flow
+    package/lib/cjs/types/StyleXTypes.d.ts
+    package/lib/cjs/types/StyleXTypes.js.flow
+    package/lib/cjs/types/StyleXUtils.d.ts
+    package/lib/cjs/types/StyleXUtils.js.flow
+    package/lib/cjs/types/VarTypes.d.ts
+    package/lib/cjs/types/VarTypes.js.flow
+    package/lib/es/inject.d.ts
+    package/lib/es/inject.js.flow
+    package/lib/es/inject.mjs
+    package/lib/es/stylesheet/createCSSStyleSheet.d.ts
+    package/lib/es/stylesheet/createCSSStyleSheet.js.flow
+    package/lib/es/stylesheet/createOrderedCSSStyleSheet.d.ts
+    package/lib/es/stylesheet/createOrderedCSSStyleSheet.js.flow
+    package/lib/es/stylesheet/createSheet.d.ts
+    package/lib/es/stylesheet/createSheet.js.flow
+    package/lib/es/stylesheet/utils.d.ts
+    package/lib/es/stylesheet/utils.js.flow
+    package/lib/es/stylex.d.ts
+    package/lib/es/stylex.js.flow
+    package/lib/es/stylex.mjs
+    package/lib/es/types/StyleXCSSTypes.d.ts
+    package/lib/es/types/StyleXCSSTypes.js.flow
+    package/lib/es/types/StyleXOpaqueTypes.d.ts
+    package/lib/es/types/StyleXOpaqueTypes.js.flow
+    package/lib/es/types/StyleXTypes.d.ts
+    package/lib/es/types/StyleXTypes.js.flow
+    package/lib/es/types/StyleXUtils.d.ts
+    package/lib/es/types/StyleXUtils.js.flow
+    package/lib/es/types/VarTypes.d.ts
+    package/lib/es/types/VarTypes.js.flow
+    package/package.json
+packed exports ok: ., ./vite, ./runtime, ./package.json
+== 3/6 copy the pilot app outside the workspace ==
+== 4/6 install the packed tarballs into the app ==
+dependencies pinned to local tarballs
+
+added 90 packages in 6s
+== 5/6 prove the app resolves the INSTALLED package, not the sources ==
+resolved tarball at: /dev/shm/pms-tooling-verification-pilot/app/node_modules/@pandamstyle/compiler
+version: 0.1.0
+shipped runtime is self-contained
+== 6/6 run the real Vite production build ==
+
+== pilot artifacts ==
+  /dev/shm/pms-tooling-verification-pilot/app/dist/assets/index-CdrllhL-.js
+  /dev/shm/pms-tooling-verification-pilot/app/dist/assets/index-Ch9eZn3x.css
+  /dev/shm/pms-tooling-verification-pilot/app/dist/index.html
+  /dev/shm/pms-tooling-verification-pilot/app/dist/pandamstyle.css
+
+== extracted PandamStyle stylesheet (head) ==
+:root, .x1l4zqxa{--x1fv6ce:0;--x1aadcii:8px;--x13fe11z:16px;--xjjlyln:24px;--x1amw00r:8px;--xhcaqmv:16px;--x5i1nq6:#0b1120;--x1f01h7p:#e2e8f0;--x19xuu6u:#4f46e5;--x15974ic:#4338ca;--xnj5jc6:#e2e8f0;--x7xs9y3:#0b1120;--x3kn7hp:#e2e8f0;--xae11qa:#4f46e5;--x1mhybtg:#4338ca;--xefbuix:system-ui, sans-serif;--x1rwe26f:14px;--xcikt3x:16px;--x1r9hq20:700;--x31p3ob:1.5;--xwcyf10:0 1px 3px rgba(11,17,32,0.12);--x1iqgym4:120ms;--x1gg224o:ease-in-out;}
+.x1s95fkv.x1s95fkv, .x1s95fkv.x1s95fkv:root{--xnj5jc6:#0b1120;--x7xs9y3:#e2e8f0;}
+.x1h360yn:not(#\#){padding:var(--x13fe11z)}
+.xr3lqr2:not(#\#){padding:var(--x1aadcii)}
+.x1q2psia:not(#\#){padding:var(--xjjlyln)}
+@media (min-width: 768px){.x115uys8.x115uys8:not(#\#){padding:var(--xjjlyln)}}
+.x1jz6qqi:not(#\#):not(#\#){border-radius:var(--x1amw00r)}
+.xwdtlqu:not(#\#):not(#\#){border-radius:var(--xhcaqmv)}
+.x12xt4yv:not(#\#):not(#\#){gap:var(--x1aadcii)}
+.x6s0dn4:not(#\#):not(#\#):not(#\#){align-items:center}
+.x11icek9:not(#\#):not(#\#):not(#\#){background-color:var(--xae11qa)}
+.x1jmjebl:not(#\#):not(#\#):not(#\#){background-color:var(--xnj5jc6)}
+.x1dvffy4:not(#\#):not(#\#):not(#\#){box-shadow:var(--xwcyf10)}
+.x11jb0vl:not(#\#):not(#\#):not(#\#){co
+PILOT OK
+   ok (exit 0)
+== artifacts ==
+$ collect_artifacts
+pandamstyle build ok registryDigest=1d58021beceabbd4 files=10 cssBytes=2495
+   ok (exit 0)
+step install: passed (exit 0) 
+step build: passed (exit 0) 
+step upstream-babel-plugin: passed (exit 0) 
+step upstream-stylex: passed (exit 0) 
+step pandamstyle: passed (exit 0) 
+step tooling-tests: passed (exit 0) 
+step pilot: passed (exit 0) 
+step artifacts: passed (exit 0) 
+
+run directory: /home/kyle/work/pandam-style/evidence/tooling-verification-step-2026-09
+tests:  1666 passed, 0 failed, 64 skipped
+suites: 71 passed, 0 failed, 1 skipped
+verification verdict: verified
+  install: passed, command, verified
+  build: passed, command, verified
+  upstream-babel-plugin: passed, test, verified
+  upstream-stylex: passed, test, verified
+  pandamstyle: passed, test, verified
+  tooling-tests: passed, test, verified
+  pilot: passed, pilot, verified
+  artifacts: passed, artifact-check, verified
+VERIFICATION OK
