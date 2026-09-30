@@ -1,7 +1,7 @@
 {
   "documentKind": "pandamstyle-run-summary",
-  "testedCommit": "c34c862396eb45ef7815b2b2d8d2ea75a5d44f9a",
-  "testedTree": "45464df4c840133ad7a2f6f0b4867469315ed6d6",
+  "testedCommit": "864ebe0aadd520fa55091c176c19c57343fe6f9b",
+  "testedTree": "670f48c5b822fffa2e2040c0ddce066bb99a54f1",
   "workingTree": "clean",
   "pandamstyleBatchBaseRef": "refs/remotes/origin/feat/pandamstyle-native-compiler",
   "pandamstyleBatchBase": "e5ff62b4a925405dcf9fb415faa00df4b68aeaa9",
@@ -11,7 +11,47 @@
     "yarn": "1.22.22",
     "npm": "11.11.1"
   },
-  "complete": true,
+  "complete": false,
+  "verification": {
+    "verdict": "incomplete",
+    "stepsVerified": 3,
+    "stepsFailed": [],
+    "stepsIncomplete": [],
+    "stepsUnverified": [
+      "install",
+      "build",
+      "pilot",
+      "artifacts"
+    ],
+    "testsPassed": 1566,
+    "testsFailed": 0,
+    "testsSkipped": 64,
+    "suitesPassed": 66,
+    "suitesFailed": 0,
+    "suitesSkipped": 1
+  },
+  "suiteIntegrityFailures": [
+    {
+      "step": "install",
+      "code": "COUNTS_MISSING",
+      "message": "install: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
+    },
+    {
+      "step": "build",
+      "code": "COUNTS_MISSING",
+      "message": "build: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
+    },
+    {
+      "step": "pilot",
+      "code": "COUNTS_MISSING",
+      "message": "pilot: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
+    },
+    {
+      "step": "artifacts",
+      "code": "COUNTS_MISSING",
+      "message": "artifacts: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
+    }
+  ],
   "skippedSteps": [],
   "failedSteps": [],
   "steps": {
@@ -20,14 +60,38 @@
       "exitCode": 0,
       "acceptance": "passed",
       "note": null,
-      "counts": null
+      "counts": null,
+      "verification": {
+        "step": "install",
+        "verdict": "unverified",
+        "exitCode": 0,
+        "findings": [
+          {
+            "code": "COUNTS_MISSING",
+            "message": "install: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
+          }
+        ],
+        "counts": null
+      }
     },
     "build": {
       "status": "passed",
       "exitCode": 0,
       "acceptance": "passed",
       "note": null,
-      "counts": null
+      "counts": null,
+      "verification": {
+        "step": "build",
+        "verdict": "unverified",
+        "exitCode": 0,
+        "findings": [
+          {
+            "code": "COUNTS_MISSING",
+            "message": "build: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
+          }
+        ],
+        "counts": null
+      }
     },
     "upstream-babel-plugin": {
       "status": "passed",
@@ -35,15 +99,45 @@
       "acceptance": "passed",
       "note": null,
       "counts": {
-        "tests": {
-          "passed": 1007,
-          "total": 1071,
-          "skipped": 64
-        },
-        "suites": {
-          "passed": 42,
-          "total": 43,
-          "skipped": 1
+        "testsPassed": 1007,
+        "testsFailed": 0,
+        "testsSkipped": 64,
+        "testsTotal": 1071,
+        "suitesPassed": 42,
+        "suitesFailed": 0,
+        "suitesSkipped": 1,
+        "suitesTotal": 43,
+        "testsAccountedFor": 1071,
+        "suitesAccountedFor": 43
+      },
+      "verification": {
+        "step": "upstream-babel-plugin",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": {
+          "tests": {
+            "passed": 1007,
+            "failed": null,
+            "skipped": 64,
+            "total": 1071
+          },
+          "suites": {
+            "passed": 42,
+            "failed": null,
+            "skipped": 1,
+            "total": 43
+          },
+          "testsPassed": 1007,
+          "testsFailed": 0,
+          "testsSkipped": 64,
+          "suitesPassed": 42,
+          "suitesFailed": 0,
+          "suitesSkipped": 1,
+          "testsAccountedFor": 1071,
+          "testsTotal": 1071,
+          "suitesAccountedFor": 43,
+          "suitesTotal": 43
         }
       }
     },
@@ -53,15 +147,45 @@
       "acceptance": "passed",
       "note": null,
       "counts": {
-        "tests": {
-          "passed": 99,
-          "total": 99,
-          "skipped": null
-        },
-        "suites": {
-          "passed": 4,
-          "total": 4,
-          "skipped": null
+        "testsPassed": 99,
+        "testsFailed": 0,
+        "testsSkipped": 0,
+        "testsTotal": 99,
+        "suitesPassed": 4,
+        "suitesFailed": 0,
+        "suitesSkipped": 0,
+        "suitesTotal": 4,
+        "testsAccountedFor": 99,
+        "suitesAccountedFor": 4
+      },
+      "verification": {
+        "step": "upstream-stylex",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": {
+          "tests": {
+            "passed": 99,
+            "failed": null,
+            "skipped": null,
+            "total": 99
+          },
+          "suites": {
+            "passed": 4,
+            "failed": null,
+            "skipped": null,
+            "total": 4
+          },
+          "testsPassed": 99,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "suitesPassed": 4,
+          "suitesFailed": 0,
+          "suitesSkipped": 0,
+          "testsAccountedFor": 99,
+          "testsTotal": 99,
+          "suitesAccountedFor": 4,
+          "suitesTotal": 4
         }
       }
     },
@@ -71,15 +195,45 @@
       "acceptance": "passed",
       "note": null,
       "counts": {
-        "tests": {
-          "passed": 333,
-          "total": 333,
-          "skipped": null
-        },
-        "suites": {
-          "passed": 14,
-          "total": 14,
-          "skipped": null
+        "testsPassed": 460,
+        "testsFailed": 0,
+        "testsSkipped": 0,
+        "testsTotal": 460,
+        "suitesPassed": 20,
+        "suitesFailed": 0,
+        "suitesSkipped": 0,
+        "suitesTotal": 20,
+        "testsAccountedFor": 460,
+        "suitesAccountedFor": 20
+      },
+      "verification": {
+        "step": "pandamstyle",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": {
+          "tests": {
+            "passed": 460,
+            "failed": null,
+            "skipped": null,
+            "total": 460
+          },
+          "suites": {
+            "passed": 20,
+            "failed": null,
+            "skipped": null,
+            "total": 20
+          },
+          "testsPassed": 460,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "suitesPassed": 20,
+          "suitesFailed": 0,
+          "suitesSkipped": 0,
+          "testsAccountedFor": 460,
+          "testsTotal": 460,
+          "suitesAccountedFor": 20,
+          "suitesTotal": 20
         }
       }
     },
@@ -88,14 +242,38 @@
       "exitCode": 0,
       "acceptance": "passed",
       "note": null,
-      "counts": null
+      "counts": null,
+      "verification": {
+        "step": "pilot",
+        "verdict": "unverified",
+        "exitCode": 0,
+        "findings": [
+          {
+            "code": "COUNTS_MISSING",
+            "message": "pilot: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
+          }
+        ],
+        "counts": null
+      }
     },
     "artifacts": {
       "status": "passed",
       "exitCode": 0,
       "acceptance": "passed",
       "note": null,
-      "counts": null
+      "counts": null,
+      "verification": {
+        "step": "artifacts",
+        "verdict": "unverified",
+        "exitCode": 0,
+        "findings": [
+          {
+            "code": "COUNTS_MISSING",
+            "message": "artifacts: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
+          }
+        ],
+        "counts": null
+      }
     }
   }
 }

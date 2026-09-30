@@ -1,35 +1,35 @@
 PASS __tests__/stylex-test.js
   stylex
     error handling
-      ✓ stylex.create (12 ms)
-      ✓ stylex.createTheme
+      ✓ stylex.create (10 ms)
+      ✓ stylex.createTheme (1 ms)
       ✓ stylex.defineConsts (1 ms)
-      ✓ stylex.defineVars (1 ms)
+      ✓ stylex.defineVars
       ✓ stylex.firstThatWorks
-      ✓ stylex.keyframes (1 ms)
-      ✓ stylex.positionTry (1 ms)
-      ✓ stylex.viewTransitionClass
-      ✓ stylex.defaultMarker
+      ✓ stylex.keyframes
+      ✓ stylex.positionTry
+      ✓ stylex.viewTransitionClass (1 ms)
+      ✓ stylex.defaultMarker (1 ms)
       ✓ stylex.defineMarker (1 ms)
-      ✓ stylex.unstable_conditional
+      ✓ stylex.unstable_conditional (1 ms)
       ✓ stylex.unstable_defineVarsNested (1 ms)
       ✓ stylex.unstable_defineConstsNested
-      ✓ stylex.unstable_createThemeNested
-      ✓ stylex.typesangle
+      ✓ stylex.unstable_createThemeNested (1 ms)
+      ✓ stylex.typesangle (1 ms)
       ✓ stylex.typescolor
-      ✓ stylex.typesurl (1 ms)
-      ✓ stylex.typesimage
-      ✓ stylex.typesinteger (1 ms)
-      ✓ stylex.typeslengthPercentage
+      ✓ stylex.typesurl
+      ✓ stylex.typesimage (1 ms)
+      ✓ stylex.typesinteger (2 ms)
+      ✓ stylex.typeslengthPercentage (1 ms)
       ✓ stylex.typeslength
       ✓ stylex.typespercentage (1 ms)
       ✓ stylex.typesnumber
-      ✓ stylex.typesresolution (1 ms)
+      ✓ stylex.typesresolution
       ✓ stylex.typestime
-      ✓ stylex.typestransformFunction (1 ms)
-      ✓ stylex.typestransformList
+      ✓ stylex.typestransformFunction
+      ✓ stylex.typestransformList (1 ms)
       ✓ stylex.whenancestor
-      ✓ stylex.whendescendant
+      ✓ stylex.whendescendant (1 ms)
       ✓ stylex.whensiblingBefore
       ✓ stylex.whensiblingAfter (1 ms)
       ✓ stylex.whenanySibling
@@ -38,44 +38,32 @@ PASS __tests__/stylex-test.js
       ✓ merge order
       ✓ with a top-level array of simple overridden classes (1 ms)
       ✓ with nested arrays and pseudoClasses overriding things
-      ✓ with just pseudoclasses (1 ms)
-      ✓ with complicated set of arguments
+      ✓ with just pseudoclasses
+      ✓ with complicated set of arguments (1 ms)
       ✓ with dynamic styles (2 ms)
       ✓ data prop for source map data
     attrs
       ✓ basic resolve
       ✓ with dynamic styles (1 ms)
       ✓ legacyMerge merges classNames
-      ✓ legacyMerge exposes attrs
-
-PASS __tests__/createSheet-test.js
-  createSheet
-    client side
-      ✓ creates a sheet (7 ms)
-      ✓ creates multiple sheets
-      ✓ reuses existing sheet for given root (1 ms)
-      ✓ supports updating styles across multiple documents (8 ms)
-      ✓ update method updates rules across all sheets (7 ms)
-    server side
-      ✓ creates a sheet
-      ✓ creates multiple sheets
+      ✓ legacyMerge exposes attrs (1 ms)
 
 PASS __tests__/inject-test.js
   inject
     ✓ @keyframes (1 ms)
-    ✓ @positionTry
+    ✓ @positionTry (1 ms)
     ✓ ::view-transition
-    ✓ @media
-    ✓ ::before (1 ms)
-    ✓ :hover
+    ✓ @media (1 ms)
+    ✓ ::before
+    ✓ :hover (1 ms)
     ✓ ::before:hover
     defineConsts runtime injection
       ✓ registers a constant
       ✓ inlines constant in CSS rule
-      ✓ inlines multiple constants in one rule
+      ✓ inlines multiple constants in one rule (1 ms)
       ✓ handles numeric constants
       ✓ leaves unreferenced constants unchanged in CSS
-      ✓ handles constants in media queries
+      ✓ handles constants in media queries (1 ms)
       ✓ handles nested at-rules with constants
       ✓ handles constants for container queries
       ✓ handles constants for supports queries (1 ms)
@@ -87,39 +75,51 @@ PASS __tests__/inject-test.js
       ✓ handles constants in complex selectors
       ✓ updates multiple dependent rules when constant changes (1 ms)
       ✓ does not update dependent rules if constant value stays the same
-      ✓ updates dependent at-rules when constant changes (2 ms)
-      ✓ prevents duplicate dependency tracking (1 ms)
+      ✓ updates dependent at-rules when constant changes (1 ms)
+      ✓ prevents duplicate dependency tracking
       ✓ tracks dependencies for multiple constants in one rule
       ✓ correctly updates stylesheet when constant value changes
       ✓ handles constant updates with at-rules and regular properties
       ✓ handles mixed constant and non-constant values (1 ms)
 
+PASS __tests__/createSheet-test.js
+  createSheet
+    client side
+      ✓ creates a sheet (1 ms)
+      ✓ creates multiple sheets (1 ms)
+      ✓ reuses existing sheet for given root (1 ms)
+      ✓ supports updating styles across multiple documents (8 ms)
+      ✓ update method updates rules across all sheets (5 ms)
+    server side
+      ✓ creates a sheet
+      ✓ creates multiple sheets
+
 PASS __tests__/createOrderedCSSStyleSheet-test.js
   createOrderedCSSStyleSheet
     #insert
-      ✓ does not throw on invalid rule (1 ms)
+      ✓ does not throw on invalid rule
       ✓ insertion of CSSStyleRule
       ✓ insertion of CSSMediaRule
       ✓ insertion of CSSMediaRule within CSSConditionRule
       ✓ insertion order for same group
-      ✓ deduplication for same group (1 ms)
+      ✓ deduplication for same group
       ✓ order for same group
-      ✓ insertion order for different groups
+      ✓ insertion order for different groups (1 ms)
     #update
-      ✓ updates an existing rule with same selector (1 ms)
+      ✓ updates an existing rule with same selector
       ✓ updates a media query rule
-      ✓ updates multiple properties in a rule
-      ✓ inserts new rule if old rule does not exist (1 ms)
+      ✓ updates multiple properties in a rule (1 ms)
+      ✓ inserts new rule if old rule does not exist
       ✓ inserts new rule if selectors are different
-      ✓ updates rule in different group
-      ✓ updates nested at-rules (1 ms)
+      ✓ updates rule in different group (1 ms)
+      ✓ updates nested at-rules
       ✓ handles update when rule has specificity selectors
     client-side hydration
-      ✓ from SSR CSS (1 ms)
-      ✓ works when the group marker is in single quotes (1 ms)
+      ✓ from SSR CSS (2 ms)
+      ✓ works when the group marker is in single quotes
 
 Test Suites: 4 passed, 4 total
 Tests:       99 passed, 99 total
 Snapshots:   74 passed, 74 total
-Time:        0.767 s, estimated 1 s
+Time:        0.743 s, estimated 1 s
 Ran all test suites.
