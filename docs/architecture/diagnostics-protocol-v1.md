@@ -1,11 +1,12 @@
 # Diagnostics protocol v1
 
-Status: target candidate pending canonical master-plan reconciliation. Schema
-version: `1`; document kind: `pandamstyle-diagnostics-result`. This is a new
-target envelope, not a claim that the baseline agent-result v1 already contains
-every field below. Baseline agent-result/build-report/coverage-report schemas
-remain historical evidence and are mapped explicitly during migration. No
-permanent compatibility transport is required.
+Status: Accepted target contract after canonical
+[master-plan reconciliation](master-plan-reconciliation.md). Schema version:
+`1`; document kind: `pandamstyle-diagnostics-result`. This is a new target
+envelope, not a claim that the baseline agent-result v1 already contains every
+field below. Baseline agent-result/build-report/coverage-report schemas remain
+historical evidence and are mapped explicitly during migration. No permanent
+compatibility transport is required.
 
 Human-readable message is convenience. Structured fields are authoritative.
 Unknown code means an unknown rule, not permission to parse prose or assume

@@ -1,15 +1,16 @@
 # ADR 0008: Diagnostics as a versioned protocol
 
-Status: proposed pending exact canonical master-plan reconciliation. Date:
+Status: Accepted after exact canonical master-plan reconciliation. Date:
 2026-09-30. Phase: architecture/specification only. Decisions: ARCH-16.
 
 ## Context
 
 PandamStyle is a standalone compiler/runtime for agent composition. The audited
 baseline is d49a7eabf6a6df4eda44cc405f6824158fafd4be; existing revision-based
-compiler assets must survive migration. The phase brief is available but
-master-plan.md is missing. Acceptance must wait for its exact contents; this ADR
-does not amend or replace the plan.
+compiler assets must survive migration. The exact canonical
+[master plan](../../../master-plan.md) is now present and this decision has been
+checked in the [reconciliation matrix](../master-plan-reconciliation.md). This
+ADR does not amend or replace the plan.
 
 ## Decision
 

@@ -1,8 +1,9 @@
 # Package architecture v1
 
-Status: target candidate pending the canonical master plan, as explained in
-[public API](public-api-v0.1.md). Runtime/compiler behavior is unchanged by
-Phase 0.
+Status: Accepted target architecture, reconciled against the canonical
+[master plan](../../master-plan.md); see the
+[reconciliation matrix](master-plan-reconciliation.md). Runtime/compiler
+behavior is unchanged by Phase 0.
 
 ## Public release boundaries (ARCH-01, ARCH-02)
 
@@ -95,7 +96,7 @@ commitment occurs here.
 
 ## Internal domains
 
-Accept the candidate compiler domains, adding private observability and
+Accept the canonical compiler domains, adding private observability and
 separating config entry from API implementation:
 
 ```text
@@ -165,7 +166,8 @@ Existing historical evidence is evidence, not a compatibility surface. Any legal
 question is resolved before deletion; no legal conclusion is inferred from
 renaming.
 
-Phase 0 batch disposition: moved none; deleted none; temporary candidate docs
-pending canonical-plan reconciliation; final production state unchanged.
+Phase 0 batch disposition: moved none; deleted none; contracts accepted after
+canonical-plan reconciliation; final production state unchanged. Current donor
+paths and dependencies are temporary migration inputs, not target exceptions.
 Subsequent batches must report transient donor edges until Phase 5 closes the
 graph gate.

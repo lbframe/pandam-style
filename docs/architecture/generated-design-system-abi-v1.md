@@ -1,10 +1,11 @@
 # Generated design-system ABI v1
 
-Status: target candidate pending canonical master-plan reconciliation. ABI
-version: `1`. This specification is not the existing donor-shaped runtime
-representation and is not yet implemented. No permanent donor namespace is
-admitted. See [public API](public-api-v0.1.md) for syntax/selection semantics
-and [package architecture](package-architecture-v1.md) for ownership.
+Status: Accepted target contract after canonical
+[master-plan reconciliation](master-plan-reconciliation.md). ABI version: `1`.
+This specification is not the existing donor-shaped runtime representation and
+is not yet implemented. No permanent donor namespace is admitted. See
+[public API](public-api-v0.1.md) for syntax/selection semantics and
+[package architecture](package-architecture-v1.md) for ownership.
 
 ## Parties and artifact set (ARCH-13, ARCH-17)
 

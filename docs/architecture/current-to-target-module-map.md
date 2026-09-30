@@ -1,7 +1,8 @@
 # Current-to-target compiler module map
 
-Status: Phase 3 migration checklist candidate pending canonical master-plan
-reconciliation. Baseline commit `d49a7eabf6a6df4eda44cc405f6824158fafd4be`, tree
+Status: Accepted migration checklist after canonical
+[master-plan reconciliation](master-plan-reconciliation.md). Baseline commit
+`d49a7eabf6a6df4eda44cc405f6824158fafd4be`, tree
 `3500c2a1c3273d6c840fc6eba757524e1ff78e99`. Inventory from tracked source, not
 an assumed greenfield decomposition. No source is moved in Phase 0.
 
@@ -124,16 +125,19 @@ The 27-file map does not claim every donor file is useful. Current imports
 include babel-plugin/src/shared/stylex-create, stylex-define-vars,
 stylex-create-theme, shared/utils/default-options, utils/evaluate-path and
 utils/js-to-ast; runtime uses stylex/src/stylex and its composition dependency.
-Phase 3 must derive the exact recursive engine/helper closure from the locked
-baseline, map each reachable file to engine/atomic, engine/lowering,
-engine/ordering or frontend/babel, and carry its independent tests/legal
-headers. Babel plugin donor visitors not used by PandamStyle are not
-automatically retained. Unreachable donor packages/tools are Phase 5 deletion
-candidates, not extra public packages.
+Phase 3 inventories the recursive engine/helper closure from the locked
+baseline, maps each reachable file to engine/atomic, engine/lowering,
+engine/ordering or frontend/babel, and records its independent tests/legal
+headers. Absorption of retained donor subsystems is Phase 4 work after the Phase
+2/3 gates, with an explicit MOVE, REFACTOR or REWRITE decision for each. Babel
+plugin donor visitors not used by PandamStyle are not automatically retained.
+Unreachable donor packages/tools are Phase 5 deletion candidates, not extra
+public packages.
 
-Move behavior first under these domains using the Phase 1 oracle. Do not
-silently fold module graph into host caches, turn publication into per-host
-writes, drop negative dependencies or replace incremental CSS with full
-aggregation. This map freezes the destination for all current PandamStyle
-modules; engine closure selection remains an evidence task within the fixed
-ownership boundary, not an unresolved public architecture question.
+Move PandamStyle-native modules in Phase 3 and absorb retained donor behavior in
+Phase 4 under these domains using the Phase 1 oracle. Do not silently fold
+module graph into host caches, turn publication into per-host writes, drop
+negative dependencies or replace incremental CSS with full aggregation. This map
+freezes the destination for all current PandamStyle modules; engine closure
+selection remains an evidence task within the fixed ownership boundary, not an
+unresolved public architecture question.

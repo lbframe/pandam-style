@@ -1,14 +1,14 @@
 # Target repository tree
 
-Status: target candidate pending canonical master-plan reconciliation. Concrete
-final ownership layout (ARCH-18/ARCH-20); not a file move authorization in
-Phase 0.
+Status: Accepted target after canonical
+[master-plan reconciliation](master-plan-reconciliation.md). Concrete final
+ownership layout (ARCH-18/ARCH-20); not a file move authorization in Phase 0.
 
 ```text
 pandam-style/
   package.json                        # private PandamStyle workspace
   yarn.lock                           # one verified dependency lock
-  master-plan.md                      # exact human canonical plan, currently missing
+  master-plan.md                      # exact human canonical plan, present unchanged
   README.md
   PANDAMSTYLE.md                       # product/status entry
   LICENSE
@@ -93,6 +93,7 @@ pandam-style/
       current-to-target-module-map.md
       target-repository-tree.md
       phase-0-delivery.md
+      master-plan-reconciliation.md
       adr/0001-*.md ... 0010-*.md
     pandamstyle-specification-v0.1/     # historical requirements/evidence
     strategic-checkpoint-2026-09.md    # historical evidence, not delivery claims

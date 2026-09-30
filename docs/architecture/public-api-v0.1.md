@@ -1,14 +1,11 @@
 # PandamStyle public API v0.1
 
-Status: Phase 0 contract candidate; canonical master-plan reconciliation is
-pending because `master-plan.md` was neither present at the baseline nor
-supplied. These are target contracts, not claims of delivered APIs. No
-implementation is authorized by this document. The phase brief fixes the known
-gates: Phase 1 semantic oracle, then Phase 2 core and Phase 3 compiler, Phase 5
-donor deletion, Phase 6 declarations, Phase 7 project-service host adoption,
-Phase 13 evidence-gated native selection. The missing plan must be preserved
-verbatim and checked before these candidates can be accepted as the Phase 0
-freeze.
+Status: Accepted Phase 0 contract, reconciled against the exact canonical
+[master plan](../../master-plan.md). These are frozen target contracts, not
+claims of delivered APIs. Implementation follows the canonical phase gates; this
+closure performs no implementation. See the
+[reconciliation](master-plan-reconciliation.md) and
+[delivery record](phase-0-delivery.md) for acceptance and sequencing.
 
 PandamStyle is a standalone CSS/design-system compiler and runtime designed for
 AI-agent-driven application development. The page-generation LLM performs
@@ -71,10 +68,14 @@ closed profile.
 
 ## Decision matrix
 
-Exactly one decision applies per concept. KEEP retains the conceptual syntax;
-ABI changes are migration work, not permission to change semantics. DEFER means
-architecture reserved here, implementation deferred, capability false until
-implemented and independently verified.
+Exactly one product decision applies per concept: KEEP, REDESIGN or REMOVE, as
+required by the master plan. KEEP retains the conceptual syntax; ABI changes are
+migration work, not permission to change semantics. For slot recipes, compound
+variants and patterns, the product decision is KEEP and the existing DEFER
+implementation decision remains: architecture reserved here, capability false
+until implemented and independently verified in Phase 12 after Phase 11 closes.
+The table's DEFER entries describe implementation timing, not a fourth product
+disposition.
 
 | Concept           | Decision | Problem and agent/source use                                                                                                                                         | Static and runtime contract                                                                                                                              | Value policy and diagnostics                                                                                                                                                                                                                                  |
 | ----------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -303,9 +304,13 @@ bounded warm paths with structural counters, without inventing new performance
 targets. Known defects get explicit expected-target fixtures and baseline-gap
 labels, not weakened assertions. New ABI serialization is compared through
 logical semantics as well as exact shape; both paths agreeing on a bug is
-insufficient. Core and compiler can proceed in separate domains only after these
-oracles and the canonical plan are approved. The generated ABI and independent
-composition vectors form their shared boundary.
+insufficient. Core and compiler can proceed in separate domains only after Phase
+0 and Phase 1 close. Phase 2 owns runtime/core and generated runtime imports;
+Phase 3 owns compiler movement and the public SDK. The generated ABI and
+independent composition vectors form their shared boundary. Shared contract
+files require one named integration owner in the future implementation brief;
+neither lane may change the ABI independently. Phase 1 is the next authorized
+phase, but is not started by this closure.
 
 See [package architecture](package-architecture-v1.md),
 [generated ABI](generated-design-system-abi-v1.md),
