@@ -4,6 +4,12 @@ Library with a constrained vocabulary: **StyleX fork + selected and adapted
 Panda CSS modules**. The goal: agents compose with an authorized design
 vocabulary instead of reinventing micro-decisions.
 
+Current technical checkpoint after performance Spikes 1–4:
+[Strategic checkpoint — September 2026](docs/strategic-checkpoint-2026-09.md).
+It records the final Phase D architecture, metric boundaries, semantic/product
+gaps and next implementation order. Earlier measurements below remain historical
+examples; P0 is still not validated.
+
 ## Repository contents
 
 | Path                                                     | Contents                                                                                                                                                                                                                     |
