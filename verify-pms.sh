@@ -407,6 +407,34 @@ for i in "${!STEP_NAMES[@]}"; do
     >> "$PMS_OUT_DIR/steps.tsv"
 done
 
+# --------------------------------------------------- runner sources present ---
+# The summary block below reads the runner's own JavaScript from `tools/pms/`.
+# Checked here, with a message that names what is missing, rather than discovered
+# as a thrown require four steps later: the symptom without this check is a run
+# whose steps all passed and whose `summary.json` does not exist, and the reader
+# is left guessing between "the runner is broken" and "the summary said
+# something". It is derived from the script's own text for the same reason the
+# test fixture derives its copies - a second list is a second place to forget.
+RUNNER_SOURCES="$(node -e '
+  const fs = require("fs");
+  const text = fs.readFileSync(process.argv[1], "utf8");
+  process.stdout.write(
+    [...new Set([...text.matchAll(/tools\/pms\/([\w.-]+\.js)/g)].map((m) => m[1]))].join("\n"),
+  );
+' "$REPO_ROOT/verify-pms.sh")"
+MISSING_SOURCES=""
+for _src in $RUNNER_SOURCES; do
+  if [ ! -f "$REPO_ROOT/tools/pms/$_src" ]; then
+    MISSING_SOURCES="${MISSING_SOURCES} tools/pms/$_src"
+  fi
+done
+if [ -n "$MISSING_SOURCES" ]; then
+  log "The runner's own sources are missing from the checkout:${MISSING_SOURCES}"
+  log "These are read by the summary block to judge the run. Refusing to write"
+  log "a summary without them: no summary is better than an invented one."
+  exit 2
+fi
+
 node - "$PMS_OUT_DIR" "$TESTED_COMMIT" "$TESTED_TREE" "$DIRTY" "$PANDAMSTYLE_BASE_RESOLVED" "$PANDAMSTYLE_BASE" "$REPO_ROOT" <<'NODE'
 const fs = require('fs');
 const path = require('path');

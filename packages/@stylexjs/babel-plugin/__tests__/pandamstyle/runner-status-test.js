@@ -220,18 +220,33 @@ function makeFixture() {
     commit(dir, n),
   );
   fs.copyFileSync(RUNNER, path.join(dir, 'verify-pms.sh'));
-  // The runner now reads its Jest counts through `tools/pms/test-counts.js`
-  // rather than parsing them inline, so the fixture has to carry that file too.
-  // It is part of the runner's source, not a helper the fixture happens to
-  // need, and a runner that silently did nothing when the file was missing
-  // would be worse than the inline parser it replaced.
+  // The runner now reads its Jest counts through `tools/pms/test-counts.js` and
+  // judges each step through `tools/pms/step-contracts.js`, rather than parsing
+  // them inline. Those files are part of the runner's SOURCE, not helpers the
+  // fixture happens to need: without them the summary block throws, and a runner
+  // that silently produced no summary would be worse than the inline parser it
+  // replaced.
+  //
+  // They are DERIVED from the runner's own text rather than listed here. A list
+  // is a second place to remember, and the day a third module is added the list
+  // is what is forgotten - with the failure surfacing as `summary: null` in an
+  // unrelated-looking assertion, which is exactly how this was found.
   fs.mkdirSync(path.join(dir, 'tools', 'pms'), { recursive: true });
-  // Resolved from the RUNNER's own location rather than from this test's, so
-  // the two stay together if the runner ever moves.
-  fs.copyFileSync(
-    path.resolve(path.dirname(RUNNER), 'tools', 'pms', 'test-counts.js'),
-    path.join(dir, 'tools', 'pms', 'test-counts.js'),
-  );
+  const runnerSource = fs.readFileSync(RUNNER, 'utf8');
+  const required = [
+    ...new Set(
+      [...runnerSource.matchAll(/tools\/pms\/([\w.-]+\.js)/g)].map((m) => m[1]),
+    ),
+  ];
+  expect(required.length).toBeGreaterThan(0);
+  for (const name of required) {
+    // Resolved from the RUNNER's own location rather than from this test's, so
+    // the two stay together if the runner ever moves.
+    fs.copyFileSync(
+      path.resolve(path.dirname(RUNNER), 'tools', 'pms', name),
+      path.join(dir, 'tools', 'pms', name),
+    );
+  }
   git(dir, 'add', '-A');
   git(dir, 'commit', '-q', '-m', 'runner sources');
 
