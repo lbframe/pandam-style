@@ -395,7 +395,8 @@ the tested commit/tree, exact final summary and command environment.
 `tools/pms/__tests__/**/*-test.js` inventory from disk, compares it with Jest's
 JSON discovery and execution results, and runs the equivalent of
 `node_modules/.bin/jest --runInBand --ci tools/pms/__tests__`. Empty or incomplete
-suite selection fails. Missing count lines/totals, failed or unaccounted
+suite selection fails; Git's tracked inventory also prevents a missing source
+suite from silently reducing coverage. Missing count lines/totals, failed or unaccounted
 tests/suites, nonzero commands, omitted/skipped required steps and unknown step
 classification cannot produce `complete: true`. Regression fixtures exercise
 the actual runner's summary and final verdict, including a green eight-step run.

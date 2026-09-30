@@ -305,6 +305,10 @@ test.each(['test failure', 'suite load failure'])(
       'test("passes", () => expect(true).toBe(true));\n',
     );
     write(
+      'tools/pms/__tests__/c-test.js',
+      'test("also passes", () => expect(true).toBe(true));\n',
+    );
+    write(
       'tools/pms/__tests__/b-test.js',
       mode === 'test failure'
         ? 'test("fails", () => expect(true).toBe(false));\n'
@@ -340,6 +344,24 @@ test.each(['test failure', 'suite load failure'])(
     }
   },
 );
+
+test('a tracked tooling suite missing from disk cannot shrink the expected population', () => {
+  const suite = path.join(fixture, 'tools/pms/__tests__/c-test.js');
+  fs.renameSync(suite, suite + '.saved');
+  try {
+    const result = run();
+    expect(result.status).toBe(1);
+    expect(result.summary.complete).toBe(false);
+    expect(
+      fs.readFileSync(
+        path.join(fixture, 'evidence/run/tooling-tests.log'),
+        'utf8',
+      ),
+    ).toContain('TOOLING_TRACKED_SUITE_MISSING');
+  } finally {
+    fs.renameSync(suite + '.saved', suite);
+  }
+});
 
 test('broken verifier code preserves raw evidence and cannot invent a passing summary', () => {
   const parser = path.join(fixture, 'tools/pms/test-counts.js');

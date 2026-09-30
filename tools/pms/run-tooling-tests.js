@@ -31,6 +31,31 @@ function runToolingTests(repoRoot, outDir) {
   if (expected.length === 0) {
     throw new Error('TOOLING_INVENTORY_EMPTY: no tooling suites found');
   }
+  // A missing tracked suite must not redefine the expected population downward.
+  // Git supplies the source inventory; new suites on disk still join the run.
+  const tracked = spawnSync(
+    'git',
+    ['ls-files', '-z', '--cached', '--', 'tools/pms/__tests__/'],
+    {
+      cwd: repoRoot,
+      encoding: 'utf8',
+    },
+  );
+  if (tracked.error) throw tracked.error;
+  if (tracked.status !== 0)
+    throw new Error(
+      'TOOLING_SOURCE_INVENTORY_FAILED: cannot inspect tracked tooling suites',
+    );
+  const missing = tracked.stdout
+    .split('\0')
+    .filter((p) => p.endsWith('-test.js'))
+    .map((p) => path.join(repoRoot, p))
+    .filter((p) => !expected.includes(p));
+  if (missing.length !== 0) {
+    throw new Error(
+      `TOOLING_TRACKED_SUITE_MISSING: ${JSON.stringify(missing)}`,
+    );
+  }
   const jest = path.join(repoRoot, 'node_modules/jest/bin/jest.js');
   const args = [jest, '--runInBand', '--ci', 'tools/pms/__tests__'];
   const listed = spawnSync(
