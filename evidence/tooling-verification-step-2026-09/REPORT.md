@@ -11,8 +11,9 @@ use of the PandamStyle compiler.
 - Repository: `lbframe/pandam-style`.
 - Branch: `fix/pandamstyle-tooling-verification-step-2026-09`.
 - Base: `73b10666a9440d86fb92721da8ff597916b80b16`.
-- Implementation and tested commit: `70fdf83096e0dc7bf0cc9d1c92b797114c8edc70`.
-- Tested tree: `8f372622808c8bbd432465b823e0e1ecfc10398f`.
+- Initial implementation commit: `70fdf83096e0dc7bf0cc9d1c92b797114c8edc70`.
+- Final implementation and tested commit: `38803486c45d6a04081ccadd6f239d9db57c367e`.
+- Tested tree: `8bd6b775851f21115fd42d95f450bd6fbc4f9604`.
 - Starting working tree: clean, captured before the verifier wrote evidence.
 - Final delivery adds only this evidence directory to the tested commit. Final
   local/remote head identifiers are reported in the delivery response and Git
@@ -27,9 +28,20 @@ The exact, unedited [summary](summary.json) is the authoritative run result.
 The official `./verify-pms.sh` completed with exit 0 and all eight steps, without
 skip flags or step filters. [Command environment](command-environment.json)
 records the exact invocation and temporary environment overrides. Root disk
-space was low, so temporary files, npm cache and pilot workspace were scoped to
-`/dev/shm` for this invocation. This is an environment accommodation, not a
-semantic requirement, and does not change persistent machine configuration.
+space was low, so the final run used an isolated Git worktree in `/dev/shm`,
+with its own dependency copy, temporary files, npm cache and pilot workspace.
+Install and build still ran in full. This is an environment accommodation, not
+a semantic requirement, and does not change persistent machine configuration.
+The exact summary retains its original worktree paths when delivered.
+
+The initial implementation had already passed an eight-step run. After adding
+the missing tracked-suite regression, a rerun in the original checkout failed
+with `ENOSPC` during install and a raw-log write error (verifier exit 1, no
+summary). Its [environment](disk-full-attempt-env.json),
+[install log](disk-full-attempt-install.log) and [run log](disk-full-attempt-run.log)
+are preserved. The final successful run below uses the same updated commit/tree
+in the isolated worktree. Successful delivered-package build outputs were also
+copied back to replace any partial generated libraries from the disk-full attempt.
 
 | Order | Step | Contract kind | Status / verdict | Counts |
 | ---: | --- | --- | --- | --- |
@@ -54,8 +66,8 @@ reject a missing Tests line or missing totals. Unknown steps remain
 | upstream-babel-plugin | 1007 | 0 | 64 | 42 | 0 | 1 |
 | upstream-stylex | 99 | 0 | 0 | 4 | 0 | 0 |
 | pandamstyle | 498 | 0 | 0 | 21 | 0 | 0 |
-| tooling-tests | 62 | 0 | 0 | 4 | 0 | 0 |
-| Global test-bearing totals | 1666 | 0 | 64 | 71 | 0 | 1 |
+| tooling-tests | 63 | 0 | 0 | 4 | 0 | 0 |
+| Global test-bearing totals | 1667 | 0 | 64 | 71 | 0 | 1 |
 
 - `complete: true`.
 - `verification.verdict: verified`.
@@ -80,19 +92,21 @@ node_modules/.bin/jest --runInBand --ci tools/pms/__tests__
 The helper adds `--json --outputFile <run-directory>/tooling-jest-results.json`
 to preserve execution evidence, and first checks `--listTests --json` discovery.
 The intended inventory is derived from `tools/pms/__tests__/**/*-test.js` on
-disk, not a maintained list or frozen count. Empty inventory, discovery
+disk, not a maintained list or frozen count. Git's tracked source inventory
+also prevents a missing source suite from silently reducing that population.
+Empty inventory, missing tracked suites, discovery
 disagreement, nonzero Jest exit, missing/incomplete execution results and suites
 that did not pass all fail the command. The official summary independently
 assesses the raw Jest count lines under the normal `kind: test` contract.
 
 [Inventory](tooling-inventory.json), [Jest execution results](tooling-jest-results.json)
 and [raw tooling log](tooling-tests.log) preserve both population and outcome.
-The baseline was 43 tests in 3 suites; this batch adds 19 tests and one suite,
-yielding 62 tests in 4 suites. PandamStyle remains 498 tests in 21 suites.
+The baseline was 43 tests in 3 suites; this batch adds 20 tests and one suite,
+yielding 63 tests in 4 suites. PandamStyle remains 498 tests in 21 suites.
 
 ## Regression coverage and acceptance
 
-`tools/pms/__tests__/tooling-verification-test.js` adds 19 tests exercising:
+`tools/pms/__tests__/tooling-verification-test.js` adds 20 tests exercising:
 
 - Actual eight-step runner/summary success, with independent compiler/tooling
   counts, summed totals, `complete: true`, `verified`, no failed/skipped steps.
@@ -100,7 +114,8 @@ yielding 62 tests in 4 suites. PandamStyle remains 498 tests in 21 suites.
   that contradicts a successful process exit.
 - Missing counts, missing Tests or Test Suites lines, missing totals, and
   unreconciled test/suite counts.
-- Missing discovery/execution populations and empty inventory.
+- Missing discovery/execution populations, empty inventory and a tracked test
+  file missing from disk.
 - Omitted and skipped required tooling step through the actual runner.
 - Existing `EXIT_CODE_DISAGREES` and `EXIT_CODE_MISSING` findings for tooling.
 - Real Jest test failure and real Jest suite-load failure propagation.

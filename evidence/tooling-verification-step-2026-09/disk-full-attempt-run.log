@@ -1,0 +1,37 @@
+PandamStyle native verification
+  repo root      : /home/kyle/work/pandam-style
+  tested commit  : 38803486c45d6a04081ccadd6f239d9db57c367e
+  tested tree    : 8bd6b775851f21115fd42d95f450bd6fbc4f9604
+  branch         : fix/pandamstyle-tooling-verification-step-2026-09
+  working tree   : clean (as found, before this run wrote anything)
+  batch base ref : 73b10666a9440d86fb92721da8ff597916b80b16
+  batch base     : 73b10666a9440d86fb92721da8ff597916b80b16
+  out dir        : /home/kyle/work/pandam-style/evidence/tooling-verification-step-2026-09
+
+== install ==
+$ env NODE_OPTIONS= yarn install --frozen-lockfile --non-interactive
+yarn install v1.22.22
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+warning Pattern ["@vitejs/plugin-react@latest"] is trying to unpack in the same destination "/home/kyle/.cache/yarn/v6/npm-@vitejs-plugin-react-5.1.1-integrity/node_modules/@vitejs/plugin-react" as pattern ["@vitejs/plugin-react@^5.0.3","@vitejs/plugin-react@^5.0.4"]. This could result in non-deterministic behavior, skipping.
+warning Pattern ["@vitejs/plugin-rsc@latest"] is trying to unpack in the same destination "/home/kyle/.cache/yarn/v6/npm-@vitejs-plugin-rsc-0.5.26-integrity/node_modules/@vitejs/plugin-rsc" as pattern ["@vitejs/plugin-rsc@^0.5.24","@vitejs/plugin-rsc@^0.5.9"]. This could result in non-deterministic behavior, skipping.
+warning svelte-eslint-parser@1.8.0: The engine "pnpm" appears to be invalid.
+warning bare-fs@4.5.1: The engine "bare" appears to be invalid.
+warning bare-os@3.6.2: The engine "bare" appears to be invalid.
+[3/4] Linking dependencies...
+warning "@typescript-eslint/parser > @typescript-eslint/typescript-estree > ts-api-utils@1.4.3" has unmet peer dependency "typescript@>=4.2.0".
+warning " > @stylexjs/unplugin@0.19.1" has unmet peer dependency "unplugin@^2.3.11".
+warning " > @stylexjs/shared-ui@0.19.1" has unmet peer dependency "react@>=18".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > @stylexjs/devtools-extension > @babel/plugin-transform-flow-strip-types@7.27.1" has unmet peer dependency "@babel/core@^7.0.0-0".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > docs-new > @monaco-editor/react@4.7.0" has unmet peer dependency "monaco-editor@>= 0.25.0 < 1".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react@^19.2.6".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > docs-new > react-server-dom-webpack@19.2.6" has incorrect peer dependency "react-dom@^19.2.6".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > docs-new > react-server-dom-webpack@19.2.6" has unmet peer dependency "webpack@^5.59.0".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > example-nextjs > autoprefixer@10.4.23" has unmet peer dependency "postcss@^8.1.0".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > example-storybook > @storybook/react-vite@9.1.16" has unmet peer dependency "vite@^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > example-storybook > @typescript-eslint/eslint-plugin@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > example-storybook > @typescript-eslint/parser@8.46.4" has unmet peer dependency "typescript@>=4.8.4 <6.0.0".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c5fa0 > example-storybook > @vitejs/plugin-react@5.1.1" has unmet peer dependency "vite@^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0".
+warning "workspace-aggregator-f4b8cbea-917e-4dee-804b-d8aa660c
