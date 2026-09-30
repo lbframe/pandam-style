@@ -1,0 +1,56 @@
+{
+  "systemId": "oracle-ui",
+  "tokens": {
+    "spacing": {
+      "sm": { "value": "8px", "visibility": "public" },
+      "md": { "value": "16px", "visibility": "public" },
+      "lg": { "value": "24px", "visibility": "public" }
+    },
+    "colors": {
+      "ink": { "value": "#112233", "visibility": "private" },
+      "paper": { "value": "#ffffff", "visibility": "private" },
+      "text": { "ref": "colors.ink", "visibility": "public" },
+      "surface": { "ref": "colors.paper", "visibility": "public" }
+    }
+  },
+  "themes": {
+    "light": { "tokens": {} },
+    "dark": {
+      "tokens": {
+        "colors": {
+          "text": { "value": "#ffffff" },
+          "surface": { "value": "#112233" }
+        }
+      }
+    }
+  },
+  "conditions": {
+    "hover": ":hover",
+    "wide": "@media (min-width: 768px)",
+    "focus": ":focus"
+  },
+  "recipes": {
+    "button": {
+      "base": {
+        "display": "inline-flex",
+        "color": { "$token": "colors.text" }
+      },
+      "variants": {
+        "tone": {
+          "quiet": { "opacity": 0.5 },
+          "loud": { "opacity": 1 }
+        },
+        "size": {
+          "sm": { "padding": { "$token": "spacing.sm" } },
+          "md": { "padding": { "$token": "spacing.md" } }
+        },
+        "flag": {
+          "true": { "display": "flex" },
+          "false": { "display": "block" }
+        }
+      },
+      "defaultVariants": { "tone": "quiet", "size": "md" }
+    },
+    "bare": { "base": { "display": "block" } }
+  }
+}

@@ -21,6 +21,7 @@ const ORDER = [
   'upstream-babel-plugin',
   'upstream-stylex',
   'pandamstyle',
+  'semantic-oracle',
   'tooling-tests',
   'pilot',
   'artifacts',
@@ -34,7 +35,7 @@ function write(relative, text, executable = false) {
 }
 
 beforeAll(() => {
-  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-eight-step-'));
+  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-nine-step-'));
   write('verify-pms.sh', fs.readFileSync(path.join(ROOT, 'verify-pms.sh')));
   for (const name of [
     'test-counts.js',
@@ -47,6 +48,10 @@ beforeAll(() => {
     );
   }
   write('yarn.lock', '# fixture lockfile\n');
+  write(
+    'tools/semantic-oracle/run.js',
+    'process.stderr.write("Test Suites: 1 passed, 1 total\\nTests: 2 passed, 2 total\\n");\n',
+  );
   write(
     'bin/yarn',
     '#!/bin/sh\nif [ "$1" = "--version" ]; then echo 1.22.22; fi\n',
@@ -137,7 +142,7 @@ process.stderr.write(log);
     execFileSync('git', args, { cwd: fixture, env: gitEnv, stdio: 'pipe' });
   git('init', '-q');
   git('add', '.');
-  git('commit', '-qm', 'eight-step fixture');
+  git('commit', '-qm', 'nine-step fixture');
   git('branch', 'fixture-base');
 });
 
@@ -152,7 +157,11 @@ function run(mode = 'green', env = {}, omitted = false, reuseOutput = false) {
     'verify-pms.sh',
     omitted
       ? original.replace(
-          /if is_filtered_out "tooling-tests"; then[\s\S]*?\nfi\n/,
+          new RegExp(
+            'if is_filtered_out "' +
+              (omitted === true ? 'tooling-tests' : omitted) +
+              '"; then[\\s\\S]*?\\nfi\\n',
+          ),
           '',
         )
       : original,
@@ -183,7 +192,7 @@ function run(mode = 'green', env = {}, omitted = false, reuseOutput = false) {
   };
 }
 
-test('the real summary accepts a green eight-step fixture with separate and summed counts', () => {
+test('the real summary accepts a green nine-step fixture with separate and summed counts', () => {
   const { status, stdout, summary } = run();
   expect(status).toBe(0);
   expect(stdout).toContain('VERIFICATION OK');
@@ -196,9 +205,11 @@ test('the real summary accepts a green eight-step fixture with separate and summ
     expect(summary.steps[name].verification.verdict).toBe('verified');
   expect(summary.steps['tooling-tests'].kind).toBe('test');
   expect(summary.steps['tooling-tests'].counts.testsPassed).toBe(43);
+  expect(summary.steps['semantic-oracle'].kind).toBe('test');
+  expect(summary.steps['semantic-oracle'].counts.testsPassed).toBe(2);
   expect(summary.steps.pandamstyle.counts.testsPassed).toBe(498);
-  expect(summary.verification.testsPassed).toBe(1647);
-  expect(summary.verification.suitesPassed).toBe(70);
+  expect(summary.verification.testsPassed).toBe(1649);
+  expect(summary.verification.suitesPassed).toBe(71);
   expect(summary.verification.testsSkipped).toBe(64);
   expect(summary.verification.suitesSkipped).toBe(1);
   for (const name of ['install', 'build', 'pilot', 'artifacts'])
@@ -272,6 +283,31 @@ test('tooling retains the exit disagreement and missing exit evidence findings',
     expect(verdict.findings.map((f) => f.code)).toContain(code);
   }
 });
+
+test.each(['omitted', 'skipped'])(
+  '%s required semantic oracle prevents a complete official run',
+  (mode) => {
+    const result = run(
+      'green',
+      mode === 'skipped'
+        ? {
+            PMS_ONLY_STEPS: ORDER.filter(
+              (name) => name !== 'semantic-oracle',
+            ).join(','),
+          }
+        : {},
+      mode === 'omitted' ? 'semantic-oracle' : false,
+    );
+    expect(result.status).toBe(mode === 'omitted' ? 1 : 0);
+    expect(result.summary.complete).toBe(false);
+    expect(result.summary.verification.verdict).toBe('incomplete');
+    expect(result.summary.skippedSteps).toEqual(['semantic-oracle']);
+    expect(
+      result.summary.steps['semantic-oracle'].verification.findings[0].code,
+    ).toBe('STEP_SKIPPED');
+    expect(result.stdout).not.toContain('VERIFICATION OK');
+  },
+);
 
 test('an empty tooling inventory fails before invoking Jest', () => {
   const testDir = path.join(fixture, 'tools/pms/__tests__');

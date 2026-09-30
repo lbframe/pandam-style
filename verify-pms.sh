@@ -362,16 +362,22 @@ else
     bash -c "cd '$REPO_ROOT/packages/@stylexjs/babel-plugin' && '$REPO_ROOT/node_modules/.bin/jest' --ci '__tests__/pandamstyle/.*-test.js'"
 fi
 
-# Verification infrastructure has its own population, separate from compiler
-# tests. The helper derives the inventory from the test directory and checks
-# Jest discovery and execution against it; no hand-maintained suite list.
+# The semantic oracle reconciles a tracked explicit suite/case inventory with
+# filesystem, Jest discovery and actual execution. It cannot bless expectations.
+if is_filtered_out "semantic-oracle"; then
+  skip_step "semantic-oracle" "not selected by PMS_ONLY_STEPS"
+else
+  run_step "semantic-oracle" node "$REPO_ROOT/tools/semantic-oracle/run.js" "$PMS_OUT_DIR/semantic-oracle"
+fi
+
+# Tooling verification independently reconciles tracked suites and discovery.
 if is_filtered_out "tooling-tests"; then
   skip_step "tooling-tests" "not selected by PMS_ONLY_STEPS"
 else
   run_step "tooling-tests" node "$REPO_ROOT/tools/pms/run-tooling-tests.js" "$PMS_OUT_DIR"
 fi
 
-# --------------------------------------------------------------------- 7. pilot ---
+# --------------------------------------------------------------------- 8. pilot ---
 if [ "${PMS_SKIP_PILOT:-0}" = "1" ]; then
   skip_step "pilot" "PMS_SKIP_PILOT=1"
 elif is_filtered_out "pilot"; then
@@ -380,7 +386,7 @@ else
   run_step "pilot" bash "$REPO_ROOT/tools/pilot/run-pilot.sh" "${PMS_PILOT_DIR:-$PMS_OUT_DIR/pilot}"
 fi
 
-# ---------------------------------------------------------------- 8. artifacts ---
+# ---------------------------------------------------------------- 9. artifacts ---
 collect_artifacts() {
   set -e
   rm -rf "$ARTIFACT_DIR"
@@ -408,7 +414,7 @@ else
   run_step "artifacts" collect_artifacts
 fi
 
-# ------------------------------------------------------------------ 6. summary ---
+# --------------------------------------------------------------------- summary ---
 # The step table is written by the shell, so every status below is the real
 # observed exit code of that step, or `skipped` when the step never ran.
 : > "$PMS_OUT_DIR/steps.tsv"
