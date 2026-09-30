@@ -10,7 +10,7 @@ Discovery, coverage maintenance, design-system views, affected-file compilation,
 CSS rule maintenance, publication and diagnostics now have incremental paths.
 This does **not** mean every default path uses them, every operation is
 O(affected), or the foundation is production-ready. Named forwarding is
-semantically wrong; types, SSR/hydration and browser cascade acceptance remain
+corrected on the tested semantic forwarding scope; types, SSR/hydration and browser cascade acceptance remain
 open.
 
 ## 1. Authority, scope and how to read this record
@@ -283,9 +283,18 @@ cost.
 
 ## 5. Semantic debt — P0 forwarding correctness
 
-**Known defect, inherited before Phase D:** [DEBT.md][debt] and the [named-list
-test][dsvtests] pin the wrong forwarding map. Not a performance regression, and
-not fixed in this checkpoint.
+**RESOLVED on the tested scope in the semantic forwarding batch:** the inherited
+named/renamed forwarding P0 is corrected. [DEBT.md][debt] preserves the defect
+history; the [named-list test][dsvtests] is converted to require correct
+invalidation. See [the forwarding contract](forwarding-semantics-2026-09.md) and
+the independent semantic matrix in `evidence/forwarding-semantics-2026-09/` for
+fresh and persistent incremental expectations. Remaining semantic/product P0s
+include generated types, browser cascade, SSR/hydration and agent protocol
+qualification. This does not assert complete ECMAScript cyclic module support.
+
+The following mechanism and observation table describe the **historical Phase D
+defect**, superseded by the semantic contract above; performance history remains
+unchanged.
 
 `collectReexports` emits named/namespace specifiers and a separate source
 marker. Specifiers have no request field. `walkToDesignSystem` groups **only
@@ -413,7 +422,7 @@ recommendations; optional broader integration is not promoted to P0 by interest.
 | SSR correctness                               | **Partial foundation, acceptance absent**; static CSS/runtime exist; SSR not_run in [consolidation][consolidation]         | Missing CSS before first paint or server/client identity drift                                                                        | Correct exports, stable registry IDs, packed integration          | **P0** for specified server/client foundation                                                            |
 | Hydration correctness                         | **Absent acceptance**; no hydration proof                                                                                  | Class/variable mismatch, runtime injection on first render                                                                            | SSR fixture, client entry, theme/recipe selection                 | **P0**                                                                                                   |
 | Browser cascade proof                         | **Absent**; CSS differential/snapshots are narrower than [acceptance][acceptance] AC-024–042                               | Correct-looking text with wrong computed style under conditions/composition                                                           | Stable output, browser fixture, pinned environment                | **P0**                                                                                                   |
-| Named re-export semantics                     | **Known incorrect**, including namespace/alias relations above                                                             | Wrong helper authority, stale recognition, unlowered calls                                                                            | Module export map and binding semantics                           | **P0 semantic correctness**                                                                              |
+| Named re-export semantics                     | **Resolved on tested scope**; named/alias/local/star/namespace/multi-hop oracle and binding tests                            | General cyclic/external-star forwarding remains fail-closed; see forwarding contract                                                   | Module export map and binding semantics                           | **Resolved semantic P0**                                                                                 |
 | Diagnostic machine contract completeness      | **Partial**; result/diagnostic versions, repair fields, caps, file context in [agent][agent] and tests                     | Nullable locations; not every error is mechanically repairable; syntax/internal failure paths and session identity need qualification | Correct semantic rejection, code catalogue, integration schemas   | **P0** core protocol qualification; richer repair suggestions **P1**                                     |
 | Token/category typing                         | Runtime/category enforcement **demonstrated**; generated static typing **absent**                                          | Typed editor contract missing; privacy/category suggestions must match consumer vocabulary                                            | Types generator over registry                                     | **P0**                                                                                                   |
 | Recipes                                       | Restricted base/finite variants/defaults **implemented and tested**; [recipe.js][recipe], recipe contract tests            | Browser conflict parity and generated signatures incomplete                                                                           | Types + cascade proof                                             | **P0** retained subset; not all Panda recipe APIs                                                        |
@@ -582,6 +591,9 @@ profiling can proceed independently after Batch 2, but native-port decisions
 wait for corrected semantics and their regression matrix.
 
 ### Batch 1 — semantic forwarding foundation
+
+**Completed on the tested scope** by the semantic forwarding batch; see §5.
+The following rationale and scope preserve the checkpoint's original plan.
 
 **Why now:** green equivalence can preserve wrong answers; exported vocabulary
 is also a dependency of types and agent authority. **Scope:** §5

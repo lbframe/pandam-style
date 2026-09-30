@@ -1,9 +1,35 @@
 # P0 semantic debt — named re-export forwarding semantics
 
-**Status:** open, unfixed, deliberately not fixed in the Phase D closure batch.
+**Status:** RESOLVED by the semantic forwarding batch. Deliberately not fixed in
+the historical Phase D closure batch. The original defect description below is
+preserved as history.
 **Severity:** P0. **Introduced by:** nothing in Phase D. This predates Phase D
 and is inherited. **Owner:** unnamed — this is a backlog item, not an in-flight
-change.
+change in Phase D.
+
+## Resolution
+
+Fix commit: the implementation commit titled
+`fix(pandamstyle): preserve binding provenance through design-system relays`
+on `fix/pandamstyle-forwarding-semantics-2026-09`; its immutable SHA is recorded
+in the batch delivery report after commit creation.
+
+Semantic contract: [forwarding semantics](../../../../docs/forwarding-semantics-2026-09.md),
+MODULE-01–10. Named specifiers carry their source, composed forwarding preserves
+original bindings and namespace members, and same-spelling fallback is removed.
+Both positive and negative results retain all consulted dependencies, including
+downstream resolution candidates. Consumer first-hop resolution now tracks
+positive candidate changes as well as negative repair.
+
+Regression tests: `forwarding-semantics-test.js` and the independent
+`tools/pms/forwarding-semantic-oracle.js` matrix assert fresh and persistent
+incremental behavior against handwritten expectations. The historical
+`design-system-view-test.js` named-list debt test is converted, not removed: it
+now requires a changed DSV and invalidated consumer. Removal/restoration,
+same-spelling remap, mixed sources, namespaces, star ambiguity and deep negative
+repair have separate fixtures.
+
+## Historical Phase D record (unchanged below)
 
 ## The defect, in one paragraph
 

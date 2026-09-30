@@ -501,7 +501,7 @@ export function createProjectSession(config) {
   // whether that path EXISTS. This is the reverse of the forward index the
   // resolver keeps, and it is what makes "a file appeared" observable without
   // re-probing every key the session has ever formed. See `probeResolution`.
-  const negativeCandidates = new Map();
+  const resolutionCandidates = new Map();
 
   /** The declared root that contains `dir`, or null if none does. */
   function rootOwning(dir) {
@@ -613,29 +613,29 @@ export function createProjectSession(config) {
    * is replaced when its answer changes, and removed when its origin file leaves
    * the project, so it cannot grow without bound.
    */
-  function indexNegativeKey(key, entry) {
-    unindexNegativeKey(key);
+  function indexResolutionKey(key, entry) {
+    unindexResolutionKey(key);
     const base = path.resolve(path.dirname(entry.fromFile), entry.request);
     for (const candidate of candidatesOf(base)) {
-      let set = negativeCandidates.get(candidate);
+      let set = resolutionCandidates.get(candidate);
       if (set === undefined) {
         set = new Set();
-        negativeCandidates.set(candidate, set);
+        resolutionCandidates.set(candidate, set);
       }
       set.add(key);
     }
     entry.candidatesIndexed = true;
   }
 
-  function unindexNegativeKey(key) {
+  function unindexResolutionKey(key) {
     const entry = resolutionKeys.get(key);
     if (entry == null || entry.candidatesIndexed !== true) return;
     const base = path.resolve(path.dirname(entry.fromFile), entry.request);
     for (const candidate of candidatesOf(base)) {
-      const set = negativeCandidates.get(candidate);
+      const set = resolutionCandidates.get(candidate);
       if (set === undefined) continue;
       set.delete(key);
-      if (set.size === 0) negativeCandidates.delete(candidate);
+      if (set.size === 0) resolutionCandidates.delete(candidate);
     }
     entry.candidatesIndexed = false;
   }
@@ -645,7 +645,7 @@ export function createProjectSession(config) {
    *
    * `null` means all of them, and that is the only answer that can be correct
    * without knowing the complete mutation set. An explicit or watched mutation
-   * knows which paths moved, so it knows which negative keys could possibly have
+   * knows which paths moved, so it knows which resolution keys could possibly have
    * a different answer: the keys that list one of those paths as a candidate.
    *
    * A path whose CONTENT changed but whose EXISTENCE did not is not in this set,
@@ -659,16 +659,18 @@ export function createProjectSession(config) {
     if (active.fullDiscoveryReason != null) return null;
     const paths = active.mutationTouched;
     if (paths == null) return null;
-    const scope = affectedNegativeKeys(existenceChangedPaths(active.mutation));
+    const scope = affectedResolutionKeys(
+      existenceChangedPaths(active.mutation),
+    );
     count('resolution_keys_scoped', scope.size);
     return scope;
   }
 
-  /** The negative keys a declared existence change could have repaired. */
-  function affectedNegativeKeys(paths) {
+  /** The resolution keys a declared existence change could have retargeted. */
+  function affectedResolutionKeys(paths) {
     const keys = new Set();
     for (const file of paths) {
-      const set = negativeCandidates.get(file);
+      const set = resolutionCandidates.get(file);
       if (set === undefined) continue;
       for (const key of set) keys.add(key);
     }
@@ -689,12 +691,13 @@ export function createProjectSession(config) {
     );
     const entry = { fromFile, request, resolved, candidatesIndexed: false };
     resolutionKeys.set(key, entry);
+    // Positive resolution also depends on candidate existence/order. Keep the
+    // existing candidate index for every answer, so a new earlier candidate or
+    // a removed winner re-derives the forwarding source.
+    indexResolutionKey(key, entry);
     if (resolved === null) {
       bump('negative_resolutions');
-      // Index it immediately. A key that is born negative is the common case -
-      // an import of a module that does not exist yet is how a project is
-      // written - and it has to be findable the moment the module appears.
-      indexNegativeKey(key, entry);
+      // It is already indexed, so appearance of the target can repair it.
     }
     count('resolution_probes');
     return resolved;
@@ -729,19 +732,16 @@ export function createProjectSession(config) {
       const after = phase('session_resolve_ms', () =>
         probeResolution(entry.fromFile, entry.request),
       );
-      if (before === null && after !== null) {
+      // Preserve the coverage graph's existing unreadable-stub contract when
+      // no replacement exists. The semantic module resolver independently
+      // returns null; content versions retire the old helper provenance.
+      if (before !== null && after === null) continue;
+      if (before !== after) {
         repaired.push(entry.fromFile);
-        count('negative_resolution_keys_rechecked', 1);
+        if (before === null) count('negative_resolution_keys_rechecked', 1);
       }
       entry.resolved = after;
-      if (after === null) {
-        if (entry.candidatesIndexed !== true) indexNegativeKey(key, entry);
-      } else {
-        // It resolves now, so it is no longer a negative key and its candidate
-        // registration is dead weight. Dropping it here is what keeps the index
-        // proportional to the number of CURRENTLY unresolvable edges.
-        unindexNegativeKey(key);
-      }
+      if (entry.candidatesIndexed !== true) indexResolutionKey(key, entry);
     }
     return repaired;
   }
@@ -946,13 +946,13 @@ export function createProjectSession(config) {
    * observation about what the answer is a function of:
    *
    *   resolveDesignSystemModule(fromFile, request, {maxDepth})
-   *     is a function of the CONTENTS of the modules it walks, and of nothing
-   *     else. It resolves its first hop from `fromFile` and then walks
+   *     is a function of module CONTENTS and downstream resolution inputs.
+   *     Both are versioned dependencies. It resolves its first hop from `fromFile` and then walks
    *     downward from there, so every file that imports the same module by the
    *     same specifier gets the SAME answer.
    *
    * Hence the relay cache: one walk per distinct first hop, keyed by the first
-   * hop and validated against the chain's content versions. Ten thousand pages
+   * hop and validated against all consulted module/candidate versions. Ten thousand pages
    * reaching the design system through one barrel pay for one walk, not ten
    * thousand - and at c10000 the generated module is a ten-thousand-token AST, so
    * that walk is the single most expensive thing on the design-system path.
@@ -968,6 +968,13 @@ export function createProjectSession(config) {
     const seen = new Set();
     for (const source of importSources) {
       const entry = ctx.resolveRelay(file, source);
+      // All consulted inputs, including negative answers and resolution
+      // candidates, participate in reverse invalidation.
+      for (const module of entry?.versions.keys() ?? []) {
+        if (seen.has(module)) continue;
+        seen.add(module);
+        chain.push(module);
+      }
       if (entry == null || entry.info == null) {
         parts.push(`${source}=>null`);
         continue;
@@ -1081,6 +1088,9 @@ export function createProjectSession(config) {
         const cached = store.get(key);
         if (cached !== undefined) {
           bump('dsv_relay_hits', 1);
+          for (const [module, version] of cached.versions) {
+            ctx.consumedVersions.set(module, version);
+          }
           return cached;
         }
         bump('dsv_relay_walks', 1);
@@ -1149,7 +1159,7 @@ export function createProjectSession(config) {
               ? null
               : `${info.modulePath}|${info.relayPath ?? ''}|` +
                 `${stableJson(info.marker)}|${(info.exports ?? []).join(',')}|` +
-                `${stableJson(info.exportsOfRelay ?? null)}`,
+                `${stableJson(info.exportsOfRelay ?? null)}|${stableJson(info.issues ?? [])}`,
         };
         dsv.relayAnswers.set(key, entry);
         if (firstHop != null) {
@@ -1203,6 +1213,19 @@ export function createProjectSession(config) {
     const worklist = [];
     for (const file of active.dirty) {
       if (covered.has(file)) worklist.push(file);
+    }
+    for (const file of active.repairedResolutions ?? []) {
+      if (covered.has(file)) worklist.push(file);
+    }
+    // Removed modules cannot be visited as covered work items. Their previous
+    // consulted consumers still need to retire positive AND negative answers.
+    for (const file of active.removedFiles) {
+      for (const consumer of [
+        ...(state.dsConsumers.get(file) ?? []),
+        ...(state.dsImportConsumers.get(file) ?? []),
+      ]) {
+        if (covered.has(consumer)) worklist.push(consumer);
+      }
     }
     // A file that ENTERED COVERAGE through an import of some other file is not
     // dirty, and was not covered before, so it has no view - and a file with no
@@ -1377,9 +1400,16 @@ export function createProjectSession(config) {
       const chain = [];
       const seen = new Set();
       for (const source of fileState.importSources ?? []) {
+        const consulted = new Set();
         const info = resolveDesignSystemModule(file, source, {
           maxDepth: maxRelayDepth,
+          consulted,
         });
+        for (const module of consulted) {
+          if (seen.has(module)) continue;
+          seen.add(module);
+          chain.push(module);
+        }
         if (info == null) {
           parts.push(`${source}=>null`);
           continue;
@@ -1387,7 +1417,7 @@ export function createProjectSession(config) {
         parts.push(
           `${source}=>${info.modulePath}|${info.relayPath ?? ''}|` +
             `${stableJson(info.marker)}|${(info.exports ?? []).join(',')}|` +
-            `${stableJson(info.exportsOfRelay ?? null)}`,
+            `${stableJson(info.exportsOfRelay ?? null)}|${stableJson(info.issues ?? [])}`,
         );
         for (const module of info.chain ?? []) {
           if (seen.has(module)) continue;
@@ -1992,8 +2022,12 @@ export function createProjectSession(config) {
       }
 
       for (const file of closure.covered.keys()) {
-        if (ensureFileState(file).contribution == null)
-          active.invalid.add(file);
+        const fileState = ensureFileState(file);
+        // A relay restoration can reintroduce a cached graph node whose file
+        // state was retired during the break. It needs a semantic view even
+        // when the graph retained the node's summary.
+        if (fileState.dsView == null) active.dirty.add(file);
+        if (fileState.contribution == null) active.invalid.add(file);
       }
       refreshDesignSystemViews(closure.covered, store);
 
@@ -2095,7 +2129,7 @@ export function createProjectSession(config) {
   function pruneResolution() {
     for (const [key, entry] of [...resolutionKeys]) {
       if (state.fileStates.has(entry.fromFile)) continue;
-      unindexNegativeKey(key);
+      unindexResolutionKey(key);
       resolutionKeys.delete(key);
     }
   }
@@ -3849,6 +3883,27 @@ export function createProjectSession(config) {
      */
     coverageGraph() {
       return coverageGraphStats(state.coverageGraph);
+    },
+
+    // Read-only semantic oracle surface. Return the answers actually used by
+    // the active revision; never recompute them through the fresh resolver.
+    inspectForwarding(file) {
+      const fileState = state.fileStates.get(file);
+      if (fileState == null) return [];
+      const store = relayStore();
+      return (fileState.importSources ?? []).map((source) => {
+        const key = relayAnswerKey(
+          file,
+          source,
+          state.config.engineOptions?.maxRelayDepth,
+        );
+        const entry = store.get(key);
+        return {
+          source,
+          bindings: entry?.info?.exportsOfRelay ?? [],
+          issues: entry?.info?.issues ?? [],
+        };
+      });
     },
 
     fileStates() {

@@ -23,6 +23,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { parse as parseModule } from '@babel/parser';
+import traverse from '@babel/traverse';
+import { getBindingIdentifiers } from '@babel/types';
 import {
   count,
   phase,
@@ -259,7 +261,7 @@ export function clearModuleCache() {
  * Relative path resolution, in the spirit of Node/Vite but restricted to the
  * explicit extension forms the spec allows a page to write.
  */
-function probeRelativeFile(fromFile, request) {
+function probeRelativeFile(fromFile, request, consulted = null) {
   const base = path.resolve(path.dirname(fromFile), request);
   const candidates = [base];
 
@@ -280,6 +282,9 @@ function probeRelativeFile(fromFile, request) {
   }
 
   for (const candidate of candidates) {
+    // Resolution inputs count too: appearance of an earlier candidate can
+    // change the answer without changing the previous winner's bytes.
+    consulted?.add(candidate);
     // An in-memory module resolves without existing on disk: that is the whole
     // point of the overlay for the generated design-system module.
     if (moduleOverlay.has(candidate)) return candidate;
@@ -316,17 +321,18 @@ function collectOwnExports(ast) {
   const names = new Set();
   for (const node of ast.program.body) {
     if (node.type === 'ExportNamedDeclaration') {
+      if (node.exportKind === 'type') continue;
       if (node.declaration != null) {
         if (node.declaration.type === 'VariableDeclaration') {
           for (const d of node.declaration.declarations) {
-            if (d.id.type === 'Identifier') names.add(d.id.name);
+            for (const name of Object.keys(getBindingIdentifiers(d.id)))
+              names.add(name);
           }
-        } else if (node.declaration.id != null) {
+        } else if (node.declaration.id != null)
           names.add(node.declaration.id.name);
-        }
       }
       for (const s of node.specifiers) {
-        if (s.type === 'ExportSpecifier') {
+        if (s.type === 'ExportSpecifier' && s.exportKind !== 'type') {
           names.add(
             s.exported.type === 'Identifier'
               ? s.exported.name
@@ -369,30 +375,63 @@ function extractMarker(ast) {
 
 function collectReexports(ast) {
   const out = [];
+  let scope;
+  (traverse.default ?? traverse)(ast, {
+    Program(p) {
+      scope = p.scope;
+      p.stop();
+    },
+  });
   for (const node of ast.program.body) {
-    if (node.type === 'ExportNamedDeclaration' && node.source != null) {
+    if (node.exportKind === 'type') continue;
+    if (node.type === 'ExportNamedDeclaration') {
       for (const s of node.specifiers) {
+        if (s.exportKind === 'type') continue;
         if (s.type === 'ExportSpecifier') {
+          let request = node.source?.value;
+          let imported = s.local.name ?? s.local.value;
+          let kind = 'named';
+          if (request == null) {
+            // Only a real import binding can forward a local export. A local
+            // declaration with the same name has its own ordinary identity.
+            const binding = scope.getBinding(imported);
+            const spec = binding?.path.node;
+            if (
+              !binding?.constant ||
+              !binding.path.parentPath.isImportDeclaration()
+            )
+              continue;
+            if (
+              binding.path.parent.importKind === 'type' ||
+              spec.importKind === 'type'
+            )
+              continue;
+            request = binding.path.parent.source.value;
+            imported =
+              spec.type === 'ImportNamespaceSpecifier'
+                ? '*'
+                : spec.type === 'ImportDefaultSpecifier'
+                  ? 'default'
+                  : (spec.imported.name ?? spec.imported.value);
+            kind = imported === '*' ? 'namespace' : 'local-reexport';
+          }
           out.push({
-            kind: 'named',
-            imported:
-              s.local.type === 'Identifier' ? s.local.name : s.local.value,
-            exported:
-              s.exported.type === 'Identifier'
-                ? s.exported.name
-                : s.exported.value,
+            kind,
+            request,
+            imported,
+            exported: s.exported.name ?? s.exported.value,
           });
         } else if (s.type === 'ExportNamespaceSpecifier') {
           out.push({
             kind: 'namespace',
+            request: node.source.value,
             imported: '*',
-            exported: s.exported.name,
+            exported: s.exported.name ?? s.exported.value,
           });
         }
       }
-      out.push({ kind: 'source', request: node.source.value });
     } else if (node.type === 'ExportAllDeclaration') {
-      out.push({ kind: 'source', request: node.source.value, star: true });
+      out.push({ kind: 'star', request: node.source.value });
     }
   }
   return out;
@@ -641,8 +680,8 @@ export function setRelayAnswerStore(store) {
  * The key one relay walk is stored under.
  *
  * It is the resolved FIRST HOP and the relay depth, and nothing else, because
- * the walk reads nothing but the contents of the modules it descends into from
- * that hop. Ten thousand pages importing the same barrel by the same specifier
+ * the walk depends on the contents and downstream resolution candidates from
+ * that hop. Its owner versions both dependency sets. Ten thousand pages importing the same barrel by the same specifier
  * are one walk, and keying by the specifier as well would be a way of not
  * noticing that.
  */
@@ -664,7 +703,7 @@ export function resolveDesignSystemModule(fromFile, request, config = {}) {
   // there is no chain to version, and a store that versions only the chain
   // keeps the `null` forever - through the revision that broke the relay and
   // the revision that repaired it.
-  const consulted = new Set();
+  const consulted = config.consulted ?? new Set();
   if (relayAnswerStore != null) {
     const key = relayAnswerKey(fromFile, request, config.maxDepth);
     const entry = relayAnswerStore.get(key);
@@ -694,77 +733,149 @@ export function resolveDesignSystemModule(fromFile, request, config = {}) {
 }
 
 function walkToDesignSystem(fromFile, request, config = {}, consulted = null) {
-  const seen = new Set();
-  const chain = [];
+  const active = new Set();
+  const readModules = new Set();
+  const resolutionDependencies = new Set();
+  const systems = new Map();
+  const issues = [];
   const budget = config.maxDepth ?? 16;
-
+  const resolve = (file, source) =>
+    source.startsWith('.')
+      ? probeRelativeFile(file, source, resolutionDependencies)
+      : null;
+  const unknown = () => ({ bindings: new Map(), opaque: true });
+  const identity = (b) =>
+    b == null
+      ? null
+      : `${b.kind === 'namespace' ? '*' : b.imported}\u0000${b.modulePath}`;
   function walk(file, depth) {
-    if (file == null || seen.has(file) || depth > budget) return null;
-    seen.add(file);
-    chain.push(file);
+    // Cyclic and truncated export sets cannot safely select a star winner.
+    if (file == null || active.has(file) || depth > budget) return unknown();
+    active.add(file);
     consulted?.add(file);
+    readModules.add(file);
     const parsed = parseModuleFile(file);
-    if (parsed.ast == null) return null;
-
+    if (parsed.ast == null || parsed.ast.errors?.length > 0) {
+      active.delete(file);
+      return unknown();
+    }
     const marker = extractMarker(parsed.ast);
-    if (marker != null) {
-      return {
-        marker,
+    const bindings = new Map();
+    for (const name of collectOwnExports(parsed.ast)) {
+      bindings.set(name, {
+        kind: 'named',
+        imported: name,
         modulePath: file,
-        exports: collectOwnExports(parsed.ast),
-        chain: [...chain],
-      };
+        chain: [file],
+        designSystem: marker != null,
+      });
     }
-
-    // No mark: this module may be a plain relay.
-    const reexports = collectReexports(parsed.ast);
-    const bySource = new Map();
-    for (const r of reexports) {
-      if (r.kind !== 'source') continue;
-      if (!bySource.has(r.request)) bySource.set(r.request, []);
-      bySource.get(r.request).push(r);
+    if (marker != null) {
+      systems.set(file, { marker, exports: [...bindings.keys()] });
+      active.delete(file);
+      return { bindings, opaque: false };
     }
-    for (const [subRequest, specs] of bySource) {
-      const target = resolveRelativeFile(file, subRequest);
-      if (target == null) continue;
-      const found = walk(target, depth + 1);
-      if (found == null) continue;
-      // `export *` forwards every export; `export {}` renames explicitly.
-      const remapped = [];
-      for (const s of specs) {
-        if (s.star === true) {
-          for (const name of found.exports) {
-            remapped.push({ exported: name, imported: name });
-          }
-        } else if (s.kind === 'named') {
-          remapped.push({ exported: s.exported, imported: s.imported });
+    const targets = new Map();
+    const stars = new Map();
+    let opaque = false;
+    const specs = collectReexports(parsed.ast);
+    const explicit = new Set(bindings.keys());
+    for (const s of specs) if (s.kind !== 'star') explicit.add(s.exported);
+    for (const s of specs) {
+      let target = targets.get(s.request);
+      if (target == null) {
+        const targetPath = resolve(file, s.request);
+        target = { ...walk(targetPath, depth + 1), modulePath: targetPath };
+        targets.set(s.request, target);
+      }
+      if (s.kind === 'star') {
+        opaque ||= target.opaque;
+        for (const [name, b] of target.bindings) {
+          if (name === 'default' || explicit.has(name)) continue;
+          if (stars.has(name) && identity(stars.get(name)) !== identity(b)) {
+            stars.set(name, null);
+            issues.push({
+              module: file,
+              exported: name,
+              reason: 'ambiguous-star-export',
+            });
+          } else if (!stars.has(name)) stars.set(name, b);
         }
+      } else {
+        const b =
+          s.kind === 'namespace' && target.modulePath != null
+            ? {
+                kind: 'namespace',
+                imported: '*',
+                modulePath: target.modulePath,
+                members: [...target.bindings]
+                  .filter(([, member]) => member != null)
+                  .map(([exported, member]) => ({ exported, ...member })),
+                chain: [target.modulePath],
+              }
+            : target.bindings.get(s.imported);
+        // Missing exports erase the provisional own-name identity as well.
+        bindings.delete(s.exported);
+        if (b != null)
+          bindings.set(s.exported, {
+            ...b,
+            chain: [file, ...b.chain],
+            forwardingKind: s.kind,
+            sourceRequest: s.request,
+          });
       }
-      if (specs.some((s) => s.kind === 'namespace')) {
-        return { ...found, chain: [...chain] };
-      }
-      return {
-        marker: found.marker,
-        modulePath: found.modulePath,
-        exports: found.exports,
-        exportsOfRelay: remapped,
-        relayPath: file,
-        chain: [...chain],
-      };
     }
-    return null;
+    if (!opaque) {
+      for (const [name, b] of stars) {
+        bindings.set(
+          name,
+          b == null
+            ? null
+            : { ...b, chain: [file, ...b.chain], forwardingKind: 'star' },
+        );
+      }
+    } else if (specs.some((s) => s.kind === 'star')) {
+      issues.push({ module: file, reason: 'incomplete-star-export-set' });
+    }
+    active.delete(file);
+    return { bindings, opaque };
   }
-
+  // First-hop resolution is owned by the consumer's resolution digest/index.
+  // Shared relay answers start at that hop; their downstream candidates are
+  // dependencies, but consumer-specific first-hop candidates are not shared.
   const file = resolveRelativeFile(fromFile, request);
-  if (file == null) return null;
-  return walk(file, 0);
+  const result = walk(file, 0);
+  // The cache owner's dependencies include existence/order inputs separately
+  // from the modules whose bytes were read. This also runs for null answers.
+  for (const candidate of resolutionDependencies) consulted?.add(candidate);
+  if (systems.size === 0) return null;
+  // The current compiler compiles one generated system per project. Do not
+  // assign a single system's policy to a barrel containing multiple systems.
+  if (systems.size > 1)
+    issues.push({ module: file, reason: 'multiple-design-systems' });
+  const [modulePath, system] = systems.entries().next().value;
+  return {
+    ...system,
+    modulePath,
+    relayPath: file === modulePath ? null : file,
+    exportsOfRelay:
+      systems.size === 1
+        ? [...result.bindings]
+            .filter(([, b]) => b != null)
+            .map(([exported, b]) => ({ exported, ...b }))
+        : [],
+    chain: [...readModules],
+    consulted: [...readModules],
+    resolutionDependencies: [...resolutionDependencies],
+    issues,
+  };
 }
 
 /** Re-export map of the design system for a given name, through a relay. */
 export function relayExportMap(moduleInfo) {
   const map = new Map();
   if (moduleInfo?.exportsOfRelay != null) {
-    for (const r of moduleInfo.exportsOfRelay) map.set(r.exported, r.imported);
+    for (const r of moduleInfo.exportsOfRelay) map.set(r.exported, r);
   }
   return map;
 }

@@ -140,6 +140,30 @@ function pushDiag(ctx, diag) {
   ctx.diags.push(diag);
 }
 
+function helperOf(binding, namespaceChain = []) {
+  if (binding?.kind === 'namespace') {
+    const members = new Map();
+    for (const member of binding.members ?? []) {
+      const helper = helperOf(member, [
+        ...namespaceChain,
+        ...(binding.chain ?? []),
+      ]);
+      if (helper != null) members.set(member.exported, helper);
+    }
+    return members.size === 0 ? null : { namespace: true, members };
+  }
+  return binding?.designSystem === true &&
+    REQUIRED_HELPERS.includes(binding.imported)
+    ? {
+        exportName: binding.imported,
+        provenance: {
+          ...binding,
+          chain: [...new Set([...namespaceChain, ...binding.chain])],
+        },
+      }
+    : null;
+}
+
 /** Reads the program imports and classifies every source. */
 export function readModuleFacts(programPath, ctx) {
   for (const stmt of programPath.get('body')) {
@@ -159,22 +183,39 @@ export function readModuleFacts(programPath, ctx) {
       ctx.pmsModulePath = resolved.modulePath;
       const relay = relayExportMap(resolved);
       for (const spec of stmt.node.specifiers) {
-        if (spec.type === 'ImportSpecifier') {
-          const exported = importedNameOf(spec);
-          const dsName = relay.get(exported) ?? exported;
-          // Keyed by the BINDING: `import { props as p }` and a local
-          // `function p()` are then two different things.
-          const binding = stmt.scope?.getBinding(spec.local.name) ?? null;
-          if (binding != null)
-            ctx.helperBindings.set(binding, { exportName: dsName });
-        } else if (spec.type === 'ImportNamespaceSpecifier') {
-          const binding = stmt.scope?.getBinding(spec.local.name) ?? null;
-          if (binding != null)
-            ctx.helperBindings.set(binding, { namespace: true });
-        } else if (spec.type === 'ImportDefaultSpecifier') {
-          const binding = stmt.scope?.getBinding(spec.local.name) ?? null;
-          if (binding != null)
-            ctx.helperBindings.set(binding, { exportName: 'default' });
+        if (spec.importKind === 'type' || spec.importKind === 'typeof')
+          continue;
+        const exported =
+          spec.type === 'ImportDefaultSpecifier'
+            ? 'default'
+            : importedNameOf(spec);
+        const descriptor =
+          spec.type === 'ImportNamespaceSpecifier'
+            ? { kind: 'namespace', members: [...relay.values()] }
+            : relay.get(exported);
+        const helper = helperOf(descriptor);
+        const binding = stmt.scope?.getBinding(spec.local.name) ?? null;
+        if (binding != null && helper != null)
+          ctx.helperBindings.set(binding, helper);
+        if (descriptor == null && exported != null) {
+          pushDiag(
+            ctx,
+            diagnostic({
+              code: Codes.FORBIDDEN_IMPORT,
+              phase: 'imports',
+              message: `No unambiguous export "${exported}" is forwarded by "${source}".`,
+              source: locationOf(stmt, ctx),
+              rule: 'module.forwarding',
+              context: {
+                source,
+                exported,
+                reason: 'missing-or-ambiguous-export',
+                forwardingIssues: resolved.issues,
+                repairShape:
+                  'Import an explicitly forwarded binding or repair the relay export.',
+              },
+            }),
+          );
         }
       }
       continue;
@@ -425,7 +466,8 @@ export function resolvePmsAccess(nodePath, ctx) {
     if (binding == null) return null;
     const helper = ctx.helperBindings.get(binding);
     if (helper == null) return null;
-    if (helper.namespace === true) return { exportPath: [], binding };
+    if (helper.namespace === true)
+      return { exportPath: [], binding, members: helper.members };
     return { exportPath: [helper.exportName], binding };
   }
   if (
@@ -444,8 +486,11 @@ export function resolvePmsAccess(nodePath, ctx) {
     const prop = staticPropertyName(nodePath);
     if (prop == null) return null;
     if (objectAccess.exportPath.length === 0) {
-      // `import * as ds`: the first segment is the property itself.
-      return { exportPath: [prop] };
+      const helper = objectAccess.members?.get(prop);
+      if (helper == null) return null;
+      return helper.namespace
+        ? { exportPath: [], members: helper.members }
+        : { exportPath: [helper.exportName] };
     }
     return { exportPath: [...objectAccess.exportPath, prop] };
   }

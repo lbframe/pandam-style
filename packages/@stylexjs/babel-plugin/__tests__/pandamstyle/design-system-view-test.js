@@ -211,23 +211,9 @@ describe('Spike 4 Phase D2: the incremental design-system view', () => {
     expect(h.session.verifyDesignSystemViews().differences).toEqual([]);
   });
 
-  test('a NAMED re-export list is not part of the view, and that is pre-existing', () => {
-    // Recorded because it is surprising and because it was found by this
-    // phase's oracle rather than by reading the code.
-    //
-    // `collectReexports` emits a relay's named specifiers and its source marker
-    // into one flat list, and `walkToDesignSystem` then groups only the `source`
-    // entries - so the group for a request contains the source marker alone and
-    // `exportsOfRelay` comes out EMPTY for `export { a, b } from '...'`. It is
-    // populated for `export * from '...'`, whose forwarding set is derived from
-    // the target rather than declared.
-    //
-    // The consequence: a relay's NAMED re-export list does not change any
-    // consumer's design-system view, so it invalidates nothing. That is the
-    // Phase C behaviour this phase inherits, 413 tests and a fresh-rebuild
-    // oracle encode, and Phase D does not change it - recognition semantics are
-    // not this phase's to revise, and a compiler that re-derived them here would
-    // be optimising a different thing.
+  test('a NAMED re-export list changes the view and invalidates its consumer', () => {
+    // Converted from the Phase D debt pin: a named list now represents actual
+    // forwarding. Historical defect and rationale remain recorded in DEBT.md.
     revise(h);
     const consumer = edit(
       h,
@@ -248,12 +234,10 @@ describe('Spike 4 Phase D2: the incremental design-system view', () => {
     );
     const v = revise(h, { changed: [changed] });
     expect(v.ok).toBe(true);
-    expect(v.counters.reverseDependentsInvalidated).toBe(0);
+    expect(v.counters.reverseDependentsInvalidated).toBeGreaterThanOrEqual(1);
     expect(
       viewOf(h, 'src/named-consumer.js').validity.designSystemViewDigest,
-    ).toBe(before.validity.designSystemViewDigest);
-    // It was still RE-DERIVED - the memo key moved with the relay's bytes - so
-    // the view is current; it simply did not change.
+    ).not.toBe(before.validity.designSystemViewDigest);
     expect(counters(h).dsv_files_recomputed).toBeGreaterThanOrEqual(1);
     expect(h.session.verifyDesignSystemViews().differences).toEqual([]);
   });
