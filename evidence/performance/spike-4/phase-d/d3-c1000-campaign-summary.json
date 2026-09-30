@@ -1,0 +1,840 @@
+{
+  "environment": {
+    "label": "d3-c1000-campaign",
+    "corpus": "c1000-t1000-r100-s809",
+    "node": "v22.22.0",
+    "platform": "linux-x64",
+    "cpuModel": "AMD Ryzen 7 5800X3D 8-Core Processor",
+    "cpuCount": 16,
+    "totalMemoryBytes": 33556586496,
+    "diskAvailBytesBefore": 2964172800,
+    "diskTotalBytes": 980666998784
+  },
+  "diskAvailBytesAfter": 2955440128,
+  "cells": [
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "no_change",
+      "iteration": 0,
+      "wallClockMs": 4034.495494,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "no_change",
+      "iteration": 1,
+      "wallClockMs": 3908.710365,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "no_change",
+      "iteration": 2,
+      "wallClockMs": 3974.113001,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "one_file_existing_atoms",
+      "iteration": 0,
+      "wallClockMs": 3972.703791,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "one_file_existing_atoms",
+      "iteration": 1,
+      "wallClockMs": 3891.731946,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "one_file_existing_atoms",
+      "iteration": 2,
+      "wallClockMs": 3898.436807,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "one_file_new_atom",
+      "iteration": 0,
+      "wallClockMs": 3887.899561,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "one_file_new_atom",
+      "iteration": 1,
+      "wallClockMs": 3870.845599,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "one_file_new_atom",
+      "iteration": 2,
+      "wallClockMs": 3986.165396,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "five_files_batch",
+      "iteration": 0,
+      "wallClockMs": 3938.540382,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "five_files_batch",
+      "iteration": 1,
+      "wallClockMs": 3939.727102,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "five_files_batch",
+      "iteration": 2,
+      "wallClockMs": 3830.511982,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "twenty_files_batch",
+      "iteration": 0,
+      "wallClockMs": 3889.161709,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "twenty_files_batch",
+      "iteration": 1,
+      "wallClockMs": 4012.157651,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "twenty_files_batch",
+      "iteration": 2,
+      "wallClockMs": 3982.437786,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "forbidden_value",
+      "iteration": 0,
+      "wallClockMs": 4100.824981,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "forbidden_value",
+      "iteration": 1,
+      "wallClockMs": 3960.44411,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "forbidden_value",
+      "iteration": 2,
+      "wallClockMs": 3884.381086,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "repair_forbidden_value",
+      "iteration": 0,
+      "wallClockMs": 3933.894018,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "repair_forbidden_value",
+      "iteration": 1,
+      "wallClockMs": 4007.97023,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "repair_forbidden_value",
+      "iteration": 2,
+      "wallClockMs": 3888.196057,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "module_add",
+      "iteration": 0,
+      "wallClockMs": 3942.475452,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "module_add",
+      "iteration": 1,
+      "wallClockMs": 3932.365678,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "module_add",
+      "iteration": 2,
+      "wallClockMs": 3896.521584,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "module_remove",
+      "iteration": 0,
+      "wallClockMs": 4020.656254,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "module_remove",
+      "iteration": 1,
+      "wallClockMs": 3969.608276,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "module_remove",
+      "iteration": 2,
+      "wallClockMs": 3853.686704,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "file_rename",
+      "iteration": 0,
+      "wallClockMs": 3911.45608,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "file_rename",
+      "iteration": 1,
+      "wallClockMs": 3786.180127,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "file_rename",
+      "iteration": 2,
+      "wallClockMs": 3956.292361,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "import_change",
+      "iteration": 0,
+      "wallClockMs": 3923.410481,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "import_change",
+      "iteration": 1,
+      "wallClockMs": 3949.782303,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "import_change",
+      "iteration": 2,
+      "wallClockMs": 4001.322157,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "unresolved_import_then_file_appears",
+      "iteration": 0,
+      "wallClockMs": 3928.123793,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "unresolved_import_then_file_appears",
+      "iteration": 1,
+      "wallClockMs": 4102.091989,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "unresolved_import_then_file_appears",
+      "iteration": 2,
+      "wallClockMs": 3964.417742,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "reexport_change",
+      "iteration": 0,
+      "wallClockMs": 3908.019468,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "reexport_change",
+      "iteration": 1,
+      "wallClockMs": 3967.968769,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "reexport_change",
+      "iteration": 2,
+      "wallClockMs": 3992.935707,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "token_value_full_fallback",
+      "iteration": 0,
+      "wallClockMs": 6551.469277,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "token_value_full_fallback",
+      "iteration": 1,
+      "wallClockMs": 6466.699033,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result",
+      "scenario": "token_value_full_fallback",
+      "iteration": 2,
+      "wallClockMs": 6544.907455,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "no_change",
+      "iteration": 0,
+      "wallClockMs": 3953.429476,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "no_change",
+      "iteration": 1,
+      "wallClockMs": 4258.192214,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "no_change",
+      "iteration": 2,
+      "wallClockMs": 4061.213325,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "one_file_existing_atoms",
+      "iteration": 0,
+      "wallClockMs": 3991.724003,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "one_file_existing_atoms",
+      "iteration": 1,
+      "wallClockMs": 4013.892135,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "one_file_existing_atoms",
+      "iteration": 2,
+      "wallClockMs": 3979.500385,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "one_file_new_atom",
+      "iteration": 0,
+      "wallClockMs": 4038.224859,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "one_file_new_atom",
+      "iteration": 1,
+      "wallClockMs": 4022.678741,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "one_file_new_atom",
+      "iteration": 2,
+      "wallClockMs": 3963.076504,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "five_files_batch",
+      "iteration": 0,
+      "wallClockMs": 4150.494559,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "five_files_batch",
+      "iteration": 1,
+      "wallClockMs": 4077.953275,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "five_files_batch",
+      "iteration": 2,
+      "wallClockMs": 3952.098245,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "twenty_files_batch",
+      "iteration": 0,
+      "wallClockMs": 4075.181295,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "twenty_files_batch",
+      "iteration": 1,
+      "wallClockMs": 4012.637847,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "twenty_files_batch",
+      "iteration": 2,
+      "wallClockMs": 3990.105791,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "forbidden_value",
+      "iteration": 0,
+      "wallClockMs": 4020.69069,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "forbidden_value",
+      "iteration": 1,
+      "wallClockMs": 3892.084285,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "forbidden_value",
+      "iteration": 2,
+      "wallClockMs": 3860.25278,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "repair_forbidden_value",
+      "iteration": 0,
+      "wallClockMs": 3975.262264,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "repair_forbidden_value",
+      "iteration": 1,
+      "wallClockMs": 3900.665777,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "repair_forbidden_value",
+      "iteration": 2,
+      "wallClockMs": 4030.580762,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "module_add",
+      "iteration": 0,
+      "wallClockMs": 4015.05183,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "module_add",
+      "iteration": 1,
+      "wallClockMs": 3954.562811,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "module_add",
+      "iteration": 2,
+      "wallClockMs": 4032.841893,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "module_remove",
+      "iteration": 0,
+      "wallClockMs": 3906.401372,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "module_remove",
+      "iteration": 1,
+      "wallClockMs": 3912.686568,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "module_remove",
+      "iteration": 2,
+      "wallClockMs": 3969.889434,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "file_rename",
+      "iteration": 0,
+      "wallClockMs": 3951.841305,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "file_rename",
+      "iteration": 1,
+      "wallClockMs": 3987.127716,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "file_rename",
+      "iteration": 2,
+      "wallClockMs": 4010.094478,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "import_change",
+      "iteration": 0,
+      "wallClockMs": 3966.351584,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "import_change",
+      "iteration": 1,
+      "wallClockMs": 3870.434573,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "import_change",
+      "iteration": 2,
+      "wallClockMs": 3903.516017,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "unresolved_import_then_file_appears",
+      "iteration": 0,
+      "wallClockMs": 3977.682079,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "unresolved_import_then_file_appears",
+      "iteration": 1,
+      "wallClockMs": 3982.229301,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "unresolved_import_then_file_appears",
+      "iteration": 2,
+      "wallClockMs": 4061.366275,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "reexport_change",
+      "iteration": 0,
+      "wallClockMs": 3960.643416,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "reexport_change",
+      "iteration": 1,
+      "wallClockMs": 3943.237288,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "reexport_change",
+      "iteration": 2,
+      "wallClockMs": 3932.463738,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "token_value_full_fallback",
+      "iteration": 0,
+      "wallClockMs": 6580.381736,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "token_value_full_fallback",
+      "iteration": 1,
+      "wallClockMs": 6751.762924,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c1000-t1000-r100-s809",
+      "corpusName": "c1000-t1000-r100-s809",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "scenario": "token_value_full_fallback",
+      "iteration": 2,
+      "wallClockMs": 6610.81379,
+      "childExitStatus": 0
+    }
+  ],
+  "rows": 5172,
+  "cellFailures": 0,
+  "metrics": [
+    "agent_edit_to_audit_report_ms",
+    "agent_edit_to_diagnostics_ms",
+    "agent_edit_to_generation_committed_ms",
+    "agent_edit_to_generation_ready_ms",
+    "agent_loop_dispatch_ms",
+    "agent_result_build_ms",
+    "agent_result_bytes",
+    "agent_result_serialize_ms",
+    "build_report_build_ms",
+    "build_report_bytes",
+    "build_report_serialize_ms",
+    "counter:closure_edges_recomputed",
+    "counter:closure_full_fallback",
+    "counter:closure_full_fallback_reason_full-discovery",
+    "counter:closure_full_fallback_reason_root-shape-changed",
+    "counter:closure_full_walk",
+    "counter:closure_nodes_added",
+    "counter:closure_nodes_entering_coverage",
+    "counter:closure_nodes_examined",
+    "counter:closure_nodes_leaving_coverage",
+    "counter:closure_nodes_pruned",
+    "counter:closure_nodes_removed",
+    "counter:closure_nodes_reused",
+    "counter:closure_reachability_updates",
+    "counter:closure_update_ms",
+    "counter:dsv_consumers_invalidated",
+    "counter:dsv_files_examined",
+    "counter:dsv_files_recomputed",
+    "counter:dsv_files_reused",
+    "counter:dsv_full_fallback",
+    "counter:dsv_relay_hits",
+    "counter:dsv_relay_nodes_touched",
+    "counter:dsv_relay_walks",
+    "counter:dsv_update_ms",
+    "counter:parse_cache_hits",
+    "counter:parse_calls",
+    "counter:parse_lookups",
+    "coverage_report_bytes",
+    "covered_entries_iterated",
+    "dirty_files_hashed",
+    "dirty_files_read",
+    "files_compiled",
+    "files_covered",
+    "files_recompiled",
+    "files_reused",
+    "full_fallback",
+    "metadata_bytes_written_audit",
+    "metadata_bytes_written_hotpath",
+    "mutation_content_changed",
+    "mutation_content_unchanged",
+    "mutation_declared",
+    "mutation_hashed",
+    "mutation_read",
+    "phase:session_closure_ms",
+    "phase:session_compile_files_ms",
+    "phase:session_dsv_view_ms",
+    "phase:session_resolve_ms",
+    "phase:session_scan_ms",
+    "session_compile_affected_ms",
+    "session_coverage_entries_ms",
+    "session_incremental_ms",
+    "session_reuse_iteration_ms",
+    "unaccounted_diagnostics_ms",
+    "verdict"
+  ]
+}

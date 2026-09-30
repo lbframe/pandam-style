@@ -174,6 +174,13 @@ const SCENARIOS = Object.freeze({
     note: 'the primary agent edit: one file, existing token references',
     revisions: [{ name: 'edit', files: 1, expect: 'ok', kind: 'edit' }],
   },
+  one_file_new_atom: {
+    note:
+      'Phase D: one file gaining a declared property the generation did not ' +
+      'contain, so the CSS actually grows. Distinct from ' +
+      'one_file_existing_atoms, which re-derives atoms already present.',
+    revisions: [{ name: 'new_atom', files: 1, expect: 'ok', kind: 'new_atom' }],
+  },
   five_files_batch: {
     note: 'one transaction naming five files: one revision, not five',
     revisions: [{ name: 'edit', files: 5, expect: 'ok', kind: 'edit' }],
@@ -217,6 +224,13 @@ const SCENARIOS = Object.freeze({
       { name: 'unresolved', files: 1, expect: 'fail', kind: 'unresolved' },
       { name: 'appears', files: 1, expect: 'ok', kind: 'resolve_unresolved' },
     ],
+  },
+  reexport_change: {
+    note:
+      'Phase D: the relay barrel changes what it re-exports. Every page ' +
+      'reaches the design system through it, so this is the revision whose ' +
+      'design-system-view dependency graph must do real work.',
+    revisions: [{ name: 'reexport', files: 1, expect: 'ok', kind: 'reexport' }],
   },
   token_value_full_fallback: {
     note:
@@ -361,6 +375,32 @@ function planRevisions(projectDir, corpusName, scenarioName, definition) {
     return out;
   };
 
+  /**
+   * `take(n)`, but skipping component files the predicate rejects.
+   *
+   * The corpus generates twelve shapes round-robin and they do not all express
+   * the same declaration - several bind the spacing token to a local `const`
+   * first - so a scenario keyed on a literal `padding: token('…'),` anchor has
+   * to look for a file that HAS the anchor rather than take the next one and
+   * fail. It still advances the cursor past everything it skipped, so the
+   * "files recompiled means what it says" property is preserved.
+   */
+  const takeWith = (n, acceptable) => {
+    const out = [];
+    while (out.length < n && cursor < components.length) {
+      const rel = components[cursor];
+      cursor += 1;
+      if (acceptable(rel)) out.push(rel);
+    }
+    if (out.length < n) {
+      throw new Error(
+        `agent-loop: ${scenarioName} needs ${n} component files carrying its ` +
+          `anchor and the corpus has ${out.length} left`,
+      );
+    }
+    return out;
+  };
+
   // EVERY revision's content is computed here, against the PRISTINE project,
   // and each write carries the complete target text. That is what makes the
   // repair revision exact: it writes back the bytes its predecessor replaced,
@@ -387,6 +427,66 @@ function planRevisions(projectDir, corpusName, scenarioName, definition) {
             content: swapToken(read(rel), definition, rel, rev.name),
           })),
           mutation: { changed: files },
+        });
+        break;
+      }
+      case 'new_atom': {
+        // A NEW DECLARED PROPERTY on an existing namespace. The compiled rule
+        // set gains a class the generation did not contain, so the CSS grows -
+        // which is what makes this a different cost from `edit`, and why a
+        // harness that measured only `edit` would never see it.
+        //
+        // `borderColor` requires a colors token: a spacing token on a colour
+        // property is refused with PMS_INVALID_TOKEN_CATEGORY and the cell
+        // would be measuring a refusal under a row labelled "new atom".
+        const files = takeWith(rev.files, (rel) =>
+          /padding: token\('[^']+'\),/.test(read(rel)),
+        );
+        const color = firstPublicTokenOf(definition, 'colors');
+        revisions.push({
+          ...rev,
+          writes: files.map((rel) => {
+            const text = read(rel);
+            const anchor = paddingAnchor(text, rel, rev.name);
+            return {
+              path: rel,
+              content:
+                text.slice(0, anchor.index) +
+                `borderColor: token('${color}'),\n    ` +
+                text.slice(anchor.index),
+            };
+          }),
+          mutation: { changed: files },
+        });
+        break;
+      }
+      case 'reexport': {
+        // The relay barrel's re-export LIST changes, without changing anything
+        // the pages import. The pages' compiled output must be unaffected and
+        // their design-system view must be re-derived, because the relay's
+        // export map is one of the things that view is a digest of.
+        const barrel = 'bridge/index.ts';
+        const text = read(barrel);
+        const anchor = '  manifest,\n';
+        if (!text.includes(anchor)) {
+          throw new Error(
+            `agent-loop: ${barrel} (revision ${rev.name}) has no re-export ` +
+              'anchor; the scenario cannot find its target and an empty edit ' +
+              'would be measured as a no-op',
+          );
+        }
+        revisions.push({
+          ...rev,
+          writes: [
+            {
+              path: barrel,
+              content: text.replace(
+                anchor,
+                `${anchor}  phaseDreexportMarker,\n`,
+              ),
+            },
+          ],
+          mutation: { changed: [barrel] },
         });
         break;
       }
@@ -548,6 +648,43 @@ function firstTokenRef(text, rel, revName) {
     );
   }
   return { index: match.index, whole: match[0], path: match[1] };
+}
+
+/** The first PUBLIC token of a category, or a harness error rather than a guess. */
+function firstPublicTokenOf(definition, category) {
+  const members = definition.tokens?.[category];
+  if (members == null) {
+    throw new Error(
+      `agent-loop: the design system has no token category ${JSON.stringify(category)}`,
+    );
+  }
+  const found = Object.keys(members).find(
+    (name) => (members[name]?.visibility ?? 'public') === 'public',
+  );
+  if (found == null) {
+    throw new Error(
+      `agent-loop: token category ${category} has no public token to use`,
+    );
+  }
+  return `${category}.${found}`;
+}
+
+/**
+ * The `padding:` declaration of an existing namespace, as a position.
+ *
+ * A position rather than a string, so the same anchor works for an insertion
+ * as for a replacement and the edit is applied to the PRISTINE text once.
+ */
+function paddingAnchor(text, rel, revName) {
+  const match = /padding: token\('[^']+'\),/.exec(text);
+  if (match == null) {
+    throw new Error(
+      `agent-loop: ${rel} (revision ${revName}) has no padding declaration; ` +
+        'the scenario cannot find its target and an empty edit would be ' +
+        'measured as a no-op',
+    );
+  }
+  return { index: match.index, whole: match[0] };
 }
 
 /**
@@ -993,8 +1130,53 @@ class AgentLoop {
     // Parse attribution, per pipeline. The closure refresh re-parses module
     // summaries, and a counter cannot say whether a revision that touched one
     // file parsed one thousand modules to rediscover the graph.
+    //
+    // From Phase D the same is true of the coverage graph and of the
+    // design-system views: the counters below are how a reader tells "the
+    // closure walked ten thousand nodes" from "the closure examined one", and
+    // they are emitted by name for the same reason the phases are.
+    const PHASE_D_COUNTERS = [
+      'closure_nodes_examined',
+      'closure_nodes_reused',
+      'closure_nodes_added',
+      'closure_nodes_removed',
+      'closure_nodes_entering_coverage',
+      'closure_nodes_leaving_coverage',
+      'closure_nodes_pruned',
+      'closure_edges_recomputed',
+      'closure_reachability_updates',
+      'closure_full_walk',
+      'closure_full_fallback',
+      'closure_set_divergence',
+      'closure_propagation_aborted',
+      'closure_update_ms',
+      'dsv_files_examined',
+      'dsv_files_recomputed',
+      'dsv_files_reused',
+      'dsv_relay_nodes_touched',
+      'dsv_consumers_invalidated',
+      'dsv_full_fallback',
+      'dsv_relay_hits',
+      'dsv_relay_walks',
+      'dsv_update_ms',
+    ];
     for (const [metric, value] of Object.entries(snapshot.counters)) {
       if (!metric.startsWith('parse_')) continue;
+      emit(`counter:${metric}`, value, 'count', STATUS.OK, null);
+    }
+    for (const name of PHASE_D_COUNTERS) {
+      const value = snapshot.counters[name];
+      if (value === undefined) continue;
+      emit(
+        `counter:${name}`,
+        value,
+        name.endsWith('_ms') ? 'ms' : 'count',
+        STATUS.OK,
+        null,
+      );
+    }
+    for (const [metric, value] of Object.entries(snapshot.counters)) {
+      if (!metric.startsWith('closure_full_fallback_reason_')) continue;
       emit(`counter:${metric}`, value, 'count', STATUS.OK, null);
     }
     // The part of the diagnostics interval no named phase accounts for. The

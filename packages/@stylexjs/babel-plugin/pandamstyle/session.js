@@ -129,6 +129,12 @@ import {
   setModuleOverlay,
   SOURCE_EXTENSIONS,
 } from './module-graph';
+import {
+  coverageGraphStats,
+  createCoverageGraph,
+  refreshCoverageClosure,
+  verifyCoverageGraph,
+} from './coverage-graph';
 import { withGeneration } from './generation';
 import { count, perfCollector, perfNow, phase, recordParse } from './perf';
 
@@ -322,6 +328,13 @@ export function createProjectSession(config) {
     fileStates: new Map(),
     // module path -> the files whose design-system view traverses it.
     dsConsumers: new Map(),
+    // Spike 4, Phase D1. The persistent coverage graph: nodes, forward and
+    // reverse local edges, root membership, coverage state and origin, the
+    // unresolved / external / relay records, and a graph revision. It replaces a
+    // per-revision project-wide closure walk, and it is the session's own state -
+    // see `coverage-graph.js` for the reachability and ordering models and for
+    // the one place its correctness is argued.
+    coverageGraph: createCoverageGraph(),
     covered: null,
     active: null,
     published: null,
@@ -347,13 +360,29 @@ export function createProjectSession(config) {
     return tally.get(name) ?? 0;
   }
 
+  /**
+   * The files this revision READ and found changed.
+   *
+   * Derived from the revision's own scan rather than from its dirty set,
+   * because a scan records what was actually read - which under
+   * `verified-explicit` is exactly the declared set, and is nothing at all when
+   * only the design system changed. That is what makes the coverage graph's work
+   * proportional to what moved.
+   */
+  function filesNeedingExamination(active) {
+    const out = new Set();
+    for (const entry of active.scan.values()) {
+      if (entry.changed === true) out.add(entry.file);
+    }
+    return out;
+  }
+
   // ------------------------------------------------------------ design ------
 
   function rebuildDesignSystem() {
     const cfg = state.config;
     const outDirAbs = path.resolve(cfg.outDir);
     const generatedModulePath = path.join(outDirAbs, cfg.designSystemFile);
-
     const designSystem = phase('boundary_ms', () =>
       buildDesignSystem(cfg.definition, { ...cfg.engineOptions }),
     );
@@ -393,11 +422,12 @@ export function createProjectSession(config) {
   let dirListings = new Map();
   let resolutionKeys = new Map();
 
-  // root absolute path -> the source files that were under it last time it was
-  // walked. Maintained incrementally in `verified-explicit` mode, and rebuilt by
-  // the walk in `full-discovery` mode. It exists because a root walk is O(project)
-  // and the agent already told us which paths moved.
-  const rootFileSets = new Map();
+  // The cached answer to "which files are under this root" moved into the
+  // coverage graph at Phase D (`state.coverageGraph.rootFiles`), because it is
+  // the graph's root membership on disk rather than a fact about the session: a
+  // file that appeared or disappeared re-reads one directory and every other
+  // root's list is reused verbatim, and the graph's reachability model is stated
+  // in terms of exactly that list.
 
   // candidate absolute path -> the resolution keys whose answer depends on
   // whether that path EXISTS. This is the reverse of the forward index the
@@ -897,88 +927,62 @@ export function createProjectSession(config) {
   // ------------------------------------------------------------ coverage ----
 
   /**
-   * The covered set, rebuilt from persistent summaries.
+   * THE CONTEXT THE COVERAGE GRAPH READS THE SESSION THROUGH.
    *
-   * The traversal is deliberately the SAME traversal `collectCoveredFiles`
-   * performs, in the same order with the same queue discipline, because the
-   * build report and the CSS rule order are both functions of the iteration
-   * order of this map. A faster traversal that visited files in a different
-   * order would emit a differently ordered stylesheet, which is exactly the
-   * class of regression the differential oracle exists to catch.
+   * The graph owns the coverage state; the session owns the things the graph has
+   * to ask about - the filesystem, the resolution cache, the per-file summary
+   * cache, and the revision's own classification of what changed. Handing those
+   * over as a plain object keeps the graph free of any assumption about how a
+   * revision is prepared, which is what lets it be audited by a test with its
+   * own context.
    */
-  function refreshClosure(active) {
-    const covered = new Map();
-    const queue = [];
-
-    // WHICH FILES ARE UNDER THE ROOTS is a question with two very different
-    // costs, and Spike 4 is about the difference between them.
-    //
-    //   full-discovery     ask the filesystem: one `readdir` per directory per
-    //                      revision. Always correct, O(project).
-    //   verified-explicit  take the previous answer and apply the declared
-    //                      mutation to it. O(declared), and the answer is the
-    //                      same one the filesystem would have given.
-    //
-    // The second is only sound because the caller performed the write. That is
-    // the whole content of the `verified-explicit` contract, and a host that
-    // cannot make that claim uses `full-discovery` and pays for it.
-    const trustRoots =
-      active?.dirtyInputMode === 'verified-explicit' ||
-      active?.dirtyInputMode === 'watcher';
-    const applied = trustRoots ? active.rootDelta : null;
-
-    // The cached root lists have to keep the EXACT order `walkFiles` would have
-    // produced, because the traversal order is a function of the coverage array
-    // and of the stylesheet's cascade order. So a declared mutation is applied
-    // by RE-READING THE DIRECTORY IT CHANGED, not by splicing the path into a
-    // list we are guessing about.
-    //
-    // A file whose CONTENT changed is not in this set at all: its path, its
-    // position and its neighbours are all unchanged, and there is nothing to
-    // re-derive. That is the one-file agent edit, and it costs no directory read
-    // whatsoever.
-    //
-    // A file that APPEARED or DISAPPEARED does change the order the walk would
-    // produce, so its parent directory is re-read. One `readdir` of one
-    // directory, not a walk of the tree - and in the pathological shape of a
-    // project with ten thousand files in one directory, that is the same
-    // `readdir` a walk would have done anyway, while the ten thousand file
-    // READS and HASHES the walk also implied are what is actually saved.
-    if (applied != null && rootFileSets.size > 0) {
-      const dirsToRefresh = new Set();
-      let shapeMoved = false;
-      for (const abs of [...applied.added, ...applied.removed]) {
-        const owner = rootOwning(path.dirname(abs));
-        if (owner === null) {
-          // The parent is not under any walked root: the tree's shape moved in
-          // a way an incremental update cannot describe. A walk is the honest
-          // answer, and it is counted.
-          shapeMoved = true;
-          break;
-        }
-        dirsToRefresh.add(owner);
-      }
-      if (shapeMoved) {
-        active.fullDiscoveryReason =
-          active.fullDiscoveryReason ?? 'root-shape-changed';
-        rootFileSets.clear();
-      } else {
-        for (const dir of dirsToRefresh) {
-          rootFileSets.set(dir, walkFiles(dir));
-          count('discovery_directory_rereads', 1);
-        }
-      }
-    }
-
-    // Seed from each declared root. In full-discovery mode, and on a session's
-    // first revision, the answer comes from the filesystem and is CACHED. In
-    // verified-explicit mode the answer is reused from the cache and corrected
-    // below, which is where the declared mutation is applied.
-    for (const root of state.config.roots) {
-      const abs = path.resolve(root);
-      const stat = statOrNull(abs);
-      if (stat == null) {
-        throw new PmsError([
+  function coverageContext(active) {
+    return {
+      roots: state.config.roots,
+      resolve: (p) => path.resolve(p),
+      statOrNull,
+      walkFiles,
+      rootOwning,
+      rootDelta: active.rootDelta ?? null,
+      dirty: active.dirty,
+      // The files whose BYTES this revision read and found changed, plus the
+      // ones whose edge resolutions were re-probed. A file's module edges can
+      // only move if one of those is true, so this - and not `dirty`, which a
+      // global fallback makes every covered file - is the set the coverage graph
+      // examines. See `examineRevision`.
+      needsExamination: filesNeedingExamination(active),
+      removedFiles: active.removedFiles,
+      repairedResolutions: active.repairedResolutions ?? [],
+      dirtyInputMode: () => active.dirtyInputMode ?? 'full-discovery',
+      fullDiscoveryReason: () => active.fullDiscoveryReason ?? null,
+      closureFallbackReason: () =>
+        active.fallbackReason === 'roots' ||
+        active.fallbackReason === 'output-directory'
+          ? active.fallbackReason
+          : null,
+      summaryFor,
+      ensureFileState,
+      resolveLocal,
+      invalidate: (file) => {
+        active.invalid.add(file);
+      },
+      /**
+       * Whether the file is GONE, as a fact about the filesystem rather than
+       * about the declaration.
+       *
+       * The declaration is not the authority here, and using it as one would be
+       * a way to make a session agree with a caller who lies. A file declared
+       * removed that is still on disk is still covered; a file that is not there
+       * is gone whatever anybody said.
+       */
+      gone: (file) => {
+        const entry = active.scan.get(file);
+        if (entry !== undefined) return entry.readable !== true;
+        return scanEntryFor(file).readable !== true;
+      },
+      bump,
+      rootMissing: (abs) =>
+        new PmsError([
           diagnostic({
             code: Codes.COVERAGE_GAP,
             phase: 'coverage',
@@ -986,98 +990,54 @@ export function createProjectSession(config) {
             rule: 'coverage.roots',
             context: { root: abs },
           }),
-        ]);
-      }
-      if (stat.isFile()) {
-        covered.set(abs, 'root');
-        queue.push(abs);
-        continue;
-      }
-      const cached = trustRoots ? rootFileSets.get(abs) : undefined;
-      const found = cached ?? walkFiles(abs);
-      if (cached === undefined) rootFileSets.set(abs, found);
-      for (const f of found) {
-        covered.set(f, 'root');
-        queue.push(f);
-      }
+        ]),
+    };
+  }
+
+  /**
+   * The covered set, from the PERSISTENT COVERAGE GRAPH.
+   *
+   * What this replaced, and why: the closure used to be rebuilt from the roots
+   * over every covered file and every edge on every revision. At c10000 a
+   * one-file agent edit spent 103.7ms of its 175.9ms diagnostics interval in
+   * here - 59% - walking ten thousand modules in order to discover that their
+   * edges had not moved, and the same pass is 33% of the interval at c1000, so
+   * the cost grew with the project rather than with the edit.
+   *
+   * What it does now: a style-only edit produces an empty graph delta and the
+   * PREVIOUS closure object is returned untouched, having visited no node. A
+   * structural edit updates the affected region and re-derives the canonical
+   * order from owned data with no read, no parse and no resolution probe. See
+   * `coverage-graph.js` for the reachability model, the ordering model and the
+   * named fallbacks, and for why the order is not traded away for speed.
+   */
+  function refreshClosure(active) {
+    const graph = state.coverageGraph;
+    const outcome = phase('session_closure_ms', () =>
+      refreshCoverageClosure(graph, coverageContext(active)),
+    );
+    const delta = outcome.delta;
+    bump('closure_nodes_examined', outcome.nodesExamined);
+    bump('closure_nodes_reused', outcome.nodesReused);
+    bump('closure_nodes_added', outcome.nodesAdded);
+    bump('closure_nodes_removed', outcome.nodesRemoved);
+    bump('closure_nodes_entering_coverage', outcome.nodesEnteringCoverage);
+    bump('closure_nodes_leaving_coverage', outcome.nodesLeavingCoverage);
+    bump('closure_edges_recomputed', outcome.edgesRecomputed);
+    bump('closure_reachability_updates', outcome.reachabilityUpdates);
+    bump('closure_nodes_pruned', delta.nodesPruned);
+    bump('closure_graph_revision', 1);
+    if (outcome.fullWalk) bump('closure_full_walk', 1);
+    if (outcome.fullFallback) {
+      bump('closure_full_fallback', 1);
+      count(`closure_full_fallback_reason_${outcome.fullFallbackReason}`, 1);
     }
-
-    const unresolved = [];
-    const external = [];
-    const relayEdges = [];
-
-    while (queue.length > 0) {
-      const file = queue.pop();
-      const summary = summaryFor(file);
-      if (summary.unreadable) {
-        unresolved.push({
-          from: file,
-          request: '<unparseable>',
-          form: 'unreadable',
-          line: null,
-        });
-        continue;
-      }
-      const fileState = ensureFileState(file);
-      for (const edge of summary.edges) {
-        if (edge.computed === true) {
-          unresolved.push({
-            from: file,
-            request: '<computed>',
-            form: edge.form,
-            line: edge.line,
-          });
-          continue;
-        }
-        // Resolution is DERIVED per revision and compared with the previous
-        // answer. A request that was unresolvable and now resolves invalidates
-        // the file that made it, and the closure grows to include the new
-        // target - which is then analysed, because a newly covered file is
-        // analysed before the revision can be valid.
-        const resolved =
-          edge.local && !edge.isStylesheet
-            ? resolveLocal(file, edge.request)
-            : null;
-        const before = fileState.edgeResolution.get(edge.request);
-        if (before !== undefined && before !== resolved) {
-          state.active.invalid.add(file);
-        }
-        fileState.edgeResolution.set(edge.request, resolved);
-
-        if (!edge.local) {
-          if (edge.form !== 'import') {
-            external.push({
-              from: file,
-              request: edge.request,
-              form: edge.form,
-            });
-          }
-          continue;
-        }
-        if (edge.isStylesheet) continue;
-        if (resolved == null) {
-          unresolved.push({
-            from: file,
-            request: edge.request,
-            form: edge.form,
-            line: edge.line,
-          });
-          continue;
-        }
-        if (!covered.has(resolved)) {
-          covered.set(resolved, `closure:${edge.form}`);
-          relayEdges.push({
-            from: file,
-            to: resolved,
-            form: edge.form,
-            request: edge.request,
-          });
-          queue.push(resolved);
-        }
-      }
-    }
-
-    return { covered, unresolved, external, relayEdges };
+    if (delta.setDivergence > 0)
+      bump('closure_set_divergence', delta.setDivergence);
+    if (delta.propagationAborted) bump('closure_propagation_aborted', 1);
+    count('closure_update_ms', outcome.elapsedMs);
+    active.closureDelta = delta;
+    return outcome.closure;
   }
 
   // ------------------------------------------------------------ revision ----
@@ -1470,12 +1430,19 @@ export function createProjectSession(config) {
       // sufficient.
       clearModuleCache();
 
-      for (const file of revalidateResolution(resolutionScopeFor(active))) {
+      // The files whose NEGATIVE resolution was re-probed and may now be
+      // positive. The coverage graph needs them by name: a request that starts
+      // resolving is a graph mutation, and a graph that is not told about one
+      // would keep reporting a coverage gap for an import that is now real.
+      active.repairedResolutions = revalidateResolution(
+        resolutionScopeFor(active),
+      );
+      for (const file of active.repairedResolutions) {
         void file;
         bump('negative_resolutions_invalidated');
       }
 
-      const closure = phase('session_closure_ms', () => refreshClosure(active));
+      const closure = refreshClosure(active);
       state.covered = closure;
       // The SIZE of the covered set, recorded as soon as the closure is known
       // and BEFORE the analysis can fail.
@@ -1649,7 +1616,30 @@ export function createProjectSession(config) {
     // page: it is staged as-is and never re-analysed. Relabelling it here,
     // before the loop, is what lets the expected-vs-analysed cross-check keep
     // meaning something.
-    closure.covered.set(designSystemPath, 'generated');
+    //
+    // It is RELABELLED in a local copy rather than written into
+    // `closure.covered`, because from Phase D that map is the coverage graph's
+    // persistent state: a revision that changes nothing in the graph hands the
+    // SAME map to every later revision, and a map that grew the generated module
+    // into itself would report a covered-file count one higher than every
+    // revision before it.
+    //
+    // `relabelled`, not `appended`, because the generated module CAN be an
+    // ordinary covered file: a configuration whose `outDir` and
+    // `designSystemFile` place it under a declared root has it in the closure
+    // already, and the pre-Phase-D `Map.set` overwrote that entry's origin IN
+    // PLACE rather than adding a second one. Appending unconditionally
+    // therefore added a file the full build has no entry for.
+    const coveredEntries = [...closure.covered];
+    const generatedIndex = coveredEntries.findIndex(
+      ([file]) => file === designSystemPath,
+    );
+    if (generatedIndex === -1) {
+      coveredEntries.push([designSystemPath, 'generated']);
+    } else {
+      coveredEntries[generatedIndex] = [designSystemPath, 'generated'];
+    }
+    const coveredFileNames = coveredEntries.map(([file]) => file);
 
     // ---------------------------------------------------------------
     // THE O(TOTAL) LOOP, INSTRUMENTED (Spike 4, Phase C)
@@ -1676,7 +1666,7 @@ export function createProjectSession(config) {
     let reuseNs = 0;
     let entryNs = 0;
 
-    for (const [file, origin] of [...closure.covered]) {
+    for (const [file, origin] of coveredEntries) {
       if (file === designSystemPath) {
         coverage.push({
           file: relativeToCwd(file),
@@ -1820,11 +1810,11 @@ export function createProjectSession(config) {
       count('session_compile_affected_ms', affectedNs / 1e6);
       count('session_reuse_iteration_ms', reuseNs / 1e6);
       count('session_coverage_entries_ms', entryNs / 1e6);
-      bump('covered_entries_iterated', closure.covered.size);
+      bump('covered_entries_iterated', coveredEntries.length);
     }
 
     const consistency = assertCoverageConsistency({
-      coveredFiles: [...closure.covered.keys()],
+      coveredFiles: coveredFileNames,
       transformedFiles: analysed,
       exemptFiles: [designSystemPath],
       phase: 'cli',
@@ -1835,7 +1825,7 @@ export function createProjectSession(config) {
     // - three different paths that all end in the same place here, and that a
     // list of "files that were removed" would only catch one of.
     const liveRuleOwners = new Set();
-    for (const file of closure.covered.keys()) {
+    for (const file of coveredFileNames) {
       if (file === designSystemPath) continue;
       const fileState = state.fileStates.get(file);
       if (fileState?.contribution == null) continue;
@@ -1853,7 +1843,7 @@ export function createProjectSession(config) {
       designSystemRules: designSystemRulesForRevision,
       recompiledRules,
       liveRuleOwners,
-      coveredFiles: [...closure.covered.keys()],
+      coveredFiles: coveredFileNames,
       coverage,
       failures,
       outputs,
@@ -3253,6 +3243,7 @@ export function createProjectSession(config) {
         generationId: state.generationId,
         projectSemanticEpoch: state.semanticEpoch,
         fileStateCount: state.fileStates.size,
+        coverageGraph: coverageGraphStats(state.coverageGraph),
         resolutionKeyCount: resolutionKeys.size,
         negativeResolutionCount: [...resolutionKeys.values()].filter(
           (v) => v.resolved === null,
@@ -3273,6 +3264,55 @@ export function createProjectSession(config) {
      */
     validityOf(file) {
       return state.fileStates.get(path.resolve(file))?.validity ?? null;
+    },
+
+    /**
+     * The FULL audit of the persistent coverage graph.
+     *
+     * Recomputes the covered set, the origins, the canonical order, the
+     * unresolved edges, the external requests and the relay edges from the
+     * module summaries, with no reuse of the incremental structure, and reports
+     * every difference. It is deliberately not on the hot path: an agent
+     * revision must never need it, and this is the function a test is allowed
+     * to call because it is slow.
+     */
+    verifyCoverageGraph() {
+      if (state.active == null) {
+        throw new Error(
+          'pandamstyle: verifyCoverageGraph() audits the CURRENT revision, ' +
+            'so a revision has to exist. Call applyChanges() first.',
+        );
+      }
+      return verifyCoverageGraph(
+        state.coverageGraph,
+        coverageContext(state.active),
+      );
+    },
+
+    /**
+     * The covered set, IN CANONICAL ORDER, as `[file, origin]` pairs.
+     *
+     * The order is semantic - the coverage array, the CSS contribution order
+     * and the cascade output are all functions of it - so it is exposed rather
+     * than inferred. A test that asserts "the incremental order equals the
+     * fresh order" and a test that asserts "the order moved" both need to read
+     * it, and an accessor is better than a published artifact for either.
+     */
+    coverageOrder() {
+      const covered = state.coverageGraph.closure?.covered;
+      if (covered == null) return [];
+      return [...covered.entries()];
+    },
+
+    /**
+     * The coverage graph's structural counts.
+     *
+     * Node, edge, reachability and root-list totals, so a long session can be
+     * shown not to grow without bound. No revision history is kept anywhere in
+     * the graph, so these numbers are the size of the CURRENT project.
+     */
+    coverageGraph() {
+      return coverageGraphStats(state.coverageGraph);
     },
 
     fileStates() {
