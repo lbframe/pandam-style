@@ -243,6 +243,7 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
       'install',
       'pandamstyle',
       'pilot',
+      'tooling-tests',
       'upstream-babel-plugin',
       'upstream-stylex',
     ]);
@@ -255,7 +256,7 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
         .filter(([, c]) => c.kind === 'test')
         .map(([n]) => n)
         .sort(),
-    ).toEqual([...TEST_STEPS].sort());
+    ).toEqual([...TEST_STEPS, 'tooling-tests'].sort());
     expect(
       classified
         .filter(([, c]) => c.kind !== 'test')

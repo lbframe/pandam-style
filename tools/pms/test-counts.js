@@ -163,8 +163,8 @@ function assessSuiteIntegrity({ step, exitCode, counts, text = null }) {
   }
   if (
     counts.suites != null &&
-    counts.suites.total != null &&
-    counts.suitesAccountedFor !== counts.suites.total
+    (counts.suites.total == null ||
+      counts.suitesAccountedFor !== counts.suites.total)
   ) {
     findings.push({
       code: 'SUITES_UNACCOUNTED',
@@ -177,8 +177,8 @@ function assessSuiteIntegrity({ step, exitCode, counts, text = null }) {
   }
   if (
     counts.tests != null &&
-    counts.tests.total != null &&
-    counts.testsAccountedFor !== counts.tests.total
+    (counts.tests.total == null ||
+      counts.testsAccountedFor !== counts.tests.total)
   ) {
     findings.push({
       code: 'TESTS_UNACCOUNTED',
@@ -195,6 +195,12 @@ function assessSuiteIntegrity({ step, exitCode, counts, text = null }) {
         `${step}: the log has a "Tests:" line and no "Test Suites:" line. The ` +
         'suite count is UNKNOWN here, not zero, and an unknown suite count ' +
         'cannot be reported as a passing one.',
+    });
+  }
+  if (counts.tests == null) {
+    findings.push({
+      code: 'TEST_LINE_MISSING',
+      message: `${step}: the log has no "Tests:" line; the test count is unknown.`,
     });
   }
   if (exitCode == null) {

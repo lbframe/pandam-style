@@ -361,12 +361,12 @@ Required regression matrix:
 
 ## 6. Verification and tooling debt
 
-Latest [native summary][summary] establishes **`complete: true`**, verdict
+Historical [native summary][summary] establishes **`complete: true`**, verdict
 **`verified`**, clean starting tree at the supplied tested commit/tree. Seven
 steps ran, none failed/skipped. Counts: **1566 passed**, **64 skipped**; **66
 passed suites**, **1 skipped suite**, zero failed.
 
-| Step                  | Kind / current evidence contract                                   |          Recorded tests |
+| Step                  | Kind / historical evidence contract                                |          Recorded tests |
 | --------------------- | ------------------------------------------------------------------ | ----------------------: |
 | install               | command: ran, exit zero; counts null                               |                       — |
 | build                 | command: ran, exit zero; counts null                               |                       — |
@@ -382,27 +382,32 @@ Passed process, verified evidence and complete run are now separate concepts.
 Unknown steps fail classification. Skips remain incomplete. Logs whose failure
 counts contradict zero exit cannot yield verified success.
 
-**Open P0 verification reliability gap:** `tools/pms/__tests__` is discoverable
-from root Jest but is **not one of the seven runner steps**. Historical Phase C
-recorded 21 tooling tests in two suites separately; Phase D has three tooling
-test files, including `step-contracts-test.js`. Do not reuse that old count as a
-current baseline, or silently include these tests in `pandamstyle`.
+**Resolved P0 verification reliability gap:** the official gate now has eight
+required steps, in order: install, build, upstream-babel-plugin, upstream-stylex,
+pandamstyle, **tooling-tests**, pilot, artifacts. Tooling runs after the compiler
+tests and before pilot/artifact qualification, using the root Jest configuration.
+It is explicitly `kind: test`, with the same test/suite count-integrity contract.
+The separate tooling subtotal contributes to global totals without changing the
+PandamStyle compiler subtotal. [Dedicated evidence][toolingverification] records
+the tested commit/tree, exact final summary and command environment.
 
-**Recommendation:** add eighth step **`tooling-tests`**, classified
-`kind: test`, explicitly scoped to `tools/pms/__tests__/*-test.js` using the
-root transform configuration. Contract: exact expected suite inventory; command
-exit captured; nonmissing suite/test counts reconcile; no failed/unaccounted
-suites/tests; all declared tooling suites collected; skips make required
-coverage incomplete. Check log parsing against missing counts, failed-to-load
-suites, swallowed exit codes, unknown step classification, artifact absence and
-partial runs. Exercise real runner summary/fixture behavior as well as pure
-count parsing. An empty or wrong selection must fail; JSON inventory plus Jest
-output can establish that.
+`node tools/pms/run-tooling-tests.js <run-directory>` derives the intended
+`tools/pms/__tests__/**/*-test.js` inventory from disk, compares it with Jest's
+JSON discovery and execution results, and runs the equivalent of
+`node_modules/.bin/jest --runInBand --ci tools/pms/__tests__`. Empty or incomplete
+suite selection fails. Missing count lines/totals, failed or unaccounted
+tests/suites, nonzero commands, omitted/skipped required steps and unknown step
+classification cannot produce `complete: true`. Regression fixtures exercise
+the actual runner's summary and final verdict, including a green eight-step run.
+This contract extends the historical seven-step gate; historical summaries and
+their 460 PandamStyle / 1566 combined baselines remain unchanged in their evidence.
 
-Future totals include an explicitly separate tooling subtotal and baseline;
-historical 460 PandamStyle / 1566 combined test baselines remain unchanged in
-their evidence. Document verification-contract version change and test discovery
-at the implementing commit. Package install/build remain non-test steps. A
+These checks belong exclusively to repository development, qualification and
+CI/release verification. Normal AI-agent compiler sessions, including
+`session.applyAgentChanges()`, do not invoke Jest, tooling tests or this verifier.
+No compiler or agent runtime behavior changes accompany this gate extension.
+
+Package install/build remain non-test steps. A
 runner claiming verification is not proof that all P0 acceptance cases ran.
 Root-wide pre-existing failures recorded in [S4][s4] are also not erased by the
 green selected delivery gate.
@@ -440,7 +445,7 @@ recommendations; optional broader integration is not promoted to P0 by interest.
 | Multi-entry builds                            | Multiple roots/closed coverage **implemented**; complete independent bundler-output proof **partial**                      | Generation isolation and CSS union/order across entries unknown                                                                       | Packed build/SSR and publisher ownership                          | **P1** broader multiple-output support; **P0** declared-root correctness                                 |
 | Incremental recovery after process restart    | Publication pending-state/crash reconciliation **implemented**; session graph/compile memo reload **absent**               | Restart pays cold rebuild; no persistent warm guarantee                                                                               | Versioned durable cache design only if measured need              | **P0** no mixed/false current generation, targeted restart proof; warm cache persistence **P2/Research** |
 | Exact host revision and mutation completeness | Session revision binding **implemented**; cross-process identity/undeclared-writer protocol **partial**                    | Same local revisionId after restart; unreported external edits                                                                        | Host session epoch, write transaction discipline, resync          | **P0** agent integration contract                                                                        |
-| Verification tooling inclusion                | **Absent** as runner step                                                                                                  | A verifier can regress without its own gate                                                                                           | Separate tooling-test inventory and step contract                 | **P0** evidence trust                                                                                    |
+| Verification tooling inclusion                | **Resolved**: independent required `tooling-tests` step                                                                     | Selected eight-step gate includes its own tooling tests; broader P0 qualification remains scoped                                      | Separate tooling inventory, count integrity and real runner fixtures | **P0** evidence trust                                                                                  |
 
 No production-readiness claim is warranted by “460 tests passed,” by a
 successful Vite build, by fresh-rebuild equality, or by completing four
@@ -607,6 +612,9 @@ high semantic impact; contain within import/export/provenance/DSV contracts,
 with no unrelated performance rewrite.
 
 ### Batch 2 — verification tooling foundation
+
+**Status: resolved.** See [eight-step verification evidence][toolingverification].
+Batch 3 remains a separate product batch; the warm-path STOP decision is unchanged.
 
 **Why now:** future type/server/semantic work needs a trustworthy gate.
 **Scope:** separate eighth `tooling-tests` step and explicit suite inventory,
@@ -845,6 +853,7 @@ branch merge, remote PR or package publication accompanies this checkpoint.
 [vite]: ../packages/@stylexjs/babel-plugin/pandamstyle/vite.js
 [verify]: ../verify-pms.sh
 [steps]: ../tools/pms/step-contracts.js
+[toolingverification]: ../evidence/tooling-verification-step-2026-09/REPORT.md
 [oxc]: https://oxc.rs/docs/guide/usage/parser
 [swc]: https://swc.rs/docs/usage/core
 [rolldown]: https://rolldown.rs/apis/plugin-api

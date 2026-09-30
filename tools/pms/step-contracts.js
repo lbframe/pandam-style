@@ -89,7 +89,7 @@ const { assessSuiteIntegrity } = require('./test-counts');
  *            inspect afterwards, and pretending otherwise would be inventing a
  *            check. Exit code zero is the whole contract.
  *
- * `test`     the three Jest suite steps. The full Phase C integrity rule
+ * `test`     the four Jest suite steps. The full Phase C integrity rule
  *            applies and is not relaxed in any way here.
  *
  * `pilot`    an end-to-end build of a real application through the delivered
@@ -128,6 +128,7 @@ const STEP_CONTRACTS = {
   'upstream-babel-plugin': { kind: 'test' },
   'upstream-stylex': { kind: 'test' },
   pandamstyle: { kind: 'test' },
+  'tooling-tests': { kind: 'test' },
   pilot: { kind: 'pilot' },
   artifacts: { kind: 'artifact-check' },
 };

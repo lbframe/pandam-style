@@ -137,6 +137,8 @@ mkdir -p "$ARTIFACT_DIR"
 
 RUN_LOG="$LOG_DIR/run.log"
 : > "$RUN_LOG"
+# A bootstrap/parser failure must never leave an earlier green summary in place.
+rm -f "$LOG_DIR/summary.json"
 
 STEP_NAMES=()
 STEP_STATUS=()
@@ -360,7 +362,16 @@ else
     bash -c "cd '$REPO_ROOT/packages/@stylexjs/babel-plugin' && '$REPO_ROOT/node_modules/.bin/jest' --ci '__tests__/pandamstyle/.*-test.js'"
 fi
 
-# --------------------------------------------------------------------- 4. pilot ---
+# Verification infrastructure has its own population, separate from compiler
+# tests. The helper derives the inventory from the test directory and checks
+# Jest discovery and execution against it; no hand-maintained suite list.
+if is_filtered_out "tooling-tests"; then
+  skip_step "tooling-tests" "not selected by PMS_ONLY_STEPS"
+else
+  run_step "tooling-tests" node "$REPO_ROOT/tools/pms/run-tooling-tests.js" "$PMS_OUT_DIR"
+fi
+
+# --------------------------------------------------------------------- 7. pilot ---
 if [ "${PMS_SKIP_PILOT:-0}" = "1" ]; then
   skip_step "pilot" "PMS_SKIP_PILOT=1"
 elif is_filtered_out "pilot"; then
@@ -369,7 +380,7 @@ else
   run_step "pilot" bash "$REPO_ROOT/tools/pilot/run-pilot.sh" "${PMS_PILOT_DIR:-$PMS_OUT_DIR/pilot}"
 fi
 
-# ---------------------------------------------------------------- 5. artifacts ---
+# ---------------------------------------------------------------- 8. artifacts ---
 collect_artifacts() {
   set -e
   rm -rf "$ARTIFACT_DIR"
@@ -435,7 +446,7 @@ if [ -n "$MISSING_SOURCES" ]; then
   exit 2
 fi
 
-node - "$PMS_OUT_DIR" "$TESTED_COMMIT" "$TESTED_TREE" "$DIRTY" "$PANDAMSTYLE_BASE_RESOLVED" "$PANDAMSTYLE_BASE" "$REPO_ROOT" <<'NODE'
+if ! node - "$PMS_OUT_DIR" "$TESTED_COMMIT" "$TESTED_TREE" "$DIRTY" "$PANDAMSTYLE_BASE_RESOLVED" "$PANDAMSTYLE_BASE" "$REPO_ROOT" <<'NODE' 2> >(tee -a "$RUN_LOG" >&2)
 const fs = require('fs');
 const path = require('path');
 const out = process.argv[2];
@@ -465,10 +476,19 @@ const {
   parseJestCounts,
 } = require(path.join(repoRoot, 'tools/pms/test-counts.js'));
 const {
+  STEP_CONTRACTS,
   assessStep,
   contractFor,
   evidenceFor,
 } = require(path.join(repoRoot, 'tools/pms/step-contracts.js'));
+
+// A missing row is missing required work, even if every recorded row passed.
+// Keep the required population in the same table as its evidence contracts.
+for (const name of Object.keys(STEP_CONTRACTS)) {
+  if (!rows.some(([recorded]) => recorded === name)) {
+    rows.push([name, 'skipped', '-', 'required step omitted from step table']);
+  }
+}
 
 const steps = {};
 const skipped = [];
@@ -588,6 +608,10 @@ fs.writeFileSync(
 );
 console.log('summary written');
 NODE
+then
+  log "VERIFICATION FAILED: the summary could not be assessed; raw logs and steps.tsv are preserved."
+  exit 1
+fi
 
 FAILED_STEPS=0
 SKIPPED_STEPS=0
@@ -692,4 +716,4 @@ if [ "$SKIPPED_STEPS" -ne 0 ]; then
 fi
 log "VERIFICATION INCOMPLETE: every step ran, but at least one could not be verified."
 log "This run is NOT a complete verification."
-exit 0
+exit 1
