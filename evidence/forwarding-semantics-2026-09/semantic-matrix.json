@@ -1,0 +1,1637 @@
+{
+  "fixtureCount": 47,
+  "fresh": {
+    "passed": 47,
+    "failed": 0
+  },
+  "incremental": {
+    "passed": 47,
+    "failed": 0
+  },
+  "rows": [
+    {
+      "fixture": "direct import",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "named source re-export",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "removed export",
+      "expected": {
+        "bindings": {
+          "create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "restored export",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "renamed source re-export",
+      "expected": {
+        "bindings": {
+          "css": "create",
+          "t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "css": "create",
+          "t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "css": "create",
+          "t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "local import + re-export",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "local import + renamed re-export",
+      "expected": {
+        "bindings": {
+          "css": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "css": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "css": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "export star",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "namespace source re-export",
+      "expected": {
+        "bindings": {
+          "pms.create": "create",
+          "pms.token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "pms.create": "create",
+          "pms.token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "pms.create": "create",
+          "pms.token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "namespace import + export",
+      "expected": {
+        "bindings": {
+          "pms.create": "create",
+          "pms.token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "pms.create": "create",
+          "pms.token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "pms.create": "create",
+          "pms.token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "multi-hop named forwarding",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "multi-hop renamed forwarding",
+      "expected": {
+        "bindings": {
+          "css": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "css": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "css": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "multi-hop star forwarding",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "partial forwarding",
+      "expected": {
+        "bindings": {
+          "create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "same exported spelling before remap",
+      "expected": {
+        "bindings": {
+          "css": "create"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "css": "create"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "css": "create"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "same exported spelling remapped",
+      "expected": {
+        "bindings": {
+          "css": "token"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_NON_STATIC_VALUE"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {
+          "css": "token"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_NON_STATIC_VALUE"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "css": "token"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_NON_STATIC_VALUE"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "same exported spelling restored",
+      "expected": {
+        "bindings": {
+          "css": "create"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "css": "create"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "css": "create"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "mixed source barrel",
+      "expected": {
+        "bindings": {
+          "create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_NON_STATIC_VALUE"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_NON_STATIC_VALUE"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_NON_STATIC_VALUE"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "non-PandamStyle same-name export",
+      "expected": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "relay before break",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "relay break",
+      "expected": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "relay restore",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "relay file removal",
+      "expected": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_COVERAGE_GAP"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_COVERAGE_GAP"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_COVERAGE_GAP"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "relay file restoration",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "deep negative answer",
+      "expected": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "deep negative repair",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "star collision",
+      "expected": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "star explicit override",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "star same-origin diamond",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "star after renamed forwarding",
+      "expected": {
+        "bindings": {
+          "css": "create",
+          "t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "css": "create",
+          "t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "css": "create",
+          "t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "namespace of partial renamed barrel",
+      "expected": {
+        "bindings": {
+          "pms.css": "create",
+          "pms.t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "pms.css": "create",
+          "pms.t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "pms.css": "create",
+          "pms.t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "direct namespace import",
+      "expected": {
+        "bindings": {
+          "pms.create": "create",
+          "pms.token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "pms.create": "create",
+          "pms.token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "pms.create": "create",
+          "pms.token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "default as foo is absent",
+      "expected": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "default forwarding is absent",
+      "expected": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "metadata alias has no helper authority",
+      "expected": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "namespace partial forwarding rejects missing token",
+      "expected": {
+        "bindings": {
+          "pms.create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_NON_STATIC_VALUE"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {
+          "pms.create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_NON_STATIC_VALUE"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "pms.create": "create"
+        },
+        "ok": false,
+        "diagnostics": [
+          "PMS_NON_STATIC_VALUE"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "direct token alias lowers",
+      "expected": {
+        "bindings": {
+          "t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "token"
+      },
+      "freshActual": {
+        "bindings": {
+          "t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "token"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "t": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "token"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "transitive star collision stays ambiguous",
+      "expected": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "ordinary destructured exports collide",
+      "expected": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "unknown external star fails closed",
+      "expected": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "star cycle fails closed",
+      "expected": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": false,
+        "diagnostics": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "shape": "rejected"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "resolution candidate appears",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "earlier resolution candidate replaces origin",
+      "expected": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "earlier candidate removed restores origin",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "first-hop candidate before replacement",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "first-hop earlier candidate replaces origin",
+      "expected": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "incrementalActual": {
+        "bindings": {},
+        "ok": true,
+        "diagnostics": [],
+        "shape": "ordinary"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    },
+    {
+      "fixture": "first-hop earlier candidate removal restores origin",
+      "expected": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "incrementalActual": {
+        "bindings": {
+          "create": "create",
+          "token": "token"
+        },
+        "ok": true,
+        "diagnostics": [],
+        "shape": "style"
+      },
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshEqualsIncremental": true,
+      "viewsMatch": true,
+      "viewDifferences": [],
+      "verdict": "pass"
+    }
+  ],
+  "testedCommit": "1719a0494f3f593cfa052493ef7a28be4c9d448e",
+  "testedTree": "024073d3190df441c0ee582dfd17f91ea34a2875",
+  "command": "TMPDIR=/dev/shm/pms-forwarding-tmp node tools/pms/forwarding-semantic-oracle.js",
+  "exitCode": 0
+}

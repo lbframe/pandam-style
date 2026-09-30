@@ -1,0 +1,196 @@
+{
+  "baseline": {
+    "commit": "88a4c51180680c2efde09cb248f8a9a8f13342ea",
+    "tree": "5150b4f1d16a1850147c2fe6258271c4f6aa09a4",
+    "build": "isolated detached checkout; compiler rebuilt from checkpoint source",
+    "boundary": "applyAgentChanges + validate; warm session; no publication",
+    "repetitions": 3,
+    "samples": {
+      "direct_local_style_edit": {
+        "runs": [
+          {
+            "ms": 7.992875,
+            "ok": true
+          },
+          {
+            "ms": 4.711683,
+            "ok": true
+          },
+          {
+            "ms": 4.155119,
+            "ok": true
+          }
+        ],
+        "medianMs": 4.711683
+      },
+      "named_relay_edit": {
+        "runs": [
+          {
+            "ms": 3.950607,
+            "ok": true
+          },
+          {
+            "ms": 3.247692,
+            "ok": true
+          },
+          {
+            "ms": 2.709359,
+            "ok": true
+          }
+        ],
+        "medianMs": 3.247692
+      },
+      "renamed_relay_edit": {
+        "runs": [
+          {
+            "ms": 3.533064,
+            "ok": true
+          },
+          {
+            "ms": 4.382341,
+            "ok": true
+          },
+          {
+            "ms": 2.569618,
+            "ok": true
+          }
+        ],
+        "medianMs": 3.533064
+      },
+      "relay_removal": {
+        "runs": [
+          {
+            "ms": 5.007345,
+            "ok": true
+          },
+          {
+            "ms": 4.30555,
+            "ok": true
+          },
+          {
+            "ms": 3.921527,
+            "ok": true
+          }
+        ],
+        "medianMs": 4.30555
+      },
+      "relay_restoration": {
+        "runs": [
+          {
+            "ms": 5.580189,
+            "ok": true
+          },
+          {
+            "ms": 4.715912,
+            "ok": true
+          },
+          {
+            "ms": 5.605519,
+            "ok": true
+          }
+        ],
+        "medianMs": 5.580189
+      }
+    }
+  },
+  "corrected": {
+    "commit": "1719a0494f3f593cfa052493ef7a28be4c9d448e",
+    "tree": "024073d3190df441c0ee582dfd17f91ea34a2875",
+    "boundary": "applyAgentChanges + validate; warm session; no publication",
+    "repetitions": 3,
+    "samples": {
+      "direct_local_style_edit": {
+        "runs": [
+          {
+            "ms": 7.853966,
+            "ok": true
+          },
+          {
+            "ms": 4.634583,
+            "ok": true
+          },
+          {
+            "ms": 3.979378,
+            "ok": true
+          }
+        ],
+        "medianMs": 4.634583
+      },
+      "named_relay_edit": {
+        "runs": [
+          {
+            "ms": 6.098503,
+            "ok": true
+          },
+          {
+            "ms": 6.391535,
+            "ok": true
+          },
+          {
+            "ms": 5.55916,
+            "ok": true
+          }
+        ],
+        "medianMs": 6.098503
+      },
+      "renamed_relay_edit": {
+        "runs": [
+          {
+            "ms": 4.681143,
+            "ok": false
+          },
+          {
+            "ms": 3.620656,
+            "ok": false
+          },
+          {
+            "ms": 3.244203,
+            "ok": false
+          }
+        ],
+        "medianMs": 3.620656
+      },
+      "relay_removal": {
+        "runs": [
+          {
+            "ms": 5.017446,
+            "ok": true
+          },
+          {
+            "ms": 4.299691,
+            "ok": true
+          },
+          {
+            "ms": 4.029899,
+            "ok": true
+          }
+        ],
+        "medianMs": 4.299691
+      },
+      "relay_restoration": {
+        "runs": [
+          {
+            "ms": 5.570279,
+            "ok": true
+          },
+          {
+            "ms": 4.776814,
+            "ok": true
+          },
+          {
+            "ms": 4.471332,
+            "ok": true
+          }
+        ],
+        "medianMs": 4.776814
+      }
+    }
+  },
+  "node": "v22.22.0",
+  "scope": "valid fixture + one relay and consumer; three initialized sessions per side; warm OS; no publication",
+  "notes": [
+    "Named relay invalidation now recompiles its consumer; old run cached incorrect semantics.",
+    "Renamed edit intentionally removes the consumer exported name: old accepts; corrected rejects.",
+    "Three observations are a regression guard, not a tail latency or performance improvement claim."
+  ]
+}

@@ -9,10 +9,9 @@ change in Phase D.
 
 ## Resolution
 
-Fix commit: the implementation commit titled
+Fix commit: `1719a0494f3f593cfa052493ef7a28be4c9d448e`, titled
 `fix(pandamstyle): preserve binding provenance through design-system relays`
-on `fix/pandamstyle-forwarding-semantics-2026-09`; its immutable SHA is recorded
-in the batch delivery report after commit creation.
+on `fix/pandamstyle-forwarding-semantics-2026-09`.
 
 Semantic contract: [forwarding semantics](../../../../docs/forwarding-semantics-2026-09.md),
 MODULE-01–10. Named specifiers carry their source, composed forwarding preserves
