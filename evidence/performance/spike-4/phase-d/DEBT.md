@@ -1,9 +1,9 @@
 # P0 semantic debt — named re-export forwarding semantics
 
 **Status:** open, unfixed, deliberately not fixed in the Phase D closure batch.
-**Severity:** P0.
-**Introduced by:** nothing in Phase D. This predates Phase D and is inherited.
-**Owner:** unnamed — this is a backlog item, not an in-flight change.
+**Severity:** P0. **Introduced by:** nothing in Phase D. This predates Phase D
+and is inherited. **Owner:** unnamed — this is a backlog item, not an in-flight
+change.
 
 ## The defect, in one paragraph
 
@@ -20,10 +20,11 @@ export { create, token, props } from './design';
 
 ## The mechanism, precisely
 
-`collectReexports` (`packages/@stylexjs/babel-plugin/pandamstyle/module-graph.js`)
-emits a named re-export as a `kind: 'named'` entry **and** emits the request's
-source marker as a separate `kind: 'source'` entry. `walkToDesignSystem` groups
-re-exports by request and adds **only** the `source` entries to each group:
+`collectReexports`
+(`packages/@stylexjs/babel-plugin/pandamstyle/module-graph.js`) emits a named
+re-export as a `kind: 'named'` entry **and** emits the request's source marker
+as a separate `kind: 'source'` entry. `walkToDesignSystem` groups re-exports by
+request and adds **only** the `source` entries to each group:
 
 ```js
 for (const r of reexports) {
@@ -81,13 +82,13 @@ numbers a measurement of two changes at once.
 3. Extend the oracle with a trace that removes a name from a **named** re-export
    list and asserts the consumer's recognition follows. The existing
    `re_export_added` / `re_export_removed` traces use `export { ... } from` on
-   the barrel and pass today; they pass *because* of this limitation, so they are
-   not evidence that the limitation is correct behaviour.
-4. Extend `design-system-view-test.js`: the test named
-   *"a NAMED re-export list is not part of the view, and that is pre-existing"*
-   asserts the current behaviour on purpose and **must be inverted** by the fix.
-   Its comment already says the behaviour is inherited, so the fix is a
-   deliberate inversion rather than a surprise.
+   the barrel and pass today; they pass _because_ of this limitation, so they
+   are not evidence that the limitation is correct behaviour.
+4. Extend `design-system-view-test.js`: the test named _"a NAMED re-export list
+   is not part of the view, and that is pre-existing"_ asserts the current
+   behaviour on purpose and **must be inverted** by the fix. Its comment already
+   says the behaviour is inherited, so the fix is a deliberate inversion rather
+   than a surprise.
 
 ## Where it is pinned today
 
@@ -95,5 +96,5 @@ numbers a measurement of two changes at once.
   — the test named above, which asserts the limitation and says in its own
   comment that it predates Phase D.
 - `benchmarks/pandamstyle/src/phase-d-oracle.js` — the `re_export_added`,
-  `re_export_removed` and `relay_restored` traces, which prove incremental equals
-  fresh rather than proving the limitation is correct.
+  `re_export_removed` and `relay_restored` traces, which prove incremental
+  equals fresh rather than proving the limitation is correct.
