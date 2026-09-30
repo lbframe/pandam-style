@@ -1,7 +1,7 @@
 {
   "documentKind": "pandamstyle-run-summary",
-  "testedCommit": "864ebe0aadd520fa55091c176c19c57343fe6f9b",
-  "testedTree": "670f48c5b822fffa2e2040c0ddce066bb99a54f1",
+  "testedCommit": "cd2dbb2272392e11161f2048baa6f236cd55205a",
+  "testedTree": "0c4e4485be06a5842e350fef9dedfbcbf7a0ff3c",
   "workingTree": "clean",
   "pandamstyleBatchBaseRef": "refs/remotes/origin/feat/pandamstyle-native-compiler",
   "pandamstyleBatchBase": "e5ff62b4a925405dcf9fb415faa00df4b68aeaa9",
@@ -11,51 +11,38 @@
     "yarn": "1.22.22",
     "npm": "11.11.1"
   },
-  "complete": false,
+  "complete": true,
   "verification": {
-    "verdict": "incomplete",
-    "stepsVerified": 3,
+    "verdict": "verified",
+    "stepsVerified": 7,
     "stepsFailed": [],
     "stepsIncomplete": [],
-    "stepsUnverified": [
-      "install",
-      "build",
-      "pilot",
-      "artifacts"
-    ],
+    "stepsUnverified": [],
     "testsPassed": 1566,
     "testsFailed": 0,
     "testsSkipped": 64,
     "suitesPassed": 66,
     "suitesFailed": 0,
-    "suitesSkipped": 1
+    "suitesSkipped": 1,
+    "testSteps": [
+      "upstream-babel-plugin",
+      "upstream-stylex",
+      "pandamstyle"
+    ],
+    "nonTestSteps": [
+      "install",
+      "build",
+      "pilot",
+      "artifacts"
+    ]
   },
-  "suiteIntegrityFailures": [
-    {
-      "step": "install",
-      "code": "COUNTS_MISSING",
-      "message": "install: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
-    },
-    {
-      "step": "build",
-      "code": "COUNTS_MISSING",
-      "message": "build: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
-    },
-    {
-      "step": "pilot",
-      "code": "COUNTS_MISSING",
-      "message": "pilot: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
-    },
-    {
-      "step": "artifacts",
-      "code": "COUNTS_MISSING",
-      "message": "artifacts: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
-    }
-  ],
+  "stepIntegrityFindings": [],
+  "suiteIntegrityFailures": [],
   "skippedSteps": [],
   "failedSteps": [],
   "steps": {
     "install": {
+      "kind": "command",
       "status": "passed",
       "exitCode": 0,
       "acceptance": "passed",
@@ -63,18 +50,15 @@
       "counts": null,
       "verification": {
         "step": "install",
-        "verdict": "unverified",
+        "kind": "command",
+        "verdict": "verified",
         "exitCode": 0,
-        "findings": [
-          {
-            "code": "COUNTS_MISSING",
-            "message": "install: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
-          }
-        ],
+        "findings": [],
         "counts": null
       }
     },
     "build": {
+      "kind": "command",
       "status": "passed",
       "exitCode": 0,
       "acceptance": "passed",
@@ -82,36 +66,46 @@
       "counts": null,
       "verification": {
         "step": "build",
-        "verdict": "unverified",
+        "kind": "command",
+        "verdict": "verified",
         "exitCode": 0,
-        "findings": [
-          {
-            "code": "COUNTS_MISSING",
-            "message": "build: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
-          }
-        ],
+        "findings": [],
         "counts": null
       }
     },
     "upstream-babel-plugin": {
+      "kind": "test",
       "status": "passed",
       "exitCode": 0,
       "acceptance": "passed",
       "note": null,
       "counts": {
+        "tests": {
+          "passed": 1007,
+          "failed": null,
+          "skipped": 64,
+          "total": 1071
+        },
+        "suites": {
+          "passed": 42,
+          "failed": null,
+          "skipped": 1,
+          "total": 43
+        },
         "testsPassed": 1007,
         "testsFailed": 0,
         "testsSkipped": 64,
-        "testsTotal": 1071,
         "suitesPassed": 42,
         "suitesFailed": 0,
         "suitesSkipped": 1,
-        "suitesTotal": 43,
         "testsAccountedFor": 1071,
-        "suitesAccountedFor": 43
+        "testsTotal": 1071,
+        "suitesAccountedFor": 43,
+        "suitesTotal": 43
       },
       "verification": {
         "step": "upstream-babel-plugin",
+        "kind": "test",
         "verdict": "verified",
         "exitCode": 0,
         "findings": [],
@@ -142,24 +136,38 @@
       }
     },
     "upstream-stylex": {
+      "kind": "test",
       "status": "passed",
       "exitCode": 0,
       "acceptance": "passed",
       "note": null,
       "counts": {
+        "tests": {
+          "passed": 99,
+          "failed": null,
+          "skipped": null,
+          "total": 99
+        },
+        "suites": {
+          "passed": 4,
+          "failed": null,
+          "skipped": null,
+          "total": 4
+        },
         "testsPassed": 99,
         "testsFailed": 0,
         "testsSkipped": 0,
-        "testsTotal": 99,
         "suitesPassed": 4,
         "suitesFailed": 0,
         "suitesSkipped": 0,
-        "suitesTotal": 4,
         "testsAccountedFor": 99,
-        "suitesAccountedFor": 4
+        "testsTotal": 99,
+        "suitesAccountedFor": 4,
+        "suitesTotal": 4
       },
       "verification": {
         "step": "upstream-stylex",
+        "kind": "test",
         "verdict": "verified",
         "exitCode": 0,
         "findings": [],
@@ -190,24 +198,38 @@
       }
     },
     "pandamstyle": {
+      "kind": "test",
       "status": "passed",
       "exitCode": 0,
       "acceptance": "passed",
       "note": null,
       "counts": {
+        "tests": {
+          "passed": 460,
+          "failed": null,
+          "skipped": null,
+          "total": 460
+        },
+        "suites": {
+          "passed": 20,
+          "failed": null,
+          "skipped": null,
+          "total": 20
+        },
         "testsPassed": 460,
         "testsFailed": 0,
         "testsSkipped": 0,
-        "testsTotal": 460,
         "suitesPassed": 20,
         "suitesFailed": 0,
         "suitesSkipped": 0,
-        "suitesTotal": 20,
         "testsAccountedFor": 460,
-        "suitesAccountedFor": 20
+        "testsTotal": 460,
+        "suitesAccountedFor": 20,
+        "suitesTotal": 20
       },
       "verification": {
         "step": "pandamstyle",
+        "kind": "test",
         "verdict": "verified",
         "exitCode": 0,
         "findings": [],
@@ -238,6 +260,7 @@
       }
     },
     "pilot": {
+      "kind": "pilot",
       "status": "passed",
       "exitCode": 0,
       "acceptance": "passed",
@@ -245,18 +268,15 @@
       "counts": null,
       "verification": {
         "step": "pilot",
-        "verdict": "unverified",
+        "kind": "pilot",
+        "verdict": "verified",
         "exitCode": 0,
-        "findings": [
-          {
-            "code": "COUNTS_MISSING",
-            "message": "pilot: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
-          }
-        ],
+        "findings": [],
         "counts": null
       }
     },
     "artifacts": {
+      "kind": "artifact-check",
       "status": "passed",
       "exitCode": 0,
       "acceptance": "passed",
@@ -264,14 +284,10 @@
       "counts": null,
       "verification": {
         "step": "artifacts",
-        "verdict": "unverified",
+        "kind": "artifact-check",
+        "verdict": "verified",
         "exitCode": 0,
-        "findings": [
-          {
-            "code": "COUNTS_MISSING",
-            "message": "artifacts: the log carries no \"Tests:\" or \"Test Suites:\" line, so nothing about this step is verified"
-          }
-        ],
+        "findings": [],
         "counts": null
       }
     }

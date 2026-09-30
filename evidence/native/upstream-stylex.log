@@ -5,29 +5,29 @@ PASS __tests__/stylex-test.js
       ✓ stylex.createTheme (1 ms)
       ✓ stylex.defineConsts (1 ms)
       ✓ stylex.defineVars
-      ✓ stylex.firstThatWorks
-      ✓ stylex.keyframes
+      ✓ stylex.firstThatWorks (1 ms)
+      ✓ stylex.keyframes (1 ms)
       ✓ stylex.positionTry
       ✓ stylex.viewTransitionClass (1 ms)
       ✓ stylex.defaultMarker (1 ms)
-      ✓ stylex.defineMarker (1 ms)
-      ✓ stylex.unstable_conditional (1 ms)
-      ✓ stylex.unstable_defineVarsNested (1 ms)
+      ✓ stylex.defineMarker
+      ✓ stylex.unstable_conditional
+      ✓ stylex.unstable_defineVarsNested
       ✓ stylex.unstable_defineConstsNested
-      ✓ stylex.unstable_createThemeNested (1 ms)
-      ✓ stylex.typesangle (1 ms)
-      ✓ stylex.typescolor
+      ✓ stylex.unstable_createThemeNested
+      ✓ stylex.typesangle
+      ✓ stylex.typescolor (1 ms)
       ✓ stylex.typesurl
       ✓ stylex.typesimage (1 ms)
-      ✓ stylex.typesinteger (2 ms)
-      ✓ stylex.typeslengthPercentage (1 ms)
+      ✓ stylex.typesinteger
+      ✓ stylex.typeslengthPercentage (3 ms)
       ✓ stylex.typeslength
       ✓ stylex.typespercentage (1 ms)
       ✓ stylex.typesnumber
-      ✓ stylex.typesresolution
+      ✓ stylex.typesresolution (1 ms)
       ✓ stylex.typestime
       ✓ stylex.typestransformFunction
-      ✓ stylex.typestransformList (1 ms)
+      ✓ stylex.typestransformList
       ✓ stylex.whenancestor
       ✓ stylex.whendescendant (1 ms)
       ✓ stylex.whensiblingBefore
@@ -39,48 +39,48 @@ PASS __tests__/stylex-test.js
       ✓ with a top-level array of simple overridden classes (1 ms)
       ✓ with nested arrays and pseudoClasses overriding things
       ✓ with just pseudoclasses
-      ✓ with complicated set of arguments (1 ms)
-      ✓ with dynamic styles (2 ms)
-      ✓ data prop for source map data
+      ✓ with complicated set of arguments
+      ✓ with dynamic styles (1 ms)
+      ✓ data prop for source map data (1 ms)
     attrs
       ✓ basic resolve
       ✓ with dynamic styles (1 ms)
       ✓ legacyMerge merges classNames
-      ✓ legacyMerge exposes attrs (1 ms)
+      ✓ legacyMerge exposes attrs
 
 PASS __tests__/inject-test.js
   inject
-    ✓ @keyframes (1 ms)
-    ✓ @positionTry (1 ms)
-    ✓ ::view-transition
-    ✓ @media (1 ms)
-    ✓ ::before
-    ✓ :hover (1 ms)
+    ✓ @keyframes (2 ms)
+    ✓ @positionTry
+    ✓ ::view-transition (1 ms)
+    ✓ @media
+    ✓ ::before (1 ms)
+    ✓ :hover
     ✓ ::before:hover
     defineConsts runtime injection
       ✓ registers a constant
       ✓ inlines constant in CSS rule
       ✓ inlines multiple constants in one rule (1 ms)
       ✓ handles numeric constants
-      ✓ leaves unreferenced constants unchanged in CSS
-      ✓ handles constants in media queries (1 ms)
+      ✓ leaves unreferenced constants unchanged in CSS (1 ms)
+      ✓ handles constants in media queries
       ✓ handles nested at-rules with constants
-      ✓ handles constants for container queries
-      ✓ handles constants for supports queries (1 ms)
+      ✓ handles constants for container queries (1 ms)
+      ✓ handles constants for supports queries
       ✓ handles constants in CSS variable definitions
-      ✓ handles constants with special characters in values
-      ✓ preserves other var() references that are not constants (1 ms)
-      ✓ updates dependent rules when constant changes
-      ✓ handles constants with zero values (1 ms)
+      ✓ handles constants with special characters in values (1 ms)
+      ✓ preserves other var() references that are not constants
+      ✓ updates dependent rules when constant changes (1 ms)
+      ✓ handles constants with zero values
       ✓ handles constants in complex selectors
       ✓ updates multiple dependent rules when constant changes (1 ms)
       ✓ does not update dependent rules if constant value stays the same
-      ✓ updates dependent at-rules when constant changes (1 ms)
+      ✓ updates dependent at-rules when constant changes
       ✓ prevents duplicate dependency tracking
-      ✓ tracks dependencies for multiple constants in one rule
+      ✓ tracks dependencies for multiple constants in one rule (1 ms)
       ✓ correctly updates stylesheet when constant value changes
-      ✓ handles constant updates with at-rules and regular properties
-      ✓ handles mixed constant and non-constant values (1 ms)
+      ✓ handles constant updates with at-rules and regular properties (1 ms)
+      ✓ handles mixed constant and non-constant values
 
 PASS __tests__/createSheet-test.js
   createSheet
@@ -92,17 +92,17 @@ PASS __tests__/createSheet-test.js
       ✓ update method updates rules across all sheets (5 ms)
     server side
       ✓ creates a sheet
-      ✓ creates multiple sheets
+      ✓ creates multiple sheets (1 ms)
 
 PASS __tests__/createOrderedCSSStyleSheet-test.js
   createOrderedCSSStyleSheet
     #insert
-      ✓ does not throw on invalid rule
+      ✓ does not throw on invalid rule (1 ms)
       ✓ insertion of CSSStyleRule
       ✓ insertion of CSSMediaRule
-      ✓ insertion of CSSMediaRule within CSSConditionRule
+      ✓ insertion of CSSMediaRule within CSSConditionRule (1 ms)
       ✓ insertion order for same group
-      ✓ deduplication for same group
+      ✓ deduplication for same group (1 ms)
       ✓ order for same group
       ✓ insertion order for different groups (1 ms)
     #update
@@ -121,5 +121,5 @@ PASS __tests__/createOrderedCSSStyleSheet-test.js
 Test Suites: 4 passed, 4 total
 Tests:       99 passed, 99 total
 Snapshots:   74 passed, 74 total
-Time:        0.743 s, estimated 1 s
+Time:        0.759 s, estimated 1 s
 Ran all test suites.

@@ -1,469 +1,469 @@
 PASS __tests__/pandamstyle/watcher-provider-test.js
   Spike 4 Phase B: the journal classifies events
-    ✓ a create is reported as an addition (6 ms)
+    ✓ a create is reported as an addition (9 ms)
     ✓ a modify is reported as a change (1 ms)
     ✓ a delete is reported as a removal (1 ms)
     ✓ a create followed by a delete in one burst cancels out (2 ms)
-    ✓ a rename is detected as one rename, not a remove plus an add (2 ms)
-    ✓ two different files in one burst are two different kinds (3 ms)
+    ✓ a rename is detected as one rename, not a remove plus an add (1 ms)
+    ✓ two different files in one burst are two different kinds (1 ms)
   Spike 4 Phase B: a burst is one revision
     ✓ an editor save burst is one transaction, not six (2 ms)
     ✓ an empty journal produces no revision (1 ms)
-    ✓ events are never merged across an explicit agent transaction (564 ms)
+    ✓ events are never merged across an explicit agent transaction (617 ms)
   Spike 4 Phase B: a watcher that cannot be trusted says so
-    ✓ an overflow produces NO transaction, not a partial one (1 ms)
+    ✓ an overflow produces NO transaction, not a partial one (4 ms)
     ✓ a resync supersedes events already in the journal (1 ms)
     ✓ an unattributable event forces a resync (1 ms)
     ✓ a resync makes the session fall back to full discovery, and counts it (386 ms)
-    ✓ a watch that never started is not a watch (3 ms)
-    ✓ a watch that started is established and closes cleanly (7 ms)
+    ✓ a watch that never started is not a watch (5 ms)
+    ✓ a watch that started is established and closes cleanly (2 ms)
   Spike 4 Phase B: the compiler does not watch its own output
-    ✓ events under the output directory and the generation scratch are ignored (1 ms)
-    ✓ a real source beside an ignored output still gets through (2 ms)
+    ✓ events under the output directory and the generation scratch are ignored (4 ms)
+    ✓ a real source beside an ignored output still gets through (1 ms)
     ✓ a project directory named like an output is NOT excluded (1 ms)
   Spike 4 Phase B: a watched revision equals a rebuild
-    ✓ a watched mutation produces the generation a rebuild produces (363 ms)
-    ✓ a watched create and a watched delete both behave (257 ms)
-    ✓ watcher and declared input agree on the same mutation (1412 ms)
+    ✓ a watched mutation produces the generation a rebuild produces (576 ms)
+    ✓ a watched create and a watched delete both behave (401 ms)
+    ✓ watcher and declared input agree on the same mutation (1205 ms)
+
+PASS __tests__/pandamstyle/staleness-test.js (5.323 s)
+  removing a token invalidates its stale usages
+    ✓ the first build is valid and records its digest (4 ms)
+    second build after removing spacing.md, pages untouched
+      ✓ the second build fails with a non-zero status (1 ms)
+      ✓ the stale usage is detected as an unknown token (1 ms)
+      ✓ the diagnostic points at the page that still uses it (1 ms)
+      ✓ no artifact is presented as the new current generation (1 ms)
+      ✓ the previous stylesheet is not overwritten by a false current one
+    restoring the token yields a valid build again
+      ✓ the third build succeeds and the digest matches the first one (878 ms)
+  changing a token value updates the digest but preserves identity
+    ✓ the build still succeeds and the digest changed (2 ms)
+    ✓ the logical variable identity of spacing.md is preserved (4 ms)
 
 PASS __tests__/pandamstyle/native-compile-test.js
   valid project builds through real files
-    ✓ the build process exits 0 (2 ms)
-    ✓ CSS is not empty and carries the expected declarations (2 ms)
-    ✓ the emitted JS imports no compiler, loader or registry (12 ms)
-    ✓ the runtime import of the page is the fork composition runtime only (7 ms)
+    ✓ the build process exits 0
+    ✓ CSS is not empty and carries the expected declarations (1 ms)
+    ✓ the emitted JS imports no compiler, loader or registry (6 ms)
+    ✓ the runtime import of the page is the fork composition runtime only (1 ms)
     ✓ page sources are not mutated by the build (1 ms)
-    ✓ the build is repeatable and yields the same digest (637 ms)
+    ✓ the build is repeatable and yields the same digest (795 ms)
   helper resolution follows binding and module
-    ✓ renamed imports reached through a barrel are compiled (1 ms)
-    ✓ a page importing only a recipe is covered and compiled (1 ms)
-    ✓ a namespace import is recognized (7 ms)
-    ✓ a hoisted token constant is lowered, not left for the runtime (1 ms)
+    ✓ renamed imports reached through a barrel are compiled
+    ✓ a page importing only a recipe is covered and compiled
+    ✓ a namespace import is recognized (1 ms)
+    ✓ a hoisted token constant is lowered, not left for the runtime
   generated design system module
-    ✓ carries the generation marker and the same digest as the manifest
-    ✓ exposes the documented consumption surface (1 ms)
-    ✓ create() and token() throw if ever reached at runtime (1 ms)
-    ✓ recipe selectors carry finite data, not a cartesian product (1 ms)
+    ✓ carries the generation marker and the same digest as the manifest (7 ms)
+    ✓ exposes the documented consumption surface (7 ms)
+    ✓ create() and token() throw if ever reached at runtime (7 ms)
+    ✓ recipe selectors carry finite data, not a cartesian product (2 ms)
   generation coherence and coverage report
-    ✓ every artifact references the same registryDigest (1 ms)
-    ✓ coverage lists the declared roots and the analysed files (1 ms)
+    ✓ every artifact references the same registryDigest (3 ms)
+    ✓ coverage lists the declared roots and the analysed files (14 ms)
     ✓ the barrel relay is recorded in the coverage chain
-    ✓ the stylesheet is non-empty and rules were collected
+    ✓ the stylesheet is non-empty and rules were collected (1 ms)
 
-PASS __tests__/pandamstyle/runner-status-test.js (8.053 s)
+PASS __tests__/pandamstyle/design-system-view-test.js (8.124 s)
+  Spike 4 Phase D2: the incremental design-system view
+    ✓ the first revision derives a view for every covered file (1461 ms)
+    ✓ a style-only edit recomputes nothing at all (379 ms)
+    ✓ a style-only edit to one page recomputes no OTHER page either (317 ms)
+    ✓ a declared file whose bytes did not change recomputes nothing (220 ms)
+    ✓ a comment-only edit to the relay invalidates nothing (321 ms)
+    ✓ a relay-contract change invalidates exactly the consumers of that relay (291 ms)
+    ✓ a NAMED re-export list is not part of the view, and that is pre-existing (1183 ms)
+    ✓ breaking the relay invalidates the files that consumed it (402 ms)
+    ✓ a namespace re-export is still followed (222 ms)
+    ✓ an export-star relay is still followed, and its renames are still renames (200 ms)
+    ✓ a deleted relay is repaired by its file reappearing (375 ms)
+    ✓ a relay that STOPS reaching the design system, and starts again (654 ms)
+    ✓ a module that ENTERS coverage through an import gets a view (281 ms)
+    ✓ a relay depth budget is part of the view (240 ms)
+    ✓ a design-system change is an explicit, named DSV fallback (256 ms)
+    ✓ the relay cache is dropped when the design system is rebuilt (279 ms)
+    ✓ after a mixed trace the incremental views equal fresh views (349 ms)
+
+PASS __tests__/pandamstyle/recipe-contract-test.js
+  the consumer runtime is dependency-light
+    ✓ the shipped runtime has no import at all (1 ms)
+    ✓ it imports no Babel, no loader, no registry, no CSS interpreter (1 ms)
+    ✓ it is finite: a small module, not a second engine (1 ms)
+  recipe selection follows axisOrder and defaults
+    ✓ base first, then one branch per axis, in declaration order (1 ms)
+    ✓ absent and undefined both take the default (1 ms)
+    ✓ the key order of the props object has no effect (2 ms)
+    ✓ false is a value, not an absence
+    ✓ null, unknown key and unknown value fail deterministically (19 ms)
+    ✓ the error carries the admitted domain (1 ms)
+    ✓ no cartesian product is generated
+  composition contract: base + hover, then a base variant
+    ✓ the hover branch of the variant survives in the emitted CSS (3 ms)
+    ✓ changing the base color does not remove the hover branch (2 ms)
+    ✓ the fork composition runtime composes the compiled refs (9 ms)
+  props-dependent selection keeps the runtime guard
+    ✓ the TSX page emits an uncompiled selector call, not a baked literal (2 ms)
+    ✓ that call goes through the bounded selector (1 ms)
+
+fatal: not a git repository (or any of the parent directories): .git
+PASS __tests__/pandamstyle/artifacts-test.js
+  pandamstyle: artefacts
+    ✓ build de la fixture conformance + page exemple + rejet 17px (45 ms)
+
+PASS __tests__/pandamstyle/chain-test.js
+  pandamstyle: registre
+    ✓ références résolues, catégories et visibilité conservées (11 ms)
+    ✓ référence vers un identifiant absent -> PMS_UNKNOWN_TOKEN (1 ms)
+    ✓ cycle de références -> PMS_TOKEN_CYCLE avec chemin (1 ms)
+  pandamstyle: tokens -> CSS
+    ✓ un token compilé devient var(--…) et les variables sont émises (3 ms)
+    ✓ condition nommée -> bloc canonique @media (7 ms)
+    ✓ deux thèmes partagent les mêmes identités de variables (3 ms)
+  pandamstyle: rejets de politique (sans TypeScript)
+    ✓ valeur brute '17px' rejetée avec candidats admis (4 ms)
+    ✓ token de mauvaise catégorie -> PMS_INVALID_TOKEN_CATEGORY (3 ms)
+    ✓ token privé côté consommateur -> PMS_TOKEN_NOT_PUBLIC (5 ms)
+    ✓ forme composite border -> PMS_UNSUPPORTED_PROPERTY_FORM (2 ms)
+    ✓ propriété hors profil -> PMS_UNSUPPORTED_PROPERTY (2 ms)
+    ✓ condition inconnue -> PMS_UNKNOWN_CONDITION (5 ms)
+  pandamstyle: recipe -> CSS
+    ✓ sélection bornée : base + branches par axe selon axisOrder (2 ms)
+    ✓ défauts appliqués quand la prop est absente ou undefined (2 ms)
+    ✓ valeur hors domaine rejetée de façon déterministe au runtime (18 ms)
+    ✓ clé inconnue et null rejetés (1 ms)
+    ✓ conflit base/hover : la variante gagne hors condition, hover conservé (3 ms)
+  pandamstyle: manifeste
+    ✓ projection consommateur : publics seulement, capacités P1 à false (2 ms)
+
+PASS __tests__/pandamstyle/provenance-props-test.js (11.017 s)
+  BC-1: props() admits no raw CSS object
+    an object literal is refused while a compiled style compiles
+      ✓ the build process fails with the provenance code (7 ms)
+      ✓ every raw route is listed, none silently accepted (2 ms)
+      ✓ the diagnostic names the reason rather than saying "invalid" (1 ms)
+      ✓ nothing is published as current (549 ms)
+    an arbitrary local object is not provenance either
+      ✓ passing the object and spreading it are both refused (14 ms)
+      ✓ a variable is not excused by having a name
+    every admitted form still compiles
+      ✓ a create() namespace is admitted
+      ✓ a theme plus a namespace is admitted (1 ms)
+      ✓ a compiled style member is admitted (3 ms)
+      ✓ a statically folded recipe selection is admitted
+      ✓ the compiled output holds composition, not a raw object (1 ms)
+      ✓ the whole theme of a props() call survives compilation (1 ms)
+  BC-2: provenance follows the binding
+    ✓ a shadowing parameter inherits nothing from the module constant (613 ms)
+    ✓ a reassigned binding is not the value that was proven (595 ms)
+    ✓ writing to a proven value is refused (824 ms)
+    ✓ a value escaped into an unknown call is refused (968 ms)
+    ✓ an alias of the helper, and a nested shadow, are not the helper (564 ms)
+  BC-6: authority is a build concern, not a vocabulary ban
+    ✓ a reserved __pms* field is refused even in ordinary data (526 ms)
+    ordinary business data is not rejected
+      ✓ a file full of role/trusted fields still builds
+      ✓ the data file is covered and compiled like any other (1 ms)
+      ✓ no role diagnostic is raised for data
+    a real attempt to self-grant authority is still refused
+      ✓ an authority field inside a recognized PandamStyle call is refused (1 ms)
+      ✓ the diagnostic says where the claim was made
+      ✓ the author engine entry point stays unreachable (1 ms)
+  buildProject is the same entry point the CLI drives
+    ✓ it is exported from the built package
+
+PASS __tests__/pandamstyle/coverage-graph-test.js (12.516 s)
+  BC-3: the closure follows re-exports
+    ✓ export * from pulls the target into the covered set (21 ms)
+    ✓ export { x } from pulls the target into the covered set (2 ms)
+    ✓ a two-hop barrel chain pulls the target into the covered set (4 ms)
+    ✓ the closure records how each file was reached (2 ms)
+    ✓ a named re-export is an edge, not just `export *` (1 ms)
+    ✓ every edge syntax is discovered from a real file (5 ms)
+    ✓ a stylesheet is not treated as a compilable module (1 ms)
+  BC-3: dynamic requests are decided, not ignored
+    ✓ a computed dynamic request is a coverage gap (477 ms)
+    ✓ the plugin refuses the same edge on its own, with its own rule (157 ms)
+    ✓ a literal local dynamic request is a normal local edge (1279 ms)
+    ✓ a forbidden engine entry cannot be reached through import() (128 ms)
+  BC-3/BC-9: every relay escape is caught by a real build
+    ✓ neg-relay-reexport-star fails with PMS_FORBIDDEN_STYLE_CHANNEL (export *) (299 ms)
+    ✓ neg-relay-reexport-named fails with PMS_FORBIDDEN_STYLE_CHANNEL (named re-export) (434 ms)
+    ✓ neg-relay-barrel-chain fails with PMS_FORBIDDEN_STYLE_CHANNEL (two-hop barrel chain) (594 ms)
+    ✓ neg-stylesheet-via-relay fails with PMS_FORBIDDEN_STYLE_CHANNEL (stylesheet through a relay) (384 ms)
+    ✓ neg-unresolved-import fails with PMS_COVERAGE_GAP (unresolved local import) (554 ms)
+    ✓ neg-dynamic-import fails with PMS_COVERAGE_GAP (computed dynamic import) (721 ms)
+    ✓ the diagnostic points at the module outside every root (532 ms)
+    ✓ the report names the relays, so the closure is auditable (2057 ms)
+  BC-4: a covered file that was never analysed is a failure
+    ✓ a fully analysed set is consistent (1 ms)
+    ✓ a covered file the bundler loaded but never compiled is missing (1 ms)
+    ✓ the generated design-system module is exempt, with a reason
+    ✓ paths are compared canonically, so a query suffix cannot hide a file
+    ✓ a file loaded but not covered is reported separately (1 ms)
+  the CLI cross-checks expected vs analysed before publishing
+    ✓ the published report carries the cross-check
+    ✓ a covered file that fails the policy still counts as analysed (1548 ms)
+
+PASS __tests__/pandamstyle/incremental-coverage-closure-test.js (12.654 s)
+  Spike 4 Phase D1: the persistent coverage graph
+    ✓ the first revision builds the graph and is not counted as a fallback (1426 ms)
+    ✓ a style-only edit examines one node and walks none of them (355 ms)
+    ✓ five style-only edits keep the fast path (377 ms)
+    ✓ a declared file whose bytes are unchanged changes no edge (259 ms)
+    ✓ a module added under a root enters coverage and shifts the order (265 ms)
+    ✓ a module added outside every root stays uncovered until something imports it (268 ms)
+    ✓ a deleted module leaves coverage and every index with it (146 ms)
+    ✓ a diamond covers the shared module through both parents (1102 ms)
+    ✓ losing one parent of a diamond does not lose the shared module (646 ms)
+    ✓ a deleted module that is still imported stays covered and is reported unreadable (280 ms)
+    ✓ a second path added later keeps a module covered after the first is gone (610 ms)
+    ✓ an unresolved import becomes resolvable and its target enters coverage (403 ms)
+    ✓ repairing a broken import does not rebuild the project to do it (438 ms)
+    ✓ a rename moves the node and publishes the new path (266 ms)
+    ✓ an import change retargets an edge and nothing else (370 ms)
+    ✓ a re-export change does not move the closure and does not need to (278 ms)
+    ✓ changing the roots is a named full fallback, not a silent rebuild (365 ms)
+    ✓ a design-system change does not need to rebuild the coverage graph (314 ms)
+    ✓ full discovery re-derives the root membership instead of trusting the cache (1924 ms)
+    ✓ after a mixed trace the incremental closure equals a fresh closure (1724 ms)
+    ✓ the canonical order equals a fresh traversal order, and is not incidental (170 ms)
+
+PASS __tests__/pandamstyle/incremental-css-test.js (12.768 s)
+  Spike 3 Phase B: incremental CSS equals a full aggregation
+    ✓ the whole trace produces the same bytes as a full aggregation (4670 ms)
+    ✓ a no-change revision reuses the previous stylesheet byte for byte (200 ms)
+    ✓ a one-file edit touches only that file rule contributions (200 ms)
+  Spike 3 Phase B: a rule belongs to its owners
+    ✓ a shared atom survives the deletion of one owner (863 ms)
+    ✓ a rule owned only by a deleted file disappears with it (362 ms)
+  Spike 3 Phase B: cascade order is preserved, not appended to
+    ✓ edits in an order unrelated to the traversal order still match (1256 ms)
+    ✓ rules for the same property are ordered by the aggregator, not by age (2093 ms)
+    ✓ a condition and a theme interaction keep their order across an edit (794 ms)
+  Spike 3 Phase B: a global change falls back, visibly
+    ✓ a design-system change is a counted, named full CSS rebuild (583 ms)
+    ✓ a configuration change is a fallback too (615 ms)
+    ✓ the fallback path itself is measured as a rebuild, not hidden (207 ms)
+  Spike 3 Phase B: the incremental stylesheet equals the full one
+    ✓ over a run of mixed edits, both paths publish identical bytes (234 ms)
+
+PASS __tests__/pandamstyle/runner-status-test.js (8.052 s)
   BC-7: an unexecuted step is never reported as passed
-    ✓ the runner itself succeeded, so only the bookkeeping is under test (11 ms)
-    ✓ a skipped pilot is reported as skipped (1 ms)
+    ✓ the runner itself succeeded, so only the bookkeeping is under test (1 ms)
+    ✓ a skipped pilot is reported as skipped (7 ms)
     ✓ a skipped install is reported as skipped (1 ms)
-    ✓ a skipped step has NO exit code
+    ✓ a skipped step has NO exit code (1 ms)
     ✓ the acceptance vocabulary says not_run, not passed
-    ✓ no step is marked passed in this run (1 ms)
+    ✓ no step is marked passed in this run
     ✓ the run is explicitly not complete (1 ms)
     ✓ the console says INCOMPLETE and names the skipped steps (1 ms)
-    ✓ the raw step table records the status too (1 ms)
+    ✓ the raw step table records the status too (14 ms)
   the skip flag is not the only way a step goes unrun
     ✓ a step excluded by the filter is skipped, with the reason (1 ms)
-    ✓ the reason distinguishes a skip from a filter exclusion (1 ms)
+    ✓ the reason distinguishes a skip from a filter exclusion
   the working tree is measured before the runner writes anything
     ✓ the fixture really was a clean checkout before the run (1 ms)
-    ✓ a clean checkout is reported clean in env.json (3 ms)
+    ✓ a clean checkout is reported clean in env.json
     ✓ a clean checkout is reported clean in summary.json
-    ✓ the run really did change the checkout after measuring (8 ms)
-    ✓ the console names the measurement as taken before the run
+    ✓ the run really did change the checkout after measuring (786 ms)
+    ✓ the console names the measurement as taken before the run (1 ms)
   a checkout that is already dirty is still reported dirty
-    ✓ the fixture was genuinely dirty before the run (175 ms)
-    ✓ a pre-existing modification is not laundered into clean (1 ms)
+    ✓ the fixture was genuinely dirty before the run (5 ms)
+    ✓ a pre-existing modification is not laundered into clean
   the batch base is a Git relation, not a commit count
-    ✓ the base is the merge base with the source branch (7 ms)
-    ✓ the base is the fork point, not a recent ancestor
+    ✓ the base is the merge base with the source branch (4 ms)
+    ✓ the base is the fork point, not a recent ancestor (1 ms)
     ✓ the ref the base was derived from is recorded
-    ✓ the base is a real ancestor of both tips (15 ms)
+    ✓ the base is a real ancestor of both tips (10 ms)
   growing the batch does not move the base
-    ✓ the same base is reported after two more commits (2914 ms)
+    ✓ the same base is reported after two more commits (1599 ms)
   an unverifiable base is refused rather than invented
     ✓ the runner fails instead of reporting a fallback SHA
     ✓ the refusal names the ref and says why
     ✓ no evidence is written, so no unverifiable SHA is left behind (1 ms)
 
-PASS __tests__/pandamstyle/chain-test.js
-  pandamstyle: registre
-    ✓ références résolues, catégories et visibilité conservées (9 ms)
-    ✓ référence vers un identifiant absent -> PMS_UNKNOWN_TOKEN (1 ms)
-    ✓ cycle de références -> PMS_TOKEN_CYCLE avec chemin (1 ms)
-  pandamstyle: tokens -> CSS
-    ✓ un token compilé devient var(--…) et les variables sont émises (3 ms)
-    ✓ condition nommée -> bloc canonique @media (2 ms)
-    ✓ deux thèmes partagent les mêmes identités de variables (2 ms)
-  pandamstyle: rejets de politique (sans TypeScript)
-    ✓ valeur brute '17px' rejetée avec candidats admis (3 ms)
-    ✓ token de mauvaise catégorie -> PMS_INVALID_TOKEN_CATEGORY (2 ms)
-    ✓ token privé côté consommateur -> PMS_TOKEN_NOT_PUBLIC (3 ms)
-    ✓ forme composite border -> PMS_UNSUPPORTED_PROPERTY_FORM (2 ms)
-    ✓ propriété hors profil -> PMS_UNSUPPORTED_PROPERTY (3 ms)
-    ✓ condition inconnue -> PMS_UNKNOWN_CONDITION (6 ms)
-  pandamstyle: recipe -> CSS
-    ✓ sélection bornée : base + branches par axe selon axisOrder (3 ms)
-    ✓ défauts appliqués quand la prop est absente ou undefined (2 ms)
-    ✓ valeur hors domaine rejetée de façon déterministe au runtime (22 ms)
-    ✓ clé inconnue et null rejetés (1 ms)
-    ✓ conflit base/hover : la variante gagne hors condition, hover conservé (1 ms)
-  pandamstyle: manifeste
-    ✓ projection consommateur : publics seulement, capacités P1 à false (1 ms)
-
-PASS __tests__/pandamstyle/design-system-view-test.js (9.125 s)
-  Spike 4 Phase D2: the incremental design-system view
-    ✓ the first revision derives a view for every covered file (1424 ms)
-    ✓ a style-only edit recomputes nothing at all (249 ms)
-    ✓ a style-only edit to one page recomputes no OTHER page either (170 ms)
-    ✓ a declared file whose bytes did not change recomputes nothing (184 ms)
-    ✓ a comment-only edit to the relay invalidates nothing (193 ms)
-    ✓ a relay-contract change invalidates exactly the consumers of that relay (1410 ms)
-    ✓ a NAMED re-export list is not part of the view, and that is pre-existing (312 ms)
-    ✓ breaking the relay invalidates the files that consumed it (180 ms)
-    ✓ a namespace re-export is still followed (168 ms)
-    ✓ an export-star relay is still followed, and its renames are still renames (179 ms)
-    ✓ a deleted relay is repaired by its file reappearing (166 ms)
-    ✓ a relay that STOPS reaching the design system, and starts again (199 ms)
-    ✓ a module that ENTERS coverage through an import gets a view (209 ms)
-    ✓ a relay depth budget is part of the view (2083 ms)
-    ✓ a design-system change is an explicit, named DSV fallback (765 ms)
-    ✓ the relay cache is dropped when the design system is rebuilt (216 ms)
-    ✓ after a mixed trace the incremental views equal fresh views (266 ms)
-
-PASS __tests__/pandamstyle/recipe-contract-test.js
-  the consumer runtime is dependency-light
-    ✓ the shipped runtime has no import at all (1 ms)
-    ✓ it imports no Babel, no loader, no registry, no CSS interpreter (5 ms)
-    ✓ it is finite: a small module, not a second engine
-  recipe selection follows axisOrder and defaults
-    ✓ base first, then one branch per axis, in declaration order (1 ms)
-    ✓ absent and undefined both take the default
-    ✓ the key order of the props object has no effect (1 ms)
-    ✓ false is a value, not an absence
-    ✓ null, unknown key and unknown value fail deterministically (15 ms)
-    ✓ the error carries the admitted domain (3 ms)
-    ✓ no cartesian product is generated (1 ms)
-  composition contract: base + hover, then a base variant
-    ✓ the hover branch of the variant survives in the emitted CSS
-    ✓ changing the base color does not remove the hover branch (1 ms)
-    ✓ the fork composition runtime composes the compiled refs (1 ms)
-  props-dependent selection keeps the runtime guard
-    ✓ the TSX page emits an uncompiled selector call, not a baked literal
-    ✓ that call goes through the bounded selector (2 ms)
-
-fatal: not a git repository (or any of the parent directories): .git
-PASS __tests__/pandamstyle/artifacts-test.js
-  pandamstyle: artefacts
-    ✓ build de la fixture conformance + page exemple + rejet 17px (23 ms)
-
-PASS __tests__/pandamstyle/incremental-coverage-closure-test.js (9.601 s)
-  Spike 4 Phase D1: the persistent coverage graph
-    ✓ the first revision builds the graph and is not counted as a fallback (1426 ms)
-    ✓ a style-only edit examines one node and walks none of them (207 ms)
-    ✓ five style-only edits keep the fast path (326 ms)
-    ✓ a declared file whose bytes are unchanged changes no edge (209 ms)
-    ✓ a module added under a root enters coverage and shifts the order (193 ms)
-    ✓ a module added outside every root stays uncovered until something imports it (1356 ms)
-    ✓ a deleted module leaves coverage and every index with it (144 ms)
-    ✓ a diamond covers the shared module through both parents (214 ms)
-    ✓ losing one parent of a diamond does not lose the shared module (215 ms)
-    ✓ a deleted module that is still imported stays covered and is reported unreadable (155 ms)
-    ✓ a second path added later keeps a module covered after the first is gone (237 ms)
-    ✓ an unresolved import becomes resolvable and its target enters coverage (168 ms)
-    ✓ repairing a broken import does not rebuild the project to do it (172 ms)
-    ✓ a rename moves the node and publishes the new path (157 ms)
-    ✓ an import change retargets an edge and nothing else (2584 ms)
-    ✓ a re-export change does not move the closure and does not need to (157 ms)
-    ✓ changing the roots is a named full fallback, not a silent rebuild (196 ms)
-    ✓ a design-system change does not need to rebuild the coverage graph (216 ms)
-    ✓ full discovery re-derives the root membership instead of trusting the cache (145 ms)
-    ✓ after a mixed trace the incremental closure equals a fresh closure (336 ms)
-    ✓ the canonical order equals a fresh traversal order, and is not incidental (120 ms)
-
-PASS __tests__/pandamstyle/provenance-props-test.js (9.772 s)
-  BC-1: props() admits no raw CSS object
-    an object literal is refused while a compiled style compiles
-      ✓ the build process fails with the provenance code (7 ms)
-      ✓ every raw route is listed, none silently accepted (1 ms)
-      ✓ the diagnostic names the reason rather than saying "invalid" (1 ms)
-      ✓ nothing is published as current (408 ms)
-    an arbitrary local object is not provenance either
-      ✓ passing the object and spreading it are both refused (1 ms)
-      ✓ a variable is not excused by having a name
-    every admitted form still compiles
-      ✓ a create() namespace is admitted (1 ms)
-      ✓ a theme plus a namespace is admitted
-      ✓ a compiled style member is admitted (1 ms)
-      ✓ a statically folded recipe selection is admitted
-      ✓ the compiled output holds composition, not a raw object (1 ms)
-      ✓ the whole theme of a props() call survives compilation (1 ms)
-  BC-2: provenance follows the binding
-    ✓ a shadowing parameter inherits nothing from the module constant (839 ms)
-    ✓ a reassigned binding is not the value that was proven (425 ms)
-    ✓ writing to a proven value is refused (400 ms)
-    ✓ a value escaped into an unknown call is refused (406 ms)
-    ✓ an alias of the helper, and a nested shadow, are not the helper (2204 ms)
-  BC-6: authority is a build concern, not a vocabulary ban
-    ✓ a reserved __pms* field is refused even in ordinary data (358 ms)
-    ordinary business data is not rejected
-      ✓ a file full of role/trusted fields still builds (1 ms)
-      ✓ the data file is covered and compiled like any other (1 ms)
-      ✓ no role diagnostic is raised for data
-    a real attempt to self-grant authority is still refused
-      ✓ an authority field inside a recognized PandamStyle call is refused (1 ms)
-      ✓ the diagnostic says where the claim was made (1 ms)
-      ✓ the author engine entry point stays unreachable
-  buildProject is the same entry point the CLI drives
-    ✓ it is exported from the built package
-
-PASS __tests__/pandamstyle/coverage-graph-test.js (10.101 s)
-  BC-3: the closure follows re-exports
-    ✓ export * from pulls the target into the covered set (23 ms)
-    ✓ export { x } from pulls the target into the covered set (3 ms)
-    ✓ a two-hop barrel chain pulls the target into the covered set (8 ms)
-    ✓ the closure records how each file was reached (1 ms)
-    ✓ a named re-export is an edge, not just `export *` (1 ms)
-    ✓ every edge syntax is discovered from a real file (8 ms)
-    ✓ a stylesheet is not treated as a compilable module (2 ms)
-  BC-3: dynamic requests are decided, not ignored
-    ✓ a computed dynamic request is a coverage gap (348 ms)
-    ✓ the plugin refuses the same edge on its own, with its own rule (100 ms)
-    ✓ a literal local dynamic request is a normal local edge (417 ms)
-    ✓ a forbidden engine entry cannot be reached through import() (8 ms)
-  BC-3/BC-9: every relay escape is caught by a real build
-    ✓ neg-relay-reexport-star fails with PMS_FORBIDDEN_STYLE_CHANNEL (export *) (391 ms)
-    ✓ neg-relay-reexport-named fails with PMS_FORBIDDEN_STYLE_CHANNEL (named re-export) (991 ms)
-    ✓ neg-relay-barrel-chain fails with PMS_FORBIDDEN_STYLE_CHANNEL (two-hop barrel chain) (738 ms)
-    ✓ neg-stylesheet-via-relay fails with PMS_FORBIDDEN_STYLE_CHANNEL (stylesheet through a relay) (441 ms)
-    ✓ neg-unresolved-import fails with PMS_COVERAGE_GAP (unresolved local import) (332 ms)
-    ✓ neg-dynamic-import fails with PMS_COVERAGE_GAP (computed dynamic import) (341 ms)
-    ✓ the diagnostic points at the module outside every root (1675 ms)
-    ✓ the report names the relays, so the closure is auditable (1003 ms)
-  BC-4: a covered file that was never analysed is a failure
-    ✓ a fully analysed set is consistent (1 ms)
-    ✓ a covered file the bundler loaded but never compiled is missing (1 ms)
-    ✓ the generated design-system module is exempt, with a reason
-    ✓ paths are compared canonically, so a query suffix cannot hide a file (2 ms)
-    ✓ a file loaded but not covered is reported separately (4 ms)
-  the CLI cross-checks expected vs analysed before publishing
-    ✓ the published report carries the cross-check (1 ms)
-    ✓ a covered file that fails the policy still counts as analysed (946 ms)
-
-PASS __tests__/pandamstyle/staleness-test.js
-  removing a token invalidates its stale usages
-    ✓ the first build is valid and records its digest
-    second build after removing spacing.md, pages untouched
-      ✓ the second build fails with a non-zero status
-      ✓ the stale usage is detected as an unknown token
-      ✓ the diagnostic points at the page that still uses it (1 ms)
-      ✓ no artifact is presented as the new current generation
-      ✓ the previous stylesheet is not overwritten by a false current one
-    restoring the token yields a valid build again
-      ✓ the third build succeeds and the digest matches the first one (804 ms)
-  changing a token value updates the digest but preserves identity
-    ✓ the build still succeeds and the digest changed (1 ms)
-    ✓ the logical variable identity of spacing.md is preserved
-
-PASS __tests__/pandamstyle/incremental-css-test.js (10.557 s)
-  Spike 3 Phase B: incremental CSS equals a full aggregation
-    ✓ the whole trace produces the same bytes as a full aggregation (4136 ms)
-    ✓ a no-change revision reuses the previous stylesheet byte for byte (157 ms)
-    ✓ a one-file edit touches only that file rule contributions (158 ms)
-  Spike 3 Phase B: a rule belongs to its owners
-    ✓ a shared atom survives the deletion of one owner (352 ms)
-    ✓ a rule owned only by a deleted file disappears with it (238 ms)
-  Spike 3 Phase B: cascade order is preserved, not appended to
-    ✓ edits in an order unrelated to the traversal order still match (3142 ms)
-    ✓ rules for the same property are ordered by the aggregator, not by age (490 ms)
-    ✓ a condition and a theme interaction keep their order across an edit (364 ms)
-  Spike 3 Phase B: a global change falls back, visibly
-    ✓ a design-system change is a counted, named full CSS rebuild (209 ms)
-    ✓ a configuration change is a fallback too (244 ms)
-    ✓ the fallback path itself is measured as a rebuild, not hidden (139 ms)
-  Spike 3 Phase B: the incremental stylesheet equals the full one
-    ✓ over a run of mixed edits, both paths publish identical bytes (169 ms)
-
-PASS __tests__/pandamstyle/agent-dirty-input-test.js (11.041 s)
+PASS __tests__/pandamstyle/agent-dirty-input-test.js (14.385 s)
   Spike 4 Phase A: an explicit mutation set does not cause a project scan
-    ✓ one changed path reads and hashes exactly one file and scans none (1065 ms)
-    ✓ the discovery scan disappears from the analysis entirely (179 ms)
-    ✓ a full-discovery session still reads the whole project (231 ms)
-    ✓ five changed paths read five files and no unrelated ones (366 ms)
-    ✓ a declared file whose bytes are identical is reported as unchanged (328 ms)
-    ✓ one agent call is one revision, however many files it names (244 ms)
+    ✓ one changed path reads and hashes exactly one file and scans none (1411 ms)
+    ✓ the discovery scan disappears from the analysis entirely (312 ms)
+    ✓ a full-discovery session still reads the whole project (328 ms)
+    ✓ five changed paths read five files and no unrelated ones (542 ms)
+    ✓ a declared file whose bytes are identical is reported as unchanged (1233 ms)
+    ✓ one agent call is one revision, however many files it names (393 ms)
   Spike 4 Phase A: explicit input equals full discovery equals a rebuild
-    ✓ agent input, full discovery and a fresh rebuild agree: one file, existing atoms (1534 ms)
-    ✓ agent input, full discovery and a fresh rebuild agree: a new file (474 ms)
-    ✓ agent input, full discovery and a fresh rebuild agree: a deleted file (271 ms)
-    ✓ agent input, full discovery and a fresh rebuild agree: a renamed file (329 ms)
-    ✓ agent input, full discovery and a fresh rebuild agree: an import change (2154 ms)
-    ✓ the whole mixed trace stays fresh-build equivalent (1258 ms)
+    ✓ agent input, full discovery and a fresh rebuild agree: one file, existing atoms (387 ms)
+    ✓ agent input, full discovery and a fresh rebuild agree: a new file (823 ms)
+    ✓ agent input, full discovery and a fresh rebuild agree: a deleted file (586 ms)
+    ✓ agent input, full discovery and a fresh rebuild agree: a renamed file (413 ms)
+    ✓ agent input, full discovery and a fresh rebuild agree: an import change (392 ms)
+    ✓ the whole mixed trace stays fresh-build equivalent (872 ms)
   Spike 4 Phase A: addition, deletion and rename
-    ✓ creating a file repairs an import that did not resolve (222 ms)
-    ✓ a creation re-probes the affected negative key and not the others (138 ms)
-    ✓ deleting a file removes its output, its rules and its coverage (222 ms)
-    ✓ a rename removes the old path and publishes the new one (204 ms)
-    ✓ an import change moves the closure (214 ms)
+    ✓ creating a file repairs an import that did not resolve (1648 ms)
+    ✓ a creation re-probes the affected negative key and not the others (454 ms)
+    ✓ deleting a file removes its output, its rules and its coverage (414 ms)
+    ✓ a rename removes the old path and publishes the new one (846 ms)
+    ✓ an import change moves the closure (530 ms)
   Spike 4 Phase A: the trust contract is explicit and enforced
-    ✓ an incomplete mutation set is detectable on demand (100 ms)
-    ✓ a complete mutation set audits clean (79 ms)
-    ✓ forceFullDiscovery re-derives everything and says so (156 ms)
-    ✓ a full-discovery transaction is honoured even through the agent API (107 ms)
-    ✓ the audit interval forces a periodic full discovery (112 ms)
-    ✓ an unknown mode is rejected by name (31 ms)
-    ✓ a malformed mutation is rejected rather than silently narrowed (23 ms)
-    ✓ a declared path that does not exist is handled as a removal (178 ms)
-    ✓ a path outside every root cannot be pulled into coverage (99 ms)
+    ✓ an incomplete mutation set is detectable on demand (150 ms)
+    ✓ a complete mutation set audits clean (117 ms)
+    ✓ forceFullDiscovery re-derives everything and says so (179 ms)
+    ✓ a full-discovery transaction is honoured even through the agent API (91 ms)
+    ✓ the audit interval forces a periodic full discovery (96 ms)
+    ✓ an unknown mode is rejected by name (32 ms)
+    ✓ a malformed mutation is rejected rather than silently narrowed (44 ms)
+    ✓ a declared path that does not exist is handled as a removal (215 ms)
+    ✓ a path outside every root cannot be pulled into coverage (169 ms)
   Spike 4 Phase A: the counters count work
-    ✓ the counter is installed at the source and reports what was done (72 ms)
+    ✓ the counter is installed at the source and reports what was done (737 ms)
 
-PASS __tests__/pandamstyle/incremental-publication-test.js (11.4 s)
+PASS __tests__/pandamstyle/incremental-publication-test.js (15.479 s)
   Spike 3 Phase A: publication does only the required work
-    ✓ a no-change revision writes zero JavaScript artifacts (549 ms)
-    ✓ a single-file edit writes only the affected JavaScript (291 ms)
-    ✓ a genuinely new atom changes the stylesheet; a shared one does not (459 ms)
-    ✓ a whitespace-only edit reuses every artifact, including the output (295 ms)
-    ✓ a property reorder changes the JavaScript and not the stylesheet (1500 ms)
-    ✓ unchanged JavaScript is reused by content, not rewritten (177 ms)
-    ✓ a five-file edit writes the affected set and no more (234 ms)
+    ✓ a no-change revision writes zero JavaScript artifacts (941 ms)
+    ✓ a single-file edit writes only the affected JavaScript (351 ms)
+    ✓ a genuinely new atom changes the stylesheet; a shared one does not (1419 ms)
+    ✓ a whitespace-only edit reuses every artifact, including the output (320 ms)
+    ✓ a property reorder changes the JavaScript and not the stylesheet (400 ms)
+    ✓ unchanged JavaScript is reused by content, not rewritten (683 ms)
+    ✓ a five-file edit writes the affected set and no more (388 ms)
   Spike 3 Phase A: a deleted source takes its output with it
-    ✓ a removed module leaves no stale JavaScript and no stale CSS (301 ms)
-    ✓ a removed module removes exactly its own artifact and nothing else (153 ms)
-    ✓ a file that leaves the covered set removes its output (222 ms)
-    ✓ a renamed source removes the old path and publishes the new one (245 ms)
+    ✓ a removed module leaves no stale JavaScript and no stale CSS (322 ms)
+    ✓ a removed module removes exactly its own artifact and nothing else (208 ms)
+    ✓ a file that leaves the covered set removes its output (353 ms)
+    ✓ a renamed source removes the old path and publishes the new one (351 ms)
   Spike 3 Phase A: incremental publication equals a fresh rebuild
-    ✓ the whole trace stays equivalent to a fresh rebuild (3297 ms)
-    ✓ a global fallback produces fresh-equivalent output (301 ms)
-    ✓ a valid -> invalid -> repair trace leaves the right generation current (303 ms)
+    ✓ the whole trace stays equivalent to a fresh rebuild (3189 ms)
+    ✓ a global fallback produces fresh-equivalent output (868 ms)
+    ✓ a valid -> invalid -> repair trace leaves the right generation current (493 ms)
   Spike 3 Phase A: a publication failure preserves the previous generation
-    ✓ a failure at mid-stage leaves generation N current, byte for byte (181 ms)
-    ✓ a failure at after-removals-computed leaves generation N current, byte for byte (144 ms)
-    ✓ a failure at after-css-staged leaves generation N current, byte for byte (160 ms)
-    ✓ a failure at before-manifest leaves generation N current, byte for byte (152 ms)
-    ✓ a failure at before-commit leaves generation N current, byte for byte (130 ms)
-    ✓ a retry after a publication failure publishes the delta (172 ms)
-    ✓ a failed first publication leaves no output directory at all (81 ms)
-    ✓ a committed generation leaves no scratch directory behind (72 ms)
-    ✓ a rolled-back generation leaves no scratch directory behind (76 ms)
+    ✓ a failure at mid-stage leaves generation N current, byte for byte (182 ms)
+    ✓ a failure at after-removals-computed leaves generation N current, byte for byte (170 ms)
+    ✓ a failure at after-css-staged leaves generation N current, byte for byte (139 ms)
+    ✓ a failure at before-manifest leaves generation N current, byte for byte (153 ms)
+    ✓ a failure at before-commit leaves generation N current, byte for byte (204 ms)
+    ✓ a retry after a publication failure publishes the delta (867 ms)
+    ✓ a failed first publication leaves no output directory at all (107 ms)
+    ✓ a committed generation leaves no scratch directory behind (99 ms)
+    ✓ a rolled-back generation leaves no scratch directory behind (107 ms)
   Spike 3 Phase A: a revision with no output change reuses its generation
-    ✓ a byte-identical generation is not rematerialized (3 ms)
-    ✓ a revision and a generation are not the same thing (79 ms)
+    ✓ a byte-identical generation is not rematerialized (7 ms)
+    ✓ a revision and a generation are not the same thing (127 ms)
   Spike 3 Phase A: unchanged artifacts are reused without being rewritten
-    ✓ a reused artifact shares an inode with the generation it came from (2 ms)
-    ✓ a changed artifact is a NEW file, never an in-place write of a linked one (1 ms)
+    ✓ a reused artifact shares an inode with the generation it came from (4 ms)
+    ✓ a changed artifact is a NEW file, never an in-place write of a linked one (2 ms)
     ✓ a record file that outlived its generation does not claim a reuse (2 ms)
-    ✓ releasing a generation does not invalidate the one that reused it (3 ms)
+    ✓ releasing a generation does not invalidate the one that reused it (4 ms)
   Spike 3 Phase A: a process that dies mid-publish is recoverable
     ✓ a crash before the commit leaves generation N current (2 ms)
     ✓ a crash after the swap is rolled forward, never left mixed (2 ms)
-    ✓ a staging directory left by a crash is identifiable and cleanable (1 ms)
+    ✓ a staging directory left by a crash is identifiable and cleanable (2 ms)
   Spike 3 Phase A: the publication variants are selectable and separate
-    ✓ the default variant is the Spike 2 reference (112 ms)
-    ✓ the same edit under delta publication is equivalent (206 ms)
-    ✓ the variant accepts its object form (81 ms)
-    ✓ an unknown variant is rejected by name (25 ms)
-    ✓ incremental CSS without incremental publication is refused (28 ms)
-    ✓ the Phase B variant is a real third path, not a relabelled one (85 ms)
+    ✓ the default variant is the Spike 2 reference (135 ms)
+    ✓ the same edit under delta publication is equivalent (281 ms)
+    ✓ the variant accepts its object form (96 ms)
+    ✓ an unknown variant is rejected by name (40 ms)
+    ✓ incremental CSS without incremental publication is refused (26 ms)
+    ✓ the Phase B variant is a real third path, not a relabelled one (95 ms)
 
-PASS __tests__/pandamstyle/vite-build-test.js (14.64 s)
+PASS __tests__/pandamstyle/vite-build-test.js (15.784 s)
   BC-3/BC-5: a real vite build publishes one coherent generation
-    ✓ the build exits 0 (1870 ms)
-    ✓ the manifest, the module and the stylesheet are all published (1 ms)
-    ✓ the stylesheet is also emitted into the bundle (1 ms)
-    ✓ every artifact references the same registryDigest (2 ms)
+    ✓ the build exits 0 (1894 ms)
+    ✓ the manifest, the module and the stylesheet are all published
+    ✓ the stylesheet is also emitted into the bundle (5 ms)
+    ✓ every artifact references the same registryDigest (1 ms)
     ✓ the report shows the expected-vs-analysed cross-check as clean (2 ms)
-    ✓ the generated design-system module is not expected to be analysed
+    ✓ the generated design-system module is not expected to be analysed (3 ms)
   BC-3/BC-4/BC-9: a relay escape fails a real vite build
-    ✓ the build exits non-zero
+    ✓ the build exits non-zero (1 ms)
     ✓ the relayed module is the one refused (1 ms)
     ✓ no generation is published
   BC-5: a late bundler failure publishes no new generation
-    ✓ the failing build exits non-zero (1957 ms)
-    ✓ the design system changes, so a partial publish would be visible (1395 ms)
-    ✓ every artifact is still byte-identical to generation N (1 ms)
+    ✓ the failing build exits non-zero (1453 ms)
+    ✓ the design system changes, so a partial publish would be visible (1802 ms)
+    ✓ every artifact is still byte-identical to generation N (2 ms)
     ✓ no staging or backup directory is left behind
-    ✓ the same design system then builds cleanly and does publish (1148 ms)
+    ✓ the same design system then builds cleanly and does publish (1749 ms)
   a build that cannot publish is refused up front
-    ✓ the build fails with a configuration diagnostic (1654 ms)
+    ✓ the build fails with a configuration diagnostic (441 ms)
     ✓ no generation is left behind by the refusal
 
-PASS __tests__/pandamstyle/incremental-session-test.js (15.368 s)
-  project session: reuse is decided by content, not by path
-    ✓ revision 1 analyses the whole covered set (330 ms)
-    ✓ a no-change revision recompiles nothing and reuses everything (14 ms)
-    ✓ a changed file is recompiled and the others are not (72 ms)
-    ✓ the validity key is not the path and not a timestamp (2 ms)
-  project session: a no-change revision performs zero real parses
-    ✓ the first revision parses, the second does not (142 ms)
-  project session: an invalid revision, a repair, and the module graph
-    ✓ the whole revision trace stays equivalent to a fresh rebuild (2861 ms)
-  project session: reverse dependencies and stale state
-    ✓ a style-only edit to a relay invalidates nothing but the relay (135 ms)
-    ✓ breaking the relay invalidates the files that consumed it (142 ms)
-    ✓ a deleted file leaves no stale rule and no stale diagnostic (118 ms)
-    ✓ a design-system change is an explicit full fallback (1832 ms)
-    ✓ a build-configuration change is a full fallback too (1223 ms)
-  project session: publication is transactional across revisions
-    ✓ a failed revision keeps the last published generation current (133 ms)
-  project session: every result carries its revision
-    ✓ revision ids increase and are reported on the generation (154 ms)
-    ✓ a result from an older revision is never presented as current (47 ms)
-  project session: memory stays bounded over a long session
-    ✓ a thousand revisions do not grow the session without bound (6233 ms)
-
-PASS __tests__/pandamstyle/transactional-generation-test.js (15.555 s)
+PASS __tests__/pandamstyle/transactional-generation-test.js (17.123 s)
   BC-5: the transaction itself
-    ✓ a rollback on a first build leaves nothing published (7 ms)
-    ✓ a rollback restores the previous generation byte for byte (8 ms)
-    ✓ a crash between snapshot and commit is recovered by the next run (5 ms)
-    ✓ a rollback restores a file the failed generation deleted (3 ms)
-    ✓ the commit marker is published last (2 ms)
-    ✓ withGeneration publishes on success (4 ms)
-    ✓ withGeneration rolls back on a throw, and rethrows (5 ms)
-    ✓ withGeneration rolls back when the callback rejects (3 ms)
+    ✓ a rollback on a first build leaves nothing published (19 ms)
+    ✓ a rollback restores the previous generation byte for byte (20 ms)
+    ✓ a crash between snapshot and commit is recovered by the next run (16 ms)
+    ✓ a rollback restores a file the failed generation deleted (7 ms)
+    ✓ the commit marker is published last (3 ms)
+    ✓ withGeneration publishes on success (5 ms)
+    ✓ withGeneration rolls back on a throw, and rethrows (7 ms)
+    ✓ withGeneration rolls back when the callback rejects (8 ms)
     ✓ a committed transaction cannot be reused (2 ms)
   BC-5/BC-9: a failing CLI build publishes no mix
-    ✓ a valid build publishes the full artifact set (716 ms)
-    ✓ a policy error leaves generation N byte-identical (2160 ms)
-    ✓ a coverage error leaves generation N byte-identical (946 ms)
-    ✓ a provenance error leaves generation N byte-identical (2573 ms)
-    ✓ a parse error leaves generation N byte-identical (1204 ms)
-    ✓ an internal error injected after the design-system module leaves generation N byte-identical (1056 ms)
-    ✓ a changed design system plus an internal failure after generation leaves generation N byte-identical (857 ms)
-    ✓ the injected failure is a real diagnostic on a real process (732 ms)
-    ✓ after a failed generation every artifact still carries the same digest (707 ms)
-    ✓ a failing FIRST build publishes nothing at all (268 ms)
+    ✓ a valid build publishes the full artifact set (1134 ms)
+    ✓ a policy error leaves generation N byte-identical (1912 ms)
+    ✓ a coverage error leaves generation N byte-identical (1294 ms)
+    ✓ a provenance error leaves generation N byte-identical (1859 ms)
+    ✓ a parse error leaves generation N byte-identical (2085 ms)
+    ✓ an internal error injected after the design-system module leaves generation N byte-identical (1351 ms)
+    ✓ a changed design system plus an internal failure after generation leaves generation N byte-identical (1395 ms)
+    ✓ the injected failure is a real diagnostic on a real process (1340 ms)
+    ✓ after a failed generation every artifact still carries the same digest (1025 ms)
+    ✓ a failing FIRST build publishes nothing at all (329 ms)
     ✓ a failing build leaves no staging or backup directory behind (256 ms)
-    ✓ a successful build leaves no staging or backup directory behind (1686 ms)
-    ✓ two consecutive valid builds are byte-identical (945 ms)
+    ✓ a successful build leaves no staging or backup directory behind (353 ms)
+    ✓ two consecutive valid builds are byte-identical (751 ms)
 
-PASS __tests__/pandamstyle/negative-builds-test.js (16.172 s)
+PASS __tests__/pandamstyle/incremental-session-test.js (17.422 s)
+  project session: reuse is decided by content, not by path
+    ✓ revision 1 analyses the whole covered set (627 ms)
+    ✓ a no-change revision recompiles nothing and reuses everything (41 ms)
+    ✓ a changed file is recompiled and the others are not (105 ms)
+    ✓ the validity key is not the path and not a timestamp (2 ms)
+  project session: a no-change revision performs zero real parses
+    ✓ the first revision parses, the second does not (207 ms)
+  project session: an invalid revision, a repair, and the module graph
+    ✓ the whole revision trace stays equivalent to a fresh rebuild (3314 ms)
+  project session: reverse dependencies and stale state
+    ✓ a style-only edit to a relay invalidates nothing but the relay (269 ms)
+    ✓ breaking the relay invalidates the files that consumed it (247 ms)
+    ✓ a deleted file leaves no stale rule and no stale diagnostic (122 ms)
+    ✓ a design-system change is an explicit full fallback (399 ms)
+    ✓ a build-configuration change is a full fallback too (530 ms)
+  project session: publication is transactional across revisions
+    ✓ a failed revision keeps the last published generation current (731 ms)
+  project session: every result carries its revision
+    ✓ revision ids increase and are reported on the generation (468 ms)
+    ✓ a result from an older revision is never presented as current (390 ms)
+  project session: memory stays bounded over a long session
+    ✓ a thousand revisions do not grow the session without bound (5686 ms)
+
+PASS __tests__/pandamstyle/negative-builds-test.js (17.507 s)
   neg-forbidden-value fails with PMS_FORBIDDEN_VALUE
-    ✓ build process exits non-zero (AC AC-011, AC-016, AC-018: raw value, forged var(), forged ref object, alias, computed key, spread) (10 ms)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
-    ✓ no artifact is published as current
+    ✓ build process exits non-zero (AC AC-011, AC-016, AC-018: raw value, forged var(), forged ref object, alias, computed key, spread) (5 ms)
+    ✓ the failure is the expected policy code, not a crash (2 ms)
+    ✓ no artifact is published as current (1 ms)
   neg-forbidden-value-ts fails with PMS_FORBIDDEN_VALUE
-    ✓ build process exits non-zero (AC AC-017: same error in TSX with `as any` and a double cast, no tsc involved)
-    ✓ the failure is the expected policy code, not a crash
-    ✓ no artifact is published as current
+    ✓ build process exits non-zero (AC AC-017: same error in TSX with `as any` and a double cast, no tsc involved) (2 ms)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current (2 ms)
   neg-unknown-token fails with PMS_UNKNOWN_TOKEN
     ✓ build process exits non-zero (AC AC-012: token absent from the registry) (1 ms)
+    ✓ the failure is the expected policy code, not a crash (2 ms)
+    ✓ no artifact is published as current (3 ms)
+  neg-private-token fails with PMS_TOKEN_NOT_PUBLIC
+    ✓ build process exits non-zero (AC AC-020: private primitive selected from a consumer page) (5 ms)
     ✓ the failure is the expected policy code, not a crash (1 ms)
     ✓ no artifact is published as current (1 ms)
-  neg-private-token fails with PMS_TOKEN_NOT_PUBLIC
-    ✓ build process exits non-zero (AC AC-020: private primitive selected from a consumer page) (1 ms)
-    ✓ the failure is the expected policy code, not a crash (22 ms)
-    ✓ no artifact is published as current
   neg-token-category fails with PMS_INVALID_TOKEN_CATEGORY
     ✓ build process exits non-zero (AC AC-013: spacing token used for fontSize)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
-    ✓ no artifact is published as current
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
   neg-composite-form fails with PMS_UNSUPPORTED_PROPERTY_FORM
-    ✓ build process exits non-zero (AC AC-015: composite border shorthand)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ build process exits non-zero (AC AC-015: composite border shorthand) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-unsupported-property fails with PMS_UNSUPPORTED_PROPERTY
-    ✓ build process exits non-zero (AC AC-012: property outside the closed profile) (1 ms)
+    ✓ build process exits non-zero (AC AC-012: property outside the closed profile)
     ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current (1 ms)
   neg-unknown-condition fails with PMS_UNKNOWN_CONDITION
@@ -472,26 +472,26 @@ PASS __tests__/pandamstyle/negative-builds-test.js (16.172 s)
     ✓ no artifact is published as current
   neg-forbidden-import fails with PMS_FORBIDDEN_IMPORT
     ✓ build process exits non-zero (AC AC-051, AC-052: direct engine entries and the atoms path in a covered page)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
-    ✓ no artifact is published as current
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
   neg-style-channel fails with PMS_FORBIDDEN_STYLE_CHANNEL
     ✓ build process exits non-zero (AC AC-054: inline style attribute and unapproved local stylesheet)
     ✓ the failure is the expected policy code, not a crash (1 ms)
     ✓ no artifact is published as current
   neg-jsx-spread fails with PMS_UNVERIFIED_JSX_SPREAD
-    ✓ build process exits non-zero (AC AC-054: JSX spread that cannot be proven free of style/className)
+    ✓ build process exits non-zero (AC AC-054: JSX spread that cannot be proven free of style/className) (1 ms)
     ✓ the failure is the expected policy code, not a crash
-    ✓ no artifact is published as current (1 ms)
+    ✓ no artifact is published as current
   neg-invalid-variant fails with PMS_INVALID_VARIANT_VALUE
-    ✓ build process exits non-zero (AC AC-039: literal invalid variant rejected at build, before any style is emitted) (1 ms)
+    ✓ build process exits non-zero (AC AC-039: literal invalid variant rejected at build, before any style is emitted)
     ✓ the failure is the expected policy code, not a crash (1 ms)
     ✓ no artifact is published as current (1 ms)
   neg-non-static fails with PMS_NON_STATIC_VALUE
-    ✓ build process exits non-zero (AC AC-023, AC-019: local helper named token gains no trust; props value is not static) (11 ms)
+    ✓ build process exits non-zero (AC AC-023, AC-019: local helper named token gains no trust; props value is not static) (2 ms)
     ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current (1 ms)
   neg-props-raw-object fails with PMS_UNVERIFIED_PROPS_SOURCE
-    ✓ build process exits non-zero (AC BC-1: an object literal handed to props(), while a create() namespace in the same file compiles) (1 ms)
+    ✓ build process exits non-zero (AC BC-1: an object literal handed to props(), while a create() namespace in the same file compiles)
     ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-props-raw-reference fails with PMS_UNVERIFIED_PROPS_SOURCE
@@ -499,20 +499,20 @@ PASS __tests__/pandamstyle/negative-builds-test.js (16.172 s)
     ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-props-shadowing fails with PMS_UNVERIFIED_JSX_SPREAD
-    ✓ build process exits non-zero (AC BC-2: a parameter shadowing a module-level props() result inherits nothing) (1 ms)
-    ✓ the failure is the expected policy code, not a crash
+    ✓ build process exits non-zero (AC BC-2: a parameter shadowing a module-level props() result inherits nothing)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
     ✓ no artifact is published as current
   neg-props-reassigned fails with PMS_UNVERIFIED_JSX_SPREAD
     ✓ build process exits non-zero (AC BC-2: a props() result that is then reassigned is not the proven value)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
-    ✓ no artifact is published as current
+    ✓ the failure is the expected policy code, not a crash
+    ✓ no artifact is published as current (1 ms)
   neg-props-mutated fails with PMS_UNVERIFIED_PROVENANCE
-    ✓ build process exits non-zero (AC BC-2: a proven props() result whose member is written to afterwards)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ build process exits non-zero (AC BC-2: a proven props() result whose member is written to afterwards) (1 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-props-escaped fails with PMS_UNVERIFIED_PROVENANCE
     ✓ build process exits non-zero (AC BC-2: a proven value handed to an unknown function and to Object.assign)
-    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-helper-shadowed fails with PMS_UNVERIFIED_JSX_SPREAD
     ✓ build process exits non-zero (AC BC-2, BC-6: an alias of the helper, and a nested declaration shadowing it, are not the helper)
@@ -521,21 +521,21 @@ PASS __tests__/pandamstyle/negative-builds-test.js (16.172 s)
   neg-relay-reexport-star fails with PMS_FORBIDDEN_STYLE_CHANNEL
     ✓ build process exits non-zero (AC BC-3, BC-9: a module outside every root, reached through `export *`)
     ✓ the failure is the expected policy code, not a crash
-    ✓ no artifact is published as current (1 ms)
+    ✓ no artifact is published as current
   neg-relay-reexport-named fails with PMS_FORBIDDEN_STYLE_CHANNEL
     ✓ build process exits non-zero (AC BC-3, BC-9: a module outside every root, reached through a named re-export)
-    ✓ the failure is the expected policy code, not a crash
-    ✓ no artifact is published as current (1 ms)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
   neg-relay-barrel-chain fails with PMS_FORBIDDEN_STYLE_CHANNEL
-    ✓ build process exits non-zero (AC BC-3, BC-9: two barrels deep, both outside every root)
+    ✓ build process exits non-zero (AC BC-3, BC-9: two barrels deep, both outside every root) (1 ms)
     ✓ the failure is the expected policy code, not a crash
-    ✓ no artifact is published as current (1 ms)
+    ✓ no artifact is published as current
   neg-unresolved-import fails with PMS_COVERAGE_GAP
     ✓ build process exits non-zero (AC BC-3, BC-4: a local import that resolves to nothing)
-    ✓ the failure is the expected policy code, not a crash
-    ✓ no artifact is published as current (1 ms)
+    ✓ the failure is the expected policy code, not a crash (1 ms)
+    ✓ no artifact is published as current
   neg-dynamic-import fails with PMS_COVERAGE_GAP
-    ✓ build process exits non-zero (AC BC-3, BC-4: a dynamic request that is not a static string) (1 ms)
+    ✓ build process exits non-zero (AC BC-3, BC-4: a dynamic request that is not a static string)
     ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-dynamic-import-local fails with PMS_FORBIDDEN_STYLE_CHANNEL
@@ -543,86 +543,86 @@ PASS __tests__/pandamstyle/negative-builds-test.js (16.172 s)
     ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   neg-stylesheet-via-relay fails with PMS_FORBIDDEN_STYLE_CHANNEL
-    ✓ build process exits non-zero (AC BC-3, BC-9: an unapproved stylesheet reached only through a relay) (1 ms)
+    ✓ build process exits non-zero (AC BC-3, BC-9: an unapproved stylesheet reached only through a relay)
     ✓ the failure is the expected policy code, not a crash
     ✓ no artifact is published as current
   role violation is reported on its own code
-    ✓ a page cannot self-declare authority (1 ms)
+    ✓ a page cannot self-declare authority
     ✓ the engine entry point is refused too
   PMS_FORBIDDEN_VALUE diagnostic content
     ✓ names the offending property
-    ✓ points at the location inside the page
+    ✓ points at the location inside the page (1 ms)
     ✓ names the violated rule and the system identity
-    ✓ lists only admissible public candidates
+    ✓ lists only admissible public candidates (1 ms)
     ✓ keeps autofix null: 17px is not a proven visual equivalent of 16px (1 ms)
     ✓ the proximity to spacing.md does not authorize a rewrite
   every forbidden-value route is refused, none silently
-    ✓ all six routes report PMS_FORBIDDEN_VALUE (241 ms)
+    ✓ all six routes report PMS_FORBIDDEN_VALUE (284 ms)
   a global runner may pass only when the negative builds really failed
-    ✓ the runner fails if a negative build unexpectedly succeeds (232 ms)
-    ✓ the runner fails if a negative build fails for another reason (233 ms)
+    ✓ the runner fails if a negative build unexpectedly succeeds (262 ms)
+    ✓ the runner fails if a negative build fails for another reason (244 ms)
 
-PASS __tests__/pandamstyle/agent-result-test.js (17.716 s)
+PASS __tests__/pandamstyle/agent-result-test.js (20.885 s)
   Phase C: the agent result is a versioned, revision-bound document
-    ✓ the result carries its kind, its version and its revision (1349 ms)
-    ✓ every result is bound to the revision it describes, and says so (276 ms)
-    ✓ a result for a revision that is not the current one is refused (189 ms)
-    ✓ a result asked for before a revision exists is refused (62 ms)
-    ✓ the mutation block reports declared, read, hashed and changed apart (208 ms)
-    ✓ a declared file whose bytes are identical is reported as a no-op, not as an edit (238 ms)
+    ✓ the result carries its kind, its version and its revision (1788 ms)
+    ✓ every result is bound to the revision it describes, and says so (176 ms)
+    ✓ a result for a revision that is not the current one is refused (238 ms)
+    ✓ a result asked for before a revision exists is refused (97 ms)
+    ✓ the mutation block reports declared, read, hashed and changed apart (1069 ms)
+    ✓ a declared file whose bytes are identical is reported as a no-op, not as an edit (422 ms)
   Phase C: a diagnostic is a repair protocol, not a sentence
-    ✓ the refusal is PMS_FORBIDDEN_VALUE, as the reference build refuses it (1331 ms)
-    ✓ the machine diagnostic names the rule without the message being read (2 ms)
-    ✓ the diagnostic carries a structured repair (1 ms)
+    ✓ the refusal is PMS_FORBIDDEN_VALUE, as the reference build refuses it (178 ms)
+    ✓ the machine diagnostic names the rule without the message being read (3 ms)
+    ✓ the diagnostic carries a structured repair (12 ms)
     ✓ a diagnostic carries the LOCAL coverage of its own file, and nothing else (1 ms)
-    ✓ a candidate list that exceeds the limit is truncated AND says so (154 ms)
-    ✓ every code the negative corpus can raise has either a repair or a stated reason (1398 ms)
+    ✓ a candidate list that exceeds the limit is truncated AND says so (257 ms)
+    ✓ every code the negative corpus can raise has either a repair or a stated reason (2693 ms)
   Phase C: an invalid revision needs no publication and no audit
-    ✓ the refusal arrives with nothing published and no generation (2270 ms)
-    ✓ the generation milestones are absent for a revision that did not publish (369 ms)
-    ✓ an audit of a refused revision is refused, and says why (156 ms)
+    ✓ the refusal arrives with nothing published and no generation (164 ms)
+    ✓ the generation milestones are absent for a revision that did not publish (183 ms)
+    ✓ an audit of a refused revision is refused, and says why (1253 ms)
   Phase C: introduce a violation, repair it, publish
-    ✓ the two revisions are a complete agent loop, and the second is clean (279 ms)
+    ✓ the two revisions are a complete agent loop, and the second is clean (1010 ms)
   Phase C: diagnostics-ready and generation-committed are two facts
-    ✓ a valid revision reports both, in order, and neither implies the other (162 ms)
-    ✓ the caller may stop at diagnostics and never publish at all (261 ms)
-    ✓ the milestone clock starts when the transaction is accepted (178 ms)
+    ✓ a valid revision reports both, in order, and neither implies the other (331 ms)
+    ✓ the caller may stop at diagnostics and never publish at all (870 ms)
+    ✓ the milestone clock starts when the transaction is accepted (255 ms)
   Phase C: the agent result does not scale with the project
-    ✓ the same diagnostics and the same affected set give the same size at 8 and 800 files (4914 ms)
-    ✓ a passing edit reports counts, not a list of the project (444 ms)
-    ✓ a GLOBAL FALLBACK still returns a small result (2025 ms)
+    ✓ the same diagnostics and the same affected set give the same size at 8 and 800 files (5723 ms)
+    ✓ a passing edit reports counts, not a list of the project (89 ms)
+    ✓ a GLOBAL FALLBACK still returns a small result (1925 ms)
   Phase C: the full audit is still available, and is the same evidence
-    ✓ the published report carries counts and a reference, not the array (61 ms)
-    ✓ the coverage counts and the coverage entries are the same numbers (105 ms)
-    ✓ the requested audit is byte-for-byte what the monolithic report carried (58 ms)
-    ✓ an audit requested BEFORE publication is committed with the generation (70 ms)
-    ✓ an audit requested AFTER publication goes beside the output, not into it (58 ms)
-    ✓ the audit is deterministic for the same revision (56 ms)
-    ✓ the audit of a session equals the audit of a full rebuild of the same bytes (101 ms)
+    ✓ the published report carries counts and a reference, not the array (105 ms)
+    ✓ the coverage counts and the coverage entries are the same numbers (164 ms)
+    ✓ the requested audit is byte-for-byte what the monolithic report carried (62 ms)
+    ✓ an audit requested BEFORE publication is committed with the generation (81 ms)
+    ✓ an audit requested AFTER publication goes beside the output, not into it (62 ms)
+    ✓ the audit is deterministic for the same revision (63 ms)
+    ✓ the audit of a session equals the audit of a full rebuild of the same bytes (110 ms)
   Phase C: nothing is generated that nobody asked for
-    ✓ a publication that was not asked for an audit writes no coverage document (59 ms)
-    ✓ the compiler reports the work it did, and only that work (58 ms)
-    ✓ a full rebuild publishes its coverage document: it writes its whole output once (101 ms)
+    ✓ a publication that was not asked for an audit writes no coverage document (63 ms)
+    ✓ the compiler reports the work it did, and only that work (60 ms)
+    ✓ a full rebuild publishes its coverage document: it writes its whole output once (106 ms)
 
   console.log
-    LONG-SESSION {"first":{"revision":0,"nodes":14,"covered":14,"forward":10,"reverse":8,"support":14,"fileStates":14,"dsConsumers":2,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":274464768},"last":{"revision":1000,"nodes":14,"covered":14,"forward":10,"reverse":8,"support":14,"fileStates":14,"dsConsumers":2,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":387334144},"samples":11}
+    LONG-SESSION {"first":{"revision":0,"nodes":14,"covered":14,"forward":10,"reverse":8,"support":14,"fileStates":14,"dsConsumers":2,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":273338368},"last":{"revision":1000,"nodes":14,"covered":14,"forward":10,"reverse":8,"support":14,"fileStates":14,"dsConsumers":2,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":389459968},"samples":11}
 
       at Object.log (__tests__/pandamstyle/phase-d-agent-loop-test.js:384:13)
 
-PASS __tests__/pandamstyle/phase-d-agent-loop-test.js (34.389 s)
+PASS __tests__/pandamstyle/phase-d-agent-loop-test.js (31.036 s)
   Spike 4 Phase D: the agent loop
-    ✓ a mixed agent trace publishes exactly what a fresh rebuild publishes (1423 ms)
-    ✓ the whole trace stays fresh-build equivalent at every revision (911 ms)
-    ✓ the agent result is still bound to its revision (1328 ms)
-    ✓ the compact agent result carries counts, not the project (169 ms)
-    ✓ the diagnostics of an invalid revision are unchanged by the graph (407 ms)
-    ✓ 1 files in one transaction is one revision (181 ms)
-    ✓ 5 files in one transaction is one revision (204 ms)
-    ✓ 20 files in one transaction is one revision (291 ms)
-    ✓ a thousand revisions leave the graph and the indexes structurally bounded (28751 ms)
+    ✓ a mixed agent trace publishes exactly what a fresh rebuild publishes (2023 ms)
+    ✓ the whole trace stays fresh-build equivalent at every revision (2104 ms)
+    ✓ the agent result is still bound to its revision (687 ms)
+    ✓ the compact agent result carries counts, not the project (161 ms)
+    ✓ the diagnostics of an invalid revision are unchanged by the graph (445 ms)
+    ✓ 1 files in one transaction is one revision (242 ms)
+    ✓ 5 files in one transaction is one revision (292 ms)
+    ✓ 20 files in one transaction is one revision (290 ms)
+    ✓ a thousand revisions leave the graph and the indexes structurally bounded (23410 ms)
 
 Test Suites: 20 passed, 20 total
 Tests:       460 passed, 460 total
 Snapshots:   0 total
-Time:        34.664 s
+Time:        31.525 s
 Ran all test suites matching __tests__/pandamstyle/.*-test.js.
