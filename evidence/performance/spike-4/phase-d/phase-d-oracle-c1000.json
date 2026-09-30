@@ -1,39 +1,1922 @@
 {
-  "documentKind": "pandamstyle-phase-c-oracle",
+  "documentKind": "pandamstyle-phase-d-oracle",
   "schemaVersion": 1,
   "corpus": "c1000-t1000-r100-s809",
-  "semantic": {
-    "revisions": 12,
-    "findings": [],
-    "verdict": "equivalent"
-  },
-  "audit": {
-    "findings": [],
-    "coverage_document_bytes": 411925,
-    "coverage_document": "/tmp/pms-phase-c-oracle-DBYxdo/audit/..pandamstyle.pms-audit/coverage-rev-2.json",
-    "verdict": "complete"
-  },
-  "field_map": {
-    "documentKind": "summary",
-    "schemaVersion": "version",
-    "contractVersion": "summary",
-    "systemId": "summary",
-    "registryDigest": "summary",
-    "coveredRoots": "summary",
-    "coveredFileCount": "summary",
-    "analysedFileCount": "summary",
-    "designSystemRuleCount": "summary",
-    "consumerRuleCount": "summary",
-    "ruleCount": "summary",
-    "cssBytes": "summary",
-    "coverage": "coverage-document",
-    "coverageConsistency": "summary",
-    "externalRequests": "summary",
-    "relayEdges": "summary",
-    "incremental": "summary"
-  },
-  "added_fields": [
-    "coverageSummary",
-    "coverageReport"
-  ]
+  "traces": 19,
+  "failedTraces": 0,
+  "verdict": "equivalent",
+  "results": {
+    "style_only_edit": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "edit-0",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 0,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "edit-1",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 0,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "edit-2",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 4,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 0,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "edit-3",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 5,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 0,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "edit-4",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 6,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 0,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "five_style_only_edits": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "five files in one revision",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 0,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "style_only_edit_new_atom": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "a declared property the generation did not have",
+          "ok": false,
+          "diagnostics": [
+            "PMS_UNKNOWN_TOKEN"
+          ],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 0,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "import_added": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "helper exists, nothing imports it",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 0,
+            "recomputed": 0,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "a page imports it",
+          "ok": false,
+          "diagnostics": [
+            "PMS_COVERAGE_GAP"
+          ],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1088,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 1,
+            "reused": 0,
+            "consumersInvalidated": 1,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 2,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "import_removed": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "a page imports a module that does not exist",
+          "ok": false,
+          "diagnostics": [
+            "PMS_COVERAGE_GAP"
+          ],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1088,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 1,
+            "reused": 0,
+            "consumersInvalidated": 1,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 2,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "and then does not",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 1,
+            "reused": 0,
+            "consumersInvalidated": 1,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 1,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "re_export_added": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "the relay re-exports one more name",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 335,
+            "recomputed": 334,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 333,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "re_export_removed": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "add",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 335,
+            "recomputed": 334,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 333,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "remove",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 0,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 335,
+            "recomputed": 334,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 333,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "export_star_relay": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "a star relay appears",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 0,
+            "recomputed": 0,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "and a page reaches the design system through it",
+          "ok": false,
+          "diagnostics": [
+            "PMS_COVERAGE_GAP"
+          ],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1005,
+            "coveredNodes": 1005,
+            "forwardEdges": 1089,
+            "reverseEdges": 1086,
+            "supportEntries": 1005,
+            "rootFileLists": 1,
+            "rootFileEntries": 1001
+          },
+          "closure": {
+            "nodesExamined": 2,
+            "nodesEntering": 2,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 2,
+            "recomputed": 2,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 0,
+            "relayAnswers": 4
+          }
+        }
+      ]
+    },
+    "relay_restored": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "the relay stops reaching the design system",
+          "ok": false,
+          "diagnostics": [
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD",
+            "PMS_UNVERIFIED_JSX_SPREAD"
+          ],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1086,
+            "reverseEdges": 1084,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 335,
+            "recomputed": 334,
+            "reused": 1,
+            "consumersInvalidated": 334,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 333,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "and comes back",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 335,
+            "recomputed": 334,
+            "reused": 1,
+            "consumersInvalidated": 334,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 333,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "module_added": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "a new page",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1004,
+            "coveredNodes": 1004,
+            "forwardEdges": 1088,
+            "reverseEdges": 1086,
+            "supportEntries": 1004,
+            "rootFileLists": 1,
+            "rootFileEntries": 1001
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 1,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 1,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 1,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "module_removed": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "a page is deleted",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1002,
+            "coveredNodes": 1002,
+            "forwardEdges": 1086,
+            "reverseEdges": 1084,
+            "supportEntries": 1002,
+            "rootFileLists": 1,
+            "rootFileEntries": 999
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 1,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 0,
+            "recomputed": 0,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "module_renamed": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "a page moves",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 2,
+            "nodesEntering": 1,
+            "nodesLeaving": 1,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 1,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 1,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "unresolved_becomes_known": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "an import that does not resolve",
+          "ok": false,
+          "diagnostics": [
+            "PMS_COVERAGE_GAP"
+          ],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1088,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 1,
+            "reused": 0,
+            "consumersInvalidated": 1,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 2,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "the module appears",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1004,
+            "coveredNodes": 1004,
+            "forwardEdges": 1088,
+            "reverseEdges": 1086,
+            "supportEntries": 1004,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 2,
+            "nodesEntering": 1,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1,
+            "recomputed": 1,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "known_becomes_unresolved": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "a module and its importer",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1004,
+            "coveredNodes": 1004,
+            "forwardEdges": 1088,
+            "reverseEdges": 1086,
+            "supportEntries": 1004,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 2,
+            "nodesEntering": 1,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 2,
+            "recomputed": 2,
+            "reused": 0,
+            "consumersInvalidated": 1,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 1,
+            "relayAnswers": 4
+          }
+        },
+        {
+          "revision": "the module is deleted",
+          "ok": false,
+          "diagnostics": [
+            "PMS_COVERAGE_GAP"
+          ],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1004,
+            "coveredNodes": 1004,
+            "forwardEdges": 1088,
+            "reverseEdges": 1086,
+            "supportEntries": 1004,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 2,
+            "recomputed": 1,
+            "reused": 1,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 2,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "diamond_parent_removed": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "a module outside every root exists",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 0,
+            "recomputed": 0,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "two pages point at it",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1006,
+            "coveredNodes": 1006,
+            "forwardEdges": 1089,
+            "reverseEdges": 1087,
+            "supportEntries": 1006,
+            "rootFileLists": 1,
+            "rootFileEntries": 1002
+          },
+          "closure": {
+            "nodesExamined": 3,
+            "nodesEntering": 3,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 3,
+            "recomputed": 3,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 1,
+            "relayAnswers": 4
+          }
+        },
+        {
+          "revision": "one of them is deleted",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 4,
+            "nodes": 1005,
+            "coveredNodes": 1005,
+            "forwardEdges": 1088,
+            "reverseEdges": 1086,
+            "supportEntries": 1005,
+            "rootFileLists": 1,
+            "rootFileEntries": 1001
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 1,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 0,
+            "recomputed": 0,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 4
+          }
+        }
+      ]
+    },
+    "alternate_path_added": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "the shared module exists",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 0,
+            "recomputed": 0,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "one path reaches it",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 3,
+            "nodes": 1005,
+            "coveredNodes": 1005,
+            "forwardEdges": 1088,
+            "reverseEdges": 1086,
+            "supportEntries": 1005,
+            "rootFileLists": 1,
+            "rootFileEntries": 1001
+          },
+          "closure": {
+            "nodesExamined": 2,
+            "nodesEntering": 2,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 2,
+            "recomputed": 2,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 0,
+            "relayAnswers": 4
+          }
+        },
+        {
+          "revision": "that path goes",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 4,
+            "nodes": 1004,
+            "coveredNodes": 1004,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1004,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 1,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 1,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 0,
+            "recomputed": 0,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        },
+        {
+          "revision": "and a different one takes its place",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 5,
+            "nodes": 1005,
+            "coveredNodes": 1005,
+            "forwardEdges": 1088,
+            "reverseEdges": 1086,
+            "supportEntries": 1005,
+            "rootFileLists": 1,
+            "rootFileEntries": 1001
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 2,
+            "nodesLeaving": 1,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 2,
+            "recomputed": 2,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 1,
+            "relayHits": 0,
+            "relayAnswers": 4
+          }
+        }
+      ]
+    },
+    "root_file_removed": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "a declared root loses a file",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1002,
+            "coveredNodes": 1002,
+            "forwardEdges": 1085,
+            "reverseEdges": 1083,
+            "supportEntries": 1002,
+            "rootFileLists": 1,
+            "rootFileEntries": 999
+          },
+          "closure": {
+            "nodesExamined": 1,
+            "nodesEntering": 0,
+            "nodesLeaving": 1,
+            "fullWalk": 1,
+            "fullFallback": 0,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 0,
+            "recomputed": 0,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 0,
+            "relayHits": 0,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    },
+    "global_config_fallback": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "an engine option changes",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1003,
+            "nodesEntering": 1003,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 1,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1003,
+            "recomputed": 1003,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 0,
+            "relayWalks": 3,
+            "relayHits": 1000,
+            "relayAnswers": 5
+          }
+        }
+      ]
+    },
+    "design_system_fallback": {
+      "ok": true,
+      "observations": [
+        {
+          "revision": "the design system itself changes",
+          "ok": true,
+          "diagnostics": [],
+          "closureOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "dsvOracle": {
+            "ok": true,
+            "differences": []
+          },
+          "graph": {
+            "revision": 2,
+            "nodes": 1003,
+            "coveredNodes": 1003,
+            "forwardEdges": 1087,
+            "reverseEdges": 1085,
+            "supportEntries": 1003,
+            "rootFileLists": 1,
+            "rootFileEntries": 1000
+          },
+          "closure": {
+            "nodesExamined": 1003,
+            "nodesEntering": 1003,
+            "nodesLeaving": 0,
+            "fullWalk": 1,
+            "fullFallback": 1,
+            "setDivergence": 0,
+            "propagationAborted": 0
+          },
+          "dsv": {
+            "examined": 1003,
+            "recomputed": 1003,
+            "reused": 0,
+            "consumersInvalidated": 0,
+            "fullFallback": 1,
+            "relayWalks": 3,
+            "relayHits": 1000,
+            "relayAnswers": 3
+          }
+        }
+      ]
+    }
+  }
 }

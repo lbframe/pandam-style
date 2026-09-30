@@ -125,8 +125,10 @@ import {
   clearModuleCache,
   clearModuleOverlay,
   moduleSummaryOfCode,
+  relayAnswerKey,
   resolveDesignSystemModule,
   setModuleOverlay,
+  setRelayAnswerStore,
   SOURCE_EXTENSIONS,
 } from './module-graph';
 import {
@@ -150,6 +152,13 @@ const SEMANTIC_CONFIG_KEYS = [
   'engineOptions',
   'useCSSLayers',
 ];
+
+function sameArray(a, b) {
+  if (a == null || b == null) return a === b;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) if (a[i] !== b[i]) return false;
+  return true;
+}
 
 function sha256(text) {
   return crypto.createHash('sha256').update(text).digest('hex');
@@ -326,8 +335,28 @@ export function createProjectSession(config) {
     generatedModulePath: null,
     overlay: new Map(),
     fileStates: new Map(),
-    // module path -> the files whose design-system view traverses it.
+    // module path -> the files whose design-system view TRAVERSES it. This is
+    // the relay-chain index: a file is a member of every module its walk
+    // descended through, and losing the last one is how a file stops being a
+    // consumer of a relay.
     dsConsumers: new Map(),
+    // module path -> the files whose design-system view IMPORTS it, whether or
+    // not the walk currently reaches the design system through it.
+    //
+    // The chain index above is not enough on its own, and the case that proves
+    // it is a relay that is DELETED and then RESTORED. On deletion the
+    // consumer's chain empties, so it withdraws from the chain index - which is
+    // correct - and on restoration the relay is indexed as nothing's consumer,
+    // so no propagation reaches it either. The consumer is holding a view that
+    // says "no design system behind this request", and nothing would ever look
+    // at it again.
+    //
+    // Indexing the IMPORT keeps the edge alive independently of what the walk
+    // concluded, which is what a dependency index is for. It is deliberately
+    // the broader relation: a file that imports a relay is examined when that
+    // relay changes, and the memo - not the index - decides whether anything is
+    // actually re-derived.
+    dsImportConsumers: new Map(),
     // Spike 4, Phase D1. The persistent coverage graph: nodes, forward and
     // reverse local edges, root membership, coverage state and origin, the
     // unresolved / external / relay records, and a graph revision. It replaces a
@@ -335,6 +364,33 @@ export function createProjectSession(config) {
     // see `coverage-graph.js` for the reachability and ordering models and for
     // the one place its correctness is argued.
     coverageGraph: createCoverageGraph(),
+    // Spike 4, Phase D2. The design-system-view state, kept across revisions.
+    //
+    //   designSystemEpoch   bumped whenever the generated design system is
+    //                       rebuilt. Part of every memo key, so a design-system
+    //                       edit invalidates every view without every view
+    //                       having to be compared against anything.
+    //   moduleVersions      file -> how many times its BYTES changed. This is
+    //                       the unit the memo keys of consumers are expressed
+    //                       in: one `Map` lookup per module on a relay chain,
+    //                       instead of a walk of the chain.
+    //   relayAnswers        (first hop, specifier, relay depth) -> the walk's
+    //                       answer plus the content versions it was produced
+    //                       from. One walk per distinct hop rather than one per
+    //                       consumer, which at c10000 is the difference between
+    //                       re-parsing a ten-thousand-token generated module
+    //                       once and ten thousand times.
+    //   relayEntriesByFirstHop   the reverse index that makes forgetting one
+    //                       O(1), so the cache is proportional to the CURRENT
+    //                       import structure.
+    dsv: {
+      designSystemEpoch: 0,
+      moduleVersions: new Map(),
+      relayAnswers: new Map(),
+      relayEntriesByFirstHop: new Map(),
+      fullFallback: false,
+      fullFallbackReason: null,
+    },
     covered: null,
     active: null,
     published: null,
@@ -377,12 +433,24 @@ export function createProjectSession(config) {
     return out;
   }
 
+  // The design-system-view state, named once because five functions below read
+  // it and `state.dsv` five times is five chances to read the wrong object.
+  const dsv = state.dsv;
+
   // ------------------------------------------------------------ design ------
 
   function rebuildDesignSystem() {
     const cfg = state.config;
     const outDirAbs = path.resolve(cfg.outDir);
     const generatedModulePath = path.join(outDirAbs, cfg.designSystemFile);
+    // Phase D2. Every design-system view is a function of the generated module
+    // and of nothing else the design system contributes, so a single epoch
+    // counter is enough to invalidate all of them - and it is what lets a memo
+    // key be O(1) in the design system instead of a digest of it.
+    state.dsv.designSystemEpoch += 1;
+    state.dsv.relayAnswers.clear();
+    state.dsv.relayEntriesByFirstHop.clear();
+
     const designSystem = phase('boundary_ms', () =>
       buildDesignSystem(cfg.definition, { ...cfg.engineOptions }),
     );
@@ -716,6 +784,38 @@ export function createProjectSession(config) {
     }
   }
 
+  function unregisterImportHops(file, hops) {
+    for (const module of hops ?? []) {
+      const set = state.dsImportConsumers.get(module);
+      if (set == null) continue;
+      set.delete(file);
+      if (set.size === 0) state.dsImportConsumers.delete(module);
+    }
+  }
+
+  /** The modules this file's import declarations resolve to. */
+  function importHopsOf(file, fileState) {
+    const hops = [];
+    for (const source of fileState.importSources ?? []) {
+      const firstHop = resolveLocal(file, source);
+      if (firstHop == null) continue;
+      if (hops.includes(firstHop)) continue;
+      hops.push(firstHop);
+    }
+    return hops;
+  }
+
+  function registerImportHops(file, hops) {
+    for (const module of hops) {
+      let set = state.dsImportConsumers.get(module);
+      if (set == null) {
+        set = new Set();
+        state.dsImportConsumers.set(module, set);
+      }
+      set.add(file);
+    }
+  }
+
   function registerChain(file, chain) {
     for (const module of chain) {
       let set = state.dsConsumers.get(module);
@@ -841,23 +941,39 @@ export function createProjectSession(config) {
    * `token` are recognized here. So the view is a digest of those answers plus
    * the chain of files that produced them, and it is the reason a re-export edit
    * invalidates its consumers while a style edit does not.
+   *
+   * Phase D wraps this in two caches, and the shape of both follows from ONE
+   * observation about what the answer is a function of:
+   *
+   *   resolveDesignSystemModule(fromFile, request, {maxDepth})
+   *     is a function of the CONTENTS of the modules it walks, and of nothing
+   *     else. It resolves its first hop from `fromFile` and then walks
+   *     downward from there, so every file that imports the same module by the
+   *     same specifier gets the SAME answer.
+   *
+   * Hence the relay cache: one walk per distinct first hop, keyed by the first
+   * hop and validated against the chain's content versions. Ten thousand pages
+   * reaching the design system through one barrel pay for one walk, not ten
+   * thousand - and at c10000 the generated module is a ten-thousand-token AST, so
+   * that walk is the single most expensive thing on the design-system path.
+   *
+   * And hence the per-file memo: a file's view can only change if its own import
+   * declarations changed, if a module on its chain changed, if the generated
+   * design system changed, or if `maxRelayDepth` changed. A style-only edit
+   * changes none of them, so the revision recomputes NOTHING.
    */
-  function computeDsView(file, importSources) {
-    const maxDepth = state.config.engineOptions?.maxRelayDepth;
+  function computeDsView(file, importSources, ctx) {
     const parts = [];
     const chain = [];
     const seen = new Set();
     for (const source of importSources) {
-      const info = resolveDesignSystemModule(file, source, { maxDepth });
-      if (info == null) {
+      const entry = ctx.resolveRelay(file, source);
+      if (entry == null || entry.info == null) {
         parts.push(`${source}=>null`);
         continue;
       }
-      parts.push(
-        `${source}=>${info.modulePath}|${info.relayPath ?? ''}|` +
-          `${stableJson(info.marker)}|${(info.exports ?? []).join(',')}|` +
-          `${stableJson(info.exportsOfRelay ?? null)}`,
-      );
+      const info = entry.info;
+      parts.push(`${source}=>${entry.fragment}`);
       for (const module of info.chain ?? []) {
         if (seen.has(module)) continue;
         seen.add(module);
@@ -868,60 +984,439 @@ export function createProjectSession(config) {
   }
 
   /**
+   * THE MEMO KEY.
+   *
+   * Two halves, and they are two halves because one of them is about the file
+   * and the other is about the answer the file already has.
+   *
+   * `dsViewInputsKey` is everything the file itself contributes: the
+   * design-system epoch, the relay depth, and each static import source together
+   * with what that source resolves to FROM THIS FILE. Two files with the same
+   * one of these walk the same path through the same design system.
+   *
+   * `dsViewChainIntact` is the other half, and it cannot be a key at all: it is
+   * a question about the chain the PREVIOUS walk visited, and the previous walk
+   * is the thing that is being validated. It compares a version number per
+   * module on a chain that is two or three modules long - one `Map` lookup each,
+   * not a traversal of anything.
+   *
+   * Together they have the property the whole optimisation rests on: if both
+   * hold, the import declarations are unchanged, every module the previous walk
+   * visited is unchanged, the design system is unchanged and the depth is
+   * unchanged - so the walk is deterministic and produces the same answer. That
+   * is the whole licence to skip it.
+   *
+   * An earlier shape of this folded the chain into one hash. It was wrong in a
+   * way only the second revision could show: the first revision has no chain to
+   * hash, so its stored key described a walk that had not happened, and every
+   * file recomputed exactly once more before the memo ever hit.
+   */
+  function dsViewInputsKey(fileState, ctx) {
+    const parts = [
+      `#epoch${ctx.designSystemEpoch}`,
+      `#depth${ctx.maxRelayDepth}`,
+    ];
+    for (const source of fileState.importSources ?? []) {
+      const firstHop = ctx.relayFirstHop(fileState.file, source);
+      // The CONTENT VERSION OF THE FIRST HOP IS PART OF THIS FILE'S INPUTS, and
+      // leaving it out is a defect this shape had once.
+      //
+      // The chain versions cover the modules a walk descended through. A walk
+      // that reached NOTHING has no chain, so nothing about it is versioned -
+      // and the one case where that matters is a relay that is deleted and then
+      // comes back. On deletion the consumer's chain empties and its reverse
+      // index entry is withdrawn, because the consumer no longer traverses the
+      // relay; on restoration the relay is no longer indexed as anything's
+      // consumer, so no propagation reaches the file either. Its own inputs have
+      // not changed on paper - same specifier, same first hop - and the view it
+      // holds ("no design system behind this request") would have survived the
+      // relay reappearing underneath it.
+      //
+      // Versioning the first hop closes that: the relay's bytes changed on the
+      // way out and again on the way back, so the key moved both times, and the
+      // view was re-derived both times.
+      parts.push(
+        `#src${source}\u0000${firstHop ?? ''}\u0000${
+          firstHop == null ? '' : ctx.moduleVersion(firstHop)
+        }`,
+      );
+    }
+    return parts.join('\n');
+  }
+
+  function dsViewChainIntact(view, ctx) {
+    const versions = view?.versions;
+    if (versions == null) return false;
+    for (const [module, version] of versions) {
+      if (ctx.moduleVersion(module) !== version) return false;
+    }
+    return true;
+  }
+
+  /**
+   * The design-system-view state the refresh reads and writes.
+   *
+   * The relay answers themselves live behind `relayStore`, which the module
+   * graph also reads: this is the one place that knows when an answer went
+   * stale.
+   */
+  function dsvContext(store) {
+    const designSystemEpoch = dsv.designSystemEpoch;
+    const maxRelayDepth = state.config.engineOptions?.maxRelayDepth;
+    const ctx = {
+      designSystemEpoch,
+      maxRelayDepth,
+      relayFirstHop: (file, source) => resolveLocal(file, source),
+      moduleVersion: (file) => dsv.moduleVersions.get(file) ?? 0,
+      // What the views derived during THIS compute were derived from. Kept on
+      // the context rather than returned by the walk, because a view is a
+      // function of every relay its own imports reach - the ones that resolved
+      // to nothing included.
+      consumedVersions: new Map(),
+      resetConsumed: () => {
+        ctx.consumedVersions.clear();
+      },
+      resolveRelay: (file, source) => {
+        const key = relayAnswerKey(file, source, maxRelayDepth);
+        const cached = store.get(key);
+        if (cached !== undefined) {
+          bump('dsv_relay_hits', 1);
+          return cached;
+        }
+        bump('dsv_relay_walks', 1);
+        // The walk is performed by the module graph and RECORDED by the store
+        // on the way out, so the transform's own call for the same relay - made
+        // a few lines later, while compiling the file this view belongs to -
+        // is answered from the same place instead of being paid for twice.
+        resolveDesignSystemModule(file, source, { maxDepth: maxRelayDepth });
+        const walked = store.get(key);
+        // Every module that walk read is an input of the view being computed,
+        // and the store already holds the version each was seen at.
+        if (walked !== undefined) {
+          for (const [module, version] of walked.versions) {
+            ctx.consumedVersions.set(module, version);
+          }
+        }
+        return walked;
+      },
+    };
+    return ctx;
+  }
+
+  /**
+   * The relay answer table, and the fragment derived from each answer.
+   *
+   * `get` is where the invalidation lives. An entry is usable exactly when every
+   * module its walk visited still has the content version the walk saw; one
+   * moved version retires the entry, and the next `resolveDesignSystemModule`
+   * re-walks. `set` records the versions alongside the answer, so the test is a
+   * comparison and not a re-derivation.
+   *
+   * `relayEntriesByFirstHop` is the reverse index that makes forgetting one O(1),
+   * which is what keeps the table proportional to the CURRENT import structure
+   * rather than to every specifier the session has ever seen.
+   */
+  function relayStore() {
+    return {
+      get(key) {
+        const entry = dsv.relayAnswers.get(key);
+        if (entry === undefined) return undefined;
+        for (const [module, version] of entry.versions) {
+          if ((dsv.moduleVersions.get(module) ?? 0) !== version) {
+            dsv.relayAnswers.delete(key);
+            dsv.relayEntriesByFirstHop.get(entry.firstHop)?.delete(key);
+            return undefined;
+          }
+        }
+        return entry;
+      },
+      set(key, firstHop, info, consulted) {
+        // Everything the walk READ, which is a superset of the chain it
+        // returned. Versioning the chain alone is a defect this shape had once:
+        // a relay that stops reaching the design system yields `null`, and
+        // `null` has no chain, so the answer stayed valid across the revision
+        // that broke the relay and the revision that repaired it.
+        const versions = new Map();
+        for (const module of consulted ?? info?.chain ?? []) {
+          versions.set(module, dsv.moduleVersions.get(module) ?? 0);
+        }
+        const entry = {
+          firstHop,
+          versions,
+          info,
+          fragment:
+            info == null
+              ? null
+              : `${info.modulePath}|${info.relayPath ?? ''}|` +
+                `${stableJson(info.marker)}|${(info.exports ?? []).join(',')}|` +
+                `${stableJson(info.exportsOfRelay ?? null)}`,
+        };
+        dsv.relayAnswers.set(key, entry);
+        if (firstHop != null) {
+          let set = dsv.relayEntriesByFirstHop.get(firstHop);
+          if (set == null) {
+            set = new Set();
+            dsv.relayEntriesByFirstHop.set(firstHop, set);
+          }
+          set.add(key);
+        }
+        return entry;
+      },
+    };
+  }
+
+  /** Forgets the design-system view of a file and every relay entry it used. */
+  function dropRelayAnswersFor(file) {
+    const keys = dsv.relayEntriesByFirstHop.get(file);
+    if (keys == null) return;
+    dsv.relayEntriesByFirstHop.delete(file);
+    for (const key of keys) dsv.relayAnswers.delete(key);
+  }
+
+  /**
    * Propagates a changed design-system view to the files that consume it.
    *
    * The propagation runs along the RELAY CHAIN, not over the whole reverse
-   * graph. A file's view can only change if the file itself changed or if a
-   * module on its chain changed; every other reverse edge - a page importing a
-   * sibling, a barrel importing a leaf that is not a design-system relay - has
-   * no bearing on whether this file's bindings are recognized.
+   * graph, and Phase D does not change that: a file's view can only change if
+   * the file itself changed or if a module on its chain changed, and every other
+   * reverse edge - a page importing a sibling, a barrel importing a leaf that is
+   * not a design-system relay - has no bearing on whether this file's bindings
+   * are recognized.
+   *
+   * What Phase D changes is what happens when the worklist reaches a file. It
+   * used to recompute the view unconditionally. Now the file is a CANDIDATE, and
+   * the memo decides: a file whose import declarations, relay chain, design
+   * system and relay depth are all unchanged keeps the view it has, and
+   * `dsv_files_recomputed` counts the ones that did not. A style-only edit names
+   * one file, and that file's memo key is unchanged, so the revision recomputes
+   * nothing at all.
+   *
+   * `coveredSet` is the session's own covered MAP rather than an array copy of
+   * its keys, because building a thousand-element - or ten thousand-element -
+   * Set on every revision to ask a membership question is exactly the kind of
+   * project-sized work this pass is being taken apart for.
    */
-  function refreshDesignSystemViews(coveredFiles) {
+  function refreshDesignSystemViews(covered, store) {
+    const started = perfNow();
     const active = state.active;
-    const coveredSet = new Set(coveredFiles);
+    const ctx = dsvContext(store);
     const worklist = [];
     for (const file of active.dirty) {
-      if (coveredSet.has(file)) worklist.push(file);
+      if (covered.has(file)) worklist.push(file);
     }
-    const recomputed = new Set();
+    // A file that ENTERED COVERAGE through an import of some other file is not
+    // dirty, and was not covered before, so it has no view - and a file with no
+    // view and no imports is not harmless to leave that way. Its fresh view is
+    // the empty one, its incremental view is nothing at all, and a host reading
+    // the two has been told that a file is in a state it is not in. The set is
+    // the affected one and nothing else: the files this revision newly covered.
+    let enteringCount = 0;
+    for (const file of active.closureDelta?.nodesEnteringCoverage ?? []) {
+      if (!covered.has(file)) continue;
+      enteringCount += 1;
+      if (!active.dirty.has(file)) worklist.push(file);
+    }
+    if (enteringCount > 0) bump('dsv_enterers_seeded', enteringCount);
+    const visited = new Set();
+
+    // A file's content version is what the memo keys of its consumers are
+    // expressed in, so it moves for every file this revision could have changed
+    // and for nothing else. A file that was declared and found byte-identical
+    // does not move its version, because it did not change - and that is the
+    // difference between an agent that over-declares costing nothing here and
+    // costing a project-wide re-derivation.
+    for (const file of active.dirty) {
+      if (!dsvContentChanged(file)) continue;
+      dsv.moduleVersions.set(file, (dsv.moduleVersions.get(file) ?? 0) + 1);
+    }
+    for (const file of active.removedFiles) {
+      dsv.moduleVersions.set(file, (dsv.moduleVersions.get(file) ?? 0) + 1);
+      dropRelayAnswersFor(file);
+    }
+
+    let examined = 0;
+    let recomputed = 0;
+    let reused = 0;
+    let consumersInvalidated = 0;
 
     while (worklist.length > 0) {
       const file = worklist.pop();
-      if (recomputed.has(file)) continue;
-      recomputed.add(file);
+      if (visited.has(file)) continue;
+      visited.add(file);
       const fileState = ensureFileState(file);
+      examined += 1;
       const consumersBefore = state.dsConsumers.get(file);
       const previous = fileState.dsView;
-      const next = phase('session_dsv_view_ms', () =>
-        computeDsView(file, fileState.importSources ?? []),
-      );
-      const changed = previous == null || previous.digest !== next.digest;
-      fileState.dsView = next;
+      const key = dsViewInputsKey(fileState, ctx);
+
       if (
         previous != null &&
-        (previous.chain.length !== next.chain.length ||
-          previous.chain.some((m, i) => m !== next.chain[i]))
+        previous.key === key &&
+        dsViewChainIntact(previous, ctx)
       ) {
-        unregisterChain(file, previous.chain);
-      }
-      registerChain(file, next.chain);
-      if (changed) {
-        active.invalid.add(file);
-        // A view that changed on a file that was NOT itself dirty is, by
-        // construction, a change reached through a relay. That is the only
-        // mechanism by which a reverse dependent is invalidated, and it is
-        // counted as such.
-        if (previous != null) bump('reverse_dependents_invalidated');
-      }
-      if (consumersBefore != null) {
-        for (const consumer of consumersBefore) {
-          if (consumer === file) continue;
-          if (!coveredSet.has(consumer)) continue;
-          if (recomputed.has(consumer)) continue;
-          worklist.push(consumer);
+        reused += 1;
+      } else {
+        ctx.resetConsumed();
+        const next = phase('session_dsv_view_ms', () =>
+          computeDsView(file, fileState.importSources ?? [], ctx),
+        );
+        next.key = key;
+        // The versions the new derivation was observed at - every module a
+        // relay walk read, not only the ones on the chain it found - so the next
+        // revision can ask whether any of them moved without walking anything.
+        next.versions = new Map(ctx.consumedVersions);
+        for (const module of next.chain) {
+          next.versions.set(module, ctx.moduleVersion(module));
+        }
+        // The import index is maintained here, where the file's import
+        // declarations were last known to be current, and nowhere else: a file
+        // whose view is REUSED provably did not change its imports, because
+        // `dsViewInputsKey` is a function of them.
+        if (previous == null || !sameArray(previous.hops, next.hops)) {
+          unregisterImportHops(file, previous?.hops);
+          next.hops = importHopsOf(file, fileState);
+          registerImportHops(file, next.hops);
+        } else {
+          next.hops = previous.hops;
+        }
+        const changed = previous == null || previous.digest !== next.digest;
+        if (
+          previous != null &&
+          (previous.chain.length !== next.chain.length ||
+            previous.chain.some((m, i) => m !== next.chain[i]))
+        ) {
+          unregisterChain(file, previous.chain);
+        }
+        fileState.dsView = next;
+        registerChain(file, next.chain);
+        recomputed += 1;
+        if (changed) {
+          active.invalid.add(file);
+          // A view that changed on a file that was NOT itself dirty is, by
+          // construction, a change reached through a relay. That is the only
+          // mechanism by which a reverse dependent is invalidated, and it is
+          // counted as such.
+          if (previous != null) {
+            bump('reverse_dependents_invalidated');
+            consumersInvalidated += 1;
+          }
         }
       }
+
+      // The relay CHAIN, and the import index. Both, and neither alone: see
+      // `dsImportConsumers` for the deleted-and-restored relay that the chain
+      // index alone cannot reach.
+      for (const consumer of [
+        ...(consumersBefore ?? []),
+        ...(state.dsImportConsumers.get(file) ?? []),
+      ]) {
+        if (consumer === file) continue;
+        if (!covered.has(consumer)) continue;
+        if (visited.has(consumer)) continue;
+        worklist.push(consumer);
+      }
     }
+
+    bump('dsv_files_examined', examined);
+    bump('dsv_files_recomputed', recomputed);
+    bump('dsv_files_reused', reused);
+    bump('dsv_consumers_invalidated', consumersInvalidated);
+    bump('dsv_relay_nodes_touched', dsv.relayAnswers.size);
+    if (dsv.fullFallback) {
+      bump('dsv_full_fallback', 1);
+      count(`dsv_full_fallback_reason_${dsv.fullFallbackReason}`, 1);
+    }
+    count('dsv_update_ms', (perfNow() - started) / 1e6);
+  }
+
+  /**
+   * Whether this revision changed a file's BYTES.
+   *
+   * Content, never mtime and never the declaration: an agent that reformatted a
+   * file without changing it must cost nothing here, and saying so is how a host
+   * finds out it is over-declaring.
+   */
+  function dsvContentChanged(file) {
+    const entry = state.active.scan.get(file);
+    if (entry !== undefined) return entry.changed === true;
+    return false;
+  }
+
+  /**
+   * The FULL audit of the incremental design-system views.
+   *
+   * Recomputes every covered file's view from scratch - no memo, no relay cache,
+   * no reuse of anything the refresh produced - and compares the digests, the
+   * chains and the recognized design-system module. It is deliberately not on
+   * the hot path: an agent revision must never need it, and this is the function
+   * a test is allowed to call because it is slow.
+   */
+  function verifyDesignSystemViews() {
+    const covered = state.covered?.covered;
+    if (covered == null || state.active == null) {
+      throw new Error(
+        'pandamstyle: verifyDesignSystemViews() audits the CURRENT revision, ' +
+          'so a revision has to exist. Call applyChanges() first.',
+      );
+    }
+    const differences = [];
+    const maxRelayDepth = state.config.engineOptions?.maxRelayDepth;
+    // The module-graph parse cache is dropped first, and it has to be.
+    //
+    // `resolveDesignSystemModule` reads an AST through the module-graph's parse
+    // cache, and `compileFile` runs a Babel transform over the SAME cached AST
+    // for the same module. An audit that ran after the analysis would therefore
+    // re-read a tree a transform may already have rewritten - which is precisely
+    // the hazard the module summary was introduced to avoid, and the reason the
+    // audit cannot be a second call into whatever the hot path already holds.
+    clearModuleCache();
+    for (const file of covered.keys()) {
+      const fileState = state.fileStates.get(file);
+      if (fileState == null) continue;
+      const parts = [];
+      const chain = [];
+      const seen = new Set();
+      for (const source of fileState.importSources ?? []) {
+        const info = resolveDesignSystemModule(file, source, {
+          maxDepth: maxRelayDepth,
+        });
+        if (info == null) {
+          parts.push(`${source}=>null`);
+          continue;
+        }
+        parts.push(
+          `${source}=>${info.modulePath}|${info.relayPath ?? ''}|` +
+            `${stableJson(info.marker)}|${(info.exports ?? []).join(',')}|` +
+            `${stableJson(info.exportsOfRelay ?? null)}`,
+        );
+        for (const module of info.chain ?? []) {
+          if (seen.has(module)) continue;
+          seen.add(module);
+          chain.push(module);
+        }
+      }
+      const expected = sha256(parts.join('\n'));
+      const actual = fileState.dsView?.digest ?? null;
+      if (actual !== expected) {
+        differences.push({
+          file,
+          kind: 'digest',
+          incremental: actual,
+          fresh: expected,
+        });
+      }
+      const expectedChain = chain.join('\u0000');
+      const actualChain = (fileState.dsView?.chain ?? []).join('\u0000');
+      if (expectedChain !== actualChain) {
+        differences.push({
+          file,
+          kind: 'chain',
+          incremental: actualChain,
+          fresh: expectedChain,
+        });
+      }
+    }
+    return { ok: differences.length === 0, differences };
   }
 
   // ------------------------------------------------------------ coverage ----
@@ -1179,6 +1674,19 @@ export function createProjectSession(config) {
         // Every cached result names the previous epoch. Dropping them is not an
         // optimisation: keeping one would be a stale result published under a
         // new revision.
+        // Phase D2. The design-system views and the relay cache are DERIVED from
+        // the module graph AND the design system, and both have just changed, so
+        // they are dropped rather than left stale. Dropping the relay cache
+        // matters as much as dropping the views: it is keyed by the design-system
+        // epoch, so keeping it would serve an answer derived from the previous
+        // design system to a revision that no longer has one.
+        state.dsv.fullFallback =
+          active.fallbackReason === 'design-system-definition';
+        state.dsv.fullFallbackReason = state.dsv.fullFallback
+          ? 'design-system-definition'
+          : (active.fallbackReason ?? null);
+        state.dsv.relayAnswers.clear();
+        state.dsv.relayEntriesByFirstHop.clear();
         for (const [file, fileState] of [...state.fileStates]) {
           fileState.contribution = null;
           fileState.validity = null;
@@ -1190,6 +1698,7 @@ export function createProjectSession(config) {
           // fallback that forgot the reverse index would leave the session
           // quietly unable to invalidate a reverse dependent afterwards.
           unregisterChain(file, fileState.dsView?.chain ?? []);
+          unregisterImportHops(file, fileState.dsView?.hops);
           fileState.dsView = null;
           active.dirty.add(file);
         }
@@ -1430,6 +1939,15 @@ export function createProjectSession(config) {
       // sufficient.
       clearModuleCache();
 
+      // The relay answer store is installed HERE and removed again below, so it
+      // exists exactly while this session is deriving views and compiling files
+      // and at no other time. A full rebuild - which runs in the same process,
+      // against the same module-level variable - never sees it, which is what
+      // keeps a session's memory out of the reference every oracle compares it
+      // against.
+      const store = relayStore();
+      setRelayAnswerStore(store);
+
       // The files whose NEGATIVE resolution was re-probed and may now be
       // positive. The coverage graph needs them by name: a request that starts
       // resolving is a graph mutation, and a graph that is not told about one
@@ -1465,6 +1983,8 @@ export function createProjectSession(config) {
           continue;
         }
         unregisterChain(file, fileState.dsView?.chain ?? []);
+        unregisterImportHops(file, fileState.dsView?.hops);
+        dropRelayAnswersFor(file);
         state.fileStates.delete(file);
         active.dirty.add(file);
         active.removedFiles.add(file);
@@ -1475,7 +1995,7 @@ export function createProjectSession(config) {
         if (ensureFileState(file).contribution == null)
           active.invalid.add(file);
       }
-      refreshDesignSystemViews([...closure.covered.keys()]);
+      refreshDesignSystemViews(closure.covered, store);
 
       if (closure.unresolved.length > 0) {
         throw new PmsError(
@@ -1537,6 +2057,7 @@ export function createProjectSession(config) {
       }
     }
 
+    setRelayAnswerStore(null);
     active.validated = true;
     active.incrementalMs = perfNow() - start;
     bump('session_file_states', state.fileStates.size);
@@ -3249,6 +3770,9 @@ export function createProjectSession(config) {
           (v) => v.resolved === null,
         ).length,
         dsConsumerModuleCount: state.dsConsumers.size,
+        dsImportConsumerModuleCount: state.dsImportConsumers.size,
+        dsViewRelayAnswerCount: state.dsv.relayAnswers.size,
+        dsViewRelayHopCount: state.dsv.relayEntriesByFirstHop.size,
         supersededRevisions: state.supersededRevisions,
         lastFallbackReason: state.lastFallbackReason,
         counters: Object.fromEntries(tally),
@@ -3264,6 +3788,18 @@ export function createProjectSession(config) {
      */
     validityOf(file) {
       return state.fileStates.get(path.resolve(file))?.validity ?? null;
+    },
+
+    /**
+     * The FULL audit of the incremental design-system views.
+     *
+     * Recomputes every covered file's view from scratch - no memo, no relay
+     * cache - and compares the digests, the relay chains and therefore the
+     * recognized design-system module, the compiler binding recognition and the
+     * diagnostics that follow from it. Not on the hot path; a test may ask.
+     */
+    verifyDesignSystemViews() {
+      return verifyDesignSystemViews();
     },
 
     /**
@@ -3329,10 +3865,15 @@ export function createProjectSession(config) {
 
     close() {
       state.closed = true;
+      setRelayAnswerStore(null);
       clearModuleOverlay();
       clearModuleCache();
       state.fileStates.clear();
       state.dsConsumers.clear();
+      state.dsImportConsumers.clear();
+      state.dsv.moduleVersions.clear();
+      state.dsv.relayAnswers.clear();
+      state.dsv.relayEntriesByFirstHop.clear();
       resolutionKeys = new Map();
       dirListings = new Map();
       state.covered = null;

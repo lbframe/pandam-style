@@ -1,181 +1,127 @@
 {
   "environment": {
-    "label": "d3-c10000-publish",
-    "corpus": "c10000-t1000-r100-s307",
+    "label": "d3-publish",
+    "corpus": "c10000",
     "node": "v22.22.0",
     "platform": "linux-x64",
     "cpuModel": "AMD Ryzen 7 5800X3D 8-Core Processor",
     "cpuCount": 16,
     "totalMemoryBytes": 33556586496,
-    "diskAvailBytesBefore": 3493220352,
+    "diskAvailBytesBefore": 3515256832,
     "diskTotalBytes": 980666998784
   },
-  "diskAvailBytesAfter": 3489832960,
+  "diskAvailBytesAfter": 3505389568,
   "cells": [
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "one_file_existing_atoms",
       "iteration": 0,
-      "wallClockMs": 33584.637034,
+      "wallClockMs": 29864.185589,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "one_file_existing_atoms",
       "iteration": 1,
-      "wallClockMs": 32318.706994,
+      "wallClockMs": 31457.868398,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
-      "variant": "compact_agent_result_plus_compact_publish_metadata",
-      "scenario": "one_file_existing_atoms",
-      "iteration": 2,
-      "wallClockMs": 33144.201444,
-      "childExitStatus": 0
-    },
-    {
-      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "one_file_new_atom",
       "iteration": 0,
-      "wallClockMs": 32636.721875,
+      "wallClockMs": 30137.303398,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "one_file_new_atom",
       "iteration": 1,
-      "wallClockMs": 31892.681009,
+      "wallClockMs": 30152.458553,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
-      "variant": "compact_agent_result_plus_compact_publish_metadata",
-      "scenario": "one_file_new_atom",
-      "iteration": 2,
-      "wallClockMs": 32095.267512,
-      "childExitStatus": 0
-    },
-    {
-      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "five_files_batch",
       "iteration": 0,
-      "wallClockMs": 31504.159488,
+      "wallClockMs": 29914.123667,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "five_files_batch",
       "iteration": 1,
-      "wallClockMs": 32158.910422,
+      "wallClockMs": 30208.593281,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
-      "variant": "compact_agent_result_plus_compact_publish_metadata",
-      "scenario": "five_files_batch",
-      "iteration": 2,
-      "wallClockMs": 32365.103168,
-      "childExitStatus": 0
-    },
-    {
-      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "twenty_files_batch",
       "iteration": 0,
-      "wallClockMs": 31949.581248,
+      "wallClockMs": 30037.246865,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "twenty_files_batch",
       "iteration": 1,
-      "wallClockMs": 31999.431476,
+      "wallClockMs": 30947.783018,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
-      "variant": "compact_agent_result_plus_compact_publish_metadata",
-      "scenario": "twenty_files_batch",
-      "iteration": 2,
-      "wallClockMs": 32961.248231,
-      "childExitStatus": 0
-    },
-    {
-      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "forbidden_value",
       "iteration": 0,
-      "wallClockMs": 31889.85253,
+      "wallClockMs": 30049.455053,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "forbidden_value",
       "iteration": 1,
-      "wallClockMs": 31144.340682,
+      "wallClockMs": 29589.224971,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
-      "variant": "compact_agent_result_plus_compact_publish_metadata",
-      "scenario": "forbidden_value",
-      "iteration": 2,
-      "wallClockMs": 31910.01795,
-      "childExitStatus": 0
-    },
-    {
-      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "repair_forbidden_value",
       "iteration": 0,
-      "wallClockMs": 32019.803619,
+      "wallClockMs": 30067.390228,
       "childExitStatus": 0
     },
     {
       "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
+      "corpusName": "c10000",
       "variant": "compact_agent_result_plus_compact_publish_metadata",
       "scenario": "repair_forbidden_value",
       "iteration": 1,
-      "wallClockMs": 32255.648114,
-      "childExitStatus": 0
-    },
-    {
-      "corpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307",
-      "corpusName": "c10000-t1000-r100-s307",
-      "variant": "compact_agent_result_plus_compact_publish_metadata",
-      "scenario": "repair_forbidden_value",
-      "iteration": 2,
-      "wallClockMs": 32215.663842,
+      "wallClockMs": 30271.898543,
       "childExitStatus": 0
     }
   ],
-  "rows": 1113,
+  "rows": 742,
   "cellFailures": 0,
   "metrics": [
     "agent_edit_to_audit_report_ms",

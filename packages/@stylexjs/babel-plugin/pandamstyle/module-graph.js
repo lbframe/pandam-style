@@ -229,10 +229,30 @@ export function moduleGraphCacheStats() {
 }
 
 /** Reset the cache (used between two builds inside one process). */
+/**
+ * The first hop a request resolves to, memoised for the revision.
+ *
+ * `resolveRelativeFile` consults `resolutionCache` only under
+ * `PMS_WORK_ELIMINATED`, which is off in production because Spike 1 introduced
+ * it as a measured, opt-in axis and nothing here is allowed to quietly conflate
+ * itself with that. The consequence is that asking "where does this request
+ * land?" per CONSUMER costs a filesystem probe per candidate extension per
+ * consumer - nineteen `stat` calls to answer a question that cannot change while
+ * the revision is being analysed, because nothing writes files during a
+ * revision.
+ *
+ * So the answer is memoised here, for the revision, and dropped with the rest of
+ * the module-graph cache at the start of the next analysis. That is the same
+ * lifetime `parseCache` has, and it is the same claim: a revision's view of the
+ * filesystem is fixed from the moment it starts.
+ */
+let firstHopCache = new Map();
+
 export function clearModuleCache() {
   parseCache.clear();
   resolutionCache.clear();
   designSystemCache.clear();
+  firstHopCache = new Map();
 }
 
 /**
@@ -587,7 +607,77 @@ export function moduleSummaryOfFile(file) {
  * Returns `{ marker, modulePath, exports, chain }` or `null`.
  * `chain` lists the files traversed so coverage can report them.
  */
+/**
+ * THE SESSION'S RELAY ANSWER STORE.
+ *
+ * `resolveDesignSystemModule` is asked the same question twice for every
+ * compiled file: once by the project session, when it derives the file's
+ * DESIGN-SYSTEM VIEW, and once by the transform, when it decides which
+ * bindings are recognized. Both answers come out of the same relay walk, and
+ * that walk re-extracts the marker, the export map and the re-export map from a
+ * module whose AST holds the whole design system - ten thousand tokens of it at
+ * c10000. Asking twice and paying twice is not a design; it is the absence of
+ * one, and Phase D2 found it.
+ *
+ * The store is a plain table supplied by whoever owns the state that can
+ * invalidate it, which in this codebase is the project session: it knows which
+ * file's BYTES changed and can therefore say whether a cached answer is still
+ * true. This module deliberately knows nothing about revisions - it asks the
+ * store and believes the answer it is given.
+ *
+ * INSTALLED FOR THE DURATION OF A SESSION ANALYSIS, AND REMOVED AGAIN BEFORE
+ * ANYTHING ELSE RUNS. A full rebuild therefore never consults a session's
+ * memory and can never be answered by one, which is the rule the differential
+ * oracle rests on and the reason the store is a module-level variable set by
+ * its owner rather than something this module owns.
+ */
+let relayAnswerStore = null;
+
+export function setRelayAnswerStore(store) {
+  relayAnswerStore = store;
+}
+
+/**
+ * The key one relay walk is stored under.
+ *
+ * It is the resolved FIRST HOP and the relay depth, and nothing else, because
+ * the walk reads nothing but the contents of the modules it descends into from
+ * that hop. Ten thousand pages importing the same barrel by the same specifier
+ * are one walk, and keying by the specifier as well would be a way of not
+ * noticing that.
+ */
+export function relayAnswerKey(fromFile, request, maxDepth) {
+  const cacheKey = `${path.dirname(fromFile)}\u0000${request}`;
+  let firstHop = firstHopCache.get(cacheKey);
+  if (firstHop === undefined) {
+    firstHop = resolveRelativeFile(fromFile, request);
+    firstHopCache.set(cacheKey, firstHop);
+  }
+  return `${maxDepth ?? 16}\u0000${firstHop ?? ''}`;
+}
+
 export function resolveDesignSystemModule(fromFile, request, config = {}) {
+  // `consulted` is every module whose BYTES this walk read, whether or not it
+  // ended up finding a design system behind the request. The chain alone is not
+  // enough to invalidate an answer, and the difference is a relay that stops
+  // reaching the design system and then starts again: the answer is `null`,
+  // there is no chain to version, and a store that versions only the chain
+  // keeps the `null` forever - through the revision that broke the relay and
+  // the revision that repaired it.
+  const consulted = new Set();
+  if (relayAnswerStore != null) {
+    const key = relayAnswerKey(fromFile, request, config.maxDepth);
+    const entry = relayAnswerStore.get(key);
+    if (entry !== undefined) return entry.info;
+    const computed = walkToDesignSystem(fromFile, request, config, consulted);
+    relayAnswerStore.set(
+      key,
+      resolveRelativeFile(fromFile, request),
+      computed,
+      consulted,
+    );
+    return computed;
+  }
   if (workEliminated()) {
     const key = `${resolutionKey(fromFile, request)}\u0000${config.maxDepth ?? 16}`;
     if (designSystemCache.has(key)) {
@@ -595,15 +685,15 @@ export function resolveDesignSystemModule(fromFile, request, config = {}) {
       return designSystemCache.get(key);
     }
     count('ds_module_walks');
-    const computed = walkToDesignSystem(fromFile, request, config);
+    const computed = walkToDesignSystem(fromFile, request, config, consulted);
     designSystemCache.set(key, computed);
     return computed;
   }
   count('ds_module_walks');
-  return walkToDesignSystem(fromFile, request, config);
+  return walkToDesignSystem(fromFile, request, config, consulted);
 }
 
-function walkToDesignSystem(fromFile, request, config = {}) {
+function walkToDesignSystem(fromFile, request, config = {}, consulted = null) {
   const seen = new Set();
   const chain = [];
   const budget = config.maxDepth ?? 16;
@@ -612,6 +702,7 @@ function walkToDesignSystem(fromFile, request, config = {}) {
     if (file == null || seen.has(file) || depth > budget) return null;
     seen.add(file);
     chain.push(file);
+    consulted?.add(file);
     const parsed = parseModuleFile(file);
     if (parsed.ast == null) return null;
 

@@ -302,11 +302,10 @@ describe('Spike 4 Phase D1: the persistent coverage graph', () => {
    * The shared half of a diamond, written OUTSIDE the declared root so that the
    * three shared modules are covered only by being reached.
    *
-   * A file outside every root is the `root-shape-changed` case - the session
-   * re-derives the whole graph, and says so - so the fixture is applied in two
-   * revisions. The first creates the modules nothing imports; the second adds
-   * the entry file, and THAT revision is the one this test is about: three nodes
-   * reached by a subtree walk from a single new edge.
+   * The fixture is applied in two revisions. The first creates the modules
+   * nothing imports; the second adds the entry file, and THAT revision is the
+   * one this test is about: three nodes reached by a subtree walk from a single
+   * new edge, with no whole-project rebuild to pay for the discovery.
    */
   function diamondShared() {
     return [
@@ -507,6 +506,38 @@ describe('Spike 4 Phase D1: the persistent coverage graph', () => {
     expect(counters(h).closure_nodes_entering_coverage).toBe(1);
     expect(counters(h).closure_nodes_examined).toBeLessThanOrEqual(2);
     expect(counters(h).negative_resolutions_invalidated).toBe(1);
+    expect(h.session.verifyCoverageGraph().ok).toBe(true);
+  });
+
+  test('repairing a broken import does not rebuild the project to do it', () => {
+    revise(h);
+    const waiting = edit(
+      h,
+      'src/waiting-outside.ts',
+      PLAIN(
+        "import { later } from '../shared/later-outside';\nexport const l = later;\n",
+      ),
+    );
+    expect(revise(h, { added: [waiting] }).ok).toBe(false);
+
+    // The repair is the NARROWEST thing an agent can do: create the one file
+    // the import named, and declare it. The module is outside every declared
+    // root, which used to be enough to condemn the revision to a whole-project
+    // rebuild - so the cost of fixing a broken import was the project.
+    const later = write(
+      h.project,
+      'shared/later-outside.ts',
+      PLAIN('export const later = 1;'),
+    );
+    const v = revise(h, { added: [later] });
+
+    expect(v.ok).toBe(true);
+    const c = counters(h);
+    expect(c.closure_full_fallback ?? 0).toBe(0);
+    expect(c.closure_nodes_entering_coverage).toBe(1);
+    // One declaration, one file that imports it, and the negative resolution
+    // that has to be re-probed. Not one visit to the rest of the project.
+    expect(c.closure_nodes_examined).toBeLessThanOrEqual(3);
     expect(h.session.verifyCoverageGraph().ok).toBe(true);
   });
 

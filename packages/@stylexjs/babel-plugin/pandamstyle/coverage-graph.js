@@ -119,8 +119,7 @@
  *   full-discovery     the caller could not describe its mutation completely,
  *                      so nothing in the previous graph can be trusted to still
  *                      be there. The whole graph is rebuilt.
- *   root-shape-changed a file appeared or disappeared outside every walked root.
- *   first-revision     there is no previous graph. Not a degraded answer - the
+   first-revision     there is no previous graph. Not a degraded answer - the
  *                      cold build is the reference - but counted, because a
  *                      metric that is zero on the cold build and zero on a
  *                      style edit and never non-zero is not measuring the
@@ -347,21 +346,32 @@ function trustRootCache(graph, ctx) {
 }
 
 /**
- * The directories a declared add or remove moved, and whether the tree's shape
- * moved somewhere an incremental update cannot describe.
+ * The root directories a declared add or remove moved the membership of.
+ *
+ * A declared path OUTSIDE every root is not a shape change, and treating it as
+ * one is expensive in exactly the case that matters most. An agent that adds the
+ * module a broken import was waiting for, or repairs an import by adding the
+ * file it names, has done the narrowest thing an agent can do - and paying for
+ * it with a whole-project rebuild made the repair cost the thing it was
+ * supposed to fix. Nothing about the root membership moved: a file under
+ * nothing is not a root member, and it enters the closure the moment a covered
+ * file imports it, which is an edge the examination below already follows.
+ *
+ * The same is true of a removal outside every root. The file leaves the closure
+ * when its last importer stops importing it, and until then it stays as the
+ * unreadable stub a fresh build would also produce.
  */
 function directoriesToRefresh(graph, ctx) {
   const dirs = new Set();
   const applied = ctx.rootDelta;
   if (applied == null || graph.rootFiles.size === 0) {
-    return { dirs, shapeMoved: false };
+    return { dirs };
   }
   for (const abs of [...applied.added, ...applied.removed]) {
     const owner = ctx.rootOwning(path.dirname(abs));
-    if (owner === null) return { dirs, shapeMoved: true };
-    dirs.add(owner);
+    if (owner !== null) dirs.add(owner);
   }
-  return { dirs, shapeMoved: false };
+  return { dirs };
 }
 
 // -------------------------------------------------------------- derivation ---
@@ -606,8 +616,15 @@ function pruneUncovered(graph, ctx, delta, touched) {
  * gap the full rebuild emits. A stub that reported a different answer would
  * break the oracle for the case it exists to describe. Its children are
  * released, because a file that is gone reaches nothing.
+ *
+ * The delta is told the edge set moved, even for a node that was a leaf. The
+ * stub's own edges are now empty where they were not, and the closure it
+ * belongs to is more than an ordering: it is the covered set AND the list of
+ * things the project asked for and did not get. A leaf that goes away changes no
+ * position and no membership, so nothing else in the gate would fire, and the
+ * closure would be returned still reporting that leaf as a file that was read.
  */
-function stubRemovedNode(graph, node, seeds) {
+function stubRemovedNode(graph, node, seeds, delta) {
   for (const target of childrenOf(node)) {
     const targetNode = graph.nodes.get(target);
     if (targetNode == null) continue;
@@ -619,6 +636,7 @@ function stubRemovedNode(graph, node, seeds) {
   node.unreadable = true;
   node.derived = true;
   node.importSources = [];
+  delta.edgeSetChanged = true;
 }
 
 // ------------------------------------------------------------- materialising -
@@ -751,24 +769,16 @@ export function refreshCoverageClosure(graph, ctx) {
     rebuildGraph(graph, ctx, delta, configuredRoots);
   } else {
     const refresh = directoriesToRefresh(graph, ctx);
-    if (refresh.shapeMoved) {
-      fullWalk = true;
-      fullFallback = true;
-      fallbackReason = 'root-shape-changed';
-      graph.rootFiles.clear();
-      rebuildGraph(graph, ctx, delta, configuredRoots);
-    } else {
-      if (refresh.dirs.size > 0) {
-        const previousRootFiles = new Map();
-        for (const dir of refresh.dirs) {
-          previousRootFiles.set(dir, graph.rootFiles.get(dir));
-          graph.rootFiles.set(dir, ctx.walkFiles(dir));
-          ctx.bump('discovery_directory_rereads', 1);
-        }
-        collectRootMembership(graph, delta, previousRootFiles);
+    if (refresh.dirs.size > 0) {
+      const previousRootFiles = new Map();
+      for (const dir of refresh.dirs) {
+        previousRootFiles.set(dir, graph.rootFiles.get(dir));
+        graph.rootFiles.set(dir, ctx.walkFiles(dir));
+        ctx.bump('discovery_directory_rereads', 1);
       }
-      examineRevision(graph, ctx, delta);
+      collectRootMembership(graph, delta, previousRootFiles);
     }
+    examineRevision(graph, ctx, delta);
   }
 
   // THE ORDERING GATE.
@@ -1025,7 +1035,7 @@ function applyChanges(graph, changes, delta, seeds) {
     if (change.kind === 'removed') {
       const node = graph.nodes.get(change.file);
       if (node == null) continue;
-      stubRemovedNode(graph, node, seeds);
+      stubRemovedNode(graph, node, seeds, delta);
       continue;
     }
     const previous = change.previousTargets;
@@ -1073,7 +1083,7 @@ function deriveUnseenSubtree(graph, seeds, ctx, delta) {
     const node = graph.nodes.get(file);
     if (node == null) continue;
     if (ctx.gone(file)) {
-      if (!node.unreadable) stubRemovedNode(graph, node, seeds);
+      if (!node.unreadable) stubRemovedNode(graph, node, seeds, delta);
       continue;
     }
     if (node.derived) continue;
