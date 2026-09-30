@@ -289,6 +289,13 @@ function assessRun(integrity) {
       (n, s) => n + (s.counts?.suitesSkipped ?? 0),
       0,
     ),
+    // The two populations behind those sums, named. Every count above is a sum
+    // over the steps that RUN tests, and a reader who cannot see which steps
+    // those were is reading a total whose denominator has been hidden from them.
+    testSteps: integrity.filter((s) => s.kind === 'test').map((s) => s.step),
+    nonTestSteps: integrity
+      .filter((s) => s.kind != null && s.kind !== 'test')
+      .map((s) => s.step),
   };
 }
 

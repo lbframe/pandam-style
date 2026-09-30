@@ -427,11 +427,20 @@ const rows = fs
 // quote a green number for a run that had not run the code. A parser with that
 // much authority over the verdict needs its own test suite rather than being
 // inlined in a heredoc.
+//
+// WHICH EVIDENCE A STEP OWES THE RUN lives in `tools/pms/step-contracts.js`,
+// for the reason its header sets out: requiring Jest counts of `install` made
+// `complete: true` unreachable for any normal run, and a verdict that can never
+// be `verified` is not a verdict.
 const {
   assessRun,
-  assessSuiteIntegrity,
   parseJestCounts,
 } = require(path.join(repoRoot, 'tools/pms/test-counts.js'));
+const {
+  assessStep,
+  contractFor,
+  evidenceFor,
+} = require(path.join(repoRoot, 'tools/pms/step-contracts.js'));
 
 const steps = {};
 const skipped = [];
@@ -439,8 +448,13 @@ const integrity = [];
 let failed = 0;
 for (const [name, status, code, note] of rows) {
   const logPath = path.join(out, `${name}.log`);
+  // Counts are read ONLY for steps whose contract requires them. Parsing a
+  // build log for `Tests:` would let a package whose output happens to contain
+  // the word contribute numbers to a delivery's totals that nobody ran.
+  const contract = contractFor(name);
+  const requiresCounts = evidenceFor(contract?.kind)?.requiresCounts === true;
   let counts = null;
-  if (fs.existsSync(logPath)) {
+  if (requiresCounts && fs.existsSync(logPath)) {
     counts = parseJestCounts(fs.readFileSync(logPath, 'utf8'));
   }
   if (status === 'skipped') skipped.push(name);
@@ -448,42 +462,43 @@ for (const [name, status, code, note] of rows) {
   // A step with no exit code records null, never 0. Reporting 0 is what
   // previously made an unexecuted step indistinguishable from a passing one.
   const exitCode = code === '-' ? null : Number(code);
-  const verdict =
-    status === 'skipped'
-      ? { step: name, verdict: 'unverified', exitCode: null,
-          findings: [{ code: 'STEP_SKIPPED',
-            message: `${name}: the step did not run, so nothing about it is verified` }],
-          counts: null }
-      : assessSuiteIntegrity({ step: name, exitCode, counts });
-  integrity.push(verdict);
-  steps[name] = {
+  // The acceptance vocabulary, mapped explicitly rather than by coincidence.
+  const acceptance =
+    status === 'passed' ? 'passed' : status === 'failed' ? 'failed' : 'not_run';
+  const verdict = assessStep({
+    step: name,
     status,
     exitCode,
-    // The acceptance vocabulary, mapped explicitly rather than by coincidence.
-    acceptance:
-      status === 'passed'
-        ? 'passed'
-        : status === 'failed'
-          ? 'failed'
-          : 'not_run',
+    counts,
+    evidence: {
+      // The acceptance vocabulary is RECORDED on the step, not cross-checked
+      // here: `record_step` derives `status` from the exit code, so `acceptance`
+      // is the same fact as `exitCode === 0` and a check between them cannot
+      // fire. What catches a swallowed exit code is a test step's counts -
+      // `EXIT_CODE_DISAGREES` - and only a test step has counts to disagree.
+      artifactPresent:
+        contract?.kind === 'artifact-check'
+          ? fs.existsSync(path.join(out, 'artifacts', 'digests.txt')) &&
+            fs.statSync(path.join(out, 'artifacts', 'digests.txt')).size > 0
+          : undefined,
+      artifactPath: path.join(out, 'artifacts', 'digests.txt'),
+    },
+  });
+  integrity.push(verdict);
+  steps[name] = {
+    kind: contract?.kind ?? null,
+    status,
+    exitCode,
+    acceptance,
     note: note === '' ? null : note,
     // Six numbers, not three: tests and suites, each passed/failed/skipped.
     // A reader who is handed only a passed-test total can be misled by a suite
     // that contributed none, which is exactly how this defect happened.
-    counts: counts == null
-      ? null
-      : {
-          testsPassed: counts.testsPassed,
-          testsFailed: counts.testsFailed,
-          testsSkipped: counts.testsSkipped,
-          testsTotal: counts.testsTotal,
-          suitesPassed: counts.suitesPassed,
-          suitesFailed: counts.suitesFailed,
-          suitesSkipped: counts.suitesSkipped,
-          suitesTotal: counts.suitesTotal,
-          testsAccountedFor: counts.testsAccountedFor,
-          suitesAccountedFor: counts.suitesAccountedFor,
-        },
+    //
+    // `null` for a step that runs no tests. That is a fact about the step, not a
+    // gap in the report, and it is deliberately not `0` - a fabricated zero
+    // would enter every total above as a real measurement.
+    counts: verdict.counts == null ? null : { ...verdict.counts },
     // The step's own verdict, which can disagree with its status. A step that
     // the shell recorded as passed because the wrapper swallowed the exit code
     // is reported here as failed, and the disagreement is the finding.
@@ -505,16 +520,33 @@ const summary = {
   toolchain: env.toolchain,
   // A run with a skipped step is NOT a complete run. This flag exists so a
   // consumer of summary.json cannot read a partial run as a full one.
+  //
   // `complete` is a conjunction of three SEPARATE claims, and a reader who
   // wants to know which one is false can look. A step can be reported as
   // `complete: false` because it never ran, because a suite failed to load, or
   // because the exit codes and the counts disagree - and those are different
   // defects with different fixes.
+  //
+  // It is not, and never was, a claim about ONE rule applied to every step. The
+  // previous form of this line also required `assessRun` to have verified every
+  // step against the Jest-count rule, which `install` and `build` can never
+  // satisfy: so `complete: true` was unreachable for any run of this script, and
+  // the flag that was supposed to be quotable was not. Each step is now
+  // assessed against the evidence its own kind owes - see
+  // `tools/pms/step-contracts.js` - and this conjunction is about the RUN.
   complete: skipped.length === 0 && failed === 0 && runIntegrity.verdict === 'verified',
   // The six numbers a delivery has to quote, and the verdict they imply. They
   // are at the TOP of the document because they are what gets quoted, and a
   // number that can be quoted without its verdict is the defect.
   verification: runIntegrity,
+  // Every finding that kept a step from being verified, under one key. The name
+  // says what it is: these are step-level integrity findings, and calling them
+  // `suiteIntegrityFailures` described four steps that run no suites at all.
+  stepIntegrityFindings: integrity
+    .filter((s) => s.verdict !== 'verified')
+    .flatMap((s) => s.findings.map((f) => ({ step: s.step, kind: s.kind, ...f }))),
+  // Kept under the old name so a reader of the previous format finds the same
+  // content. Two names for one array is a cost; a silent rename is worse.
   suiteIntegrityFailures: integrity
     .filter((s) => s.verdict !== 'verified')
     .flatMap((s) => s.findings.map((f) => ({ step: s.step, ...f }))),
@@ -542,18 +574,63 @@ done
 
 log ""
 log "run directory: $PMS_OUT_DIR"
-if [ -f "$PMS_OUT_DIR/suite-integrity.json" ]; then
+
+# ONE SOURCE OF TRUTH FOR THE VERDICT.
+#
+# The shell used to print VERIFICATION OK whenever no step failed and none was
+# skipped, while `summary.json` could say `incomplete` about the same run - which
+# is the same defect in a second place, and the reason this run reported a green
+# result and an incomplete one simultaneously. The document is the authority: it
+# holds every step's contract, its evidence and its findings, and this is a
+# reader of it rather than a second implementation of the same question.
+SUMMARY_COMPLETE=""
+RUN_VERDICT=""
+if [ -f "$PMS_OUT_DIR/summary.json" ]; then
+  read -r SUMMARY_COMPLETE RUN_VERDICT <<EOF
+$(node -e '
+  const fs = require("fs");
+  try {
+    const d = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    process.stdout.write(`${d.complete === true} ${d.verification?.verdict ?? "unknown"}`);
+  } catch {
+    // A summary that cannot be read is not a verified run, and saying so here is
+    // better than letting a missing document read as a green one.
+    process.stdout.write("false unreadable");
+  }
+' "$PMS_OUT_DIR/summary.json")
+EOF
+fi
+
+log "tests:  $(node -e '
+  const fs = require("fs");
+  const d = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+  process.stdout.write(`${d.verification.testsPassed} passed, ${d.verification.testsFailed} failed, ${d.verification.testsSkipped} skipped`);
+' "$PMS_OUT_DIR/summary.json" 2>/dev/null || echo "unavailable")"
+log "suites: $(node -e '
+  const fs = require("fs");
+  const d = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+  process.stdout.write(`${d.verification.suitesPassed} passed, ${d.verification.suitesFailed} failed, ${d.verification.suitesSkipped} skipped`);
+' "$PMS_OUT_DIR/summary.json" 2>/dev/null || echo "unavailable")"
+log "verification verdict: ${RUN_VERDICT:-unknown}"
+if [ "$SUMMARY_COMPLETE" = "true" ]; then
+  for i in "${!STEP_NAMES[@]}"; do
+    kind="$(node -e '
+      const fs = require("fs");
+      const d = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+      process.stdout.write(d.steps[process.argv[2]]?.kind ?? "unknown");
+    ' "$PMS_OUT_DIR/summary.json" "${STEP_NAMES[$i]}" 2>/dev/null || echo unknown)"
+    log "  ${STEP_NAMES[$i]}: ${STEP_STATUS[$i]}, ${kind}, verified"
+  done
+else
   node -e '
     const fs = require("fs");
     const d = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-    log "tests:  ${d.verification.testsPassed} passed, ${d.verification.testsFailed} failed, ${d.verification.testsSkipped} skipped";
-    log "suites: ${d.verification.suitesPassed} passed, ${d.verification.suitesFailed} failed, ${d.verification.suitesSkipped} skipped";
-    log "suite-integrity verdict: ${d.verification.verdict}";
-    for (const f of d.suiteIntegrityFailures) {
-      log "  - [${f.step}] ${f.code}: ${f.message}";
+    for (const f of d.stepIntegrityFindings ?? []) {
+      process.stdout.write(`  - [${f.step}${f.kind ? `/${f.kind}` : ""}] ${f.code}: ${f.message}\n`);
     }
-  ' "$PMS_OUT_DIR/summary.json"
+  ' "$PMS_OUT_DIR/summary.json" 2>/dev/null || true
 fi
+
 if [ "$FAILED_STEPS" -ne 0 ]; then
   log "VERIFICATION FAILED: $FAILED_STEPS required step(s) did not pass."
   exit 1
@@ -563,26 +640,19 @@ fi
 # code would otherwise turn that into a green delivery. The counts are the
 # authority, so the run is failed when the counts say it is - whatever the step
 # table says.
-SUITE_INTEGRITY_FAILED=0
-if [ -f "$PMS_OUT_DIR/summary.json" ]; then
-  SUITE_INTEGRITY_FAILED="$(node -e '
-    const fs = require("fs");
-    try {
-      const d = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-      process.stdout.write(d.verification?.verdict === "failed" ? "1" : "0");
-    } catch {
-      process.stdout.write("1");
-    }
-  ' "$PMS_OUT_DIR/summary.json")"
-fi
-if [ "$SUITE_INTEGRITY_FAILED" -ne 0 ]; then
-  log "VERIFICATION FAILED: a test step reported failing tests or suites."
+if [ "$RUN_VERDICT" = "failed" ]; then
+  log "VERIFICATION FAILED: a step did not satisfy its verification contract."
   exit 1
 fi
+if [ "$SUMMARY_COMPLETE" = "true" ]; then
+  log "VERIFICATION OK"
+  exit 0
+fi
+
+# Exit 0 is honest here: nothing that ran failed. The INCOMPLETE verdict is what
+# matters, and it is what prevents a partial run from being read as a complete
+# P0 verification.
 if [ "$SKIPPED_STEPS" -ne 0 ]; then
-  # Exit 0 is honest here: nothing that ran failed. The INCOMPLETE verdict is
-  # what matters, and it is what prevents a partial run from being read as a
-  # complete P0 verification.
   log "VERIFICATION INCOMPLETE: $SKIPPED_STEPS step(s) were not run."
   log "This run is NOT a complete verification. The skipped steps were:"
   for i in "${!STEP_NAMES[@]}"; do
@@ -592,4 +662,6 @@ if [ "$SKIPPED_STEPS" -ne 0 ]; then
   done
   exit 0
 fi
-log "VERIFICATION OK"
+log "VERIFICATION INCOMPLETE: every step ran, but at least one could not be verified."
+log "This run is NOT a complete verification."
+exit 0
