@@ -29,12 +29,42 @@ const COMPILER_PKG = path.resolve(
 const BUILD_BIN = path.join(COMPILER_PKG, 'bin', 'pms-build.js');
 
 /**
+ * The temp root for this PROCESS, created on first use and removed when the
+ * process ends.
+ *
+ * ONE root per process rather than one per call, for an operational reason that
+ * cost two benchmark campaigns: a full run of this suite makes thousands of
+ * fixture copies, nothing removed them, and the volume filled. A campaign
+ * running at the time died with a full disk, which looks exactly like a harness
+ * failure and is not one. With one root, a worker that is SIGTERMed without
+ * running its exit handler leaks one directory instead of dozens.
+ *
+ * The per-call subdirectory is what preserves isolation: every `freshCopyOf`
+ * still gets its own pristine copy, and two tests cannot see each other's edits.
+ */
+let processTempRoot = null;
+
+function tempRoot() {
+  if (processTempRoot != null) return processTempRoot;
+  processTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-fixtures-'));
+  const remove = () => {
+    try {
+      fs.rmSync(processTempRoot, { recursive: true, force: true });
+    } catch {
+      /* a temp directory that will not delete is not a test failure */
+    }
+  };
+  process.on('exit', remove);
+  return processTempRoot;
+}
+
+/**
  * Copies the whole fixtures tree to a temp directory and returns the requested
  * project inside it, so shared inputs (the design system definition) and any
  * mutation made by a test stay isolated from the repository.
  */
 function freshCopyOf(projectName) {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-fixtures-'));
+  const tmp = fs.mkdtempSync(path.join(tempRoot(), 'copy-'));
   fs.cpSync(FIXTURES, tmp, {
     recursive: true,
     filter: (src) => !src.includes(`${path.sep}generated`),

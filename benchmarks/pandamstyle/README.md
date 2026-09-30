@@ -1,5 +1,139 @@
 # PandamStyle benchmark laboratory
 
+**Batch: Spike 4, Phase C — the agent loop and the split of audit metadata.**
+
+This directory also holds the Spike 1 and Spike 2 harnesses, which are
+unchanged and still runnable. The five tools Phase C added are documented
+first, because the agent loop is the workload this batch is about; the rest of
+the document is Spike 2's brief, still accurate for what it measured.
+
+---
+
+## The agent loop, and what Phase C measures
+
+The loop an AI coding agent runs, end to end:
+
+```
+agent writes files
+        ↓
+session.applyAgentChanges({ changed: [...] })
+        ↓
+session.validate()          → complete diagnostics for that revision
+        ↓
+session.compile()           → generation committed
+session.requestFullAudit()  → the full evidence, when it is wanted
+```
+
+The primary metric is **`agent_edit_to_diagnostics_ms`**: the mutation
+transaction accepted, to complete authoritative diagnostics for that revision.
+It is *not* mutation → publication → audit report written, and the two are
+never collapsed.
+
+| tool | what it does |
+| --- | --- |
+| `src/agent-loop.js` | the campaign. Four metadata policies × twelve scenarios × N iterations, one process per cell |
+| `src/agent-loop-summary.js` | the tables. Headline milestones, work counters, byte counters, reuse-loop timing |
+| `src/phase-c-oracle.js` | the correctness gate. Semantic equality against a fresh rebuild in a separate process, and audit completeness against the pre-Phase-C artifact |
+| `src/phase-c-rebuild.js` | the oracle's fresh-rebuild child process. Never runs in the oracle's own process |
+| `src/report-bytes.js` | the byte audit. A deterministic breakdown of the published metadata, measured from the serialized bytes on disk |
+
+### The four variants are one compiler and four metadata policies
+
+| variant | audit policy | publishes | audits |
+| --- | --- | --- | --- |
+| `full_metadata` | `inline` | yes | no |
+| `compact_agent_result` | `reference` | no | no |
+| `compact_agent_result_plus_compact_publish_metadata` | `reference` | yes | no |
+| `full_audit_requested` | `reference` | yes | yes |
+
+Same tree, same session, same analysis, same compiler. `full_metadata` produces
+the pre-Phase-C artifact — the whole project-wide coverage array inline in
+`build-report.json`, schema version 1 — so the difference between the rows is
+the metadata policy and nothing else. A `full_metadata` row taken from a
+*different checkout* would confound the metadata with every compiler change
+between the two, which is the mistake the Spike 2 engine split was made to avoid
+and the mistake this design exists not to repeat.
+
+Variants that do different amounts of work are labelled `comparable: false` in
+the summary. `full_audit_requested` writes three megabytes of evidence that
+`compact_agent_result` does not, so a faster number for less work has not won
+anything.
+
+### Why the harness is separate from `run-campaign.js`
+
+The campaign matrix is five engines × four cache states × twenty-seven
+scenarios. Adding two more axes to it would make every existing row mean two
+things. The Phase C questions need cells with their own names.
+
+### The scenarios are sequences, and every edit asserts its target
+
+`no_change`, `one_file_existing_atoms`, `five_files_batch`,
+`twenty_files_batch`, `forbidden_value`, `repair_forbidden_value`,
+`module_add`, `module_remove`, `file_rename`, `import_change`,
+`unresolved_import_then_file_appears`, `token_value_full_fallback`.
+
+Each revision declares what the compiler is expected to answer, and a cell that
+gets the wrong answer FAILS rather than reporting a fast wrong one. Every edit
+asserts that the text it is about to change is present: a scenario that did not
+find its target would apply an empty edit, and an empty edit is a no-op — the
+single most misleading number this harness could report. The `no_change`
+scenario is the one that submits identical bytes, and it is reported as
+`declared / contentChanged / contentUnchanged` so it can never be read as an
+edit.
+
+### Running it
+
+```bash
+# The harness's own tests, on the smallest corpus.
+PMS_AGENT_LOOP_CORPUS=$PWD/.pms-bench/corpora/c100-t100-r10-s101   node src/agent-loop.js --self-test
+
+# The campaign.
+node src/agent-loop.js   --corpus $PWD/.pms-bench/corpora/c1000-t1000-r100-s809   --out-dir ../.pms-bench/run --iterations 7
+
+# The tables.
+node src/agent-loop-summary.js   -i ../.pms-bench/run/c1000-t1000-r100-s809-agent-loop.jsonl   -o ../.pms-bench/run/c1000-agent-loop-summary.json
+
+# Correctness.
+node src/phase-c-oracle.js   --corpus $PWD/.pms-bench/corpora/c1000-t1000-r100-s809   --out ../.pms-bench/run/c1000-phase-c-oracle.json
+
+# The metadata byte audit, from the bytes a publication wrote.
+node src/report-bytes.js   --corpus $PWD/.pms-bench/corpora/c10000-t1000-r100-s307   --out ../.pms-bench/run/c10000-report-bytes.json
+```
+
+### What the byte audit measures, and how
+
+`bytes(field) = size(serialize(document)) - size(serialize(document \ field))`,
+applied to the document that was actually written. An exact marginal cost: it
+includes the key, the punctuation around the value, and the pretty-printing,
+because the difference is taken between two real serializations of the real
+document. A "sum the parts" breakdown is used nowhere, because the parts do not
+sum to the file — the braces, the commas and the newlines belong to no part, and
+the residue is reported explicitly rather than spread around.
+
+The audit publishes with the project as the working directory, because
+`relativeToCwd` falls back to the absolute path outside it and the coverage
+entries are mostly path strings; a project in `/tmp` therefore produces hundreds
+of kilobytes more for reasons that have nothing to do with the report's content.
+
+### Two oracles, and why they are not the same
+
+**Semantic** — compared for EQUALITY against a fresh full rebuild in a separate
+process: the verdict, the diagnostics and their locations, the coverage set, the
+compiled JavaScript, the CSS, the generation's file set, the manifest, the
+registry and system identity, and the runtime composition structure.
+
+**Audit** — compared for COMPLETENESS, not byte equality. Demanding byte
+equality between the old monolithic report and the new pair would demand that
+Phase C changed nothing about the format, which is the opposite of what it is
+for. `AUDIT_FIELD_MAP` names where every field version 1 carried lives in
+version 2; a field with no entry is reported as **unaccounted** rather than
+skipped, because a comparison that ignores fields it does not recognise passes
+when information was lost.
+
+---
+
+# Spike 2 (unchanged)
+
 **Batch: Spike 2 — incremental file-level compilation.**
 
 This directory is the benchmark laboratory for PandamStyle. Spike 2 asks one

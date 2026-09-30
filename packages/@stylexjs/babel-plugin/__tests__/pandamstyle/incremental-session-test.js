@@ -313,9 +313,15 @@ describe('project session: reverse dependencies and stale state', () => {
     const without = read(h.outDir + '/styles.css');
     expect(without.length).toBeLessThan(withVictim.length);
     const report = JSON.parse(read(path.join(h.outDir, 'build-report.json')));
-    expect(
-      report.coverage.some((c) => c.file.endsWith('conditional-props.tsx')),
-    ).toBe(false);
+    // The coverage snapshot is a separate document now (Phase C), so the
+    // assertion asks for it. What it is really checking is unchanged: the
+    // deleted file is not in the project's coverage.
+    const entries = h.auditState().coverage.entries;
+    expect(entries.some((c) => c.file.endsWith('conditional-props.tsx'))).toBe(
+      false,
+    );
+    expect(report.coverageSummary.entries).toBe(entries.length);
+    expect(report.coveredFileCount).toBe(entries.length);
   });
 
   test('a design-system change is an explicit full fallback', () => {

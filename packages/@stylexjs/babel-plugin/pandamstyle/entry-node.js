@@ -38,6 +38,25 @@ export {
   resolveProvider,
 } from './dirty-input';
 export { buildDesignSystem } from './index';
+// The agent-facing result contract and the audit document schemas (Spike 4,
+// Phase C). Exported so a host can name the schema versions it is written
+// against, and so a test can assert the shapes directly rather than through a
+// session that happens to produce them.
+export {
+  AGENT_RESULT_KIND,
+  AGENT_RESULT_SCHEMA_VERSION,
+  BUILD_REPORT_KIND,
+  BUILD_REPORT_SCHEMA_VERSION,
+  COVERAGE_REPORT_KIND,
+  COVERAGE_REPORT_SCHEMA_VERSION,
+  COVERAGE_REPORT_FILE,
+  DEFAULT_AFFECTED_ENTRY_LIMIT,
+  DEFAULT_CANDIDATE_LIMIT,
+  buildAgentResult,
+  buildCoverageReport,
+  coverageSummary,
+  machineDiagnostic,
+} from './agent-result';
 export { buildRegistry, registryDigest } from './registry';
 export { supportedProperties, propertyKind, propertyCategory } from './policy';
 export { token, mintTokenRef, tokenPathOf } from './token';

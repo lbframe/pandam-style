@@ -6,20 +6,21 @@ vocabulary instead of reinventing micro-decisions.
 
 ## Repository contents
 
-| Path | Contents |
-|---|---|
-| `packages/@stylexjs/*` | StyleX fork code (upstream remote → facebook/stylex) |
-| `packages/@stylexjs/babel-plugin/pandamstyle/` | PandamStyle modules: registry, policy, compiler, recipe, plus the native Babel plugin, build pipeline, codegen and bundler adapter |
-| `packages/@pandamstyle/compiler/` | Installable package: the fork engine bundled with the PandamStyle modules. Exposes `.`, `./runtime`, `./vite` and the `pms-build` bin |
-| `benchmarks/pandamstyle/` | The benchmark laboratory: corpus generator, campaign runner, the engine-vs-engine oracle, the incremental-vs-fresh-rebuild oracle and the long-session memory trace |
-| `packages/@stylexjs/babel-plugin/__tests__/pandamstyle/` | Tests and fixture projects: one valid project (JS/TS/TSX) and 14 negative projects, each built by a real process |
-| `pilot/vite-react/` | Vite + React pilot application, installed from local `npm pack` tarballs |
-| `docs/pandamstyle-specification-v0.1/` | Specification v0.1 (architecture, P0 scope, acceptance, decisions) |
-| `evidence/l0/`, `evidence/demo/` | Historical L0 baseline and demo evidence (kept unchanged) |
-| `evidence/native/` | This batch's run: report, environment, per-step logs, digests |
-| `upstream/panda/` | Vendored Panda CSS donor (comparison source) |
-| `tools/pilot/run-pilot.sh` | Pilot driver: pack, install outside the workspace, build |
-| `verify-pms.sh` | Verification entry point |
+| Path                                                     | Contents                                                                                                                                                                                                                     |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/@stylexjs/*`                                   | StyleX fork code (upstream remote → facebook/stylex)                                                                                                                                                                         |
+| `packages/@stylexjs/babel-plugin/pandamstyle/`           | PandamStyle modules: registry, policy, compiler, recipe, plus the native Babel plugin, build pipeline, codegen and bundler adapter                                                                                           |
+| `packages/@pandamstyle/compiler/`                        | Installable package: the fork engine bundled with the PandamStyle modules. Exposes `.`, `./runtime`, `./vite` and the `pms-build` bin                                                                                        |
+| `benchmarks/pandamstyle/`                                | The benchmark laboratory: corpus generator, campaign runner, the engine-vs-engine oracle, the incremental-vs-fresh-rebuild oracle, the long-session memory trace, the agent-loop campaign and the Phase C correctness oracle |
+| `packages/@stylexjs/babel-plugin/__tests__/pandamstyle/` | Tests and fixture projects: one valid project (JS/TS/TSX) and 14 negative projects, each built by a real process                                                                                                             |
+| `pilot/vite-react/`                                      | Vite + React pilot application, installed from local `npm pack` tarballs                                                                                                                                                     |
+| `docs/pandamstyle-specification-v0.1/`                   | Specification v0.1 (architecture, P0 scope, acceptance, decisions)                                                                                                                                                           |
+| `evidence/l0/`, `evidence/demo/`                         | Historical L0 baseline and demo evidence (kept unchanged)                                                                                                                                                                    |
+| `evidence/native/`                                       | This batch's run: report, environment, per-step logs, digests                                                                                                                                                                |
+| `upstream/panda/`                                        | Vendored Panda CSS donor (comparison source)                                                                                                                                                                                 |
+| `tools/pilot/run-pilot.sh`                               | Pilot driver: pack, install outside the workspace, build                                                                                                                                                                     |
+| `tools/pms/`                                             | Verification reporting: the Jest-output reader that decides a run's verdict from suite AND test counts                                                                                                                       |
+| `verify-pms.sh`                                          | Verification entry point                                                                                                                                                                                                     |
 
 ## Verify the work
 
@@ -77,10 +78,10 @@ diagnostics with the same locations, the same coverage set, the same stylesheet
 in the same cascade-relevant order. Reuse is decided by a **validity key** per
 file (source content hash, role, compiler contract version, project semantic
 epoch, engine options, local edge resolutions, design-system view), never by
-path, never by mtime, and never by "the file is still there". A file's
-compiled result depends on its own source, on the design system, and on what
-its own module edges resolve to — not on the content of any other covered file,
-which is what makes reuse possible at all.
+path, never by mtime, and never by "the file is still there". A file's compiled
+result depends on its own source, on the design system, and on what its own
+module edges resolve to — not on the content of any other covered file, which is
+what makes reuse possible at all.
 
 A change the session cannot yet reason about locally — the design system, the
 policy, the roots, the compiler or resolution configuration — is an explicit,
@@ -90,6 +91,59 @@ its diagnostics, publishes nothing, and leaves the previous generation current.
 
 The measurements, the oracle and the known limits are in
 `evidence/performance/spike-2/`.
+
+## The agent loop
+
+An AI agent knows which file it just wrote. `applyAgentChanges` asks the CALLER
+where to look, and `validate()` answers with a compact, revision-bound,
+machine-readable result instead of a project snapshot.
+
+```js
+session.applyAgentChanges({ changed: [file] });
+const { agentResult } = session.validate();
+
+if (!agentResult.ok) {
+  // Structured, machine-authoritative. No prose parsing.
+  for (const d of agentResult.diagnostics) {
+    console.log(d.code, d.source.file, d.source.line, d.repair.kind);
+  }
+} else {
+  const bytes = session.serializeAgentResult().bytes; // ~1.8 KB at c10000
+  session.compile(); // generation committed
+}
+```
+
+The result carries the mutation (`declared` / `read` / `hashed` /
+`contentChanged` / `contentUnchanged` / `noOp`, as six separate numbers), the
+incremental work (`filesCompiled` / `filesRecompiled` / `filesReused`, and the
+project size as a **number**), the coverage of the **affected** files only, and
+four separate completion points — `diagnosticsReady`, `generationReady`,
+`generationCommitted`, `auditReportReady` — with a duration beside each. A
+failed revision reports the first and leaves the other three false: it published
+nothing, and reporting a generation time for it would be inventing work.
+
+A diagnostic is a protocol. Each one carries `code`, `severity`, `rule`, a
+structured `source` (`file` / `line` / `column` / `role`), the violation's
+`context`, an `expected` category or admitted domain, a capped `candidates` list
+with its true `candidatesTotal` and a truncation flag, and a `repair` that is
+either a structured suggestion or a stated reason there is none. `autofix` stays
+`null`: `17` is not a proven equivalent of any token value.
+
+**The full audit is still there.** `build-report.json` is small and carries the
+coverage _counts_ plus a reference; `session.requestFullAudit()` produces the
+project-wide snapshot for that revision, on demand, synchronously, and
+byte-for-byte the array the monolithic report carried inline. Before `compile()`
+the snapshot is staged into the generation, so a generation that contains it is
+complete; after `compile()` it is written beside the output directory, because a
+committed generation is never mutated.
+
+`auditPolicy: 'inline'` reproduces the previous format exactly, for a host whose
+reader is written against it, and so that the two policies can be measured
+against each other on one compiler.
+
+At c10000 a one-file agent edit is **173 ms** to diagnostics and the compact
+build report is **3,301 bytes** instead of **5,003,195**. See
+`evidence/performance/spike-4/`.
 
 ## Status
 
@@ -107,6 +161,6 @@ JavaScript, and `padding: '17px'` fails a real build process with
   `evidence/native/REPORT.md`, which distinguishes `passed`, `not_run` and
   `blocked`.
 
-Earlier limits recorded in `evidence/demo/REPORT.md` (AST traversal,
-cross-file resolution, build integration, out-of-workspace install, coverage)
-are now closed by this batch; the historical report is left unchanged.
+Earlier limits recorded in `evidence/demo/REPORT.md` (AST traversal, cross-file
+resolution, build integration, out-of-workspace install, coverage) are now
+closed by this batch; the historical report is left unchanged.

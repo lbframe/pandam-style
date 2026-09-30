@@ -1,0 +1,173 @@
+{
+  "audit": {
+    "documentKind": "pandamstyle-report-byte-audit",
+    "schemaVersion": 1,
+    "label": "c10000-t1000-r100-s307",
+    "auditPolicy": "reference",
+    "report_schema_version": 2,
+    "file": "build-report.json",
+    "file_bytes_on_disk": 2572,
+    "serialized_bytes": 2572,
+    "reconcile_note": "serialized_bytes equals file_bytes_on_disk: the audit reads the bytes the publication actually wrote, and re-serializing the parsed document with the publisher's own formatting reproduces them.",
+    "buckets": [
+      {
+        "bucket": "coverage entries",
+        "bytes": 0,
+        "percent": 0
+      },
+      {
+        "bucket": "relayEdges",
+        "bytes": 391,
+        "percent": 15.202177293934682
+      },
+      {
+        "bucket": "externalRequests",
+        "bytes": 26,
+        "percent": 1.010886469673406
+      },
+      {
+        "bucket": "incremental counters",
+        "bytes": 808,
+        "percent": 31.41524105754277
+      },
+      {
+        "bucket": "diagnostics",
+        "bytes": 0,
+        "percent": 0
+      },
+      {
+        "bucket": "top-level metadata (everything else)",
+        "bytes": 1344,
+        "percent": 52.255054432348366
+      }
+    ],
+    "top_level_fields": [
+      {
+        "field": "documentKind",
+        "bytes": 46,
+        "entries": null
+      },
+      {
+        "field": "schemaVersion",
+        "bytes": 22,
+        "entries": null
+      },
+      {
+        "field": "contractVersion",
+        "bytes": 32,
+        "entries": null
+      },
+      {
+        "field": "systemId",
+        "bytes": 54,
+        "entries": null
+      },
+      {
+        "field": "registryDigest",
+        "bytes": 40,
+        "entries": null
+      },
+      {
+        "field": "coveredRoots",
+        "bytes": 91,
+        "entries": 1
+      },
+      {
+        "field": "coveredFileCount",
+        "bytes": 29,
+        "entries": null
+      },
+      {
+        "field": "analysedFileCount",
+        "bytes": 30,
+        "entries": null
+      },
+      {
+        "field": "designSystemRuleCount",
+        "bytes": 32,
+        "entries": null
+      },
+      {
+        "field": "consumerRuleCount",
+        "bytes": 30,
+        "entries": null
+      },
+      {
+        "field": "ruleCount",
+        "bytes": 22,
+        "entries": null
+      },
+      {
+        "field": "cssBytes",
+        "bytes": 21,
+        "entries": null
+      },
+      {
+        "field": "coverageSummary",
+        "bytes": 275,
+        "entries": 10
+      },
+      {
+        "field": "coverageReport",
+        "bytes": 429,
+        "entries": 9
+      },
+      {
+        "field": "coverageConsistency",
+        "bytes": 191,
+        "entries": 4
+      },
+      {
+        "field": "externalRequests",
+        "bytes": 26,
+        "entries": 0
+      },
+      {
+        "field": "relayEdges",
+        "bytes": 391,
+        "entries": 3
+      },
+      {
+        "field": "incremental",
+        "bytes": 808,
+        "entries": 26
+      }
+    ],
+    "coverage_entry_fields": [],
+    "coverage_entry_count": 0,
+    "coverage_field_names": [],
+    "accounted_bytes": 2569,
+    "residue_bytes": 3,
+    "residue_percent": 0.11664074650077762,
+    "path_form_note": "paths are stored through relativeToCwd, which falls back to the absolute path outside the working directory. This run published with the project as the working directory, so the coverage entries hold the same short relative paths an in-tree project produces. A project published from outside the working directory stores absolute paths and this table grows accordingly; that is where the strings are, not a change in what the report says."
+  },
+  "coverage_document_bytes": null,
+  "generation": {
+    "documentKind": "pandamstyle-report-byte-audit",
+    "schemaVersion": 1,
+    "label": "c10000-t1000-r100-s307",
+    "out_dir": "/tmp/pms-report-bytes/c10000-t1000-r100-s307/.pandamstyle",
+    "file_count": 10006,
+    "total_bytes": 9019754,
+    "files": [
+      {
+        "file": "design.pandamstyle.js",
+        "bytes": 216619
+      },
+      {
+        "file": "manifest.json",
+        "bytes": 58874
+      },
+      {
+        "file": "styles.css",
+        "bytes": 27082
+      },
+      {
+        "file": "build-report.json",
+        "bytes": 2572
+      }
+    ],
+    "js_artifact_count": 10002,
+    "js_artifact_bytes": 8714607
+  }
+}

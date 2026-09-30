@@ -1,0 +1,230 @@
+{
+  "audit": {
+    "documentKind": "pandamstyle-report-byte-audit",
+    "schemaVersion": 1,
+    "label": "c10000-t1000-r100-s307",
+    "auditPolicy": "inline",
+    "report_schema_version": 1,
+    "file": "build-report.json",
+    "file_bytes_on_disk": 3252376,
+    "serialized_bytes": 3252376,
+    "reconcile_note": "serialized_bytes equals file_bytes_on_disk: the audit reads the bytes the publication actually wrote, and re-serializing the parsed document with the publisher's own formatting reproduces them.",
+    "buckets": [
+      {
+        "bucket": "coverage entries",
+        "bytes": 3250511,
+        "percent": 99.94265730653528
+      },
+      {
+        "bucket": "relayEdges",
+        "bytes": 391,
+        "percent": 0.012021980238447215
+      },
+      {
+        "bucket": "externalRequests",
+        "bytes": 26,
+        "percent": 0.0007994155657279478
+      },
+      {
+        "bucket": "incremental counters",
+        "bytes": 805,
+        "percent": 0.024751135785038382
+      },
+      {
+        "bucket": "diagnostics",
+        "bytes": 0,
+        "percent": 0
+      },
+      {
+        "bucket": "top-level metadata (everything else)",
+        "bytes": 640,
+        "percent": 0.019677921617918717
+      }
+    ],
+    "top_level_fields": [
+      {
+        "field": "documentKind",
+        "bytes": 46,
+        "entries": null
+      },
+      {
+        "field": "schemaVersion",
+        "bytes": 22,
+        "entries": null
+      },
+      {
+        "field": "contractVersion",
+        "bytes": 32,
+        "entries": null
+      },
+      {
+        "field": "systemId",
+        "bytes": 54,
+        "entries": null
+      },
+      {
+        "field": "registryDigest",
+        "bytes": 40,
+        "entries": null
+      },
+      {
+        "field": "coveredRoots",
+        "bytes": 91,
+        "entries": 1
+      },
+      {
+        "field": "coveredFileCount",
+        "bytes": 29,
+        "entries": null
+      },
+      {
+        "field": "analysedFileCount",
+        "bytes": 30,
+        "entries": null
+      },
+      {
+        "field": "designSystemRuleCount",
+        "bytes": 32,
+        "entries": null
+      },
+      {
+        "field": "consumerRuleCount",
+        "bytes": 30,
+        "entries": null
+      },
+      {
+        "field": "ruleCount",
+        "bytes": 22,
+        "entries": null
+      },
+      {
+        "field": "cssBytes",
+        "bytes": 21,
+        "entries": null
+      },
+      {
+        "field": "coverage",
+        "bytes": 3250511,
+        "entries": 10003
+      },
+      {
+        "field": "coverageConsistency",
+        "bytes": 191,
+        "entries": 4
+      },
+      {
+        "field": "externalRequests",
+        "bytes": 26,
+        "entries": 0
+      },
+      {
+        "field": "relayEdges",
+        "bytes": 391,
+        "entries": 3
+      },
+      {
+        "field": "incremental",
+        "bytes": 805,
+        "entries": 26
+      }
+    ],
+    "coverage_entry_fields": [
+      {
+        "field": "coverage[].file",
+        "bytes": 499012,
+        "entries": 10003
+      },
+      {
+        "field": "coverage[].origin",
+        "bytes": 240103,
+        "entries": 10003
+      },
+      {
+        "field": "coverage[].role",
+        "bytes": 220075,
+        "entries": 10003
+      },
+      {
+        "field": "coverage[].analysed",
+        "bytes": 240072,
+        "entries": 10003
+      },
+      {
+        "field": "coverage[].usedDesignSystem",
+        "bytes": 320065,
+        "entries": 10002
+      },
+      {
+        "field": "coverage[].usedPmsHelpers",
+        "bytes": 300061,
+        "entries": 10002
+      },
+      {
+        "field": "coverage[].ruleCount",
+        "bytes": 220877,
+        "entries": 10002
+      },
+      {
+        "field": "coverage[].relayChain",
+        "bytes": 850118,
+        "entries": 10002
+      },
+      {
+        "field": "coverage[].diagnostics",
+        "bytes": 240072,
+        "entries": 10003
+      },
+      {
+        "field": "coverage[].relayChain[] (elements)",
+        "bytes": 850118,
+        "entries": 13335,
+        "note": "bytes are the whole field, elements are its item count"
+      }
+    ],
+    "coverage_entry_count": 10003,
+    "coverage_field_names": [
+      "file",
+      "origin",
+      "role",
+      "analysed",
+      "usedDesignSystem",
+      "usedPmsHelpers",
+      "ruleCount",
+      "relayChain",
+      "diagnostics"
+    ],
+    "accounted_bytes": 3252373,
+    "residue_bytes": 3,
+    "residue_percent": 0.00009224025758399398,
+    "path_form_note": "paths are stored through relativeToCwd, which falls back to the absolute path outside the working directory. This run published with the project as the working directory, so the coverage entries hold the same short relative paths an in-tree project produces. A project published from outside the working directory stores absolute paths and this table grows accordingly; that is where the strings are, not a change in what the report says."
+  },
+  "coverage_document_bytes": null,
+  "generation": {
+    "documentKind": "pandamstyle-report-byte-audit",
+    "schemaVersion": 1,
+    "label": "c10000-t1000-r100-s307",
+    "out_dir": "/tmp/pms-report-bytes/c10000-t1000-r100-s307/.pandamstyle",
+    "file_count": 10006,
+    "total_bytes": 12269558,
+    "files": [
+      {
+        "file": "build-report.json",
+        "bytes": 3252376
+      },
+      {
+        "file": "design.pandamstyle.js",
+        "bytes": 216619
+      },
+      {
+        "file": "manifest.json",
+        "bytes": 58874
+      },
+      {
+        "file": "styles.css",
+        "bytes": 27082
+      }
+    ],
+    "js_artifact_count": 10002,
+    "js_artifact_bytes": 8714607
+  }
+}

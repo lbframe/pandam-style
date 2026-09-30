@@ -343,7 +343,15 @@ describe('the CLI cross-checks expected vs analysed before publishing', () => {
     expect(report.coverageConsistency.missing).toEqual([]);
     expect(report.analysedFileCount).toBeGreaterThan(0);
     // The design-system module is covered and exempt, not silently dropped.
-    expect(report.coveredFileCount).toBe(report.coverage.length);
+    // The per-file snapshot is its own document since Phase C, and the counts
+    // in the summary must be the counts in it.
+    const coverage = readJson(
+      path.join(project, 'generated/coverage.json'),
+    ).entries;
+    expect(report.coveredFileCount).toBe(coverage.length);
+    expect(report.coverageSummary.entries).toBe(coverage.length);
+    expect(report.coverageReport.entries).toBe(coverage.length);
+    expect(report.coverageReport.materialized).toBe(true);
   });
 
   test('a covered file that fails the policy still counts as analysed', () => {
@@ -352,8 +360,10 @@ describe('the CLI cross-checks expected vs analysed before publishing', () => {
     expect(runBuild(neg).status).toBe(1);
     const clean = freshCopyOf('valid');
     expect(runBuild(clean).status).toBe(0);
-    const report = readJson(path.join(clean, 'generated/build-report.json'));
-    for (const entry of report.coverage) {
+    const entries = readJson(
+      path.join(clean, 'generated/coverage.json'),
+    ).entries;
+    for (const entry of entries) {
       expect(entry.analysed).toBe(true);
     }
   });

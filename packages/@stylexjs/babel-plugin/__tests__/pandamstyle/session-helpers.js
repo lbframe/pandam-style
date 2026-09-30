@@ -132,9 +132,7 @@ function readTree(dir) {
  * The session's additive block, removed.
  *
  * It is removed on BOTH sides and only because it is the one field that states
- * how the generation was produced rather than what it contains. Everything else
- * - the coverage array, the consistency verdict, the external requests, the
- * relay edges, every rule count - is compared as published.
+ * how the generation was produced rather than what it contains.
  */
 function stripIncrementalBlock(text) {
   return text.replace(/,?\n {2}"incremental": \{[\s\S]*?\n {2}\}\n\}/, '\n}');
@@ -144,11 +142,112 @@ function sha256(text) {
   return crypto.createHash('sha256').update(text).digest('hex');
 }
 
-/** Content digests of every published artifact, path-independent. */
+/** The metadata documents, which are compared as AUDIT STATE, not as bytes. */
+const METADATA_ARTIFACTS = new Set(['build-report.json', 'coverage.json']);
+
+/**
+ * The build report, in a form two producers can be compared through.
+ *
+ * Three things are removed, and each removal is a fact about the two producers
+ * rather than a fact about the report's content:
+ *
+ *   `incremental`       how the generation was produced. A delta publisher and
+ *                       a full publisher, and a reused generation and a written
+ *                       one, describe themselves differently by design.
+ *   `coverageReport`    WHERE the detail document physically lives. One producer
+ *                       published it into the generation; the other wrote it
+ *                       beside the output directory on request. Both hold the
+ *                       same entries, and the entries are compared as audit
+ *                       state below - comparing the pointer instead would be
+ *                       comparing a file layout, which is the one thing the
+ *                       split is allowed to change.
+ *   `coverage`          absent in schema version 2, and asserted absent by its
+ *                       own test.
+ *
+ * Everything a reader of the report would use - identity, counts, the
+ * consistency cross-check, external requests, relay edges - is compared.
+ */
+function canonicalBuildReport(report) {
+  const copy = { ...report };
+  delete copy.incremental;
+  delete copy.coverageReport;
+  delete copy.coverage;
+  return copy;
+}
+
+/**
+ * The coverage document, without the two fields that are about WHICH revision
+ * was being described rather than about what it contains.
+ *
+ * A session knows its revision and generation numbers; a one-shot full rebuild
+ * has neither, and the audit oracle must be able to say "these describe the same
+ * project" without a translation table for that.
+ */
+function canonicalCoverageReport(doc) {
+  const copy = { ...doc };
+  delete copy.revisionId;
+  delete copy.generationId;
+  return copy;
+}
+
+/**
+ * The audit state of a generation, wherever its documents physically are.
+ *
+ * Returns the summary's semantic fields and the project-wide coverage snapshot
+ * as two comparable values. `revisionId` selects the snapshot when it had to be
+ * written beside the output directory rather than inside the generation, which
+ * is the deferred case Phase C introduced.
+ */
+function auditStateOf(
+  outDir,
+  { auditDir = null, coveragePath = null, revisionId = null } = {},
+) {
+  const reportPath = path.join(outDir, 'build-report.json');
+  const summary = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+  const inGeneration = path.join(outDir, 'coverage.json');
+  let coverage = null;
+  let where = null;
+  const explicit =
+    coveragePath != null && fs.existsSync(coveragePath) ? coveragePath : null;
+  if (explicit != null) {
+    coverage = JSON.parse(fs.readFileSync(explicit, 'utf8'));
+    where = 'requested';
+  } else if (fs.existsSync(inGeneration)) {
+    coverage = JSON.parse(fs.readFileSync(inGeneration, 'utf8'));
+    where = 'generation';
+  } else if (auditDir != null && revisionId != null) {
+    const file = path.join(auditDir, `coverage-rev-${revisionId}.json`);
+    if (fs.existsSync(file)) {
+      coverage = JSON.parse(fs.readFileSync(file, 'utf8'));
+      where = 'audit-dir';
+    }
+  }
+  return {
+    summary: canonicalBuildReport(summary),
+    coverage: coverage == null ? null : canonicalCoverageReport(coverage),
+    coverageWhere: where,
+  };
+}
+
+/** The sibling audit directory, derived the way the session derives it. */
+function auditDirOf(outDir) {
+  const abs = path.resolve(outDir);
+  return path.join(path.dirname(abs), `.${path.basename(abs)}.pms-audit`);
+}
+
+/**
+ * Content digests of every published COMPILER artifact.
+ *
+ * The two metadata documents are excluded: they are compared as audit state by
+ * `auditStateOf`, because the split between them is the one thing Phase C
+ * intentionally changed, and comparing them as opaque bytes would report that
+ * intended change as a compiler difference on every single revision.
+ */
 function fingerprint(outDir) {
   const tree = readTree(outDir);
   const out = {};
   for (const rel of [...tree.keys()].sort()) {
+    if (METADATA_ARTIFACTS.has(rel)) continue;
     out[rel] = sha256(stripIncrementalBlock(tree.get(rel)));
   }
   return out;
@@ -285,6 +384,35 @@ function openExistingProject(project, options = {}) {
       return compiler.buildProject(args());
     },
 
+    /**
+     * The session's audit state, after ASKING for it.
+     *
+     * This is the product's promise being exercised rather than assumed: the
+     * session published a compact summary, and the project-wide coverage
+     * snapshot is produced here, on request, for this revision. A session that
+     * could not produce it would make the oracle's audit half report a missing
+     * document rather than a wrong one, which is the difference between a
+     * layout change and evidence loss.
+     *
+     * It reads the document AT THE PATH THE REQUEST RETURNED, not by globbing
+     * the output directory. That matters because the differential runs a full
+     * rebuild into the same output directory, and a glob would then read the
+     * REFERENCE's coverage document and call the comparison a pass.
+     */
+    auditState() {
+      const request = session.requestFullAudit({});
+      expect(request.materialized).toBe(true);
+      return auditStateOf(outDir, {
+        coveragePath: request.path,
+        revisionId: request.revisionId,
+      });
+    },
+
+    /** The audit state of whatever `full()` just published, as-is. */
+    fullAuditState() {
+      return auditStateOf(outDir, { auditDir: auditDirOf(outDir) });
+    },
+
     /** What the published generation looks like, as content digests. */
     published() {
       return fingerprint(outDir);
@@ -300,10 +428,28 @@ function openExistingProject(project, options = {}) {
  * published generations to be identical - and the two verdicts to be identical
  * too. It returns the findings rather than asserting, so a test can report what
  * diverged instead of only that something did.
+ *
+ * THE ORACLE HAS TWO HALVES, AND PHASE C MADE THEM DIFFERENT THINGS
+ *
+ *   semantics   the compiled artifacts, the CSS, the manifest: the bytes a
+ *               reader loads. Compared as digests, exactly.
+ *   audit       the metadata: the summary's semantic fields and the
+ *               project-wide coverage snapshot. Compared after ASKING the
+ *               session to produce its audit, because "the information is
+ *               available on request" is the claim, and a comparison that
+ *               required the snapshot to be sitting in the generation would be
+ *               asserting the old layout rather than the new promise.
+ *
+ * The audit half is not optional and not normalised away. If the session cannot
+ * produce a coverage document equal to the full rebuild's, the finding says so
+ * with the entry count of each side, because "the agent got a small object" and
+ * "the evidence is still there" are two different claims and only the first one
+ * is cheap.
  */
 function differential(harness, label, changes = {}) {
   const validation = harness.revise(changes);
   const incremental = validation.ok ? harness.published() : null;
+  const audit = validation.ok ? harness.auditState() : null;
 
   let fullOk = true;
   let fullDiagnostics = [];
@@ -314,6 +460,7 @@ function differential(harness, label, changes = {}) {
     fullDiagnostics = (err.diagnostics ?? []).map((d) => d.code).sort();
   }
   const full = fullOk ? harness.published() : null;
+  const fullAudit = fullOk ? harness.fullAuditState() : null;
 
   const incrementalDiagnostics = validation.diagnostics
     .map((d) => d.code)
@@ -334,8 +481,44 @@ function differential(harness, label, changes = {}) {
     if (differing.length > 0) {
       findings.push(`artifacts: ${differing.join(', ')}`);
     }
+    findings.push(...auditFindings(audit, fullAudit));
   }
   return { label, revisionId: validation.revisionId, findings, validation };
+}
+
+/** The findings that say the two audit representations are not the same audit. */
+function auditFindings(incremental, full) {
+  const findings = [];
+  if (incremental == null || full == null) return findings;
+  if (JSON.stringify(incremental.summary) !== JSON.stringify(full.summary)) {
+    findings.push(
+      `audit-summary: ${describeSummaryDiff(incremental.summary, full.summary)}`,
+    );
+  }
+  if (incremental.coverage == null) {
+    findings.push(
+      'audit-coverage: the session produced no coverage snapshot for this ' +
+        'revision; the full rebuild published one',
+    );
+  } else if (
+    JSON.stringify(incremental.coverage) !== JSON.stringify(full.coverage)
+  ) {
+    findings.push(
+      `audit-coverage: entries differ (session=${incremental.coverage.entries?.length} ` +
+        `full=${full.coverage?.entries?.length})`,
+    );
+  }
+  return findings;
+}
+
+function describeSummaryDiff(a, b) {
+  const keys = new Set([...Object.keys(a ?? {}), ...Object.keys(b ?? {})]);
+  const differing = [...keys]
+    .sort()
+    .filter((k) => JSON.stringify(a?.[k]) !== JSON.stringify(b?.[k]));
+  return differing.length === 0
+    ? 'identical'
+    : `fields [${differing.join(', ')}] differ`;
 }
 
 /**
@@ -348,6 +531,7 @@ function differential(harness, label, changes = {}) {
  */
 function comparePublished(harness) {
   const incremental = harness.published();
+  const audit = harness.auditState();
   let fullOk = true;
   let fullDiagnostics = [];
   try {
@@ -363,12 +547,17 @@ function comparePublished(harness) {
     const differing = diffFingerprints(full, incremental);
     if (differing.length > 0)
       findings.push(`artifacts: ${differing.join(', ')}`);
+    findings.push(...auditFindings(audit, harness.fullAuditState()));
   }
   return { findings, fullOk, fullDiagnostics };
 }
 
 module.exports = {
   COMPILER_PKG,
+  auditDirOf,
+  auditStateOf,
+  canonicalBuildReport,
+  canonicalCoverageReport,
   comparePublished,
   differential,
   fingerprint,

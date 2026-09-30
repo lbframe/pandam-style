@@ -184,15 +184,35 @@ const RESERVED = Object.freeze({
   full_discovery_fallback: 0,
   mutation_set_audits: 0,
   mutation_set_discrepancies: 0,
-  // Agent-loop metadata (Spike 4, Phase C).
+  // Agent-loop metadata (Spike 4, Phase C). These are DURATION names for
+  // numbers that are not phases of a build, so they are fed to `count()` with a
+  // millisecond value rather than added through `phase()`. That asymmetry is
+  // deliberate: a phase is a boundary the compiler owns, and these are
+  // measurements of intervals the SPIKE defined across several of them.
   agent_result_bytes: 0,
+  agent_result_build_ms: 0,
   agent_result_serialize_ms: 0,
+  build_report_bytes: 0,
+  build_report_build_ms: 0,
+  build_report_serialize_ms: 0,
+  build_report_write_ms: 0,
+  coverage_report_bytes: 0,
+  coverage_report_build_ms: 0,
+  coverage_report_serialize_ms: 0,
+  coverage_report_write_ms: 0,
   full_report_bytes: 0,
   full_report_serialize_ms: 0,
   full_report_write_ms: 0,
   full_report_requested: 0,
   full_report_deferred: 0,
   metadata_bytes_written: 0,
+  // The O(total) half of `analyseCoveredFiles`, split from the O(affected)
+  // half. `session_compile_affected_ms` is the work the edit caused;
+  // `session_reuse_iteration_ms` is what visiting the untouched files costs.
+  session_compile_affected_ms: 0,
+  session_reuse_iteration_ms: 0,
+  session_coverage_entries_ms: 0,
+  covered_entries_iterated: 0,
   dirty_input_apply_ms: 0,
   filesystem_discovery_ms: 0,
   metadata_hotpath_ms: 0,

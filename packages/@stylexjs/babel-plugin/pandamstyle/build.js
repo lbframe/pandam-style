@@ -32,6 +32,14 @@ const tsPreset = presetTypeScript?.default ?? presetTypeScript;
 const reactPreset = presetReact?.default ?? presetReact;
 
 import { PmsError, Codes, diagnostic, formatDiagnostic } from './diagnostics';
+import {
+  BUILD_REPORT_KIND,
+  BUILD_REPORT_SCHEMA_VERSION,
+  COVERAGE_REPORT_FILE,
+  buildCoverageReport,
+  coverageReference,
+  coverageSummary,
+} from './agent-result';
 import { buildDesignSystem } from './index';
 import { generateDesignSystemModule } from './codegen';
 import { pandamstyleBabelPlugin } from './babel-plugin';
@@ -591,7 +599,13 @@ export function buildProject(config) {
         const css = session.renderCss(allRules);
 
         const buildReport = {
-          documentKind: 'pandamstyle-build-report',
+          documentKind: BUILD_REPORT_KIND,
+          // The same schema version the project session writes, and for the
+          // same reason. The full rebuild is the session's SEMANTIC reference -
+          // if the two disagreed about the report's shape, an oracle comparing
+          // them would be comparing two formats and calling the difference a
+          // compiler difference.
+          schemaVersion: BUILD_REPORT_SCHEMA_VERSION,
           contractVersion: designSystem.manifest.compilerContractVersion,
           systemId: designSystem.registry.systemId,
           registryDigest,
@@ -602,7 +616,18 @@ export function buildProject(config) {
           consumerRuleCount: allRules.length - designSystemRuleCount,
           ruleCount: allRules.length,
           cssBytes: Buffer.byteLength(css, 'utf8'),
-          coverage,
+          // Schema version 1 carried the project-wide `coverage` array inline.
+          // Version 2 carries the counts and a reference; the detail document is
+          // `coverage.json`, staged below. See `agent-result.js`.
+          coverageSummary: coverageSummary(coverage),
+          coverageReport: coverageReference({
+            // The full rebuild has no revision counter of its own: a build is
+            // one revision, and naming it 0 is a fact about the API rather than
+            // a stand-in for a sequence the caller does not have.
+            revisionId: 0,
+            summary: coverageSummary(coverage),
+            materialized: true,
+          }),
           coverageConsistency: {
             expectedCount: consistency.expectedCount,
             analysedCount: consistency.transformedCount,
@@ -622,6 +647,21 @@ export function buildProject(config) {
           })),
         };
 
+        // A one-shot build has no agent waiting on a compact result, so it has
+        // no reason to defer anything: the coverage detail is staged with
+        // everything else, in the same generation and the same commit. The
+        // deferral exists for a long-lived session's hot path, not for a build
+        // that is going to write its whole output once.
+        const coverageDoc = buildCoverageReport({
+          contractVersion: designSystem.manifest.compilerContractVersion,
+          systemId: designSystem.registry.systemId,
+          registryDigest,
+          revisionId: 0,
+          generationId: null,
+          coveredRoots: roots.map((r) => path.resolve(r)),
+          entries: coverage,
+        });
+
         const manifestWithDigest = {
           ...designSystem.manifest,
           registryDigest,
@@ -637,6 +677,10 @@ export function buildProject(config) {
           JSON.stringify(buildReport, null, 2) + '\n',
         );
         gen.stage(
+          COVERAGE_REPORT_FILE,
+          JSON.stringify(coverageDoc, null, 2) + '\n',
+        );
+        gen.stage(
           'manifest.json',
           JSON.stringify(manifestWithDigest, null, 2) + '\n',
         );
@@ -645,6 +689,7 @@ export function buildProject(config) {
           css,
           manifest: manifestWithDigest,
           buildReport,
+          coverageReport: coverageDoc,
           designSystem,
           designSystemPath,
           coverage,
@@ -655,6 +700,7 @@ export function buildProject(config) {
             ...outputs.map(({ file }) => outputRelFor(file)),
             'styles.css',
             'build-report.json',
+            COVERAGE_REPORT_FILE,
             'manifest.json',
             designSystemFile,
           ],

@@ -1,0 +1,257 @@
+{
+  "documentKind": "pandamstyle-performance-evidence-index",
+  "batch": "spike-4-phase-c",
+  "title": "The agent loop and the split of audit metadata",
+  "base": "7799e89a7ce872a2f0b3325d01747bdb65f747d9",
+  "report": "REPORT.md",
+  "provenance": {
+    "note": "This index does NOT record the delivered branch head, for the reason Spike 3's does not: an index that is corrected whenever the evidence changes cannot meaningfully embed its own commit. The live head is established from Git. What is recorded here is the base, the harness that produced every number, and the corpora the numbers are against.",
+    "reproduce": [
+      "npm --prefix packages/@pandamstyle/compiler run build",
+      "PMS_AGENT_LOOP_CORPUS=$PWD/.pms-bench/corpora/c100-t100-r10-s101 node benchmarks/pandamstyle/src/agent-loop.js --self-test",
+      "node benchmarks/pandamstyle/src/agent-loop.js --corpus .pms-bench/corpora/c1000-t1000-r100-s809 --out-dir .pms-bench/run --iterations 7",
+      "node benchmarks/pandamstyle/src/agent-loop.js --corpus .pms-bench/corpora/c10000-t1000-r100-s307 --out-dir .pms-bench/run10k --iterations 1",
+      "node benchmarks/pandamstyle/src/phase-c-oracle.js --corpus .pms-bench/corpora/c10000-t1000-r100-s307 --out .pms-bench/run10k/oracle.json",
+      "node benchmarks/pandamstyle/src/report-bytes.js --corpus .pms-bench/corpora/c10000-t1000-r100-s307 --audit-policy inline"
+    ],
+    "observationStream": "not committed. Regenerable from the commands above, like the Spike 1-3 campaigns; the committed documents are the summaries, the oracle results and the byte audits."
+  },
+  "corpora": {
+    "c1000": "c1000-t1000-r100-s809",
+    "c10000": "c10000-t1000-r100-s307",
+    "selfTest": "c100-t100-r10-s101"
+  },
+  "iterations": {
+    "c1000": 7,
+    "c10000": 1,
+    "note": "c10000 carries the scale and c1000 carries the distribution. c10000 medians are single observations and are reported as measurements, not distributions; agent-loop-summary.js prints the session count beside every number."
+  },
+  "acceptance": {
+    "testsPassed": 413,
+    "testsBaseline": 381,
+    "testsFailed": 0,
+    "testsSkipped": 0,
+    "suitesPassed": 17,
+    "suitesFailed": 0,
+    "suitesSkipped": 0,
+    "toolingTestsPassed": 21,
+    "toolingSuitesPassed": 2,
+    "benchmarkHarnessSelfTest": "pass, 15 assertions",
+    "prettier": "clean",
+    "eslint": "clean",
+    "note": "The six numbers are recorded because Phase A and B found a verification defect in which a suite that failed to load contributed no tests and the aggregate still looked healthy. tools/pms/test-counts.js now decides the verdict from them and verify-pms.sh exits non-zero when the counts and the step table disagree.",
+    "rootRun": {
+      "note": "a cross-package convenience run, not the delivery gate. The gate is `npm run test:packages`, which is what verify-pms.sh runs and which is green. This run exists to prove the repository-level Jest configuration is narrowly scoped.",
+      "phaseBHead": {
+        "suitesFailed": 132,
+        "testsFailed": 185,
+        "testsPassed": 2112,
+        "pandamstyleSuites": "all failed to load"
+      },
+      "phaseC": {
+        "suitesFailed": 11,
+        "testsFailed": 18,
+        "testsPassed": 2454,
+        "pandamstyleSuites": "17 of 17 pass"
+      },
+      "remainingFailuresArePreExisting": true,
+      "remainingFailingSuites": [
+        "benchmarks/pandamstyle/tests/bench.test.js",
+        "packages/style-value-parser/src/properties/__tests__/border-radius.test.js",
+        "packages/@stylexjs/babel-plugin/__tests__/legacy/stylex-transform-call-test.js",
+        "packages/@stylexjs/babel-plugin/__tests__/legacy/stylex-transform-legacy-shorthands-test.js",
+        "packages/@stylexjs/babel-plugin/__tests__/transform-stylex-props-test.js",
+        "packages/@stylexjs/cli/__tests__/compile-stylex-folder-test.js",
+        "packages/@stylexjs/devtools-extension/__tests__/clipboard-test.js",
+        "packages/@stylexjs/stylex/__tests__/createOrderedCSSStyleSheet-test.js",
+        "packages/@stylexjs/stylex/__tests__/createSheet-test.js",
+        "packages/@stylexjs/stylex/__tests__/inject-test.js",
+        "packages/@stylexjs/stylex/__tests__/stylex-test.js"
+      ],
+      "howChecked": "a git worktree at 7799e89a with the same node_modules, run with the same `npx jest`"
+    }
+  },
+  "headline": {
+    "agent_edit_to_diagnostics_ms": {
+      "c1000": {
+        "one_file": 34.64,
+        "invalid": 31.65,
+        "repair": 32.2
+      },
+      "c10000": {
+        "one_file": 173.12,
+        "invalid": 158.31,
+        "repair": 142.81
+      }
+    },
+    "agent_edit_to_generation_ready_ms": {
+      "c1000": 91.78,
+      "c10000": 711.41
+    },
+    "agent_edit_to_generation_committed_ms": {
+      "c1000": 105.18,
+      "c10000": 834.22
+    },
+    "agent_edit_to_audit_report_ms": {
+      "c1000": 109.52,
+      "c10000": 813.06
+    },
+    "build_report_bytes": {
+      "c1000": {
+        "pre_phase_c_inline": 495397,
+        "phase_c_reference": 3259,
+        "reduction": 152
+      },
+      "c10000": {
+        "pre_phase_c_inline": 5003195,
+        "phase_c_reference": 3301,
+        "reduction": 1516
+      }
+    },
+    "agent_result_bytes": {
+      "c1000": {
+        "success": 1803,
+        "with_diagnostic": 3720,
+        "global_fallback": 27570
+      },
+      "c10000": {
+        "success": 1815,
+        "with_diagnostic": 3738,
+        "global_fallback": 27976
+      }
+    },
+    "coverage_document_bytes_on_request": {
+      "c1000": 509848,
+      "c10000": 5164617
+    },
+    "transactions": {
+      "one_file": {
+        "c1000_ms": 34.64,
+        "c10000_ms": 173.12,
+        "compiled": 1,
+        "reused_c10000": 10001
+      },
+      "five_files": {
+        "c1000_ms": 54.71,
+        "c10000_ms": 174.23,
+        "compiled": 5,
+        "reused_c10000": 9997
+      },
+      "twenty_files": {
+        "c1000_ms": 93.21,
+        "c10000_ms": 212.3,
+        "compiled": 20,
+        "reused_c10000": 9982
+      }
+    }
+  },
+  "metadata_byte_audit": {
+    "method": "bytes(field) = size(serialize(document)) - size(serialize(document without field)), applied to the bytes a publication actually wrote, with the publisher's own formatting",
+    "c10000_pre_phase_c": {
+      "total": 3252376,
+      "coverage_entries": {
+        "bytes": 3250511,
+        "percent": 99.943
+      },
+      "relay_chain_field": {
+        "bytes": 850118,
+        "percent": 26.138
+      },
+      "relayEdges": {
+        "bytes": 391,
+        "percent": 0.012
+      },
+      "externalRequests": {
+        "bytes": 26,
+        "percent": 0.001
+      },
+      "incremental": {
+        "bytes": 805,
+        "percent": 0.025
+      },
+      "top_level_metadata": {
+        "bytes": 640,
+        "percent": 0.02
+      }
+    },
+    "c10000_phase_c": {
+      "total": 2572
+    },
+    "c1000_pre_phase_c": {
+      "total": 326609,
+      "coverage_entries": {
+        "bytes": 324761,
+        "percent": 99.434
+      },
+      "relay_chain_field": {
+        "bytes": 85118,
+        "percent": 26.061
+      }
+    },
+    "c1000_phase_c": {
+      "total": 2548
+    }
+  },
+  "oracle": {
+    "c100": {
+      "semantic": "equivalent",
+      "revisions": 12,
+      "mismatches": 0,
+      "audit": "complete",
+      "unaccounted_fields": 0
+    },
+    "c1000": {
+      "semantic": "equivalent",
+      "revisions": 12,
+      "mismatches": 0,
+      "audit": "complete",
+      "unaccounted_fields": 0,
+      "coverage_document_bytes": 411925
+    },
+    "c10000": {
+      "semantic": "equivalent",
+      "revisions": 12,
+      "mismatches": 0,
+      "audit": "complete",
+      "unaccounted_fields": 0,
+      "coverage_document_bytes": 4114740
+    }
+  },
+  "profile": {
+    "question": "is analyseCoveredFiles' O(total) reuse iteration material to agent_edit_to_diagnostics_ms?",
+    "answer": "no",
+    "one_file_edit_c1000_ms": {
+      "total": 30.5,
+      "session_closure_ms": 10.74,
+      "session_dsv_view_ms": 10.58,
+      "session_compile_files_ms": 7.81,
+      "session_compile_affected_ms": 4.54,
+      "session_reuse_iteration_ms": 0.39,
+      "session_coverage_entries_ms": 0.56,
+      "session_scan_ms": 0.39,
+      "unaccounted_ms": 0.98
+    },
+    "reuse_iteration_share_c1000": "1.3%",
+    "reuse_iteration_share_c10000": "3.1%",
+    "dominant": "refreshClosure and refreshDesignSystemViews, together 70% of the one-file edit at c1000, both O(total) and both unrelated to the file the agent edited",
+    "next": "Phase D should target the two O(total) per-revision passes, not the reuse loop and not the metadata."
+  },
+  "files": {
+    "report": "REPORT.md",
+    "campaign": [
+      "agent-loop/c1000-agent-loop-summary.json",
+      "agent-loop/c10000-agent-loop-summary.json"
+    ],
+    "profile": ["agent-loop/c1000-phase-profile.json"],
+    "correctness": [
+      "agent-loop/c1000-phase-c-oracle.json",
+      "agent-loop/c10000-phase-c-oracle.json"
+    ],
+    "metadata": [
+      "metadata/bytes2-c1000-t1000-r100-s809-inline.json",
+      "metadata/bytes2-c1000-t1000-r100-s809-reference.json",
+      "metadata/bytes2-c10000-t1000-r100-s307-inline.json",
+      "metadata/bytes2-c10000-t1000-r100-s307-reference.json"
+    ]
+  }
+}

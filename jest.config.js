@@ -49,6 +49,11 @@ const path = require('path');
 const BABEL_ROOT = path.join(__dirname, 'packages/@stylexjs/babel-plugin');
 
 module.exports = {
+  // The repository's own convention, and the one the packages already use: a
+  // test file is named `*-test.js`. The `*.test.js` spelling exists in three
+  // places in `style-value-parser` and `unplugin`, so it is admitted explicitly
+  // rather than left to be discovered by accident.
+  testMatch: ['**/__tests__/**/*-test.js', '**/?(*.)+(spec|test).js'],
   modulePathIgnorePatterns: [
     '<rootDir>/evidence/',
     '<rootDir>/upstream/',
@@ -56,7 +61,18 @@ module.exports = {
     '<rootDir>/\\.unpacked/',
   ],
   watchPathIgnorePatterns: ['<rootDir>/evidence/', '<rootDir>/\\.unpacked/'],
-  testPathIgnorePatterns: ['<rootDir>/evidence/', '<rootDir>/upstream/'],
+  testPathIgnorePatterns: [
+    '<rootDir>/evidence/',
+    '<rootDir>/upstream/',
+    // Fixture projects are real application sources read by the build, and the
+    // build writes their compiled output into them. Neither is a test. The
+    // package's own config ignores the same two paths, and the two must not
+    // drift: a root run that collects a fixture as a suite while the package
+    // run does not is how 128 phantom failures appear.
+    '/__fixtures__/',
+    '/pandamstyle/fixtures/',
+    '/fixtures/',
+  ],
   transform: {
     '^.+\\.[cm]?[jt]sx?$': [
       'babel-jest',

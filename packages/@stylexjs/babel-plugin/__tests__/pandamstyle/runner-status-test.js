@@ -182,12 +182,6 @@ function commit(cwd, name) {
   return git(cwd, 'rev-parse', 'HEAD');
 }
 
-function commitExisting(cwd, name) {
-  git(cwd, 'add', name);
-  git(cwd, 'commit', '-q', '-m', `add ${name}`);
-  return git(cwd, 'rev-parse', 'HEAD');
-}
-
 /**
  * A Git repository the runner can be pointed at. verify-pms.sh resolves the
  * repository from its own location, so a copy of the script makes the fixture
@@ -226,7 +220,20 @@ function makeFixture() {
     commit(dir, n),
   );
   fs.copyFileSync(RUNNER, path.join(dir, 'verify-pms.sh'));
-  commitExisting(dir, 'verify-pms.sh');
+  // The runner now reads its Jest counts through `tools/pms/test-counts.js`
+  // rather than parsing them inline, so the fixture has to carry that file too.
+  // It is part of the runner's source, not a helper the fixture happens to
+  // need, and a runner that silently did nothing when the file was missing
+  // would be worse than the inline parser it replaced.
+  fs.mkdirSync(path.join(dir, 'tools', 'pms'), { recursive: true });
+  // Resolved from the RUNNER's own location rather than from this test's, so
+  // the two stay together if the runner ever moves.
+  fs.copyFileSync(
+    path.resolve(path.dirname(RUNNER), 'tools', 'pms', 'test-counts.js'),
+    path.join(dir, 'tools', 'pms', 'test-counts.js'),
+  );
+  git(dir, 'add', '-A');
+  git(dir, 'commit', '-q', '-m', 'runner sources');
 
   // A committed run directory, mirroring evidence/<run>/ in the real checkout.
   fs.mkdirSync(path.join(dir, 'evidence'));

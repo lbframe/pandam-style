@@ -407,11 +407,11 @@ for i in "${!STEP_NAMES[@]}"; do
     >> "$PMS_OUT_DIR/steps.tsv"
 done
 
-node - "$PMS_OUT_DIR" "$TESTED_COMMIT" "$TESTED_TREE" "$DIRTY" "$PANDAMSTYLE_BASE_RESOLVED" "$PANDAMSTYLE_BASE" <<'NODE'
+node - "$PMS_OUT_DIR" "$TESTED_COMMIT" "$TESTED_TREE" "$DIRTY" "$PANDAMSTYLE_BASE_RESOLVED" "$PANDAMSTYLE_BASE" "$REPO_ROOT" <<'NODE'
 const fs = require('fs');
 const path = require('path');
 const out = process.argv[2];
-const [commit, tree, dirty, baseRef, base] = process.argv.slice(3);
+const [commit, tree, dirty, baseRef, base, repoRoot] = process.argv.slice(3);
 const env = JSON.parse(fs.readFileSync(path.join(out, 'env.json'), 'utf8'));
 
 const rows = fs
@@ -420,41 +420,45 @@ const rows = fs
   .filter((l) => l.trim() !== '')
   .map((l) => l.split('\t'));
 
-// Jest prints, e.g.: "Tests: 1 skipped, 46 passed, 47 of 48 total"
-function count(text, label) {
-  const re = new RegExp(label + ':\\s+(.*)');
-  const m = text.match(re);
-  if (m == null) return null;
-  const tail = m[1];
-  const passed = tail.match(/(\d+) passed/);
-  const total = tail.match(/(?:of )?(\d+) total/);
-  const skipped = tail.match(/(\d+) skipped/);
-  return {
-    passed: passed ? Number(passed[1]) : null,
-    total: total ? Number(total[1]) : null,
-    skipped: skipped ? Number(skipped[1]) : null,
-  };
-}
+// The counting and the verdict live in `tools/pms/test-counts.js`, with their
+// own tests, because the defect this replaces was a REPORTING defect: the old
+// parser read only `passed` and `total`, so a suite that failed to load
+// contributed no tests, the total still looked plausible, and a delivery could
+// quote a green number for a run that had not run the code. A parser with that
+// much authority over the verdict needs its own test suite rather than being
+// inlined in a heredoc.
+const {
+  assessRun,
+  assessSuiteIntegrity,
+  parseJestCounts,
+} = require(path.join(repoRoot, 'tools/pms/test-counts.js'));
 
 const steps = {};
 const skipped = [];
+const integrity = [];
 let failed = 0;
 for (const [name, status, code, note] of rows) {
   const logPath = path.join(out, `${name}.log`);
   let counts = null;
   if (fs.existsSync(logPath)) {
-    const text = fs.readFileSync(logPath, 'utf8');
-    const tests = count(text, 'Tests');
-    const suites = count(text, 'Test Suites');
-    if (tests != null || suites != null) counts = { tests, suites };
+    counts = parseJestCounts(fs.readFileSync(logPath, 'utf8'));
   }
   if (status === 'skipped') skipped.push(name);
   if (status === 'failed') failed++;
+  // A step with no exit code records null, never 0. Reporting 0 is what
+  // previously made an unexecuted step indistinguishable from a passing one.
+  const exitCode = code === '-' ? null : Number(code);
+  const verdict =
+    status === 'skipped'
+      ? { step: name, verdict: 'unverified', exitCode: null,
+          findings: [{ code: 'STEP_SKIPPED',
+            message: `${name}: the step did not run, so nothing about it is verified` }],
+          counts: null }
+      : assessSuiteIntegrity({ step: name, exitCode, counts });
+  integrity.push(verdict);
   steps[name] = {
     status,
-    // A skipped step has NO exit code. Reporting 0 here is what previously made
-    // an unexecuted step indistinguishable from a passing one.
-    exitCode: code === '-' ? null : Number(code),
+    exitCode,
     // The acceptance vocabulary, mapped explicitly rather than by coincidence.
     acceptance:
       status === 'passed'
@@ -463,9 +467,30 @@ for (const [name, status, code, note] of rows) {
           ? 'failed'
           : 'not_run',
     note: note === '' ? null : note,
-    counts,
+    // Six numbers, not three: tests and suites, each passed/failed/skipped.
+    // A reader who is handed only a passed-test total can be misled by a suite
+    // that contributed none, which is exactly how this defect happened.
+    counts: counts == null
+      ? null
+      : {
+          testsPassed: counts.testsPassed,
+          testsFailed: counts.testsFailed,
+          testsSkipped: counts.testsSkipped,
+          testsTotal: counts.testsTotal,
+          suitesPassed: counts.suitesPassed,
+          suitesFailed: counts.suitesFailed,
+          suitesSkipped: counts.suitesSkipped,
+          suitesTotal: counts.suitesTotal,
+          testsAccountedFor: counts.testsAccountedFor,
+          suitesAccountedFor: counts.suitesAccountedFor,
+        },
+    // The step's own verdict, which can disagree with its status. A step that
+    // the shell recorded as passed because the wrapper swallowed the exit code
+    // is reported here as failed, and the disagreement is the finding.
+    verification: verdict,
   };
 }
+const runIntegrity = assessRun(integrity);
 
 const summary = {
   documentKind: 'pandamstyle-run-summary',
@@ -480,7 +505,19 @@ const summary = {
   toolchain: env.toolchain,
   // A run with a skipped step is NOT a complete run. This flag exists so a
   // consumer of summary.json cannot read a partial run as a full one.
-  complete: skipped.length === 0 && failed === 0,
+  // `complete` is a conjunction of three SEPARATE claims, and a reader who
+  // wants to know which one is false can look. A step can be reported as
+  // `complete: false` because it never ran, because a suite failed to load, or
+  // because the exit codes and the counts disagree - and those are different
+  // defects with different fixes.
+  complete: skipped.length === 0 && failed === 0 && runIntegrity.verdict === 'verified',
+  // The six numbers a delivery has to quote, and the verdict they imply. They
+  // are at the TOP of the document because they are what gets quoted, and a
+  // number that can be quoted without its verdict is the defect.
+  verification: runIntegrity,
+  suiteIntegrityFailures: integrity
+    .filter((s) => s.verdict !== 'verified')
+    .flatMap((s) => s.findings.map((f) => ({ step: s.step, ...f }))),
   skippedSteps: skipped,
   failedSteps: Object.keys(steps).filter((n) => steps[n].status === 'failed'),
   steps,
@@ -505,8 +542,41 @@ done
 
 log ""
 log "run directory: $PMS_OUT_DIR"
+if [ -f "$PMS_OUT_DIR/suite-integrity.json" ]; then
+  node -e '
+    const fs = require("fs");
+    const d = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    log "tests:  ${d.verification.testsPassed} passed, ${d.verification.testsFailed} failed, ${d.verification.testsSkipped} skipped";
+    log "suites: ${d.verification.suitesPassed} passed, ${d.verification.suitesFailed} failed, ${d.verification.suitesSkipped} skipped";
+    log "suite-integrity verdict: ${d.verification.verdict}";
+    for (const f of d.suiteIntegrityFailures) {
+      log "  - [${f.step}] ${f.code}: ${f.message}";
+    }
+  ' "$PMS_OUT_DIR/summary.json"
+fi
 if [ "$FAILED_STEPS" -ne 0 ]; then
   log "VERIFICATION FAILED: $FAILED_STEPS required step(s) did not pass."
+  exit 1
+fi
+# A step the shell recorded as passed can still be a failure on its own counts:
+# a suite that failed to load exits non-zero, and a wrapper that swallows the
+# code would otherwise turn that into a green delivery. The counts are the
+# authority, so the run is failed when the counts say it is - whatever the step
+# table says.
+SUITE_INTEGRITY_FAILED=0
+if [ -f "$PMS_OUT_DIR/summary.json" ]; then
+  SUITE_INTEGRITY_FAILED="$(node -e '
+    const fs = require("fs");
+    try {
+      const d = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+      process.stdout.write(d.verification?.verdict === "failed" ? "1" : "0");
+    } catch {
+      process.stdout.write("1");
+    }
+  ' "$PMS_OUT_DIR/summary.json")"
+fi
+if [ "$SUITE_INTEGRITY_FAILED" -ne 0 ]; then
+  log "VERIFICATION FAILED: a test step reported failing tests or suites."
   exit 1
 fi
 if [ "$SKIPPED_STEPS" -ne 0 ]; then

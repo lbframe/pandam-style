@@ -26,6 +26,11 @@ const VALID_IN_REPO = path.join(FIXTURES, 'valid');
 let project;
 let result;
 let artifacts;
+// The per-file coverage snapshot. It is its own document since Phase C split it
+// out of the build report, so the assertions that used to read
+// `report.coverage` read this, and the two are cross-checked below so a reader
+// can see the split did not make them disagree.
+let coverage;
 
 beforeAll(() => {
   project = freshCopyOf(VALID);
@@ -35,12 +40,14 @@ beforeAll(() => {
       css: fs.readFileSync(path.join(project, 'generated/styles.css'), 'utf8'),
       manifest: readJson(path.join(project, 'generated/manifest.json')),
       report: readJson(path.join(project, 'generated/build-report.json')),
+      coverageReport: readJson(path.join(project, 'generated/coverage.json')),
       designSystem: fs.readFileSync(
         path.join(project, 'generated/design.pandamstyle.js'),
         'utf8',
       ),
       emittedDir: path.join(project, 'generated/js'),
     };
+    coverage = artifacts.coverageReport.entries;
   }
 });
 
@@ -137,9 +144,7 @@ describe('helper resolution follows binding and module', () => {
   });
 
   test('a page importing only a recipe is covered and compiled', () => {
-    const entry = artifacts.report.coverage.find((c) =>
-      c.file.endsWith('only-recipe.js'),
-    );
+    const entry = coverage.find((c) => c.file.endsWith('only-recipe.js'));
     expect(entry).toBeDefined();
     expect(entry.analysed).toBe(true);
     expect(entry.usedDesignSystem).toBe(true);
@@ -228,22 +233,19 @@ describe('generation coherence and coverage report', () => {
 
   test('coverage lists the declared roots and the analysed files', () => {
     expect(artifacts.report.coveredRoots.length).toBeGreaterThan(0);
-    expect(artifacts.report.coveredFileCount).toBe(
-      artifacts.report.coverage.length,
-    );
-    for (const entry of artifacts.report.coverage) {
+    expect(artifacts.report.coveredFileCount).toBe(coverage.length);
+    expect(artifacts.report.coverageSummary.entries).toBe(coverage.length);
+    for (const entry of coverage) {
       expect(entry.analysed).toBe(true);
       expect(entry.failed).toBeUndefined();
     }
-    const kinds = new Set(artifacts.report.coverage.map((c) => c.origin));
+    const kinds = new Set(coverage.map((c) => c.origin));
     expect(kinds).toContain('root');
     expect(kinds).toContain('generated');
   });
 
   test('the barrel relay is recorded in the coverage chain', () => {
-    const entry = artifacts.report.coverage.find((c) =>
-      c.file.endsWith('renamed.js'),
-    );
+    const entry = coverage.find((c) => c.file.endsWith('renamed.js'));
     expect(entry.relayChain.length).toBeGreaterThan(1);
   });
 

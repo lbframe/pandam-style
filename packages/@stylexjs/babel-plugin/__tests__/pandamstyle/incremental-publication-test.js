@@ -333,12 +333,17 @@ describe('Spike 3 Phase A: a deleted source takes its output with it', () => {
     expect(cssAfter).not.toContain('grid');
     expect(cssAfter).not.toBe(cssBefore);
 
-    // And the report no longer mentions the module.
+    // And the report no longer mentions the module. The per-file coverage
+    // snapshot is no longer inline in the build report (Phase C), so the
+    // assertion asks the session for its audit and looks there: which is also
+    // how an auditor would have to do it.
+    const entries = h.auditState().coverage.entries;
+    expect(entries.some((c) => c.file.includes('zz-unique.js'))).toBe(false);
     const report = JSON.parse(
       fs.readFileSync(path.join(h.outDir, 'build-report.json'), 'utf8'),
     );
-    expect(report.coverage.some((c) => c.file.includes('zz-unique.js'))).toBe(
-      false,
+    expect(report.coverageSummary.pages).toBe(
+      entries.filter((c) => c.role === 'page').length,
     );
 
     // And the generation equals a fresh rebuild of the same bytes - file set
@@ -959,7 +964,6 @@ describe('Spike 3 Phase A: the publication variants are selectable and separate'
   test('the default variant is the Spike 2 reference', () => {
     const h = openProject('valid');
     publish(h);
-    const before = h.published();
 
     editFile(h, 'src/conditional-props.tsx', EXISTING_ATOM, EXISTING_ATOM_PLUS);
     const { publication } = publish(h);
@@ -978,7 +982,22 @@ describe('Spike 3 Phase A: the publication variants are selectable and separate'
     expect(publication.byKind.js.added).toBe(0);
     expect(publication.byKind.metadata.reused).toBe(0);
     expect(publication.byKind.css.reused).toBe(0);
-    expect(Object.keys(before).length).toBe(jsCount + 4);
+    // The generation's own file list, not the oracle's fingerprint: the
+    // fingerprint deliberately leaves the two metadata documents out, because
+    // they are compared as audit state, and this assertion is about what is on
+    // disk. jsCount JavaScript outputs, the stylesheet, the design-system
+    // module, the manifest, and the build report. The coverage detail is NOT
+    // among them: this variant was not asked for it, and publishing evidence
+    // nobody requested is what Phase C removed from the hot path.
+    expect([...readTree(h.outDir).keys()].sort()).toEqual(
+      [
+        ...jsOutputs(h),
+        'build-report.json',
+        'design.pandamstyle.js',
+        'manifest.json',
+        'styles.css',
+      ].sort(),
+    );
   });
 
   test('the same edit under delta publication is equivalent', () => {

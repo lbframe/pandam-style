@@ -217,12 +217,10 @@ describe('BC-6: authority is a build concern, not a vocabulary ban', () => {
     });
 
     test('the data file is covered and compiled like any other', () => {
-      const report = readJson(
-        path.join(project, 'generated/build-report.json'),
-      );
-      const entry = report.coverage.find((c) =>
-        c.file.endsWith('business-data.ts'),
-      );
+      const entries = readJson(
+        path.join(project, 'generated/coverage.json'),
+      ).entries;
+      const entry = entries.find((c) => c.file.endsWith('business-data.ts'));
       expect(entry).toBeDefined();
       expect(entry.analysed).toBe(true);
       expect(entry.failed).toBeUndefined();

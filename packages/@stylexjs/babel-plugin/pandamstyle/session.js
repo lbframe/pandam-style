@@ -99,6 +99,21 @@ import { buildDesignSystem } from './index';
 import { generateDesignSystemModule } from './codegen';
 import { PmsError, Codes, diagnostic } from './diagnostics';
 import {
+  BUILD_REPORT_KIND,
+  BUILD_REPORT_SCHEMA_VERSION,
+  COVERAGE_REPORT_FILE,
+  DEFAULT_AFFECTED_ENTRY_LIMIT,
+  auditBlock,
+  buildAgentResult,
+  buildCoverageReport,
+  coverageReference,
+  coverageSummary,
+  generationBlock,
+  incrementalBlock,
+  machineDiagnostic,
+  mutationBlock,
+} from './agent-result';
+import {
   assertCoverageConsistency,
   commonBase,
   compileFile,
@@ -115,7 +130,7 @@ import {
   SOURCE_EXTENSIONS,
 } from './module-graph';
 import { withGeneration } from './generation';
-import { count, perfNow, phase, recordParse } from './perf';
+import { count, perfCollector, perfNow, phase, recordParse } from './perf';
 
 const CONTRACT_VERSION = 'pms-0.1';
 
@@ -197,7 +212,38 @@ function normalizeConfig(input) {
     // "a failure at any point leaves generation N current" is proved rather
     // than asserted. Never set by a caller that is not a test.
     publishFailAt: input.publishFailAt ?? null,
+    // Spike 4, Phase C. Where the project-wide coverage snapshot goes.
+    //
+    //   'reference'  the default. `build-report.json` carries the coverage
+    //                COUNTS and a reference; the detail document is produced
+    //                only when something asks for it. This is the agent hot
+    //                path.
+    //   'inline'     the pre-Phase-C artifact: the whole per-file array in
+    //                `build-report.json`, schema version 1, no reference, no
+    //                separate document. Kept as a POLICY rather than deleted,
+    //                for two reasons. A host that has a reader written against
+    //                version 1 keeps working instead of breaking at a
+    //                dependency bump; and the spike can measure the two
+    //                policies against each other on ONE compiler, which
+    //                attributes the difference to the metadata policy rather
+    //                than to a different tree.
+    //
+    // It is a config field and not a semantic one: the generation's CONTENT is
+    // the same either way, and it does not bump the semantic epoch, so switching
+    // it does not invalidate a single compiled file.
+    auditPolicy: resolveAuditPolicy(input.auditPolicy),
   };
+}
+
+/** The metadata policies, and what each one is allowed to do. */
+const AUDIT_POLICIES = Object.freeze(['reference', 'inline']);
+
+function resolveAuditPolicy(name) {
+  if (name == null) return 'reference';
+  if (typeof name === 'string' && AUDIT_POLICIES.includes(name)) return name;
+  throw new Error(
+    `pandamstyle: unknown auditPolicy ${JSON.stringify(name)}; expected one of ${AUDIT_POLICIES.join(', ')}.`,
+  );
 }
 
 /**
@@ -617,6 +663,12 @@ export function createProjectSession(config) {
         dsView: null,
         validity: null,
         contribution: null,
+        // The coverage record of the last revision in which this file FAILED to
+        // compile. Kept beside the contribution rather than inside it, because
+        // a failure REPLACES the contribution with null and an agent repairing
+        // the failure needs the record of what failed, not of what it used to
+        // contribute. Cleared as soon as the file compiles cleanly.
+        failureCoverage: null,
         compiledRevision: null,
         origin: null,
       };
@@ -1053,6 +1105,34 @@ export function createProjectSession(config) {
       published: false,
       diagnostics: [],
       incrementalMs: null,
+      // ---------------------------------------------------------------
+      // The four completion points, as monotonic nanosecond stamps taken
+      // against a single clock (perfNow), so every reported interval is a
+      // difference of two real readings rather than a difference of two
+      // wall-clock timestamps that could disagree.
+      //
+      // They are STAMPS, not durations, and they stay null until the thing
+      // they describe has actually happened. A failed revision reaches
+      // `diagnosticsReady` and stops: reporting a generation time for a
+      // revision that refused to publish would be inventing work.
+      //
+      // `transactionAcceptedNs` is the zero the primary KPI is measured from.
+      // It is taken inside `applyChanges`, before a single byte of the
+      // declared set is read, so the interval it starts contains the
+      // session's own discovery, hashing, closure and compilation and not
+      // the host's write.
+      // ---------------------------------------------------------------
+      transactionAcceptedNs: perfNow(),
+      diagnosticsReadyNs: null,
+      generationReadyNs: null,
+      generationCommittedNs: null,
+      auditReportReadyNs: null,
+      // Set when the caller asked for the project-wide audit of THIS
+      // revision. Requested and ready are different states and are reported
+      // as two.
+      auditRequested: false,
+      audit: null,
+      agentResult: null,
     };
     state.active = active;
     bump('session_revisions');
@@ -1215,7 +1295,7 @@ export function createProjectSession(config) {
       1,
     );
     if (declared != null) {
-      count('dirty_files_declared', touchedPaths(declared).size);
+      bump('dirty_files_declared', touchedPaths(declared).size);
     }
 
     // -------------------------------------------------------------- declared
@@ -1242,7 +1322,7 @@ export function createProjectSession(config) {
           continue;
         }
         const entry = scanEntryFor(file);
-        count('dirty_files_read', 1);
+        bump('dirty_files_read', 1);
         if (!entry.readable) {
           // Declared as changed and gone. A removal the caller did not label,
           // handled as one rather than ignored.
@@ -1255,7 +1335,7 @@ export function createProjectSession(config) {
           delta.removed.add(file);
           continue;
         }
-        count('dirty_files_hashed', 1);
+        bump('dirty_files_hashed', 1);
         if (!entry.known) {
           bump('files_added');
           active.newFiles.add(file);
@@ -1266,7 +1346,7 @@ export function createProjectSession(config) {
           // Declared dirty and hashed identical. An agent that reformatted a
           // file without changing it should cost nothing downstream, and
           // saying so is how a host can find out it is over-declaring.
-          count('dirty_files_unchanged', 1);
+          bump('dirty_files_unchanged', 1);
         }
         active.dirty.add(file);
         active.invalid.add(file);
@@ -1310,8 +1390,8 @@ export function createProjectSession(config) {
     const counted = new Set();
     for (const file of known) {
       const entry = scanEntryFor(file);
-      count('dirty_files_read', 1);
-      if (entry.readable) count('dirty_files_hashed', 1);
+      bump('dirty_files_read', 1);
+      if (entry.readable) bump('dirty_files_hashed', 1);
       if (!entry.readable) {
         if (entry.known) {
           active.dirty.add(file);
@@ -1335,9 +1415,9 @@ export function createProjectSession(config) {
     for (const file of rootFiles) {
       if (known.has(file)) continue;
       const entry = scanEntryFor(file);
-      count('dirty_files_read', 1);
+      bump('dirty_files_read', 1);
       if (!entry.readable) continue;
-      if (entry.readable) count('dirty_files_hashed', 1);
+      if (entry.readable) bump('dirty_files_hashed', 1);
       if (!counted.has(file)) bump('files_added');
       counted.add(file);
       active.newFiles.add(file);
@@ -1397,6 +1477,16 @@ export function createProjectSession(config) {
 
       const closure = phase('session_closure_ms', () => refreshClosure(active));
       state.covered = closure;
+      // The SIZE of the covered set, recorded as soon as the closure is known
+      // and BEFORE the analysis can fail.
+      //
+      // It is recorded separately from `active.coverage` because that array is
+      // only assigned when the whole analysis succeeds, and a FAILED revision
+      // is precisely the case where an agent most needs to be told how big the
+      // project it just edited is. Deriving it from `coverage.length` would
+      // report zero for every refusal, which is a number no reader could
+      // interpret.
+      active.coveredCount = closure.covered.size;
 
       // Files that left the covered set lose EVERYTHING they owned. This is the
       // step that makes "no stale rule from a deleted file" true rather than
@@ -1487,6 +1577,14 @@ export function createProjectSession(config) {
     count('session_resolution_dirs', dirListings.size);
     pruneResolution();
     active.counters = buildReportCounters(active);
+    // The verdict for THIS revision now exists, and it is stamped before the
+    // agent result is built, so `diagnosticsMs` reports the compilation and not
+    // the cost of describing the compilation. The two are timed separately and
+    // both are reported: a caller that only needs the verdict is not paying for
+    // the object, and a caller that needs the object is not paying for the
+    // compile twice.
+    active.diagnosticsReadyNs = perfNow();
+    active.agentResult = buildResultFor(active);
     return revisionSummary(active);
   }
 
@@ -1553,6 +1651,31 @@ export function createProjectSession(config) {
     // meaning something.
     closure.covered.set(designSystemPath, 'generated');
 
+    // ---------------------------------------------------------------
+    // THE O(TOTAL) LOOP, INSTRUMENTED (Spike 4, Phase C)
+    //
+    // This loop still visits every covered file on every revision, including
+    // the 10,000 that were not touched. Phase C's question is whether that
+    // iteration is material to `agent_edit_to_diagnostics_ms`, and the only
+    // honest way to answer it is to time the two halves SEPARATELY:
+    //
+    //   affected    reading, parsing, compiling and recording the files whose
+    //               bytes or resolutions changed. This is the work the agent's
+    //               edit actually caused.
+    //   reuse       everything the loop does for a file it is NOT recompiling:
+    //               the map lookup, the rule re-append, the coverage entry,
+    //               the output record. No parse, no read of the source.
+    //
+    // Reporting only the aggregate would make a fast revision look like it did
+    // no work, and a slow one undiagnosable. The timers are gated on a
+    // collector being installed, so a production session executes neither
+    // `perfNow` call.
+    // ---------------------------------------------------------------
+    const timing = perfCollector() != null;
+    let affectedNs = 0;
+    let reuseNs = 0;
+    let entryNs = 0;
+
     for (const [file, origin] of [...closure.covered]) {
       if (file === designSystemPath) {
         coverage.push({
@@ -1571,6 +1694,7 @@ export function createProjectSession(config) {
       const fileState = ensureFileState(file);
       fileState.origin = origin;
 
+      const affectedStart = timing ? perfNow() : 0;
       if (fileState.contribution == null || active.invalid.has(file)) {
         const entry = scanEntryFor(file);
         if (!entry.readable) {
@@ -1585,6 +1709,7 @@ export function createProjectSession(config) {
             }),
           );
           analysed.push(file);
+          if (timing) affectedNs += perfNow() - affectedStart;
           continue;
         }
         bump('files_recompiled');
@@ -1599,7 +1724,7 @@ export function createProjectSession(config) {
         } catch (err) {
           if (err != null && Array.isArray(err.diagnostics)) {
             failures.push(...err.diagnostics);
-            coverage.push({
+            const failedEntry = {
               file: relativeToCwd(file),
               origin,
               role: 'page',
@@ -1607,7 +1732,14 @@ export function createProjectSession(config) {
               failed: true,
               diagnostics: err.diagnostics.length,
               codes: [...new Set(err.diagnostics.map((d) => d.code))],
-            });
+            };
+            coverage.push(failedEntry);
+            // The coverage record of a file that FAILED is kept even though its
+            // contribution is not: it is the only place the failing file's own
+            // role, origin and codes are recorded, and the agent result looks it
+            // up from here to attach LOCAL context to each of its diagnostics.
+            // A repair revision replaces it with a passing entry.
+            fileState.failureCoverage = failedEntry;
             analysed.push(file);
             // The file's previous contribution is REMOVED, not left behind a
             // diagnostic. A repair revision must publish the repaired file, and
@@ -1615,6 +1747,7 @@ export function createProjectSession(config) {
             // aggregation.
             fileState.contribution = null;
             fileState.validity = null;
+            if (timing) affectedNs += perfNow() - affectedStart;
             continue;
           }
           throw err;
@@ -1644,11 +1777,19 @@ export function createProjectSession(config) {
           },
           diagnostics: [],
         };
+        fileState.failureCoverage = null;
         fileState.compiledRevision = active.revisionId;
         fileState.validity = validityKeyOf(fileState, cfg);
+        if (timing) affectedNs += perfNow() - affectedStart;
       } else {
         bump('files_reused');
+        if (timing) {
+          const spent = perfNow() - affectedStart;
+          affectedNs += spent;
+          reuseNs -= spent;
+        }
       }
+      const entryStart = timing ? perfNow() : 0;
       for (const rule of fileState.contribution.rules) allRules.push(rule);
       coverage.push(fileState.contribution.coverage);
       if (fileState.compiledRevision === active.revisionId) {
@@ -1661,6 +1802,25 @@ export function createProjectSession(config) {
         codeDigest: fileState.contribution.codeDigest,
         codeBytes: fileState.contribution.codeBytes,
       });
+      if (timing) {
+        // The tail of the loop - re-appending rules, recording the coverage
+        // entry, recording the output - is the part a REUSED file pays. It is
+        // attributed to whichever side the file belongs to, because the
+        // question the two numbers answer is "what does not touching this file
+        // cost", and that cost is exactly this tail.
+        const spent = perfNow() - entryStart;
+        entryNs += spent;
+        if (fileState.compiledRevision === active.revisionId)
+          affectedNs += spent;
+        else reuseNs += spent;
+      }
+    }
+
+    if (timing) {
+      count('session_compile_affected_ms', affectedNs / 1e6);
+      count('session_reuse_iteration_ms', reuseNs / 1e6);
+      count('session_coverage_entries_ms', entryNs / 1e6);
+      bump('covered_entries_iterated', closure.covered.size);
     }
 
     const consistency = assertCoverageConsistency({
@@ -1897,44 +2057,142 @@ export function createProjectSession(config) {
         const css = aggregateCss(active, cfg, variant);
         count('css_bytes_written', Buffer.byteLength(css, 'utf8'));
 
-        const buildReport = {
-          documentKind: 'pandamstyle-build-report',
-          contractVersion: designSystem.manifest.compilerContractVersion,
-          systemId: designSystem.registry.systemId,
-          registryDigest,
-          coveredRoots: cfg.roots,
-          coveredFileCount: active.coverage.length,
-          analysedFileCount: active.analysed.length,
-          designSystemRuleCount: active.designSystemRuleCount,
-          consumerRuleCount: active.ruleCount - active.designSystemRuleCount,
-          ruleCount: active.ruleCount,
-          cssBytes: Buffer.byteLength(css, 'utf8'),
-          coverage: active.coverage,
-          coverageConsistency: {
+        // The project-wide coverage snapshot is a SEPARATE document (Spike 4,
+        // Phase C). At c10000 the inline array was 3,250,511 of the report's
+        // 3,252,194 bytes - 99.95% - and it was being serialized and written on
+        // the critical path of an agent's one-line edit.
+        //
+        // The `entries` array itself is NOT computed here. It is already in
+        // memory as `active.coverage` (every entry was built during analysis,
+        // and the CSS aggregation needs the rule contributions beside it), so
+        // deferring means deferring the SERIALIZATION and the WRITE - the two
+        // things that cost milliseconds and megabytes - and not the collection.
+        // That distinction matters: a "lazy" report that quietly re-derives the
+        // array at read time has moved the cost, not removed it, and would make
+        // the hot path look smaller by making the audit path dishonest.
+        // The `inline` policy does not need the counts at all - the whole array
+        // is right there - so deriving them would be O(project) work for a
+        // document that does not read them. Skipped rather than computed and
+        // discarded: the measurement below would otherwise charge the fast
+        // policy for the slow one's work.
+        const coverageSummaryOfRevision =
+          cfg.auditPolicy === 'inline'
+            ? null
+            : phase('build_report_build_ms', () =>
+                coverageSummary(active.coverage),
+              );
+
+        // The four metadata costs, timed apart. Building the object,
+        // serializing it, staging it and committing it are different operations
+        // with different causes, and an aggregate over them cannot say which one
+        // a caller should stop paying for.
+        const reportBuildStart = perfNow();
+        // Schema version 1 under the `inline` policy: the whole array, in the
+        // report, exactly as a pre-Phase-C reader expects to find it. It is
+        // built from the same `active.coverage` every other policy uses, so
+        // the two policies describe the same project and differ only in where
+        // the bytes are written - which is the whole of what the measurement
+        // attributes.
+        const buildReport =
+          cfg.auditPolicy === 'inline'
+            ? {
+                documentKind: BUILD_REPORT_KIND,
+                schemaVersion: 1,
+                contractVersion: designSystem.manifest.compilerContractVersion,
+                systemId: designSystem.registry.systemId,
+                registryDigest,
+                coveredRoots: cfg.roots,
+                coveredFileCount: active.coverage.length,
+                analysedFileCount: active.analysed.length,
+                designSystemRuleCount: active.designSystemRuleCount,
+                consumerRuleCount:
+                  active.ruleCount - active.designSystemRuleCount,
+                ruleCount: active.ruleCount,
+                cssBytes: Buffer.byteLength(css, 'utf8'),
+                coverage: active.coverage,
+                coverageConsistency: coverageConsistencyOf(),
+                externalRequests: externalRequestsOf(),
+                relayEdges: relayEdgesOf(),
+                incremental: incrementalBlockOf(),
+              }
+            : {
+                documentKind: BUILD_REPORT_KIND,
+                schemaVersion: BUILD_REPORT_SCHEMA_VERSION,
+                contractVersion: designSystem.manifest.compilerContractVersion,
+                systemId: designSystem.registry.systemId,
+                registryDigest,
+                coveredRoots: cfg.roots,
+                coveredFileCount: active.coverage.length,
+                analysedFileCount: active.analysed.length,
+                designSystemRuleCount: active.designSystemRuleCount,
+                consumerRuleCount:
+                  active.ruleCount - active.designSystemRuleCount,
+                ruleCount: active.ruleCount,
+                cssBytes: Buffer.byteLength(css, 'utf8'),
+                // Version 1 of this document carried `coverage` here: the whole
+                // project-wide array. Version 2 replaces it with the counts
+                // derived from that same array plus a reference to the document
+                // that holds it. Nothing was dropped: `requestFullAudit()`
+                // produces the detail for this revision on demand, and
+                // `auditPolicy: 'inline'` reproduces version 1 exactly.
+                coverageSummary: coverageSummaryOfRevision,
+                coverageReport: coverageReference({
+                  revisionId: active.revisionId,
+                  summary: coverageSummaryOfRevision,
+                  // True only when this generation is about to publish the
+                  // detail document itself, because the caller asked for it
+                  // before publishing. A later `requestFullAudit()` on an
+                  // already-published revision writes it outside the generation
+                  // and the summary keeps saying `false`, which is why the
+                  // reference carries `revisionId`: that is what makes the
+                  // standalone document findable.
+                  materialized: active.auditRequested,
+                }),
+                coverageConsistency: coverageConsistencyOf(),
+                externalRequests: externalRequestsOf(),
+                relayEdges: relayEdgesOf(),
+                // The generation describes the WHOLE current revision, reused
+                // files included. This block exists so a reader can see how
+                // much of it was recomputed without inferring it from a
+                // timestamp, and so a partial generation can never be mistaken
+                // for a complete one.
+                incremental: incrementalBlockOf(),
+              };
+        count('build_report_build_ms', (perfNow() - reportBuildStart) / 1e6);
+
+        // Shared by both policies. Declared as functions so the two object
+        // literals above cannot drift: the `inline` document is meant to be
+        // version 1 of the SAME report, and a field that appeared in one branch
+        // and not the other would make it version 1 of something else.
+        function coverageConsistencyOf() {
+          return {
             expectedCount: active.consistency.expectedCount,
             analysedCount: active.consistency.transformedCount,
             missing: active.consistency.missing.map(relativeToCwd),
             classification:
               'a covered file that the CLI did not analyse fails the build',
-          },
-          externalRequests: (state.covered?.external ?? []).map((e) => ({
+          };
+        }
+        function externalRequestsOf() {
+          return (state.covered?.external ?? []).map((e) => ({
             request: e.request,
             form: e.form,
             from: relativeToCwd(e.from),
-          })),
-          relayEdges: (state.covered?.relayEdges ?? []).map((e) => ({
+          }));
+        }
+        function relayEdgesOf() {
+          return (state.covered?.relayEdges ?? []).map((e) => ({
             from: relativeToCwd(e.from),
             to: relativeToCwd(e.to),
             form: e.form,
-          })),
-          // The generation describes the WHOLE current revision, reused files
-          // included. This block exists so a reader can see how much of it was
-          // recomputed without inferring it from a timestamp, and so a partial
-          // generation can never be mistaken for a complete one.
-          incremental: {
+          }));
+        }
+        function incrementalBlockOf() {
+          return {
             revisionId: active.revisionId,
             generationId: nextGenerationId,
             publishVariant: variant,
+            auditPolicy: cfg.auditPolicy,
             projectSemanticEpoch: state.semanticEpoch,
             incrementalAnalysisMs: active.incrementalMs / 1e6,
             ...active.counters,
@@ -1942,8 +2200,8 @@ export function createProjectSession(config) {
             // updated. Present only for the variant that owns CSS state; the
             // other two report the same generation without it.
             ...(active.cssReport == null ? {} : { css: active.cssReport }),
-          },
-        };
+          };
+        }
 
         const manifestWithDigest = {
           ...designSystem.manifest,
@@ -1963,15 +2221,49 @@ export function createProjectSession(config) {
           });
         }
         put(gen, 'styles.css', css, { owner: 'styles', kind: 'css' });
-        put(
-          gen,
-          'build-report.json',
-          JSON.stringify(buildReport, null, 2) + '\n',
-          {
+
+        // The coverage detail, when and only when the caller asked for it
+        // BEFORE publishing. Requested after publication it is written outside
+        // the generation instead, because a committed generation is immutable:
+        // writing a file into it afterwards would mutate a generation whose
+        // manifest already certified its contents, which is precisely the
+        // guarantee the transactional publication exists to provide.
+        if (active.auditRequested) {
+          const coverageDoc = materializeCoverageReport(active, {
+            contractVersion: designSystem.manifest.compilerContractVersion,
+            systemId: designSystem.registry.systemId,
+            registryDigest,
+            generationId: nextGenerationId,
+            coveredRoots: cfg.roots,
+          });
+          put(gen, COVERAGE_REPORT_FILE, coverageDoc.text, {
             owner: 'metadata',
             kind: 'metadata',
-          },
+          });
+          active.audit = {
+            ...coverageDoc.receipt,
+            materializedAt: 'generation',
+            inGeneration: true,
+          };
+          // The document EXISTS from here, but it is not committed yet. The
+          // milestone that says so is `generationReady` - the same window in
+          // which every other artifact of this generation exists and the
+          // previous one is still current - so reporting it here rather than
+          // after the commit keeps the two claims consistent.
+          active.auditReportReadyNs = perfNow();
+        }
+
+        const reportSerializeStart = perfNow();
+        const reportText = JSON.stringify(buildReport, null, 2) + '\n';
+        count(
+          'build_report_serialize_ms',
+          (perfNow() - reportSerializeStart) / 1e6,
         );
+        count('build_report_bytes', Buffer.byteLength(reportText, 'utf8'));
+        put(gen, 'build-report.json', reportText, {
+          owner: 'metadata',
+          kind: 'metadata',
+        });
         put(
           gen,
           'manifest.json',
@@ -1980,6 +2272,15 @@ export function createProjectSession(config) {
             owner: 'metadata',
             kind: 'metadata',
           },
+        );
+        count(
+          'metadata_bytes_written',
+          Buffer.byteLength(reportText, 'utf8') +
+            Buffer.byteLength(
+              JSON.stringify(manifestWithDigest, null, 2),
+              'utf8',
+            ) +
+            Buffer.byteLength(state.designSystemSource, 'utf8'),
         );
 
         // Everything the caller needs to describe WHAT was published, collected
@@ -1994,6 +2295,11 @@ export function createProjectSession(config) {
             'build-report.json',
             'manifest.json',
             cfg.designSystemFile,
+            // Only when it was actually staged above. A `published` list that
+            // named an artifact nobody wrote would be a list of intentions, and
+            // this one is read as a list of facts by the delta publisher and by
+            // every test that checks a generation's contents.
+            ...(active.auditRequested ? [COVERAGE_REPORT_FILE] : []),
           ],
           css,
           manifest: manifestWithDigest,
@@ -2003,6 +2309,13 @@ export function createProjectSession(config) {
           revisionId: active.revisionId,
           nextGenerationId,
         };
+        // `generationReady`: every artifact for this revision is STAGED. The
+        // output directory is untouched - the previous generation is still
+        // current - and there is a real window between here and the commit in
+        // which a caller reading the output directory would read the wrong
+        // bytes. That window is why this is a reported milestone and not an
+        // implementation detail.
+        active.generationReadyNs = perfNow();
         // `withGeneration` commits after this returns, so the delta is picked up
         // from the transaction rather than reconstructed here.
         gen.onCommitted = (outcome) => {
@@ -2018,6 +2331,9 @@ export function createProjectSession(config) {
         failAt: cfg.publishFailAt ?? null,
       },
     );
+
+    // `generationCommitted`: the commit marker is on disk.
+    active.generationCommittedNs = perfNow();
 
     // A generation can be REUSED: when every record is byte-identical to the one
     // already published, the current generation already is that content and is
@@ -2086,6 +2402,18 @@ export function createProjectSession(config) {
       filesRemoved: active.removedFiles.size,
       filesReparsed: read('files_reparsed'),
       filesRecompiled: recompiled,
+      // How many files the analysis ACTUALLY compiled, as opposed to how many
+      // files own a contribution this revision replaced.
+      //
+      // The two differ exactly where something went wrong or went away: a file
+      // that FAILED to compile was compiled and owns nothing, and a file that
+      // was removed was never compiled. `filesRecompiled` counts the
+      // contributions, so on a refused revision it reports 0 while the compiler
+      // was demonstrably busy - and a counter that reads 0 after the compiler
+      // did the work is the kind of number an agent stops trusting. Both are
+      // reported, and the difference between them is itself a signal: a
+      // revision whose compiled count exceeds its recompiled count failed.
+      filesCompiled: read('files_recompiled'),
       filesReused: reused,
       coverageSummariesReused: read('coverage_summaries_reused'),
       coverageSummariesRebuilt: read('coverage_summaries_rebuilt'),
@@ -2094,8 +2422,20 @@ export function createProjectSession(config) {
       fullFallback: active.fallbackReason != null ? 1 : 0,
       fullFallbackReason: active.fallbackReason,
       newlyCoveredFiles: active.newFiles.size,
-      coveredFileCount: active.coverage?.length ?? 0,
+      // The covered set's size, which exists for a failed revision too. See
+      // `active.coveredCount`: deriving this from the analysis result would
+      // report 0 for every refusal.
+      coveredFileCount: active.coverage?.length ?? active.coveredCount ?? 0,
       fileStateCount: state.fileStates.size,
+      // The dirty-input accounting, kept in the revision's own tally rather
+      // than read back from a collector, so the agent result can say what the
+      // transaction cost even when nobody installed one. `dirtyFilesUnchanged`
+      // in particular is the number that distinguishes "an edit" from "a host
+      // that declared a file it did not change".
+      dirtyFilesDeclared: read('dirty_files_declared'),
+      dirtyFilesRead: read('dirty_files_read'),
+      dirtyFilesHashed: read('dirty_files_hashed'),
+      dirtyFilesUnchanged: read('dirty_files_unchanged'),
     };
   }
 
@@ -2112,7 +2452,315 @@ export function createProjectSession(config) {
       incrementalAnalysisMs:
         active.incrementalMs == null ? null : active.incrementalMs / 1e6,
       counters: active.counters ?? buildReportCounters(active),
+      // The compact machine result for THIS revision. Attached additively: the
+      // fields above are unchanged, and a caller that already reads them is
+      // unaffected. The timestamps live here too, because "how long ago was
+      // this revision's verdict produced" is a question about the revision, not
+      // about a result object a caller may or may not have asked for.
+      agentResult: active.agentResult ?? null,
+      milestones: milestonesOf(active),
     };
+  }
+
+  /**
+   * The four completion points, as durations from the moment the mutation
+   * transaction was accepted.
+   *
+   * Every interval here is a difference of two readings of the SAME monotonic
+   * clock, taken inside this session. A null means the thing did not happen -
+   * and for a FAILED revision that is not a gap in the measurement, it is the
+   * result: a refused revision reaches diagnostics and stops, and reporting a
+   * generation time for it would be inventing work that was correctly refused.
+   */
+  function milestonesOf(active) {
+    const t0 = active.transactionAcceptedNs;
+    const since = (mark) => (mark == null ? null : (mark - t0) / 1e6);
+    return {
+      // The milestone BOOLEANS and the durations are both reported because they
+      // answer different questions: a caller waiting on the loop needs to know
+      // which points it can wait for, and a profile needs the numbers.
+      diagnosticsReady: active.diagnosticsReadyNs != null,
+      generationReady: active.generationReadyNs != null,
+      generationCommitted: active.generationCommittedNs != null,
+      auditReportReady: active.auditReportReadyNs != null,
+      agent_edit_to_diagnostics_ms: since(active.diagnosticsReadyNs),
+      agent_edit_to_generation_ready_ms: since(active.generationReadyNs),
+      agent_edit_to_generation_committed_ms: since(
+        active.generationCommittedNs,
+      ),
+      agent_edit_to_audit_report_ms: since(active.auditReportReadyNs),
+    };
+  }
+
+  // ------------------------------------------------------ agent result ------
+
+  /**
+   * The coverage record of a file, looked up in O(1).
+   *
+   * It reads the per-file STATE rather than the revision's `coverage` array,
+   * and that is the whole point: building an index over 10,003 entries to
+   * attach context to the two diagnostics an agent actually caused would be the
+   * O(total) cost Phase C exists to keep out of the loop, reintroduced in a
+   * smaller disguise. The two states - a contribution's record and a failure's
+   * record - are both kept on the file, so the lookup succeeds either way.
+   *
+   * The key is the ABSOLUTE path and the lookup resolves the diagnostic's
+   * `relativeToCwd` form back to one. `relativeToCwd` falls back to the absolute
+   * path for a file outside the working directory, and `path.resolve` is the
+   * identity on an absolute path, so both forms resolve correctly without the
+   * lookup having to know which convention produced the string.
+   */
+  function coverageLookup() {
+    return {
+      get(file) {
+        const abs = path.resolve(file);
+        const fileState = state.fileStates.get(abs);
+        if (fileState == null) return null;
+        return (
+          fileState.contribution?.coverage ?? fileState.failureCoverage ?? null
+        );
+      },
+    };
+  }
+
+  /**
+   * The coverage of the files THIS revision touched, and nothing else.
+   *
+   * The agent needs to know whether the file it just wrote is covered, what role
+   * it has, and which relay it reaches the design system through - all of which
+   * are properties of that file. `projectEntries` is a count, so a reader can
+   * see that the project is large without this object being large.
+   */
+  function affectedCoverageOf(active) {
+    const touched = new Set();
+    for (const file of active.invalid) touched.add(file);
+    for (const file of active.newFiles) touched.add(file);
+    for (const file of active.removedFiles) touched.add(file);
+    const entries = [];
+    for (const file of touched) {
+      const fileState = state.fileStates.get(file);
+      const entry =
+        fileState?.contribution?.coverage ?? fileState?.failureCoverage ?? null;
+      if (entry != null) entries.push(entry);
+    }
+    // A file that was REMOVED has no state left to describe it, and saying so is
+    // better than omitting it: an agent that deleted a file needs to know that
+    // the file it deleted is no longer covered.
+    for (const file of active.removedFiles) {
+      if (state.fileStates.has(file)) continue;
+      entries.push({
+        file: relativeToCwd(file),
+        origin: null,
+        role: null,
+        analysed: false,
+        removed: true,
+        diagnostics: 0,
+      });
+    }
+    entries.sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
+    // The cap, and what is said about it. See `DEFAULT_AFFECTED_ENTRY_LIMIT`:
+    // the affected set is normally a handful of files and this never fires, but a
+    // GLOBAL FALLBACK's affected set is the whole project, and a result that
+    // listed it would be the project - measured at 413,988 bytes at c1000,
+    // which throws away the entire saving on the one revision where an agent
+    // most needs a small answer. The remainder is in the coverage document and
+    // `affectedTruncated` is how a caller knows there is one.
+    const inlineEntries = entries.slice(0, DEFAULT_AFFECTED_ENTRY_LIMIT);
+    return {
+      // "Did this revision change WHAT the project covers?" - the question an
+      // agent asks before it trusts its edit. It is about the covered SET
+      // (files that appeared or disappeared), not about the bytes inside files,
+      // and the name says so: an edit to an existing file does not change what
+      // is covered, and reporting otherwise would teach a host to distrust the
+      // flag.
+      coveredSetChanged:
+        active.newFiles.size > 0 || active.removedFiles.size > 0,
+      affectedCount: entries.length,
+      affectedEntryLimit: DEFAULT_AFFECTED_ENTRY_LIMIT,
+      affectedTruncated: entries.length > inlineEntries.length,
+      // The size of the project, as a NUMBER. Not as a list. This is the line
+      // where a report that grew with the project would give itself away. It is
+      // populated for a FAILED revision too, which is when an agent is most
+      // likely to want to know it.
+      projectEntries: active.coveredCount ?? active.coverage?.length ?? 0,
+      affectedEntries: inlineEntries,
+    };
+  }
+
+  /**
+   * Builds the compact, revision-bound result for the active revision.
+   *
+   * `build_ms` and `serialize_ms` are separate because they have different
+   * causes and different owners. The object is built when the verdict exists,
+   * because that is the point at which an agent can act. The bytes are produced
+   * on demand, because producing them is transport: a host that hands the
+   * object to a function does not need a string, and a host that writes it to a
+   * file does. Eagerly serializing here would put a cost on the caller who does
+   * not want it, and measuring a serialization the compiler performed for its
+   * own reasons would report a number nothing in the loop ever paid.
+   */
+  function buildResultFor(active) {
+    const buildStart = perfNow();
+    const counters = active.counters ?? buildReportCounters(active);
+    const coverageByFile = coverageLookup();
+    const result = buildAgentResult({
+      revisionId: active.revisionId,
+      ok: active.ok,
+      projectSemanticEpoch: state.semanticEpoch,
+      diagnostics: active.diagnostics.map((d) =>
+        machineDiagnostic(d, { coverageByFile }),
+      ),
+      mutation: mutationBlock({
+        mode:
+          active.mutation?.mode ?? active.dirtyInputMode ?? 'full-discovery',
+        transaction: active.mutation,
+        counters,
+      }),
+      incremental: incrementalBlock({
+        counters,
+        mode:
+          active.mutation?.mode ?? active.dirtyInputMode ?? 'full-discovery',
+        // A revision ran the full walk rather than trusting a declared set, and
+        // the agent should be able to see that its latency was paid for a
+        // reason. `fullDiscovery` and `fullFallback` are different questions: one
+        // is about WHERE the mutation set came from, the other about whether the
+        // session had to discard its per-file results.
+        fullDiscovery:
+          active.mutation == null ||
+          active.mutation.mode === 'full-discovery' ||
+          active.fullDiscoveryReason != null,
+        fullFallbackReason: active.fallbackReason,
+      }),
+      coverage: affectedCoverageOf(active),
+      generation: generationBlock({
+        published: active.published,
+        // Null until there is a generation to name. A validated-but-unpublished
+        // revision is a real state - it is exactly the state the invalid hot
+        // path is always in - and giving it a generation id would be claiming
+        // output on disk that does not exist.
+        generationId: active.published ? state.generationId : null,
+        generationReused: active.publication?.generationReused === true,
+        mode: active.publication?.mode ?? null,
+        outputsWritten:
+          (active.publication?.outputsAdded ?? 0) +
+          (active.publication?.outputsChanged ?? 0),
+        outputsReused: active.publication?.outputsReused ?? 0,
+        bytesWritten: active.publication?.bytesWritten ?? 0,
+      }),
+      audit: auditBlock({
+        requested: active.auditRequested,
+        ready: active.audit != null,
+        document: active.audit?.path ?? null,
+        bytes: active.audit?.bytes ?? null,
+        reason: active.auditRequested
+          ? null
+          : 'not requested; project-wide coverage is available on demand',
+      }),
+      timings: milestoneTimings(active),
+    });
+    count('agent_result_build_ms', (perfNow() - buildStart) / 1e6);
+    return result;
+  }
+
+  /**
+   * The timings block.
+   *
+   * A SNAPSHOT, and the docstring says so rather than implying a live view. The
+   * result object is built once, when the verdict exists, so its `generation`
+   * block and its generation timestamps are the ones that were true at that
+   * moment. A caller that needs the state after `compile()` or after
+   * `requestFullAudit()` calls `session.agentResult()` again, which rebuilds
+   * from the revision's own stamps.
+   *
+   * A live view was the alternative and it was rejected for a reason worth
+   * writing down: an object whose fields change under a caller that has already
+   * read them is harder to reason about than a snapshot the caller knows to
+   * refresh, and the refresh is one method call.
+   */
+  function milestoneTimings(active) {
+    return {
+      ...milestonesOf(active),
+      incrementalAnalysisMs:
+        active.incrementalMs == null ? null : active.incrementalMs / 1e6,
+    };
+  }
+
+  // ------------------------------------------------------------ full audit ----
+
+  /**
+   * Builds the project-wide coverage document for a revision.
+   *
+   * `active.coverage` is the array the analysis already produced this revision.
+   * This is therefore a SERIALIZATION, not a re-derivation: the entries are the
+   * same objects, in the same order, that version 1 of the build report carried
+   * inline, and the audit oracle compares them directly rather than through a
+   * semantic translation.
+   */
+  function materializeCoverageReport(
+    active,
+    { contractVersion, systemId, registryDigest, generationId, coveredRoots },
+  ) {
+    const buildStart = perfNow();
+    const doc = buildCoverageReport({
+      contractVersion,
+      systemId,
+      registryDigest,
+      revisionId: active.revisionId,
+      generationId:
+        generationId ?? (active.published ? state.generationId : null),
+      coveredRoots,
+      entries: active.coverage,
+    });
+    count('coverage_report_build_ms', (perfNow() - buildStart) / 1e6);
+
+    const serializeStart = perfNow();
+    const text = JSON.stringify(doc, null, 2) + '\n';
+    const bytes = Buffer.byteLength(text, 'utf8');
+    count('coverage_report_serialize_ms', (perfNow() - serializeStart) / 1e6);
+    count('coverage_report_bytes', bytes);
+    count('full_report_bytes', bytes);
+    return {
+      text,
+      bytes,
+      document: doc,
+      receipt: {
+        revisionId: active.revisionId,
+        bytes,
+        path: null,
+        documentKind: doc.documentKind,
+        schemaVersion: doc.schemaVersion,
+        entryCount: doc.entryCount,
+      },
+    };
+  }
+
+  /**
+   * The directory audit documents are written to.
+   *
+   * A SIBLING of the output directory, derived the same way `generation.js`
+   * derives its staging and state paths, and for the same reason: the output
+   * directory is replaced by a rename on every publication, so anything written
+   * inside it either travels with the generation or is destroyed by the swap.
+   * An audit document that must outlive the generation it describes cannot live
+   * there.
+   */
+  function auditDir() {
+    const absOut = path.resolve(state.config.outDir);
+    return path.join(
+      path.dirname(absOut),
+      `.${path.basename(absOut)}.pms-audit`,
+    );
+  }
+
+  function writeCoverageStandalone(active, text) {
+    const dir = auditDir();
+    const file = path.join(dir, `coverage-rev-${active.revisionId}.json`);
+    const writeStart = perfNow();
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(file, text, 'utf8');
+    count('coverage_report_write_ms', (perfNow() - writeStart) / 1e6);
+    count('full_report_write_ms', (perfNow() - writeStart) / 1e6);
+    return file;
   }
 
   // ----------------------------------------------------------------- API ----
@@ -2172,6 +2820,244 @@ export function createProjectSession(config) {
       });
       state.dirtyInputMode = transaction.mode;
       return applyChanges({ mutation: transaction });
+    },
+
+    /**
+     * The compact, revision-bound, machine-readable result of the CURRENT
+     * revision, rebuilt on access.
+     *
+     * An agent loop is
+     *
+     *     applyAgentChanges(mutation) -> validate() -> read this
+     *
+     * and `validate()` already returns it as `agentResult`. This method exists
+     * for the two cases that method does not cover: a caller that wants it
+     * again after `compile()` - when the generation milestones have moved - and
+     * a caller holding only a revision summary.
+     *
+     * It REFUSES to answer for a revision that is not the current one. A
+     * revision id is not a lookup key here: the session keeps the coverage of
+     * the revision it is on and nothing older, and a method that accepted an
+     * arbitrary id would have to either lie or silently describe the wrong
+     * revision. Revision binding is a safety property, not a convenience.
+     */
+    agentResult(options = {}) {
+      const active = state.active;
+      if (active == null) {
+        throw new Error(
+          'pandamstyle: agentResult() was called before applyChanges(); there ' +
+            'is no revision to describe.',
+        );
+      }
+      if (
+        options.revisionId != null &&
+        options.revisionId !== active.revisionId
+      ) {
+        throw new Error(
+          `pandamstyle: agentResult({ revisionId: ${options.revisionId} }) was ` +
+            `refused: the session is on revision ${active.revisionId}. A result ` +
+            'is bound to the revision it describes, and the session retains the ' +
+            'current one only. Read the result before starting the next ' +
+            'revision.',
+        );
+      }
+      if (active.validated) return buildResultFor(active);
+      return null;
+    },
+
+    /**
+     * The agent result as BYTES, and the cost of producing them.
+     *
+     * Separated from building the object because serializing is transport. The
+     * object is complete and authoritative the moment `validate()` returns;
+     * turning it into a string is something a host does when it has somewhere
+     * to put the string. Doing it here would charge every caller for a
+     * serialization most of them never use, and would make
+     * `agent_result_serialize_ms` a measurement of the compiler's choice rather
+     * than of the host's.
+     *
+     * The returned text is COMPACT (`JSON.stringify`, no indentation) because
+     * the whole point of the object is that it is small, and a pretty-printed
+     * version of a 4 KB result is 9 KB of the same information.
+     */
+    serializeAgentResult(options = {}) {
+      const result = api.agentResult(options);
+      if (result == null) return null;
+      const start = perfNow();
+      const text = JSON.stringify(result);
+      const bytes = Buffer.byteLength(text, 'utf8');
+      count('agent_result_serialize_ms', (perfNow() - start) / 1e6);
+      count('agent_result_bytes', bytes);
+      return { text, bytes, serializeMs: (perfNow() - start) / 1e6, result };
+    },
+
+    /**
+     * The full project-wide audit for a revision, produced ON DEMAND.
+     *
+     * This is the answer to "the agent got a small object; where did the rest of
+     * the evidence go". Nothing was deleted: the compact build report says
+     * `coverageReport.materialized: false` and carries the entry count and the
+     * revision id, and this method writes the document that reference points
+     * at.
+     *
+     * Two ways to use it, and the difference is about atomicity:
+     *
+     *   BEFORE `compile()`   the document is staged into the generation and
+     *                        committed with everything else, so a generation
+     *                     that contains it is a generation that is complete.
+     *                        This is what CI wants.
+     *   AFTER `compile()`    the generation is already committed and its
+     *                     manifest already certified its contents, so the
+     *                     document is written to the audit directory beside the
+     *                     output directory instead. It names its revision and
+     *                     generation, so the two halves are still joinable.
+     *                     Mutating a committed generation is the one thing this
+     *                     session will not do.
+     *
+     * It is a SYNCHRONOUS, caller-driven operation. There is no background
+     * writer, no timer and no queue: a caller that asks and does not wait has
+     * not got an audit, and this method's return value is the only evidence
+     * that one exists.
+     */
+    requestFullAudit(options = {}) {
+      const active = state.active;
+      if (active == null) {
+        throw new Error(
+          'pandamstyle: requestFullAudit() was called before applyChanges(); ' +
+            'there is no revision to audit.',
+        );
+      }
+      if (active.revisionId !== state.revisionId) {
+        throw new Error(
+          'pandamstyle: requestFullAudit() can only audit the current revision.',
+        );
+      }
+      if (!active.validated) {
+        throw new Error(
+          'pandamstyle: requestFullAudit() was called before validate(); the ' +
+            'coverage of an unvalidated revision is not known.',
+        );
+      }
+      const requested = options.revisionId ?? active.revisionId;
+      if (requested !== active.revisionId) {
+        throw new Error(
+          `pandamstyle: requestFullAudit({ revisionId: ${requested} }) was ` +
+            `refused: the session is on revision ${active.revisionId}, and a ` +
+            "superseded revision's coverage is not retained. Request the audit " +
+            'for the revision while it is current.',
+        );
+      }
+      if (!active.ok) {
+        // A refused revision has no coverage snapshot to publish: the whole
+        // point of refusing is that no generation exists. Saying so is more
+        // useful than emitting a document that would read like a passing build.
+        throw new Error(
+          'pandamstyle: requestFullAudit() was called for a revision that ' +
+            'failed validation. A failed revision does not publish a ' +
+            'generation, so it has no project-wide snapshot; its diagnostics ' +
+            'are in the agent result.',
+        );
+      }
+
+      const designSystem = state.designSystem;
+      const contract = {
+        contractVersion: designSystem.manifest.compilerContractVersion,
+        systemId: designSystem.registry.systemId,
+        registryDigest: designSystem.registry.registryDigest,
+        generationId: active.published ? state.generationId : null,
+        coveredRoots: state.config.roots,
+      };
+
+      if (!active.published) {
+        // Requested before publication: stage it. The write happens inside the
+        // generation, atomically with everything else.
+        active.auditRequested = true;
+        count('full_report_requested', 1);
+        count('full_report_deferred', 1);
+        return {
+          revisionId: active.revisionId,
+          documentKind: 'pandamstyle-full-audit-request',
+          staged: true,
+          materialized: false,
+          inGeneration: true,
+          note:
+            'the coverage document will be staged into the next generation; ' +
+            'call compile() to commit it',
+        };
+      }
+
+      const doc = materializeCoverageReport(active, contract);
+      const file = writeCoverageStandalone(active, doc.text);
+      doc.receipt.path = file;
+      doc.receipt.materialized = true;
+      doc.receipt.inGeneration = false;
+      active.audit = { ...doc.receipt, materializedAt: 'post-publication' };
+      active.auditReportReadyNs = perfNow();
+      active.agentResult = buildResultFor(active);
+      count('full_report_requested', 1);
+      return {
+        revisionId: active.revisionId,
+        generationId: state.generationId,
+        documentKind: 'pandamstyle-full-audit-request',
+        staged: false,
+        materialized: true,
+        inGeneration: false,
+        path: file,
+        bytes: doc.bytes,
+        entryCount: doc.document.entryCount,
+        timings: {
+          agent_edit_to_audit_report_ms:
+            (active.auditReportReadyNs - active.transactionAcceptedNs) / 1e6,
+        },
+      };
+    },
+
+    /**
+     * The admissible token references for a category.
+     *
+     * The reason this exists is size. A `PMS_FORBIDDEN_VALUE` diagnostic used to
+     * carry the whole admissible list for its category, and that list is
+     * derived from the REGISTRY - so at a 10,000-token design system a single
+     * one-line agent edit produced a diagnostic carrying 10,000 strings, and
+     * the "compact" result scaled with the project after all. The diagnostic
+     * now carries a capped prefix with `candidatesTotal` and
+     * `candidatesTruncated` beside it, and this is where the rest is.
+     *
+     * `offset` exists so a caller can page through a large category without
+     * either truncating silently or asking for everything at once.
+     */
+    candidateTokens(query = {}) {
+      const registry = state.designSystem?.registry;
+      if (registry == null) {
+        throw new Error(
+          'pandamstyle: candidateTokens() was called before a design system ' +
+            'existed for this session.',
+        );
+      }
+      const limit = Number.isInteger(query.limit)
+        ? Math.max(0, query.limit)
+        : 32;
+      const offset = Number.isInteger(query.offset)
+        ? Math.max(0, query.offset)
+        : 0;
+      const allowPrivate = query.allowPrivate === true;
+      const all = Object.keys(registry.tokens).filter((id) => {
+        const entry = registry.tokens[id];
+        if (query.category != null && entry.category !== query.category) {
+          return false;
+        }
+        if (!allowPrivate && entry.visibility !== 'public') return false;
+        return true;
+      });
+      return {
+        category: query.category ?? null,
+        allowPrivate,
+        total: all.length,
+        offset,
+        limit,
+        truncated: offset + limit < all.length,
+        tokens: all.slice(offset, offset + limit),
+      };
     },
 
     /**

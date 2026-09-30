@@ -1,0 +1,2344 @@
+{
+  "documentKind": "pandamstyle-agent-loop-summary",
+  "schemaVersion": 1,
+  "input": "/tmp/opencode/pmsc/prof/c1000-t1000-r100-s809-agent-loop.jsonl",
+  "rows": 115,
+  "errors": [],
+  "error_count": 0,
+  "variants": {
+    "full_metadata": {
+      "auditPolicy": "inline",
+      "publishes": true,
+      "audits": false,
+      "label": "the pre-Phase-C artifact: the whole coverage array inline"
+    },
+    "compact_agent_result": {
+      "auditPolicy": "reference",
+      "publishes": false,
+      "audits": false,
+      "label": "diagnostics only; nothing published"
+    },
+    "compact_agent_result_plus_compact_publish_metadata": {
+      "auditPolicy": "reference",
+      "publishes": true,
+      "audits": false,
+      "label": "diagnostics, then a publication with counts and a reference"
+    },
+    "full_audit_requested": {
+      "auditPolicy": "reference",
+      "publishes": true,
+      "audits": true,
+      "label": "diagnostics, publication, and the requested coverage document"
+    }
+  },
+  "comparability": {
+    "full_metadata|full_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_metadata|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result_plus_compact_publish_metadata|full_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result_plus_compact_publish_metadata|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result|compact_agent_result": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_audit_requested|full_audit_requested": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_metadata|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: the pre-Phase-C artifact: the whole coverage array inline vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "full_metadata|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: the pre-Phase-C artifact: the whole coverage array inline vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|full_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs the pre-Phase-C artifact: the whole coverage array inline. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs diagnostics, then a publication with counts and a reference. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "compact_agent_result_plus_compact_publish_metadata|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, then a publication with counts and a reference vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "compact_agent_result_plus_compact_publish_metadata|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, then a publication with counts and a reference vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|full_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs the pre-Phase-C artifact: the whole coverage array inline. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs diagnostics, then a publication with counts and a reference. A faster number for less work has not won anything."
+    }
+  },
+  "headline": [
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 30.500723,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 1806,
+      "work": {
+        "filesCompiled": 1,
+        "filesRecompiled": 1,
+        "filesReused": 1001,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 3.462403,
+        "reuse_ms": 0.350795,
+        "coverage_entries_ms": 0.493445,
+        "entries_iterated": 1003
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.07792,
+        "agent_result_serialize_ms": 0.00928
+      }
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 2781.88824,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 27717,
+      "work": {
+        "filesCompiled": 1002,
+        "filesRecompiled": 1002,
+        "filesReused": 0,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0
+      },
+      "reuseLoop": {
+        "affected_ms": 2643.750667,
+        "reuse_ms": 0,
+        "coverage_entries_ms": 1.716447,
+        "entries_iterated": 1003
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.653824,
+        "agent_result_serialize_ms": 0.064221
+      }
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 86.434304,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 1
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 9235,
+      "work": {
+        "filesCompiled": 20,
+        "filesRecompiled": 20,
+        "filesReused": 982,
+        "dirtyFilesRead": 20,
+        "dirtyFilesHashed": 20
+      },
+      "reuseLoop": {
+        "affected_ms": 55.470997,
+        "reuse_ms": 0.278474,
+        "coverage_entries_ms": 0.483574,
+        "entries_iterated": 1003
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.095472,
+        "agent_result_serialize_ms": 0.02462
+      }
+    }
+  ],
+  "cells": [
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 30.500723,
+      "p50": 30.500723,
+      "p95": 30.500723,
+      "max": 30.500723,
+      "mean": 30.500723
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 30.789415,
+      "p50": 30.789415,
+      "p95": 30.789415,
+      "max": 30.789415,
+      "mean": 30.789415
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.07792,
+      "p50": 0.07792,
+      "p95": 0.07792,
+      "max": 0.07792,
+      "mean": 0.07792
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1806,
+      "p50": 1806,
+      "p95": 1806,
+      "max": 1806,
+      "mean": 1806
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.00928,
+      "p50": 0.00928,
+      "p95": 0.00928,
+      "max": 0.00928,
+      "mean": 0.00928
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_cache_hits",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 5,
+      "p50": 5,
+      "p95": 5,
+      "max": 5,
+      "mean": 5
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_lookups",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1003,
+      "p50": 1003,
+      "p95": 1003,
+      "max": 1003,
+      "mean": 1003
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1003,
+      "p50": 1003,
+      "p95": 1003,
+      "max": 1003,
+      "mean": 1003
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1001,
+      "p50": 1001,
+      "p95": 1001,
+      "max": 1001,
+      "mean": 1001
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 10.739805,
+      "p50": 10.739805,
+      "p95": 10.739805,
+      "max": 10.739805,
+      "mean": 10.739805
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 7.813935,
+      "p50": 7.813935,
+      "p95": 7.813935,
+      "max": 7.813935,
+      "mean": 7.813935
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 10.579384,
+      "p50": 10.579384,
+      "p95": 10.579384,
+      "max": 10.579384,
+      "mean": 10.579384
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.388733,
+      "p50": 0.388733,
+      "p95": 0.388733,
+      "max": 0.388733,
+      "mean": 0.388733
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 3.462403,
+      "p50": 3.462403,
+      "p95": 3.462403,
+      "max": 3.462403,
+      "mean": 3.462403
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.493445,
+      "p50": 0.493445,
+      "p95": 0.493445,
+      "max": 0.493445,
+      "mean": 0.493445
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.350795,
+      "p50": 0.350795,
+      "p95": 0.350795,
+      "max": 0.350795,
+      "mean": 0.350795
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.978866,
+      "p50": 0.978866,
+      "p95": 0.978866,
+      "max": 0.978866,
+      "mean": 0.978866
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 2781.88824,
+      "p50": 2781.88824,
+      "p95": 2781.88824,
+      "max": 2781.88824,
+      "mean": 2781.88824
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 2782.804466,
+      "p50": 2782.804466,
+      "p95": 2782.804466,
+      "max": 2782.804466,
+      "mean": 2782.804466
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.653824,
+      "p50": 0.653824,
+      "p95": 0.653824,
+      "max": 0.653824,
+      "mean": 0.653824
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 27717,
+      "p50": 27717,
+      "p95": 27717,
+      "max": 27717,
+      "mean": 27717
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.064221,
+      "p50": 0.064221,
+      "p95": 0.064221,
+      "max": 0.064221,
+      "mean": 0.064221
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_cache_hits",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 2668,
+      "p50": 2668,
+      "p95": 2668,
+      "max": 2668,
+      "mean": 2668
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 2007,
+      "p50": 2007,
+      "p95": 2007,
+      "max": 2007,
+      "mean": 2007
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_lookups",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 2668,
+      "p50": 2668,
+      "p95": 2668,
+      "max": 2668,
+      "mean": 2668
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1003,
+      "p50": 1003,
+      "p95": 1003,
+      "max": 1003,
+      "mean": 1003
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1002,
+      "p50": 1002,
+      "p95": 1002,
+      "max": 1002,
+      "mean": 1002
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1003,
+      "p50": 1003,
+      "p95": 1003,
+      "max": 1003,
+      "mean": 1003
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1002,
+      "p50": 1002,
+      "p95": 1002,
+      "max": 1002,
+      "mean": 1002
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 29.108904,
+      "p50": 29.108904,
+      "p95": 29.108904,
+      "max": 29.108904,
+      "mean": 29.108904
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 2647.739992,
+      "p50": 2647.739992,
+      "p95": 2647.739992,
+      "max": 2647.739992,
+      "mean": 2647.739992
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 59.858321,
+      "p50": 59.858321,
+      "p95": 59.858321,
+      "max": 59.858321,
+      "mean": 59.858321
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_resolve_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.16243,
+      "p50": 0.16243,
+      "p95": 0.16243,
+      "max": 0.16243,
+      "mean": 0.16243
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.222061,
+      "p50": 0.222061,
+      "p95": 0.222061,
+      "max": 0.222061,
+      "mean": 0.222061
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 2643.750667,
+      "p50": 2643.750667,
+      "p95": 2643.750667,
+      "max": 2643.750667,
+      "mean": 2643.750667
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1.716447,
+      "p50": 1.716447,
+      "p95": 1.716447,
+      "max": 1.716447,
+      "mean": 1.716447
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 44.7965320000003,
+      "p50": 44.7965320000003,
+      "p95": 44.7965320000003,
+      "max": 44.7965320000003,
+      "mean": 44.7965320000003
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "token_value_full_fallback#definition",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 86.434304,
+      "p50": 86.434304,
+      "p95": 86.434304,
+      "max": 86.434304,
+      "mean": 86.434304
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 86.777436,
+      "p50": 86.777436,
+      "p95": 86.777436,
+      "max": 86.777436,
+      "mean": 86.777436
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.095472,
+      "p50": 0.095472,
+      "p95": 0.095472,
+      "max": 0.095472,
+      "mean": 0.095472
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 9235,
+      "p50": 9235,
+      "p95": 9235,
+      "max": 9235,
+      "mean": 9235
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.02462,
+      "p50": 0.02462,
+      "p95": 0.02462,
+      "max": 0.02462,
+      "mean": 0.02462
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_cache_hits",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 50,
+      "p50": 50,
+      "p95": 50,
+      "max": 50,
+      "mean": 50
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 62,
+      "p50": 62,
+      "p95": 62,
+      "max": 62,
+      "mean": 62
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_lookups",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 50,
+      "p50": 50,
+      "p95": 50,
+      "max": 50,
+      "mean": 50
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1003,
+      "p50": 1003,
+      "p95": 1003,
+      "max": 1003,
+      "mean": 1003
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 20,
+      "p50": 20,
+      "p95": 20,
+      "max": 20,
+      "mean": 20
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 20,
+      "p50": 20,
+      "p95": 20,
+      "max": 20,
+      "mean": 20
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 20,
+      "p50": 20,
+      "p95": 20,
+      "max": 20,
+      "mean": 20
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1003,
+      "p50": 1003,
+      "p95": 1003,
+      "max": 1003,
+      "mean": 1003
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 20,
+      "p50": 20,
+      "p95": 20,
+      "max": 20,
+      "mean": 20
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 982,
+      "p50": 982,
+      "p95": 982,
+      "max": 982,
+      "mean": 982
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 20,
+      "p50": 20,
+      "p95": 20,
+      "max": 20,
+      "mean": 20
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 20,
+      "p50": 20,
+      "p95": 20,
+      "max": 20,
+      "mean": 20
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 20,
+      "p50": 20,
+      "p95": 20,
+      "max": 20,
+      "mean": 20
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 20,
+      "p50": 20,
+      "p95": 20,
+      "max": 20,
+      "mean": 20
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 15.195447,
+      "p50": 15.195447,
+      "p95": 15.195447,
+      "max": 15.195447,
+      "mean": 15.195447
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 58.519849,
+      "p50": 58.519849,
+      "p95": 58.519849,
+      "max": 58.519849,
+      "mean": 58.519849
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 11.036665,
+      "p50": 11.036665,
+      "p95": 11.036665,
+      "max": 11.036665,
+      "mean": 11.036665
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.635225,
+      "p50": 0.635225,
+      "p95": 0.635225,
+      "max": 0.635225,
+      "mean": 0.635225
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 55.470997,
+      "p50": 55.470997,
+      "p95": 55.470997,
+      "max": 55.470997,
+      "mean": 55.470997
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.483574,
+      "p50": 0.483574,
+      "p95": 0.483574,
+      "max": 0.483574,
+      "mean": 0.483574
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 0.278474,
+      "p50": 0.278474,
+      "p95": 0.278474,
+      "max": 0.278474,
+      "mean": 0.278474
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1.0471179999999976,
+      "p50": 1.0471179999999976,
+      "p95": 1.0471179999999976,
+      "max": 1.0471179999999976,
+      "mean": 1.0471179999999976
+    },
+    {
+      "corpus": "c1000-t1000-r100-s809",
+      "scenario": "twenty_files_batch#edit",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 1,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 1,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    }
+  ],
+  "statistics": {
+    "method": "upper-rank percentiles over the observed values",
+    "confidence_intervals": "not computed, and that is stated rather than implied: every observation of a cell comes from the same process, so the values are correlated and a median over them is a statistic of that process",
+    "sessions_reported": true
+  }
+}
