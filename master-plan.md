@@ -957,7 +957,21 @@ For every future implementation brief:
 
 # 11. Current next action
 
-**Next required phase: Phase 0 — Freeze product architecture and public contracts.**
+**Status correction, 2026-10-01:** The initial next action below was not updated
+after the subsequent phase deliveries and is stale. The accepted Phase 4
+delivery records tested commit `7b6b58ee2a430d8495a2acbed67fb631fc43f577`,
+final branch head `44bbdb4c323cfaae9abc69f524d4fc8b5ceb4133`, and Phase 5
+readiness. The repository is therefore at the Phase 5 gate: Phase 4 is complete
+and Phase 5 is authorized to begin, but Phase 5 is not yet complete. This
+correction updates execution status only; it does not change product contracts,
+phase ordering, or exit criteria. Phase 6 and Phase 7 remain unauthorized until
+every Phase 5 exit gate is verified.
 
-Before implementation begins, settle the authoring API and the exact responsibilities of `@pandamstyle/core`, `@pandamstyle/compiler`, `@pandamstyle/vite`, and `@pandamstyle/next`.
+The former initial action was: **Phase 0 — Freeze product architecture and
+public contracts.** That prerequisite is represented by the accepted Phase 0
+contracts and their delivery records; it is no longer the current next action.
 
+**Next required phase: Phase 5 — Delete donor/legacy repository structure.**
+
+Follow the Phase 5 deletion-readiness record and require the complete Phase 5
+exit gate before authorizing later phases.
