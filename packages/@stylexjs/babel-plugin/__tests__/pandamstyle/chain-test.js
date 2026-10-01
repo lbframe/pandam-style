@@ -21,7 +21,7 @@ import {
   conformanceDefinition,
   token,
   PmsError,
-} from '../../../../../tests/support/compiler-inspection';
+} from '../../../../../.pms-test-support/compiler-inspection.cjs';
 
 const build = () => buildDesignSystem(conformanceDefinition);
 

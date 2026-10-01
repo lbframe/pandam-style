@@ -394,9 +394,10 @@ function createCompilerSessionInContext(config, graphContext) {
         compileFile(code, filename, designSystem, { ...engineOptions, role }),
       ),
     renderCss: (rules) =>
-      phase('css_serialize_ms', () =>
-        styleXTransform.processStylexRules(rules, { useLayers: useCSSLayers }),
-      ),
+      styleXTransform.processStylexRules(rules, {
+        useLayers: useCSSLayers,
+        __pmsPerfPhase: phase,
+      }),
     designSystemRules: () => {
       const rules = [];
       for (const [key, { priority, ...rest }] of Object.entries(
@@ -622,14 +623,17 @@ function buildProjectInContext(config) {
           );
         }
 
+        // Test seam: observe the generated state after every covered source
+        // has been attempted but BEFORE a verdict can publish anything. This
+        // remains available for rejected builds so the independent fresh
+        // oracle can inspect the same authority context that produced them.
+        if (typeof onStage === 'function') {
+          onStage({ gen, session, coverage });
+        }
+
         // A failing generation must not publish artifacts as current (ARC-14).
         if (failures.length > 0) {
           throw new PmsError(failures);
-        }
-
-        // Test seam: an internal failure AFTER generation, BEFORE publication.
-        if (typeof onStage === 'function') {
-          onStage({ gen, session, coverage });
         }
 
         // Single CSS circuit: the fork's own rule processor.

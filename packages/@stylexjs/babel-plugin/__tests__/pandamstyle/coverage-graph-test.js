@@ -261,9 +261,7 @@ describe('BC-3/BC-9: every relay escape is caught by a real build', () => {
       (x) => x.code === 'PMS_FORBIDDEN_STYLE_CHANNEL',
     );
     // Either the relayed module or the stylesheet it imports, both outside src.
-    expect(d.location.file).toMatch(
-      /neg-relay-reexport-star[\\/](outside|bridge)[\\/]/,
-    );
+    expect(d.location.file).toMatch(/^(outside|bridge)\//);
   });
 
   test('the report names the relays, so the closure is auditable', () => {

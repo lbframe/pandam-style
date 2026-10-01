@@ -19,8 +19,7 @@ const {
   createUsageContext,
   readModuleFacts,
   resolvePmsAccess,
-  clearModuleCache,
-} = require('../../../../../tests/support/compiler-inspection');
+} = require('../../../../../.pms-test-support/compiler-inspection.cjs');
 
 describe('PandamStyle independent forwarding semantic oracle', () => {
   test.each(cases.map((fixture) => [fixture.name, fixture]))(
@@ -44,12 +43,17 @@ describe('PandamStyle independent forwarding semantic oracle', () => {
 describe('Babel binding identity at forwarded API access', () => {
   test('the real generated export contract contains exactly five compiler APIs and two metadata/marker exports', () => {
     const h = openProject('valid');
-    h.full();
-    h.compiler.clearModuleCache();
-    const info = h.compiler.resolveDesignSystemModule(
-      h.src('src/page.tsx'),
-      '../generated/design.pandamstyle',
-    );
+    let info;
+    h.full({
+      onStage: ({ session }) => {
+        info = session._withGraphContext(() =>
+          h.compiler.resolveDesignSystemModule(
+            h.src('src/page.tsx'),
+            '../generated/design.pandamstyle',
+          ),
+        );
+      },
+    });
     expect(info.exports.slice().sort()).toEqual([
       '__PMS_DESIGN_SYSTEM__',
       'create',
@@ -70,33 +74,37 @@ describe('Babel binding identity at forwarded API access', () => {
   });
   function accesses(relay, source) {
     const h = openProject('valid');
-    h.full();
     fs.writeFileSync(h.src('src/binding-relay.js'), relay);
-    clearModuleCache();
     const result = [];
-    babel.transformSync(source, {
-      filename: h.src('src/binding-consumer.js'),
-      configFile: false,
-      babelrc: false,
-      plugins: [
-        () => ({
-          visitor: {
-            Program(program) {
-              const ctx = createUsageContext({
-                filename: h.src('src/binding-consumer.js'),
-              });
-              readModuleFacts(program, ctx);
-              program.traverse({
-                CallExpression(p) {
-                  result.push(
-                    resolvePmsAccess(p.get('callee'), ctx)?.exportPath ?? null,
-                  );
+    h.full({
+      onStage: ({ session }) =>
+        session._withGraphContext(() =>
+          babel.transformSync(source, {
+            filename: h.src('src/binding-consumer.js'),
+            configFile: false,
+            babelrc: false,
+            plugins: [
+              () => ({
+                visitor: {
+                  Program(program) {
+                    const ctx = createUsageContext({
+                      filename: h.src('src/binding-consumer.js'),
+                    });
+                    readModuleFacts(program, ctx);
+                    program.traverse({
+                      CallExpression(p) {
+                        result.push(
+                          resolvePmsAccess(p.get('callee'), ctx)?.exportPath ??
+                            null,
+                        );
+                      },
+                    });
+                  },
                 },
-              });
-            },
-          },
-        }),
-      ],
+              }),
+            ],
+          }),
+        ),
     });
     h.session.close();
     return result;

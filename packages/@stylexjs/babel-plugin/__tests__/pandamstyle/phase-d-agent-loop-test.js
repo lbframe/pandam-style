@@ -228,7 +228,8 @@ describe('Spike 4 Phase D: the agent loop', () => {
     for (const d of broken.diagnostics) {
       expect(typeof d.code).toBe('string');
       expect(typeof d.message).toBe('string');
-      expect(d.source).toBe(h.src('src/page.tsx'));
+      expect(d.location.file).toBe(h.src('src/page.tsx'));
+      expect(d.location.role).toBe('page');
     }
 
     // The repair is the exact inverse, and it is clean.

@@ -98,8 +98,8 @@ function makeApp(extraFiles = {}) {
   fs.writeFileSync(path.join(app, 'src/main.jsx'), MAIN, 'utf8');
   fs.writeFileSync(path.join(app, 'src/pages/App.jsx'), PAGE, 'utf8');
   fs.writeFileSync(
-    path.join(app, 'design.pms.config.cjs'),
-    `module.exports = require(${JSON.stringify(SHARED_DEFINITION)});\n`,
+    path.join(app, 'design.pms.config.mjs'),
+    `export { default } from ${JSON.stringify(SHARED_DEFINITION)};\n`,
     'utf8',
   );
   for (const [rel, content] of Object.entries(extraFiles)) {
@@ -138,7 +138,7 @@ export default defineConfig({
   plugins: [
     react(),
     pandamstyle({
-      designSystem: './design.pms.config.cjs',
+      designSystem: './design.pms.config.mjs',
       roots: ['./src/pages'],
       outDir: './.pandamstyle',
       runtimeModule: '@pandamstyle/compiler/runtime',
@@ -159,7 +159,14 @@ export default defineConfig({
   // would resolve them; NODE_PATH is not read by ESM, so link instead.
   const scope = path.join(app, 'node_modules');
   fs.mkdirSync(scope, { recursive: true });
-  for (const dep of ['vite', '@vitejs', 'react', 'react-dom', '@stylexjs']) {
+  for (const dep of [
+    'vite',
+    '@vitejs',
+    'react',
+    'react-dom',
+    '@stylexjs',
+    '@pandamstyle',
+  ]) {
     const from = path.join(REPO_ROOT, 'node_modules', dep);
     if (!fs.existsSync(from)) continue;
     const to = path.join(scope, dep);
@@ -343,12 +350,12 @@ describe('BC-5: a late bundler failure publishes no new generation', () => {
     // Make generation N+1 genuinely different. If the plugin had already
     // written its manifest or its module when the bundler failed, the digests
     // below would differ.
-    const def = path.join(app, 'design.pms.config.cjs');
+    const def = path.join(app, 'design.pms.config.mjs');
     fs.writeFileSync(
       def,
-      `const def = require(${JSON.stringify(SHARED_DEFINITION)});
+      `import def from ${JSON.stringify(SHARED_DEFINITION)};
 def.tokens.spacing.md = { value: '19px', visibility: 'public' };
-module.exports = def;
+export default def;
 `,
       'utf8',
     );

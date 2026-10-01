@@ -88,8 +88,8 @@ describe('removing a token invalidates its stale usages', () => {
       const diag = second.diagnostics.find(
         (d) => d.code === 'PMS_UNKNOWN_TOKEN',
       );
-      expect(diag.location.file).toMatch(/valid[/\\]src[/\\]page\.js$/);
-      expect(diag.location.role).toBe('page');
+      expect(diag.location.file).toBe('src/page.js');
+      expect(diag.role).toBe('page');
     });
 
     test('no artifact is presented as the new current generation', () => {

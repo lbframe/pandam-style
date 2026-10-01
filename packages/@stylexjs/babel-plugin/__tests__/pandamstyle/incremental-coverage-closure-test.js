@@ -411,7 +411,7 @@ describe('Spike 4 Phase D1: the persistent coverage graph', () => {
     expect(h.session.verifyCoverageGraph().ok).toBe(true);
   });
 
-  test('a deleted module that is still imported stays covered and is reported unreadable', () => {
+  test('a deleted import target leaves positive coverage and becomes a negative dependency', () => {
     revise(h);
     const added = [
       edit(h, 'src/gone-soon.ts', PLAIN('export const gone = 1;')),
@@ -424,10 +424,9 @@ describe('Spike 4 Phase D1: the persistent coverage graph', () => {
     expect(revise(h, { added }).ok).toBe(true);
     const before = h.session.coverageGraph();
 
-    // The file is gone and something still imports it. The session does not
-    // pretend the import resolves to nothing: the target stays in the closure as
-    // an UNREADABLE STUB, which is what makes the coverage gap name the file
-    // that went away rather than blaming the importer.
+    // The file is gone and something still imports it. The positive target edge
+    // leaves coverage, while the unresolved request remains indexed at its
+    // importer so a later file creation can repair it incrementally.
     fs.rmSync(h.src('src/gone-soon.ts'));
     const v = revise(h, { removed: [h.src('src/gone-soon.ts')] });
 
@@ -435,9 +434,15 @@ describe('Spike 4 Phase D1: the persistent coverage graph', () => {
     const gap = v.diagnostics.find((d) => d.code === 'PMS_COVERAGE_GAP');
     expect(gap).toBeDefined();
     expect(gap.message).toContain('gone-soon');
-    expect(h.session.coverageGraph().coveredNodes).toBe(before.coveredNodes);
-    // `holder` is still covered: it is under a declared root, and the edge it
-    // lost is a gap in `holder`, not a reason for `holder` to leave the project.
+    expect(h.session.coverageGraph().coveredNodes).toBe(
+      before.coveredNodes - 1,
+    );
+    expect(
+      h.session
+        .coverageOrder()
+        .some(([file]) => file === h.src('src/gone-soon.ts')),
+    ).toBe(false);
+    // `holder` remains covered and owns the negative dependency.
     expect(
       h.session
         .coverageOrder()

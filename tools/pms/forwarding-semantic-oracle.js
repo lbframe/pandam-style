@@ -437,19 +437,24 @@ function runCase(fixture) {
       : null;
     let freshOk = true,
       freshDiags = [];
+    const request = source.match(/from ['"]([^'"]+)['"]/)?.[1];
+    let info = null;
     try {
-      h.full();
+      h.full({
+        onStage: ({ session }) => {
+          info = session._withGraphContext(() =>
+            h.compiler.resolveDesignSystemModule(
+              h.src('src/consumer.js'),
+              request,
+            ),
+          );
+        },
+      });
     } catch (err) {
       freshOk = false;
       freshDiags = err.diagnostics ?? [];
       if (!err.diagnostics) throw err;
     }
-    h.compiler.clearModuleCache();
-    const request = source.match(/from ['"]([^'"]+)['"]/)?.[1];
-    const info = h.compiler.resolveDesignSystemModule(
-      h.src('src/consumer.js'),
-      request,
-    );
     const fresh = resultOf(
       h,
       source,

@@ -387,8 +387,8 @@ function openExistingProject(project, options = {}) {
     },
 
     /** A full rebuild of exactly what is on disk right now. */
-    full() {
-      return compiler.buildProject(args());
+    full(overrides = {}) {
+      return compiler.buildProject({ ...args(), ...overrides });
     },
 
     /**

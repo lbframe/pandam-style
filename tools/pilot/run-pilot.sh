@@ -43,12 +43,12 @@ EXTRACT_DIR="${WORK_DIR}/.unpacked"
 mkdir -p "${EXTRACT_DIR}"
 PMS_TGZ="${PACK_DIR}/${PMS_TARBALL}"
 tar -xzf "${PMS_TGZ}" -C "${EXTRACT_DIR}"
+# runtime and vite are temporary Phase 2 / Phase 8 verifier seams.
 node -e '
 const fs = require("fs");
 const path = require("path");
 const pkgDir = process.argv[1];
 const pkg = JSON.parse(fs.readFileSync(path.join(pkgDir, "package.json"), "utf8"));
-# runtime and vite are temporary Phase 2 / Phase 8 verifier seams.
 for (const key of [".", "./config", "./host", "./runtime", "./vite", "./package.json"]) {
   if (pkg.exports[key] == null) {
     console.error("MISSING EXPORT in the packed package: " + key);

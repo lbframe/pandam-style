@@ -272,26 +272,26 @@ describe('PMS_FORBIDDEN_VALUE diagnostic content', () => {
 
   test('points at the location inside the page', () => {
     expect(diag.location).not.toBeNull();
-    expect(diag.location.file).toMatch(
-      /neg-forbidden-value[/\\]src[/\\]page\.js$/,
-    );
+    expect(diag.location.file).toBe('src/page.js');
     expect(typeof diag.location.line).toBe('number');
     expect(diag.location.line).toBeGreaterThan(0);
-    expect(diag.location.role).toBe('page');
+    expect(diag.role).toBe('page');
   });
 
   test('names the violated rule and the system identity', () => {
     expect(diag.rule).toBe('category-strict');
     expect(diag.context.systemId).toBe('conformance@0.1');
-    expect(diag.context.category).toBe('spacing');
+    expect(diag.expected.category).toBe('spacing');
   });
 
   test('lists only admissible public candidates', () => {
-    expect(diag.context.candidates).toEqual(
+    expect(diag.candidates.map((candidate) => candidate.tokenId)).toEqual(
       expect.arrayContaining(['spacing.md', 'spacing.lg']),
     );
     // No private primitive may be offered as a candidate.
-    expect(diag.context.candidates).not.toContain('colors.blue.500');
+    expect(diag.candidates.map((candidate) => candidate.tokenId)).not.toContain(
+      'colors.blue.500',
+    );
   });
 
   test('keeps autofix null: 17px is not a proven visual equivalent of 16px', () => {

@@ -26,7 +26,11 @@ import {
   structuralDomain,
 } from '../../design-system/policy/properties';
 // Benchmark-only measurement hooks (Spike 1).
-import { perfCollector, workEliminated } from '../../observability/metrics';
+import {
+  count,
+  perfCollector,
+  workEliminated,
+} from '../../observability/metrics';
 
 // Stable variable identity: systemId + tokenId (D-03). The upstream hash
 // is computed over `${exportId}.${key}`, independent of the checkout path.
@@ -482,7 +486,11 @@ export function compileStyles({
     throw new PmsError(diagnostics);
   }
 
-  const engineOptions = { ...defaultOptions, ...options };
+  const engineOptions = {
+    ...defaultOptions,
+    ...options,
+    __pmsCount: perfCollector() === null ? null : count,
+  };
   // Atomic lowering is timed separately, so the policy figure EXCLUDES it.
   // Two nested numbers that are added by a reader is one number reported wrong;
   // the two phases are disjoint here, which makes the split exact rather than

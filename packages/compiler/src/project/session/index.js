@@ -2482,6 +2482,7 @@ export function createProjectSession(config) {
     return phase('session_aggregate_ms', () =>
       styleXTransform.processStylexRules(closureRules, {
         useLayers: cfg.useCSSLayers,
+        __pmsPerfPhase: phase,
       }),
     );
   }

@@ -15,9 +15,6 @@ import * as t from '@babel/types';
 import { MediaQuery } from 'style-value-parser';
 import type { MediaQueryRule } from 'style-value-parser';
 import StateManager from './utils/state-manager';
-// Benchmark-only measurement hooks (Spike 1). Absent a collector these are one
-// null check each; compilation order and output are unaffected.
-import { phase as pandamstylePerfPhase } from '../../../compiler/src/observability/metrics';
 import {
   EXTENSIONS,
   filePathResolver,
@@ -679,6 +676,14 @@ function compareWidthSortKeys(
     : b.bound.value - a.bound.value;
 }
 
+function measurePandamStylePhase(config, name, work) {
+  const callback =
+    config != null && typeof config === 'object'
+      ? (config: $FlowFixMe).__pmsPerfPhase
+      : null;
+  return typeof callback === 'function' ? callback(name, work) : work();
+}
+
 function processStylexRules(
   rules: Array<Rule>,
   config?:
@@ -697,9 +702,9 @@ function processStylexRules(
         ...
       },
 ): string {
-  // Benchmark-only measurement hooks (Spike 1). With no collector installed the
-  // wrapper collapses to a direct call and the body below is unchanged.
-  return pandamstylePerfPhase('css_serialize_ms', () =>
+  // Benchmark-only callback supplied by the compiler. Ordinary StyleX callers
+  // have no dependency on PandamStyle observability.
+  return measurePandamStylePhase(config, 'css_serialize_ms', () =>
     processStylexRulesInner(rules, config),
   );
 }
@@ -808,63 +813,69 @@ function processStylexRulesInner(
     return key;
   };
 
-  const sortedRules: Array<Rule> = pandamstylePerfPhase('rule_sort_ms', () =>
-    nonConstantRules
-      .map(([key, { ...styleObj }, priority]): Rule => {
-        Object.keys(styleObj).forEach((dir) => {
-          let original = styleObj[dir];
-          for (const [varRef, constValue] of constsMap.entries()) {
-            if (typeof original !== 'string') continue;
-            const replacement = String(constValue);
-            original = original.replaceAll(varRef, () => replacement);
-            if (replacement.startsWith('var(') && replacement.endsWith(')')) {
-              const inside = replacement.slice(4, -1).trim();
-              const commaIdx = inside.indexOf(',');
-              const targetName = (
-                commaIdx >= 0 ? inside.slice(0, commaIdx) : inside
-              ).trim();
-              const constName = varRef.slice(4, -1);
-              original = original.replaceAll(`${constName}:`, `${targetName}:`);
+  const sortedRules: Array<Rule> = measurePandamStylePhase(
+    config,
+    'rule_sort_ms',
+    () =>
+      nonConstantRules
+        .map(([key, { ...styleObj }, priority]): Rule => {
+          Object.keys(styleObj).forEach((dir) => {
+            let original = styleObj[dir];
+            for (const [varRef, constValue] of constsMap.entries()) {
+              if (typeof original !== 'string') continue;
+              const replacement = String(constValue);
+              original = original.replaceAll(varRef, () => replacement);
+              if (replacement.startsWith('var(') && replacement.endsWith(')')) {
+                const inside = replacement.slice(4, -1).trim();
+                const commaIdx = inside.indexOf(',');
+                const targetName = (
+                  commaIdx >= 0 ? inside.slice(0, commaIdx) : inside
+                ).trim();
+                const constName = varRef.slice(4, -1);
+                original = original.replaceAll(
+                  `${constName}:`,
+                  `${targetName}:`,
+                );
+              }
+              styleObj[dir] = original;
             }
-            styleObj[dir] = original;
-          }
-        });
-        return [key, styleObj, priority];
-      })
-      .sort(
-        (
-          [classname1, { ltr: rule1 }, firstPriority]: [string, any, number],
-          [classname2, { ltr: rule2 }, secondPriority]: [string, any, number],
-        ) => {
-          const priorityComparison = firstPriority - secondPriority;
-          if (priorityComparison !== 0) return priorityComparison;
+          });
+          return [key, styleObj, priority];
+        })
+        .sort(
+          (
+            [classname1, { ltr: rule1 }, firstPriority]: [string, any, number],
+            [classname2, { ltr: rule2 }, secondPriority]: [string, any, number],
+          ) => {
+            const priorityComparison = firstPriority - secondPriority;
+            if (priorityComparison !== 0) return priorityComparison;
 
-          if (useLegacyClassnamesSort) {
-            return classname1.localeCompare(classname2);
-          } else {
-            const nameComparison = declaredPropertyName(rule1).localeCompare(
-              declaredPropertyName(rule2),
-            );
-            if (nameComparison !== 0) return nameComparison;
+            if (useLegacyClassnamesSort) {
+              return classname1.localeCompare(classname2);
+            } else {
+              const nameComparison = declaredPropertyName(rule1).localeCompare(
+                declaredPropertyName(rule2),
+              );
+              if (nameComparison !== 0) return nameComparison;
 
-            // Only rules for the same property compete in the cascade, so the
-            // breakpoint order applies within a property, after it. Ordering by
-            // width first would decide some pairs by width and others by
-            // declaration text, which is not a consistent ordering.
-            const mqComparison = compareWidthSortKeys(
-              getWidthSortKey(rule1),
-              getWidthSortKey(rule2),
-            );
-            if (mqComparison !== 0) return mqComparison;
+              // Only rules for the same property compete in the cascade, so the
+              // breakpoint order applies within a property, after it. Ordering by
+              // width first would decide some pairs by width and others by
+              // declaration text, which is not a consistent ordering.
+              const mqComparison = compareWidthSortKeys(
+                getWidthSortKey(rule1),
+                getWidthSortKey(rule2),
+              );
+              if (mqComparison !== 0) return mqComparison;
 
-            const property1 = rule1.slice(rule1.lastIndexOf('{'));
-            const property2 = rule2.slice(rule2.lastIndexOf('{'));
-            const propertyComparison = property1.localeCompare(property2);
-            if (propertyComparison !== 0) return propertyComparison;
-            return rule1.localeCompare(rule2);
-          }
-        },
-      ),
+              const property1 = rule1.slice(rule1.lastIndexOf('{'));
+              const property2 = rule2.slice(rule2.lastIndexOf('{'));
+              const propertyComparison = property1.localeCompare(property2);
+              if (propertyComparison !== 0) return propertyComparison;
+              return rule1.localeCompare(rule2);
+            }
+          },
+        ),
   );
 
   let lastKPri = -1;
@@ -882,7 +893,7 @@ function processStylexRulesInner(
     return acc;
   }, []);
 
-  const logicalFloatVars = pandamstylePerfPhase('styleq_ms', () =>
+  const logicalFloatVars = measurePandamStylePhase(config, 'styleq_ms', () =>
     getLogicalFloatVars(sortedRules),
   );
 
@@ -905,7 +916,7 @@ function processStylexRulesInner(
       .flatMap((rule) => transformRuleEntry(rule, index, rawConfig))
       .join('\n');
 
-  const collectedCSS = pandamstylePerfPhase('css_join_ms', () =>
+  const collectedCSS = measurePandamStylePhase(config, 'css_join_ms', () =>
     grouped
       .map((group, index) => {
         // A `priorityLevel` (Math.floor(priority / 1000)) can mix rules that must

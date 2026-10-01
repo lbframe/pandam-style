@@ -19,15 +19,14 @@ import { createShortHash } from './hash';
 import { defaultOptions } from './utils/default-options';
 import { flattenRawStyleObject } from './preprocess-rules/flatten-raw-style-obj';
 import { validateNamespace } from './preprocess-rules/basic-validation';
-// Benchmark-only measurement hooks. No collector installed -> one null check
-// per hook and the work below is byte-for-byte the work that was there before.
+// Benchmark-only measurement callback provided privately by the compiler. No
+// collector means no callback; StyleX remains independent of compiler modules.
 //
 // `atomic_lower_ms` is deliberately NOT measured here: pandamstyle/compiler.js
 // times the `styleXCreateSet` call that reaches this function, which is the same
 // interval and does not include the policy work that precedes it. Two timers on
 // one interval would double-count it, and a phase that is counted twice is worse
 // than a phase that is counted once.
-import { count } from '../../../../compiler/src/observability/metrics';
 
 type TPropTuple = [+key: string, +styles: $ReadOnlyArray<ComputedStyle>];
 
@@ -55,6 +54,7 @@ export default function styleXCreateSet(
   { [string]: InjectableStyle },
   { +[string]: ClassPathsInNamespace },
 ] {
+  const pmsCount = (options: $FlowFixMe).__pmsCount;
   const resolvedNamespaces: { [string]: FlatCompiledStyles } = {};
   const injectedStyles: { [string]: InjectableStyle } = {};
   const namespaceToClassPaths: { [string]: ClassPathsInNamespace } = {};
@@ -120,9 +120,9 @@ export default function styleXCreateSet(
       for (const [className, injectable] of classNameTuples) {
         if (injectedStyles[className] == null) {
           injectedStyles[className] = injectable;
-          count('atoms');
+          if (typeof pmsCount === 'function') pmsCount('atoms');
         }
-        count('atom_contributions');
+        if (typeof pmsCount === 'function') pmsCount('atom_contributions');
       }
     }
     resolvedNamespaces[namespaceName] = { ...namespaceObj, $$css: true };

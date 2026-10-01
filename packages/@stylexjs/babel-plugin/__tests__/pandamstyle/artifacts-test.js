@@ -25,7 +25,7 @@ import {
   conformanceDefinition,
   token,
   PmsError,
-} from '../../../../../tests/support/compiler-inspection';
+} from '../../../../../.pms-test-support/compiler-inspection.cjs';
 
 const OUT =
   process.env.PMS_OUT_DIR ??
