@@ -1,0 +1,6199 @@
+{
+  "documentKind": "pandamstyle-agent-loop-summary",
+  "schemaVersion": 1,
+  "input": "/home/kyle/work/pandam-style/evidence/phase-4-engine-absorption/performance/diagnostics/c10000-t1000-r100-s307-reconciliation-agent-loop.jsonl",
+  "rows": 960,
+  "errors": [],
+  "error_count": 0,
+  "variants": {
+    "full_metadata": {
+      "auditPolicy": "inline",
+      "publishes": true,
+      "audits": false,
+      "label": "the pre-Phase-C artifact: the whole coverage array inline"
+    },
+    "compact_agent_result": {
+      "auditPolicy": "reference",
+      "publishes": false,
+      "audits": false,
+      "label": "diagnostics only; nothing published"
+    },
+    "compact_agent_result_plus_compact_publish_metadata": {
+      "auditPolicy": "reference",
+      "publishes": true,
+      "audits": false,
+      "label": "diagnostics, then a publication with counts and a reference"
+    },
+    "full_audit_requested": {
+      "auditPolicy": "reference",
+      "publishes": true,
+      "audits": true,
+      "label": "diagnostics, publication, and the requested coverage document"
+    }
+  },
+  "comparability": {
+    "full_metadata|full_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_metadata|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result_plus_compact_publish_metadata|full_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result_plus_compact_publish_metadata|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result|compact_agent_result": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_audit_requested|full_audit_requested": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_metadata|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: the pre-Phase-C artifact: the whole coverage array inline vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "full_metadata|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: the pre-Phase-C artifact: the whole coverage array inline vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|full_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs the pre-Phase-C artifact: the whole coverage array inline. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs diagnostics, then a publication with counts and a reference. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "compact_agent_result_plus_compact_publish_metadata|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, then a publication with counts and a reference vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "compact_agent_result_plus_compact_publish_metadata|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, then a publication with counts and a reference vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|full_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs the pre-Phase-C artifact: the whole coverage array inline. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs diagnostics, then a publication with counts and a reference. A faster number for less work has not won anything."
+    }
+  },
+  "headline": [
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 20.918786,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 3340,
+      "work": {
+        "filesCompiled": 0,
+        "filesRecompiled": 0,
+        "filesReused": 10002,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 0,
+        "reuse_ms": 0,
+        "coverage_entries_ms": 0,
+        "entries_iterated": 0
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.23564000000000002,
+        "agent_result_serialize_ms": 0.01635
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 67.287221,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 1870,
+      "work": {
+        "filesCompiled": 1,
+        "filesRecompiled": 1,
+        "filesReused": 10001,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 8.592862,
+        "reuse_ms": 5.385704,
+        "coverage_entries_ms": 6.922774,
+        "entries_iterated": 10003
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.10024,
+        "agent_result_serialize_ms": 0.01813
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 70.121342,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 1913,
+      "work": {
+        "filesCompiled": 1,
+        "filesRecompiled": 1,
+        "filesReused": 10001,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 5.207202,
+        "reuse_ms": 6.543182,
+        "coverage_entries_ms": 8.415883,
+        "entries_iterated": 10003
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.08984,
+        "agent_result_serialize_ms": 0.01462
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 114.983166,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 1622,
+      "work": {
+        "filesCompiled": 1,
+        "filesRecompiled": 1,
+        "filesReused": 10001,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 3.033481,
+        "reuse_ms": 4.637431,
+        "coverage_entries_ms": 6.342662,
+        "entries_iterated": 10003
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.08673,
+        "agent_result_serialize_ms": 0.01305
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 76.935054,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 2266,
+      "work": {
+        "filesCompiled": 2,
+        "filesRecompiled": 2,
+        "filesReused": 10001,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 7.630952,
+        "reuse_ms": 4.339702,
+        "coverage_entries_ms": 6.130072,
+        "entries_iterated": 10004
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.085771,
+        "agent_result_serialize_ms": 0.01523
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 21.045696,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 3494,
+      "work": {
+        "filesCompiled": 0,
+        "filesRecompiled": 0,
+        "filesReused": 10002,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 0,
+        "reuse_ms": 0,
+        "coverage_entries_ms": 0,
+        "entries_iterated": 0
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.23268,
+        "agent_result_serialize_ms": 0.01658
+      }
+    }
+  ],
+  "cells": [
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 18.869106,
+      "p50": 20.918786,
+      "p95": 21.532696,
+      "max": 21.532696,
+      "mean": 20.440196
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 19.687226,
+      "p50": 21.722657,
+      "p95": 22.277318,
+      "max": 22.277318,
+      "mean": 21.229067
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.233011,
+      "p50": 0.23564000000000002,
+      "p95": 0.25064,
+      "max": 0.25064,
+      "mean": 0.23976366666666668
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3340,
+      "p50": 3340,
+      "p95": 3340,
+      "max": 3340,
+      "mean": 3340
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01594,
+      "p50": 0.01635,
+      "p95": 0.01678,
+      "max": 0.01678,
+      "mean": 0.01635666666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_full_walk",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 9.958383,
+      "p50": 9.981713,
+      "p95": 11.277064,
+      "max": 11.277064,
+      "mean": 10.405719999999999
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_hits",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.55377,
+      "p50": 0.55509,
+      "p95": 0.558831,
+      "max": 0.558831,
+      "mean": 0.555897
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10.118223,
+      "p50": 10.146223,
+      "p95": 11.429624,
+      "max": 11.429624,
+      "mean": 10.56469
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.40833,
+      "p50": 0.41162,
+      "p95": 0.418091,
+      "max": 0.418091,
+      "mean": 0.4126803333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_resolve_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.10336,
+      "p50": 0.11053,
+      "p95": 0.11862,
+      "max": 0.11862,
+      "mean": 0.11083666666666665
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.433091,
+      "p50": 2.494981,
+      "p95": 3.740001,
+      "max": 3.740001,
+      "mean": 2.8893576666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.753080999999998,
+      "p50": 6.541702000000001,
+      "p95": 7.093111000000002,
+      "max": 7.093111000000002,
+      "mean": 6.462631333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 66.409011,
+      "p50": 67.287221,
+      "p95": 68.696622,
+      "max": 68.696622,
+      "mean": 67.46428466666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 67.047651,
+      "p50": 67.967031,
+      "p95": 69.401942,
+      "max": 69.401942,
+      "mean": 68.13887466666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.09789,
+      "p50": 0.10024,
+      "p95": 0.10104,
+      "max": 0.10104,
+      "mean": 0.09972333333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1870,
+      "p50": 1870,
+      "p95": 1871,
+      "max": 1871,
+      "mean": 1870.3333333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01385,
+      "p50": 0.01813,
+      "p95": 0.01875,
+      "max": 0.01875,
+      "mean": 0.016909999999999998
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.15085,
+      "p50": 0.15214,
+      "p95": 0.16771,
+      "max": 0.16771,
+      "mean": 0.1569
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.10426,
+      "p50": 0.10671,
+      "p95": 0.10966,
+      "max": 0.10966,
+      "mean": 0.10687666666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10001,
+      "p50": 10001,
+      "p95": 10001,
+      "max": 10001,
+      "mean": 10001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.314491,
+      "p50": 0.31602,
+      "p95": 0.32239,
+      "max": 0.32239,
+      "mean": 0.31763366666666665
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 56.565638,
+      "p50": 57.805279,
+      "p95": 60.448179,
+      "max": 60.448179,
+      "mean": 58.273032
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.420991,
+      "p50": 2.441261,
+      "p95": 2.528261,
+      "max": 2.528261,
+      "mean": 2.4635043333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.858681,
+      "p50": 8.592862,
+      "p95": 9.740073,
+      "max": 9.740073,
+      "mean": 7.730538666666668
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.920503,
+      "p50": 6.922774,
+      "p95": 7.443842,
+      "max": 7.443842,
+      "mean": 6.762373
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.335343,
+      "p50": 5.385704,
+      "p95": 6.014672,
+      "max": 6.014672,
+      "mean": 5.2452396666666665
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.484791999999999,
+      "p50": 6.639190000000006,
+      "p95": 7.106362000000004,
+      "max": 7.106362000000004,
+      "mean": 6.4101146666666695
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 65.233012,
+      "p50": 70.121342,
+      "p95": 72.492983,
+      "max": 72.492983,
+      "mean": 69.28244566666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 65.861862,
+      "p50": 70.823782,
+      "p95": 73.286823,
+      "max": 73.286823,
+      "mean": 69.99082233333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.08610000000000001,
+      "p50": 0.08984,
+      "p95": 0.12456999999999999,
+      "max": 0.12456999999999999,
+      "mean": 0.10017
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1913,
+      "p50": 1913,
+      "p95": 1914,
+      "max": 1914,
+      "mean": 1913.3333333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01419,
+      "p50": 0.01462,
+      "p95": 0.01694,
+      "max": 0.01694,
+      "mean": 0.01525
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.58457,
+      "p50": 0.60971,
+      "p95": 0.77119,
+      "max": 0.77119,
+      "mean": 0.6551566666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.10088,
+      "p50": 0.10845,
+      "p95": 0.13025,
+      "max": 0.13025,
+      "mean": 0.11319333333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10001,
+      "p50": 10001,
+      "p95": 10001,
+      "max": 10001,
+      "mean": 10001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.74012,
+      "p50": 0.77342,
+      "p95": 0.9776,
+      "max": 0.9776,
+      "mean": 0.8303799999999999
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 56.015739,
+      "p50": 57.931148,
+      "p95": 62.63877,
+      "max": 62.63877,
+      "mean": 58.861885666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.391871,
+      "p50": 2.50052,
+      "p95": 3.443931,
+      "max": 3.443931,
+      "mean": 2.778774
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.780162,
+      "p50": 5.207202,
+      "p95": 5.607403,
+      "max": 5.607403,
+      "mean": 5.198255666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.861202,
+      "p50": 8.415883,
+      "p95": 9.521632,
+      "max": 9.521632,
+      "mean": 7.932905666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.345061,
+      "p50": 6.543182,
+      "p95": 7.31655,
+      "max": 7.31655,
+      "mean": 6.068264333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 6.085281999999999,
+      "p50": 6.580272999999991,
+      "p95": 7.7686629999999965,
+      "max": 7.7686629999999965,
+      "mean": 6.811405999999995
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 114.827506,
+      "p50": 114.983166,
+      "p95": 116.733347,
+      "max": 116.733347,
+      "mean": 115.514673
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 115.496647,
+      "p50": 115.636576,
+      "p95": 117.363567,
+      "max": 117.363567,
+      "mean": 116.16559666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.08539,
+      "p50": 0.08673,
+      "p95": 0.10455,
+      "max": 0.10455,
+      "mean": 0.09222333333333332
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1622,
+      "p50": 1622,
+      "p95": 1622,
+      "max": 1622,
+      "mean": 1622
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01269,
+      "p50": 0.01305,
+      "p95": 0.01343,
+      "max": 0.01343,
+      "mean": 0.013056666666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.411341,
+      "p50": 0.41325,
+      "p95": 0.41351,
+      "max": 0.41351,
+      "mean": 0.4127003333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3335,
+      "p50": 3335,
+      "p95": 3335,
+      "max": 3335,
+      "mean": 3335
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3334,
+      "p50": 3334,
+      "p95": 3334,
+      "max": 3334,
+      "mean": 3334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_hits",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3333,
+      "p50": 3333,
+      "p95": 3333,
+      "max": 3333,
+      "mean": 3333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_walks",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 52.715657,
+      "p50": 52.996597,
+      "p95": 53.549027,
+      "max": 53.549027,
+      "mean": 53.08709366666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5,
+      "p50": 5,
+      "p95": 5,
+      "max": 5,
+      "mean": 5
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10001,
+      "p50": 10001,
+      "p95": 10001,
+      "max": 10001,
+      "mean": 10001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.564661,
+      "p50": 0.56943,
+      "p95": 0.57458,
+      "max": 0.57458,
+      "mean": 0.569557
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 52.203546,
+      "p50": 52.923357,
+      "p95": 53.733617,
+      "max": 53.733617,
+      "mean": 52.95350666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 37.89277,
+      "p50": 37.936492,
+      "p95": 38.125151,
+      "max": 38.125151,
+      "mean": 37.98480433333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.411981,
+      "p50": 2.44215,
+      "p95": 2.478981,
+      "max": 2.478981,
+      "mean": 2.4443706666666665
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3.026281,
+      "p50": 3.033481,
+      "p95": 3.094141,
+      "max": 3.094141,
+      "mean": 3.051301
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.781402,
+      "p50": 6.342662,
+      "p95": 7.276844,
+      "max": 7.276844,
+      "mean": 6.466969333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.077622,
+      "p50": 4.637431,
+      "p95": 5.532384,
+      "max": 5.532384,
+      "mean": 4.749145666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 20.994648999999995,
+      "p50": 21.610826999999986,
+      "p95": 22.08182699999999,
+      "max": 22.08182699999999,
+      "mean": 21.562434333333325
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 71.218673,
+      "p50": 76.935054,
+      "p95": 81.342466,
+      "max": 81.342466,
+      "mean": 76.498731
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 71.423003,
+      "p50": 77.155255,
+      "p95": 81.571276,
+      "max": 81.571276,
+      "mean": 76.71651133333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.08252999999999999,
+      "p50": 0.085771,
+      "p95": 0.0944,
+      "max": 0.0944,
+      "mean": 0.08756699999999999
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2266,
+      "p50": 2266,
+      "p95": 2266,
+      "max": 2266,
+      "mean": 2266
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01379,
+      "p50": 0.01523,
+      "p95": 0.01922,
+      "max": 0.01922,
+      "mean": 0.01608
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_full_walk",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 7.664493,
+      "p50": 7.721712,
+      "p95": 7.762793,
+      "max": 7.762793,
+      "mean": 7.716332666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_hits",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4,
+      "p50": 4,
+      "p95": 4,
+      "max": 4,
+      "mean": 4
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_walks",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1.31413,
+      "p50": 4.837181,
+      "p95": 4.889592,
+      "max": 4.889592,
+      "mean": 3.680301
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 6,
+      "p50": 6,
+      "p95": 6,
+      "max": 6,
+      "mean": 6
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10004,
+      "p50": 10004,
+      "p95": 10004,
+      "max": 10004,
+      "mean": 10004
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10004,
+      "p50": 10004,
+      "p95": 10004,
+      "max": 10004,
+      "mean": 10004
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10001,
+      "p50": 10001,
+      "p95": 10001,
+      "max": 10001,
+      "mean": 10001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 7.675563,
+      "p50": 7.732542,
+      "p95": 7.774163,
+      "max": 7.774163,
+      "mean": 7.7274226666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 58.472329,
+      "p50": 60.630799,
+      "p95": 64.86077,
+      "max": 64.86077,
+      "mean": 61.321299333333336
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1.22412,
+      "p50": 4.746431,
+      "p95": 4.798522,
+      "max": 4.798522,
+      "mean": 3.589691
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_resolve_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.05391,
+      "p50": 0.05534,
+      "p95": 0.05554,
+      "max": 0.05554,
+      "mean": 0.05493
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1.7482,
+      "p50": 1.850651,
+      "p95": 1.858781,
+      "max": 1.858781,
+      "mean": 1.8192106666666668
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 6.252681,
+      "p50": 7.630952,
+      "p95": 8.632723,
+      "max": 8.632723,
+      "mean": 7.505452000000001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.804932,
+      "p50": 6.130072,
+      "p95": 6.237222,
+      "max": 6.237222,
+      "mean": 6.057408666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.214802,
+      "p50": 4.339702,
+      "p95": 4.560792,
+      "max": 4.560792,
+      "mean": 4.371765333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1.9207209999999861,
+      "p50": 1.9323399999999964,
+      "p95": 2.1054709999999943,
+      "max": 2.1054709999999943,
+      "mean": 1.9861773333333257
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 20.708727,
+      "p50": 21.045696,
+      "p95": 23.574258,
+      "max": 23.574258,
+      "mean": 21.776227000000002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 21.471737,
+      "p50": 21.851856,
+      "p95": 24.432828,
+      "max": 24.432828,
+      "mean": 22.58547366666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.2313,
+      "p50": 0.23268,
+      "p95": 0.25831,
+      "max": 0.25831,
+      "mean": 0.24076333333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3494,
+      "p50": 3494,
+      "p95": 3494,
+      "max": 3494,
+      "mean": 3494
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01627,
+      "p50": 0.01658,
+      "p95": 0.01769,
+      "max": 0.01769,
+      "mean": 0.016846666666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_full_walk",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 9.924754,
+      "p50": 9.940933,
+      "p95": 11.988494,
+      "max": 11.988494,
+      "mean": 10.618060333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_hits",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.54792,
+      "p50": 0.56308,
+      "p95": 0.574071,
+      "max": 0.574071,
+      "mean": 0.5616903333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10.078314,
+      "p50": 10.094463,
+      "p95": 12.161784,
+      "max": 12.161784,
+      "mean": 10.778187
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.40581,
+      "p50": 0.41702,
+      "p95": 0.424311,
+      "max": 0.424311,
+      "mean": 0.4157136666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_resolve_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.10888,
+      "p50": 0.11583,
+      "p95": 0.12064,
+      "max": 0.12064,
+      "mean": 0.11511666666666669
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.391021,
+      "p50": 2.504051,
+      "p95": 3.145371,
+      "max": 3.145371,
+      "mean": 2.6801476666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 7.690052000000001,
+      "p50": 7.729443,
+      "p95": 7.941690999999999,
+      "max": 7.941690999999999,
+      "mean": 7.787062
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    }
+  ],
+  "statistics": {
+    "method": "upper-rank percentiles over the observed values",
+    "confidence_intervals": "not computed, and that is stated rather than implied: every observation of a cell comes from the same process, so the values are correlated and a median over them is a statistic of that process",
+    "sessions_reported": true
+  }
+}

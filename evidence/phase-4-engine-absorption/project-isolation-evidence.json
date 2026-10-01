@@ -1,0 +1,18 @@
+{
+  "documentKind": "pandamstyle-phase4-project-isolation-evidence",
+  "testedCommit": "7b6b58ee2a430d8495a2acbed67fb631fc43f577",
+  "testedTree": "2459745ffd057f10bd567ee4dadd6805534eddf7",
+  "result": "pass",
+  "testSuite": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/project-api-test.js",
+  "testName": "separate project sessions keep identities and artifacts isolated",
+  "assertions": [
+    "two projects receive distinct project identities and session identities",
+    "a project cannot request an agent result using the other project’s revision identity",
+    "changing one project changes only its artifact; the other project’s artifact and current revision remain unchanged"
+  ],
+  "logEvidence": [
+    "PASS __tests__/pandamstyle/project-api-test.js",
+    "    ✓ separate project sessions keep identities and artifacts isolated (631 ms)"
+  ],
+  "testLog": "verify/pandamstyle.log"
+}

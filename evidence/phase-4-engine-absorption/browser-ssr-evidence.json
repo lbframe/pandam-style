@@ -1,0 +1,58 @@
+{
+  "documentKind": "pandamstyle-phase4-browser-ssr-evidence",
+  "testedCommit": "7b6b58ee2a430d8495a2acbed67fb631fc43f577",
+  "testedTree": "2459745ffd057f10bd567ee4dadd6805534eddf7",
+  "semanticOracleExecution": {
+    "tests": 148,
+    "suites": 20
+  },
+  "browserCaseCount": 6,
+  "allBrowserCasesPass": true,
+  "cases": [
+    {
+      "id": "browser.shorthand-longhand",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.token-values",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.theme-scope",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.conflict",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.media-cascade",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.ssr-hydration",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    }
+  ],
+  "detailDirectory": "verify/semantic-oracle/cases/",
+  "hydrationCase": "verify/semantic-oracle/cases/browser.ssr-hydration.json",
+  "testLog": "verify/semantic-oracle.log"
+}

@@ -1,0 +1,57 @@
+{
+  "documentKind": "pandamstyle-phase4-engine-reachability-snapshot",
+  "analysis": "pre-absorption recursive AST import/re-export walk, scoped to the 13 Phase 4 direct edges; full MOVE/REFACTOR/REWRITE table is phase-4-engine-absorption-map.md",
+  "baseCommit": "902f4e89cb11faae54fa02bb4883e5e05159454a",
+  "baseTree": "a32339cac578f50142156734811d78492f538243",
+  "directEdges": {
+    "total": 14,
+    "phase4Engine": 13,
+    "temporaryVitePhase8Seam": 1
+  },
+  "recursiveSourceModules": {
+    "stylex": {
+      "sourceModules": 84,
+      "retained": 40,
+      "discarded": 44,
+      "packageMetadataEntries": 1
+    },
+    "styleValueParser": {
+      "sourceModules": 19,
+      "retained": 8,
+      "discarded": 11
+    },
+    "combinedSourceModules": 103,
+    "retained": 48,
+    "discardedUnneeded": 55,
+    "separateDonorPackageMetadataEntries": 1
+  },
+  "decisionsForRetainedModules": {
+    "MOVE": 14,
+    "REFACTOR": 31,
+    "REWRITE": 3
+  },
+  "rawSupplementalSnapshot": {
+    "file": "reachability/pre-absorption-static-closure.json",
+    "reachableDonorModuleCount": 85,
+    "groupCounts": {
+      "packages/@stylexjs/atoms/src": 1,
+      "packages/@stylexjs/babel-plugin/src": 75,
+      "packages/@stylexjs/shared/src": 2,
+      "packages/@stylexjs/stylex/package.json": 1,
+      "packages/@stylexjs/stylex/src": 6
+    },
+    "donorEdges": 257,
+    "unresolved": 0,
+    "parseErrors": [
+      {
+        "file": "packages/@stylexjs/stylex/package.json",
+        "message": "/home/kyle/work/pandam-style/packages/@stylexjs/stylex/package.json: ';' expected (2:8)"
+      }
+    ],
+    "note": "The raw walker counts package.json as a donor path (hence 85 versus 84 source paths) and tried to parse that JSON manifest as JS; the mapped inventory treats the single package.json as resolution metadata, not a source module."
+  },
+  "afterAbsorption": {
+    "productionDonorEngineEdges": 0,
+    "donorClosureReport": "verify/donor-closure/report.json"
+  }
+}

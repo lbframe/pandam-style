@@ -1,0 +1,2536 @@
+{
+  "documentKind": "pandamstyle-phase4-performance-comparison",
+  "testedCommit": "7b6b58ee2a430d8495a2acbed67fb631fc43f577",
+  "testedTree": "2459745ffd057f10bd567ee4dadd6805534eddf7",
+  "corpus": {
+    "name": "c10000-t1000-r100-s307-reconciliation",
+    "fileCount": 10021
+  },
+  "environment": {
+    "node": "v22.22.0",
+    "platform": "linux-x64",
+    "cpuModel": "AMD Ryzen 7 5800X3D 8-Core Processor",
+    "cpuCount": 16,
+    "baseline": {
+      "label": "phase4-baseline-diagnostics",
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "node": "v22.22.0",
+      "platform": "linux-x64",
+      "cpuModel": "AMD Ryzen 7 5800X3D 8-Core Processor",
+      "cpuCount": 16,
+      "totalMemoryBytes": 33556586496,
+      "diskAvailBytesBefore": 118445297664,
+      "diskTotalBytes": 980666998784
+    },
+    "current": {
+      "documentKind": "pandamstyle-run-environment",
+      "testedCommit": "7b6b58ee2a430d8495a2acbed67fb631fc43f577",
+      "testedTree": "2459745ffd057f10bd567ee4dadd6805534eddf7",
+      "testedBranch": "refactor/pandamstyle-phase-4-engine-absorption-2026-10",
+      "workingTree": "clean",
+      "gitWorkTree": true,
+      "pandamstyleBatchBaseRef": "refs/remotes/origin/feat/pandamstyle-native-compiler",
+      "pandamstyleBatchBase": "e5ff62b4a925405dcf9fb415faa00df4b68aeaa9",
+      "stylexUpstreamMergeBase": "unknown",
+      "pandaDonorCommit": "no-git-metadata-in-this-checkout (pinned SHA recorded in docs/pandamstyle-specification-v0.1/specs/01-ARCHITECTURE.md)",
+      "outDir": "/home/kyle/work/pandam-style/evidence/phase-4-engine-absorption/verify",
+      "toolchain": {
+        "node": "v22.22.0",
+        "yarn": "1.22.22",
+        "npm": "11.11.1"
+      },
+      "lockfile": "yarn.lock",
+      "lockfileSha256": "2f5f4caa16797bb58d77484bd8244a2370a8df3ad0da793c0ea6c419fa4eb777"
+    }
+  },
+  "method": {
+    "variant": "compact_agent_result for diagnostics; compact_agent_result_plus_compact_publish_metadata for publication",
+    "iterations": 3,
+    "harnessVersion": "pms-agent-loop-harness/1.0.0",
+    "cacheState": "process_warm_agent_loop",
+    "processIsolation": "one child process per benchmark cell; the harness warmup revision is discarded; p50 and upper-rank p95 summarize three measured session observations",
+    "uncertainty": "no confidence intervals; the three observations per cell are a small sample and latency comparisons should be treated as measured evidence, not a universal estimate",
+    "baselineIdentity": "pre-absorption phase4-audit baseline files; original baseline rows do not embed a tested commit SHA",
+    "sourceDigests": {
+      "performance/baseline/diagnostics.jsonl": "a07daec0013301822901e7e0ac00aa4caf32cfe667874b6a1b7b46b0cdb7972a",
+      "performance/baseline/diagnostics-summary.json": "82fd403deb68c0d45fc60ccbbbd51ada394eae7455b1067bea3295a0c47cd531",
+      "performance/baseline/publication.jsonl": "124e50e3120eeed60773252ef811c7facabd8c61403489905951020ca416924f",
+      "performance/baseline/publication-summary.json": "d8ee55624339a800c0388f677721045ce5ec04e76a9b2fc4c345e7e80eb182b2",
+      "reachability/pre-absorption-static-closure.json": "34fcde14bb13bb853571ac74270aa68d6e3e3f7cc15e87e2a3a1ac28f30870cb"
+    }
+  },
+  "campaigns": {
+    "diagnostics": {
+      "baselineRows": 960,
+      "testedRows": 960,
+      "baselineErrors": 0,
+      "testedErrors": 0,
+      "baselineFallbacks": {
+        "observations": 18,
+        "nonzero": 0
+      },
+      "testedFallbacks": {
+        "observations": 18,
+        "nonzero": 0
+      },
+      "scenarios": [
+        {
+          "scenario": "one_file_existing_atoms#edit",
+          "label": "style edit",
+          "latency": {
+            "agent_loop_dispatch_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 59.321535,
+                "p95UpperRank": 59.496429,
+                "min": 58.509201,
+                "max": 59.496429
+              },
+              "tested": {
+                "n": 3,
+                "p50": 70.823782,
+                "p95UpperRank": 73.286823,
+                "min": 65.861862,
+                "max": 73.286823
+              },
+              "delta": 11.502246999999997,
+              "changePercent": 19.39
+            },
+            "agent_edit_to_diagnostics_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 58.703641,
+                "p95UpperRank": 58.827774,
+                "min": 57.904347,
+                "max": 58.827774
+              },
+              "tested": {
+                "n": 3,
+                "p50": 70.121342,
+                "p95UpperRank": 72.492983,
+                "min": 65.233012,
+                "max": 72.492983
+              },
+              "delta": 11.417701000000001,
+              "changePercent": 19.45
+            }
+          },
+          "workShape": {
+            "mutation_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "mutation_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_compiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_recompiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10001,
+                "p95UpperRank": 10001,
+                "min": 10001,
+                "max": 10001
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10001,
+                "p95UpperRank": 10001,
+                "min": 10001,
+                "max": 10001
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "covered_entries_iterated": {
+              "baseline": {
+                "n": 3,
+                "p50": 10003,
+                "p95UpperRank": 10003,
+                "min": 10003,
+                "max": 10003
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10003,
+                "p95UpperRank": 10003,
+                "min": 10003,
+                "max": 10003
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "full_fallback": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:parse_calls": {
+              "baseline": {
+                "n": 3,
+                "p50": 3,
+                "p95UpperRank": 3,
+                "min": 3,
+                "max": 3
+              },
+              "tested": {
+                "n": 3,
+                "p50": 3,
+                "p95UpperRank": 3,
+                "min": 3,
+                "max": 3
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_edges_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:dsv_files_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:dsv_files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            }
+          }
+        },
+        {
+          "scenario": "import_change#import",
+          "label": "import change",
+          "latency": {
+            "agent_loop_dispatch_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 22.963599,
+                "p95UpperRank": 24.031737,
+                "min": 20.260779,
+                "max": 24.031737
+              },
+              "tested": {
+                "n": 3,
+                "p50": 21.722657,
+                "p95UpperRank": 22.277318,
+                "min": 19.687226,
+                "max": 22.277318
+              },
+              "delta": -1.2409419999999969,
+              "changePercent": -5.4
+            },
+            "agent_edit_to_diagnostics_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 22.155823,
+                "p95UpperRank": 23.337761,
+                "min": 19.494914,
+                "max": 23.337761
+              },
+              "tested": {
+                "n": 3,
+                "p50": 20.918786,
+                "p95UpperRank": 21.532696,
+                "min": 18.869106,
+                "max": 21.532696
+              },
+              "delta": -1.2370370000000008,
+              "changePercent": -5.58
+            }
+          },
+          "workShape": {
+            "mutation_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "mutation_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_compiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "files_recompiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "covered_entries_iterated": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "full_fallback": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:parse_calls": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_edges_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            }
+          }
+        },
+        {
+          "scenario": "reexport_change#reexport",
+          "label": "re-export change",
+          "latency": {
+            "agent_loop_dispatch_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 109.81412,
+                "p95UpperRank": 115.580122,
+                "min": 107.363972,
+                "max": 115.580122
+              },
+              "tested": {
+                "n": 3,
+                "p50": 115.636576,
+                "p95UpperRank": 117.363567,
+                "min": 115.496647,
+                "max": 117.363567
+              },
+              "delta": 5.8224560000000025,
+              "changePercent": 5.3
+            },
+            "agent_edit_to_diagnostics_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 109.089734,
+                "p95UpperRank": 114.916687,
+                "min": 106.741817,
+                "max": 114.916687
+              },
+              "tested": {
+                "n": 3,
+                "p50": 114.983166,
+                "p95UpperRank": 116.733347,
+                "min": 114.827506,
+                "max": 116.733347
+              },
+              "delta": 5.89343199999999,
+              "changePercent": 5.4
+            }
+          },
+          "workShape": {
+            "mutation_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "mutation_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_compiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_recompiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10001,
+                "p95UpperRank": 10001,
+                "min": 10001,
+                "max": 10001
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10001,
+                "p95UpperRank": 10001,
+                "min": 10001,
+                "max": 10001
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "covered_entries_iterated": {
+              "baseline": {
+                "n": 3,
+                "p50": 10003,
+                "p95UpperRank": 10003,
+                "min": 10003,
+                "max": 10003
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10003,
+                "p95UpperRank": 10003,
+                "min": 10003,
+                "max": 10003
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "full_fallback": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:parse_calls": {
+              "baseline": {
+                "n": 3,
+                "p50": 5,
+                "p95UpperRank": 5,
+                "min": 5,
+                "max": 5
+              },
+              "tested": {
+                "n": 3,
+                "p50": 5,
+                "p95UpperRank": 5,
+                "min": 5,
+                "max": 5
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_edges_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:dsv_files_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 3335,
+                "p95UpperRank": 3335,
+                "min": 3335,
+                "max": 3335
+              },
+              "tested": {
+                "n": 3,
+                "p50": 3335,
+                "p95UpperRank": 3335,
+                "min": 3335,
+                "max": 3335
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 3334,
+                "p95UpperRank": 3334,
+                "min": 3334,
+                "max": 3334
+              },
+              "tested": {
+                "n": 3,
+                "p50": 3334,
+                "p95UpperRank": 3334,
+                "min": 3334,
+                "max": 3334
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            }
+          }
+        },
+        {
+          "scenario": "unresolved_import_then_file_appears#unresolved",
+          "label": "unresolved import",
+          "latency": {
+            "agent_loop_dispatch_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 22.027673,
+                "p95UpperRank": 23.1057,
+                "min": 21.143117,
+                "max": 23.1057
+              },
+              "tested": {
+                "n": 3,
+                "p50": 21.851856,
+                "p95UpperRank": 24.432828,
+                "min": 21.471737,
+                "max": 24.432828
+              },
+              "delta": -0.17581699999999856,
+              "changePercent": -0.8
+            },
+            "agent_edit_to_diagnostics_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 21.282228,
+                "p95UpperRank": 22.299885,
+                "min": 20.414312,
+                "max": 22.299885
+              },
+              "tested": {
+                "n": 3,
+                "p50": 21.045696,
+                "p95UpperRank": 23.574258,
+                "min": 20.708727,
+                "max": 23.574258
+              },
+              "delta": -0.2365320000000004,
+              "changePercent": -1.11
+            }
+          },
+          "workShape": {
+            "mutation_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "mutation_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_compiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "files_recompiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "covered_entries_iterated": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "full_fallback": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:parse_calls": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_edges_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            }
+          }
+        },
+        {
+          "scenario": "unresolved_import_then_file_appears#appears",
+          "label": "unresolved import repaired",
+          "latency": {
+            "agent_loop_dispatch_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 61.951641,
+                "p95UpperRank": 66.171179,
+                "min": 61.8883,
+                "max": 66.171179
+              },
+              "tested": {
+                "n": 3,
+                "p50": 77.155255,
+                "p95UpperRank": 81.571276,
+                "min": 71.423003,
+                "max": 81.571276
+              },
+              "delta": 15.203613999999995,
+              "changePercent": 24.54
+            },
+            "agent_edit_to_diagnostics_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 61.75156,
+                "p95UpperRank": 65.964637,
+                "min": 61.691899,
+                "max": 65.964637
+              },
+              "tested": {
+                "n": 3,
+                "p50": 76.935054,
+                "p95UpperRank": 81.342466,
+                "min": 71.218673,
+                "max": 81.342466
+              },
+              "delta": 15.183493999999996,
+              "changePercent": 24.59
+            }
+          },
+          "workShape": {
+            "mutation_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "mutation_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_compiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "tested": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_recompiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "tested": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10001,
+                "p95UpperRank": 10001,
+                "min": 10001,
+                "max": 10001
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10001,
+                "p95UpperRank": 10001,
+                "min": 10001,
+                "max": 10001
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "covered_entries_iterated": {
+              "baseline": {
+                "n": 3,
+                "p50": 10004,
+                "p95UpperRank": 10004,
+                "min": 10004,
+                "max": 10004
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10004,
+                "p95UpperRank": 10004,
+                "min": 10004,
+                "max": 10004
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "full_fallback": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:parse_calls": {
+              "baseline": {
+                "n": 3,
+                "p50": 6,
+                "p95UpperRank": 6,
+                "min": 6,
+                "max": 6
+              },
+              "tested": {
+                "n": 3,
+                "p50": 6,
+                "p95UpperRank": 6,
+                "min": 6,
+                "max": 6
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "tested": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10002,
+                "p95UpperRank": 10002,
+                "min": 10002,
+                "max": 10002
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_edges_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "tested": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "tested": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            }
+          }
+        },
+        {
+          "scenario": "no_change#declared_unchanged",
+          "label": "no change",
+          "latency": {
+            "agent_loop_dispatch_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 59.321955,
+                "p95UpperRank": 59.785477,
+                "min": 57.186009,
+                "max": 59.785477
+              },
+              "tested": {
+                "n": 3,
+                "p50": 67.967031,
+                "p95UpperRank": 69.401942,
+                "min": 67.047651,
+                "max": 69.401942
+              },
+              "delta": 8.645076000000003,
+              "changePercent": 14.57
+            },
+            "agent_edit_to_diagnostics_ms": {
+              "baseline": {
+                "n": 3,
+                "p50": 58.68128,
+                "p95UpperRank": 59.090452,
+                "min": 56.567875,
+                "max": 59.090452
+              },
+              "tested": {
+                "n": 3,
+                "p50": 67.287221,
+                "p95UpperRank": 68.696622,
+                "min": 66.409011,
+                "max": 68.696622
+              },
+              "delta": 8.605941000000001,
+              "changePercent": 14.67
+            }
+          },
+          "workShape": {
+            "mutation_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "mutation_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_compiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_recompiled": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10001,
+                "p95UpperRank": 10001,
+                "min": 10001,
+                "max": 10001
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10001,
+                "p95UpperRank": 10001,
+                "min": 10001,
+                "max": 10001
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_read": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "dirty_files_hashed": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "covered_entries_iterated": {
+              "baseline": {
+                "n": 3,
+                "p50": 10003,
+                "p95UpperRank": 10003,
+                "min": 10003,
+                "max": 10003
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10003,
+                "p95UpperRank": 10003,
+                "min": 10003,
+                "max": 10003
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "full_fallback": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:parse_calls": {
+              "baseline": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "tested": {
+                "n": 3,
+                "p50": 2,
+                "p95UpperRank": 2,
+                "min": 2,
+                "max": 2
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_nodes_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:closure_nodes_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 10003,
+                "p95UpperRank": 10003,
+                "min": 10003,
+                "max": 10003
+              },
+              "tested": {
+                "n": 3,
+                "p50": 10003,
+                "p95UpperRank": 10003,
+                "min": 10003,
+                "max": 10003
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:closure_edges_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:dsv_files_examined": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            },
+            "counter:dsv_files_recomputed": {
+              "baseline": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "tested": {
+                "n": 3,
+                "p50": 0,
+                "p95UpperRank": 0,
+                "min": 0,
+                "max": 0
+              },
+              "delta": 0,
+              "changePercent": null
+            },
+            "counter:dsv_files_reused": {
+              "baseline": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "tested": {
+                "n": 3,
+                "p50": 1,
+                "p95UpperRank": 1,
+                "min": 1,
+                "max": 1
+              },
+              "delta": 0,
+              "changePercent": 0
+            }
+          }
+        }
+      ]
+    },
+    "publication": {
+      "baselineRows": 159,
+      "testedRows": 159,
+      "baselineErrors": 0,
+      "testedErrors": 0,
+      "baselineFallbacks": {
+        "observations": 3,
+        "nonzero": 0
+      },
+      "testedFallbacks": {
+        "observations": 3,
+        "nonzero": 0
+      },
+      "result": {
+        "scenario": "one_file_existing_atoms#edit",
+        "variant": "compact_agent_result_plus_compact_publish_metadata",
+        "metrics": {
+          "agent_loop_dispatch_ms": {
+            "baseline": {
+              "n": 3,
+              "p50": 60.659907,
+              "p95UpperRank": 63.405277,
+              "min": 57.383234,
+              "max": 63.405277
+            },
+            "tested": {
+              "n": 3,
+              "p50": 75.725414,
+              "p95UpperRank": 76.676004,
+              "min": 75.136964,
+              "max": 76.676004
+            },
+            "delta": 15.065507000000004,
+            "changePercent": 24.84
+          },
+          "agent_edit_to_diagnostics_ms": {
+            "baseline": {
+              "n": 3,
+              "p50": 59.965482,
+              "p95UpperRank": 62.770031,
+              "min": 56.750779,
+              "max": 62.770031
+            },
+            "tested": {
+              "n": 3,
+              "p50": 74.999684,
+              "p95UpperRank": 76.014444,
+              "min": 74.391613,
+              "max": 76.014444
+            },
+            "delta": 15.034202,
+            "changePercent": 25.07
+          },
+          "agent_edit_to_generation_ready_ms": {
+            "baseline": {
+              "n": 3,
+              "p50": 497.556424,
+              "p95UpperRank": 497.830772,
+              "min": 493.462498,
+              "max": 497.830772
+            },
+            "tested": {
+              "n": 3,
+              "p50": 619.375025,
+              "p95UpperRank": 756.80724,
+              "min": 597.948729,
+              "max": 756.80724
+            },
+            "delta": 121.81860100000006,
+            "changePercent": 24.48
+          },
+          "agent_edit_to_generation_committed_ms": {
+            "baseline": {
+              "n": 3,
+              "p50": 617.5007,
+              "p95UpperRank": 617.531719,
+              "min": 614.387422,
+              "max": 617.531719
+            },
+            "tested": {
+              "n": 3,
+              "p50": 750.996737,
+              "p95UpperRank": 887.577911,
+              "min": 738.151933,
+              "max": 887.577911
+            },
+            "delta": 133.496037,
+            "changePercent": 21.62
+          },
+          "build_report_build_ms": {
+            "baseline": {
+              "n": 3,
+              "p50": 0.047781,
+              "p95UpperRank": 0.048671,
+              "min": 0.04548,
+              "max": 0.048671
+            },
+            "tested": {
+              "n": 3,
+              "p50": 0.08744,
+              "p95UpperRank": 0.09656,
+              "min": 0.05607,
+              "max": 0.09656
+            },
+            "delta": 0.03965900000000001,
+            "changePercent": 83
+          },
+          "build_report_serialize_ms": {
+            "baseline": {
+              "n": 3,
+              "p50": 0.01549,
+              "p95UpperRank": 0.01803,
+              "min": 0.01539,
+              "max": 0.01803
+            },
+            "tested": {
+              "n": 3,
+              "p50": 0.01829,
+              "p95UpperRank": 0.02039,
+              "min": 0.0171,
+              "max": 0.02039
+            },
+            "delta": 0.0028000000000000004,
+            "changePercent": 18.08
+          },
+          "build_report_bytes": {
+            "baseline": {
+              "n": 3,
+              "p50": 2921,
+              "p95UpperRank": 2921,
+              "min": 2921,
+              "max": 2921
+            },
+            "tested": {
+              "n": 3,
+              "p50": 3516,
+              "p95UpperRank": 3516,
+              "min": 3516,
+              "max": 3516
+            },
+            "delta": 595,
+            "changePercent": 20.37
+          },
+          "metadata_bytes_written_hotpath": {
+            "baseline": {
+              "n": 3,
+              "p50": 482260,
+              "p95UpperRank": 482260,
+              "min": 482260,
+              "max": 482260
+            },
+            "tested": {
+              "n": 3,
+              "p50": 482940,
+              "p95UpperRank": 482940,
+              "min": 482940,
+              "max": 482940
+            },
+            "delta": 680,
+            "changePercent": 0.14
+          },
+          "mutation_read": {
+            "baseline": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "tested": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "mutation_hashed": {
+            "baseline": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "tested": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "files_compiled": {
+            "baseline": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "tested": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "files_recompiled": {
+            "baseline": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "tested": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "files_reused": {
+            "baseline": {
+              "n": 3,
+              "p50": 10001,
+              "p95UpperRank": 10001,
+              "min": 10001,
+              "max": 10001
+            },
+            "tested": {
+              "n": 3,
+              "p50": 10001,
+              "p95UpperRank": 10001,
+              "min": 10001,
+              "max": 10001
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "dirty_files_read": {
+            "baseline": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "tested": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "dirty_files_hashed": {
+            "baseline": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "tested": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "covered_entries_iterated": {
+            "baseline": {
+              "n": 3,
+              "p50": 10003,
+              "p95UpperRank": 10003,
+              "min": 10003,
+              "max": 10003
+            },
+            "tested": {
+              "n": 3,
+              "p50": 10003,
+              "p95UpperRank": 10003,
+              "min": 10003,
+              "max": 10003
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "full_fallback": {
+            "baseline": {
+              "n": 3,
+              "p50": 0,
+              "p95UpperRank": 0,
+              "min": 0,
+              "max": 0
+            },
+            "tested": {
+              "n": 3,
+              "p50": 0,
+              "p95UpperRank": 0,
+              "min": 0,
+              "max": 0
+            },
+            "delta": 0,
+            "changePercent": null
+          },
+          "counter:parse_calls": {
+            "baseline": {
+              "n": 3,
+              "p50": 3,
+              "p95UpperRank": 3,
+              "min": 3,
+              "max": 3
+            },
+            "tested": {
+              "n": 3,
+              "p50": 3,
+              "p95UpperRank": 3,
+              "min": 3,
+              "max": 3
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "counter:closure_nodes_examined": {
+            "baseline": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "tested": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "counter:closure_nodes_reused": {
+            "baseline": {
+              "n": 3,
+              "p50": 10002,
+              "p95UpperRank": 10002,
+              "min": 10002,
+              "max": 10002
+            },
+            "tested": {
+              "n": 3,
+              "p50": 10002,
+              "p95UpperRank": 10002,
+              "min": 10002,
+              "max": 10002
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "counter:closure_edges_recomputed": {
+            "baseline": {
+              "n": 3,
+              "p50": 0,
+              "p95UpperRank": 0,
+              "min": 0,
+              "max": 0
+            },
+            "tested": {
+              "n": 3,
+              "p50": 0,
+              "p95UpperRank": 0,
+              "min": 0,
+              "max": 0
+            },
+            "delta": 0,
+            "changePercent": null
+          },
+          "counter:dsv_files_examined": {
+            "baseline": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "tested": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "delta": 0,
+            "changePercent": 0
+          },
+          "counter:dsv_files_recomputed": {
+            "baseline": {
+              "n": 3,
+              "p50": 0,
+              "p95UpperRank": 0,
+              "min": 0,
+              "max": 0
+            },
+            "tested": {
+              "n": 3,
+              "p50": 0,
+              "p95UpperRank": 0,
+              "min": 0,
+              "max": 0
+            },
+            "delta": 0,
+            "changePercent": null
+          },
+          "counter:dsv_files_reused": {
+            "baseline": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "tested": {
+              "n": 3,
+              "p50": 1,
+              "p95UpperRank": 1,
+              "min": 1,
+              "max": 1
+            },
+            "delta": 0,
+            "changePercent": 0
+          }
+        }
+      }
+    }
+  },
+  "workShapeMedianChanges": [],
+  "workShapeMediansUnchanged": true,
+  "rawEvidence": {
+    "baselineDiagnostics": "baseline/diagnostics.jsonl",
+    "baselineDiagnosticsSummary": "baseline/diagnostics-summary.json",
+    "baselinePublication": "baseline/publication.jsonl",
+    "baselinePublicationSummary": "baseline/publication-summary.json",
+    "testedDiagnostics": "diagnostics/c10000-t1000-r100-s307-reconciliation-agent-loop.jsonl",
+    "testedDiagnosticsSummary": "diagnostics/summary.json",
+    "testedPublication": "publication/c10000-t1000-r100-s307-reconciliation-agent-loop.jsonl",
+    "testedPublicationSummary": "publication/summary.json"
+  }
+}

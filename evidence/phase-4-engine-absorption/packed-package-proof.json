@@ -1,0 +1,80 @@
+{
+  "documentKind": "pandamstyle-phase4-packed-dependency-proof",
+  "testedCommit": "7b6b58ee2a430d8495a2acbed67fb631fc43f577",
+  "testedTree": "2459745ffd057f10bd567ee4dadd6805534eddf7",
+  "sourceReport": "verify/donor-closure/report.json",
+  "productionDonorEngineEdges": 0,
+  "findings": [],
+  "core": {
+    "manifestDonorDependencies": [],
+    "sourceFiles": 7,
+    "sourceDonorImports": 0,
+    "packed": {
+      "manifestDonorDependencies": [],
+      "files": 7,
+      "donorImports": 0,
+      "tarball": "pandamstyle-core-0.1.0.tgz"
+    }
+  },
+  "compiler": {
+    "manifestDonorDependencies": [],
+    "sourceFiles": 80,
+    "sourceDonorImports": 0,
+    "rollupGraphs": [
+      {
+        "input": [
+          "./src/api/cli.js"
+        ],
+        "watchedFileCount": 78,
+        "donorSourceFiles": [],
+        "emittedDonorSpecifiers": []
+      },
+      {
+        "input": [
+          "./src/api/index.js"
+        ],
+        "watchedFileCount": 77,
+        "donorSourceFiles": [],
+        "emittedDonorSpecifiers": []
+      },
+      {
+        "input": [
+          "./src/api/config.js"
+        ],
+        "watchedFileCount": 2,
+        "donorSourceFiles": [],
+        "emittedDonorSpecifiers": []
+      },
+      {
+        "input": [
+          "./src/api/host.js"
+        ],
+        "watchedFileCount": 1,
+        "donorSourceFiles": [],
+        "emittedDonorSpecifiers": []
+      }
+    ],
+    "builtArtifacts": {
+      "fileCount": 4,
+      "importCount": 35,
+      "donorSpecifiers": []
+    },
+    "packed": {
+      "manifestDonorDependencies": [],
+      "files": 8,
+      "donorImports": 0,
+      "tarball": "pandamstyle-compiler-0.1.0.tgz"
+    }
+  },
+  "installedDependencyGraph": {
+    "complete": true,
+    "workspaceLeakage": false,
+    "donorPackages": [],
+    "installedPackageCount": 59
+  },
+  "generatedRuntime": {
+    "files": 10,
+    "coreImports": 8,
+    "donorImports": []
+  }
+}

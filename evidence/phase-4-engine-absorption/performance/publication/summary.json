@@ -1,0 +1,1118 @@
+{
+  "documentKind": "pandamstyle-agent-loop-summary",
+  "schemaVersion": 1,
+  "input": "/home/kyle/work/pandam-style/evidence/phase-4-engine-absorption/performance/publication/c10000-t1000-r100-s307-reconciliation-agent-loop.jsonl",
+  "rows": 159,
+  "errors": [],
+  "error_count": 0,
+  "variants": {
+    "full_metadata": {
+      "auditPolicy": "inline",
+      "publishes": true,
+      "audits": false,
+      "label": "the pre-Phase-C artifact: the whole coverage array inline"
+    },
+    "compact_agent_result": {
+      "auditPolicy": "reference",
+      "publishes": false,
+      "audits": false,
+      "label": "diagnostics only; nothing published"
+    },
+    "compact_agent_result_plus_compact_publish_metadata": {
+      "auditPolicy": "reference",
+      "publishes": true,
+      "audits": false,
+      "label": "diagnostics, then a publication with counts and a reference"
+    },
+    "full_audit_requested": {
+      "auditPolicy": "reference",
+      "publishes": true,
+      "audits": true,
+      "label": "diagnostics, publication, and the requested coverage document"
+    }
+  },
+  "comparability": {
+    "full_metadata|full_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_metadata|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result_plus_compact_publish_metadata|full_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result_plus_compact_publish_metadata|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result|compact_agent_result": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_audit_requested|full_audit_requested": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_metadata|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: the pre-Phase-C artifact: the whole coverage array inline vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "full_metadata|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: the pre-Phase-C artifact: the whole coverage array inline vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|full_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs the pre-Phase-C artifact: the whole coverage array inline. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs diagnostics, then a publication with counts and a reference. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "compact_agent_result_plus_compact_publish_metadata|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, then a publication with counts and a reference vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "compact_agent_result_plus_compact_publish_metadata|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, then a publication with counts and a reference vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|full_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs the pre-Phase-C artifact: the whole coverage array inline. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs diagnostics, then a publication with counts and a reference. A faster number for less work has not won anything."
+    }
+  },
+  "headline": [
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": null,
+        "compact_publish": 74.999684,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": 619.375025,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": 750.996737,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": 3516,
+        "coverage_document": null
+      },
+      "agent_result_bytes": null,
+      "work": {
+        "filesCompiled": null,
+        "filesRecompiled": null,
+        "filesReused": null,
+        "dirtyFilesRead": null,
+        "dirtyFilesHashed": null
+      },
+      "reuseLoop": {
+        "affected_ms": null,
+        "reuse_ms": null,
+        "coverage_entries_ms": null,
+        "entries_iterated": null
+      },
+      "metadata_timings": {
+        "build_report_build_ms": 0.08744,
+        "build_report_serialize_ms": 0.01829,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": null,
+        "agent_result_serialize_ms": null
+      }
+    }
+  ],
+  "cells": [
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 74.391613,
+      "p50": 74.999684,
+      "p95": 76.014444,
+      "max": 76.014444,
+      "mean": 75.135247
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 738.151933,
+      "p50": 750.996737,
+      "p95": 887.577911,
+      "max": 887.577911,
+      "mean": 792.2421936666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 597.948729,
+      "p50": 619.375025,
+      "p95": 756.80724,
+      "max": 756.80724,
+      "mean": 658.0436646666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 75.136964,
+      "p50": 75.725414,
+      "p95": 76.676004,
+      "max": 76.676004,
+      "mean": 75.84612733333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.09746,
+      "p50": 0.10244,
+      "p95": 0.12356999999999999,
+      "max": 0.12356999999999999,
+      "mean": 0.10782333333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2004,
+      "p50": 2004,
+      "p95": 2004,
+      "max": 2004,
+      "mean": 2004
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01416,
+      "p50": 0.01618,
+      "p95": 0.01755,
+      "max": 0.01755,
+      "mean": 0.015963333333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "build_report_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.05607,
+      "p50": 0.08744,
+      "p95": 0.09656,
+      "max": 0.09656,
+      "mean": 0.08002333333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "build_report_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3516,
+      "p50": 3516,
+      "p95": 3516,
+      "max": 3516,
+      "mean": 3516
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "build_report_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.0171,
+      "p50": 0.01829,
+      "p95": 0.02039,
+      "max": 0.02039,
+      "mean": 0.018593333333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.58733,
+      "p50": 0.62373,
+      "p95": 0.63452,
+      "max": 0.63452,
+      "mean": 0.6151933333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.10275,
+      "p50": 0.108161,
+      "p95": 0.134231,
+      "max": 0.134231,
+      "mean": 0.11504733333333332
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10001,
+      "p50": 10001,
+      "p95": 10001,
+      "max": 10001,
+      "mean": 10001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 482940,
+      "p50": 482940,
+      "p95": 482940,
+      "max": 482940,
+      "mean": 482940
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.74654,
+      "p50": 0.78842,
+      "p95": 0.78938,
+      "max": 0.78938,
+      "mean": 0.7747799999999999
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 64.70838,
+      "p50": 65.803931,
+      "p95": 65.970111,
+      "max": 65.970111,
+      "mean": 65.49414066666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.41074,
+      "p50": 2.512141,
+      "p95": 2.521331,
+      "max": 2.521331,
+      "mean": 2.481404
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.885921,
+      "p50": 8.933343,
+      "p95": 9.885005,
+      "max": 9.885005,
+      "mean": 7.901423
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.99035,
+      "p50": 7.257683,
+      "p95": 8.023154,
+      "max": 8.023154,
+      "mean": 7.090395666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.584387,
+      "p50": 5.633943,
+      "p95": 6.447184,
+      "max": 6.447184,
+      "mean": 5.555171333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.886001999999991,
+      "p50": 6.424552000000006,
+      "p95": 6.844212999999996,
+      "max": 6.844212999999996,
+      "mean": 6.384922333333331
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result_plus_compact_publish_metadata",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    }
+  ],
+  "statistics": {
+    "method": "upper-rank percentiles over the observed values",
+    "confidence_intervals": "not computed, and that is stated rather than implied: every observation of a cell comes from the same process, so the values are correlated and a median over them is a statistic of that process",
+    "sessions_reported": true
+  }
+}

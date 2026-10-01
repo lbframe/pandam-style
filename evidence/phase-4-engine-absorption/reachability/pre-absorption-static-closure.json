@@ -1,0 +1,1857 @@
+{
+  "roots": [
+    "packages/@stylexjs/babel-plugin/src/index.js",
+    "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js",
+    "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+  ],
+  "reachableDonorModuleCount": 85,
+  "reachableDonorModules": [
+    "packages/@stylexjs/atoms/src/babel-transform.js",
+    "packages/@stylexjs/babel-plugin/src/index.js",
+    "packages/@stylexjs/babel-plugin/src/shared/common-types.js",
+    "packages/@stylexjs/babel-plugin/src/shared/hash.js",
+    "packages/@stylexjs/babel-plugin/src/shared/index.js",
+    "packages/@stylexjs/babel-plugin/src/shared/messages.js",
+    "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-ltr.js",
+    "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-rtl.js",
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js",
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/application-order.js",
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/basic-validation.js",
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js",
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js",
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/legacy-expand-shorthands.js",
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/property-specificity.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-consts-utils.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme-nested.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-defaultMarker.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts-nested.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars-nested.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-first-that-works.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-nested-utils.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-vars-utils.js",
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+    "packages/@stylexjs/babel-plugin/src/shared/types/index.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/dashify.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/file-based-identifier.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/convert-camel-case-values.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-fns.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-strings.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/font-size-px-to-rem.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/leading-zero.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/quotes.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/timings.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/whitespace.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/zero-dimensions.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/rule-utils.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/split-css-value.js",
+    "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js",
+    "packages/@stylexjs/babel-plugin/src/shared/when/when.js",
+    "packages/@stylexjs/babel-plugin/src/utils/add-sourcemap-data.js",
+    "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js",
+    "packages/@stylexjs/babel-plugin/src/utils/dev-classname.js",
+    "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js",
+    "packages/@stylexjs/babel-plugin/src/utils/evaluation-errors.js",
+    "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js",
+    "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+    "packages/@stylexjs/babel-plugin/src/utils/validate.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/imports.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-keyframes.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-merge.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+    "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js",
+    "packages/@stylexjs/shared/src/index.js",
+    "packages/@stylexjs/shared/src/utils/property-priorities.js",
+    "packages/@stylexjs/stylex/package.json",
+    "packages/@stylexjs/stylex/src/stylex.js",
+    "packages/@stylexjs/stylex/src/types/StyleXCSSTypes.js",
+    "packages/@stylexjs/stylex/src/types/StyleXOpaqueTypes.js",
+    "packages/@stylexjs/stylex/src/types/StyleXTypes.js",
+    "packages/@stylexjs/stylex/src/types/StyleXUtils.js",
+    "packages/@stylexjs/stylex/src/types/VarTypes.js"
+  ],
+  "importers": {
+    "packages/@stylexjs/babel-plugin/src/shared/common-types.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-ltr.js",
+      "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-rtl.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/application-order.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/legacy-expand-shorthands.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/property-specificity.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme-nested.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-defaultMarker.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts-nested.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars-nested.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/split-css-value.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js",
+      "packages/@stylexjs/babel-plugin/src/shared/when/when.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/hash.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-vars-utils.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-nested-utils.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/types/index.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-nested-utils.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-vars-utils.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-ltr.js",
+      "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-rtl.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-defaultMarker.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js",
+      "packages/@stylexjs/babel-plugin/src/shared/when/when.js",
+      "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/basic-validation.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/rule-utils.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/basic-validation.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/messages.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/basic-validation.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-fns.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-strings.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/rule-utils.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/dashify.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/convert-camel-case-values.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-ltr.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-rtl.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js"
+    ],
+    "packages/@stylexjs/shared/src/index.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js"
+    ],
+    "packages/@stylexjs/shared/src/utils/property-priorities.js": [
+      "packages/@stylexjs/shared/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/font-size-px-to-rem.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/leading-zero.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/quotes.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/timings.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/whitespace.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/zero-dimensions.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-fns.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-strings.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/convert-camel-case-values.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/application-order.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/legacy-expand-shorthands.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/property-specificity.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/split-css-value.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/legacy-expand-shorthands.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/index.js": [
+      "packages/@stylexjs/babel-plugin/src/utils/add-sourcemap-data.js",
+      "packages/@stylexjs/babel-plugin/src/utils/dev-classname.js",
+      "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js",
+      "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/utils/validate.js": [
+      "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js": [
+      "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-merge.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js"
+    ],
+    "packages/@stylexjs/stylex/package.json": [
+      "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js",
+      "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/utils/state-manager.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js",
+      "packages/@stylexjs/babel-plugin/src/utils/add-sourcemap-data.js",
+      "packages/@stylexjs/babel-plugin/src/utils/dev-classname.js",
+      "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/imports.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-keyframes.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-merge.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/utils/evaluation-errors.js": [
+      "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars-nested.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts-nested.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme-nested.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-first-that-works.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/utils/file-based-identifier.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars-nested.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts-nested.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme-nested.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/when/when.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-nested-utils.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme-nested.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts-nested.js",
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars-nested.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-consts-utils.js": [
+      "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/imports.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-keyframes.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-merge.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/atoms/src/babel-transform.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/utils/dev-classname.js": [
+      "packages/@stylexjs/babel-plugin/src/index.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js": [
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-defaultMarker.js": [
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js": [
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js"
+    ],
+    "packages/@stylexjs/stylex/src/stylex.js": [
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-merge.js",
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js"
+    ],
+    "packages/@stylexjs/stylex/src/types/StyleXTypes.js": [
+      "packages/@stylexjs/stylex/src/stylex.js"
+    ],
+    "packages/@stylexjs/stylex/src/types/StyleXUtils.js": [
+      "packages/@stylexjs/stylex/src/stylex.js",
+      "packages/@stylexjs/stylex/src/types/VarTypes.js"
+    ],
+    "packages/@stylexjs/stylex/src/types/VarTypes.js": [
+      "packages/@stylexjs/stylex/src/stylex.js",
+      "packages/@stylexjs/stylex/src/types/StyleXTypes.js"
+    ],
+    "packages/@stylexjs/stylex/src/types/StyleXCSSTypes.js": [
+      "packages/@stylexjs/stylex/src/types/StyleXTypes.js"
+    ],
+    "packages/@stylexjs/stylex/src/types/StyleXOpaqueTypes.js": [
+      "packages/@stylexjs/stylex/src/types/StyleXTypes.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/utils/add-sourcemap-data.js": [
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js"
+    ],
+    "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js": [
+      "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js"
+    ]
+  },
+  "donorEdges": [
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "specifier": "./hash",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/hash.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "specifier": "./stylex-vars-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-vars-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "specifier": "./types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/types/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js",
+      "specifier": "./utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-vars-utils.js",
+      "specifier": "./types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/types/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "specifier": "./stylex-vars-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-vars-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "specifier": "./types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/types/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "specifier": "./hash",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/hash.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "specifier": "./utils/object-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js",
+      "specifier": "./utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "specifier": "./preprocess-rules/PreRule",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "specifier": "./hash",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/hash.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "specifier": "./utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "specifier": "./preprocess-rules/flatten-raw-style-obj",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js",
+      "specifier": "./preprocess-rules/basic-validation",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/basic-validation.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/basic-validation.js",
+      "specifier": "../messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/basic-validation.js",
+      "specifier": "../utils/object-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js",
+      "specifier": "./index",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js",
+      "specifier": "../messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/flatten-raw-style-obj.js",
+      "specifier": "./PreRule",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js",
+      "specifier": "../utils/convert-to-className",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js",
+      "specifier": "../utils/object-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/PreRule.js",
+      "specifier": "../utils/rule-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/rule-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/rule-utils.js",
+      "specifier": "./object-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "specifier": "../hash",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/hash.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "specifier": "./dashify",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/dashify.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "specifier": "./transform-value",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "specifier": "./generate-css-rule",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "specifier": "./default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "specifier": "../messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/convert-to-className.js",
+      "specifier": "./rule-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/rule-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js",
+      "specifier": "./default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js",
+      "specifier": "../physical-rtl/generate-ltr",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-ltr.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js",
+      "specifier": "../physical-rtl/generate-rtl",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-rtl.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js",
+      "specifier": "@stylexjs/shared",
+      "to": "packages/@stylexjs/shared/src/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/shared/src/index.js",
+      "specifier": "./utils/property-priorities",
+      "to": "packages/@stylexjs/shared/src/utils/property-priorities.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-rtl.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-rtl.js",
+      "specifier": "../utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-ltr.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-ltr.js",
+      "specifier": "../utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js",
+      "specifier": "./normalize-value",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "./normalizers/font-size-px-to-rem",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/font-size-px-to-rem.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "./normalizers/leading-zero",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/leading-zero.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "./normalizers/quotes",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/quotes.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "./normalizers/timings",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/timings.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "./normalizers/whitespace",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/whitespace.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "./normalizers/zero-dimensions",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/zero-dimensions.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "./normalizers/detect-unclosed-fns",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-fns.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "./normalizers/detect-unclosed-strings",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-strings.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js",
+      "specifier": "./normalizers/convert-camel-case-values",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/convert-camel-case-values.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/convert-camel-case-values.js",
+      "specifier": "../dashify",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/dashify.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-strings.js",
+      "specifier": "../../messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-fns.js",
+      "specifier": "../../messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js",
+      "specifier": "./application-order",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/application-order.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js",
+      "specifier": "./legacy-expand-shorthands",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/legacy-expand-shorthands.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js",
+      "specifier": "./property-specificity",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/property-specificity.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/property-specificity.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/legacy-expand-shorthands.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/legacy-expand-shorthands.js",
+      "specifier": "../utils/split-css-value",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/split-css-value.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/split-css-value.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/application-order.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "specifier": "./validate",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/validate.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "specifier": "./evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "specifier": "@stylexjs/stylex/package.json",
+      "to": "packages/@stylexjs/stylex/package.json"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "specifier": "./ast-helpers",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js",
+      "specifier": "../shared/utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js",
+      "specifier": "./state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js",
+      "specifier": "./evaluation-errors",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluation-errors.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-create",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-define-vars",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-define-consts",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-create-theme",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-keyframes",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-position-try",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-first-that-works",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-first-that-works.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./hash",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/hash.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./utils/file-based-identifier",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/file-based-identifier.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-define-vars-nested",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars-nested.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-define-consts-nested",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts-nested.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./stylex-create-theme-nested",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme-nested.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "@stylexjs/shared",
+      "to": "packages/@stylexjs/shared/src/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/types/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/index.js",
+      "specifier": "./when/when",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/when/when.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/when/when.js",
+      "specifier": "../common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/when/when.js",
+      "specifier": "../utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme-nested.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme-nested.js",
+      "specifier": "./stylex-nested-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-nested-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme-nested.js",
+      "specifier": "./stylex-create-theme",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-nested-utils.js",
+      "specifier": "./stylex-vars-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-vars-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-nested-utils.js",
+      "specifier": "./types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/types/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts-nested.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts-nested.js",
+      "specifier": "./stylex-nested-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-nested-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts-nested.js",
+      "specifier": "./stylex-define-consts",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js",
+      "specifier": "./stylex-consts-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-consts-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js",
+      "specifier": "./utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-consts.js",
+      "specifier": "./hash",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/hash.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars-nested.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars-nested.js",
+      "specifier": "./stylex-nested-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-nested-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars-nested.js",
+      "specifier": "./stylex-define-vars",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "specifier": "./hash",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/hash.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "specifier": "./preprocess-rules/index",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "specifier": "./physical-rtl/generate-ltr",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-ltr.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "specifier": "./physical-rtl/generate-rtl",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-rtl.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "specifier": "./utils/transform-value",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "specifier": "./utils/dashify",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/dashify.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "specifier": "./utils/object-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js",
+      "specifier": "./utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "specifier": "./hash",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/hash.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "specifier": "./preprocess-rules/index",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "specifier": "./physical-rtl/generate-ltr",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-ltr.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "specifier": "./physical-rtl/generate-rtl",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/physical-rtl/generate-rtl.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "specifier": "./utils/transform-value",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "specifier": "./utils/dashify",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/dashify.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "specifier": "./utils/object-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-keyframes.js",
+      "specifier": "./utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/imports",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/imports.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-create",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-create-theme",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-define-vars",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-define-consts",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-keyframes",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-keyframes.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-position-try",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-merge",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-merge.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-props",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-view-transition-class",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-default-marker",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./shared/preprocess-rules/legacy-expand-shorthands",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/legacy-expand-shorthands.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-define-marker",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-define-vars-nested",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-define-consts-nested",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./visitors/stylex-create-theme-nested",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "@stylexjs/atoms/babel-transform",
+      "to": "packages/@stylexjs/atoms/src/babel-transform.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./shared/stylex-create",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-create.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./utils/ast-helpers",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/index.js",
+      "specifier": "./utils/dev-classname",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/dev-classname.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/dev-classname.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/dev-classname.js",
+      "specifier": "./state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme-nested.js",
+      "specifier": "./visitor-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js",
+      "specifier": "../utils/ast-helpers",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts-nested.js",
+      "specifier": "./visitor-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars-nested.js",
+      "specifier": "./visitor-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/visitor-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "specifier": "../shared/messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-marker.js",
+      "specifier": "../utils/ast-helpers",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js",
+      "specifier": "../shared/messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js",
+      "specifier": "../shared/stylex-defaultMarker",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-defaultMarker.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-default-marker.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-defaultMarker.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-defaultMarker.js",
+      "specifier": "./utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+      "specifier": "../shared/messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+      "specifier": "../shared/stylex-view-transition-class",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-view-transition-class.js",
+      "specifier": "../shared/common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "specifier": "./common-types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/common-types.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "specifier": "./hash",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/hash.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "specifier": "./preprocess-rules/index",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "specifier": "./utils/object-utils",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "specifier": "./utils/default-options",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "specifier": "./utils/transform-value",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/shared/stylex-view-transition-class.js",
+      "specifier": "./utils/dashify",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/dashify.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+      "specifier": "@stylexjs/stylex",
+      "to": "packages/@stylexjs/stylex/src/stylex.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+      "specifier": "../shared/stylex-defaultMarker",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-defaultMarker.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-props.js",
+      "specifier": "../utils/ast-helpers",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js"
+    },
+    {
+      "from": "packages/@stylexjs/stylex/src/stylex.js",
+      "specifier": "./types/StyleXTypes",
+      "to": "packages/@stylexjs/stylex/src/types/StyleXTypes.js"
+    },
+    {
+      "from": "packages/@stylexjs/stylex/src/stylex.js",
+      "specifier": "./types/StyleXUtils",
+      "to": "packages/@stylexjs/stylex/src/types/StyleXUtils.js"
+    },
+    {
+      "from": "packages/@stylexjs/stylex/src/stylex.js",
+      "specifier": "./types/VarTypes",
+      "to": "packages/@stylexjs/stylex/src/types/VarTypes.js"
+    },
+    {
+      "from": "packages/@stylexjs/stylex/src/types/VarTypes.js",
+      "specifier": "./StyleXUtils",
+      "to": "packages/@stylexjs/stylex/src/types/StyleXUtils.js"
+    },
+    {
+      "from": "packages/@stylexjs/stylex/src/types/StyleXTypes.js",
+      "specifier": "./StyleXCSSTypes",
+      "to": "packages/@stylexjs/stylex/src/types/StyleXCSSTypes.js"
+    },
+    {
+      "from": "packages/@stylexjs/stylex/src/types/StyleXTypes.js",
+      "specifier": "./StyleXOpaqueTypes",
+      "to": "packages/@stylexjs/stylex/src/types/StyleXOpaqueTypes.js"
+    },
+    {
+      "from": "packages/@stylexjs/stylex/src/types/StyleXTypes.js",
+      "specifier": "./VarTypes",
+      "to": "packages/@stylexjs/stylex/src/types/VarTypes.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-merge.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-merge.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-merge.js",
+      "specifier": "@stylexjs/stylex",
+      "to": "packages/@stylexjs/stylex/src/stylex.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+      "specifier": "../shared/stylex-position-try",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-position-try.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-position-try.js",
+      "specifier": "../shared/messages",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/messages.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-keyframes.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-keyframes.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-keyframes.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-consts.js",
+      "specifier": "../utils/ast-helpers",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "specifier": "../shared/types",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/types/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-define-vars.js",
+      "specifier": "../utils/ast-helpers",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create-theme.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "../shared/stylex-defaultMarker",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/stylex-defaultMarker.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "../utils/add-sourcemap-data",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/add-sourcemap-data.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "../utils/dev-classname",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/dev-classname.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "../utils/js-to-ast",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/js-to-ast.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "./parse-stylex-create-arg",
+      "to": "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "../shared/preprocess-rules",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/stylex-create.js",
+      "specifier": "../utils/ast-helpers",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js",
+      "specifier": "../utils/evaluate-path",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/evaluate-path.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/parse-stylex-create-arg.js",
+      "specifier": "../shared/utils/transform-value",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/utils/transform-value.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/add-sourcemap-data.js",
+      "specifier": "../shared",
+      "to": "packages/@stylexjs/babel-plugin/src/shared/index.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/utils/add-sourcemap-data.js",
+      "specifier": "./state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/imports.js",
+      "specifier": "../utils/state-manager",
+      "to": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    }
+  ],
+  "external": [
+    {
+      "specifier": "@babel/core",
+      "from": "packages/@stylexjs/babel-plugin/src/index.js"
+    },
+    {
+      "specifier": "@babel/helper-module-imports",
+      "from": "packages/@stylexjs/babel-plugin/src/utils/ast-helpers.js"
+    },
+    {
+      "specifier": "@babel/traverse",
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/imports.js"
+    },
+    {
+      "specifier": "@babel/types",
+      "from": "packages/@stylexjs/babel-plugin/src/visitors/imports.js"
+    },
+    {
+      "specifier": "@dual-bundle/import-meta-resolve",
+      "from": "packages/@stylexjs/babel-plugin/src/utils/state-manager.js"
+    },
+    {
+      "specifier": "postcss-value-parser",
+      "from": "packages/@stylexjs/babel-plugin/src/shared/utils/split-css-value.js"
+    },
+    {
+      "specifier": "styleq",
+      "from": "packages/@stylexjs/stylex/src/stylex.js"
+    }
+  ],
+  "unresolved": [],
+  "parseErrors": [
+    {
+      "file": "packages/@stylexjs/stylex/package.json",
+      "message": "/home/kyle/work/pandam-style/packages/@stylexjs/stylex/package.json: ';' expected (2:8)"
+    }
+  ],
+  "groupCounts": {
+    "packages/@stylexjs/atoms/src": 1,
+    "packages/@stylexjs/babel-plugin/src": 75,
+    "packages/@stylexjs/shared/src": 2,
+    "packages/@stylexjs/stylex/package.json": 1,
+    "packages/@stylexjs/stylex/src": 6
+  }
+}
