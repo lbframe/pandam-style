@@ -32,6 +32,21 @@ function resolveConfig(config = {}) {
   };
 }
 
+function resolveMutationPaths(mutation, rootDir) {
+  const resolvePath = (file) =>
+    path.isAbsolute(file) ? file : path.resolve(rootDir, file);
+  return {
+    ...mutation,
+    changed: mutation.changed.map(resolvePath),
+    added: mutation.added.map(resolvePath),
+    removed: mutation.removed.map(resolvePath),
+    renamed: mutation.renamed.map(({ from, to }) => ({
+      from: resolvePath(from),
+      to: resolvePath(to),
+    })),
+  };
+}
+
 function lifecycleError(code, message, context = {}) {
   return new PmsError([
     diagnostic({
@@ -159,7 +174,10 @@ export function createProjectSession(config) {
       );
     }
     requireRevision(transaction?.baseRevision, 'applyChanges()');
-    const mutation = normalizeMutationTransaction(transaction);
+    const mutation = resolveMutationPaths(
+      normalizeMutationTransaction(transaction),
+      normalized.rootDir,
+    );
     const value = implementation.applyChanges({
       mutation,
       definition: transaction?.definition,

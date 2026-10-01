@@ -7,6 +7,7 @@
 
 'use strict';
 
+const fs = require('fs');
 const { openProject } = require('./session-helpers');
 
 describe('stable project SDK lifecycle', () => {
@@ -82,6 +83,74 @@ describe('stable project SDK lifecycle', () => {
       await expect(project.commitPrepared(ticket)).rejects.toThrow(/stale/);
     } finally {
       await project.close();
+    }
+  });
+
+  test('separate project sessions keep identities and artifacts isolated', async () => {
+    const leftFixture = openProject('valid');
+    const rightFixture = openProject('valid');
+    const left = leftFixture.openPublicSession();
+    const right = rightFixture.openPublicSession();
+
+    try {
+      const leftInitial = await left.initialize();
+      const rightInitial = await right.initialize();
+      expect(leftInitial.revision.projectId).toBe(leftFixture.project);
+      expect(rightInitial.revision.projectId).toBe(rightFixture.project);
+      expect(leftInitial.revision.projectId).not.toBe(
+        rightInitial.revision.projectId,
+      );
+      expect(leftInitial.revision.sessionId).not.toBe(
+        rightInitial.revision.sessionId,
+      );
+
+      const leftValidated = await left.validate(leftInitial.revision);
+      const rightValidated = await right.validate(rightInitial.revision);
+      const rightArtifactBefore = await right.readArtifact(
+        rightValidated.revision,
+        'src/page.js',
+      );
+
+      await expect(left.agentResult(rightValidated.revision)).rejects.toThrow(
+        /exact current project\/session\/revision identity/,
+      );
+
+      const page = leftFixture.src('src/page.js');
+      const original = fs.readFileSync(page, 'utf8');
+      const changed = original.replace(
+        "gap: token('spacing.sm'),",
+        "gap: token('spacing.xl'),",
+      );
+      expect(changed).not.toBe(original);
+      fs.writeFileSync(page, changed, 'utf8');
+
+      const next = await left.applyChanges({
+        baseRevision: leftValidated.revision,
+        mode: 'verified-explicit',
+        changed: ['src/page.js'],
+        added: [],
+        removed: [],
+        renamed: [],
+      });
+      const leftAfterChange = await left.validate(next.revision);
+      expect(leftAfterChange.ok).toBe(true);
+      const leftArtifactAfter = await left.readArtifact(
+        leftAfterChange.revision,
+        'src/page.js',
+      );
+      const rightArtifactAfter = await right.readArtifact(
+        rightValidated.revision,
+        'src/page.js',
+      );
+
+      expect(leftArtifactAfter.javascript).not.toBe(
+        rightArtifactBefore.javascript,
+      );
+      expect(rightArtifactAfter).toEqual(rightArtifactBefore);
+      expect((await right.current()).revision).toEqual(rightValidated.revision);
+    } finally {
+      await left.close();
+      await right.close();
     }
   });
 });
