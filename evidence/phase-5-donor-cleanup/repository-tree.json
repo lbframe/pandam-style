@@ -1,0 +1,86 @@
+{
+  "documentKind": "pandamstyle-phase-5-repository-tree-proof",
+  "schemaVersion": 1,
+  "testedCommit": "cf2a1403ed6e651fdc23c950a40b4d639c504ef5",
+  "testedTree": "aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478",
+  "proofMethod": "git ls-tree against the exact tested commit, cross-checked by the structured donor-closure report",
+  "forbiddenPaths": [
+    {
+      "path": "packages/@stylexjs",
+      "exists": false
+    },
+    {
+      "path": "packages/style-value-parser",
+      "exists": false
+    },
+    {
+      "path": "upstream/stylex",
+      "exists": false
+    },
+    {
+      "path": "upstream/panda",
+      "exists": false
+    },
+    {
+      "path": "legacy",
+      "exists": false
+    },
+    {
+      "path": "archive",
+      "exists": false
+    },
+    {
+      "path": "vendor",
+      "exists": false
+    },
+    {
+      "path": "old-stylex",
+      "exists": false
+    },
+    {
+      "path": "stylex-reference",
+      "exists": false
+    },
+    {
+      "path": "panda-reference",
+      "exists": false
+    },
+    {
+      "path": "reference-copy",
+      "exists": false
+    },
+    {
+      "path": "vendor-history",
+      "exists": false
+    },
+    {
+      "path": "donor-backup",
+      "exists": false
+    }
+  ],
+  "forbiddenPathCount": 13,
+  "forbiddenPathsAbsent": true,
+  "rootWorkspaceName": "pandamstyle-workspace",
+  "rootWorkspaceEntries": [
+    "packages/core",
+    "packages/compiler"
+  ],
+  "publicPackageDirectories": [
+    {
+      "path": "packages/core",
+      "name": "@pandamstyle/core"
+    },
+    {
+      "path": "packages/compiler",
+      "name": "@pandamstyle/compiler"
+    }
+  ],
+  "publicPackages": [
+    "@pandamstyle/core",
+    "@pandamstyle/compiler"
+  ],
+  "unimplementedTargetPackages": [
+    "@pandamstyle/vite",
+    "@pandamstyle/next"
+  ]
+}

@@ -1,0 +1,296 @@
+PandamStyle native verification
+  repo root      : /tmp/pandamstyle-phase5-tested
+  tested commit  : cf2a1403ed6e651fdc23c950a40b4d639c504ef5
+  tested tree    : aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478
+  branch         : HEAD
+  working tree   : clean (as found, before this run wrote anything)
+  batch base ref : 44bbdb4c323cfaae9abc69f524d4fc8b5ceb4133
+  batch base     : 44bbdb4c323cfaae9abc69f524d4fc8b5ceb4133
+  out dir        : /tmp/pandamstyle-phase5-tested/evidence/phase-5-donor-cleanup/verify
+
+== install ==
+$ env NODE_OPTIONS= yarn install --frozen-lockfile --non-interactive
+yarn install v1.22.22
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+[3/4] Linking dependencies...
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+warning Workspaces can only be enabled in private projects.
+[4/4] Building fresh packages...
+$ husky install tools/husky
+husky - Git hooks installed
+Done in 24.83s.
+   ok (exit 0)
+== build ==
+$ build_delivered_packages
+
+./src/api/cli.js → ./lib/cli.mjs...
+created ./lib/cli.mjs in 1.4s
+
+./src/api/index.js → ./lib/index.mjs...
+created ./lib/index.mjs in 871ms
+
+./src/api/config.js → ./lib/config.mjs...
+created ./lib/config.mjs in 10ms
+
+./src/api/host.js → ./lib/host.mjs...
+created ./lib/host.mjs in 7ms
+
+../../tests/support/compiler-inspection.js → ../../.pms-test-support/compiler-inspection.cjs...
+created ../../.pms-test-support/compiler-inspection.cjs in 796ms
+   ok (exit 0)
+== pandamstyle ==
+$ /tmp/pandamstyle-phase5-tested/node_modules/.bin/jest --config /tmp/pandamstyle-phase5-tested/jest.config.js --ci --runInBand /tmp/pandamstyle-phase5-tested/packages/compiler/__tests__/pandamstyle /tmp/pandamstyle-phase5-tested/packages/compiler/__tests__/engine-absorption-test.js
+PASS packages/compiler/__tests__/pandamstyle/phase-d-agent-loop-test.js (18.537 s)
+  ● Console
+
+    console.log
+      LONG-SESSION {"first":{"revision":0,"nodes":14,"covered":14,"forward":9,"reverse":8,"support":14,"fileStates":14,"dsConsumers":6,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":276004864},"last":{"revision":1000,"nodes":14,"covered":14,"forward":9,"reverse":8,"support":14,"fileStates":14,"dsConsumers":6,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":359698432},"samples":11}
+
+      at Object.log (packages/compiler/__tests__/pandamstyle/phase-d-agent-loop-test.js:385:13)
+
+PASS packages/compiler/__tests__/pandamstyle/negative-builds-test.js (9.795 s)
+PASS packages/compiler/__tests__/pandamstyle/incremental-session-test.js (5.388 s)
+PASS packages/compiler/__tests__/pandamstyle/agent-result-test.js (8.699 s)
+PASS packages/compiler/__tests__/pandamstyle/vite-build-test.js (8.338 s)
+PASS packages/compiler/__tests__/pandamstyle/transactional-generation-test.js (10.349 s)
+PASS packages/compiler/__tests__/pandamstyle/forwarding-semantics-test.js
+PASS packages/compiler/__tests__/pandamstyle/coverage-graph-test.js
+PASS packages/compiler/__tests__/pandamstyle/agent-dirty-input-test.js
+PASS packages/compiler/__tests__/pandamstyle/incremental-publication-test.js
+PASS packages/compiler/__tests__/pandamstyle/provenance-props-test.js
+PASS packages/compiler/__tests__/pandamstyle/runner-status-test.js
+PASS packages/compiler/__tests__/pandamstyle/incremental-css-test.js
+PASS packages/compiler/__tests__/pandamstyle/incremental-coverage-closure-test.js (5.271 s)
+PASS packages/compiler/__tests__/pandamstyle/design-system-view-test.js
+PASS packages/compiler/__tests__/pandamstyle/staleness-test.js
+PASS packages/compiler/__tests__/pandamstyle/watcher-provider-test.js
+PASS packages/compiler/__tests__/pandamstyle/native-compile-test.js
+PASS packages/compiler/__tests__/pandamstyle/project-api-test.js
+PASS packages/compiler/__tests__/pandamstyle/recipe-contract-test.js
+PASS packages/compiler/__tests__/engine-absorption-test.js
+PASS packages/compiler/__tests__/pandamstyle/chain-test.js
+PASS packages/compiler/__tests__/pandamstyle/artifacts-test.js
+
+Test Suites: 23 passed, 23 total
+Tests:       510 passed, 510 total
+Snapshots:   0 total
+Time:        98.446 s, estimated 123 s
+Ran all test suites matching /tmp/pandamstyle-phase5-tested/packages/compiler/__tests__/pandamstyle|/tmp/pandamstyle-phase5-tested/packages/compiler/__tests__/engine-absorption-test.js.
+   ok (exit 0)
+== pandamstyle-core ==
+$ /tmp/pandamstyle-phase5-tested/node_modules/.bin/jest --config /tmp/pandamstyle-phase5-tested/jest.config.js --ci --runInBand --runTestsByPath /tmp/pandamstyle-phase5-tested/packages/core/__tests__/core-test.js
+PASS packages/core/__tests__/core-test.js
+  @pandamstyle/core ABI v1
+    ✓ assertAbi accepts v1 and rejects unsupported versions structurally (2 ms)
+    ✓ empty composition and false/null/undefined omissions return no classes (1 ms)
+    ✓ nested refs flatten left to right and the last conflict wins (1 ms)
+    ✓ tombstones cancel an earlier key and duplicate classes keep their last position
+    ✓ themes replace the same variable group while styles remain independent (1 ms)
+    ✓ cross-system composition and malformed runtime sources fail closed (11 ms)
+    ✓ unsupported reference ABI fails with PMS_ABI_MISMATCH (1 ms)
+    ✓ cyclic nested input arrays are rejected deterministically
+  finite generated recipe selectors
+    ✓ returns one StyleRef with base and selected branches in axis order (1 ms)
+    ✓ undefined uses defaults, absent defaults add no branch, and false is a value (1 ms)
+    ✓ selection helpers expose readonly metadata and split declared axes (1 ms)
+    ✓ unknown axes/values and explicit null fail with structured errors (1 ms)
+    ✓ numeric scalar values retain baseline coercion to finite string keys (1 ms)
+    ✓ malformed recipe data and cross-system branches are rejected at factory time (3 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       14 passed, 14 total
+Snapshots:   0 total
+Time:        0.373 s, estimated 1 s
+Ran all test suites within paths "/tmp/pandamstyle-phase5-tested/packages/core/__tests__/core-test.js".
+   ok (exit 0)
+== semantic-oracle ==
+$ node /tmp/pandamstyle-phase5-tested/tools/semantic-oracle/run.js /tmp/pandamstyle-phase5-tested/evidence/phase-5-donor-cleanup/verify/semantic-oracle
+PASS tests/semantic/__tests__/browser-test.js (15.118 s)
+PASS tests/semantic/__tests__/recipes-test.js (9.697 s)
+PASS tests/semantic/__tests__/props-test.js (9.106 s)
+PASS tests/semantic/__tests__/forwarding-test.js (9.083 s)
+PASS tests/semantic/__tests__/tokens-test.js (6.932 s)
+PASS tests/semantic/__tests__/create-test.js (6.45 s)
+PASS tests/semantic/__tests__/conditions-test.js (5.366 s)
+PASS tests/semantic/__tests__/themes-test.js (5.31 s)
+PASS tests/semantic/__tests__/incremental-css-test.js
+PASS tests/semantic/__tests__/coverage-test.js
+PASS tests/semantic/__tests__/revisions-test.js
+PASS tests/semantic/__tests__/publication-test.js
+PASS tests/semantic/__tests__/module-resolution-test.js
+PASS tests/semantic/__tests__/multi-revision-test.js
+PASS tests/semantic/__tests__/provenance-test.js
+PASS tests/semantic/__tests__/negative-resolution-test.js
+PASS tests/semantic/__tests__/diagnostics-test.js
+PASS tests/semantic/__tests__/syntax-test.js
+PASS tests/semantic/__tests__/harness-integrity-test.js
+PASS tests/semantic/__tests__/deferred-test.js
+
+Test Suites: 20 passed, 20 total
+Tests:       148 passed, 148 total
+Snapshots:   0 total
+Time:        90.092 s, estimated 95 s
+Ran all test suites.
+Test results written to: evidence/phase-5-donor-cleanup/verify/semantic-oracle/semantic-jest-results.json
+   ok (exit 0)
+== tooling-tests ==
+$ node /tmp/pandamstyle-phase5-tested/tools/pms/run-tooling-tests.js /tmp/pandamstyle-phase5-tested/evidence/phase-5-donor-cleanup/verify
+PASS tools/pms/__tests__/tooling-verification-test.js (12.045 s)
+PASS tools/pms/__tests__/jest-config-test.js
+PASS tools/pms/__tests__/step-contracts-test.js
+PASS tools/pms/__tests__/semantic-verification-test.js
+PASS tools/pms/__tests__/test-counts-test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       81 passed, 81 total
+Snapshots:   0 total
+Time:        13.37 s, estimated 14 s
+Ran all test suites matching tools/pms/__tests__.
+Test results written to: evidence/phase-5-donor-cleanup/verify/tooling-jest-results.json
+   ok (exit 0)
+== pilot ==
+$ bash /tmp/pandamstyle-phase5-tested/tools/pilot/run-pilot.sh /tmp/pandamstyle-pilot-cf2a1403ed6e651fdc23c950a40b4d639c504ef5-3746997
+== 1/6 pack the PandamStyle compiler and core ==
+packed pandamstyle-compiler-0.1.0.tgz
+packed pandamstyle-core-0.1.0.tgz
+== 2/6 verify the tarball contents and exports ==
+--- pandamstyle-compiler-0.1.0.tgz
+    package/bin/pms-build.js
+    package/lib/cli.mjs
+    package/lib/config.mjs
+    package/lib/host.mjs
+    package/lib/index.mjs
+    package/package.json
+    package/types/config.d.ts
+    package/types/host.d.ts
+    package/types/index.d.ts
+--- pandamstyle-core-0.1.0.tgz
+    package/package.json
+    package/src/abi.js
+    package/src/index.js
+    package/src/props.js
+    package/src/recipe-select.js
+    package/src/recipe.js
+    package/src/selection-error.js
+    package/src/types.ts
+packed exports ok: ., ./config, ./host, ./package.json
+== 3/6 copy the pilot app outside the workspace ==
+== 4/6 install the packed tarballs into the app ==
+dependencies pinned to local tarballs
+
+added 85 packages in 3s
+== build the private Phase 4 Vite qualification seam ==
+
+/tmp/pandamstyle-phase5-tested/tools/pilot/vite-seam.js → ../../pandamstyle-phase5-tested/.pms-test-support/vite-seam.mjs...
+created ../../pandamstyle-phase5-tested/.pms-test-support/vite-seam.mjs in 1.4s
+== 5/6 prove the app resolves the INSTALLED package, not the sources ==
+resolved tarball at: /tmp/pandamstyle-pilot-cf2a1403ed6e651fdc23c950a40b4d639c504ef5-3746997/app/node_modules/@pandamstyle/compiler
+version: 0.1.0
+resolved packed core at: /tmp/pandamstyle-pilot-cf2a1403ed6e651fdc23c950a40b4d639c504ef5-3746997/app/node_modules/@pandamstyle/core
+installed compiler SDK and core subpath imports successfully
+== 6/6 run the real Vite production build ==
+
+== pilot artifacts ==
+  /tmp/pandamstyle-pilot-cf2a1403ed6e651fdc23c950a40b4d639c504ef5-3746997/app/dist/assets/index-Ch9eZn3x.css
+  /tmp/pandamstyle-pilot-cf2a1403ed6e651fdc23c950a40b4d639c504ef5-3746997/app/dist/assets/index-D-FNvVFO.js
+  /tmp/pandamstyle-pilot-cf2a1403ed6e651fdc23c950a40b4d639c504ef5-3746997/app/dist/index.html
+  /tmp/pandamstyle-pilot-cf2a1403ed6e651fdc23c950a40b4d639c504ef5-3746997/app/dist/pandamstyle.css
+
+== extracted PandamStyle stylesheet (head) ==
+:root, .x1l4zqxa{--x1fv6ce:0;--x1aadcii:8px;--x13fe11z:16px;--xjjlyln:24px;--x1amw00r:8px;--xhcaqmv:16px;--x5i1nq6:#0b1120;--x1f01h7p:#e2e8f0;--x19xuu6u:#4f46e5;--x15974ic:#4338ca;--xnj5jc6:#e2e8f0;--x7xs9y3:#0b1120;--x3kn7hp:#e2e8f0;--xae11qa:#4f46e5;--x1mhybtg:#4338ca;--xefbuix:system-ui, sans-serif;--x1rwe26f:14px;--xcikt3x:16px;--x1r9hq20:700;--x31p3ob:1.5;--xwcyf10:0 1px 3px rgba(11,17,32,0.12);--x1iqgym4:120ms;--x1gg224o:ease-in-out;}
+.x1s95fkv.x1s95fkv, .x1s95fkv.x1s95fkv:root{--xnj5jc6:#0b1120;--x7xs9y3:#e2e8f0;}
+.x1h360yn:not(#\#){padding:var(--x13fe11z)}
+.xr3lqr2:not(#\#){padding:var(--x1aadcii)}
+.x1q2psia:not(#\#){padding:var(--xjjlyln)}
+@media (min-width: 768px){.x115uys8.x115uys8:not(#\#){padding:var(--xjjlyln)}}
+.x1jz6qqi:not(#\#):not(#\#){border-radius:var(--x1amw00r)}
+.xwdtlqu:not(#\#):not(#\#){border-radius:var(--xhcaqmv)}
+.x12xt4yv:not(#\#):not(#\#){gap:var(--x1aadcii)}
+.x6s0dn4:not(#\#):not(#\#):not(#\#){align-items:center}
+.x11icek9:not(#\#):not(#\#):not(#\#){background-color:var(--xae11qa)}
+.x1jmjebl:not(#\#):not(#\#):not(#\#){background-color:var(--xnj5jc6)}
+.x1dvffy4:not(#\#):not(#\#):not(#\#){box-shadow:var(--xwcyf10)}
+.x11jb0vl:not(#\#):not(#\#):not(#\#){co
+PILOT OK
+   ok (exit 0)
+== artifacts ==
+$ collect_artifacts
+{
+  "package": "@pandamstyle/core",
+  "version": "0.1.0",
+  "tarball": "evidence/phase-5-donor-cleanup/verify/core-package-proof/tarball/pandamstyle-core-0.1.0.tgz",
+  "tarballBytes": 5251,
+  "installedPath": "/tmp/pandamstyle-core-consumer-p8QF02/node_modules/@pandamstyle/core/src/index.js",
+  "fixturePath": "/tmp/pandamstyle-core-consumer-p8QF02",
+  "workspaceLeakage": false,
+  "exports": [
+    ".",
+    "./package.json"
+  ],
+  "runtimeDependencies": {},
+  "dependencyGraph": [
+    "@pandamstyle/core"
+  ],
+  "stylexDependencyCount": 0,
+  "pandacssDependencyCount": 0,
+  "nodeBuiltinImports": [],
+  "donorRuntimeImports": [],
+  "runtimeChecks": {
+    "composition": "passed",
+    "recipeSelection": "passed",
+    "malformedRefCode": "PMS_UNVERIFIED_PROPS_SOURCE",
+    "unsupportedAbiCode": "PMS_ABI_MISMATCH"
+  },
+  "benchmark": {
+    "singleStyleRef": {
+      "iterations": 10000,
+      "elapsedMs": 17.702
+    },
+    "multipleStyleRefs": {
+      "iterations": 10000,
+      "elapsedMs": 22.465
+    },
+    "recipeSelection": {
+      "iterations": 10000,
+      "elapsedMs": 17.634
+    },
+    "largeRepeatedComposition": {
+      "iterations": 1000,
+      "elapsedMs": 25.264
+    }
+  }
+}
+pandamstyle build ok registryDigest=1d58021beceabbd4 files=10 cssBytes=2495
+   ok (exit 0)
+== donor-closure ==
+$ node /tmp/pandamstyle-phase5-tested/tools/pms/donor-closure.js /tmp/pandamstyle-phase5-tested /tmp/pandamstyle-pilot-cf2a1403ed6e651fdc23c950a40b4d639c504ef5-3746997 /tmp/pandamstyle-phase5-tested/evidence/phase-5-donor-cleanup/verify/artifacts/valid-fixture-generation /tmp/pandamstyle-phase5-tested/evidence/phase-5-donor-cleanup/verify/donor-closure/report.json
+donor closure: PASS (0 findings)
+   ok (exit 0)
+step install: passed (exit 0)
+step build: passed (exit 0)
+step pandamstyle: passed (exit 0)
+step pandamstyle-core: passed (exit 0)
+step semantic-oracle: passed (exit 0)
+step tooling-tests: passed (exit 0)
+step pilot: passed (exit 0)
+step artifacts: passed (exit 0)
+step donor-closure: passed (exit 0)
+
+run directory: /tmp/pandamstyle-phase5-tested/evidence/phase-5-donor-cleanup/verify
+tests:  753 passed, 0 failed, 0 skipped
+suites: 49 passed, 0 failed, 0 skipped
+verification verdict: verified
+  install: passed, command, verified
+  build: passed, command, verified
+  pandamstyle: passed, test, verified
+  pandamstyle-core: passed, test, verified
+  semantic-oracle: passed, test, verified
+  tooling-tests: passed, test, verified
+  pilot: passed, pilot, verified
+  artifacts: passed, artifact-check, verified
+  donor-closure: passed, artifact-check, verified
+VERIFICATION OK

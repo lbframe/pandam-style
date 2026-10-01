@@ -1,0 +1,2277 @@
+{
+  "id": "revision.no-change",
+  "area": "revisions",
+  "status": "MUST_PRESERVE",
+  "gapId": null,
+  "fresh": {
+    "applicable": true
+  },
+  "incremental": {
+    "applicable": true
+  },
+  "freshMatchesExpected": true,
+  "incrementalMatchesExpected": true,
+  "freshMatchesIncremental": true,
+  "revisions": [
+    {
+      "revision": 1,
+      "label": "initial",
+      "fresh": {
+        "accepted": true,
+        "codes": [],
+        "diagnostics": [],
+        "rules": [
+          {
+            "selector": ":root, .base|light",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.ink)",
+                "#112233"
+              ],
+              [
+                "token(colors.paper)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.surface)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.text)",
+                "#112233"
+              ],
+              [
+                "token(spacing.lg)",
+                "24px"
+              ],
+              [
+                "token(spacing.md)",
+                "16px"
+              ],
+              [
+                "token(spacing.sm)",
+                "8px"
+              ]
+            ],
+            "themes": [
+              "base",
+              "light"
+            ]
+          },
+          {
+            "selector": ".dark.dark, .dark.dark:root",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.surface)",
+                "#112233"
+              ],
+              [
+                "token(colors.text)",
+                "#ffffff"
+              ]
+            ],
+            "themes": [
+              "dark"
+            ]
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.sm)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "gap",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "color",
+                "token(colors.text)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "block"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "inline-flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "0.5"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "1"
+              ]
+            ],
+            "themes": []
+          }
+        ],
+        "manifest": {
+          "schemaVersion": 1,
+          "systemId": "oracle-ui",
+          "registryDigest": "29f325221f326d3f",
+          "compilerContractVersion": "pms-0.1",
+          "capabilities": {
+            "slots": false,
+            "compoundVariants": false,
+            "patterns": false,
+            "rawDynamicStyles": false
+          },
+          "tokens": {
+            "spacing.sm": {
+              "category": "spacing"
+            },
+            "spacing.md": {
+              "category": "spacing"
+            },
+            "spacing.lg": {
+              "category": "spacing"
+            },
+            "colors.text": {
+              "category": "colors"
+            },
+            "colors.surface": {
+              "category": "colors"
+            }
+          },
+          "conditions": [
+            "hover",
+            "wide",
+            "focus"
+          ],
+          "themes": [
+            "light",
+            "dark"
+          ],
+          "recipes": {
+            "button": {
+              "axes": {
+                "tone": [
+                  "quiet",
+                  "loud"
+                ],
+                "size": [
+                  "sm",
+                  "md"
+                ],
+                "flag": [
+                  "true",
+                  "false"
+                ]
+              },
+              "axisOrder": [
+                "tone",
+                "size",
+                "flag"
+              ],
+              "defaults": {
+                "tone": "quiet",
+                "size": "md"
+              }
+            },
+            "bare": {
+              "axes": {},
+              "axisOrder": [],
+              "defaults": {}
+            }
+          },
+          "supportedProperties": {
+            "categories": {
+              "color": "colors",
+              "backgroundColor": "colors",
+              "borderColor": "colors",
+              "borderTopColor": "colors",
+              "borderRightColor": "colors",
+              "borderBottomColor": "colors",
+              "borderLeftColor": "colors",
+              "borderInlineColor": "colors",
+              "borderBlockColor": "colors",
+              "outlineColor": "colors",
+              "textDecorationColor": "colors",
+              "caretColor": "colors",
+              "fill": "colors",
+              "stroke": "colors",
+              "padding": "spacing",
+              "paddingTop": "spacing",
+              "paddingRight": "spacing",
+              "paddingBottom": "spacing",
+              "paddingLeft": "spacing",
+              "paddingInline": "spacing",
+              "paddingInlineStart": "spacing",
+              "paddingInlineEnd": "spacing",
+              "paddingBlock": "spacing",
+              "paddingBlockStart": "spacing",
+              "paddingBlockEnd": "spacing",
+              "margin": "spacing",
+              "marginTop": "spacing",
+              "marginRight": "spacing",
+              "marginBottom": "spacing",
+              "marginLeft": "spacing",
+              "marginInlineStart": "spacing",
+              "marginInlineEnd": "spacing",
+              "marginBlock": "spacing",
+              "marginBlockStart": "spacing",
+              "marginBlockEnd": "spacing",
+              "gap": "spacing",
+              "rowGap": "spacing",
+              "columnGap": "spacing",
+              "borderRadius": "radii",
+              "borderTopLeftRadius": "radii",
+              "borderTopRightRadius": "radii",
+              "borderBottomLeftRadius": "radii",
+              "borderBottomRightRadius": "radii",
+              "borderStartStartRadius": "radii",
+              "borderStartEndRadius": "radii",
+              "borderEndStartRadius": "radii",
+              "borderEndEndRadius": "radii",
+              "fontFamily": "fontFamilies",
+              "fontSize": "fontSizes",
+              "fontWeight": "fontWeights",
+              "lineHeight": "lineHeights",
+              "letterSpacing": "letterSpacings",
+              "boxShadow": "shadows",
+              "textShadow": "shadows",
+              "transitionDuration": "durations",
+              "transitionDelay": "durations",
+              "transitionTimingFunction": "easings",
+              "animationDuration": "durations",
+              "animationDelay": "durations",
+              "animationTimingFunction": "easings"
+            },
+            "structuralSets": {
+              "display": [
+                "flex",
+                "inline-flex",
+                "block",
+                "inline-block",
+                "grid",
+                "none"
+              ],
+              "flexDirection": [
+                "row",
+                "row-reverse",
+                "column",
+                "column-reverse"
+              ],
+              "alignItems": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "baseline",
+                "stretch"
+              ],
+              "justifyContent": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "space-between",
+                "space-around"
+              ],
+              "boxSizing": [
+                "border-box"
+              ],
+              "width": [
+                "100%"
+              ],
+              "marginInline": [
+                "auto"
+              ]
+            },
+            "structuralNumbers": {
+              "opacity": {
+                "min": 0,
+                "max": 1
+              },
+              "flex": {
+                "min": 0,
+                "max": null
+              },
+              "flexGrow": {
+                "min": 0,
+                "max": null
+              },
+              "flexShrink": {
+                "min": 0,
+                "max": null
+              }
+            },
+            "compositeFormsRejected": [
+              "background",
+              "border",
+              "font",
+              "animation",
+              "transition"
+            ]
+          },
+          "designSystemModule": "generated/design.pandamstyle.js"
+        },
+        "revisionId": null,
+        "current": null,
+        "publication": {
+          "exists": true,
+          "artifacts": [
+            "build-report.json",
+            "coverage.json",
+            "design.pandamstyle.js",
+            "js/src/page.js",
+            "manifest.json",
+            "styles.css"
+          ]
+        },
+        "counters": null,
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "29f325221f326d3f"
+          },
+          "abiVersion": 1,
+          "ok": true,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [],
+          "diagnosticsTotal": 0,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 1,
+            "truncated": false
+          },
+          "generation": {
+            "published": true,
+            "generationId": 1,
+            "artifactRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            },
+            "artifactDigest": "96e16a96903be0be5802f3e24cde65fa6d52ef28af2ddd20c001a8e6119c0884",
+            "associationRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            }
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": true,
+            "generationCommitted": true,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {
+          "build-report.json": "ea7c38d8ed0298bbd483c1df64b2c2d4a32579f07b61863a4888b78df4996970",
+          "coverage.json": "3ecd97ae7ac86ef38e9ee89ed431d78d3ef8541594b69e5888cf106e1732b40b",
+          "design.pandamstyle.js": "cabad34bea84c5df8e625752a7332b513516a785736705900e3cd4c2c6055370",
+          "js/src/page.js": "b60e166a82e2c0600a15c6d9f65ad3289ff2ed2341e5df87b01aeb0f293b0dea",
+          "manifest.json": "a9056403569e6e1acf646ddd6c54bfe9a415edb773a49bbf3069efe375cb68d1",
+          "styles.css": "240f397a064163ce1e84b01524decc1710c4e7e044821a2ab57c5f68925dc4f1"
+        },
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "runtime": {
+          "result": {
+            "keys": [
+              "className"
+            ],
+            "rules": [
+              {
+                "selector": "&:not(#\\#):not(#\\#)",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "gap",
+                    "token(spacing.md)"
+                  ]
+                ],
+                "themes": []
+              }
+            ],
+            "classOrder": [
+              [
+                {
+                  "selector": "&:not(#\\#):not(#\\#)",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "gap",
+                      "token(spacing.md)"
+                    ]
+                  ],
+                  "themes": []
+                }
+              ]
+            ]
+          }
+        },
+        "artifactBytes": {
+          "design.pandamstyle.js": "/**\n * GENERATED BY PANDAMSTYLE - DO NOT EDIT.\n *\n * This file is the consumption surface of one design-system instance.\n * It holds finite, precompiled data only.\n */\n\nimport { assertAbi, defineRecipeSelector, props as __pmsProps, PmsSelectionError } from '@pandamstyle/core';\n\nassertAbi(1);\n\nexport const __PMS_DESIGN_SYSTEM__ = {\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"contractVersion\": \"pms-0.1\"\n};\n\nexport const manifest = {\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"conditions\": [\n    \"hover\",\n    \"wide\",\n    \"focus\"\n  ],\n  \"themes\": [\n    \"light\",\n    \"dark\"\n  ],\n  \"recipes\": {\n    \"button\": {\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    },\n    \"bare\": {\n      \"axes\": {},\n      \"axisOrder\": [],\n      \"defaults\": {}\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  }\n};\n\nexport const props = __pmsProps;\n\nexport const themes = {\n  \"base\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"base\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"light\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"light\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"dark\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"dark\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x1jmeyti\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        \"x5jm8p5\"\n      ]\n    ]\n  }\n};\n\nconst __pmsRecipe_bare = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"bare\",\n  \"axisOrder\": [],\n  \"variantMap\": {},\n  \"defaultVariants\": {},\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x1lliihq\"\n      ]\n    ]\n  },\n  \"branches\": {}\n});\n\nconst __pmsRecipe_button = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"button\",\n  \"axisOrder\": [\n    \"tone\",\n    \"size\",\n    \"flag\"\n  ],\n  \"variantMap\": {\n    \"tone\": [\n      \"quiet\",\n      \"loud\"\n    ],\n    \"size\": [\n      \"sm\",\n      \"md\"\n    ],\n    \"flag\": [\n      \"true\",\n      \"false\"\n    ]\n  },\n  \"defaultVariants\": {\n    \"tone\": \"quiet\",\n    \"size\": \"md\"\n  },\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x3nfvp2\"\n      ],\n      [\n        \"kMwMTN\",\n        \"xmcn0qq\"\n      ]\n    ]\n  },\n  \"branches\": {\n    \"tone\": {\n      \"quiet\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"xbyyjgo\"\n          ]\n        ]\n      },\n      \"loud\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"x1hc1fzr\"\n          ]\n        ]\n      }\n    },\n    \"size\": {\n      \"sm\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"xr1eeyi\"\n          ]\n        ]\n      },\n      \"md\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"x1db5p44\"\n          ]\n        ]\n      }\n    },\n    \"flag\": {\n      \"true\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x78zum5\"\n          ]\n        ]\n      },\n      \"false\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x1lliihq\"\n          ]\n        ]\n      }\n    }\n  }\n});\n\nexport const recipes = { \"bare\": __pmsRecipe_bare, \"button\": __pmsRecipe_button };\n\n// Compile-time only: reaching either at runtime means the PandamStyle\n// compiler did not transform this file.\nexport const token = function token(path) {\n  throw new PmsSelectionError({ code: 'PMS_TOKEN_RUNTIME', message: 'token() is compile-time only.', rule: 'generated.token-runtime', context: { path } });\n};\n\nexport const create = function create() {\n  throw new PmsSelectionError({ code: 'PMS_UNCOMPILED_CREATE', message: 'create() must be transformed by the PandamStyle compiler.', rule: 'generated.create-runtime', context: {} });\n};\n",
+          "js/src/page.js": "import { props as __pmsProps } from \"@pandamstyle/core\";\nconst s = {\n  a: {\n    kind: \"pandamstyle-style-ref\",\n    abiVersion: 1,\n    systemId: \"oracle-ui\",\n    entries: [[\"kOIVth\", \"xvej669\"]]\n  }\n};\nexport const result = __pmsProps(s.a);",
+          "manifest.json": "{\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"conditions\": [\n    \"hover\",\n    \"wide\",\n    \"focus\"\n  ],\n  \"themes\": [\n    \"light\",\n    \"dark\"\n  ],\n  \"recipes\": {\n    \"button\": {\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    },\n    \"bare\": {\n      \"axes\": {},\n      \"axisOrder\": [],\n      \"defaults\": {}\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  },\n  \"designSystemModule\": \"generated/design.pandamstyle.js\"\n}\n",
+          "styles.css": ":root, .x5jm8p5{--x806e8r:8px;--x1efyk35:16px;--x10bq9o0:24px;--x1a46r13:#112233;--x19wwu0b:#ffffff;--x19gs4d:#112233;--x1wcnge4:#ffffff;}\n.x1jmeyti.x1jmeyti, .x1jmeyti.x1jmeyti:root{--x1wcnge4:#112233;--x19gs4d:#ffffff;}\n.x1db5p44:not(#\\#){padding:var(--x1efyk35)}\n.xr1eeyi:not(#\\#){padding:var(--x806e8r)}\n.xvej669:not(#\\#):not(#\\#){gap:var(--x1efyk35)}\n.xmcn0qq:not(#\\#):not(#\\#):not(#\\#){color:var(--x19gs4d)}\n.x1lliihq:not(#\\#):not(#\\#):not(#\\#){display:block}\n.x78zum5:not(#\\#):not(#\\#):not(#\\#){display:flex}\n.x3nfvp2:not(#\\#):not(#\\#):not(#\\#){display:inline-flex}\n.xbyyjgo:not(#\\#):not(#\\#):not(#\\#){opacity:.5}\n.x1hc1fzr:not(#\\#):not(#\\#):not(#\\#){opacity:1}"
+        }
+      },
+      "incremental": {
+        "accepted": true,
+        "codes": [],
+        "diagnostics": [],
+        "rules": [
+          {
+            "selector": ":root, .base|light",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.ink)",
+                "#112233"
+              ],
+              [
+                "token(colors.paper)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.surface)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.text)",
+                "#112233"
+              ],
+              [
+                "token(spacing.lg)",
+                "24px"
+              ],
+              [
+                "token(spacing.md)",
+                "16px"
+              ],
+              [
+                "token(spacing.sm)",
+                "8px"
+              ]
+            ],
+            "themes": [
+              "base",
+              "light"
+            ]
+          },
+          {
+            "selector": ".dark.dark, .dark.dark:root",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.surface)",
+                "#112233"
+              ],
+              [
+                "token(colors.text)",
+                "#ffffff"
+              ]
+            ],
+            "themes": [
+              "dark"
+            ]
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.sm)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "gap",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "color",
+                "token(colors.text)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "block"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "inline-flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "0.5"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "1"
+              ]
+            ],
+            "themes": []
+          }
+        ],
+        "manifest": {
+          "schemaVersion": 1,
+          "systemId": "oracle-ui",
+          "registryDigest": "29f325221f326d3f",
+          "compilerContractVersion": "pms-0.1",
+          "capabilities": {
+            "slots": false,
+            "compoundVariants": false,
+            "patterns": false,
+            "rawDynamicStyles": false
+          },
+          "tokens": {
+            "spacing.sm": {
+              "category": "spacing"
+            },
+            "spacing.md": {
+              "category": "spacing"
+            },
+            "spacing.lg": {
+              "category": "spacing"
+            },
+            "colors.text": {
+              "category": "colors"
+            },
+            "colors.surface": {
+              "category": "colors"
+            }
+          },
+          "conditions": [
+            "hover",
+            "wide",
+            "focus"
+          ],
+          "themes": [
+            "light",
+            "dark"
+          ],
+          "recipes": {
+            "button": {
+              "axes": {
+                "tone": [
+                  "quiet",
+                  "loud"
+                ],
+                "size": [
+                  "sm",
+                  "md"
+                ],
+                "flag": [
+                  "true",
+                  "false"
+                ]
+              },
+              "axisOrder": [
+                "tone",
+                "size",
+                "flag"
+              ],
+              "defaults": {
+                "tone": "quiet",
+                "size": "md"
+              }
+            },
+            "bare": {
+              "axes": {},
+              "axisOrder": [],
+              "defaults": {}
+            }
+          },
+          "supportedProperties": {
+            "categories": {
+              "color": "colors",
+              "backgroundColor": "colors",
+              "borderColor": "colors",
+              "borderTopColor": "colors",
+              "borderRightColor": "colors",
+              "borderBottomColor": "colors",
+              "borderLeftColor": "colors",
+              "borderInlineColor": "colors",
+              "borderBlockColor": "colors",
+              "outlineColor": "colors",
+              "textDecorationColor": "colors",
+              "caretColor": "colors",
+              "fill": "colors",
+              "stroke": "colors",
+              "padding": "spacing",
+              "paddingTop": "spacing",
+              "paddingRight": "spacing",
+              "paddingBottom": "spacing",
+              "paddingLeft": "spacing",
+              "paddingInline": "spacing",
+              "paddingInlineStart": "spacing",
+              "paddingInlineEnd": "spacing",
+              "paddingBlock": "spacing",
+              "paddingBlockStart": "spacing",
+              "paddingBlockEnd": "spacing",
+              "margin": "spacing",
+              "marginTop": "spacing",
+              "marginRight": "spacing",
+              "marginBottom": "spacing",
+              "marginLeft": "spacing",
+              "marginInlineStart": "spacing",
+              "marginInlineEnd": "spacing",
+              "marginBlock": "spacing",
+              "marginBlockStart": "spacing",
+              "marginBlockEnd": "spacing",
+              "gap": "spacing",
+              "rowGap": "spacing",
+              "columnGap": "spacing",
+              "borderRadius": "radii",
+              "borderTopLeftRadius": "radii",
+              "borderTopRightRadius": "radii",
+              "borderBottomLeftRadius": "radii",
+              "borderBottomRightRadius": "radii",
+              "borderStartStartRadius": "radii",
+              "borderStartEndRadius": "radii",
+              "borderEndStartRadius": "radii",
+              "borderEndEndRadius": "radii",
+              "fontFamily": "fontFamilies",
+              "fontSize": "fontSizes",
+              "fontWeight": "fontWeights",
+              "lineHeight": "lineHeights",
+              "letterSpacing": "letterSpacings",
+              "boxShadow": "shadows",
+              "textShadow": "shadows",
+              "transitionDuration": "durations",
+              "transitionDelay": "durations",
+              "transitionTimingFunction": "easings",
+              "animationDuration": "durations",
+              "animationDelay": "durations",
+              "animationTimingFunction": "easings"
+            },
+            "structuralSets": {
+              "display": [
+                "flex",
+                "inline-flex",
+                "block",
+                "inline-block",
+                "grid",
+                "none"
+              ],
+              "flexDirection": [
+                "row",
+                "row-reverse",
+                "column",
+                "column-reverse"
+              ],
+              "alignItems": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "baseline",
+                "stretch"
+              ],
+              "justifyContent": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "space-between",
+                "space-around"
+              ],
+              "boxSizing": [
+                "border-box"
+              ],
+              "width": [
+                "100%"
+              ],
+              "marginInline": [
+                "auto"
+              ]
+            },
+            "structuralNumbers": {
+              "opacity": {
+                "min": 0,
+                "max": 1
+              },
+              "flex": {
+                "min": 0,
+                "max": null
+              },
+              "flexGrow": {
+                "min": 0,
+                "max": null
+              },
+              "flexShrink": {
+                "min": 0,
+                "max": null
+              }
+            },
+            "compositeFormsRejected": [
+              "background",
+              "border",
+              "font",
+              "animation",
+              "transition"
+            ]
+          },
+          "designSystemModule": "generated/design.pandamstyle.js"
+        },
+        "revisionId": 1,
+        "current": {
+          "revisionId": 1,
+          "generationId": 1,
+          "registryDigest": "29f325221f326d3f"
+        },
+        "publication": {
+          "exists": true,
+          "artifacts": [
+            "build-report.json",
+            "design.pandamstyle.js",
+            "js/src/page.js",
+            "manifest.json",
+            "styles.css"
+          ]
+        },
+        "counters": {
+          "filesChanged": 0,
+          "filesAdded": 1,
+          "filesRemoved": 0,
+          "filesReparsed": 2,
+          "filesRecompiled": 1,
+          "filesCompiled": 1,
+          "filesReused": 0,
+          "coverageSummariesReused": 0,
+          "coverageSummariesRebuilt": 2,
+          "reverseDependentsInvalidated": 0,
+          "negativeResolutionsInvalidated": 0,
+          "fullFallback": 1,
+          "fullFallbackReason": "design-system-definition",
+          "newlyCoveredFiles": 1,
+          "coveredFileCount": 2,
+          "fileStateCount": 2,
+          "dirtyFilesDeclared": 0,
+          "dirtyFilesRead": 1,
+          "dirtyFilesHashed": 1,
+          "dirtyFilesUnchanged": 0
+        },
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "29f325221f326d3f"
+          },
+          "abiVersion": 1,
+          "ok": true,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [],
+          "diagnosticsTotal": 0,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 1,
+            "truncated": false
+          },
+          "generation": {
+            "published": true,
+            "generationId": 1,
+            "artifactRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            },
+            "artifactDigest": "29147abb55fb7f8b65030efa2017a50bc2f02cc969e3424c67217deb4a60b758",
+            "associationRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            }
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": true,
+            "generationCommitted": true,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {
+          "build-report.json": "1f1b8df50c9c2cb85f50703c09ca91639518acac0452db030faf54a9535f3fba",
+          "design.pandamstyle.js": "cabad34bea84c5df8e625752a7332b513516a785736705900e3cd4c2c6055370",
+          "js/src/page.js": "b60e166a82e2c0600a15c6d9f65ad3289ff2ed2341e5df87b01aeb0f293b0dea",
+          "manifest.json": "32429500181c30e331cc7994905806c9080e346fa54ac2c6bbf916f6c59bad6a",
+          "styles.css": "240f397a064163ce1e84b01524decc1710c4e7e044821a2ab57c5f68925dc4f1"
+        },
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "runtime": {
+          "result": {
+            "keys": [
+              "className"
+            ],
+            "rules": [
+              {
+                "selector": "&:not(#\\#):not(#\\#)",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "gap",
+                    "token(spacing.md)"
+                  ]
+                ],
+                "themes": []
+              }
+            ],
+            "classOrder": [
+              [
+                {
+                  "selector": "&:not(#\\#):not(#\\#)",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "gap",
+                      "token(spacing.md)"
+                    ]
+                  ],
+                  "themes": []
+                }
+              ]
+            ]
+          }
+        },
+        "artifactBytes": {
+          "design.pandamstyle.js": "/**\n * GENERATED BY PANDAMSTYLE - DO NOT EDIT.\n *\n * This file is the consumption surface of one design-system instance.\n * It holds finite, precompiled data only.\n */\n\nimport { assertAbi, defineRecipeSelector, props as __pmsProps, PmsSelectionError } from '@pandamstyle/core';\n\nassertAbi(1);\n\nexport const __PMS_DESIGN_SYSTEM__ = {\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"contractVersion\": \"pms-0.1\"\n};\n\nexport const manifest = {\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"conditions\": [\n    \"hover\",\n    \"wide\",\n    \"focus\"\n  ],\n  \"themes\": [\n    \"light\",\n    \"dark\"\n  ],\n  \"recipes\": {\n    \"button\": {\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    },\n    \"bare\": {\n      \"axes\": {},\n      \"axisOrder\": [],\n      \"defaults\": {}\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  }\n};\n\nexport const props = __pmsProps;\n\nexport const themes = {\n  \"base\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"base\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"light\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"light\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"dark\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"dark\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x1jmeyti\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        \"x5jm8p5\"\n      ]\n    ]\n  }\n};\n\nconst __pmsRecipe_bare = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"bare\",\n  \"axisOrder\": [],\n  \"variantMap\": {},\n  \"defaultVariants\": {},\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x1lliihq\"\n      ]\n    ]\n  },\n  \"branches\": {}\n});\n\nconst __pmsRecipe_button = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"button\",\n  \"axisOrder\": [\n    \"tone\",\n    \"size\",\n    \"flag\"\n  ],\n  \"variantMap\": {\n    \"tone\": [\n      \"quiet\",\n      \"loud\"\n    ],\n    \"size\": [\n      \"sm\",\n      \"md\"\n    ],\n    \"flag\": [\n      \"true\",\n      \"false\"\n    ]\n  },\n  \"defaultVariants\": {\n    \"tone\": \"quiet\",\n    \"size\": \"md\"\n  },\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x3nfvp2\"\n      ],\n      [\n        \"kMwMTN\",\n        \"xmcn0qq\"\n      ]\n    ]\n  },\n  \"branches\": {\n    \"tone\": {\n      \"quiet\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"xbyyjgo\"\n          ]\n        ]\n      },\n      \"loud\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"x1hc1fzr\"\n          ]\n        ]\n      }\n    },\n    \"size\": {\n      \"sm\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"xr1eeyi\"\n          ]\n        ]\n      },\n      \"md\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"x1db5p44\"\n          ]\n        ]\n      }\n    },\n    \"flag\": {\n      \"true\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x78zum5\"\n          ]\n        ]\n      },\n      \"false\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x1lliihq\"\n          ]\n        ]\n      }\n    }\n  }\n});\n\nexport const recipes = { \"bare\": __pmsRecipe_bare, \"button\": __pmsRecipe_button };\n\n// Compile-time only: reaching either at runtime means the PandamStyle\n// compiler did not transform this file.\nexport const token = function token(path) {\n  throw new PmsSelectionError({ code: 'PMS_TOKEN_RUNTIME', message: 'token() is compile-time only.', rule: 'generated.token-runtime', context: { path } });\n};\n\nexport const create = function create() {\n  throw new PmsSelectionError({ code: 'PMS_UNCOMPILED_CREATE', message: 'create() must be transformed by the PandamStyle compiler.', rule: 'generated.create-runtime', context: {} });\n};\n",
+          "js/src/page.js": "import { props as __pmsProps } from \"@pandamstyle/core\";\nconst s = {\n  a: {\n    kind: \"pandamstyle-style-ref\",\n    abiVersion: 1,\n    systemId: \"oracle-ui\",\n    entries: [[\"kOIVth\", \"xvej669\"]]\n  }\n};\nexport const result = __pmsProps(s.a);",
+          "manifest.json": "{\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"conditions\": [\n    \"hover\",\n    \"wide\",\n    \"focus\"\n  ],\n  \"themes\": [\n    \"light\",\n    \"dark\"\n  ],\n  \"recipes\": {\n    \"button\": {\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    },\n    \"bare\": {\n      \"axes\": {},\n      \"axisOrder\": [],\n      \"defaults\": {}\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  },\n  \"designSystemModule\": \"generated/design.pandamstyle.js\"\n}\n",
+          "styles.css": ":root, .x5jm8p5{--x806e8r:8px;--x1efyk35:16px;--x10bq9o0:24px;--x1a46r13:#112233;--x19wwu0b:#ffffff;--x19gs4d:#112233;--x1wcnge4:#ffffff;}\n.x1jmeyti.x1jmeyti, .x1jmeyti.x1jmeyti:root{--x1wcnge4:#112233;--x19gs4d:#ffffff;}\n.x1db5p44:not(#\\#){padding:var(--x1efyk35)}\n.xr1eeyi:not(#\\#){padding:var(--x806e8r)}\n.xvej669:not(#\\#):not(#\\#){gap:var(--x1efyk35)}\n.xmcn0qq:not(#\\#):not(#\\#):not(#\\#){color:var(--x19gs4d)}\n.x1lliihq:not(#\\#):not(#\\#):not(#\\#){display:block}\n.x78zum5:not(#\\#):not(#\\#):not(#\\#){display:flex}\n.x3nfvp2:not(#\\#):not(#\\#):not(#\\#){display:inline-flex}\n.xbyyjgo:not(#\\#):not(#\\#):not(#\\#){opacity:.5}\n.x1hc1fzr:not(#\\#):not(#\\#):not(#\\#){opacity:1}"
+        }
+      },
+      "freshChecks": [
+        {
+          "path": "accepted",
+          "value": true,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "conditions": [],
+            "declarations": [
+              [
+                "gap",
+                "token(spacing.md)"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": 1,
+          "op": "length",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/keys",
+          "value": [
+            "className"
+          ],
+          "op": "equal",
+          "matches": true
+        }
+      ],
+      "incrementalChecks": [
+        {
+          "path": "accepted",
+          "value": true,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "conditions": [],
+            "declarations": [
+              [
+                "gap",
+                "token(spacing.md)"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": 1,
+          "op": "length",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/keys",
+          "value": [
+            "className"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "revisionId",
+          "value": 1,
+          "matches": true
+        }
+      ],
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "revision": 2,
+      "label": "unchanged revision",
+      "fresh": {
+        "accepted": true,
+        "codes": [],
+        "diagnostics": [],
+        "rules": [
+          {
+            "selector": ":root, .base|light",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.ink)",
+                "#112233"
+              ],
+              [
+                "token(colors.paper)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.surface)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.text)",
+                "#112233"
+              ],
+              [
+                "token(spacing.lg)",
+                "24px"
+              ],
+              [
+                "token(spacing.md)",
+                "16px"
+              ],
+              [
+                "token(spacing.sm)",
+                "8px"
+              ]
+            ],
+            "themes": [
+              "base",
+              "light"
+            ]
+          },
+          {
+            "selector": ".dark.dark, .dark.dark:root",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.surface)",
+                "#112233"
+              ],
+              [
+                "token(colors.text)",
+                "#ffffff"
+              ]
+            ],
+            "themes": [
+              "dark"
+            ]
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.sm)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "gap",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "color",
+                "token(colors.text)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "block"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "inline-flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "0.5"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "1"
+              ]
+            ],
+            "themes": []
+          }
+        ],
+        "manifest": {
+          "schemaVersion": 1,
+          "systemId": "oracle-ui",
+          "registryDigest": "29f325221f326d3f",
+          "compilerContractVersion": "pms-0.1",
+          "capabilities": {
+            "slots": false,
+            "compoundVariants": false,
+            "patterns": false,
+            "rawDynamicStyles": false
+          },
+          "tokens": {
+            "spacing.sm": {
+              "category": "spacing"
+            },
+            "spacing.md": {
+              "category": "spacing"
+            },
+            "spacing.lg": {
+              "category": "spacing"
+            },
+            "colors.text": {
+              "category": "colors"
+            },
+            "colors.surface": {
+              "category": "colors"
+            }
+          },
+          "conditions": [
+            "hover",
+            "wide",
+            "focus"
+          ],
+          "themes": [
+            "light",
+            "dark"
+          ],
+          "recipes": {
+            "button": {
+              "axes": {
+                "tone": [
+                  "quiet",
+                  "loud"
+                ],
+                "size": [
+                  "sm",
+                  "md"
+                ],
+                "flag": [
+                  "true",
+                  "false"
+                ]
+              },
+              "axisOrder": [
+                "tone",
+                "size",
+                "flag"
+              ],
+              "defaults": {
+                "tone": "quiet",
+                "size": "md"
+              }
+            },
+            "bare": {
+              "axes": {},
+              "axisOrder": [],
+              "defaults": {}
+            }
+          },
+          "supportedProperties": {
+            "categories": {
+              "color": "colors",
+              "backgroundColor": "colors",
+              "borderColor": "colors",
+              "borderTopColor": "colors",
+              "borderRightColor": "colors",
+              "borderBottomColor": "colors",
+              "borderLeftColor": "colors",
+              "borderInlineColor": "colors",
+              "borderBlockColor": "colors",
+              "outlineColor": "colors",
+              "textDecorationColor": "colors",
+              "caretColor": "colors",
+              "fill": "colors",
+              "stroke": "colors",
+              "padding": "spacing",
+              "paddingTop": "spacing",
+              "paddingRight": "spacing",
+              "paddingBottom": "spacing",
+              "paddingLeft": "spacing",
+              "paddingInline": "spacing",
+              "paddingInlineStart": "spacing",
+              "paddingInlineEnd": "spacing",
+              "paddingBlock": "spacing",
+              "paddingBlockStart": "spacing",
+              "paddingBlockEnd": "spacing",
+              "margin": "spacing",
+              "marginTop": "spacing",
+              "marginRight": "spacing",
+              "marginBottom": "spacing",
+              "marginLeft": "spacing",
+              "marginInlineStart": "spacing",
+              "marginInlineEnd": "spacing",
+              "marginBlock": "spacing",
+              "marginBlockStart": "spacing",
+              "marginBlockEnd": "spacing",
+              "gap": "spacing",
+              "rowGap": "spacing",
+              "columnGap": "spacing",
+              "borderRadius": "radii",
+              "borderTopLeftRadius": "radii",
+              "borderTopRightRadius": "radii",
+              "borderBottomLeftRadius": "radii",
+              "borderBottomRightRadius": "radii",
+              "borderStartStartRadius": "radii",
+              "borderStartEndRadius": "radii",
+              "borderEndStartRadius": "radii",
+              "borderEndEndRadius": "radii",
+              "fontFamily": "fontFamilies",
+              "fontSize": "fontSizes",
+              "fontWeight": "fontWeights",
+              "lineHeight": "lineHeights",
+              "letterSpacing": "letterSpacings",
+              "boxShadow": "shadows",
+              "textShadow": "shadows",
+              "transitionDuration": "durations",
+              "transitionDelay": "durations",
+              "transitionTimingFunction": "easings",
+              "animationDuration": "durations",
+              "animationDelay": "durations",
+              "animationTimingFunction": "easings"
+            },
+            "structuralSets": {
+              "display": [
+                "flex",
+                "inline-flex",
+                "block",
+                "inline-block",
+                "grid",
+                "none"
+              ],
+              "flexDirection": [
+                "row",
+                "row-reverse",
+                "column",
+                "column-reverse"
+              ],
+              "alignItems": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "baseline",
+                "stretch"
+              ],
+              "justifyContent": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "space-between",
+                "space-around"
+              ],
+              "boxSizing": [
+                "border-box"
+              ],
+              "width": [
+                "100%"
+              ],
+              "marginInline": [
+                "auto"
+              ]
+            },
+            "structuralNumbers": {
+              "opacity": {
+                "min": 0,
+                "max": 1
+              },
+              "flex": {
+                "min": 0,
+                "max": null
+              },
+              "flexGrow": {
+                "min": 0,
+                "max": null
+              },
+              "flexShrink": {
+                "min": 0,
+                "max": null
+              }
+            },
+            "compositeFormsRejected": [
+              "background",
+              "border",
+              "font",
+              "animation",
+              "transition"
+            ]
+          },
+          "designSystemModule": "generated/design.pandamstyle.js"
+        },
+        "revisionId": null,
+        "current": null,
+        "publication": {
+          "exists": true,
+          "artifacts": [
+            "build-report.json",
+            "coverage.json",
+            "design.pandamstyle.js",
+            "js/src/page.js",
+            "manifest.json",
+            "styles.css"
+          ]
+        },
+        "counters": null,
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "29f325221f326d3f"
+          },
+          "abiVersion": 1,
+          "ok": true,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [],
+          "diagnosticsTotal": 0,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 1,
+            "truncated": false
+          },
+          "generation": {
+            "published": true,
+            "generationId": 0,
+            "artifactRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            },
+            "artifactDigest": "96e16a96903be0be5802f3e24cde65fa6d52ef28af2ddd20c001a8e6119c0884",
+            "associationRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            }
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": true,
+            "generationCommitted": true,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {
+          "build-report.json": "ea7c38d8ed0298bbd483c1df64b2c2d4a32579f07b61863a4888b78df4996970",
+          "coverage.json": "3ecd97ae7ac86ef38e9ee89ed431d78d3ef8541594b69e5888cf106e1732b40b",
+          "design.pandamstyle.js": "cabad34bea84c5df8e625752a7332b513516a785736705900e3cd4c2c6055370",
+          "js/src/page.js": "b60e166a82e2c0600a15c6d9f65ad3289ff2ed2341e5df87b01aeb0f293b0dea",
+          "manifest.json": "a9056403569e6e1acf646ddd6c54bfe9a415edb773a49bbf3069efe375cb68d1",
+          "styles.css": "240f397a064163ce1e84b01524decc1710c4e7e044821a2ab57c5f68925dc4f1"
+        },
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "runtime": {
+          "result": {
+            "keys": [
+              "className"
+            ],
+            "rules": [
+              {
+                "selector": "&:not(#\\#):not(#\\#)",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "gap",
+                    "token(spacing.md)"
+                  ]
+                ],
+                "themes": []
+              }
+            ],
+            "classOrder": [
+              [
+                {
+                  "selector": "&:not(#\\#):not(#\\#)",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "gap",
+                      "token(spacing.md)"
+                    ]
+                  ],
+                  "themes": []
+                }
+              ]
+            ]
+          }
+        },
+        "artifactBytes": {
+          "design.pandamstyle.js": "/**\n * GENERATED BY PANDAMSTYLE - DO NOT EDIT.\n *\n * This file is the consumption surface of one design-system instance.\n * It holds finite, precompiled data only.\n */\n\nimport { assertAbi, defineRecipeSelector, props as __pmsProps, PmsSelectionError } from '@pandamstyle/core';\n\nassertAbi(1);\n\nexport const __PMS_DESIGN_SYSTEM__ = {\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"contractVersion\": \"pms-0.1\"\n};\n\nexport const manifest = {\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"conditions\": [\n    \"hover\",\n    \"wide\",\n    \"focus\"\n  ],\n  \"themes\": [\n    \"light\",\n    \"dark\"\n  ],\n  \"recipes\": {\n    \"button\": {\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    },\n    \"bare\": {\n      \"axes\": {},\n      \"axisOrder\": [],\n      \"defaults\": {}\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  }\n};\n\nexport const props = __pmsProps;\n\nexport const themes = {\n  \"base\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"base\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"light\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"light\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"dark\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"dark\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x1jmeyti\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        \"x5jm8p5\"\n      ]\n    ]\n  }\n};\n\nconst __pmsRecipe_bare = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"bare\",\n  \"axisOrder\": [],\n  \"variantMap\": {},\n  \"defaultVariants\": {},\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x1lliihq\"\n      ]\n    ]\n  },\n  \"branches\": {}\n});\n\nconst __pmsRecipe_button = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"button\",\n  \"axisOrder\": [\n    \"tone\",\n    \"size\",\n    \"flag\"\n  ],\n  \"variantMap\": {\n    \"tone\": [\n      \"quiet\",\n      \"loud\"\n    ],\n    \"size\": [\n      \"sm\",\n      \"md\"\n    ],\n    \"flag\": [\n      \"true\",\n      \"false\"\n    ]\n  },\n  \"defaultVariants\": {\n    \"tone\": \"quiet\",\n    \"size\": \"md\"\n  },\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x3nfvp2\"\n      ],\n      [\n        \"kMwMTN\",\n        \"xmcn0qq\"\n      ]\n    ]\n  },\n  \"branches\": {\n    \"tone\": {\n      \"quiet\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"xbyyjgo\"\n          ]\n        ]\n      },\n      \"loud\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"x1hc1fzr\"\n          ]\n        ]\n      }\n    },\n    \"size\": {\n      \"sm\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"xr1eeyi\"\n          ]\n        ]\n      },\n      \"md\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"x1db5p44\"\n          ]\n        ]\n      }\n    },\n    \"flag\": {\n      \"true\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x78zum5\"\n          ]\n        ]\n      },\n      \"false\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x1lliihq\"\n          ]\n        ]\n      }\n    }\n  }\n});\n\nexport const recipes = { \"bare\": __pmsRecipe_bare, \"button\": __pmsRecipe_button };\n\n// Compile-time only: reaching either at runtime means the PandamStyle\n// compiler did not transform this file.\nexport const token = function token(path) {\n  throw new PmsSelectionError({ code: 'PMS_TOKEN_RUNTIME', message: 'token() is compile-time only.', rule: 'generated.token-runtime', context: { path } });\n};\n\nexport const create = function create() {\n  throw new PmsSelectionError({ code: 'PMS_UNCOMPILED_CREATE', message: 'create() must be transformed by the PandamStyle compiler.', rule: 'generated.create-runtime', context: {} });\n};\n",
+          "js/src/page.js": "import { props as __pmsProps } from \"@pandamstyle/core\";\nconst s = {\n  a: {\n    kind: \"pandamstyle-style-ref\",\n    abiVersion: 1,\n    systemId: \"oracle-ui\",\n    entries: [[\"kOIVth\", \"xvej669\"]]\n  }\n};\nexport const result = __pmsProps(s.a);",
+          "manifest.json": "{\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"conditions\": [\n    \"hover\",\n    \"wide\",\n    \"focus\"\n  ],\n  \"themes\": [\n    \"light\",\n    \"dark\"\n  ],\n  \"recipes\": {\n    \"button\": {\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    },\n    \"bare\": {\n      \"axes\": {},\n      \"axisOrder\": [],\n      \"defaults\": {}\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  },\n  \"designSystemModule\": \"generated/design.pandamstyle.js\"\n}\n",
+          "styles.css": ":root, .x5jm8p5{--x806e8r:8px;--x1efyk35:16px;--x10bq9o0:24px;--x1a46r13:#112233;--x19wwu0b:#ffffff;--x19gs4d:#112233;--x1wcnge4:#ffffff;}\n.x1jmeyti.x1jmeyti, .x1jmeyti.x1jmeyti:root{--x1wcnge4:#112233;--x19gs4d:#ffffff;}\n.x1db5p44:not(#\\#){padding:var(--x1efyk35)}\n.xr1eeyi:not(#\\#){padding:var(--x806e8r)}\n.xvej669:not(#\\#):not(#\\#){gap:var(--x1efyk35)}\n.xmcn0qq:not(#\\#):not(#\\#):not(#\\#){color:var(--x19gs4d)}\n.x1lliihq:not(#\\#):not(#\\#):not(#\\#){display:block}\n.x78zum5:not(#\\#):not(#\\#):not(#\\#){display:flex}\n.x3nfvp2:not(#\\#):not(#\\#):not(#\\#){display:inline-flex}\n.xbyyjgo:not(#\\#):not(#\\#):not(#\\#){opacity:.5}\n.x1hc1fzr:not(#\\#):not(#\\#):not(#\\#){opacity:1}"
+        }
+      },
+      "incremental": {
+        "accepted": true,
+        "codes": [],
+        "diagnostics": [],
+        "rules": [
+          {
+            "selector": ":root, .base|light",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.ink)",
+                "#112233"
+              ],
+              [
+                "token(colors.paper)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.surface)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.text)",
+                "#112233"
+              ],
+              [
+                "token(spacing.lg)",
+                "24px"
+              ],
+              [
+                "token(spacing.md)",
+                "16px"
+              ],
+              [
+                "token(spacing.sm)",
+                "8px"
+              ]
+            ],
+            "themes": [
+              "base",
+              "light"
+            ]
+          },
+          {
+            "selector": ".dark.dark, .dark.dark:root",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.surface)",
+                "#112233"
+              ],
+              [
+                "token(colors.text)",
+                "#ffffff"
+              ]
+            ],
+            "themes": [
+              "dark"
+            ]
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.sm)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "gap",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "color",
+                "token(colors.text)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "block"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "inline-flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "0.5"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "1"
+              ]
+            ],
+            "themes": []
+          }
+        ],
+        "manifest": {
+          "schemaVersion": 1,
+          "systemId": "oracle-ui",
+          "registryDigest": "29f325221f326d3f",
+          "compilerContractVersion": "pms-0.1",
+          "capabilities": {
+            "slots": false,
+            "compoundVariants": false,
+            "patterns": false,
+            "rawDynamicStyles": false
+          },
+          "tokens": {
+            "spacing.sm": {
+              "category": "spacing"
+            },
+            "spacing.md": {
+              "category": "spacing"
+            },
+            "spacing.lg": {
+              "category": "spacing"
+            },
+            "colors.text": {
+              "category": "colors"
+            },
+            "colors.surface": {
+              "category": "colors"
+            }
+          },
+          "conditions": [
+            "hover",
+            "wide",
+            "focus"
+          ],
+          "themes": [
+            "light",
+            "dark"
+          ],
+          "recipes": {
+            "button": {
+              "axes": {
+                "tone": [
+                  "quiet",
+                  "loud"
+                ],
+                "size": [
+                  "sm",
+                  "md"
+                ],
+                "flag": [
+                  "true",
+                  "false"
+                ]
+              },
+              "axisOrder": [
+                "tone",
+                "size",
+                "flag"
+              ],
+              "defaults": {
+                "tone": "quiet",
+                "size": "md"
+              }
+            },
+            "bare": {
+              "axes": {},
+              "axisOrder": [],
+              "defaults": {}
+            }
+          },
+          "supportedProperties": {
+            "categories": {
+              "color": "colors",
+              "backgroundColor": "colors",
+              "borderColor": "colors",
+              "borderTopColor": "colors",
+              "borderRightColor": "colors",
+              "borderBottomColor": "colors",
+              "borderLeftColor": "colors",
+              "borderInlineColor": "colors",
+              "borderBlockColor": "colors",
+              "outlineColor": "colors",
+              "textDecorationColor": "colors",
+              "caretColor": "colors",
+              "fill": "colors",
+              "stroke": "colors",
+              "padding": "spacing",
+              "paddingTop": "spacing",
+              "paddingRight": "spacing",
+              "paddingBottom": "spacing",
+              "paddingLeft": "spacing",
+              "paddingInline": "spacing",
+              "paddingInlineStart": "spacing",
+              "paddingInlineEnd": "spacing",
+              "paddingBlock": "spacing",
+              "paddingBlockStart": "spacing",
+              "paddingBlockEnd": "spacing",
+              "margin": "spacing",
+              "marginTop": "spacing",
+              "marginRight": "spacing",
+              "marginBottom": "spacing",
+              "marginLeft": "spacing",
+              "marginInlineStart": "spacing",
+              "marginInlineEnd": "spacing",
+              "marginBlock": "spacing",
+              "marginBlockStart": "spacing",
+              "marginBlockEnd": "spacing",
+              "gap": "spacing",
+              "rowGap": "spacing",
+              "columnGap": "spacing",
+              "borderRadius": "radii",
+              "borderTopLeftRadius": "radii",
+              "borderTopRightRadius": "radii",
+              "borderBottomLeftRadius": "radii",
+              "borderBottomRightRadius": "radii",
+              "borderStartStartRadius": "radii",
+              "borderStartEndRadius": "radii",
+              "borderEndStartRadius": "radii",
+              "borderEndEndRadius": "radii",
+              "fontFamily": "fontFamilies",
+              "fontSize": "fontSizes",
+              "fontWeight": "fontWeights",
+              "lineHeight": "lineHeights",
+              "letterSpacing": "letterSpacings",
+              "boxShadow": "shadows",
+              "textShadow": "shadows",
+              "transitionDuration": "durations",
+              "transitionDelay": "durations",
+              "transitionTimingFunction": "easings",
+              "animationDuration": "durations",
+              "animationDelay": "durations",
+              "animationTimingFunction": "easings"
+            },
+            "structuralSets": {
+              "display": [
+                "flex",
+                "inline-flex",
+                "block",
+                "inline-block",
+                "grid",
+                "none"
+              ],
+              "flexDirection": [
+                "row",
+                "row-reverse",
+                "column",
+                "column-reverse"
+              ],
+              "alignItems": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "baseline",
+                "stretch"
+              ],
+              "justifyContent": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "space-between",
+                "space-around"
+              ],
+              "boxSizing": [
+                "border-box"
+              ],
+              "width": [
+                "100%"
+              ],
+              "marginInline": [
+                "auto"
+              ]
+            },
+            "structuralNumbers": {
+              "opacity": {
+                "min": 0,
+                "max": 1
+              },
+              "flex": {
+                "min": 0,
+                "max": null
+              },
+              "flexGrow": {
+                "min": 0,
+                "max": null
+              },
+              "flexShrink": {
+                "min": 0,
+                "max": null
+              }
+            },
+            "compositeFormsRejected": [
+              "background",
+              "border",
+              "font",
+              "animation",
+              "transition"
+            ]
+          },
+          "designSystemModule": "generated/design.pandamstyle.js"
+        },
+        "revisionId": 2,
+        "current": {
+          "revisionId": 2,
+          "generationId": 2,
+          "registryDigest": "29f325221f326d3f"
+        },
+        "publication": {
+          "exists": true,
+          "artifacts": [
+            "build-report.json",
+            "design.pandamstyle.js",
+            "js/src/page.js",
+            "manifest.json",
+            "styles.css"
+          ]
+        },
+        "counters": {
+          "filesChanged": 0,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesReparsed": 0,
+          "filesRecompiled": 0,
+          "filesCompiled": 0,
+          "filesReused": 1,
+          "coverageSummariesReused": 2,
+          "coverageSummariesRebuilt": 0,
+          "reverseDependentsInvalidated": 0,
+          "negativeResolutionsInvalidated": 0,
+          "fullFallback": 0,
+          "fullFallbackReason": null,
+          "newlyCoveredFiles": 0,
+          "coveredFileCount": 2,
+          "fileStateCount": 2,
+          "dirtyFilesDeclared": 0,
+          "dirtyFilesRead": 2,
+          "dirtyFilesHashed": 2,
+          "dirtyFilesUnchanged": 0
+        },
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 2
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "29f325221f326d3f"
+          },
+          "abiVersion": 1,
+          "ok": true,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [],
+          "diagnosticsTotal": 0,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [],
+            "total": 0,
+            "truncated": false
+          },
+          "generation": {
+            "published": true,
+            "generationId": 2,
+            "artifactRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 2
+            },
+            "artifactDigest": "f1ce9721b04e5757208a8337404d8d929c99219283cb6786d2ce8d8cc482e1b2",
+            "associationRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 2
+            }
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": true,
+            "generationCommitted": true,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 2
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {
+          "build-report.json": "0ff119727bcfc30065fc1d9190ff929ca94367d67d7954cb500cf983cf8549b8",
+          "design.pandamstyle.js": "cabad34bea84c5df8e625752a7332b513516a785736705900e3cd4c2c6055370",
+          "js/src/page.js": "b60e166a82e2c0600a15c6d9f65ad3289ff2ed2341e5df87b01aeb0f293b0dea",
+          "manifest.json": "32429500181c30e331cc7994905806c9080e346fa54ac2c6bbf916f6c59bad6a",
+          "styles.css": "240f397a064163ce1e84b01524decc1710c4e7e044821a2ab57c5f68925dc4f1"
+        },
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "runtime": {
+          "result": {
+            "keys": [
+              "className"
+            ],
+            "rules": [
+              {
+                "selector": "&:not(#\\#):not(#\\#)",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "gap",
+                    "token(spacing.md)"
+                  ]
+                ],
+                "themes": []
+              }
+            ],
+            "classOrder": [
+              [
+                {
+                  "selector": "&:not(#\\#):not(#\\#)",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "gap",
+                      "token(spacing.md)"
+                    ]
+                  ],
+                  "themes": []
+                }
+              ]
+            ]
+          }
+        },
+        "artifactBytes": {
+          "design.pandamstyle.js": "/**\n * GENERATED BY PANDAMSTYLE - DO NOT EDIT.\n *\n * This file is the consumption surface of one design-system instance.\n * It holds finite, precompiled data only.\n */\n\nimport { assertAbi, defineRecipeSelector, props as __pmsProps, PmsSelectionError } from '@pandamstyle/core';\n\nassertAbi(1);\n\nexport const __PMS_DESIGN_SYSTEM__ = {\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"contractVersion\": \"pms-0.1\"\n};\n\nexport const manifest = {\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"conditions\": [\n    \"hover\",\n    \"wide\",\n    \"focus\"\n  ],\n  \"themes\": [\n    \"light\",\n    \"dark\"\n  ],\n  \"recipes\": {\n    \"button\": {\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    },\n    \"bare\": {\n      \"axes\": {},\n      \"axisOrder\": [],\n      \"defaults\": {}\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  }\n};\n\nexport const props = __pmsProps;\n\nexport const themes = {\n  \"base\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"base\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"light\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"light\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"dark\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"dark\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x1jmeyti\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        \"x5jm8p5\"\n      ]\n    ]\n  }\n};\n\nconst __pmsRecipe_bare = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"bare\",\n  \"axisOrder\": [],\n  \"variantMap\": {},\n  \"defaultVariants\": {},\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x1lliihq\"\n      ]\n    ]\n  },\n  \"branches\": {}\n});\n\nconst __pmsRecipe_button = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"button\",\n  \"axisOrder\": [\n    \"tone\",\n    \"size\",\n    \"flag\"\n  ],\n  \"variantMap\": {\n    \"tone\": [\n      \"quiet\",\n      \"loud\"\n    ],\n    \"size\": [\n      \"sm\",\n      \"md\"\n    ],\n    \"flag\": [\n      \"true\",\n      \"false\"\n    ]\n  },\n  \"defaultVariants\": {\n    \"tone\": \"quiet\",\n    \"size\": \"md\"\n  },\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x3nfvp2\"\n      ],\n      [\n        \"kMwMTN\",\n        \"xmcn0qq\"\n      ]\n    ]\n  },\n  \"branches\": {\n    \"tone\": {\n      \"quiet\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"xbyyjgo\"\n          ]\n        ]\n      },\n      \"loud\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"x1hc1fzr\"\n          ]\n        ]\n      }\n    },\n    \"size\": {\n      \"sm\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"xr1eeyi\"\n          ]\n        ]\n      },\n      \"md\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"x1db5p44\"\n          ]\n        ]\n      }\n    },\n    \"flag\": {\n      \"true\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x78zum5\"\n          ]\n        ]\n      },\n      \"false\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x1lliihq\"\n          ]\n        ]\n      }\n    }\n  }\n});\n\nexport const recipes = { \"bare\": __pmsRecipe_bare, \"button\": __pmsRecipe_button };\n\n// Compile-time only: reaching either at runtime means the PandamStyle\n// compiler did not transform this file.\nexport const token = function token(path) {\n  throw new PmsSelectionError({ code: 'PMS_TOKEN_RUNTIME', message: 'token() is compile-time only.', rule: 'generated.token-runtime', context: { path } });\n};\n\nexport const create = function create() {\n  throw new PmsSelectionError({ code: 'PMS_UNCOMPILED_CREATE', message: 'create() must be transformed by the PandamStyle compiler.', rule: 'generated.create-runtime', context: {} });\n};\n",
+          "js/src/page.js": "import { props as __pmsProps } from \"@pandamstyle/core\";\nconst s = {\n  a: {\n    kind: \"pandamstyle-style-ref\",\n    abiVersion: 1,\n    systemId: \"oracle-ui\",\n    entries: [[\"kOIVth\", \"xvej669\"]]\n  }\n};\nexport const result = __pmsProps(s.a);",
+          "manifest.json": "{\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"29f325221f326d3f\",\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"conditions\": [\n    \"hover\",\n    \"wide\",\n    \"focus\"\n  ],\n  \"themes\": [\n    \"light\",\n    \"dark\"\n  ],\n  \"recipes\": {\n    \"button\": {\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    },\n    \"bare\": {\n      \"axes\": {},\n      \"axisOrder\": [],\n      \"defaults\": {}\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  },\n  \"designSystemModule\": \"generated/design.pandamstyle.js\"\n}\n",
+          "styles.css": ":root, .x5jm8p5{--x806e8r:8px;--x1efyk35:16px;--x10bq9o0:24px;--x1a46r13:#112233;--x19wwu0b:#ffffff;--x19gs4d:#112233;--x1wcnge4:#ffffff;}\n.x1jmeyti.x1jmeyti, .x1jmeyti.x1jmeyti:root{--x1wcnge4:#112233;--x19gs4d:#ffffff;}\n.x1db5p44:not(#\\#){padding:var(--x1efyk35)}\n.xr1eeyi:not(#\\#){padding:var(--x806e8r)}\n.xvej669:not(#\\#):not(#\\#){gap:var(--x1efyk35)}\n.xmcn0qq:not(#\\#):not(#\\#):not(#\\#){color:var(--x19gs4d)}\n.x1lliihq:not(#\\#):not(#\\#):not(#\\#){display:block}\n.x78zum5:not(#\\#):not(#\\#):not(#\\#){display:flex}\n.x3nfvp2:not(#\\#):not(#\\#):not(#\\#){display:inline-flex}\n.xbyyjgo:not(#\\#):not(#\\#):not(#\\#){opacity:.5}\n.x1hc1fzr:not(#\\#):not(#\\#):not(#\\#){opacity:1}"
+        }
+      },
+      "freshChecks": [
+        {
+          "path": "accepted",
+          "value": true,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "conditions": [],
+            "declarations": [
+              [
+                "gap",
+                "token(spacing.md)"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": 1,
+          "op": "length",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/keys",
+          "value": [
+            "className"
+          ],
+          "op": "equal",
+          "matches": true
+        }
+      ],
+      "incrementalChecks": [
+        {
+          "path": "accepted",
+          "value": true,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "conditions": [],
+            "declarations": [
+              [
+                "gap",
+                "token(spacing.md)"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": 1,
+          "op": "length",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/keys",
+          "value": [
+            "className"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "counters/filesRecompiled",
+          "value": 0,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "counters/filesReparsed",
+          "value": 0,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "counters/filesReused",
+          "value": 1,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "revisionId",
+          "value": 2,
+          "matches": true
+        }
+      ],
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    }
+  ],
+  "contractReferences": [
+    "docs/architecture/public-api-v0.1.md",
+    "docs/architecture/generated-design-system-abi-v1.md"
+  ],
+  "classificationVerified": true
+}

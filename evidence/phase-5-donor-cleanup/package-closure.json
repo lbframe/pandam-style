@@ -1,0 +1,123 @@
+{
+  "documentKind": "pandamstyle-phase-5-package-tarball-closure",
+  "schemaVersion": 1,
+  "testedCommit": "cf2a1403ed6e651fdc23c950a40b4d639c504ef5",
+  "testedTree": "aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478",
+  "environment": "external temporary consumer project; verifier packed both packages and installed the tarballs outside the workspace",
+  "packages": [
+    {
+      "name": "@pandamstyle/compiler",
+      "tarball": "pandamstyle-compiler-0.1.0.tgz",
+      "tarballFileCount": 8,
+      "donorDependencies": [],
+      "donorImports": [],
+      "publicExports": {
+        ".": {
+          "types": "./types/index.d.ts",
+          "import": "./lib/index.mjs"
+        },
+        "./config": {
+          "types": "./types/config.d.ts",
+          "import": "./lib/config.mjs"
+        },
+        "./host": {
+          "types": "./types/host.d.ts",
+          "import": "./lib/host.mjs"
+        },
+        "./package.json": "./package.json"
+      },
+      "exportsLoaded": true,
+      "tarballContentsListedInPilotEvidence": true,
+      "evidenceTarball": "verify/package-tarballs/pandamstyle-compiler-0.1.0.tgz",
+      "tarballSha256": "5ecba4e0c2cafbf65f11fb82acd9dfe4c8dd6d86c1a8e7396fc534aed522b71c",
+      "tarballEntries": [
+        "package/bin/pms-build.js",
+        "package/package.json",
+        "package/lib/cli.mjs",
+        "package/lib/config.mjs",
+        "package/lib/host.mjs",
+        "package/lib/index.mjs",
+        "package/types/config.d.ts",
+        "package/types/host.d.ts",
+        "package/types/index.d.ts"
+      ],
+      "tarballDonorTreeEntries": []
+    },
+    {
+      "name": "@pandamstyle/core",
+      "tarball": "pandamstyle-core-0.1.0.tgz",
+      "tarballFileCount": 7,
+      "donorDependencies": [],
+      "donorImports": [],
+      "publicExports": [
+        ".",
+        "./package.json"
+      ],
+      "coreRuntimeLoads": true,
+      "workspaceLeakage": false,
+      "tarballContentsListedInPilotEvidence": true,
+      "evidenceTarball": "verify/package-tarballs/pandamstyle-core-0.1.0.tgz",
+      "tarballSha256": "6cfb1fee95306ee40b382a2e09d8467d697db38d86fe9fa3c70514294faa1ca6",
+      "tarballEntries": [
+        "package/src/abi.js",
+        "package/src/index.js",
+        "package/src/props.js",
+        "package/src/recipe-select.js",
+        "package/src/recipe.js",
+        "package/src/selection-error.js",
+        "package/package.json",
+        "package/src/types.ts"
+      ],
+      "tarballDonorTreeEntries": []
+    }
+  ],
+  "installedGraph": {
+    "complete": true,
+    "packageCount": 60,
+    "donorPackageCount": 0,
+    "workspaceLeakage": false
+  },
+  "generatedRuntime": {
+    "fileCount": 6,
+    "coreImportCount": 5,
+    "stylexImportCount": 0,
+    "pandacssImportCount": 0,
+    "pilotGeneratedRuntimeFileCount": 10,
+    "pilotReportCoreImportCount": 8
+  },
+  "tarballDonorTreeLeakage": false,
+  "evidence": [
+    "verify/donor-closure/report.json",
+    "verify/pilot.log",
+    "verify/artifacts/compiler-package.json",
+    "verify/core-package-proof/proof.json",
+    "verify/artifacts/generated-runtime-imports.json",
+    "verify/package-tarballs/manifest.json",
+    "verify/package-tarballs/pandamstyle-compiler-0.1.0.tgz",
+    "verify/package-tarballs/pandamstyle-core-0.1.0.tgz"
+  ],
+  "tarballContents": {
+    "pandamstyle-compiler-0.1.0.tgz": [
+      "package/bin/pms-build.js",
+      "package/lib/cli.mjs",
+      "package/lib/config.mjs",
+      "package/lib/host.mjs",
+      "package/lib/index.mjs",
+      "package/package.json",
+      "package/types/config.d.ts",
+      "package/types/host.d.ts",
+      "package/types/index.d.ts"
+    ],
+    "pandamstyle-core-0.1.0.tgz": [
+      "package/package.json",
+      "package/src/abi.js",
+      "package/src/index.js",
+      "package/src/props.js",
+      "package/src/recipe-select.js",
+      "package/src/recipe.js",
+      "package/src/selection-error.js",
+      "package/src/types.ts"
+    ]
+  },
+  "tarballDonorTreePathsFound": []
+}

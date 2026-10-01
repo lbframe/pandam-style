@@ -1,0 +1,34 @@
+{
+  "documentKind": "pandamstyle-phase-5-static-check-results",
+  "schemaVersion": 1,
+  "testedCommit": "cf2a1403ed6e651fdc23c950a40b4d639c504ef5",
+  "testedTree": "aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478",
+  "checks": {
+    "flow": {
+      "command": "yarn flow",
+      "status": "passed",
+      "remainingErrors": 0,
+      "log": "flow.log"
+    },
+    "eslint": {
+      "command": "yarn lint:report",
+      "status": "passed",
+      "remainingFailures": 0,
+      "ownership": "PandamStyle repository",
+      "log": "eslint.log"
+    },
+    "prettier": {
+      "command": "yarn prettier:report",
+      "status": "passed",
+      "remainingFailures": 0,
+      "log": "prettier.log"
+    },
+    "benchmarkHarness": {
+      "command": "node --test benchmarks/pandamstyle/tests/bench.test.js",
+      "status": "passed",
+      "tests": 35,
+      "failed": 0,
+      "log": "benchmark-tests.tap"
+    }
+  }
+}

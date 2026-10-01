@@ -1,0 +1,52 @@
+{
+  "documentKind": "pandamstyle-phase-5-test-migration-result",
+  "schemaVersion": 1,
+  "testedCommit": "cf2a1403ed6e651fdc23c950a40b4d639c504ef5",
+  "testedTree": "aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478",
+  "sourceCommit": "44bbdb4c323cfaae9abc69f524d4fc8b5ceb4133",
+  "oldRoot": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle",
+  "newOwnedRoot": "packages/compiler/__tests__/pandamstyle",
+  "counts": {
+    "tests": 22,
+    "helpers": 2,
+    "fixtureFiles": 84,
+    "total": 108
+  },
+  "unmigratedPandamStyleTests": 0,
+  "ownedSuiteVerification": {
+    "command": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle packages/compiler/__tests__/engine-absorption-test.js",
+    "status": "passed",
+    "testSuites": 23,
+    "tests": 510,
+    "includesAllMigratedTests": true,
+    "includesEngineAbsorptionRegressions": true
+  },
+  "referenceSuiteDisposition": {
+    "removedPhase4VerifierSteps": [
+      "upstream-babel-plugin",
+      "upstream-stylex"
+    ],
+    "retainedBehaviorCategoryCount": 6,
+    "retainedBehaviorCategories": [
+      "static evaluation, per-pass isolation, and fail-closed escape handling",
+      "stable atom hashes, declaration normalization, deduplication, shorthand priority, and null longhand suppression",
+      "CSS functions/quoted values in splitting and supported numeric normalization",
+      "breakpoint ordering, layer emission, and RTL logical floats",
+      "token variables, theme projection, runtime composition, and recipes",
+      "browser computed style, SSR/hydration, incremental ownership, publication, revision, diagnostics, and isolation contracts"
+    ],
+    "intentionallyDiscardedCategoryCount": 3,
+    "intentionallyDiscardedCategories": [
+      "donor DOM injection and StyleX-specific runtime behavior not retained by PandamStyle",
+      "standalone StyleX APIs outside the PandamStyle product contract",
+      "unused donor Babel transforms and tests"
+    ],
+    "rationale": "Retained behavior has owned compiler/core tests and the independent semantic oracle; donor implementation suites and unrelated behavior were removed with the physical donor trees. These counts are behavior categories, not upstream test-case counts."
+  },
+  "evidence": [
+    "inventory.json",
+    "../verify/pandamstyle.log",
+    "../verify/summary.json",
+    "../../../docs/architecture/phase-5-deletion-map.md"
+  ]
+}

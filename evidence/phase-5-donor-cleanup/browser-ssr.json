@@ -1,0 +1,61 @@
+{
+  "documentKind": "pandamstyle-phase-5-browser-ssr-result",
+  "schemaVersion": 1,
+  "testedCommit": "cf2a1403ed6e651fdc23c950a40b4d639c504ef5",
+  "testedTree": "aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478",
+  "suite": "semantic-oracle",
+  "result": "passed",
+  "caseCount": 6,
+  "cases": [
+    {
+      "id": "browser.shorthand-longhand",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.token-values",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.theme-scope",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.conflict",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.media-cascade",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    },
+    {
+      "id": "browser.ssr-hydration",
+      "status": "MUST_PRESERVE",
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    }
+  ],
+  "covered": [
+    "computed styles",
+    "shorthand/longhand conflict",
+    "condition/media cascade",
+    "theme scope",
+    "token values",
+    "SSR/hydration"
+  ]
+}

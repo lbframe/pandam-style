@@ -1,0 +1,64 @@
+{
+  "documentKind": "pandamstyle-phase-5-npm-pack-tarballs",
+  "schemaVersion": 1,
+  "testedCommit": "cf2a1403ed6e651fdc23c950a40b4d639c504ef5",
+  "testedTree": "aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478",
+  "command": "npm pack --pack-destination <pilot-work-dir> --silent",
+  "source": "tools/pilot/run-pilot.sh in the tested tree",
+  "externallyInstalledByPilot": true,
+  "packages": [
+    {
+      "name": "@pandamstyle/compiler",
+      "version": "0.1.0",
+      "file": "pandamstyle-compiler-0.1.0.tgz",
+      "sha256": "5ecba4e0c2cafbf65f11fb82acd9dfe4c8dd6d86c1a8e7396fc534aed522b71c",
+      "archiveFileCount": 9,
+      "archiveEntries": [
+        "package/bin/pms-build.js",
+        "package/package.json",
+        "package/lib/cli.mjs",
+        "package/lib/config.mjs",
+        "package/lib/host.mjs",
+        "package/lib/index.mjs",
+        "package/types/config.d.ts",
+        "package/types/host.d.ts",
+        "package/types/index.d.ts"
+      ],
+      "dependencies": {
+        "@pandamstyle/core": "0.1.0",
+        "@babel/core": "^7.26.8",
+        "@babel/helper-module-imports": "^7.25.9",
+        "@babel/parser": "^7.28.5",
+        "@babel/preset-react": "^7.27.1",
+        "@babel/preset-typescript": "^7.26.0",
+        "@babel/traverse": "^7.26.8",
+        "@babel/types": "^7.26.8",
+        "@csstools/css-tokenizer": "^3.0.3",
+        "postcss-value-parser": "^4.1.0"
+      },
+      "donorDependencies": [],
+      "donorTreeEntries": []
+    },
+    {
+      "name": "@pandamstyle/core",
+      "version": "0.1.0",
+      "file": "pandamstyle-core-0.1.0.tgz",
+      "sha256": "6cfb1fee95306ee40b382a2e09d8467d697db38d86fe9fa3c70514294faa1ca6",
+      "archiveFileCount": 8,
+      "archiveEntries": [
+        "package/src/abi.js",
+        "package/src/index.js",
+        "package/src/props.js",
+        "package/src/recipe-select.js",
+        "package/src/recipe.js",
+        "package/src/selection-error.js",
+        "package/package.json",
+        "package/src/types.ts"
+      ],
+      "dependencies": {},
+      "donorDependencies": [],
+      "donorTreeEntries": []
+    }
+  ],
+  "donorTarballContentsAbsent": true
+}

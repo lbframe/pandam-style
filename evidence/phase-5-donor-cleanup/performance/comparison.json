@@ -1,0 +1,926 @@
+{
+  "documentKind": "pandamstyle-phase-5-performance-comparison",
+  "schemaVersion": 1,
+  "testedCommit": "cf2a1403ed6e651fdc23c950a40b4d639c504ef5",
+  "testedTree": "aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478",
+  "phase4ComparisonCommit": "7b6b58ee2a430d8495a2acbed67fb631fc43f577",
+  "phase4ComparisonTree": "2459745ffd057f10bd567ee4dadd6805534eddf7",
+  "corpus": {
+    "name": "c10000-t1000-r100-s307-reconciliation",
+    "contentHash": "91ad54984875a9226624413db899415bad8ff7427810099f234350e927c964da",
+    "generatorVersion": "pms-corpus/1.0.0",
+    "sourceFiles": 10020,
+    "filesIncludingManifest": 10021,
+    "manifestSha256": "d273bee02dcd3a0a6cafe6e2ed0e3f08d1cb326687e71d2c50a5e3e9f912338d"
+  },
+  "method": {
+    "harnessVersion": "pms-agent-loop-harness/1.0.0",
+    "iterationsPerCell": 3,
+    "warmup": "discarded",
+    "processIsolation": "one child process per cell",
+    "diagnosticsVariant": "compact_agent_result",
+    "publicationVariant": "compact_agent_result_plus_compact_publish_metadata",
+    "phase4Baseline": "Phase 4 tested medians from its performance/comparison.json; original pre-absorption rows retained there",
+    "confidenceIntervals": "not computed; each cell has three observations and latency differences are measured evidence, not a universal estimate"
+  },
+  "diagnostics": {
+    "rows": 960,
+    "errors": 0,
+    "cells": [
+      {
+        "scenario": "style edit",
+        "scenarioId": "one_file_existing_atoms#edit",
+        "metric": "agent_edit_to_diagnostics_ms",
+        "unit": "ms",
+        "phase4P50": 70.121342,
+        "phase4P95UpperRank": 72.492983,
+        "phase5P50": 65.617115,
+        "phase5P95UpperRank": 67.854652,
+        "deltaMs": -4.504227,
+        "changePercent": -6.42,
+        "n": 3
+      },
+      {
+        "scenario": "import change",
+        "scenarioId": "import_change#import",
+        "metric": "agent_edit_to_diagnostics_ms",
+        "unit": "ms",
+        "phase4P50": 20.918786,
+        "phase4P95UpperRank": 21.532696,
+        "phase5P50": 31.859011,
+        "phase5P95UpperRank": 32.419534,
+        "deltaMs": 10.940225,
+        "changePercent": 52.3,
+        "n": 3
+      },
+      {
+        "scenario": "re-export change",
+        "scenarioId": "reexport_change#reexport",
+        "metric": "agent_edit_to_diagnostics_ms",
+        "unit": "ms",
+        "phase4P50": 114.983166,
+        "phase4P95UpperRank": 116.733347,
+        "phase5P50": 113.371877,
+        "phase5P95UpperRank": 134.994721,
+        "deltaMs": -1.611289,
+        "changePercent": -1.4,
+        "n": 3
+      },
+      {
+        "scenario": "unresolved import",
+        "scenarioId": "unresolved_import_then_file_appears#unresolved",
+        "metric": "agent_edit_to_diagnostics_ms",
+        "unit": "ms",
+        "phase4P50": 21.045696,
+        "phase4P95UpperRank": 23.574258,
+        "phase5P50": 20.802998,
+        "phase5P95UpperRank": 25.489793,
+        "deltaMs": -0.242698,
+        "changePercent": -1.15,
+        "n": 3
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "scenarioId": "unresolved_import_then_file_appears#appears",
+        "metric": "agent_edit_to_diagnostics_ms",
+        "unit": "ms",
+        "phase4P50": 76.935054,
+        "phase4P95UpperRank": 81.342466,
+        "phase5P50": 77.018383,
+        "phase5P95UpperRank": 85.94878,
+        "deltaMs": 0.083329,
+        "changePercent": 0.11,
+        "n": 3
+      },
+      {
+        "scenario": "no change",
+        "scenarioId": "no_change#declared_unchanged",
+        "metric": "agent_edit_to_diagnostics_ms",
+        "unit": "ms",
+        "phase4P50": 67.287221,
+        "phase4P95UpperRank": 68.696622,
+        "phase5P50": 61.617717,
+        "phase5P95UpperRank": 61.727617,
+        "deltaMs": -5.669504,
+        "changePercent": -8.43,
+        "n": 3
+      }
+    ]
+  },
+  "publication": {
+    "rows": 159,
+    "errors": 0,
+    "cells": [
+      {
+        "scenario": "publication ready",
+        "metric": "agent_edit_to_generation_ready_ms",
+        "unit": "ms",
+        "phase4P50": 619.375025,
+        "phase4P95UpperRank": 756.80724,
+        "phase5P50": 563.465017,
+        "phase5P95UpperRank": 653.028763,
+        "deltaMs": -55.910008,
+        "changePercent": -9.03,
+        "n": 3
+      },
+      {
+        "scenario": "publication committed",
+        "metric": "agent_edit_to_generation_committed_ms",
+        "unit": "ms",
+        "phase4P50": 750.996737,
+        "phase4P95UpperRank": 887.577911,
+        "phase5P50": 700.907946,
+        "phase5P95UpperRank": 927.072387,
+        "deltaMs": -50.088791,
+        "changePercent": -6.67,
+        "n": 3
+      }
+    ]
+  },
+  "workShape": {
+    "comparedCounters": 96,
+    "unchangedCounters": 96,
+    "changedCounters": [],
+    "countersByScenario": [
+      {
+        "scenario": "style edit",
+        "metric": "mutation_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "mutation_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "files_compiled",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "files_recompiled",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "files_reused",
+        "phase4P50": 10001,
+        "phase5P50": 10001,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "dirty_files_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "dirty_files_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "covered_entries_iterated",
+        "phase4P50": 10003,
+        "phase5P50": 10003,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "full_fallback",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:parse_calls",
+        "phase4P50": 3,
+        "phase5P50": 3,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:closure_nodes_examined",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:closure_nodes_reused",
+        "phase4P50": 10002,
+        "phase5P50": 10002,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:closure_edges_recomputed",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:dsv_files_examined",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:dsv_files_recomputed",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:dsv_files_reused",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "mutation_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "mutation_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "files_compiled",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "files_recompiled",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "files_reused",
+        "phase4P50": 10002,
+        "phase5P50": 10002,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "dirty_files_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "dirty_files_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "covered_entries_iterated",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "full_fallback",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "counter:parse_calls",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "counter:closure_nodes_examined",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "counter:closure_nodes_reused",
+        "phase4P50": 10002,
+        "phase5P50": 10002,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "counter:closure_edges_recomputed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "counter:dsv_files_examined",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "counter:dsv_files_recomputed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "import change",
+        "metric": "counter:dsv_files_reused",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "mutation_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "mutation_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "files_compiled",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "files_recompiled",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "files_reused",
+        "phase4P50": 10001,
+        "phase5P50": 10001,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "dirty_files_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "dirty_files_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "covered_entries_iterated",
+        "phase4P50": 10003,
+        "phase5P50": 10003,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "full_fallback",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "counter:parse_calls",
+        "phase4P50": 5,
+        "phase5P50": 5,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "counter:closure_nodes_examined",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "counter:closure_nodes_reused",
+        "phase4P50": 10002,
+        "phase5P50": 10002,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "counter:closure_edges_recomputed",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "counter:dsv_files_examined",
+        "phase4P50": 3335,
+        "phase5P50": 3335,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "counter:dsv_files_recomputed",
+        "phase4P50": 3334,
+        "phase5P50": 3334,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "re-export change",
+        "metric": "counter:dsv_files_reused",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "mutation_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "mutation_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "files_compiled",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "files_recompiled",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "files_reused",
+        "phase4P50": 10002,
+        "phase5P50": 10002,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "dirty_files_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "dirty_files_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "covered_entries_iterated",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "full_fallback",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "counter:parse_calls",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "counter:closure_nodes_examined",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "counter:closure_nodes_reused",
+        "phase4P50": 10002,
+        "phase5P50": 10002,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "counter:closure_edges_recomputed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "counter:dsv_files_examined",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "counter:dsv_files_recomputed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import",
+        "metric": "counter:dsv_files_reused",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "mutation_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "mutation_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "files_compiled",
+        "phase4P50": 2,
+        "phase5P50": 2,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "files_recompiled",
+        "phase4P50": 2,
+        "phase5P50": 2,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "files_reused",
+        "phase4P50": 10001,
+        "phase5P50": 10001,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "dirty_files_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "dirty_files_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "covered_entries_iterated",
+        "phase4P50": 10004,
+        "phase5P50": 10004,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "full_fallback",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "counter:parse_calls",
+        "phase4P50": 6,
+        "phase5P50": 6,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "counter:closure_nodes_examined",
+        "phase4P50": 2,
+        "phase5P50": 2,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "counter:closure_nodes_reused",
+        "phase4P50": 10002,
+        "phase5P50": 10002,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "counter:closure_edges_recomputed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "counter:dsv_files_examined",
+        "phase4P50": 2,
+        "phase5P50": 2,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "counter:dsv_files_recomputed",
+        "phase4P50": 2,
+        "phase5P50": 2,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "unresolved import repaired",
+        "metric": "counter:dsv_files_reused",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "mutation_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "mutation_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "files_compiled",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "files_recompiled",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "files_reused",
+        "phase4P50": 10001,
+        "phase5P50": 10001,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "dirty_files_read",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "dirty_files_hashed",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "covered_entries_iterated",
+        "phase4P50": 10003,
+        "phase5P50": 10003,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "full_fallback",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:parse_calls",
+        "phase4P50": 2,
+        "phase5P50": 2,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:closure_nodes_examined",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:closure_nodes_reused",
+        "phase4P50": 10003,
+        "phase5P50": 10003,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:closure_edges_recomputed",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:dsv_files_examined",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:dsv_files_recomputed",
+        "phase4P50": 0,
+        "phase5P50": 0,
+        "delta": 0,
+        "unchanged": true
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:dsv_files_reused",
+        "phase4P50": 1,
+        "phase5P50": 1,
+        "delta": 0,
+        "unchanged": true
+      }
+    ],
+    "phase4NonzeroFallbackObservations": 0,
+    "phase5DiagnosticsFallbackObservations": 18,
+    "phase5DiagnosticsNonzeroFallbacks": 0,
+    "phase5PublicationFallbackObservations": 3,
+    "phase5PublicationNonzeroFallbacks": 0
+  },
+  "totalErrors": 0,
+  "limitations": [
+    "Three samples per cell; no confidence intervals.",
+    "The Phase 4 baseline rows do not record a tested commit. The Phase 4 tested tree is identified above.",
+    "Small latency movements include normal process and host variability; work-shape counters are compared separately."
+  ]
+}

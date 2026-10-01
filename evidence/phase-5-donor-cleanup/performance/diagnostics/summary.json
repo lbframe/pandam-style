@@ -1,0 +1,6199 @@
+{
+  "documentKind": "pandamstyle-agent-loop-summary",
+  "schemaVersion": 1,
+  "input": "/tmp/pandamstyle-phase5-tested/evidence/phase-5-donor-cleanup/performance/diagnostics/c10000-t1000-r100-s307-reconciliation-agent-loop.jsonl",
+  "rows": 960,
+  "errors": [],
+  "error_count": 0,
+  "variants": {
+    "full_metadata": {
+      "auditPolicy": "inline",
+      "publishes": true,
+      "audits": false,
+      "label": "the pre-Phase-C artifact: the whole coverage array inline"
+    },
+    "compact_agent_result": {
+      "auditPolicy": "reference",
+      "publishes": false,
+      "audits": false,
+      "label": "diagnostics only; nothing published"
+    },
+    "compact_agent_result_plus_compact_publish_metadata": {
+      "auditPolicy": "reference",
+      "publishes": true,
+      "audits": false,
+      "label": "diagnostics, then a publication with counts and a reference"
+    },
+    "full_audit_requested": {
+      "auditPolicy": "reference",
+      "publishes": true,
+      "audits": true,
+      "label": "diagnostics, publication, and the requested coverage document"
+    }
+  },
+  "comparability": {
+    "full_metadata|full_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_metadata|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result_plus_compact_publish_metadata|full_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result_plus_compact_publish_metadata|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": true,
+      "reason": null
+    },
+    "compact_agent_result|compact_agent_result": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_audit_requested|full_audit_requested": {
+      "comparable": true,
+      "reason": null
+    },
+    "full_metadata|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: the pre-Phase-C artifact: the whole coverage array inline vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "full_metadata|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: the pre-Phase-C artifact: the whole coverage array inline vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|full_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs the pre-Phase-C artifact: the whole coverage array inline. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs diagnostics, then a publication with counts and a reference. A faster number for less work has not won anything."
+    },
+    "compact_agent_result|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics only; nothing published vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "compact_agent_result_plus_compact_publish_metadata|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, then a publication with counts and a reference vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "compact_agent_result_plus_compact_publish_metadata|full_audit_requested": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, then a publication with counts and a reference vs diagnostics, publication, and the requested coverage document. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|full_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs the pre-Phase-C artifact: the whole coverage array inline. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|compact_agent_result": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs diagnostics only; nothing published. A faster number for less work has not won anything."
+    },
+    "full_audit_requested|compact_agent_result_plus_compact_publish_metadata": {
+      "comparable": false,
+      "reason": "these two do different amounts of work: diagnostics, publication, and the requested coverage document vs diagnostics, then a publication with counts and a reference. A faster number for less work has not won anything."
+    }
+  },
+  "headline": [
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 31.859011,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 3319,
+      "work": {
+        "filesCompiled": 0,
+        "filesRecompiled": 0,
+        "filesReused": 10002,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 0,
+        "reuse_ms": 0,
+        "coverage_entries_ms": 0,
+        "entries_iterated": 0
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.240773,
+        "agent_result_serialize_ms": 0.01621
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 61.617717,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 1859,
+      "work": {
+        "filesCompiled": 1,
+        "filesRecompiled": 1,
+        "filesReused": 10001,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 6.059129,
+        "reuse_ms": 3.194095,
+        "coverage_entries_ms": 5.921918,
+        "entries_iterated": 10003
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.08742,
+        "agent_result_serialize_ms": 0.014
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 65.617115,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 1902,
+      "work": {
+        "filesCompiled": 1,
+        "filesRecompiled": 1,
+        "filesReused": 10001,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 5.077698,
+        "reuse_ms": 5.430299,
+        "coverage_entries_ms": 6.887746,
+        "entries_iterated": 10003
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.09401,
+        "agent_result_serialize_ms": 0.01411
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 113.371877,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 1618,
+      "work": {
+        "filesCompiled": 1,
+        "filesRecompiled": 1,
+        "filesReused": 10001,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 4.237502,
+        "reuse_ms": 4.449391,
+        "coverage_entries_ms": 6.379296,
+        "entries_iterated": 10003
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.0907,
+        "agent_result_serialize_ms": 0.01385
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 77.018383,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 2250,
+      "work": {
+        "filesCompiled": 2,
+        "filesRecompiled": 2,
+        "filesReused": 10001,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 7.07322,
+        "reuse_ms": 5.439515,
+        "coverage_entries_ms": 6.874794,
+        "entries_iterated": 10004
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.08668000000000001,
+        "agent_result_serialize_ms": 0.0152
+      }
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "agent_edit_to_diagnostics_ms": {
+        "compact_agent_result": 20.802998,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_ready_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_generation_committed_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "agent_edit_to_audit_report_ms": {
+        "compact_agent_result": null,
+        "compact_publish": null,
+        "full_audit_requested": null,
+        "sessions": 3
+      },
+      "metadata_bytes": {
+        "full_metadata": null,
+        "compact_publish": null,
+        "coverage_document": null
+      },
+      "agent_result_bytes": 3474,
+      "work": {
+        "filesCompiled": 0,
+        "filesRecompiled": 0,
+        "filesReused": 10002,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1
+      },
+      "reuseLoop": {
+        "affected_ms": 0,
+        "reuse_ms": 0,
+        "coverage_entries_ms": 0,
+        "entries_iterated": 0
+      },
+      "metadata_timings": {
+        "build_report_build_ms": null,
+        "build_report_serialize_ms": null,
+        "coverage_report_build_ms": null,
+        "coverage_report_serialize_ms": null,
+        "agent_result_build_ms": 0.239311,
+        "agent_result_serialize_ms": 0.017141
+      }
+    }
+  ],
+  "cells": [
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 28.351434,
+      "p50": 31.859011,
+      "p95": 32.419534,
+      "max": 32.419534,
+      "mean": 30.876659666666665
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 29.15264,
+      "p50": 32.573436,
+      "p95": 33.228281,
+      "max": 33.228281,
+      "mean": 31.65145233333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.232261,
+      "p50": 0.240773,
+      "p95": 0.255853,
+      "max": 0.255853,
+      "mean": 0.2429623333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3319,
+      "p50": 3319,
+      "p95": 3320,
+      "max": 3320,
+      "mean": 3319.3333333333335
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.0161,
+      "p50": 0.01621,
+      "p95": 0.02121,
+      "max": 0.02121,
+      "mean": 0.017839999999999998
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_full_walk",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 16.464114,
+      "p50": 17.218651,
+      "p95": 21.775765,
+      "max": 21.775765,
+      "mean": 18.48617666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_hits",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.558834,
+      "p50": 0.919847,
+      "p95": 1.692423,
+      "max": 1.692423,
+      "mean": 1.0570346666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 16.619515,
+      "p50": 17.381352,
+      "p95": 21.928626,
+      "max": 21.928626,
+      "mean": 18.643164333333335
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.406483,
+      "p50": 0.643695,
+      "p95": 1.535451,
+      "max": 1.535451,
+      "mean": 0.8618763333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_resolve_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.103271,
+      "p50": 0.108461,
+      "p95": 0.112431,
+      "max": 0.112431,
+      "mean": 0.10805433333333332
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.513949,
+      "p50": 2.57842,
+      "p95": 2.58628,
+      "max": 2.58628,
+      "mean": 2.559549666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 7.462014999999994,
+      "p50": 7.514777000000002,
+      "p95": 11.135252999999999,
+      "max": 11.135252999999999,
+      "mean": 8.704014999999998
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "import_change#import",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 59.640822,
+      "p50": 61.617717,
+      "p95": 61.727617,
+      "max": 61.727617,
+      "mean": 60.99538533333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 60.278026,
+      "p50": 62.248481,
+      "p95": 62.381712,
+      "max": 62.381712,
+      "mean": 61.636073
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.08476,
+      "p50": 0.08742,
+      "p95": 0.10466,
+      "max": 0.10466,
+      "mean": 0.09227999999999999
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1858,
+      "p50": 1859,
+      "p95": 1859,
+      "max": 1859,
+      "mean": 1858.6666666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01307,
+      "p50": 0.014,
+      "p95": 0.01419,
+      "max": 0.01419,
+      "mean": 0.013753333333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.149441,
+      "p50": 0.149471,
+      "p95": 0.149641,
+      "max": 0.149641,
+      "mean": 0.14951766666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.099991,
+      "p50": 0.100591,
+      "p95": 0.106421,
+      "max": 0.106421,
+      "mean": 0.10233433333333332
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10001,
+      "p50": 10001,
+      "p95": 10001,
+      "max": 10001,
+      "mean": 10001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.304862,
+      "p50": 0.309442,
+      "p95": 0.310732,
+      "max": 0.310732,
+      "mean": 0.3083453333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 50.667553,
+      "p50": 52.657448,
+      "p95": 53.331264,
+      "max": 53.331264,
+      "mean": 52.218754999999994
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.351868,
+      "p50": 2.404168,
+      "p95": 2.425249,
+      "max": 2.425249,
+      "mean": 2.393761666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.832781,
+      "p50": 6.059129,
+      "p95": 6.161437,
+      "max": 6.161437,
+      "mean": 5.684449
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.896962,
+      "p50": 5.921918,
+      "p95": 5.998167,
+      "max": 5.998167,
+      "mean": 5.939015666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3.144484,
+      "p50": 3.194095,
+      "p95": 4.346006,
+      "max": 4.346006,
+      "mean": 3.561528333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.623853000000004,
+      "p50": 6.238578000000004,
+      "p95": 6.361139000000001,
+      "max": 6.361139000000001,
+      "mean": 6.074523333333336
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "no_change#declared_unchanged",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 64.281874,
+      "p50": 65.617115,
+      "p95": 67.854652,
+      "max": 67.854652,
+      "mean": 65.91788033333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 64.905999,
+      "p50": 66.23764,
+      "p95": 68.567927,
+      "max": 68.567927,
+      "mean": 66.570522
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.089341,
+      "p50": 0.09401,
+      "p95": 0.10209099999999999,
+      "max": 0.10209099999999999,
+      "mean": 0.09514733333333332
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1902,
+      "p50": 1902,
+      "p95": 1902,
+      "max": 1902,
+      "mean": 1902
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.012381,
+      "p50": 0.01411,
+      "p95": 0.01761,
+      "max": 0.01761,
+      "mean": 0.014700333333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.567294,
+      "p50": 0.570395,
+      "p95": 0.594855,
+      "max": 0.594855,
+      "mean": 0.5775146666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.0981,
+      "p50": 0.099041,
+      "p95": 0.10349,
+      "max": 0.10349,
+      "mean": 0.10021033333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10001,
+      "p50": 10001,
+      "p95": 10001,
+      "max": 10001,
+      "mean": 10001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.724936,
+      "p50": 0.727725,
+      "p95": 0.756166,
+      "max": 0.756166,
+      "mean": 0.7362756666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 54.239309,
+      "p50": 56.799248,
+      "p95": 57.801196,
+      "max": 57.801196,
+      "mean": 56.27991766666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.367988,
+      "p50": 2.439438,
+      "p95": 2.564839,
+      "max": 2.564839,
+      "mean": 2.4574216666666664
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.613804,
+      "p50": 5.077698,
+      "p95": 6.195736,
+      "max": 6.195736,
+      "mean": 5.295746
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.917439,
+      "p50": 6.887746,
+      "p95": 7.245853,
+      "max": 7.245853,
+      "mean": 6.683679333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.330087,
+      "p50": 5.430299,
+      "p95": 5.493996,
+      "max": 5.493996,
+      "mean": 5.084794
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.724942999999996,
+      "p50": 6.732451000000005,
+      "p95": 6.875402000000001,
+      "max": 6.875402000000001,
+      "mean": 6.444265333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "one_file_existing_atoms#edit",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 112.542691,
+      "p50": 113.371877,
+      "p95": 134.994721,
+      "max": 134.994721,
+      "mean": 120.30309633333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 113.174356,
+      "p50": 114.019982,
+      "p95": 135.664755,
+      "max": 135.664755,
+      "mean": 120.95303100000001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.085571,
+      "p50": 0.0907,
+      "p95": 0.09706100000000001,
+      "max": 0.09706100000000001,
+      "mean": 0.09111066666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1618,
+      "p50": 1618,
+      "p95": 1618,
+      "max": 1618,
+      "mean": 1618
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01349,
+      "p50": 0.01385,
+      "p95": 0.02168,
+      "max": 0.02168,
+      "mean": 0.01634
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.396813,
+      "p50": 0.410053,
+      "p95": 0.430613,
+      "max": 0.430613,
+      "mean": 0.412493
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3335,
+      "p50": 3335,
+      "p95": 3335,
+      "max": 3335,
+      "mean": 3335
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3334,
+      "p50": 3334,
+      "p95": 3334,
+      "max": 3334,
+      "mean": 3334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_hits",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3333,
+      "p50": 3333,
+      "p95": 3333,
+      "max": 3333,
+      "mean": 3333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_walks",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 52.385166,
+      "p50": 54.741054,
+      "p95": 61.331113,
+      "max": 61.331113,
+      "mean": 56.152444333333335
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5,
+      "p50": 5,
+      "p95": 5,
+      "max": 5,
+      "mean": 5
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10001,
+      "p50": 10001,
+      "p95": 10001,
+      "max": 10001,
+      "mean": 10001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.551644,
+      "p50": 0.565814,
+      "p95": 0.592384,
+      "max": 0.592384,
+      "mean": 0.5699473333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 49.631735,
+      "p50": 51.159576,
+      "p95": 63.778283,
+      "max": 63.778283,
+      "mean": 54.85653133333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 36.797568,
+      "p50": 37.497283,
+      "p95": 42.606485,
+      "max": 42.606485,
+      "mean": 38.96711199999999
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.354088,
+      "p50": 2.385038,
+      "p95": 2.608769,
+      "max": 2.608769,
+      "mean": 2.4492983333333336
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.953867,
+      "p50": 4.237502,
+      "p95": 4.300215,
+      "max": 4.300215,
+      "mean": 3.8305279999999997
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.721747,
+      "p50": 6.379296,
+      "p95": 7.080703,
+      "max": 7.080703,
+      "mean": 6.393915333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3.996444,
+      "p50": 4.449391,
+      "p95": 4.696609,
+      "max": 4.696609,
+      "mean": 4.380814666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 21.648865000000015,
+      "p50": 23.322956999999988,
+      "p95": 25.4088,
+      "max": 25.4088,
+      "mean": 23.460207333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "reexport_change#reexport",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 70.174361,
+      "p50": 77.018383,
+      "p95": 85.94878,
+      "max": 85.94878,
+      "mean": 77.71384133333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 70.371182,
+      "p50": 77.231784,
+      "p95": 86.185542,
+      "max": 86.185542,
+      "mean": 77.92950266666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.08136,
+      "p50": 0.08668000000000001,
+      "p95": 0.09759200000000001,
+      "max": 0.09759200000000001,
+      "mean": 0.08854400000000001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2249,
+      "p50": 2250,
+      "p95": 2250,
+      "max": 2250,
+      "mean": 2249.6666666666665
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.0124,
+      "p50": 0.0152,
+      "p95": 0.02009,
+      "max": 0.02009,
+      "mean": 0.015896666666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_full_walk",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 7.592867,
+      "p50": 7.94929,
+      "p95": 12.552605,
+      "max": 12.552605,
+      "mean": 9.364920666666666
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_hits",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4,
+      "p50": 4,
+      "p95": 4,
+      "max": 4,
+      "mean": 4
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_walks",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1.206099,
+      "p50": 1.248799,
+      "p95": 1.279709,
+      "max": 1.279709,
+      "mean": 1.244869
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 6,
+      "p50": 6,
+      "p95": 6,
+      "max": 6,
+      "mean": 6
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10004,
+      "p50": 10004,
+      "p95": 10004,
+      "max": 10004,
+      "mean": 10004
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10004,
+      "p50": 10004,
+      "p95": 10004,
+      "max": 10004,
+      "mean": 10004
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10001,
+      "p50": 10001,
+      "p95": 10001,
+      "max": 10001,
+      "mean": 10001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 7.604147,
+      "p50": 7.96057,
+      "p95": 12.568925,
+      "max": 12.568925,
+      "mean": 9.377880666666668
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_compile_files_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 56.547208,
+      "p50": 59.194018,
+      "p95": 71.788733,
+      "max": 71.788733,
+      "mean": 62.50998633333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1.114558,
+      "p50": 1.159829,
+      "p95": 1.192299,
+      "max": 1.192299,
+      "mean": 1.155562
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_resolve_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.053221,
+      "p50": 0.05439,
+      "p95": 0.070461,
+      "max": 0.070461,
+      "mean": 0.05935733333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1.860484,
+      "p50": 2.759121,
+      "p95": 2.852411,
+      "max": 2.852411,
+      "mean": 2.490672
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 6.131804,
+      "p50": 7.07322,
+      "p95": 7.393757,
+      "max": 7.393757,
+      "mean": 6.866260333333333
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 5.797765,
+      "p50": 6.874794,
+      "p95": 8.780964,
+      "max": 8.780964,
+      "mean": 7.1511743333333335
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 4.230347,
+      "p50": 5.439515,
+      "p95": 6.437016,
+      "max": 6.437016,
+      "mean": 5.368959333333334
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1.9250750000000068,
+      "p50": 2.2099369999999965,
+      "p95": 2.2261370000000085,
+      "max": 2.2261370000000085,
+      "mean": 2.120383000000004
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_audit_report_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 20.707697,
+      "p50": 20.802998,
+      "p95": 25.489793,
+      "max": 25.489793,
+      "mean": 22.333495999999997
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_loop_dispatch_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 21.471272,
+      "p50": 21.719274,
+      "p95": 26.226229,
+      "max": 26.226229,
+      "mean": 23.138925
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_build_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.23233199999999998,
+      "p50": 0.239311,
+      "p95": 0.349703,
+      "max": 0.349703,
+      "mean": 0.27378199999999997
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_bytes",
+      "unit": "bytes",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3474,
+      "p50": 3474,
+      "p95": 3474,
+      "max": 3474,
+      "mean": 3474
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "agent_result_serialize_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.01708,
+      "p50": 0.017141,
+      "p95": 0.02184,
+      "max": 0.02184,
+      "mean": 0.018687
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "build_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_edges_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_full_walk",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_added",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_entering_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_leaving_coverage",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_pruned",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_removed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_nodes_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_reachability_updates",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:closure_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10.505309,
+      "p50": 10.58123,
+      "p95": 15.595838,
+      "max": 15.595838,
+      "mean": 12.227459000000001
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_consumers_invalidated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_examined",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_recomputed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_hits",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2,
+      "p50": 2,
+      "p95": 2,
+      "max": 2,
+      "mean": 2
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_relay_nodes_touched",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 3,
+      "p50": 3,
+      "p95": 3,
+      "max": 3,
+      "mean": 3
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:dsv_update_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.551644,
+      "p50": 0.560324,
+      "p95": 0.729695,
+      "max": 0.729695,
+      "mean": 0.6138876666666667
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "counter:parse_calls",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "coverage_report_bytes",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "covered_entries_iterated",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "dirty_files_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "files_compiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "files_covered",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10003,
+      "p50": 10003,
+      "p95": 10003,
+      "max": 10003,
+      "mean": 10003
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "files_recompiled",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "files_reused",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10002,
+      "p50": 10002,
+      "p95": 10002,
+      "max": 10002,
+      "mean": 10002
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "full_fallback",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_audit",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "metadata_bytes_written_hotpath",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "unsupported"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": null,
+      "p50": null,
+      "p95": null,
+      "max": null,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_changed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_content_unchanged",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_declared",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_hashed",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "mutation_read",
+      "unit": "count",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_closure_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 10.65899,
+      "p50": 10.734151,
+      "p95": 15.756829,
+      "max": 15.756829,
+      "mean": 12.383323333333331
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_dsv_view_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.408193,
+      "p50": 0.417174,
+      "p95": 0.550655,
+      "max": 0.550655,
+      "mean": 0.45867399999999997
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_resolve_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0.099771,
+      "p50": 0.101681,
+      "p95": 0.105931,
+      "max": 0.105931,
+      "mean": 0.10246099999999998
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "phase:session_scan_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 2.322248,
+      "p50": 2.399998,
+      "p95": 2.560249,
+      "max": 2.560249,
+      "mean": 2.4274983333333338
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "session_compile_affected_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "session_coverage_entries_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "session_incremental_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "session_reuse_iteration_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "unaccounted_diagnostics_ms",
+      "unit": "ms",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 6.825001999999998,
+      "p50": 6.890191999999999,
+      "p95": 7.169423999999998,
+      "max": 7.169423999999998,
+      "mean": 6.961539333333332
+    },
+    {
+      "corpus": "c10000-t1000-r100-s307-reconciliation",
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "variant": "compact_agent_result",
+      "metric": "verdict",
+      "unit": "bool",
+      "sessions": 3,
+      "statuses": [
+        "ok"
+      ],
+      "partial": false,
+      "n": 3,
+      "min": 1,
+      "p50": 1,
+      "p95": 1,
+      "max": 1,
+      "mean": 1
+    }
+  ],
+  "statistics": {
+    "method": "upper-rank percentiles over the observed values",
+    "confidence_intervals": "not computed, and that is stated rather than implied: every observation of a cell comes from the same process, so the values are correlated and a median over them is a statistic of that process",
+    "sessions_reported": true
+  }
+}

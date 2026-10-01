@@ -1,0 +1,19 @@
+{
+  "documentKind": "pandamstyle-phase-5-clean-install-proof",
+  "schemaVersion": 1,
+  "testedCommit": "cf2a1403ed6e651fdc23c950a40b4d639c504ef5",
+  "testedTree": "aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478",
+  "checkoutMethod": "detached clean Git worktree at tested commit",
+  "workingTreeAsFound": "clean",
+  "command": "yarn install --frozen-lockfile --non-interactive",
+  "lockfile": "yarn.lock",
+  "lockfileSha256": "b94393de24d6639f447a0b96545ec04dd7a11f7dd2bd2cdf0b29b6b1e442e31e",
+  "toolchain": {
+    "node": "v22.22.0",
+    "yarn": "1.22.22",
+    "npm": "11.11.1"
+  },
+  "installStepStatus": "passed",
+  "exitCode": 0,
+  "result": "passed"
+}

@@ -1,0 +1,220 @@
+TAP version 13
+# Subtest: the same parameters produce byte-identical source and manifest
+ok 1 - the same parameters produce byte-identical source and manifest
+  ---
+  duration_ms: 13.72193
+  type: 'test'
+  ...
+# Subtest: a different seed produces a different corpus, on purpose
+ok 2 - a different seed produces a different corpus, on purpose
+  ---
+  duration_ms: 7.258103
+  type: 'test'
+  ...
+# Subtest: every generated recipe default belongs to its declared variant domain
+ok 3 - every generated recipe default belongs to its declared variant domain
+  ---
+  duration_ms: 0.504423
+  type: 'test'
+  ...
+# Subtest: the PRNG is a specified integer stream, not Math.random
+ok 4 - the PRNG is a specified integer stream, not Math.random
+  ---
+  duration_ms: 0.160431
+  type: 'test'
+  ...
+# Subtest: the generator rejects nonsensical parameters instead of inventing them
+ok 5 - the generator rejects nonsensical parameters instead of inventing them
+  ---
+  duration_ms: 0.385812
+  type: 'test'
+  ...
+# Subtest: the manifest records what the brief requires it to record
+ok 6 - the manifest records what the brief requires it to record
+  ---
+  duration_ms: 2.487694
+  type: 'test'
+  ...
+# Subtest: the generated corpus references only tokens that exist
+ok 7 - the generated corpus references only tokens that exist
+  ---
+  duration_ms: 4.043074
+  type: 'test'
+  ...
+# Subtest: a corpus carries a negative trace per distinct policy code
+ok 8 - a corpus carries a negative trace per distinct policy code
+  ---
+  duration_ms: 2.047862
+  type: 'test'
+  ...
+# Subtest: every scenario in the protocol vocabulary is declared
+ok 9 - every scenario in the protocol vocabulary is declared
+  ---
+  duration_ms: 0.438732
+  type: 'test'
+  ...
+# Subtest: the two not-implemented scenarios are kept and explained, not removed
+ok 10 - the two not-implemented scenarios are kept and explained, not removed
+  ---
+  duration_ms: 0.354452
+  type: 'test'
+  ...
+# Subtest: a scenario edit either changes bytes or is declared a no-op
+ok 11 - a scenario edit either changes bytes or is declared a no-op
+  ---
+  duration_ms: 18.497028
+  type: 'test'
+  ...
+# Subtest: a negative scenario is never measured in a no-edit cache state
+ok 12 - a negative scenario is never measured in a no-edit cache state
+  ---
+  duration_ms: 0.10839
+  type: 'test'
+  ...
+# Subtest: scenario replay is deterministic
+ok 13 - scenario replay is deterministic
+  ---
+  duration_ms: 12.550544
+  type: 'test'
+  ...
+# Subtest: an observation row carries every field the kit requires
+ok 14 - an observation row carries every field the kit requires
+  ---
+  duration_ms: 0.157581
+  type: 'test'
+  ...
+# Subtest: a negative case that correctly refuses is ok, not error
+ok 15 - a negative case that correctly refuses is ok, not error
+  ---
+  duration_ms: 0.07475
+  type: 'test'
+  ...
+# Subtest: allowed statuses are exactly the four the protocol defines
+ok 16 - allowed statuses are exactly the four the protocol defines
+  ---
+  duration_ms: 0.085971
+  type: 'test'
+  ...
+# Subtest: the collector separates real parses from module-cache lookups
+ok 17 - the collector separates real parses from module-cache lookups
+  ---
+  duration_ms: 0.407242
+  type: 'test'
+  ...
+# Subtest: the timer is monotonic and nanosecond-scoped, not a wall clock
+ok 18 - the timer is monotonic and nanosecond-scoped, not a wall clock
+  ---
+  duration_ms: 4.407015
+  type: 'test'
+  ...
+# Subtest: the harness documents the timer it used
+ok 19 - the harness documents the timer it used
+  ---
+  duration_ms: 0.152041
+  type: 'test'
+  ...
+# Subtest: the summary script self-test passes
+ok 20 - the summary script self-test passes
+  ---
+  duration_ms: 31.713446
+  type: 'test'
+  ...
+# Subtest: summarize.py keeps a failed observation visible
+ok 21 - summarize.py keeps a failed observation visible
+  ---
+  duration_ms: 29.08333
+  type: 'test'
+  ...
+# Subtest: the engine registry names a repository root for every engine
+ok 22 - the engine registry names a repository root for every engine
+  ---
+  duration_ms: 1.125727
+  type: 'test'
+  ...
+# Subtest: the reference engine pins work elimination off in its child job
+ok 23 - the reference engine pins work elimination off in its child job
+  ---
+  duration_ms: 0.176431
+  type: 'test'
+  ...
+# Subtest: plan.json preserves historical Spike 1 baseline provenance
+ok 24 - plan.json preserves historical Spike 1 baseline provenance
+  ---
+  duration_ms: 0.181221
+  type: 'test'
+  ...
+# Subtest: the plan keeps the out-of-scope engines out
+ok 25 - the plan keeps the out-of-scope engines out
+  ---
+  duration_ms: 0.280492
+  type: 'test'
+  ...
+# Subtest: the plan declares the counters this batch cannot populate
+ok 26 - the plan declares the counters this batch cannot populate
+  ---
+  duration_ms: 0.138971
+  type: 'test'
+  ...
+# Subtest: the differential oracle compares what it claims to compare
+ok 27 - the differential oracle compares what it claims to compare
+  ---
+  duration_ms: 0.149791
+  type: 'test'
+  ...
+# Subtest: the differential oracle runs green on a small corpus
+ok 28 - the differential oracle runs green on a small corpus
+  ---
+  duration_ms: 3705.713295
+  type: 'test'
+  ...
+# Subtest: a failed run is not silently dropped by the summariser
+ok 29 - a failed run is not silently dropped by the summariser
+  ---
+  duration_ms: 29.452063
+  type: 'test'
+  ...
+# Subtest: a malformed observation line is reported rather than skipped
+ok 30 - a malformed observation line is reported rather than skipped
+  ---
+  duration_ms: 28.755289
+  type: 'test'
+  ...
+# Subtest: file_rename is a real content revision of the covered set
+ok 31 - file_rename is a real content revision of the covered set
+  ---
+  duration_ms: 3.43805
+  type: 'test'
+  ...
+# Subtest: the incremental oracle compares what it claims to compare
+ok 32 - the incremental oracle compares what it claims to compare
+  ---
+  duration_ms: 0.267672
+  type: 'test'
+  ...
+# Subtest: the incremental oracle runs green on a small corpus
+ok 33 - the incremental oracle runs green on a small corpus
+  ---
+  duration_ms: 4990.31597
+  type: 'test'
+  ...
+# Subtest: the long-session trace is bounded and mixes the hard cases
+ok 34 - the long-session trace is bounded and mixes the hard cases
+  ---
+  duration_ms: 2218.855501
+  type: 'test'
+  ...
+# Subtest: the plan declares the revision counters the session emits
+ok 35 - the plan declares the revision counters the session emits
+  ---
+  duration_ms: 0.255842
+  type: 'test'
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11170.954488
