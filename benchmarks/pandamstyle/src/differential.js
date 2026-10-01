@@ -320,11 +320,17 @@ function compareProject({
     fs.mkdirSync(scope, { recursive: true });
     const link = path.join(scope, 'compiler');
     if (fs.existsSync(link)) fs.rmSync(link, { force: true });
-    fs.symlinkSync(
+    const compilerCandidates = [
+      path.join(root, 'packages', 'compiler'),
       path.join(root, 'packages', '@pandamstyle', 'compiler'),
-      link,
-      'dir',
+    ];
+    const compilerPackage = compilerCandidates.find((candidate) =>
+      fs.existsSync(path.join(candidate, 'package.json')),
     );
+    if (compilerPackage == null) {
+      throw new Error(`No PandamStyle compiler package found under ${root}`);
+    }
+    fs.symlinkSync(compilerPackage, link, 'dir');
 
     process.env.__PMS_WE = we ? '1' : '';
     const run = runBuild({ engineRoot: root, projectDir: stage, configRel });

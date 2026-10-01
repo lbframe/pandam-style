@@ -36,14 +36,13 @@ jest.autoMockOff();
 
 const {
   comparePublished,
+  loadCompiler,
   measure,
   openExistingProject,
   openProject,
 } = require('./session-helpers');
 
-const build = require(
-  path.join(require('./pms-helpers').COMPILER_PKG, 'lib', 'index.js'),
-);
+const build = loadCompiler();
 
 const D = { publishVariant: 'session_incremental_publish_css' };
 

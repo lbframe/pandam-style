@@ -17,7 +17,7 @@ import type { MediaQueryRule } from 'style-value-parser';
 import StateManager from './utils/state-manager';
 // Benchmark-only measurement hooks (Spike 1). Absent a collector these are one
 // null check each; compilation order and output are unaffected.
-import { phase as pandamstylePerfPhase } from '../pandamstyle/perf';
+import { phase as pandamstylePerfPhase } from '../../../compiler/src/observability/metrics';
 import {
   EXTENSIONS,
   filePathResolver,

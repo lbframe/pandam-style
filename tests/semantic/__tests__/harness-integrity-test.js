@@ -185,13 +185,14 @@ test('inventory.zero-test', () => {
     'SEMANTIC_TEST_TOTALS_DISAGREE',
   );
 });
-test('gaps.not-passed', () => {
-  const gap = cases.find((c) => c.id === 'props.empty');
+test('gaps.phase-2-gap-not-passed', () => {
+  const gap = cases.find((c) => c.id === 'props.runtime-malformed');
   expect(gap.status).toBe('KNOWN_GAP');
+  expect(gap.gapId).toBe('SG-12');
   expect(
-    gap.revisions[0].expected.find((c) => c.path === 'accepted').value,
-  ).toBe(true);
+    gap.revisions[0].expected.find((c) => c.path === 'runtimeGuard').value,
+  ).toEqual({ rejected: true, code: 'PMS_UNVERIFIED_PROPS_SOURCE' });
   expect(
-    gap.revisions[0].observed.find((c) => c.path === 'accepted').value,
-  ).toBe(false);
+    gap.revisions[0].observed.find((c) => c.path === 'runtimeGuard').value,
+  ).toEqual({ rejected: false, code: null });
 });

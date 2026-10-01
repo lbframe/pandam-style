@@ -74,9 +74,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const COMPILER_PKG = path.resolve(
+const COMPILER_PKG = path.resolve(__dirname, '../../../packages/compiler');
+const COMPILER_SUPPORT = path.resolve(
   __dirname,
-  '../../../packages/@pandamstyle/compiler',
+  '../../../.pms-test-support/compiler-inspection.cjs',
 );
 
 /** Plain modules. The graph does not care what a covered file contains. */
@@ -649,7 +650,7 @@ async function main() {
     process.stderr.write('phase-d-oracle: --corpus and --out are required\n');
     process.exit(2);
   }
-  const compiler = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+  const compiler = require(COMPILER_SUPPORT);
   const results = {};
   let failures = 0;
   for (const trace of traces) {

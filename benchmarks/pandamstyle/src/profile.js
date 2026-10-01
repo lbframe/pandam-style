@@ -126,20 +126,48 @@ function materialise(sourceDir, projectDir) {
 }
 
 /**
- * The generated design system imports `@pandamstyle/compiler`, so the package
- * has to be resolvable from the project. The link points at the ENGINE's own
- * package, so the definition is loaded by the same code that compiles it.
+ * The generated design system imports `@pandamstyle/compiler/config`, so the
+ * package has to be resolvable from the project. The link points at the
+ * ENGINE's own package, so the definition is loaded by the same code that
+ * compiles it.
  */
 function linkCompiler(projectDir, engineRoot) {
   const scope = path.join(projectDir, 'node_modules', '@pandamstyle');
   fs.mkdirSync(scope, { recursive: true });
   const link = path.join(scope, 'compiler');
   if (fs.existsSync(link)) fs.rmSync(link, { force: true });
-  fs.symlinkSync(
+  const packageCandidates = [
+    path.join(engineRoot, 'packages', 'compiler'),
     path.join(engineRoot, 'packages', '@pandamstyle', 'compiler'),
-    link,
-    'dir',
+  ];
+  const compilerPackage = packageCandidates.find((candidate) =>
+    fs.existsSync(path.join(candidate, 'package.json')),
   );
+  if (compilerPackage == null) {
+    throw new Error(
+      `No PandamStyle compiler package found under ${engineRoot}`,
+    );
+  }
+  fs.symlinkSync(compilerPackage, link, 'dir');
+}
+
+function compilerInspectionModule(engineRoot) {
+  const testSupport = path.join(
+    engineRoot,
+    '.pms-test-support',
+    'compiler-inspection.cjs',
+  );
+  if (fs.existsSync(testSupport)) return testSupport;
+  const legacyBundle = path.join(
+    engineRoot,
+    'packages',
+    '@pandamstyle',
+    'compiler',
+    'lib',
+    'index.js',
+  );
+  if (fs.existsSync(legacyBundle)) return legacyBundle;
+  throw new Error(`No compiler measurement bundle found under ${engineRoot}`);
 }
 
 /**
@@ -188,13 +216,12 @@ function selfTimeTable(profile, topN = 40) {
 }
 
 /**
- * Names a function inside a rollup BUNDLE.
+ * Names a function inside the compiler measurement bundle.
  *
- * The published compiler is a single generated `lib/index.js`, so every
- * internal function is anonymous and a profile frame identifies it only by line
- * number. A line number is not a finding. This walks BACKWARD from the frame's
- * line to the nearest function declaration and recovers its name, so the profile
- * says `resolveRelativeFile` rather than `index.js:9386`.
+ * The published SDK no longer exposes this private implementation bundle.
+ * The profile uses the test-only inspection bundle, so each frame identifies
+ * it by line number. A line number is not a finding. This walks BACKWARD from
+ * the frame's line to the nearest function declaration and recovers its name.
  *
  * A miss is a miss, not a guess: when no declaration is found the frame keeps
  * its raw form, and the reader can see that the name is unknown.
@@ -238,11 +265,12 @@ function byModule(profile) {
   const buckets = new Map();
   const classify = (url) => {
     const u = url || '';
-    // The compiler is a ROLLUP BUNDLE: the fork and the PandamStyle modules are
-    // inlined into one `lib/index.js`, so they share a URL and cannot be told
-    // apart by file. The bucket therefore names the bundle, and the per-frame
-    // table below it is where the individual functions are named.
-    if (u.includes('@pandamstyle/compiler/lib/'))
+    // The private inspection bundle contains compiler modules for measurement;
+    // the public ESM bundle intentionally exposes only the SDK.
+    if (
+      u.includes('@pandamstyle/compiler/lib/') ||
+      u.includes('.pms-test-support/compiler-inspection.cjs')
+    )
       return 'pandamstyle-compiler-bundle';
     if (u.includes('/pandamstyle/')) return 'pandamstyle-harness';
     if (u.includes('@babel/core')) return '@babel/core';
@@ -285,7 +313,11 @@ function compilerFunctionTable(profile, bundlePath, topN = 30) {
   const resolve = makeBundleResolver(bundlePath);
   const acc = new Map();
   for (const row of table) {
-    if (!row.frame.includes('@pandamstyle/compiler/lib/')) continue;
+    if (
+      !row.frame.includes('@pandamstyle/compiler/lib/') &&
+      !row.frame.includes('.pms-test-support/compiler-inspection.cjs')
+    )
+      continue;
     const line = Number(row.frame.split(':').pop());
     const name = resolve(line);
     const key = name ?? `unresolved (bundle line ${line})`;
@@ -346,14 +378,7 @@ function main() {
         [
           driverPath,
           JSON.stringify({
-            engineModulePath: path.join(
-              engineRoot,
-              'packages',
-              '@pandamstyle',
-              'compiler',
-              'lib',
-              'index.js',
-            ),
+            engineModulePath: compilerInspectionModule(engineRoot),
             engine: engineName,
             projectDir,
             profileOut,
@@ -381,14 +406,7 @@ function main() {
         continue;
       }
       const profile = JSON.parse(fs.readFileSync(profileOut, 'utf8'));
-      const bundlePath = path.join(
-        engineRoot,
-        'packages',
-        '@pandamstyle',
-        'compiler',
-        'lib',
-        'index.js',
-      );
+      const bundlePath = compilerInspectionModule(engineRoot);
       results.push({
         corpus: name,
         engine: engineName,
@@ -397,10 +415,9 @@ function main() {
         wall_ms: (profile.endTime - profile.startTime) / 1000,
         byModule: byModule(profile),
         selfTime: selfTimeTable(profile),
-        // The compiler is a rollup bundle, so all of its internal functions
-        // share one URL and the shallow table above collapses them. This deep
-        // table is where the individual PandamStyle and fork functions become
-        // visible.
+        // The private compiler inspection bundle gives its internal functions
+        // one profile URL. This deep table recovers their names from source
+        // lines while keeping those internals out of the published SDK.
         compilerFunctions: compilerFunctionTable(profile, bundlePath),
         stats: JSON.parse(fs.readFileSync(statsOut, 'utf8')),
         profileFile: path.relative(outDir, profileOut),

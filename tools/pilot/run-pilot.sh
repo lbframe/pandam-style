@@ -17,13 +17,13 @@ WORK_DIR="${1:-${PMS_PILOT_DIR:-/tmp/pandamstyle-pilot}}"
 # the registry instead of linking the local workspace copy.
 PILOT_SRC="${REPO_ROOT}/pilot/vite-react"
 
-echo "== 1/6 pack the PandamStyle compiler and the fork stylex runtime =="
+echo "== 1/6 pack the PandamStyle compiler and required StyleX runtime package =="
 rm -rf "${WORK_DIR}"
 mkdir -p "${WORK_DIR}"
 PACK_DIR="${WORK_DIR}/.tarballs"
 mkdir -p "${PACK_DIR}"
 
-cd "${REPO_ROOT}/packages/@pandamstyle/compiler"
+cd "${REPO_ROOT}/packages/compiler"
 PMS_TARBALL=$(npm pack --pack-destination "${PACK_DIR}" --silent)
 echo "packed ${PMS_TARBALL}"
 
@@ -48,7 +48,8 @@ const fs = require("fs");
 const path = require("path");
 const pkgDir = process.argv[1];
 const pkg = JSON.parse(fs.readFileSync(path.join(pkgDir, "package.json"), "utf8"));
-for (const key of [".", "./runtime", "./vite", "./package.json"]) {
+# runtime and vite are temporary Phase 2 / Phase 8 verifier seams.
+for (const key of [".", "./config", "./host", "./runtime", "./vite", "./package.json"]) {
   if (pkg.exports[key] == null) {
     console.error("MISSING EXPORT in the packed package: " + key);
     process.exit(1);
@@ -104,8 +105,8 @@ if (real.includes("/packages/@stylexjs/babel-plugin/")) {
   console.error("resolved to monorepo sources: " + real);
   process.exit(1);
 }
-if (!fs.existsSync(path.join(pkgDir, "lib", "vite.js"))) {
-  console.error("installed package is missing lib/vite.js");
+if (!fs.existsSync(path.join(pkgDir, "lib", "vite.mjs"))) {
+  console.error("installed package is missing lib/vite.mjs");
   process.exit(1);
 }
 if (!fs.existsSync(path.join(pkgDir, "lib", "runtime.mjs"))) {
@@ -121,6 +122,15 @@ if (/^\s*import\s/m.test(runtime)) {
   process.exit(1);
 }
 console.log("shipped runtime is self-contained");
+'
+
+node --input-type=module -e '
+await import("@pandamstyle/compiler");
+await import("@pandamstyle/compiler/config");
+await import("@pandamstyle/compiler/host");
+await import("@pandamstyle/compiler/runtime");
+await import("@pandamstyle/compiler/vite");
+console.log("installed compiler SDK and verifier subpaths import successfully");
 '
 
 echo "== 6/6 run the real Vite production build =="

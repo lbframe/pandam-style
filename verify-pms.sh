@@ -328,9 +328,9 @@ build_delivered_packages() {
        "$REPO_ROOT/node_modules/.bin/rollup" -c ./rollup.config.mjs)
   (cd "$REPO_ROOT/packages/@stylexjs/babel-plugin" \
     && "$REPO_ROOT/node_modules/.bin/rollup" --config ./rollup.config.mjs)
-  # The delivered PandamStyle package: the fork engine plus the PandamStyle
-  # modules, built by its own rollup config.
-  (cd "$REPO_ROOT/packages/@pandamstyle/compiler" \
+  # The delivered PandamStyle-owned compiler and its explicitly externalized
+  # Phase 4 donor dependencies, built by its own rollup config.
+  (cd "$REPO_ROOT/packages/compiler" \
     && "$REPO_ROOT/node_modules/.bin/rollup" --config ./rollup.config.mjs)
 }
 
@@ -392,12 +392,12 @@ collect_artifacts() {
   rm -rf "$ARTIFACT_DIR"
   mkdir -p "$ARTIFACT_DIR"
   # The compiled package the pilot installed.
-  cp -R "$REPO_ROOT/packages/@pandamstyle/compiler/lib" "$ARTIFACT_DIR/compiler-lib"
-  cp "$REPO_ROOT/packages/@pandamstyle/compiler/package.json" \
+  cp -R "$REPO_ROOT/packages/compiler/lib" "$ARTIFACT_DIR/compiler-lib"
+  cp "$REPO_ROOT/packages/compiler/package.json" \
      "$ARTIFACT_DIR/compiler-package.json"
   # One valid fixture build, for the CSS/JS/manifest triple.
   (cd "$REPO_ROOT/packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid" \
-    && node "$REPO_ROOT/packages/@pandamstyle/compiler/bin/pms-build.js" \
+    && node "$REPO_ROOT/packages/compiler/bin/pms-build.js" \
        --config ./pandamstyle.config.js)
   cp -R "$REPO_ROOT/packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/generated" \
      "$ARTIFACT_DIR/valid-fixture-generation"

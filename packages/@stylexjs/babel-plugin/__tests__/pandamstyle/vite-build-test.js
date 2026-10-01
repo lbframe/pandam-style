@@ -16,10 +16,10 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '../../../../..');
-const COMPILER_PKG = path.join(REPO_ROOT, 'packages/@pandamstyle/compiler');
+const COMPILER_PKG = path.join(REPO_ROOT, 'packages/compiler');
 const SHARED_DEFINITION = path.resolve(
   __dirname,
-  'fixtures/_shared/design.pms.config.js',
+  'fixtures/_shared/design.pms.config.mjs',
 );
 
 jest.setTimeout(180000);

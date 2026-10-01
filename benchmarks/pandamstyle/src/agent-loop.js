@@ -98,11 +98,11 @@ const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const COMPILER_PKG = path.join(
+const COMPILER_PKG = path.join(REPO_ROOT, 'packages', 'compiler');
+const COMPILER_SUPPORT = path.join(
   REPO_ROOT,
-  'packages',
-  '@pandamstyle',
-  'compiler',
+  '.pms-test-support',
+  'compiler-inspection.cjs',
 );
 const HARNESS_VERSION = 'pms-agent-loop-harness/1.0.0';
 const SCHEMA_VERSION = 1;
@@ -785,7 +785,7 @@ class AgentLoop {
   async prepare() {
     materialiseProject(this.corpusDir, this.projectDir);
     linkCompiler(this.projectDir);
-    this.compiler = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+    this.compiler = require(COMPILER_SUPPORT);
     this.compiler.installPerfCollector(this.collector);
     this.config = require(path.join(this.projectDir, 'pandamstyle.config.js'));
     this.definitionPath = path.resolve(

@@ -106,9 +106,10 @@ function resolveEngines(names) {
       workEliminated: true,
     },
     // Spike 2 engines. Both run THIS tree, so the only difference between them
-    // is which public API of the same bundle is driven: `buildProject` (a full
-    // rebuild, every file every time) or `createProjectSession` (the project
-    // session, which reuses every file whose validity key still holds).
+    // is which private measurement interface from the same test-support bundle
+    // is driven: `buildProject` (a full rebuild, every file every time) or
+    // `createProjectSession` (the project session, which reuses every file
+    // whose validity key still holds).
     // Anchoring `babel_full` to a separate worktree would make a tree
     // difference indistinguishable from an incrementality difference, which is
     // the one attribution this batch has to get right.
@@ -116,7 +117,7 @@ function resolveEngines(names) {
       name: 'babel_full',
       root: REPO_ROOT,
       description:
-        'the full rebuild, through buildProject: every covered file is ' +
+        'the private full-rebuild reference path: every covered file is ' +
         're-read, re-parsed and recompiled on every revision. This is the ' +
         'existing compiler semantics and the semantic reference.',
       workEliminated: false,

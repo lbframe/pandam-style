@@ -54,11 +54,11 @@ published SDK.
 | vite.js           | Current Vite-owned session/rule map/coverage/generation integration                  | packages/vite/src/index.js backed only by compiler/host                                                                                                                                | PUBLIC adapter                                                         | REFACTOR |
 | watcher.js        | Watch journal/digest provider, resync and scratch exclusions                         | packages/compiler/src/hosts/watcher/index.js; journal.js                                                                                                                               | INTERNAL implementation; ADVANCED PUBLIC session bridge                | MOVE     |
 
-| Additional current path                          | Responsibility                                                   | Target                                                                      | Visibility                       | Action   |
-| ------------------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------- | -------- |
-| packages/@pandamstyle/compiler/bin/pms-build.js  | Real CLI process/status/config loading and injected-failure seam | packages/compiler/bin/pms-build.js; src/api/cli.js; tests/support/faults.js | PUBLIC CLI; TEST ONLY fault seam | REFACTOR |
-| packages/@pandamstyle/compiler/rollup.config.mjs | Compiler/runtime/Vite distribution assembly                      | packages/compiler/rollup.config.mjs plus core/vite build configs            | INTERNAL                         | REFACTOR |
-| packages/@pandamstyle/compiler/package.json      | Current donor-coupled distribution/subpath exports               | packages/compiler/package.json                                              | PUBLIC release metadata          | REFACTOR |
+| Additional current path                          | Responsibility                                                    | Target                                                                                                             | Visibility                       | Action   |
+| ------------------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- | -------- |
+| packages/@pandamstyle/compiler/bin/pms-build.js  | Real CLI process/status/config loading; test-only failure fixture | packages/compiler/bin/pms-build.js; packages/compiler/src/api/cli.js; tests/support/pms-build-injected-failure.mjs | PUBLIC CLI; TEST ONLY fault seam | REFACTOR |
+| packages/@pandamstyle/compiler/rollup.config.mjs | Compiler/runtime/Vite distribution assembly                       | packages/compiler/rollup.config.mjs plus core/vite build configs                                                   | INTERNAL                         | REFACTOR |
+| packages/@pandamstyle/compiler/package.json      | Current donor-coupled distribution/subpath exports                | packages/compiler/package.json                                                                                     | PUBLIC release metadata          | REFACTOR |
 
 ## Current exported symbols: exhaustive classification
 
@@ -141,3 +141,21 @@ negative dependencies or replace incremental CSS with full aggregation. This map
 freezes the destination for all current PandamStyle modules; engine closure
 selection remains an evidence task within the fixed ownership boundary, not an
 unresolved public architecture question.
+
+### Parallel-phase seams remaining after Phase 3
+
+The Phase 3 branch keeps three source files under
+`packages/@stylexjs/babel-plugin/pandamstyle/` solely because the Phase 2 core
+branch runs from the same Phase 1 base and is not integrated here:
+
+- `recipe-select.js` supplies the shared finite selector until reconciliation;
+  Phase 2 moves it to `@pandamstyle/core`, and compiler/runtime consumers then
+  share that implementation.
+- `runtime.js` and the compiler `/runtime` build subpath are a temporary bridge
+  for the pilot; remove both when generated modules import the Phase 2 core ABI.
+- `vite.js` and the compiler `/vite` build subpath keep the existing verifier
+  and pilot working; Phase 8 moves the adapter to `packages/vite` and removes
+  both.
+
+These seams are not additional compiler authorities or migration destinations.
+Their source comments name their owning integration phase and removal condition.

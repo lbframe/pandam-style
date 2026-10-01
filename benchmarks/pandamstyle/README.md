@@ -2,10 +2,10 @@
 
 **Batch: Spike 4, Phase C — the agent loop and the split of audit metadata.**
 
-This directory also holds the Spike 1 and Spike 2 harnesses, which are
-unchanged and still runnable. The five tools Phase C added are documented
-first, because the agent loop is the workload this batch is about; the rest of
-the document is Spike 2's brief, still accurate for what it measured.
+This directory also holds the Spike 1 and Spike 2 harnesses, which are unchanged
+and still runnable. The five tools Phase C added are documented first, because
+the agent loop is the workload this batch is about; the rest of the document is
+Spike 2's brief, still accurate for what it measured.
 
 ---
 
@@ -26,31 +26,31 @@ session.requestFullAudit()  → the full evidence, when it is wanted
 
 The primary metric is **`agent_edit_to_diagnostics_ms`**: the mutation
 transaction accepted, to complete authoritative diagnostics for that revision.
-It is *not* mutation → publication → audit report written, and the two are
-never collapsed.
+It is _not_ mutation → publication → audit report written, and the two are never
+collapsed.
 
-| tool | what it does |
-| --- | --- |
-| `src/agent-loop.js` | the campaign. Four metadata policies × twelve scenarios × N iterations, one process per cell |
-| `src/agent-loop-summary.js` | the tables. Headline milestones, work counters, byte counters, reuse-loop timing |
-| `src/phase-c-oracle.js` | the correctness gate. Semantic equality against a fresh rebuild in a separate process, and audit completeness against the pre-Phase-C artifact |
-| `src/phase-c-rebuild.js` | the oracle's fresh-rebuild child process. Never runs in the oracle's own process |
-| `src/report-bytes.js` | the byte audit. A deterministic breakdown of the published metadata, measured from the serialized bytes on disk |
+| tool                        | what it does                                                                                                                                   |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/agent-loop.js`         | the campaign. Four metadata policies × twelve scenarios × N iterations, one process per cell                                                   |
+| `src/agent-loop-summary.js` | the tables. Headline milestones, work counters, byte counters, reuse-loop timing                                                               |
+| `src/phase-c-oracle.js`     | the correctness gate. Semantic equality against a fresh rebuild in a separate process, and audit completeness against the pre-Phase-C artifact |
+| `src/phase-c-rebuild.js`    | the oracle's fresh-rebuild child process. Never runs in the oracle's own process                                                               |
+| `src/report-bytes.js`       | the byte audit. A deterministic breakdown of the published metadata, measured from the serialized bytes on disk                                |
 
 ### The four variants are one compiler and four metadata policies
 
-| variant | audit policy | publishes | audits |
-| --- | --- | --- | --- |
-| `full_metadata` | `inline` | yes | no |
-| `compact_agent_result` | `reference` | no | no |
-| `compact_agent_result_plus_compact_publish_metadata` | `reference` | yes | no |
-| `full_audit_requested` | `reference` | yes | yes |
+| variant                                              | audit policy | publishes | audits |
+| ---------------------------------------------------- | ------------ | --------- | ------ |
+| `full_metadata`                                      | `inline`     | yes       | no     |
+| `compact_agent_result`                               | `reference`  | no        | no     |
+| `compact_agent_result_plus_compact_publish_metadata` | `reference`  | yes       | no     |
+| `full_audit_requested`                               | `reference`  | yes       | yes    |
 
 Same tree, same session, same analysis, same compiler. `full_metadata` produces
 the pre-Phase-C artifact — the whole project-wide coverage array inline in
 `build-report.json`, schema version 1 — so the difference between the rows is
 the metadata policy and nothing else. A `full_metadata` row taken from a
-*different checkout* would confound the metadata with every compiler change
+_different checkout_ would confound the metadata with every compiler change
 between the two, which is the mistake the Spike 2 engine split was made to avoid
 and the mistake this design exists not to repeat.
 
@@ -68,8 +68,8 @@ things. The Phase C questions need cells with their own names.
 ### The scenarios are sequences, and every edit asserts its target
 
 `no_change`, `one_file_existing_atoms`, `five_files_batch`,
-`twenty_files_batch`, `forbidden_value`, `repair_forbidden_value`,
-`module_add`, `module_remove`, `file_rename`, `import_change`,
+`twenty_files_batch`, `forbidden_value`, `repair_forbidden_value`, `module_add`,
+`module_remove`, `file_rename`, `import_change`,
 `unresolved_import_then_file_appears`, `token_value_full_fallback`.
 
 Each revision declares what the compiler is expected to answer, and a cell that
@@ -155,17 +155,18 @@ runnable; the Spike 2 additions are additive.
 
 ## The Spike 2 engines
 
-| engine | what it is | how it is anchored |
-| --- | --- | --- |
-| `babel_full` | the full rebuild, through `buildProject`: every covered file is re-read, re-parsed and recompiled on every revision | this branch |
-| `babel_incremental` | the project session, through `createProjectSession`: a revision re-scans and re-hashes the covered set, rebuilds the coverage closure from persistent module summaries, and recompiles only the files whose validity key changed | this branch |
-| `babel_incremental_work_eliminated` | the factorial variant: the session **and** the Spike 1 work-elimination caches (`PMS_WORK_ELIMINATED=1`) | this branch |
+| engine                              | what it is                                                                                                                                                                                                                                              | how it is anchored |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `babel_full`                        | the private fresh reference path (`buildProject`): every covered file is re-read, re-parsed and recompiled on every revision                                                                                                                            | this branch        |
+| `babel_incremental`                 | the project session (`createProjectSession`) through compiler test support: a revision re-scans and re-hashes the covered set, rebuilds the coverage closure from persistent module summaries, and recompiles only the files whose validity key changed | this branch        |
+| `babel_incremental_work_eliminated` | the factorial variant: the session **and** the Spike 1 work-elimination caches (`PMS_WORK_ELIMINATED=1`)                                                                                                                                                | this branch        |
 
 **Both decision-bearing engines run the SAME tree.** That is deliberate: a
 `babel_full` anchored to a different worktree would make a tree difference
 indistinguishable from an incrementality difference, and this batch has exactly
 one attribution to get right. The only difference between `babel_full` and
-`babel_incremental` is which public API of the same bundle is driven.
+`babel_incremental` is which private measurement interface of the same compiler
+tree is driven. These internals are not part of the published SDK.
 
 `babel_incremental` does **not** set `PMS_WORK_ELIMINATED`, so the benefit of
 invalidation is never conflated with the benefit of Spike 1 memoization. The
@@ -173,19 +174,19 @@ factorial variant exists so the two can be measured apart, and it is reported
 separately.
 
 `babel_current` and `babel_work_eliminated` — the Spike 1 pair — remain
-available for continuity. `babel_current` is **not** the superseded
-`e5ff62b4`: that SHA predates native JS/TS/TSX compilation, binding-based
-provenance, `props()` provenance enforcement, complete local module coverage,
-transactional publication, the Vite pilot and the evidence-integrity fixes, and
-benchmarking it as "current" would measure a compiler that no longer exists.
+available for continuity. `babel_current` is **not** the superseded `e5ff62b4`:
+that SHA predates native JS/TS/TSX compilation, binding-based provenance,
+`props()` provenance enforcement, complete local module coverage, transactional
+publication, the Vite pilot and the evidence-integrity fixes, and benchmarking
+it as "current" would measure a compiler that no longer exists.
 
 ### Why the compiler carries the measurement hooks
 
 A monkey patch could time `resolveRelativeFile`. It could not time
 `buildRegistry` separately from `compileTokens`, could not say which pipeline
-performed a parse, and could not attribute a diagnostic to the phase that
-raised it. A phase boundary only the compiler itself can report honestly is a
-compiler concern, so the hooks live in
+performed a parse, and could not attribute a diagnostic to the phase that raised
+it. A phase boundary only the compiler itself can report honestly is a compiler
+concern, so the hooks live in
 `packages/@stylexjs/babel-plugin/pandamstyle/perf.js`. They are additive and
 inert without a collector: every call is one null check, and a build that
 installs no collector executes the same work in the same order.
@@ -195,8 +196,8 @@ installs no collector executes the same work in the same order.
 ## The incremental differential oracle
 
 `src/incremental-oracle.js` is the authoritative correctness gate for the
-session. For every revision of every scenario, in one project whose revisions are
-cumulative:
+session. For every revision of every scenario, in one project whose revisions
+are cumulative:
 
 1. apply the revision to the source tree;
 2. drive the project session and capture what it **published**;
@@ -218,7 +219,7 @@ the manifest; and the build report's semantic state.
 
 The one normalisation, applied to **both** sides by the same rule, removes the
 session's own additive `incremental` block from `build-report.json` — the block
-that states *how* the generation was produced rather than *what* it contains.
+that states _how_ the generation was produced rather than _what_ it contains.
 
 ```bash
 node src/incremental-oracle.js --corpus /tmp/c --components 24 --tokens 120 \
@@ -284,19 +285,20 @@ verdict, pass or fail.
 
 The sub-intervals are recorded separately and are never collapsed into it:
 
-| metric | meaning |
-| --- | --- |
-| `diagnostics_complete_ms` | the verdict is known |
-| `pms_generation_ready_ms` | every artifact is staged, nothing published |
-| `pms_generation_committed_ms` | the commit marker is on disk |
-| `bundler_ready_ms` | the bundler adapter settled (`unsupported` on the CLI path) |
+| metric                        | meaning                                                     |
+| ----------------------------- | ----------------------------------------------------------- |
+| `diagnostics_complete_ms`     | the verdict is known                                        |
+| `pms_generation_ready_ms`     | every artifact is staged, nothing published                 |
+| `pms_generation_committed_ms` | the commit marker is on disk                                |
+| `bundler_ready_ms`            | the bundler adapter settled (`unsupported` on the CLI path) |
 
 ### No-op is not edit
 
 These are different quantities and are never averaged together:
 
 - **`process_warm_no_edit`** resubmits identical bytes. It is a cache hit, it is
-  labelled as one in every summary row, and it is never reported as edit latency.
+  labelled as one in every summary row, and it is never reported as edit
+  latency.
 - **`process_warm_edit`** submits bytes that differ from what was there before.
 
 Every scenario is a real content revision. The test
@@ -308,12 +310,12 @@ misleading number this harness could produce.
 
 ## Cache states
 
-| state | process | output directory |
-| --- | --- | --- |
-| `process_cold_cache_empty` | never compiled this corpus | no published generation |
-| `process_cold_cache_warm` | never compiled this corpus | a published generation is present, so the transactional snapshot and restore run |
-| `process_warm_no_edit` | has compiled it | unchanged bytes resubmitted — **a cache hit** |
-| `process_warm_edit` | has compiled it | a real revision on top |
+| state                      | process                    | output directory                                                                 |
+| -------------------------- | -------------------------- | -------------------------------------------------------------------------------- |
+| `process_cold_cache_empty` | never compiled this corpus | no published generation                                                          |
+| `process_cold_cache_warm`  | never compiled this corpus | a published generation is present, so the transactional snapshot and restore run |
+| `process_warm_no_edit`     | has compiled it            | unchanged bytes resubmitted — **a cache hit**                                    |
+| `process_warm_edit`        | has compiled it            | a real revision on top                                                           |
 
 `os_cold` is **`not_run`**. Dropping the OS page cache needs privileges this
 environment does not grant, and faking it would not reproduce a cold cache.
@@ -332,9 +334,9 @@ files:
 - a **barrel** that pages reach the design system through, so the re-export walk
   is on the hot path of every component;
 - twelve component shapes — themed, recipe-static, recipe-props, aliased,
-  conditional, composition, barrel, TS wrapper, multi-namespace, condition block,
-  wide, plain — distributed round-robin, so every transform path is exercised at
-  scale;
+  conditional, composition, barrel, TS wrapper, multi-namespace, condition
+  block, wide, plain — distributed round-robin, so every transform path is
+  exercised at scale;
 - TypeScript on every component, because pass 2 has to strip it;
 - an **isolated** negative root, one file per policy code, with its own build
   config. A forbidden channel inside the positive root would make every positive
@@ -343,8 +345,8 @@ files:
 ### Determinism
 
 Same `(components, tokens, recipes, seed, fanout)` ⇒ byte-identical source and a
-byte-identical manifest. Randomness is a pinned SplitMix64 stream seeded only
-by `seed`; `Math.random` and `Date.now` are never called. The only excluded
+byte-identical manifest. Randomness is a pinned SplitMix64 stream seeded only by
+`seed`; `Math.random` and `Date.now` are never called. The only excluded
 metadata is the generator commit.
 
 Proven by `the same parameters produce byte-identical source and manifest`, and
@@ -361,32 +363,33 @@ corpus name always implies its seed and its fanout.
 `perf.js` exposes a collector the driver installs. With no collector, every hook
 is a null check and the compilation is the compilation.
 
-**Phases** (`*_ms`): `startup`, `io`, `resolve`, `parse`, `semantic`, `ir_lower`,
-`policy`, `recipe`, `atomic_lower`, `hash_dedup`, `rule_sort`, `js_codegen`,
-`sourcemap`, `css_serialize`, `cache_validate`, `cache_hydrate`, `boundary`,
-`publish`, plus the design-system sub-phases (`ds_build_registry`,
+**Phases** (`*_ms`): `startup`, `io`, `resolve`, `parse`, `semantic`,
+`ir_lower`, `policy`, `recipe`, `atomic_lower`, `hash_dedup`, `rule_sort`,
+`js_codegen`, `sourcemap`, `css_serialize`, `cache_validate`, `cache_hydrate`,
+`boundary`, `publish`, plus the design-system sub-phases (`ds_build_registry`,
 `ds_token_compile`, `ds_theme_compile`, `ds_recipe_compile`, `ds_manifest`,
 `ds_module_codegen`) and the CSS sub-phases (`css_lower`, `css_dedup`,
 `css_sort`, `css_join`, `styleq`).
 
 **Counters**: `parsed_files`, `parse_calls`, `semantic_builds`, `ast_clones`,
-`read_bytes`, `written_bytes`, `read_calls`, `write_calls`, `stat_calls`, `atoms`,
-`atom_contributions`, `diagnostics`, `covered_files`, `design_system_builds`,
-`resolution_probes`, `resolution_positive_hits`, `resolution_negative_hits`,
-`ds_module_walks`, `ds_module_walk_hits`, `pass1_calls`, `pass2_calls`.
+`read_bytes`, `written_bytes`, `read_calls`, `write_calls`, `stat_calls`,
+`atoms`, `atom_contributions`, `diagnostics`, `covered_files`,
+`design_system_builds`, `resolution_probes`, `resolution_positive_hits`,
+`resolution_negative_hits`, `ds_module_walks`, `ds_module_walk_hits`,
+`pass1_calls`, `pass2_calls`.
 
 **Memory**: `rss_peak_bytes`, `heap_peak_bytes`, `external_peak_bytes`,
 `process_rss_end_bytes`. The scope is stated in the row: for this batch the
-process group *is* the Node build process, because the CLI path spawns no
+process group _is_ the Node build process, because the CLI path spawns no
 children.
 
 ### Phases that cannot be isolated are reported as unavailable
 
-| metric | status | why |
-| --- | --- | --- |
-| `sourcemap_ms` | `unsupported` | source maps are not requested by either the CLI or the adapter, so there is no source-map work to time. Reporting `0` would understate the build. |
-| `cache_hydrate_ms` | `unsupported` | the compiler persists no cache across processes. A persistent cache is a Spike 2 candidate, not a fact about this compiler. |
-| `cache_validate_ms` | `unsupported` | the only cache is an in-process `Map` with no validation step. Its cost is reported as hit/miss counters instead. |
+| metric              | status        | why                                                                                                                                               |
+| ------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sourcemap_ms`      | `unsupported` | source maps are not requested by either the CLI or the adapter, so there is no source-map work to time. Reporting `0` would understate the build. |
+| `cache_hydrate_ms`  | `unsupported` | the compiler persists no cache across processes. A persistent cache is a Spike 2 candidate, not a fact about this compiler.                       |
+| `cache_validate_ms` | `unsupported` | the only cache is an in-process `Map` with no validation step. Its cost is reported as hit/miss counters instead.                                 |
 
 A phase boundary that cannot be observed is recorded `null` with a reason. It is
 never inferred from a neighbouring boundary.
@@ -429,7 +432,7 @@ against it on:
 
 Two gates, in this order:
 
-1. **Expectation.** The *reference* engine's verdict is asserted against the
+1. **Expectation.** The _reference_ engine's verdict is asserted against the
    scenario's declared expectation. Equivalence between two engines that are
    both wrong is not equivalence, and a negative scenario where both quietly
    accepted the program would otherwise compare as "equivalent" while the policy
@@ -493,10 +496,10 @@ additive), give it the same `node_modules` (a symlink is enough), and build
 
 ## Statistics
 
-`summarize.py` is the kit's summariser and must pass `--self-test` before use. It
-reports count, min, median, **p95 by upper rank**, max, sample variance, status
-counts, the number of distinct sessions behind each statistic, and the sessions
-themselves.
+`summarize.py` is the kit's summariser and must pass `--self-test` before use.
+It reports count, min, median, **p95 by upper rank**, max, sample variance,
+status counts, the number of distinct sessions behind each statistic, and the
+sessions themselves.
 
 It computes **no confidence intervals**, and says so in its own output. The
 architecture study recommends session/block-level treatment because warm events
@@ -505,9 +508,9 @@ one session more votes than another. The script therefore preserves session ids
 and flags any group resting on a single session as a measurement, not a
 distribution. Raw observations are never destroyed.
 
-Engines are **not ranked** when their correctness status differs. A faster engine
-that does not do the same work has not won anything; the row is emitted with
-`comparable: false` and the reason.
+Engines are **not ranked** when their correctness status differs. A faster
+engine that does not do the same work has not won anything; the row is emitted
+with `comparable: false` and the reason.
 
 ---
 
@@ -524,9 +527,9 @@ edit, because an empty edit measures a no-op and would be reported as an edit.
 ## Known limitations of the harness
 
 - **OS page cache is never cold.** Every number is a warm-OS-cache number.
-- **`bundler_ready_ms` is `unsupported` on the CLI path.** The bundler adapter is
-  not driven in the latency campaign; driving Vite for every cell would measure
-  Vite.
+- **`bundler_ready_ms` is `unsupported` on the CLI path.** The bundler adapter
+  is not driven in the latency campaign; driving Vite for every cell would
+  measure Vite.
 - **`cancel_and_retry` and `crash_during_publication` are `not_run`.** They stay
   in the protocol with a stated reason. The transactional guarantee they would
   touch is covered by the existing compiler tests, which is a correctness gate
@@ -534,6 +537,6 @@ edit, because an empty edit measures a no-op and would be reported as an edit.
 - **The generated corpus is one shape family.** Twelve component shapes over
   real tokens, conditions, recipes and barrels is representative of P0, not of
   every application that will use PandamStyle. The absolute numbers characterise
-  *this* workload; the ratios between phases are the transferable result.
+  _this_ workload; the ratios between phases are the transferable result.
 - **One machine, one Node, one filesystem.** Nothing here is a claim about other
   hardware. The machine identity is recorded precisely enough to re-check it.

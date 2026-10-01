@@ -12,5 +12,12 @@ const { cases } = require('../cases');
 const [id, lane, output] = process.argv.slice(2);
 const spec = cases.find((c) => c.id === id);
 if (!spec) throw new Error('Missing semantic case ' + id);
-const result = run(spec, lane).map((raw) => project(raw, spec.observe));
-fs.writeFileSync(output, JSON.stringify(result));
+(async () => {
+  const result = (await run(spec, lane)).map((raw) =>
+    project(raw, spec.observe),
+  );
+  fs.writeFileSync(output, JSON.stringify(result));
+})().catch((error) => {
+  process.stderr.write(`${error?.stack ?? error}\n`);
+  process.exitCode = 1;
+});

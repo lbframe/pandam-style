@@ -11,14 +11,14 @@ jest.autoMockOff();
 
 const fs = require('fs');
 const path = require('path');
-const {
-  COMPILER_PKG,
-  freshCopyOf,
-  readJson,
-  runBuild,
-} = require('./pms-helpers');
+const { freshCopyOf, readJson, runBuild } = require('./pms-helpers');
 
-const build = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+const build = require(
+  path.resolve(
+    __dirname,
+    '../../../../../.pms-test-support/compiler-inspection.cjs',
+  ),
+);
 
 // ---------------------------------------------------------------------------
 // BC-1 - the props() bypass

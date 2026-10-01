@@ -27,6 +27,7 @@ const crypto = require('crypto');
 
 const {
   COMPILER_PKG,
+  evaluateDefinitionText,
   freshCopyOf,
   sharedDefinitionOf,
 } = require('./pms-helpers');
@@ -34,7 +35,12 @@ const {
 /** The real compiler bundle, the same artifact the CLI loads. */
 function loadCompiler() {
   // eslint-disable-next-line
-  return require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+  return require(
+    path.resolve(
+      __dirname,
+      '../../../../../.pms-test-support/compiler-inspection.cjs',
+    ),
+  );
 }
 
 /**
@@ -306,10 +312,7 @@ function openExistingProject(project, options = {}) {
   const roots = (config.roots ?? []).map((r) => path.resolve(project, r));
 
   const loadDefinition = () => {
-    delete require.cache[require.resolve(definitionPath)];
-    // eslint-disable-next-line
-    const mod = require(definitionPath);
-    return mod != null && mod.default != null ? mod.default : mod;
+    return evaluateDefinitionText(definitionPath);
   };
 
   /**
@@ -324,13 +327,7 @@ function openExistingProject(project, options = {}) {
    */
   const reloadDefinitionFromBytes = () => {
     const text = fs.readFileSync(definitionPath, 'utf8');
-    const nodeRequire = require('module').createRequire(definitionPath);
-    const module_ = { exports: {} };
-    // eslint-disable-next-line no-new-func
-    const fn = new Function('require', 'module', 'exports', text);
-    fn(nodeRequire, module_, module_.exports);
-    const value = module_.exports;
-    return value != null && value.default != null ? value.default : value;
+    return evaluateDefinitionText(definitionPath, text);
   };
 
   let definition = loadDefinition();
@@ -359,6 +356,16 @@ function openExistingProject(project, options = {}) {
     sharedDefinitionPath: sharedDefinitionOf(project),
     src: (...p) => path.join(project, ...p),
     session,
+
+    /** Creates an isolated stable SDK session over the same fixture inputs. */
+    openPublicSession(publicOptions = {}) {
+      return compiler.createPublicProjectSession({
+        ...args(),
+        projectId: project,
+        rootDir: project,
+        ...publicOptions,
+      });
+    },
 
     /** Re-reads the design system definition from disk, from its bytes. */
     reloadDefinition() {

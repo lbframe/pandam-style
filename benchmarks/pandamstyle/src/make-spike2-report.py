@@ -34,8 +34,8 @@ HERE = Path(__file__).resolve().parent
 SUMMARIZE = HERE.parent / "summarize.py"
 
 # The engine pair the Spike 2 decision rests on. Both run the SAME tree; the
-# only difference between them is which public API of the same bundle is
-# driven, so the difference cannot be a tree difference.
+# only difference between them is which private measurement interface from
+# the test-support bundle is driven, so the difference cannot be a tree change.
 REFERENCE = "babel_full"
 VARIANT = "babel_incremental"
 

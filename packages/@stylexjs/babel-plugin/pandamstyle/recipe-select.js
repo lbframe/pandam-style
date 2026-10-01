@@ -8,6 +8,11 @@
 /**
  * PandamStyle - bounded recipe selection (ARC-10/ARC-11, D-06).
  *
+ * TEMPORARY PHASE 2 INTEGRATION SEAM: the parallel Phase 2 core package is not
+ * present on this branch's base. After the branches are reconciled, move this
+ * shared selector to `@pandamstyle/core` and have compiler/runtime consumers
+ * import that single implementation, then remove this file.
+ *
  * ONE implementation, shared by:
  *  - build time (validation of a literal selection);
  *  - consumer runtime (selection that depends on props).
@@ -24,7 +29,11 @@
  *  - `null`, unknown key, unknown value -> deterministic error.
  */
 
-import { diagnostic, PmsError, Codes } from './diagnostics';
+import {
+  diagnostic,
+  PmsError,
+  Codes,
+} from '../../../compiler/src/protocol/diagnostics.js';
 
 export function recipeError(code, message, context) {
   return new PmsError([

@@ -27,7 +27,7 @@ import { validateNamespace } from './preprocess-rules/basic-validation';
 // interval and does not include the policy work that precedes it. Two timers on
 // one interval would double-count it, and a phase that is counted twice is worse
 // than a phase that is counted once.
-import { count } from '../../pandamstyle/perf';
+import { count } from '../../../../compiler/src/observability/metrics';
 
 type TPropTuple = [+key: string, +styles: $ReadOnlyArray<ComputedStyle>];
 

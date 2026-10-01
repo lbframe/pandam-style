@@ -8,6 +8,11 @@
 /**
  * PandamStyle - consumer runtime.
  *
+ * TEMPORARY PHASE 2 INTEGRATION SEAM: this small bridge remains only so the
+ * Phase 3 branch can qualify against the parallel core branch's base. After
+ * reconciliation, generated modules import `@pandamstyle/core` directly and
+ * this file plus the compiler `/runtime` subpath are removed.
+ *
  * ARC-02 / architecture section 3: this module MUST NOT import the config
  * loader, the full registry, the CSS validator, Babel, or the generation
  * modules. Its only dependency is `recipe-select`, itself reduced to
@@ -18,10 +23,14 @@
  * statically at build time.
  */
 
-import { selectRecipeRefs } from './recipe-select';
+import { selectRecipeRefs } from './recipe-select.js';
 
 export { selectRecipeRefs };
-export { PmsError, Codes, formatDiagnostic } from './diagnostics';
+export {
+  PmsError,
+  Codes,
+  formatDiagnostic,
+} from '../../../compiler/src/protocol/diagnostics.js';
 
 /**
  * Builds a recipe selector bound to its finite data.

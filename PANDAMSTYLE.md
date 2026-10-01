@@ -15,8 +15,8 @@ examples; P0 is still not validated.
 | Path                                                     | Contents                                                                                                                                                                                                                     |
 | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/@stylexjs/*`                                   | StyleX fork code (upstream remote → facebook/stylex)                                                                                                                                                                         |
-| `packages/@stylexjs/babel-plugin/pandamstyle/`           | PandamStyle modules: registry, policy, compiler, recipe, plus the native Babel plugin, build pipeline, codegen and bundler adapter                                                                                           |
-| `packages/@pandamstyle/compiler/`                        | Installable package: the fork engine bundled with the PandamStyle modules. Exposes `.`, `./runtime`, `./vite` and the `pms-build` bin                                                                                        |
+| `packages/compiler/`                                     | Installable `@pandamstyle/compiler`: stable project SDK, compiler domains and `pms-build`; temporary `./runtime` and `./vite` seams remain assigned to Phases 2 and 8                                                        |
+| `packages/@stylexjs/babel-plugin/pandamstyle/`           | Temporary Phase 2 runtime and Phase 8 Vite adapter sources; compiler-owned implementation has moved under `packages/compiler/src/`                                                                                           |
 | `benchmarks/pandamstyle/`                                | The benchmark laboratory: corpus generator, campaign runner, the engine-vs-engine oracle, the incremental-vs-fresh-rebuild oracle, the long-session memory trace, the agent-loop campaign and the Phase C correctness oracle |
 | `packages/@stylexjs/babel-plugin/__tests__/pandamstyle/` | Tests and fixture projects: one valid project (JS/TS/TSX) and 14 negative projects, each built by a real process                                                                                                             |
 | `pilot/vite-react/`                                      | Vite + React pilot application, installed from local `npm pack` tarballs                                                                                                                                                     |
@@ -53,26 +53,18 @@ Reference results: 1007 upstream babel-plugin tests (64 skipped, 887 snapshots),
 
 ## Incremental compilation (project session)
 
-`buildProject` is a **full rebuild**: every covered file is read, parsed and
-compiled on every invocation. `@pandamstyle/compiler` also exports
-`createProjectSession`, a reusable session over one project that keeps the state
-a build produces — per-file compiled results, per-file rule contributions,
-per-file coverage certificates, the forward and reverse module graphs and the
-resolution state — and reuses it across revisions.
+`createProjectSession` is the stable compiler API. The private full-rebuild
+reference used by tests is not a product export. A session owns one project, its
+revisions, validated diagnostics, artifacts and publication state.
 
 ```js
-const { createProjectSession } = require('@pandamstyle/compiler');
+import { createProjectSession } from '@pandamstyle/compiler';
 
-const session = createProjectSession({ definition, roots, outDir });
-session.initialize();          // revision 1: the full analysis
-session.validate();            // the verdict for the active revision
-session.compile();             // transactional publication of that revision
-
-// later, in the same process:
-session.applyChanges({ addedFiles: [...], removedFiles: [...] });
-session.validate();
-session.compile();
-session.close();
+const project = createProjectSession({ rootDir, definition, roots, outDir });
+const initial = await project.initialize();
+const result = await project.validate(initial.revision);
+if (result.ok) await project.compile(result.revision);
+await project.close();
 ```
 
 The contract is exact equivalence:
@@ -100,22 +92,29 @@ The measurements, the oracle and the known limits are in
 
 ## The agent loop
 
-An AI agent knows which file it just wrote. `applyAgentChanges` asks the CALLER
-where to look, and `validate()` answers with a compact, revision-bound,
-machine-readable result instead of a project snapshot.
+An agent submits a complete revision transaction. The SDK returns a compact,
+revision-bound Diagnostics Protocol v1 result.
 
 ```js
-session.applyAgentChanges({ changed: [file] });
-const { agentResult } = session.validate();
-
-if (!agentResult.ok) {
-  // Structured, machine-authoritative. No prose parsing.
-  for (const d of agentResult.diagnostics) {
-    console.log(d.code, d.source.file, d.source.line, d.repair.kind);
+const revision = await project.applyChanges({
+  baseRevision: initial.revision,
+  mode: 'verified-explicit',
+  changed: [file],
+  added: [],
+  removed: [],
+  renamed: [],
+});
+const result = await project.validate(revision.revision);
+if (!result.ok) {
+  for (const diagnostic of result.diagnostics) {
+    console.log(
+      diagnostic.code,
+      diagnostic.source.file,
+      diagnostic.source.line,
+    );
   }
 } else {
-  const bytes = session.serializeAgentResult().bytes; // ~1.8 KB at c10000
-  session.compile(); // generation committed
+  await project.compile(revision.revision);
 }
 ```
 

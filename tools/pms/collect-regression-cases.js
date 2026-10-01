@@ -32,10 +32,7 @@ const TESTS = path.join(
   'packages/@stylexjs/babel-plugin/__tests__/pandamstyle',
 );
 const FIXTURES = path.join(TESTS, 'fixtures');
-const BUILD_BIN = path.join(
-  REPO_ROOT,
-  'packages/@pandamstyle/compiler/bin/pms-build.js',
-);
+const BUILD_BIN = path.join(REPO_ROOT, 'packages/compiler/bin/pms-build.js');
 
 /** criterion -> fixture, grouped by the batch criterion it demonstrates. */
 const CASES = [
@@ -213,7 +210,7 @@ function freshCopyOf(projectName) {
   const scope = path.join(tmp, 'node_modules', '@pandamstyle');
   fs.mkdirSync(scope, { recursive: true });
   fs.symlinkSync(
-    path.join(REPO_ROOT, 'packages/@pandamstyle/compiler'),
+    path.join(REPO_ROOT, 'packages/compiler'),
     path.join(scope, 'compiler'),
     'dir',
   );

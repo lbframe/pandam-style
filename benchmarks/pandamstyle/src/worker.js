@@ -191,13 +191,26 @@ async function main() {
   const job = JSON.parse(process.argv[2]);
   const engineRoot = job.engineRoot;
 
-  const compilerPkgDir = path.join(
-    engineRoot,
-    'packages',
-    '@pandamstyle',
-    'compiler',
+  const compilerPkgCandidates = [
+    path.join(engineRoot, 'packages', 'compiler'),
+    path.join(engineRoot, 'packages', '@pandamstyle', 'compiler'),
+  ];
+  const compilerPkgDir = compilerPkgCandidates.find((candidate) =>
+    fs.existsSync(path.join(candidate, 'package.json')),
   );
-  const engineModulePath = path.join(compilerPkgDir, 'lib', 'index.js');
+  if (compilerPkgDir == null) {
+    throw new Error(
+      `No PandamStyle compiler package found under ${engineRoot}`,
+    );
+  }
+  const testSupportPath = path.join(
+    engineRoot,
+    '.pms-test-support',
+    'compiler-inspection.cjs',
+  );
+  const engineModulePath = fs.existsSync(testSupportPath)
+    ? testSupportPath
+    : path.join(compilerPkgDir, 'lib', 'index.js');
 
   const projectDir = materialiseProject(job.corpusDir, job.projectDir);
   linkCompiler(projectDir, compilerPkgDir);
@@ -222,7 +235,8 @@ async function main() {
   };
 
   // The engine NAME selects the compilation path, and only that. Both paths
-  // load the same bundle and call the same public API; `babel_incremental`
+  // load the same test-support bundle and call the same measurement interface;
+  // `babel_incremental`
   // adds the project session and nothing else, so the difference between the
   // two engines is reuse and cannot be attributed to a different compiler.
   // The engine DECLARES its mode, and the job carries the declaration through.

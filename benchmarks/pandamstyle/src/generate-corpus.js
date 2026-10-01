@@ -387,7 +387,7 @@ function renderDefinitionModule(definition) {
     ` * ${definition.systemId} - ${definition.tokens ? Object.keys(definition.tokens).length : 0} token categories, ${Object.keys(definition.recipes).length} recipes.`,
     ' * Deterministic from (components, tokens, recipes, seed, fanout).',
     ' */',
-    "import { token } from '@pandamstyle/compiler';",
+    "import { token } from '@pandamstyle/compiler/config';",
     '',
     'const t = (p) => token(p);',
     '',

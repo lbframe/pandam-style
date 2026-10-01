@@ -1,46 +1,45 @@
 # Semantic gap register
 
-Status: frozen Phase 1 target/current discrepancy register. These are bounded
-existing deficiencies, **not passing semantics**. Their target assertions live
-in `tests/semantic/cases/`; exact structured observed evidence is emitted per
-revision in the
-[Phase 1 report](../../evidence/phase-1-semantic-oracle/REPORT.md). The oracle
-checks both the target mismatch boundary and authored observed facts. Unrelated
-differences fail rather than being absorbed by a gap.
+Status: Phase 1 discrepancy history with Phase 3 resolution recorded below.
+Target assertions remain unchanged in `tests/semantic/cases/`; the Phase 3
+oracle records repaired behavior and revision evidence. SG-01 through SG-11 and
+SG-13 are promoted to `MUST_PRESERVE`. SG-12 remains the Phase 2-owned
+`KNOWN_GAP`. The Phase 1 observations below are historical, not descriptions of
+the current implementation.
 
-For **every entry below**: migration must preserve current behavior: **NO**;
-target behavior already frozen: **YES**. No production change is made in Phase 1
-because its authorized scope is verification, not product repair. Resolution
-phases indicate the owning future migration batch; that batch must explicitly
-review and promote the repaired case, with a contract reference and reviewable
-diff. Phase 1 does not authorize fixing these before its own closure.
+The Phase 1 target behavior remains frozen for every entry. Phase 3 reviewed and
+promoted the repaired cases with their authored expectations intact. The Phase 1
+observations explain the original migration risk.
 
-## SG-01 — static omission/empty composition
+## SG-01 — static omission/empty composition — resolved in Phase 3
 
 - Cases: `props.omissions`, `props.empty`.
 - Contract: [public API, props](public-api-v0.1.md),
   [ABI ref composition](generated-design-system-abi-v1.md).
 - Target: null/false conditional omissions introduce no classes; empty props
   returns `{}`. Static analysis admits these accepted forms.
-- Current: null/false produce two `PMS_UNVERIFIED_PROPS_SOURCE` errors; empty
-  props produces one. Both lanes reject the source before runtime execution.
+- Phase 1 observed: null/false produced two `PMS_UNVERIFIED_PROPS_SOURCE`
+  errors; empty props produces one. Both lanes reject the source before runtime
+  execution.
 - Migration risk: an extracted validator could canonize this narrower input
   domain and silently reject valid composition.
-- Expected resolution: Phase 3 compiler provenance validation.
+- Resolution: Phase 3 compiler provenance validation; cases promoted to
+  `MUST_PRESERVE`.
 
-## SG-02 — immutable local intrinsic alias
+## SG-02 — immutable local intrinsic alias — resolved in Phase 3
 
 - Case: `forward.local-alias`.
 - Contract: [public API binding authority](public-api-v0.1.md),
   [ADR 0004](adr/0004-generated-import-model.md).
 - Target: a proven immutable local alias of authenticated create retains binding
   identity; its resulting ref is valid for composition.
-- Current: the alias call is not recognized as create, so props rejects its
-  result with `PMS_UNVERIFIED_PROPS_SOURCE` in both lanes.
+- Phase 1 observed: the alias call was not recognized as create, so props
+  rejected its result with `PMS_UNVERIFIED_PROPS_SOURCE` in both lanes.
 - Migration risk: spelling-based recognition could replace identity provenance.
-- Expected resolution: Phase 3 binding/provenance frontend.
+- Resolution: Phase 3 binding/provenance frontend; case promoted to
+  `MUST_PRESERVE`.
 
-## SG-03 — stale design-system CSS after invalid rename and repair
+## SG-03 — stale design-system CSS after invalid rename and repair — resolved in Phase 3
 
 - Case: `token.rename-removal`.
 - Contract: [public API token rename and revisions](public-api-v0.1.md),
@@ -49,17 +48,18 @@ diff. Phase 1 does not authorize fixing these before its own closure.
 - Target: renaming `spacing.md` to `spacing.medium` invalidates the old
   consumer; its repaired revision contains the renamed variable/value and equals
   fresh.
-- Current: fresh repaired output defines medium; incremental retains the prior
-  design-system owner contribution defining the removed md variable. The new
-  consumer references the medium variable, which is not defined. The authored
-  observed evidence pins the old declaration and ordered base values separately
-  from the renamed target. Revision 1 and rejection at revision 2 remain
-  correct.
+- Phase 1 observed: fresh repaired output defined medium; incremental retained
+  the prior design-system owner contribution defining the removed md variable.
+  The new consumer references the medium variable, which is not defined. The
+  authored observed evidence pins the old declaration and ordered base values
+  separately from the renamed target. Revision 1 and rejection at revision 2
+  remain correct.
 - Migration risk: stale shared-owner state can pass acceptance while producing
   browser-visible missing token values; two-cache consistency is insufficient.
-- Expected resolution: Phase 3 revision/design-system CSS invalidation.
+- Resolution: Phase 3 revision/design-system CSS invalidation; case promoted to
+  `MUST_PRESERVE`.
 
-## SG-04 — deleted positive edges retained instead of negative resolution
+## SG-04 — deleted positive edges retained instead of negative resolution — resolved in Phase 3
 
 - Cases: `resolution.deleted-restored`, `resolution.rename-import-repair`,
   `resolution.relay-added-removed`.
@@ -69,16 +69,18 @@ diff. Phase 1 does not authorize fixing these before its own closure.
 - Target: deletion/rename removes the target from coverage, diagnoses the
   originating import request, records a real negative dependency, and repairs
   correctly after source/import restoration.
-- Current: incremental retains the removed positive edge and covers the missing
-  target. It diagnoses `<unparseable>` in that target rather than the consumer's
-  import. For the ordinary dependency, fresh negative count is 1 and incremental
-  count is 0. Fresh and incremental reject, but their coverage and diagnostic
-  contexts differ. Restored/import-repaired revisions agree again.
+- Phase 1 observed: incremental retained the removed positive edge and covered
+  the missing target. It diagnoses `<unparseable>` in that target rather than
+  the consumer's import. For the ordinary dependency, fresh negative count is 1
+  and incremental count is 0. Fresh and incremental reject, but their coverage
+  and diagnostic contexts differ. Restored/import-repaired revisions agree
+  again.
 - Migration risk: false coverage and missing negative dependencies can cause
   later creation or resolution changes to go unvalidated.
-- Expected resolution: Phase 3 project graph/resolution invalidation.
+- Resolution: Phase 3 project graph/resolution invalidation; cases promoted to
+  `MUST_PRESERVE`.
 
-## SG-05 — historical agent envelope versus Diagnostics Protocol v1
+## SG-05 — historical agent envelope versus Diagnostics Protocol v1 — resolved in Phase 3
 
 - Case: `diagnostics.protocol-v1`.
 - Contract:
@@ -90,27 +92,30 @@ diff. Phase 1 does not authorize fixing these before its own closure.
   entries, and repairs/coverage/affected-region/query fields follow the frozen
   protocol. Session identity is opaque and must agree between envelope and
   diagnostic.
-- Current: `pandamstyle-agent-result`, numeric revisionId, no full identity, ABI
-  or completeness, source.role nested in source, missing end coordinates,
-  expected domain/visibility/static fields, string candidates, old repair and
-  query shapes, missing diagnostic/envelope totals and affected-region fields.
-  Actual gap evidence retains historical structured fields; no adapter
-  fabricates a target envelope to hide the discrepancy.
+- Phase 1 observed: `pandamstyle-agent-result`, numeric revisionId, no full
+  identity, ABI or completeness, source.role nested in source, missing end
+  coordinates, expected domain/visibility/static fields, string candidates, old
+  repair and query shapes, missing diagnostic/envelope totals and
+  affected-region fields. Actual gap evidence retains historical structured
+  fields; no adapter fabricates a target envelope to hide the discrepancy.
 - Migration risk: transport migration may silently bless incomplete revision or
   coverage authority, or treat prose as machine repair instructions.
-- Expected resolution: Phase 3 compiler SDK diagnostics protocol migration.
+- Resolution: Phase 3 compiler SDK diagnostics protocol migration; case promoted
+  to `MUST_PRESERVE`.
 
-## SG-06 — wrong-category repair loses expected category
+## SG-06 — wrong-category repair loses expected category — resolved in Phase 3
 
 - Case: `diagnostics.category-repair`.
 - Contract:
   [Diagnostics Protocol v1 category repairs](diagnostics-protocol-v1.md).
 - Target: spacing category appears in machine expected and repair.expected.
-- Current: both fields are null while context.expected correctly says spacing.
+- Phase 1 observed: both fields were null while context.expected correctly said
+  spacing.
 - Migration risk: an agent cannot safely select the right repair domain.
-- Expected resolution: Phase 3 diagnostic normalization.
+- Resolution: Phase 3 diagnostic normalization; case promoted to
+  `MUST_PRESERVE`.
 
-## SG-07 — private-token repair suggests a forbidden page privilege
+## SG-07 — private-token repair suggests a forbidden page privilege — resolved in Phase 3
 
 - Case: `diagnostics.private-repair`.
 - Contract:
@@ -119,12 +124,14 @@ diff. Phase 1 does not authorize fixing these before its own closure.
 - Target: structured replace-with-token repair scoped to public color
   vocabulary, with target property and category; no page access to private
   channels.
-- Current: old use-public-token repair has no structured target/category and its
-  `how` prose suggests explicitly allowing the private page channel.
+- Phase 1 observed: old use-public-token repair had no structured
+  target/category and its `how` prose suggested explicitly allowing the private
+  page channel.
 - Migration risk: copying old repair prose weakens frozen product policy.
-- Expected resolution: Phase 3 diagnostics/repair protocol migration.
+- Resolution: Phase 3 diagnostics/repair protocol migration; case promoted to
+  `MUST_PRESERVE`.
 
-## SG-08 — syntax failures lose available parser coordinates
+## SG-08 — syntax failures lose available parser coordinates — resolved in Phase 3
 
 - Cases: `syntax.incomplete-edit`, `syntax.error-affected`.
 - Contract:
@@ -133,14 +140,15 @@ diff. Phase 1 does not authorize fixing these before its own closure.
   fixture EOF is line 3 column 1; affected-file syntax error is line 2
   column 11. Repaired syntax validates normally. No new parser diagnostic code
   is invented.
-- Current: generic `PMS_COVERAGE_GAP`, rule coverage.local-imports, request
-  `<unparseable>`, unreadable context and null location. Source filename
+- Phase 1 observed: generic `PMS_COVERAGE_GAP`, rule coverage.local-imports,
+  request `<unparseable>`, unreadable context and null location. Source filename
   survives but useful available parser coordinates are discarded in both lanes.
 - Migration risk: extraction could canonize a generic internal/coverage failure
   that cannot guide repair of incomplete agent edits.
-- Expected resolution: Phase 3 parser-to-diagnostic mapping.
+- Resolution: Phase 3 parser-to-diagnostic mapping; cases promoted to
+  `MUST_PRESERVE`.
 
-## SG-09 — generation receipt omits origin/association identities
+## SG-09 — generation receipt omits origin/association identities — resolved in Phase 3
 
 - Case: `publication.noop-generation`.
 - Contract: [public API RevisionId/GenerationId table](public-api-v0.1.md),
@@ -148,29 +156,31 @@ diff. Phase 1 does not authorize fixing these before its own closure.
 - Target: generation receipt names both artifact origin revision and current
   association revision. The latter is revision 2; artifact origin remains a
   committed revision and generationId agrees with the current publication.
-- Current: publisher rewrites metadata and advances to GenerationId 2 with
-  generationReused false, and lacks the required origin/association fields.
+- Phase 1 observed: publisher rewrote metadata and advanced to GenerationId 2
+  with generationReused false, and lacks the required origin/association fields.
   Allocating a generation for changed metadata bytes is not itself a defect;
   byte-identical reuse is permitted, not forced by this expectation. Other tests
   separately prove invalid/staged-failed publication preserves the previous
   generation and files.
 - Migration risk: revision identity is mistaken for artifact generation
   identity.
-- Expected resolution: Phase 3 publication receipt/generation identity
-  migration.
+- Resolution: Phase 3 publication receipt/generation identity migration; case
+  promoted to `MUST_PRESERVE`.
 
-## SG-10 — private recipe exposed in consumer manifest
+## SG-10 — private recipe exposed in consumer manifest — resolved in Phase 3
 
 - Case: `recipe.private-visibility`.
 - Contract:
   [public API recipe visibility, explicit baseline gap requirement](public-api-v0.1.md).
 - Target: consumer recipe vocabulary contains button and bare, excluding secret.
-- Current: generated manifest/selector vocabulary exposes the private secret
-  recipe. The expectation remains the public vocabulary, not historical output.
+- Phase 1 observed: generated manifest/selector vocabulary exposed the private
+  secret recipe. The expectation remains the public vocabulary, not historical
+  output.
 - Migration risk: generator re-homing carries author-only vocabulary into pages.
-- Expected resolution: Phase 3 generated consumer visibility filtering.
+- Resolution: Phase 3 generated consumer visibility filtering; case promoted to
+  `MUST_PRESERVE`.
 
-## SG-11 — counterfeit generated metadata receives intrinsic authority
+## SG-11 — counterfeit generated metadata receives intrinsic authority — resolved in Phase 3
 
 - Case: `provenance.generated-authentication`.
 - Contract: [generated ABI authentication](generated-design-system-abi-v1.md),
@@ -179,38 +189,43 @@ diff. Phase 1 does not authorize fixing these before its own closure.
 - Target: an arbitrary module copying generated markers is rejected with
   `PMS_GENERATED_ARTIFACT_MISMATCH`; only authenticated service-owned origin
   confers helper identity.
-- Current: a user module with the same systemId and deliberately forged digest
-  is accepted as an intrinsic source. This is distinct from the passing tests
-  proving ordinary same-spelling functions and ambiguous stars lack authority.
+- Phase 1 observed: a user module with the same systemId and deliberately forged
+  digest was accepted as an intrinsic source. This is distinct from the passing
+  tests proving ordinary same-spelling functions and ambiguous stars lack
+  authority.
 - Migration risk: marker shape could become a permanent authority bypass.
-- Expected resolution: Phase 3 generated artifact authentication.
+- Resolution: Phase 3 generated artifact authentication; case promoted to
+  `MUST_PRESERVE`.
 
-## SG-12 — runtime malformed refs lack structured rejection
+## SG-12 — runtime malformed refs lack structured rejection — unresolved, Phase 2
 
 - Case: `props.runtime-malformed`.
 - Contract: [public API runtime malformed refs](public-api-v0.1.md),
   [ABI runtime format checks](generated-design-system-abi-v1.md).
 - Target: generated runtime props rejects `{className: 'invented'}` with
   structured `PMS_UNVERIFIED_PROPS_SOURCE` selection error.
-- Current: actual generated props accepts the raw object without throwing. The
-  adapter invokes the actual generated function; it does not simulate rejection.
-  Passing static spoofing tests do not establish this runtime guard.
+- Phase 1 observed: actual generated props accepted the raw object without
+  throwing. The adapter invokes the actual generated function; it does not
+  simulate rejection. Passing static spoofing tests do not establish this
+  runtime guard.
 - Migration risk: new core inherits permissive donor format behavior.
-- Expected resolution: Phase 2 core composition/runtime selection errors.
+- Resolution: intentionally untouched in Phase 3; Phase 2 owns core
+  composition/runtime selection errors.
 
-## SG-13 — smaller requested diagnostic bounds ignored
+## SG-13 — smaller requested diagnostic bounds ignored — resolved in Phase 3
 
 - Case: `diagnostics.smaller-bound`.
 - Contract:
   [Diagnostics Protocol v1 bounded candidate queries/results](diagnostics-protocol-v1.md).
 - Target: requested bound 2 returns two candidates, full total 3, truncation
   true.
-- Current: session agentResult ignores candidateLimit 2, returning three
-  candidates and truncation false. Default-bound behavior is separately passing
-  at 32 of 37 public candidates in `diagnostics.truncation`.
+- Phase 1 observed: session agentResult ignored candidateLimit 2, returning
+  three candidates and truncation false. Default-bound behavior is separately
+  passing at 32 of 37 public candidates in `diagnostics.truncation`.
 - Migration risk: compact host result limits become unreliable despite correct
   default-bound tests.
-- Expected resolution: Phase 3 diagnostics host options/query binding.
+- Resolution: Phase 3 diagnostics host options/query binding; case promoted to
+  `MUST_PRESERVE`.
 
 ## Deferred concepts
 

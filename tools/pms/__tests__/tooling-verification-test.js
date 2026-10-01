@@ -79,15 +79,9 @@ beforeAll(() => {
   ]) {
     fs.mkdirSync(path.join(fixture, 'packages', name), { recursive: true });
   }
-  write('packages/@pandamstyle/compiler/lib/index.js', '// delivered build\n');
-  write(
-    'packages/@pandamstyle/compiler/package.json',
-    '{"name":"@pandamstyle/compiler"}\n',
-  );
-  write(
-    'packages/@pandamstyle/compiler/bin/pms-build.js',
-    '// fixture generator\n',
-  );
+  write('packages/compiler/lib/index.mjs', '// delivered build\n');
+  write('packages/compiler/package.json', '{"name":"@pandamstyle/compiler"}\n');
+  write('packages/compiler/bin/pms-build.js', '// fixture generator\n');
   write(
     'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/generated/fixture.css',
     '.fixture{}\n',

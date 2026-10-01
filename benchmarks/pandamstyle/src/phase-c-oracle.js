@@ -69,11 +69,11 @@ const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const COMPILER_PKG = path.join(
+const COMPILER_PKG = path.join(REPO_ROOT, 'packages', 'compiler');
+const COMPILER_SUPPORT = path.join(
   REPO_ROOT,
-  'packages',
-  '@pandamstyle',
-  'compiler',
+  '.pms-test-support',
+  'compiler-inspection.cjs',
 );
 
 /**
@@ -252,7 +252,7 @@ function readPublished(outDir) {
  * generations captured for each.
  */
 function openDriver(projectDir) {
-  const compiler = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+  const compiler = require(COMPILER_SUPPORT);
   const config = require(path.join(projectDir, 'pandamstyle.config.js'));
   const definitionPath = path.resolve(
     path.dirname(path.join(projectDir, 'pandamstyle.config.js')),

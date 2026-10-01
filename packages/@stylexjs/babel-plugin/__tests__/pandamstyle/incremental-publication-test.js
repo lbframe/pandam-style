@@ -41,7 +41,6 @@ const path = require('path');
 jest.autoMockOff();
 
 const {
-  COMPILER_PKG,
   comparePublished,
   differential,
   openExistingProject,
@@ -50,7 +49,12 @@ const {
 } = require('./session-helpers');
 
 // eslint-disable-next-line
-const build = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+const build = require(
+  path.resolve(
+    __dirname,
+    '../../../../../.pms-test-support/compiler-inspection.cjs',
+  ),
+);
 
 const DELTA = { publishVariant: 'session_incremental_publish' };
 

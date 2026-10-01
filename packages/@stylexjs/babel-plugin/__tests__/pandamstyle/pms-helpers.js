@@ -22,11 +22,12 @@ const path = require('path');
 
 const FIXTURES = path.resolve(__dirname, 'fixtures');
 // __dirname is packages/@stylexjs/babel-plugin/__tests__/pandamstyle
-const COMPILER_PKG = path.resolve(
-  __dirname,
-  '../../../../@pandamstyle/compiler',
-);
+const COMPILER_PKG = path.resolve(__dirname, '../../../../compiler');
 const BUILD_BIN = path.join(COMPILER_PKG, 'bin', 'pms-build.js');
+const TEST_FAILURE_BIN = path.join(
+  path.resolve(COMPILER_PKG, '../..'),
+  'tests/support/pms-build-injected-failure.mjs',
+);
 
 /**
  * The temp root for this PROCESS, created on first use and removed when the
@@ -80,9 +81,12 @@ function freshCopyOf(projectName) {
 }
 
 function runBuild(projectDir, extraArgs = []) {
+  const injectFailure = extraArgs.includes('--inject-failure=after-compile');
   const result = spawnSync(
     process.execPath,
-    [BUILD_BIN, '--config', './pandamstyle.config.js', ...extraArgs],
+    injectFailure
+      ? [TEST_FAILURE_BIN, './pandamstyle.config.js']
+      : [BUILD_BIN, '--config', './pandamstyle.config.js', ...extraArgs],
     { cwd: projectDir, encoding: 'utf8', env: { ...process.env } },
   );
   return {
@@ -118,12 +122,51 @@ function readJson(file) {
 
 /** The shared design system definition that sits next to a copied project. */
 function sharedDefinitionOf(projectDir) {
-  return path.join(path.dirname(projectDir), '_shared', 'design.pms.config.js');
+  return path.join(
+    path.dirname(projectDir),
+    '_shared',
+    'design.pms.config.mjs',
+  );
+}
+
+/** Evaluate a design-system ESM file synchronously from its current bytes. */
+function evaluateDefinitionText(
+  filePath,
+  source = fs.readFileSync(filePath, 'utf8'),
+) {
+  const babel = require('@babel/core');
+  const moduleTransform = require('@babel/plugin-transform-modules-commonjs');
+  const transformed = babel.transformSync(source, {
+    filename: filePath,
+    babelrc: false,
+    configFile: false,
+    plugins: [moduleTransform],
+  });
+  const module_ = { exports: {} };
+  const nodeRequire = require('module').createRequire(filePath);
+  const localRequire = (specifier) => {
+    if (specifier === '@pandamstyle/compiler/config') {
+      const compiler = require(
+        path.resolve(
+          __dirname,
+          '../../../../../.pms-test-support/compiler-inspection.cjs',
+        ),
+      );
+      return { token: compiler.token, defineConfig: (config) => config };
+    }
+    return nodeRequire(specifier);
+  };
+  // eslint-disable-next-line no-new-func
+  const fn = new Function('require', 'module', 'exports', transformed.code);
+  fn(localRequire, module_, module_.exports);
+  const value = module_.exports;
+  return value != null && value.default != null ? value.default : value;
 }
 
 module.exports = {
   FIXTURES,
   sharedDefinitionOf,
+  evaluateDefinitionText,
   COMPILER_PKG,
   BUILD_BIN,
   freshCopyOf,

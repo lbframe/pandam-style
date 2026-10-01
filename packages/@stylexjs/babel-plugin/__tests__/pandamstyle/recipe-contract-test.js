@@ -22,7 +22,12 @@ const fs = require('fs');
 const path = require('path');
 const { COMPILER_PKG, freshCopyOf, runBuild } = require('./pms-helpers');
 
-const runtime = require(path.join(COMPILER_PKG, 'lib', 'runtime.cjs'));
+const runtime = require(
+  path.resolve(
+    __dirname,
+    '../../../../../.pms-test-support/compiler-inspection.cjs',
+  ),
+);
 
 let project;
 let spec;

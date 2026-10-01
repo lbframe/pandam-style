@@ -12,13 +12,18 @@ jest.autoMockOff();
 const fs = require('fs');
 const path = require('path');
 const {
-  COMPILER_PKG,
+  evaluateDefinitionText,
   freshCopyOf,
   readJson,
   runBuild,
 } = require('./pms-helpers');
 
-const build = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+const build = require(
+  path.resolve(
+    __dirname,
+    '../../../../../.pms-test-support/compiler-inspection.cjs',
+  ),
+);
 const { collectCoveredFiles, assertCoverageConsistency, moduleEdgesOf } = build;
 
 const FIXTURES = path.resolve(__dirname, 'fixtures');
@@ -146,8 +151,8 @@ describe('BC-3: dynamic requests are decided, not ignored', () => {
         'utf8',
       );
       const session = build.createCompilerSession({
-        definition: require(
-          path.join(FIXTURES, '_shared', 'design.pms.config.js'),
+        definition: evaluateDefinitionText(
+          path.join(FIXTURES, '_shared', 'design.pms.config.mjs'),
         ),
         roots: [file],
         runtimeModule: '@pandamstyle/compiler/runtime',
@@ -191,8 +196,8 @@ describe('BC-3: dynamic requests are decided, not ignored', () => {
         'utf8',
       );
       const session = build.createCompilerSession({
-        definition: require(
-          path.join(FIXTURES, '_shared', 'design.pms.config.js'),
+        definition: evaluateDefinitionText(
+          path.join(FIXTURES, '_shared', 'design.pms.config.mjs'),
         ),
         roots: [dir],
         runtimeModule: '@pandamstyle/compiler/runtime',

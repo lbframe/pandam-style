@@ -20,10 +20,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
 
-import { buildDesignSystem } from '../../pandamstyle/index';
-import { conformanceDefinition } from '../../pandamstyle/conformance';
-import { token } from '../../pandamstyle/token';
-import { PmsError } from '../../pandamstyle/diagnostics';
+import {
+  buildDesignSystem,
+  conformanceDefinition,
+  token,
+  PmsError,
+} from '../../../../../tests/support/compiler-inspection';
 
 const OUT =
   process.env.PMS_OUT_DIR ??

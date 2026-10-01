@@ -8,7 +8,7 @@
 /**
  * Pilot design system. Educational values, not a shipped theme.
  */
-import { token } from '@pandamstyle/compiler';
+import { token } from '@pandamstyle/compiler/config';
 
 export default {
   systemId: 'pilot@0.1',

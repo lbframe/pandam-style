@@ -13,9 +13,14 @@ const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { COMPILER_PKG, freshCopyOf, runBuild } = require('./pms-helpers');
+const { freshCopyOf, runBuild } = require('./pms-helpers');
 
-const build = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+const build = require(
+  path.resolve(
+    __dirname,
+    '../../../../../.pms-test-support/compiler-inspection.cjs',
+  ),
+);
 
 // ---------------------------------------------------------------------------
 // helpers
@@ -296,7 +301,7 @@ describe('BC-5/BC-9: a failing CLI build publishes no mix', () => {
       },
     },
     {
-      label: 'an internal error injected after the design-system module',
+      label: 'an internal error injected during publication staging',
       extraArgs: ['--inject-failure=after-compile'],
       breakIt() {
         // Nothing is wrong with the sources: the failure is raised inside the
@@ -304,19 +309,15 @@ describe('BC-5/BC-9: a failing CLI build publishes no mix', () => {
       },
     },
     {
-      // The scenario that actually separates transactional from
-      // write-during-the-build: the design system CHANGES, so generation N+1
-      // has a different registryDigest, and the failure lands after the new
-      // design-system module was written. Publishing that module without its
-      // manifest and stylesheet is precisely the N/N+1 mix that must not happen.
-      label:
-        'a changed design system plus an internal failure after generation',
+      // The design system CHANGES, so generation N+1 has a different
+      // registryDigest. A staging failure must leave every prior artifact in N.
+      label: 'a changed design system plus an internal failure during staging',
       extraArgs: ['--inject-failure=after-compile'],
       breakIt(project) {
         const def = path.join(
           path.dirname(project),
           '_shared',
-          'design.pms.config.js',
+          'design.pms.config.mjs',
         );
         const before = fs.readFileSync(def, 'utf8');
         fs.writeFileSync(
@@ -377,7 +378,7 @@ describe('BC-5/BC-9: a failing CLI build publishes no mix', () => {
     const def = path.join(
       path.dirname(project),
       '_shared',
-      'design.pms.config.js',
+      'design.pms.config.mjs',
     );
     fs.writeFileSync(
       def,

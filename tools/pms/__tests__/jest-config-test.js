@@ -122,7 +122,7 @@ describe('the root jest configuration excludes the generated trees', () => {
     }
     // Exactly one: the real workspace package. A second one is the
     // `_assertNoDuplicates` crash, found here rather than inside a suite.
-    expect(found).toEqual(['packages/@pandamstyle/compiler/package.json']);
+    expect(found).toEqual(['packages/compiler/package.json']);
   });
 });
 

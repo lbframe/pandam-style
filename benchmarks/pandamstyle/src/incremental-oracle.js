@@ -61,11 +61,11 @@ const { pathToFileURL } = require('url');
 const { spawnSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const COMPILER_PKG = path.join(
+const COMPILER_PKG = path.join(REPO_ROOT, 'packages', 'compiler');
+const COMPILER_SUPPORT = path.join(
   REPO_ROOT,
-  'packages',
-  '@pandamstyle',
-  'compiler',
+  '.pms-test-support',
+  'compiler-inspection.cjs',
 );
 const BUILD_BIN = path.join(COMPILER_PKG, 'bin', 'pms-build.js');
 
@@ -346,7 +346,7 @@ async function main() {
     ? args.scenarios.split(',').map((s) => s.trim())
     : SCENARIOS.filter((s) => s.kind !== 'not-implemented').map((s) => s.name);
 
-  const compiler = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+  const compiler = require(COMPILER_SUPPORT);
   const revisions = [];
   let mismatches = 0;
   let errors = 0;

@@ -338,14 +338,10 @@ function publishOne(projectDir, auditPolicy = 'reference') {
   fs.mkdirSync(scope, { recursive: true });
   const link = path.join(scope, 'compiler');
   if (!fs.existsSync(link)) {
-    fs.symlinkSync(
-      path.join(REPO_ROOT, 'packages/@pandamstyle/compiler'),
-      link,
-      'dir',
-    );
+    fs.symlinkSync(path.join(REPO_ROOT, 'packages/compiler'), link, 'dir');
   }
   const compiler = require(
-    path.join(REPO_ROOT, 'packages/@pandamstyle/compiler/lib/index.js'),
+    path.join(REPO_ROOT, '.pms-test-support/compiler-inspection.cjs'),
   );
   const config = require(path.join(projectDir, 'pandamstyle.config.js'));
   const resolveRoot = (r) =>

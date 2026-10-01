@@ -13,7 +13,7 @@ const path = require('path');
 const babel = require('@babel/core');
 const postcss = require('postcss');
 const crypto = require('crypto');
-const compiler = require('@pandamstyle/compiler');
+const compiler = require('../../../.pms-test-support/compiler-inspection.cjs');
 const hasClass = (selector, name) =>
   [...selector.matchAll(/\.([\w-]+)/g)].some((match) => match[1] === name);
 
@@ -50,12 +50,16 @@ function relative(root, value) {
   return value.replaceAll(root + path.sep, '');
 }
 
-function portable(root, value) {
-  if (typeof value === 'string') return relative(root, value);
-  if (Array.isArray(value)) return value.map((v) => portable(root, v));
+function portable(root, value, sessionId = null) {
+  if (typeof value === 'string') {
+    if (sessionId != null && value === sessionId) return 'oracle-session';
+    return relative(root, value);
+  }
+  if (Array.isArray(value))
+    return value.map((v) => portable(root, v, sessionId));
   if (value && typeof value === 'object')
     return Object.fromEntries(
-      Object.entries(value).map(([k, v]) => [k, portable(root, v)]),
+      Object.entries(value).map(([k, v]) => [k, portable(root, v, sessionId)]),
     );
   return value;
 }
@@ -144,7 +148,17 @@ function evaluate(root, out, entry) {
   );
 }
 
-function observe(root, out, validation, session, spec, system) {
+function observe(
+  root,
+  out,
+  validation,
+  session,
+  spec,
+  system,
+  publicResult,
+  publicSession,
+  publicRoot,
+) {
   const artifacts = tree(out);
   const manifest = artifacts['manifest.json']
     ? JSON.parse(artifacts['manifest.json'])
@@ -168,9 +182,10 @@ function observe(root, out, validation, session, spec, system) {
     ),
     css,
     manifest: portable(root, manifest),
-    agent: session
-      ? portable(root, session.agentResult(spec.observe?.agentOptions ?? {}))
-      : null,
+    agent:
+      publicResult == null
+        ? null
+        : portable(publicRoot, publicResult, publicSession?.sessionId ?? null),
     counters: validation.counters ?? null,
     negativeResolutionCount: session
       ? session.stats().negativeResolutionCount
@@ -260,12 +275,16 @@ function observe(root, out, validation, session, spec, system) {
   return result;
 }
 
-function run(spec, lane) {
+async function run(spec, lane) {
   const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-semantic-'));
   const root = path.join(parent, 'project');
   const out = path.join(root, 'generated');
+  const publicRoot = path.join(parent, 'protocol-project');
+  const publicOut = path.join(publicRoot, 'generated');
   for (const [name, text] of Object.entries(spec.files))
     write(root, name, text);
+  for (const [name, text] of Object.entries(spec.files))
+    write(publicRoot, name, text);
   let input = structuredClone(spec.designSystem);
   let failurePoint = null;
   function injected(point) {
@@ -289,12 +308,61 @@ function run(spec, lane) {
   });
   const session =
     lane === 'incremental' ? compiler.createProjectSession(args()) : null;
+  const publicArgs = () => ({
+    projectId: 'oracle-project',
+    definition: definition(input),
+    rootDir: publicRoot,
+    roots: spec.roots.map((p) => path.join(publicRoot, p)),
+    outDir: publicOut,
+    runtimeModule: '@pandamstyle/compiler/runtime',
+    publishVariant: 'session_incremental_publish_css',
+    publishFailAt: injected,
+  });
+  const incrementalPublicSession =
+    lane === 'incremental'
+      ? compiler.createPublicProjectSession(publicArgs())
+      : null;
+  const ephemeralPublicSessions = [];
+  let publicRevision = null;
   const results = [];
   try {
     for (const [index, step] of spec.revisions.entries()) {
       mutate(root, step);
+      mutate(publicRoot, step);
       if (step.designSystem) input = structuredClone(step.designSystem);
       failurePoint = step.publicationFailure ?? null;
+      const publicSession =
+        incrementalPublicSession ??
+        compiler.createPublicProjectSession(publicArgs());
+      if (publicSession !== incrementalPublicSession)
+        ephemeralPublicSessions.push(publicSession);
+      if (lane === 'fresh' || index === 0) {
+        const initialized = await publicSession.initialize();
+        publicRevision = initialized.revision;
+      } else {
+        const applied = await publicSession.applyChanges({
+          baseRevision: publicRevision,
+          mode: 'full-discovery',
+          changed: [],
+          added: [],
+          removed: [],
+          renamed: [],
+          definition: definition(input),
+        });
+        publicRevision = applied.revision;
+      }
+      const publicValidation = await publicSession.validate(publicRevision);
+      if (publicValidation.ok && step.publish !== false) {
+        try {
+          await publicSession.compile(publicRevision);
+        } catch (error) {
+          if (error.code !== 'PMS_INJECTED_PUBLICATION_FAILURE') throw error;
+        }
+      }
+      const publicResult = await publicSession.agentResult(
+        publicRevision,
+        spec.observe?.agentOptions ?? {},
+      );
       let validation;
       if (session) {
         session.applyChanges({
@@ -326,17 +394,22 @@ function run(spec, lane) {
         let forwarding = [];
         if (spec.observe?.forwarding) {
           const file = path.join(root, spec.observe.forwarding);
-          forwarding = compiler
-            .moduleEdgesOf(file)
-            .edges.filter((e) => e.form === 'import')
-            .map((e) => {
-              const info = compiler.resolveDesignSystemModule(file, e.request);
-              return {
-                source: e.request,
-                bindings: info?.exportsOfRelay ?? [],
-                issues: info?.issues ?? [],
-              };
-            });
+          forwarding = cold._withGraphContext(() =>
+            compiler
+              .moduleEdgesOf(file)
+              .edges.filter((e) => e.form === 'import')
+              .map((e) => {
+                const info = compiler.resolveDesignSystemModule(
+                  file,
+                  e.request,
+                );
+                return {
+                  source: e.request,
+                  bindings: info?.exportsOfRelay ?? [],
+                  issues: info?.issues ?? [],
+                };
+              }),
+          );
         }
         probe.rollback();
         try {
@@ -359,11 +432,29 @@ function run(spec, lane) {
         validation.negativeResolutionCount = negativeResolutionCount;
       }
       const system = compiler.buildDesignSystem(definition(input));
-      results.push(observe(root, out, validation, session, spec, system));
+      results.push(
+        observe(
+          root,
+          out,
+          validation,
+          session,
+          spec,
+          system,
+          publicResult ?? publicValidation.agentResult,
+          publicSession,
+          publicRoot,
+        ),
+      );
     }
     return results;
   } finally {
     session?.close();
+    await Promise.all(
+      [
+        ...(incrementalPublicSession ? [incrementalPublicSession] : []),
+        ...ephemeralPublicSessions,
+      ].map((publicSession) => publicSession.close()),
+    );
     fs.rmSync(parent, { recursive: true, force: true });
   }
 }

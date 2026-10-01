@@ -19,8 +19,8 @@ const {
   createUsageContext,
   readModuleFacts,
   resolvePmsAccess,
-} = require('../../pandamstyle/evaluate-usage');
-const { clearModuleCache } = require('../../pandamstyle/module-graph');
+  clearModuleCache,
+} = require('../../../../../tests/support/compiler-inspection');
 
 describe('PandamStyle independent forwarding semantic oracle', () => {
   test.each(cases.map((fixture) => [fixture.name, fixture]))(

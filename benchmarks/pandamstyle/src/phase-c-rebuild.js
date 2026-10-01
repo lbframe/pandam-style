@@ -32,11 +32,10 @@ const fs = require('fs');
 const path = require('path');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const COMPILER_PKG = path.join(
+const COMPILER_SUPPORT = path.join(
   REPO_ROOT,
-  'packages',
-  '@pandamstyle',
-  'compiler',
+  '.pms-test-support',
+  'compiler-inspection.cjs',
 );
 
 const projectDir = process.argv[2];
@@ -46,7 +45,7 @@ if (projectDir == null) {
 }
 process.chdir(projectDir);
 
-const compiler = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+const compiler = require(COMPILER_SUPPORT);
 const config = require(path.join(projectDir, 'pandamstyle.config.js'));
 const definitionPath = path.resolve(
   path.dirname(path.join(projectDir, 'pandamstyle.config.js')),

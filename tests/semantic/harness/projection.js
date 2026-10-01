@@ -56,6 +56,10 @@ function project(raw) {
     protocol: raw.agent
       ? {
           ...raw.agent,
+          // Older cases refer to the same revision through a flat alias. Keep
+          // that assertion on the test projection while the wire envelope
+          // retains the frozen full RevisionIdentity.
+          revisionId: raw.agent.revision?.revisionId ?? raw.agent.revisionId,
           timings: raw.agent.timings
             ? Object.fromEntries(
                 Object.entries(raw.agent.timings).filter(

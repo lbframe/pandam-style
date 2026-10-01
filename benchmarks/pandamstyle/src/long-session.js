@@ -42,11 +42,11 @@ const path = require('path');
 const crypto = require('crypto');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const COMPILER_PKG = path.join(
+const COMPILER_PKG = path.join(REPO_ROOT, 'packages', 'compiler');
+const COMPILER_SUPPORT = path.join(
   REPO_ROOT,
-  'packages',
-  '@pandamstyle',
-  'compiler',
+  '.pms-test-support',
+  'compiler-inspection.cjs',
 );
 
 function parseArgs(argv) {
@@ -177,7 +177,7 @@ async function main() {
     return mod != null && mod.default != null ? mod.default : mod;
   };
 
-  const compiler = require(path.join(COMPILER_PKG, 'lib', 'index.js'));
+  const compiler = require(COMPILER_SUPPORT);
   const options = (definition) => ({
     definition,
     roots: (config.roots ?? []).map((r) => path.resolve(projectDir, r)),

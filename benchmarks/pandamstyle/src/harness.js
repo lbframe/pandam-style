@@ -232,9 +232,9 @@ class CompileDriver {
     engineName,
     engineVariantCommit,
     // 'full' drives the unchanged full rebuild; 'incremental' drives the
-    // project session. Both go through the SAME public API of the SAME bundle,
-    // so the difference between the two engines is project-session reuse and
-    // nothing else - which is the only way the comparison can be attributed.
+    // project session. Both go through the same private measurement interface
+    // from the test-support bundle; the difference between the two engines is
+    // project-session reuse and nothing else.
     mode = 'full',
     // Spike 3: the publication strategy. The three variants share this bundle,
     // this session and this compilation, and differ ONLY in how the result is
@@ -242,8 +242,9 @@ class CompileDriver {
     // and CSS aggregation possible at all.
     publishVariant = 'session_full_publish',
   }) {
-    // The engine bundle exposes the compiler API AND the perf surface directly;
-    // there is no separate `compiler` sub-object.
+    // The private test-support bundle exposes the compiler measurement
+    // interface AND the perf surface directly; there is no separate `compiler`
+    // sub-object.
     this.compiler = engineModule;
     this.perf = engineModule;
     this.corpus = corpus;
@@ -593,11 +594,10 @@ class CompileDriver {
   }
 
   /**
-   * One real build through the public API of the engine's compiler bundle.
-   *
-   * This is the production entry point (`buildProject`), driven in-process. The
-   * only thing the harness substitutes is the clock: it reads the generation's
-   * own staging and commit points rather than the bundler.
+   * One fresh reference build through the compiler's private test-support
+   * interface. `buildProject` is not part of the stable SDK. The harness
+   * substitutes only the clock: it reads the generation's staging and commit
+   * points rather than the bundler.
    */
   /**
    * Loads the build configuration and the design-system definition.
@@ -673,7 +673,7 @@ class CompileDriver {
    * One revision through the PROJECT SESSION.
    *
    * The same three calls a build tool makes - applyChanges, validate, compile -
-   * against the same public API the full rebuild uses. The only substitution
+   * against the same private test-support interface the full rebuild uses. The only substitution
    * the harness makes is the clock: `validate()` returning is
    * `pms_generation_ready` (every artifact computed, nothing published yet) and
    * `compile()` returning is `pms_generation_committed`.
