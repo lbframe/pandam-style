@@ -1,144 +1,147 @@
 #!/usr/bin/env bash
-# PandamStyle pilot - packs the built packages and installs them OUTSIDE the
-# workspace, then runs the real Vite build.
-#
-# Why outside the workspace: a workspace alias can silently satisfy an import
-# that a published package would not export. The pilot must consume the tarballs
-# that npm would actually produce.
-#
-# Usage: tools/pilot/run-pilot.sh [work-dir]
-# Exits non-zero on any failure; no step is allowed to hide an error.
+# Pack and qualify the real PandamStyle Vite adapter in an app outside the repo.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-WORK_DIR="${1:-${PMS_PILOT_DIR:-/tmp/pandamstyle-pilot}}"
-# The pilot lives outside every workspace glob on purpose: as a workspace
-# member, the root install would try to resolve @pandamstyle/compiler from
-# the registry instead of linking the local workspace copy.
+WORK_DIR="${1:-${PMS_PILOT_DIR:-/tmp/pandamstyle-vite-pilot}}"
 PILOT_SRC="${REPO_ROOT}/examples/pilots/vite-react"
-
-echo "== 1/6 pack the PandamStyle compiler and core =="
-rm -rf "${WORK_DIR}"
-mkdir -p "${WORK_DIR}"
 PACK_DIR="${WORK_DIR}/.tarballs"
+APP_DIR="${WORK_DIR}/app"
+
+rm -rf "${WORK_DIR}"
 mkdir -p "${PACK_DIR}"
 
-cd "${REPO_ROOT}/packages/compiler"
-PMS_TARBALL=$(npm pack --pack-destination "${PACK_DIR}" --silent)
-echo "packed ${PMS_TARBALL}"
-
-cd "${REPO_ROOT}/packages/core"
-CORE_TARBALL=$(npm pack --pack-destination "${PACK_DIR}" --silent)
-echo "packed ${CORE_TARBALL}"
-
-echo "== 2/6 verify the tarball contents and exports =="
-for tgz in "${PACK_DIR}"/*.tgz; do
-  echo "--- $(basename "${tgz}")"
-  tar -tzf "${tgz}" | sort | sed 's/^/    /'
+echo "== pack the compiler, core runtime, and Vite adapter =="
+for package in compiler core vite; do
+  cd "${REPO_ROOT}/packages/${package}"
+  npm pack --pack-destination "${PACK_DIR}" --silent
 done
 
-# The exports actually declared by the packed package, read from the tarball
-# itself rather than from the source tree.
-EXTRACT_DIR="${WORK_DIR}/.unpacked"
-mkdir -p "${EXTRACT_DIR}"
-PMS_TGZ="${PACK_DIR}/${PMS_TARBALL}"
-tar -xzf "${PMS_TGZ}" -C "${EXTRACT_DIR}"
-# Vite qualification uses a private tools/pilot seam; Phase 8 still owns the
-# future public Vite integration.
-node -e '
-const fs = require("fs");
-const path = require("path");
-const pkgDir = process.argv[1];
-const pkg = JSON.parse(fs.readFileSync(path.join(pkgDir, "package.json"), "utf8"));
-for (const key of [".", "./config", "./host", "./package.json"]) {
-  if (pkg.exports[key] == null) {
-    console.error("MISSING EXPORT in the packed package: " + key);
-    process.exit(1);
-  }
+echo "== verify packed exports and the explicit Vite peer =="
+node --input-type=module - "${PACK_DIR}" <<'NODE'
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const packDir = process.argv[2];
+const expected = new Map([
+  ['@pandamstyle/compiler', null],
+  ['@pandamstyle/core', null],
+  ['@pandamstyle/vite', null],
+]);
+const proof = [];
+for (const filename of fs.readdirSync(packDir).filter((entry) => entry.endsWith('.tgz'))) {
+  const file = path.join(packDir, filename);
+  const manifest = JSON.parse(execFileSync('tar', ['-xOzf', file, 'package/package.json'], { encoding: 'utf8' }));
+  if (expected.has(manifest.name)) expected.set(manifest.name, { file, manifest });
 }
-// Every declared export target must really be inside the tarball.
-for (const [key, value] of Object.entries(pkg.exports)) {
-  const targets = typeof value === "string" ? [value] : Object.values(value);
-  for (const t of targets) {
-    if (!fs.existsSync(path.join(pkgDir, t))) {
-      console.error("declared export target missing from the tarball: " + key + " -> " + t);
-      process.exit(1);
+for (const [name, packed] of expected) {
+  assert.ok(packed, `missing packed package ${name}`);
+  const files = execFileSync('tar', ['-tzf', packed.file], { encoding: 'utf8' }).trim().split('\n');
+  const packageFiles = new Set(files.map((entry) => entry.replace(/^package\//, '')));
+  for (const [exportName, value] of Object.entries(packed.manifest.exports ?? {})) {
+    const targets = typeof value === 'string' ? [value] : Object.values(value);
+    for (const target of targets) {
+      if (typeof target !== 'string') continue;
+      const normalized = target.replace(/^\.\//, '');
+      assert.ok(packageFiles.has(normalized), `${name} export ${exportName} target missing: ${target}`);
     }
   }
+  console.log(`${name}@${packed.manifest.version}: ${files.length} packed files`);
 }
-console.log("packed exports ok:", Object.keys(pkg.exports).join(", "));
-' "${EXTRACT_DIR}/package"
+assert.deepEqual(expected.get('@pandamstyle/vite').manifest.exports, {
+  '.': {
+    types: './types/index.d.ts',
+    import: './src/index.js',
+  },
+  './package.json': './package.json',
+});
+  assert.equal(expected.get('@pandamstyle/vite').manifest.peerDependencies.vite, '7.3.2');
+assert.equal(expected.get('@pandamstyle/vite').manifest.dependencies['@pandamstyle/compiler'], '0.1.0');
+for (const [name, packed] of expected) {
+  proof.push({
+    name,
+    version: packed.manifest.version,
+    tarball: path.basename(packed.file),
+    packedBytes: fs.statSync(packed.file).size,
+    fileCount: execFileSync('tar', ['-tzf', packed.file], { encoding: 'utf8' }).trim().split('\n').length,
+    exports: packed.manifest.exports ?? {},
+    dependencies: packed.manifest.dependencies ?? {},
+    peerDependencies: packed.manifest.peerDependencies ?? {},
+  });
+}
+fs.writeFileSync(path.resolve(packDir, '..', 'package-proof.json'), `${JSON.stringify({ packages: proof }, null, 2)}\n`);
+NODE
 
-echo "== 3/6 copy the pilot app outside the workspace =="
-APP_DIR="${WORK_DIR}/app"
+echo "== install packed packages into a temporary external Vite app =="
 cp -R "${PILOT_SRC}" "${APP_DIR}"
 rm -rf "${APP_DIR}/node_modules" "${APP_DIR}/dist" "${APP_DIR}/.pandamstyle"
-
-echo "== 4/6 install the packed tarballs into the app =="
-cd "${APP_DIR}"
-node -e '
-const fs = require("fs");
-const p = JSON.parse(fs.readFileSync("package.json", "utf8"));
-const dir = process.argv[1];
-const files = fs.readdirSync(dir).filter((f) => f.endsWith(".tgz"));
-const pms = files.find((f) => f.startsWith("pandamstyle-compiler"));
-const core = files.find((f) => f.startsWith("pandamstyle-core"));
-if (pms == null || core == null) {
-  console.error("missing expected tarballs:", files);
-  process.exit(1);
+node - "${APP_DIR}" "${PACK_DIR}" <<'NODE'
+const fs = require('node:fs');
+const path = require('node:path');
+const appDir = process.argv[2];
+const packDir = process.argv[3];
+const manifests = fs.readdirSync(packDir).filter((file) => file.endsWith('.tgz')).map((file) => {
+  const tarball = path.join(packDir, file);
+  const json = require('node:child_process').execFileSync('tar', ['-xOzf', tarball, 'package/package.json'], { encoding: 'utf8' });
+  return { file, name: JSON.parse(json).name };
+});
+const pkg = JSON.parse(fs.readFileSync(path.join(appDir, 'package.json'), 'utf8'));
+for (const name of ['@pandamstyle/compiler', '@pandamstyle/core', '@pandamstyle/vite']) {
+  const packed = manifests.find((entry) => entry.name === name);
+  if (!packed) throw new Error(`missing tarball for ${name}`);
+  pkg.dependencies[name] = `file:${path.join(packDir, packed.file)}`;
 }
-p.dependencies["@pandamstyle/compiler"] = "file:" + path(dir, pms);
-p.dependencies["@pandamstyle/core"] = "file:" + path(dir, core);
-fs.writeFileSync("package.json", JSON.stringify(p, null, 2) + "\n");
-console.log("dependencies pinned to local tarballs");
-function path(a, b) { return a + "/" + b; }
-' "${PACK_DIR}"
+fs.writeFileSync(path.join(appDir, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
+NODE
 
+cd "${APP_DIR}"
 npm install --no-audit --no-fund --loglevel=error
 
-echo "== build the private Phase 4 Vite qualification seam =="
-"${REPO_ROOT}/node_modules/.bin/rollup" \
-  --config "${REPO_ROOT}/tools/pilot/vite-seam.rollup.config.mjs"
-
-echo "== 5/6 prove the app resolves the INSTALLED package, not the sources =="
-node -e '
-const fs = require("fs");
-const path = require("path");
-const repoRoot = path.resolve(process.argv[1]);
-const pkgDir = path.dirname(require.resolve("@pandamstyle/compiler/package.json"));
-const real = fs.realpathSync(pkgDir);
-if (real === repoRoot || real.startsWith(repoRoot + path.sep)) {
-  console.error("resolved inside the repository workspace: " + real);
-  process.exit(1);
+echo "== prove the app resolves installed tarballs outside the repo =="
+node - "${REPO_ROOT}" <<'NODE'
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const repoRoot = path.resolve(process.argv[2]);
+const packages = [];
+for (const name of ['@pandamstyle/compiler', '@pandamstyle/core', '@pandamstyle/vite']) {
+  const packagePath = require.resolve(`${name}/package.json`);
+  const real = fs.realpathSync(path.dirname(packagePath));
+  assert.ok(!real.startsWith(`${repoRoot}${path.sep}`), `${name} resolved inside repository: ${real}`);
+  const manifest = require(packagePath);
+  console.log(`${name}@${manifest.version}: ${real}`);
+  packages.push({
+    name,
+    version: manifest.version,
+    realpath: real,
+    outsideRepository: !real.startsWith(`${repoRoot}${path.sep}`),
+  });
 }
-const manifest = require("@pandamstyle/compiler/package.json");
-console.log("resolved tarball at:", real);
-console.log("version:", manifest.version);
-const coreDir = path.dirname(require.resolve("@pandamstyle/core/package.json"));
-const coreReal = fs.realpathSync(coreDir);
-if (coreReal === repoRoot || coreReal.startsWith(repoRoot + path.sep)) {
-  console.error("core resolved inside the repository workspace: " + coreReal);
-  process.exit(1);
-}
-console.log("resolved packed core at:", coreReal);
-' "$REPO_ROOT"
+const vitePackage = require('@pandamstyle/vite/package.json');
+assert.equal(vitePackage.peerDependencies.vite, '7.3.2');
+fs.writeFileSync(path.resolve(process.cwd(), '..', 'external-install-proof.json'), `${JSON.stringify({
+  repository: repoRoot,
+  app: process.cwd(),
+  viteVersion: require('vite/package.json').version,
+  packages,
+}, null, 2)}\n`);
+NODE
 
-node --input-type=module -e '
-await import("@pandamstyle/compiler");
-await import("@pandamstyle/compiler/config");
-await import("@pandamstyle/compiler/host");
-await import("@pandamstyle/core");
-console.log("installed compiler SDK and core subpath imports successfully");
-'
+node --input-type=module <<'NODE'
+await import('@pandamstyle/compiler');
+await import('@pandamstyle/compiler/config');
+await import('@pandamstyle/compiler/host');
+await import('@pandamstyle/core');
+const adapter = await import('@pandamstyle/vite');
+if (typeof adapter.pandamstyle !== 'function') throw new Error('pandamstyle() export missing');
+console.log('public compiler SDK and @pandamstyle/vite exports load from installed tarballs');
+NODE
 
-echo "== 6/6 run the real Vite production build =="
-PMS_VITE_SEAM_PATH="${REPO_ROOT}/.pms-test-support/vite-seam.mjs" npx vite build --logLevel warn
+echo "== run the Vite development, HMR, isolation, and production qualification =="
+cp "${REPO_ROOT}/tools/pilot/qualify-vite.mjs" "${APP_DIR}/.qualify-vite.mjs"
+node "${APP_DIR}/.qualify-vite.mjs" "${APP_DIR}" "${WORK_DIR}/pilot-report.json"
 
 echo
-echo "== pilot artifacts =="
-find "${APP_DIR}/dist" -type f | sort | sed 's/^/  /'
-echo
-echo "== extracted PandamStyle stylesheet (head) =="
-head -c 1200 "${APP_DIR}/dist/pandamstyle.css" || true
-echo
-echo "PILOT OK"
+echo "PILOT OK: ${APP_DIR}"

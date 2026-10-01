@@ -315,6 +315,11 @@ build_delivered_packages() (
   # The delivered PandamStyle-owned compiler, built by its own Rollup config.
   (cd "$REPO_ROOT/packages/compiler" \
     && "$REPO_ROOT/node_modules/.bin/rollup" --config ./rollup.config.mjs)
+  # The Vite adapter ships its authored ESM entry directly and depends only on
+  # the public compiler package surface.
+  node --check "$REPO_ROOT/packages/vite/src/index.js"
+  node -e 'const p = require(process.argv[1]); if (p.exports?.["."]?.import !== "./src/index.js" || p.peerDependencies?.vite !== "7.3.2") process.exit(1)' \
+    "$REPO_ROOT/packages/vite/package.json"
 )
 
 if is_filtered_out "build"; then
@@ -377,6 +382,11 @@ collect_artifacts() (
      "$ARTIFACT_DIR/compiler-package.json"
   cp -R "$REPO_ROOT/packages/core/src" "$ARTIFACT_DIR/core-src"
   cp "$REPO_ROOT/packages/core/package.json" "$ARTIFACT_DIR/core-package.json"
+  mkdir -p "$ARTIFACT_DIR/vite-adapter"
+  cp -R "$REPO_ROOT/packages/vite/src" "$ARTIFACT_DIR/vite-adapter/src"
+  cp -R "$REPO_ROOT/packages/vite/types" "$ARTIFACT_DIR/vite-adapter/types"
+  cp "$REPO_ROOT/packages/vite/package.json" \
+     "$ARTIFACT_DIR/vite-adapter/package.json"
   node "$REPO_ROOT/tools/pms/core-package-proof.js" \
     "$PMS_OUT_DIR/core-package-proof"
   cp -R "$PMS_OUT_DIR/core-package-proof" "$ARTIFACT_DIR/core-package-proof"
@@ -391,6 +401,17 @@ collect_artifacts() (
     "$ARTIFACT_DIR/generated-runtime-imports.json"
   if [ -d "$PMS_PILOT_DIR/app/dist" ]; then
     cp -R "$PMS_PILOT_DIR/app/dist" "$ARTIFACT_DIR/pilot-dist"
+  fi
+  if [ -f "$PMS_PILOT_DIR/pilot-report.json" ]; then
+    cp "$PMS_PILOT_DIR/pilot-report.json" "$ARTIFACT_DIR/pilot-report.json"
+  fi
+  for proof in package-proof.json external-install-proof.json; do
+    if [ -f "$PMS_PILOT_DIR/$proof" ]; then
+      cp "$PMS_PILOT_DIR/$proof" "$ARTIFACT_DIR/$proof"
+    fi
+  done
+  if [ -d "$PMS_PILOT_DIR/.tarballs" ]; then
+    cp -R "$PMS_PILOT_DIR/.tarballs" "$ARTIFACT_DIR/pilot-tarballs"
   fi
   (cd "$ARTIFACT_DIR" && find . -type f ! -name digests.txt -print0 \
     | sort -z | xargs -0 shasum -a 256 > digests.txt)

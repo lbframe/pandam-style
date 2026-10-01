@@ -219,6 +219,7 @@ function inspectRootWorkspace(repoRoot, findings) {
   const expectedWorkspaces = [
     { path: 'packages/compiler', name: '@pandamstyle/compiler' },
     { path: 'packages/core', name: '@pandamstyle/core' },
+    { path: 'packages/vite', name: '@pandamstyle/vite' },
   ];
   const workspaces = Array.isArray(manifest.workspaces)
     ? manifest.workspaces
@@ -443,6 +444,7 @@ function inspectPackedPackages(repoRoot, pilotDir, findings) {
   const expected = new Map([
     ['@pandamstyle/compiler', null],
     ['@pandamstyle/core', null],
+    ['@pandamstyle/vite', null],
   ]);
   for (const tarball of tarballs) {
     try {
