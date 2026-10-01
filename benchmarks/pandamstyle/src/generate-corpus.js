@@ -136,7 +136,7 @@ function keywords(i) {
 
 const SCALES = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'];
 const HUES = ['base', 'primary', 'secondary', 'muted', 'accent', 'danger'];
-const ROLES = ['primary', 'secondary', 'tertiary'];
+const TONE_VARIANTS = ['primary', 'secondary', 'danger'];
 const CONDITION_NAMES = [
   'hover',
   'focus',
@@ -269,7 +269,7 @@ function buildDefinition({ tokenCount, recipeCount, seed, systemId }) {
   const recipes = {};
   for (let i = 0; i < recipeCount; i++) {
     const id = `recipe${String(i).padStart(3, '0')}`;
-    const tone = ROLES[i % ROLES.length];
+    const tone = TONE_VARIANTS[i % TONE_VARIANTS.length];
     // A deterministic, per-recipe rotation through the available keys: every
     // recipe references real tokens, and different recipes reference different
     // ones, so the recipe corpus exercises the registry rather than one path.

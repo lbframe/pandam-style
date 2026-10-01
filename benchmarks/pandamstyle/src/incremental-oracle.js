@@ -33,19 +33,20 @@
  *   - the verdict (accepted / rejected), for every revision;
  *   - diagnostics: code, phase, rule, severity, line, column, role, source and
  *     context, for every rejected revision;
- *   - every published artifact, as bytes: the compiled JS per file, the
- *     generated design-system module, the stylesheet (cascade-relevant order
- *     never normalised), the manifest, and the build report;
+ *   - every published artifact, byte-compared per file after normalizing only
+ *     publisher lifecycle ids in coverage metadata;
+ *   - the generated design-system module, stylesheet (cascade-relevant order
+ *     never normalised), manifest, and build report;
  *   - the build report's semantic state: the covered file set, the
  *     expected-vs-analysed verdict, the external requests, the relay edges;
  *   - runtime composition structure: the class literals, the
  *     `__pmsRecipe_*` references and the import specifiers the runtime
  *     actually consumes.
  *
- * The ONE thing removed on both sides is the additive `incremental` block the
- * session writes into the build report, which states HOW the generation was
- * produced rather than WHAT it contains. It is removed on both sides, by the
- * same rule, and nothing else about the report is touched.
+ * Normalization removes the session-only `incremental` work block and the
+ * publisher-assigned revision/generation ids in coverage metadata. Those ids
+ * identify a publisher's lifecycle rather than the content. The coverage
+ * entries, registry identity, and all other artifact bytes remain compared.
  *
  * A FAILURE IS A FAILURE. The oracle exits non-zero if any revision diverges
  * and never reports a "close enough" verdict.
@@ -67,7 +68,6 @@ const COMPILER_SUPPORT = path.join(
   '.pms-test-support',
   'compiler-inspection.cjs',
 );
-const BUILD_BIN = path.join(COMPILER_PKG, 'bin', 'pms-build.js');
 
 function sha256(buf) {
   return crypto.createHash('sha256').update(buf).digest('hex');
@@ -77,9 +77,22 @@ function rmrf(p) {
   fs.rmSync(p, { recursive: true, force: true });
 }
 
-/** The session's additive block, and nothing else. */
+/** Remove session-only work data and normalize publisher-assigned report id. */
 function stripIncrementalBlock(text) {
-  return text.replace(/,?\n {2}"incremental": \{[\s\S]*?\n {2}\}\n\}/, '\n}');
+  const report = JSON.parse(text);
+  delete report.incremental;
+  if (report.coverageReport != null) report.coverageReport.revisionId = 0;
+  return JSON.stringify(report, null, 2) + '\n';
+}
+
+function normaliseCoverageReport(text) {
+  const report = JSON.parse(text);
+  // Revision and generation ids identify a publisher's lifecycle. They differ
+  // by construction between an incremental session and an isolated full build;
+  // all coverage entries and registry identity remain byte-compared.
+  report.revisionId = 0;
+  report.generationId = null;
+  return JSON.stringify(report, null, 2) + '\n';
 }
 
 function readTree(dir) {
@@ -106,6 +119,8 @@ function fingerprint(dir) {
     let buf = tree.get(rel);
     if (rel === 'build-report.json') {
       buf = Buffer.from(stripIncrementalBlock(buf.toString('utf8')), 'utf8');
+    } else if (rel === 'coverage.json') {
+      buf = Buffer.from(normaliseCoverageReport(buf.toString('utf8')), 'utf8');
     }
     files[rel] = { bytes: buf.length, sha256: sha256(buf) };
     if (rel.startsWith('js/')) {
@@ -131,6 +146,11 @@ function fingerprint(dir) {
       contractVersion: r.contractVersion,
       systemId: r.systemId,
       registryDigest: r.registryDigest,
+      coverageSummary: r.coverageSummary,
+      coverageReport:
+        r.coverageReport == null
+          ? null
+          : { ...r.coverageReport, revisionId: 0 },
       coveredRoots: r.coveredRoots,
       coveredFileCount: r.coveredFileCount,
       analysedFileCount: r.analysedFileCount,
@@ -138,7 +158,6 @@ function fingerprint(dir) {
       consumerRuleCount: r.consumerRuleCount,
       ruleCount: r.ruleCount,
       cssBytes: r.cssBytes,
-      coverage: r.coverage,
       coverageConsistency: r.coverageConsistency,
       externalRequests: r.externalRequests,
       relayEdges: r.relayEdges,
@@ -167,6 +186,7 @@ function diffPaths(a, b, prefix = '', out = []) {
     const va = a?.[k];
     const vb = b?.[k];
     const p = prefix === '' ? k : `${prefix}.${k}`;
+    if (va === undefined && vb === undefined) continue;
     if (va === undefined || vb === undefined) {
       out.push({ path: p, kind: 'missing-on-one-side' });
       continue;
@@ -250,26 +270,44 @@ function sortDiagnostics(list) {
 
 /** One fresh full rebuild, in its own process, from the bytes on disk. */
 function freshFullRebuild(projectDir, configRel) {
-  const res = spawnSync(process.execPath, [BUILD_BIN, '--config', configRel], {
-    cwd: projectDir,
-    encoding: 'utf8',
-    timeout: 900000,
-    env: { ...process.env },
-  });
-  let diagnostics = [];
-  for (const line of (res.stderr ?? '').split('\n')) {
-    if (!line.startsWith('PMS_JSON:')) continue;
-    try {
-      const parsed = JSON.parse(line.slice('PMS_JSON:'.length));
-      diagnostics = parsed.diagnostics ?? [];
-    } catch {
-      diagnostics = [];
-    }
+  const runner = `
+    const path = require('node:path');
+    const { pathToFileURL } = require('node:url');
+    const { buildProject } = require(process.argv[1]);
+    const configPath = path.resolve(process.argv[2]);
+    const config = require(configPath);
+    (async () => {
+      const definitionPath = path.resolve(config.definition);
+      const imported = await import(pathToFileURL(definitionPath).href);
+      buildProject({ ...config, definition: imported.default ?? imported });
+      process.stdout.write(JSON.stringify({ ok: true, diagnostics: [] }));
+    })().catch((error) => {
+      const diagnostics = Array.isArray(error?.diagnostics) ? error.diagnostics : [];
+      process.stdout.write(JSON.stringify({ ok: false, diagnostics }));
+      process.stderr.write(error?.stack ?? String(error));
+      process.exitCode = diagnostics.length > 0 ? 1 : 2;
+    });
+  `;
+  const res = spawnSync(
+    process.execPath,
+    ['-e', runner, COMPILER_SUPPORT, configRel],
+    {
+      cwd: projectDir,
+      encoding: 'utf8',
+      timeout: 900000,
+      env: { ...process.env },
+    },
+  );
+  let result = null;
+  try {
+    result = JSON.parse(res.stdout);
+  } catch {
+    result = null;
   }
   return {
-    ok: res.status === 0,
+    ok: res.status === 0 && result?.ok === true,
     exit: res.status,
-    diagnostics,
+    diagnostics: result?.diagnostics ?? [],
     stderr: res.stderr ?? '',
   };
 }
@@ -410,7 +448,13 @@ async function main() {
       // revision is not a session.
       session.initialize();
       const seedValidation = session.validate();
-      if (seedValidation.ok) session.compile();
+      if (seedValidation.ok) {
+        // A one-shot full build materializes coverage before publishing. Ask
+        // the session for the same document before its commit so this oracle
+        // compares like-for-like generations.
+        session.requestFullAudit({});
+        session.compile();
+      }
       if (seedValidation.ok) {
         const seedIncremental = fingerprint(outDir);
         definition = await loadDefinition();
@@ -510,7 +554,10 @@ async function main() {
               },
         );
         const validation = session.validate();
-        if (validation.ok) session.compile();
+        if (validation.ok) {
+          session.requestFullAudit({});
+          session.compile();
+        }
         const incremental = validation.ok ? fingerprint(outDir) : null;
 
         // 2. a FRESH PROCESS, full rebuild, same bytes
@@ -653,14 +700,14 @@ async function main() {
       'module registry, nor the compiler caches, nor the design system the ' +
       'session built',
     normalisation:
-      'the additive `incremental` block of build-report.json, removed on BOTH ' +
-      'sides by the same rule; nothing else is normalised, and cascade-relevant ' +
-      'CSS order is compared as text',
+      'the additive `incremental` block and per-publisher revision/generation ' +
+      'ids in coverage metadata; all coverage entries and other artifact bytes ' +
+      'remain compared, and cascade-relevant CSS order is compared as text',
     checksPerRevision: [
       'verdict (accepted / rejected)',
       'diagnostics (code, phase, rule, severity, line, column, role, source, context)',
       'generation file set, as a set difference (a stale extra file fails)',
-      'published artifacts, byte for byte, per file',
+      'published artifacts after lifecycle normalization',
       'runtime composition structure (class literals, recipe references, import specifiers)',
       'css bytes and css text (ordering preserved)',
       'generated design-system module',

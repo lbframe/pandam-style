@@ -9,7 +9,7 @@
 /**
  * PandamStyle differential oracle.
  *
- * `babel_current` is the semantic reference for Spike 1.
+ * `babel_current` is the current compiler with work elimination disabled.
  * `babel_work_eliminated` must be indistinguishable from it, on:
  *
  *   - build success / failure
@@ -61,20 +61,15 @@ function rmrf(p) {
 
 /** Runs one build in a child process and returns everything observable. */
 function runBuild({ engineRoot, projectDir, configRel }) {
+  const compilerPackage = path.join(engineRoot, 'packages', 'compiler');
+  if (!fs.existsSync(path.join(compilerPackage, 'package.json'))) {
+    throw new Error(
+      `No PandamStyle compiler package found under ${engineRoot}`,
+    );
+  }
   const res = spawnSync(
     process.execPath,
-    [
-      path.join(
-        engineRoot,
-        'packages',
-        '@pandamstyle',
-        'compiler',
-        'bin',
-        'pms-build.js',
-      ),
-      '--config',
-      configRel,
-    ],
+    [path.join(compilerPackage, 'bin', 'pms-build.js'), '--config', configRel],
     {
       cwd: projectDir,
       encoding: 'utf8',
@@ -258,6 +253,7 @@ function diffPaths(a, b, prefix = '', out = []) {
     const va = a?.[k];
     const vb = b?.[k];
     const p = prefix === '' ? k : `${prefix}.${k}`;
+    if (va === undefined && vb === undefined) continue;
     if (va === undefined || vb === undefined) {
       out.push({ path: p, a: va, b: vb, kind: 'missing-on-one-side' });
       continue;
@@ -287,8 +283,7 @@ function compareProject({
   outDirRel,
   expect = 'ok',
 }) {
-  const currentRoot =
-    process.env.PMS_BASELINE_ROOT ?? path.join(REPO_ROOT, '..', 'pms-baseline');
+  const currentRoot = REPO_ROOT;
   const variantRoot = REPO_ROOT;
 
   const outRel = outDirRel ?? '.pandamstyle';
@@ -320,14 +315,8 @@ function compareProject({
     fs.mkdirSync(scope, { recursive: true });
     const link = path.join(scope, 'compiler');
     if (fs.existsSync(link)) fs.rmSync(link, { force: true });
-    const compilerCandidates = [
-      path.join(root, 'packages', 'compiler'),
-      path.join(root, 'packages', '@pandamstyle', 'compiler'),
-    ];
-    const compilerPackage = compilerCandidates.find((candidate) =>
-      fs.existsSync(path.join(candidate, 'package.json')),
-    );
-    if (compilerPackage == null) {
+    const compilerPackage = path.join(root, 'packages', 'compiler');
+    if (!fs.existsSync(path.join(compilerPackage, 'package.json'))) {
       throw new Error(`No PandamStyle compiler package found under ${root}`);
     }
     fs.symlinkSync(compilerPackage, link, 'dir');

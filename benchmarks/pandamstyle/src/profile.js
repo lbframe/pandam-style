@@ -136,13 +136,7 @@ function linkCompiler(projectDir, engineRoot) {
   fs.mkdirSync(scope, { recursive: true });
   const link = path.join(scope, 'compiler');
   if (fs.existsSync(link)) fs.rmSync(link, { force: true });
-  const packageCandidates = [
-    path.join(engineRoot, 'packages', 'compiler'),
-    path.join(engineRoot, 'packages', '@pandamstyle', 'compiler'),
-  ];
-  const compilerPackage = packageCandidates.find((candidate) =>
-    fs.existsSync(path.join(candidate, 'package.json')),
-  );
+  const compilerPackage = path.join(engineRoot, 'packages', 'compiler');
   if (compilerPackage == null) {
     throw new Error(
       `No PandamStyle compiler package found under ${engineRoot}`,
@@ -158,15 +152,6 @@ function compilerInspectionModule(engineRoot) {
     'compiler-inspection.cjs',
   );
   if (fs.existsSync(testSupport)) return testSupport;
-  const legacyBundle = path.join(
-    engineRoot,
-    'packages',
-    '@pandamstyle',
-    'compiler',
-    'lib',
-    'index.js',
-  );
-  if (fs.existsSync(legacyBundle)) return legacyBundle;
   throw new Error(`No compiler measurement bundle found under ${engineRoot}`);
 }
 
@@ -350,8 +335,6 @@ function main() {
   });
 
   const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-  const BASELINE =
-    process.env.PMS_BASELINE_ROOT ?? path.join(REPO_ROOT, '..', 'pms-baseline');
   const engines = (args.engines ?? 'babel_current,babel_work_eliminated')
     .split(',')
     .map((s) => s.trim());
@@ -367,7 +350,7 @@ function main() {
       generate({ ...cell, outDir: corpusDir, negative: false });
     }
     for (const engineName of engines) {
-      const engineRoot = engineName === 'babel_current' ? BASELINE : REPO_ROOT;
+      const engineRoot = REPO_ROOT;
       const projectDir = path.join(outDir, 'project', `${name}-${engineName}`);
       materialise(corpusDir, projectDir);
       linkCompiler(projectDir, engineRoot);

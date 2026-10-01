@@ -30,7 +30,7 @@
         "session_incremental_publish",
         "session_incremental_publish_css"
       ],
-      "description": "Which compiler, or which publication variant, produced the value. babel_current is anchored to the official hygiene baseline d5702374; babel_work_eliminated is the same compiler with the measured redundant work removed. babel_full and babel_incremental are the Spike 2 engines. The three session_* engines are the Spike 3 publication variants: the same project session, the same compilation, differing only in how the result is written to disk."
+      "description": "Which compiler, or which publication variant, produced the value. babel_current and babel_work_eliminated are the current PandamStyle tree with work elimination off/on. The plan retains the old Spike 1 source SHA as historical provenance only. babel_full and babel_incremental are the Spike 2 engines. The three session_* engines are the Spike 3 publication variants: the same project session, the same compilation, differing only in how the result is written to disk."
     },
     "corpus": {
       "type": "string",

@@ -191,13 +191,7 @@ async function main() {
   const job = JSON.parse(process.argv[2]);
   const engineRoot = job.engineRoot;
 
-  const compilerPkgCandidates = [
-    path.join(engineRoot, 'packages', 'compiler'),
-    path.join(engineRoot, 'packages', '@pandamstyle', 'compiler'),
-  ];
-  const compilerPkgDir = compilerPkgCandidates.find((candidate) =>
-    fs.existsSync(path.join(candidate, 'package.json')),
-  );
+  const compilerPkgDir = path.join(engineRoot, 'packages', 'compiler');
   if (compilerPkgDir == null) {
     throw new Error(
       `No PandamStyle compiler package found under ${engineRoot}`,
@@ -208,14 +202,14 @@ async function main() {
     '.pms-test-support',
     'compiler-inspection.cjs',
   );
-  const engineModulePath = fs.existsSync(testSupportPath)
-    ? testSupportPath
-    : path.join(compilerPkgDir, 'lib', 'index.js');
+  if (!fs.existsSync(testSupportPath)) {
+    throw new Error(`No compiler measurement bundle found under ${engineRoot}`);
+  }
 
   const projectDir = materialiseProject(job.corpusDir, job.projectDir);
   linkCompiler(projectDir, compilerPkgDir);
 
-  const engineModule = require(engineModulePath);
+  const engineModule = require(testSupportPath);
 
   // Engine startup: everything between the top of this process and the moment
   // the compiler bundle is loaded and its own caches are cold. This is what a

@@ -82,27 +82,25 @@ function readPlan(file) {
 }
 
 /**
- * The engines. Each names a repository root, so `babel_current` is literally a
- * checkout of the official baseline and `babel_work_eliminated` is this branch.
+ * Spike 1 engines compare two policies of the same current compiler. Keeping
+ * both on this repository tree isolates the work-elimination flag from source
+ * changes and removes any runtime dependence on a historical donor checkout.
  */
 function resolveEngines(names) {
   const all = {
     babel_current: {
       name: 'babel_current',
-      root:
-        process.env.PMS_BASELINE_ROOT ??
-        path.join(REPO_ROOT, '..', 'pms-baseline'),
+      root: REPO_ROOT,
       description:
-        'the compiler at the official hygiene baseline d5702374, unmodified ' +
-        'except for the measurement hooks, which are inert without a collector',
+        'the current PandamStyle compiler with work elimination disabled',
       workEliminated: false,
     },
     babel_work_eliminated: {
       name: 'babel_work_eliminated',
       root: REPO_ROOT,
       description:
-        'the same compiler with the measured redundant work removed, behind ' +
-        'PMS_WORK_ELIMINATED=1; production keeps the default',
+        'the same current compiler with work elimination enabled for ' +
+        'measurement through PMS_WORK_ELIMINATED=1',
       workEliminated: true,
     },
     // Spike 2 engines. Both run THIS tree, so the only difference between them

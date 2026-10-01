@@ -174,11 +174,9 @@ factorial variant exists so the two can be measured apart, and it is reported
 separately.
 
 `babel_current` and `babel_work_eliminated` — the Spike 1 pair — remain
-available for continuity. `babel_current` is **not** the superseded `e5ff62b4`:
-that SHA predates native JS/TS/TSX compilation, binding-based provenance,
-`props()` provenance enforcement, complete local module coverage, transactional
-publication, the Vite pilot and the evidence-integrity fixes, and benchmarking
-it as "current" would measure a compiler that no longer exists.
+available for continuity on the current PandamStyle tree. They differ only by
+whether `PMS_WORK_ELIMINATED` is set. The old Spike 1 source SHA remains in
+`plan.json` as historical provenance; current runs do not check out or build it.
 
 ### Why the compiler carries the measurement hooks
 
@@ -212,14 +210,16 @@ rebuild at all — it would be a second opinion from the same memory, and the
 whole question is whether that memory is sound.
 
 Compared, per revision: the verdict; diagnostics (code, phase, rule, severity,
-line, column, role, source, context); every published artifact byte for byte;
-the runtime composition structure; the CSS bytes **and** the CSS text, with
-cascade-relevant ordering never normalised; the generated design-system module;
-the manifest; and the build report's semantic state.
+line, column, role, source, context); every published artifact byte for byte
+after normalizing publisher-assigned revision/generation ids in coverage
+metadata; the runtime composition structure; the CSS bytes **and** the CSS text,
+with cascade-relevant ordering never normalised; the generated design-system
+module; the manifest; and the build report's semantic state.
 
-The one normalisation, applied to **both** sides by the same rule, removes the
-session's own additive `incremental` block from `build-report.json` — the block
-that states _how_ the generation was produced rather than _what_ it contains.
+The normalization, applied to **both** sides by the same rule, removes the
+session's additive `incremental` work block and normalizes publisher-assigned
+revision/generation ids. Those fields describe how a publisher produced a
+generation; coverage entries and all other artifact content stay byte-compared.
 
 ```bash
 node src/incremental-oracle.js --corpus /tmp/c --components 24 --tokens 120 \
@@ -414,8 +414,9 @@ evidence. The counters are derived from that list.
 
 ## The differential oracle
 
-`babel_current` is the semantic reference. `babel_work_eliminated` is compared
-against it on:
+`babel_current` (current tree, work elimination off) is the semantic reference.
+`babel_work_eliminated` (same tree, work elimination on) is compared against it
+on:
 
 - build success/failure (exit status)
 - PMS diagnostic codes, count, phase, rule, severity, **line and column**, and

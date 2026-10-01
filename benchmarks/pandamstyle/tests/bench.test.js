@@ -33,7 +33,7 @@ const HERE = __dirname;
 const SRC = path.join(HERE, '..', 'src');
 const REPO_ROOT = path.resolve(HERE, '..', '..', '..');
 
-const { generate, GENERATOR_VERSION, splitmix32 } = require(
+const { buildDefinition, generate, GENERATOR_VERSION, splitmix32 } = require(
   path.join(SRC, 'generate-corpus.js'),
 );
 const {
@@ -108,6 +108,24 @@ test('a different seed produces a different corpus, on purpose', () => {
     outDir: b,
   });
   assert.notStrictEqual(ma.contentHash, mb.contentHash);
+});
+
+test('every generated recipe default belongs to its declared variant domain', () => {
+  const definition = buildDefinition({
+    tokenCount: 80,
+    recipeCount: 6,
+    seed: 307,
+    systemId: 'benchmark-recipe-defaults@0.1',
+  });
+
+  for (const [name, recipe] of Object.entries(definition.recipes)) {
+    for (const [variant, value] of Object.entries(recipe.defaultVariants)) {
+      assert.ok(
+        Object.hasOwn(recipe.variants[variant], value),
+        `${name} default ${variant}=${value} is outside its declared domain`,
+      );
+    }
+  }
 });
 
 test('the PRNG is a specified integer stream, not Math.random', () => {
@@ -607,55 +625,28 @@ test('the engine registry names a repository root for every engine', () => {
       `${name} must state what it is`,
     );
   }
-  assert.notStrictEqual(
+  assert.strictEqual(
     engines.babel_current.root,
     engines.babel_work_eliminated.root,
-    'the two engines must be different code states',
+    'the two Spike 1 policies must run the same source tree',
   );
   assert.strictEqual(engines.babel_current.workEliminated, false);
   assert.strictEqual(engines.babel_work_eliminated.workEliminated, true);
 });
 
-test('the baseline engine cannot be optimized by any environment variable', () => {
-  // The baseline tree must be the baseline BY CONSTRUCTION, not by the absence
-  // of a flag being set. Its perf module therefore hard-codes the gate off.
-  const root =
-    process.env.PMS_BASELINE_ROOT ?? path.join(REPO_ROOT, '..', 'pms-baseline');
-  const perfPath = path.join(
-    root,
-    'packages',
-    '@stylexjs',
-    'babel-plugin',
-    'pandamstyle',
-    'perf.js',
-  );
-  if (!fs.existsSync(perfPath)) {
-    // The baseline worktree is optional for the unit suite; the campaign needs
-    // it, and says so.
-    return;
-  }
-  const src = fs.readFileSync(perfPath, 'utf8');
+test('the reference engine pins work elimination off in its child job', () => {
+  const runner = fs.readFileSync(path.join(SRC, 'run-campaign.js'), 'utf8');
   assert.ok(
-    !/PMS_WORK_ELIMINATED\s*===\s*'1'/.test(src),
-    'the baseline perf module reads the work-elimination flag, so an ' +
-      'environment variable could change its behaviour',
+    runner.includes("PMS_WORK_ELIMINATED: engine.workEliminated ? '1' : ''"),
+    'the child environment must be selected from the engine declaration',
   );
-  const graphPath = path.join(
-    root,
-    'packages',
-    '@stylexjs',
-    'babel-plugin',
-    'pandamstyle',
-    'module-graph.js',
-  );
-  const graph = fs.readFileSync(graphPath, 'utf8');
-  assert.ok(
-    !graph.includes('resolutionCache') && !graph.includes('designSystemCache'),
-    'the baseline module graph contains the work-elimination caches',
-  );
+  const { resolveEngines } = require(path.join(SRC, 'run-campaign.js'));
+  const reference = resolveEngines(['babel_current']).babel_current;
+  assert.strictEqual(reference.root, REPO_ROOT);
+  assert.strictEqual(reference.workEliminated, false);
 });
 
-test('plan.json binds the campaign to the official hygiene baseline', () => {
+test('plan.json preserves historical Spike 1 baseline provenance', () => {
   const plan = JSON.parse(
     fs.readFileSync(path.join(HERE, '..', 'plan.json'), 'utf8'),
   );
@@ -789,28 +780,14 @@ test(
     const variantLib = path.join(
       REPO_ROOT,
       'packages',
-      '@pandamstyle',
       'compiler',
       'lib',
-      'index.js',
+      'index.mjs',
     );
     assert.ok(
       fs.existsSync(variantLib),
       `${variantLib} is missing. The oracle drives the real compiler CLI, so ` +
-        'build it first: ./verify-pms.sh (its build step), or the 5-package ' +
-        'build it runs.',
-    );
-    const baselineRoot =
-      process.env.PMS_BASELINE_ROOT ??
-      path.join(REPO_ROOT, '..', 'pms-baseline');
-    assert.ok(
-      fs.existsSync(
-        path.join(baselineRoot, 'packages', '@stylexjs', 'babel-plugin'),
-      ),
-      `the reference engine at ${baselineRoot} is missing or unbuilt. The ` +
-        'oracle compares this repo against a checked-out reference engine; ' +
-        'set PMS_BASELINE_ROOT to its path, then build it with ' +
-        './verify-pms.sh (its build step).',
+        'build it first with ./verify-pms.sh (its build step).',
     );
     const dir = tmpdir('oracle');
     const res = spawnSync(
@@ -991,7 +968,7 @@ test('file_rename is a real content revision of the covered set', () => {
 test('the incremental oracle compares what it claims to compare', () => {
   const src = fs.readFileSync(path.join(SRC, 'incremental-oracle.js'), 'utf8');
   for (const check of [
-    'published artifacts, byte for byte, per file',
+    'published artifacts after lifecycle normalization',
     'runtime-composition-structure',
     'css-bytes',
     'css-text',
@@ -1010,19 +987,29 @@ test('the incremental oracle compares what it claims to compare', () => {
   // the same process as the session would share its module registry, its
   // caches and its design system, and would not be a fresh rebuild at all.
   assert.ok(
-    src.includes('spawnSync') && src.includes('BUILD_BIN'),
-    'the reference build must run the real CLI in another process',
+    src.includes('spawnSync') && src.includes('buildProject'),
+    'the reference build must run the full builder in another process',
   );
   assert.ok(
     src.includes('fresh process'),
     'the oracle must state the isolation it claims for its reference build',
   );
-  // Exactly one normalisation, and it must be the session's own additive block.
+  // Normalization is limited to the session's work block and publisher ids.
   const strip = src.match(/function stripIncrementalBlock[\s\S]*?\n}/);
   assert.ok(strip != null, 'the oracle has no normalisation function at all');
   assert.ok(
-    strip[0].includes('"incremental"'),
-    "the only normalisation must remove the session's additive block",
+    strip[0].includes('delete report.incremental') &&
+      strip[0].includes('coverageReport.revisionId = 0'),
+    'build-report normalization must remove work counters and normalize its publisher id',
+  );
+  const coverageNormalizer = src.match(
+    /function normaliseCoverageReport[\s\S]*?\n}/,
+  );
+  assert.ok(
+    coverageNormalizer != null &&
+      coverageNormalizer[0].includes('report.revisionId = 0') &&
+      coverageNormalizer[0].includes('report.generationId = null'),
+    'coverage normalization must be limited to revision and generation ids',
   );
 });
 
@@ -1033,10 +1020,9 @@ test(
     const lib = path.join(
       REPO_ROOT,
       'packages',
-      '@pandamstyle',
       'compiler',
       'lib',
-      'index.js',
+      'index.mjs',
     );
     assert.ok(
       fs.existsSync(lib),
@@ -1179,7 +1165,7 @@ test('the plan declares the revision counters the session emits', () => {
       'will read a reused file as a cheap file rather than as an absent one',
   );
   assert.ok(
-    plan.planVersion.startsWith('1.2.'),
+    plan.planVersion.startsWith('1.3.'),
     'the plan version must record that metric semantics were extended',
   );
   assert.ok(

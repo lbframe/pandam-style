@@ -1,6 +1,6 @@
 {
   "documentKind": "pandamstyle-benchmark-plan",
-  "planVersion": "1.2.0",
+  "planVersion": "1.3.0",
   "plan_version_note": [
     "1.0.0 -> 1.1.0 is a BINDING change, not a protocol change: the official",
     "baseline moved from the superseded SHA e5ff62b4a925405dcf9fb415faa00df4b68aeaa9",
@@ -10,12 +10,13 @@
     "and reinterprets nothing: `filesystem_to_diagnostics_ms` still means the",
     "same interval, and every Spike 1 metric keeps its meaning. The new counters",
     "are emitted only by the session engine, and only when a revision exists, so",
-    "no row is ever a fabricated zero for an engine with no such concept."
+    "no row is ever a fabricated zero for an engine with no such concept.",
+    "1.2.0 -> 1.3.0 keeps the Spike 1 source SHA as historical provenance but runs both Spike 1 policies on the current PandamStyle tree; the work-elimination policy is the only changed axis."
   ],
   "baseline_commit": "d5702374ac5a685499d14a53bf323d8533e6982d",
   "baseline_tree": "836a24ec91239e148547a9c686041a6f65fe0099",
   "superseded_baseline_commit": "e5ff62b4a925405dcf9fb415faa00df4b68aeaa9",
-  "baseline_reason": "The older SHA predates native JS/TS/TSX compilation, binding-based provenance, props() provenance enforcement, complete local module coverage, transactional publication, the real Vite pilot, the evidence integrity fixes and the repository hygiene fixes. Benchmarking it as 'current' would measure a compiler that no longer exists.",
+  "baseline_reason": "Historical Spike 1 source provenance only. Current benchmark runs use the current PandamStyle tree for both Spike 1 policies and do not check out this source tree.",
   "batch": "spike-2",
   "batch_scope": "Babel-only: keep the existing compiler, add a project session that reuses a file's compiled result while its validity key holds, and measure. No Oxc, no SWC, no Rust, no Salsa, no daemon, no new CSS backend.",
   "qualification_matrix": {
@@ -192,15 +193,15 @@
     },
     {
       "name": "babel_current",
-      "status": "spike-1-baseline",
-      "anchor": "git worktree at baseline_commit, plus the inert measurement hooks",
+      "status": "continuity",
+      "anchor": "this branch, work elimination off",
       "work_elimination": "off",
-      "rationale": "Retained from Spike 1 for continuity. The Spike 2 decision-bearing comparison is babel_full vs babel_incremental, both on this tree."
+      "rationale": "Retained as the unoptimized policy label. Current runs use the same owned compiler tree as babel_work_eliminated; historical source output remains in the evidence archive."
     },
     {
       "name": "babel_work_eliminated",
-      "status": "spike-1-baseline",
-      "anchor": "this branch at Spike 1, PMS_WORK_ELIMINATED=1",
+      "status": "continuity",
+      "anchor": "this branch, PMS_WORK_ELIMINATED=1",
       "work_elimination": "on",
       "rationale": "Retained from Spike 1 for continuity."
     }
