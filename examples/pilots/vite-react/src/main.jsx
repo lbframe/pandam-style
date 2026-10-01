@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import './base.css';
 import { createRoot } from 'react-dom/client';
 import { App } from './pages/App.jsx';
 

@@ -1,0 +1,30 @@
+{
+  "name": "@pandamstyle/vite",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Vite host adapter for the PandamStyle Project Service.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src/*",
+    "types/*"
+  ],
+  "keywords": [
+    "vite-plugin"
+  ],
+  "dependencies": {
+    "@pandamstyle/compiler": "0.1.0"
+  },
+  "peerDependencies": {
+    "vite": "7.3.2"
+  }
+}

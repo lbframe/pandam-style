@@ -2,13 +2,15 @@
 
 Demonstrates the native compilation chain inside a real bundler pipeline.
 
-- The app installs `@pandamstyle/compiler` from a **local `npm pack` tarball**,
-  not from a workspace alias, so missing exports cannot be masked.
-- `vite.config.js` declares the covered root (`./src/pages`); coverage comes
-  from the declared roots and their local import closure, not from a textual
-  import filter.
-- The production CSS is emitted as a first-class asset and injected into
-  `index.html` before the first render.
-- Page files are never mutated: the compiler lowers them in memory.
+- The external pilot installs packed `@pandamstyle/compiler`,
+  `@pandamstyle/core`, and `@pandamstyle/vite` tarballs, then proves Vite
+  resolves those packages outside the repository.
+- `vite.config.js` declares `./src` as its covered root. The Project Service
+  owns coverage, transformed JavaScript, diagnostics, and generated artifacts.
+- Development CSS is served from the canonical Project Service artifact set;
+  production builds emit the same `styles.css` as a bundle asset.
+- Page files are never mutated: host-provided source bytes are revision-bound
+  overlays consumed by the Project Service.
 
-This batch does **not** certify SSR, hydration, TanStack Start, or advanced HMR.
+The pilot qualifies Vite 7.3.2. It does not claim SSR, another bundler, or a
+wider Vite compatibility range.

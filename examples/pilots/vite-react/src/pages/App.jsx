@@ -12,13 +12,7 @@
  * props(), and the recipe selection is validated or guarded. No inline style,
  * no local stylesheet, no upstream engine import.
  */
-import {
-  create,
-  token,
-  recipes,
-  themes,
-  props,
-} from '../../.pandamstyle/design.pandamstyle.js';
+import { create, token, recipes, themes, props } from './bridge.js';
 
 const styles = create({
   page: {
