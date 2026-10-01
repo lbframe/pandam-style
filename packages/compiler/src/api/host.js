@@ -5,12 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const HOST_OPERATIONS = [
+const HOST_OPERATIONS = Object.freeze([
   'readArtifact',
   'preparePublication',
   'commitPrepared',
   'abortPrepared',
-];
+]);
 
 export function createHostBridge(project) {
   if (

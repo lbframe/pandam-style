@@ -10,13 +10,15 @@ export interface DesignSystemIdentity {
 }
 
 export interface ProjectConfig {
-  projectId?: string;
-  rootDir: string;
-  definition: Definition;
-  roots: readonly string[];
-  outDir?: string;
-  designSystemFile?: string;
-  useCSSLayers?: boolean;
+  readonly projectId?: string;
+  readonly rootDir: string;
+  readonly definition: Definition;
+  readonly roots: readonly string[];
+  readonly outDir?: string;
+  readonly designSystemFile?: string;
+  readonly useCSSLayers?: boolean;
+  readonly engineOptions?: Readonly<Record<string, unknown>>;
+  readonly auditPolicy?: 'reference' | 'inline';
 }
 
 export interface Definition {
@@ -31,6 +33,67 @@ export interface MutationTransaction {
   readonly added: readonly string[];
   readonly removed: readonly string[];
   readonly renamed: readonly { readonly from: string; readonly to: string }[];
+  readonly definition?: Definition;
+  readonly config?: ProjectConfigChanges;
+  readonly forceFullDiscovery?: boolean;
+}
+
+export interface ProjectConfigChanges {
+  readonly roots?: readonly string[];
+  readonly definition?: Definition;
+  readonly designSystemFile?: string;
+  readonly engineOptions?: Readonly<Record<string, unknown>>;
+  readonly useCSSLayers?: boolean;
+  readonly auditPolicy?: 'reference' | 'inline';
+}
+
+export interface ProjectRevisionResult {
+  readonly revision: RevisionIdentity;
+  readonly [key: string]: unknown;
+}
+
+export interface ProjectGeneration {
+  readonly generationId: number;
+  readonly artifactRevision: RevisionIdentity | null;
+  readonly associationRevision: RevisionIdentity | null;
+  readonly artifactDigest: string;
+  readonly designSystem: Readonly<{
+    systemId: string;
+    registryDigest: string | null;
+  }> | null;
+  readonly publication: Readonly<Record<string, unknown>> | null;
+}
+
+export interface ProjectCurrent {
+  readonly revision: RevisionIdentity | null;
+  readonly generation: ProjectGeneration | null;
+}
+
+export interface WatchTransaction {
+  readonly mode: 'watcher';
+  readonly changed: readonly string[];
+  readonly added: readonly string[];
+  readonly removed: readonly string[];
+  readonly renamed: readonly { readonly from: string; readonly to: string }[];
+  readonly forceFullDiscovery: boolean;
+}
+
+export interface WatcherHandle {
+  readonly name: string;
+  readonly mode: 'watcher';
+  readonly established: boolean;
+  readonly startFailures: readonly Readonly<{ root: string; code: string }>[];
+  flush(): Promise<ProjectRevisionResult | null>;
+  stats(): Readonly<Record<string, number | boolean>>;
+  close(): void;
+}
+
+export interface WatchOptions {
+  readonly debounceMs?: number;
+  readonly maxPending?: number;
+  readonly onRevision?: (result: ProjectRevisionResult) => void;
+  readonly onError?: (error: unknown) => void;
+  readonly onResync?: (reason: string, result: ProjectRevisionResult) => void;
 }
 
 export interface DiagnosticSource {
@@ -89,7 +152,7 @@ export interface PublicationReceipt {
   readonly artifactRevision: RevisionIdentity;
   readonly artifactDigest: string;
   readonly associationRevision: RevisionIdentity;
-  readonly generationId: number | string;
+  readonly generationId: number;
   readonly designSystem: DesignSystemIdentity;
   readonly abiVersion: 1;
   readonly publication: Readonly<Record<string, unknown>> | null;
@@ -100,6 +163,30 @@ export interface CandidateQuery {
   readonly category?: string;
   readonly offset?: number;
   readonly limit?: number;
+}
+
+export interface CandidateToken {
+  readonly tokenId: string;
+  readonly category: string | null;
+}
+
+export interface CandidateTokenResult {
+  readonly revision: RevisionIdentity;
+  readonly category: string | null;
+  readonly offset: number;
+  readonly limit: number;
+  readonly total: number;
+  readonly truncated: boolean;
+  readonly candidates: readonly CandidateToken[];
+}
+
+export interface MutationAuditResult {
+  readonly revision: RevisionIdentity;
+  readonly mode: string;
+  readonly audited: boolean;
+  readonly discrepancies: readonly Readonly<Record<string, unknown>>[];
+  readonly declared: number;
+  readonly note?: string;
 }
 
 export interface ArtifactResult {
@@ -118,6 +205,7 @@ export interface ArtifactResult {
 
 export interface PublicationTicket {
   readonly ticketId: string;
+  readonly projectId: string;
   readonly sessionId: string;
   readonly revision: RevisionIdentity;
   readonly candidateDigest: string;
@@ -127,33 +215,27 @@ export interface PublicationTicket {
 export interface ProjectSession {
   readonly projectId: string;
   readonly sessionId: string;
-  initialize(): Promise<
-    Readonly<Record<string, unknown>> & { revision: RevisionIdentity }
-  >;
+  initialize(): Promise<ProjectRevisionResult>;
   applyChanges(
     transaction: MutationTransaction,
-  ): Promise<
-    Readonly<Record<string, unknown>> & { revision: RevisionIdentity }
-  >;
+  ): Promise<ProjectRevisionResult>;
   validate(
     revision: RevisionIdentity,
   ): Promise<DiagnosticsResult & Readonly<Record<string, unknown>>>;
   compile(revision: RevisionIdentity): Promise<PublicationReceipt>;
-  current(): Promise<Readonly<Record<string, unknown>>>;
+  current(): Promise<ProjectCurrent>;
   agentResult(
     revision: RevisionIdentity,
     options?: { candidateLimit?: number },
   ): Promise<DiagnosticsResult | null>;
-  candidateTokens(
-    query: CandidateQuery,
-  ): Promise<Readonly<Record<string, unknown>>>;
+  candidateTokens(query: CandidateQuery): Promise<CandidateTokenResult>;
   requestFullAudit(
     revision: RevisionIdentity,
-  ): Promise<Readonly<Record<string, unknown>>>;
-  auditMutationSet(
-    revision: RevisionIdentity,
-  ): Promise<Readonly<Record<string, unknown>>>;
-  watch(options?: Readonly<Record<string, unknown>>): Promise<unknown>;
+  ): Promise<
+    Readonly<Record<string, unknown>> & { revision: RevisionIdentity }
+  >;
+  auditMutationSet(revision: RevisionIdentity): Promise<MutationAuditResult>;
+  watch(options?: WatchOptions): Promise<WatcherHandle>;
   readArtifact(
     revision: RevisionIdentity,
     moduleId: string,

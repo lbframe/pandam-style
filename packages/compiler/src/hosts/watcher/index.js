@@ -97,6 +97,7 @@ export function generationScratchPaths(outDir) {
  */
 export function createChangeJournal({
   debounceMs = 50,
+  maxPending = 10000,
   exclude = [],
   known: initiallyKnown = null,
   digests = null,
@@ -138,6 +139,10 @@ export function createChangeJournal({
   let resyncReason = null;
   let timer = null;
   let onFlush = null;
+  let onResync = null;
+  let closed = false;
+  const pendingLimit =
+    Number.isInteger(maxPending) && maxPending >= 0 ? maxPending : 10000;
 
   const excluded = exclude.filter(Boolean).map((p) => path.resolve(p));
 
@@ -150,6 +155,10 @@ export function createChangeJournal({
   };
 
   const note = (name, eventType) => {
+    if (closed || resyncRequired) {
+      stats.ignored += 1;
+      return;
+    }
     // `fs.watch` reports a path RELATIVE to the watched directory, and a null
     // name when the platform cannot say. A null name is an event we cannot
     // attribute, and an unattributable event is exactly the case a resync exists
@@ -176,6 +185,10 @@ export function createChangeJournal({
         kind: mergeKinds(existing.kind, classify(file, eventType)),
         at: existing.at,
       });
+      return;
+    }
+    if (pending.size >= pendingLimit) {
+      requireResync('buffer-overflow');
       return;
     }
     pending.set(file, { kind: classify(file, eventType), at: Date.now() });
@@ -228,6 +241,11 @@ export function createChangeJournal({
     // say what it missed, so what it did see is not a complete picture and must
     // not be presented as one.
     pending.clear();
+    if (timer != null) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    if (onResync != null) onResync(resyncReason);
   }
 
   const journal = {
@@ -267,6 +285,7 @@ export function createChangeJournal({
      * whatever the overflow swallowed.
      */
     flush() {
+      if (closed) return null;
       if (timer != null) {
         clearTimeout(timer);
         timer = null;
@@ -338,7 +357,7 @@ export function createChangeJournal({
 
     /** Arms a debounce window, if one is configured. */
     arm() {
-      if (debounceMs <= 0 || timer != null) return;
+      if (closed || resyncRequired || debounceMs <= 0 || timer != null) return;
       timer = setTimeout(() => {
         timer = null;
         const transaction = journal.flush();
@@ -365,8 +384,26 @@ export function createChangeJournal({
       onFlush = fn;
     },
 
+    onResync(fn) {
+      onResync = fn;
+      if (resyncRequired && onResync != null) onResync(resyncReason);
+    },
+
     stats() {
       return { ...stats, pending: pending.size, resyncRequired };
+    },
+    close() {
+      if (closed) return;
+      closed = true;
+      if (timer != null) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      pending.clear();
+      known.clear();
+      knownDigests.clear();
+      onFlush = null;
+      onResync = null;
     },
   };
 
@@ -399,17 +436,45 @@ export function createFilesystemWatcher({
   roots,
   outDir,
   debounceMs = 50,
+  maxPending = 10000,
+  known = null,
+  digests = null,
   onFlush = null,
   onResync = null,
 } = {}) {
   const rootList = (roots ?? []).map((r) => path.resolve(r));
   const journal = createChangeJournal({
     debounceMs,
+    maxPending,
+    known,
+    digests,
     exclude: [outDir, ...generationScratchPaths(outDir)].filter(Boolean),
   });
   const watchers = [];
   const startFailures = [];
+  let closed = false;
+  let resyncNotified = false;
+
+  const closeWatchers = () => {
+    for (const watcher of watchers) {
+      try {
+        watcher.close();
+      } catch {
+        /* already closed */
+      }
+    }
+    watchers.length = 0;
+  };
+
+  const notifyResync = (reason) => {
+    closeWatchers();
+    if (resyncNotified) return;
+    resyncNotified = true;
+    if (onResync != null) onResync(reason ?? journal.resyncReason);
+  };
   journal.onFlush(onFlush);
+  journal.onResync(notifyResync);
+  const signalResync = (reason) => journal.requireResync(reason);
 
   for (const root of rootList) {
     try {
@@ -417,19 +482,22 @@ export function createFilesystemWatcher({
         root,
         { recursive: true, persistent: false },
         (eventType, name) => {
-          journal.record(name, eventType);
+          journal.record(
+            name == null ? name : path.resolve(root, String(name)),
+            eventType,
+          );
           journal.arm();
         },
       );
       watcher.on('error', (err) => {
         // An error on a watch is the backend saying it can no longer see
         // everything. That is an overflow, whatever the message says.
-        journal.requireResync(`watch-error:${err?.code ?? 'unknown'}`);
-        if (onResync != null) onResync(journal.resyncReason);
+        signalResync(`watch-error:${err?.code ?? 'unknown'}`);
       });
       watchers.push(watcher);
     } catch (err) {
       startFailures.push({ root, code: err?.code ?? String(err) });
+      break;
     }
   }
 
@@ -439,22 +507,23 @@ export function createFilesystemWatcher({
     journal,
     /** A watch that never started is not a watch. */
     get established() {
-      return watchers.length > 0 && watchers.length === rootList.length;
+      return (
+        !closed && watchers.length > 0 && watchers.length === rootList.length
+      );
     },
-    startFailures,
+    startFailures: Object.freeze(
+      startFailures.map((failure) => Object.freeze({ ...failure })),
+    ),
     /** The transaction to submit, or null when there is nothing or a resync. */
     pending() {
+      if (closed) return null;
       return journal.flush();
     },
     close() {
-      for (const watcher of watchers) {
-        try {
-          watcher.close();
-        } catch {
-          /* already closed */
-        }
-      }
-      watchers.length = 0;
+      if (closed) return;
+      closed = true;
+      closeWatchers();
+      journal.close();
     },
     stats() {
       return journal.stats();
@@ -465,8 +534,7 @@ export function createFilesystemWatcher({
     // Recorded rather than thrown: a host that can fall back wants to know WHY
     // it is falling back, and a host that cannot will find out on the first
     // revision it takes through the fallback path.
-    journal.requireResync(`watch-start-failed:${startFailures[0].code}`);
-    if (onResync != null) onResync(journal.resyncReason);
+    signalResync(`watch-start-failed:${startFailures[0].code}`);
   }
 
   return provider;

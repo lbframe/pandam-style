@@ -6,10 +6,11 @@
  */
 
 /**
- * PandamStyle - project build (ARC-13, ARC-14, P0-09, P0-10).
+ * PandamStyle - independent fresh semantic oracle (ARC-13, ARC-14, P0-09, P0-10).
  *
- * This is the real entry point the tests and the pilot drive. It does NOT take
- * a pre-normalized IR: it reads actual JS/TS/TSX files from declared roots,
+ * This is the reference path used by differential tests and the qualification
+ * pilot. It is not the production Project Service or a host-facing session. It
+ * does NOT take a pre-normalized IR: it reads actual JS/TS/TSX files from roots,
  * runs them through the fork's compiler pipeline, collects the rules the engine
  * emitted, and produces CSS, JS, a manifest and a coverage report that all
  * reference the SAME registryDigest.
@@ -284,11 +285,13 @@ export function relativeToCwd(file) {
 }
 
 /**
- * Creates a reusable compilation session.
+ * Creates a reusable fresh-reference session. This is private to semantic
+ * qualification and the Phase 8 Vite seam under tools/pilot; production hosts
+ * use the Promise-based Project Service in `api/project.js`.
  *
- * The Vite/Rollup adapter and `buildProject` share it so both drive the exact
- * same two-pass pipeline, the same policy and the same engine: there is only
- * one compilation circuit.
+ * It remains separate from the incremental service so fresh-vs-incremental
+ * comparisons stay independent. Both use the same compiler pipeline, policy,
+ * and engine, while only the service owns production project lifecycle.
  *
  * `generation` is the transaction the caller opened (see generation.js). The
  * session NEVER writes: publishing is the transaction's job, so a failed

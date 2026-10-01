@@ -216,6 +216,8 @@ const RESERVED = Object.freeze({
   dirty_input_apply_ms: 0,
   filesystem_discovery_ms: 0,
   metadata_hotpath_ms: 0,
+  project_service_queue_wait_ms: 0,
+  project_service_queue_run_ms: 0,
   // Watcher (Spike 4, Phase B).
   watch_events_seen: 0,
   watch_events_coalesced: 0,
@@ -324,6 +326,12 @@ export function phaseAsync(metric, fn) {
 export function count(metric, n = 1) {
   if (collector == null) return;
   collector.addCount(metric, n);
+}
+
+/** Records an already measured duration without including it in a build phase. */
+export function recordDuration(metric, durationNs) {
+  if (collector == null) return;
+  collector.addDuration(metric, durationNs);
 }
 
 /**

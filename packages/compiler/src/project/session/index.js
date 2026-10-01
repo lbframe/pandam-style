@@ -16,9 +16,9 @@
  * and reverse module graphs, the resolution state - and keeps them across
  * revisions, so that a revision only re-does the work whose inputs changed.
  *
- * It is production compiler code. The benchmark harness drives it; it does not
- * exist for the benchmark. `buildProject` - the full rebuild - is UNCHANGED and
- * remains the semantic reference this session is measured against.
+ * This is the private session owner called by the public Project Service.
+ * `buildProject` is retained separately as a fresh semantic oracle; it is not a
+ * production project authority or host-facing session.
  *
  * THE ONE RULE THAT MAKES IT CORRECT
  *
@@ -331,9 +331,12 @@ const usesIncrementalCss = (variant) =>
 
 export function createProjectSession(config) {
   const graphContext = createModuleGraphContext();
+  const initialGenerationId = Number.isSafeInteger(config?.initialGenerationId)
+    ? config.initialGenerationId
+    : 0;
   const state = {
     revisionId: 0,
-    generationId: 0,
+    generationId: initialGenerationId,
     // `projectSemanticEpoch` is part of every file's validity key. It changes
     // on every global mutation the session cannot yet reason about locally.
     semanticEpoch: 1,
@@ -2585,7 +2588,7 @@ export function createProjectSession(config) {
 
   // ------------------------------------------------------------- compile ----
 
-  function compile() {
+  function compile(options = {}) {
     const active = state.active;
     if (active == null || !active.validated) {
       throw new Error(
@@ -2598,10 +2601,10 @@ export function createProjectSession(config) {
       // THIS revision.
       throw active.error ?? new PmsError(active.diagnostics);
     }
-    return publish(active);
+    return publish(active, options);
   }
 
-  function publish(active) {
+  function publish(active, { revisionIdentity = null } = {}) {
     const cfg = state.config;
     const absOut = path.resolve(cfg.outDir);
     const sourceBase = commonBase(cfg.roots);
@@ -2915,6 +2918,7 @@ export function createProjectSession(config) {
         mode: incremental ? 'delta' : 'full',
         generationId: state.generationId + 1,
         revisionId: active.revisionId,
+        revisionIdentity,
         failAt: cfg.publishFailAt ?? null,
       },
     );
@@ -2927,9 +2931,9 @@ export function createProjectSession(config) {
     // left in place. A revision is not a generation - a revision can be
     // recorded without forcing new published bytes to exist.
     const generationReused = committed?.generationReused === true;
-    if (!generationReused) {
-      state.generationId += 1;
-    }
+    state.generationId = Number.isSafeInteger(committed?.generationId)
+      ? committed.generationId
+      : state.generationId + (generationReused ? 0 : 1);
     active.published = true;
     state.published = {
       revisionId: active.revisionId,
@@ -2951,6 +2955,11 @@ export function createProjectSession(config) {
       ...result,
       generationId: state.generationId,
       generationReused,
+      artifactRevisionIdentity:
+        committed?.artifactRevisionIdentity ?? revisionIdentity,
+      associationRevisionIdentity:
+        committed?.associationRevisionIdentity ?? revisionIdentity,
+      artifactDigest: committed?.artifactDigest ?? null,
       publication: {
         mode: result.mode,
         variant,
@@ -3631,14 +3640,16 @@ export function createProjectSession(config) {
         ? Math.max(0, query.offset)
         : 0;
       const allowPrivate = query.allowPrivate === true;
-      const all = Object.keys(registry.tokens).filter((id) => {
-        const entry = registry.tokens[id];
-        if (query.category != null && entry.category !== query.category) {
-          return false;
-        }
-        if (!allowPrivate && entry.visibility !== 'public') return false;
-        return true;
-      });
+      const all = Object.keys(registry.tokens)
+        .filter((id) => {
+          const entry = registry.tokens[id];
+          if (query.category != null && entry.category !== query.category) {
+            return false;
+          }
+          if (!allowPrivate && entry.visibility !== 'public') return false;
+          return true;
+        })
+        .sort((left, right) => (left < right ? -1 : left > right ? 1 : 0));
       return {
         category: query.category ?? null,
         allowPrivate,
@@ -3870,12 +3881,16 @@ export function createProjectSession(config) {
         const digest = fileState?.sourceHash;
         if (digest != null) digests.push([file, digest]);
       }
+      const { debounceMs, maxPending, onFlush, onResync } = options;
       return createFilesystemWatcher({
         roots: state.config.roots,
         outDir: state.config.outDir,
         digests,
         known: [...state.fileStates.keys()],
-        ...options,
+        debounceMs,
+        maxPending,
+        onFlush,
+        onResync,
       });
     },
 
@@ -4049,17 +4064,37 @@ export function createProjectSession(config) {
       setRelayAnswerStore(null);
       clearModuleOverlay();
       clearModuleCache();
+      state.overlay.clear();
+      state.overlay = new Map();
       state.fileStates.clear();
       state.dsConsumers.clear();
       state.dsImportConsumers.clear();
       state.dsv.moduleVersions.clear();
       state.dsv.relayAnswers.clear();
       state.dsv.relayEntriesByFirstHop.clear();
+      state.dsv.fullFallback = false;
+      state.dsv.fullFallbackReason = null;
       resolutionKeys = new Map();
       dirListings = new Map();
       state.covered = null;
       state.active = null;
       state.designSystem = null;
+      state.designSystemSource = null;
+      state.generatedModulePath = null;
+      state.coverageGraph = createCoverageGraph();
+      state.published = null;
+      state.lastPublication = null;
+      state.config = {
+        ...state.config,
+        definition: null,
+        roots: [],
+        engineOptions: {},
+      };
+      cssState = null;
+      cssStateKey = null;
+      cssStateLastCss = null;
+      cssStateDesignSystemEpoch = null;
+      tally.clear();
     },
   };
 

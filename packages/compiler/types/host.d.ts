@@ -1,11 +1,17 @@
 import type {
   ArtifactResult,
   ProjectSession,
+  PublicationReceipt,
   PublicationTicket,
   RevisionIdentity,
 } from './index.js';
 
-export type { ArtifactResult, PublicationTicket };
+export type {
+  ArtifactResult,
+  PublicationReceipt,
+  PublicationTicket,
+  RevisionIdentity,
+};
 
 export interface HostBridge {
   readArtifact(
@@ -13,7 +19,7 @@ export interface HostBridge {
     moduleId: string,
   ): Promise<ArtifactResult>;
   preparePublication(revision: RevisionIdentity): Promise<PublicationTicket>;
-  commitPrepared(ticket: PublicationTicket): Promise<unknown>;
+  commitPrepared(ticket: PublicationTicket): Promise<PublicationReceipt>;
   abortPrepared(ticket: PublicationTicket): Promise<boolean>;
 }
 

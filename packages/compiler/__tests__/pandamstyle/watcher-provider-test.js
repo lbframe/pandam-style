@@ -280,6 +280,21 @@ describe('Spike 4 Phase B: a watcher that cannot be trusted says so', () => {
     expect(j.flush()).toBeNull();
   });
 
+  test('the bounded journal resyncs before accepting an incomplete burst', () => {
+    const first = path.join(dir, 'first.js');
+    const second = path.join(dir, 'second.js');
+    fs.writeFileSync(first, 'one', 'utf8');
+    fs.writeFileSync(second, 'two', 'utf8');
+    const j = journal({ maxPending: 1 });
+    j.record(first, 'change');
+    j.record(second, 'change');
+
+    expect(j.resyncRequired).toBe(true);
+    expect(j.resyncReason).toBe('buffer-overflow');
+    expect(j.stats().pending).toBe(0);
+    expect(j.flush()).toBeNull();
+  });
+
   test('a resync supersedes events already in the journal', () => {
     const file = path.join(dir, 'page.js');
     fs.writeFileSync(file, 'v1', 'utf8');

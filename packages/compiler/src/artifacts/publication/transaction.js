@@ -8,9 +8,10 @@
 /**
  * PandamStyle - transactional publication of a generation (ARC-14, P0-10).
  *
- * ONE mechanism, shared by the CLI (`buildProject`) and the bundler adapter
- * (`pandamstyle()` in vite.js). Two divergent implementations were exactly how a
- * half-published generation became possible, so there is one here.
+ * ONE private mechanism, called by the canonical Project Service. The CLI is a
+ * service consumer; framework qualification seams do not own publication.
+ * Divergent implementations were exactly how a half-published generation
+ * became possible, so there is one here.
  *
  * The contract:
  *
@@ -216,6 +217,27 @@ function readJsonIfPresent(file) {
   }
 }
 
+function isRevisionIdentity(value) {
+  return (
+    value != null &&
+    typeof value.projectId === 'string' &&
+    typeof value.sessionId === 'string' &&
+    Number.isSafeInteger(value.revisionId) &&
+    value.revisionId >= 0
+  );
+}
+
+function artifactDigestOf(records = {}) {
+  const hash = crypto.createHash('sha256');
+  for (const rel of Object.keys(records).sort()) {
+    hash.update(rel);
+    hash.update('\0');
+    hash.update(records[rel]?.digest ?? '');
+    hash.update('\0');
+  }
+  return hash.digest('hex');
+}
+
 /** Written-and-renamed, so a reader never sees a half-written control file. */
 function writeJsonAtomic(target, value) {
   const tmp = `${target}.tmp-${process.pid}`;
@@ -281,6 +303,92 @@ function scratchPaths(absOut) {
   };
 }
 
+function reconcileInterruptedGeneration(absOut, paths = scratchPaths(absOut)) {
+  let recovered = false;
+  const pending = readJsonIfPresent(paths.pendingStatePath);
+  const hasOut = isDir(absOut);
+  const hasBackup = isDir(paths.backupDir);
+  const hasStaging = isDir(paths.stagingDir);
+
+  if (pending != null) {
+    // The intent marker is written only after validation and staging complete,
+    // so recovery rolls this generation forward rather than inventing a
+    // rollback result that was never committed by its owner.
+    if (hasStaging) {
+      if (hasOut) {
+        rmrf(paths.backupDir);
+        fs.renameSync(absOut, paths.backupDir);
+      }
+      fs.renameSync(paths.stagingDir, absOut);
+    }
+    if (fs.existsSync(paths.pendingStatePath)) {
+      fs.renameSync(paths.pendingStatePath, paths.statePath);
+    }
+    rmrf(paths.backupDir);
+    recovered = true;
+  } else if (hasBackup) {
+    // No durable intent means publication had not started. Restore the prior
+    // committed generation byte for byte.
+    rmrf(absOut);
+    copyTree(paths.backupDir, absOut);
+    rmrf(paths.backupDir);
+    recovered = true;
+  } else if (hasStaging) {
+    rmrf(paths.stagingDir);
+  }
+
+  return { recovered, state: readJsonIfPresent(paths.statePath) };
+}
+
+/**
+ * Reconciles a prior interrupted publication and returns its durable identity.
+ * This is used during cold Project Service initialization; it never restores
+ * compiler caches or treats an old session as a current revision.
+ */
+export function recoverPublishedGeneration(outDir) {
+  const absOut = path.resolve(outDir);
+  const paths = scratchPaths(absOut);
+  const { state } = reconcileInterruptedGeneration(absOut, paths);
+  if (
+    !isDir(absOut) ||
+    state?.version !== STATE_VERSION ||
+    state?.files == null ||
+    state.files['manifest.json'] == null
+  ) {
+    return null;
+  }
+
+  const manifest = readJsonIfPresent(path.join(absOut, 'manifest.json'));
+  const designSystem =
+    manifest?.systemId == null || manifest?.registryDigest == null
+      ? null
+      : Object.freeze({
+          systemId: manifest.systemId,
+          registryDigest: manifest.registryDigest,
+        });
+  const artifactRevision = isRevisionIdentity(state.artifactRevisionIdentity)
+    ? Object.freeze({ ...state.artifactRevisionIdentity })
+    : null;
+  const associationRevision = isRevisionIdentity(
+    state.associationRevisionIdentity,
+  )
+    ? Object.freeze({ ...state.associationRevisionIdentity })
+    : null;
+
+  return Object.freeze({
+    generationId: Number.isSafeInteger(state.generationId)
+      ? state.generationId
+      : null,
+    artifactRevision,
+    associationRevision,
+    artifactDigest:
+      typeof state.artifactDigest === 'string'
+        ? state.artifactDigest
+        : artifactDigestOf(state.files),
+    designSystem,
+  });
+}
+
 /**
  * The publication delta.
  *
@@ -341,6 +449,7 @@ export function beginGeneration(outDir, options = {}) {
     // later process can tell "revision N" from "generation N".
     generationId = null,
     revisionId = null,
+    revisionIdentity = null,
     // Test seam. A point name, or a `(point) => void` that may throw. See
     // `maybeFail` below. Never set in a production path.
     failAt = null,
@@ -409,59 +518,42 @@ export function beginGeneration(outDir, options = {}) {
 
   const delta = emptyDelta();
   const requestedDelta = mode === 'delta';
-  let recovered = false;
-
   // ---- crash reconciliation -------------------------------------------------
   //
   // Done before anything is prepared, and before the previous generation is read,
   // so a process that died mid-publish is resolved rather than inherited.
-  const pending = readJsonIfPresent(pendingStatePath);
-  const hasOut = isDir(absOut);
-  const hasBackup = isDir(backupDir);
-  const hasStaging = isDir(stagingDir);
-
-  if (pending != null) {
-    // A generation had been fully prepared and had begun to publish. Rolling
-    // FORWARD is correct: it was validated before the intent file was written.
-    if (hasStaging) {
-      if (hasOut) {
-        rmrf(backupDir);
-        fs.renameSync(absOut, backupDir);
-      }
-      fs.renameSync(stagingDir, absOut);
-    }
-    if (fs.existsSync(pendingStatePath)) {
-      fs.renameSync(pendingStatePath, statePath);
-    }
-    rmrf(backupDir);
-    recovered = true;
-  } else if (hasBackup) {
-    // No publication was in flight, but a full-mode snapshot of the current
-    // generation exists: the process died between the snapshot and the commit.
-    // The good generation is in it, so it is restored rather than inherited -
-    // this is what stops a half-published generation from becoming the baseline
-    // of the next one. (A delta-mode generation always writes its intent file
-    // before it retires the current generation, so it cannot reach here.)
-    rmrf(absOut);
-    copyTree(backupDir, absOut);
-    rmrf(backupDir);
-    recovered = true;
-  } else {
-    if (hasStaging) rmrf(stagingDir);
-  }
+  const recovery = reconcileInterruptedGeneration(absOut, {
+    stagingDir,
+    backupDir,
+    statePath,
+    pendingStatePath,
+  });
+  const recovered = recovery.recovered;
   // The reconciliation above is real work this transaction did, so it counts
   // towards the I/O aggregate; the segment that follows it is the caller's.
   markIoEnd();
 
   // ---- the previous generation ---------------------------------------------
   const hadOutDir = isDir(absOut);
-  const previousState = readJsonIfPresent(statePath);
+  const previousState = recovery.state;
   const previousRecords =
     previousState != null &&
     previousState.version === STATE_VERSION &&
     previousState.files != null
       ? previousState.files
       : null;
+  const previousGenerationId = Number.isSafeInteger(previousState?.generationId)
+    ? previousState.generationId
+    : null;
+  const activeGenerationId =
+    typeof generationId === 'number' && previousGenerationId != null
+      ? Math.max(generationId, previousGenerationId + 1)
+      : generationId;
+  const forceNewGeneration =
+    revisionIdentity != null &&
+    previousState != null &&
+    (previousGenerationId == null ||
+      !isRevisionIdentity(previousState?.artifactRevisionIdentity));
 
   // Delta publication needs the previous generation to EXIST, and to know what
   // each of its artifacts hashed to. Without the state file it would have to
@@ -504,6 +596,13 @@ export function beginGeneration(outDir, options = {}) {
   const staged = new Map();
   /** rel -> { digest, size, owner, generationId } for THIS generation. */
   const records = {};
+  let generationArtifactDigest = null;
+  const getGenerationArtifactDigest = () => {
+    if (generationArtifactDigest == null) {
+      generationArtifactDigest = artifactDigestOf(records);
+    }
+    return generationArtifactDigest;
+  };
 
   rmrf(stagingDir);
   fs.mkdirSync(stagingDir, { recursive: true });
@@ -542,7 +641,7 @@ export function beginGeneration(outDir, options = {}) {
       size,
       owner: meta.owner ?? null,
       kind,
-      generationId: meta.generationId ?? generationId,
+      generationId: meta.generationId ?? activeGenerationId,
     };
     return { digest, size, kind };
   };
@@ -879,8 +978,15 @@ export function beginGeneration(outDir, options = {}) {
       const metaStart = perfNow();
       writeJsonAtomic(statePath, {
         version: STATE_VERSION,
-        generationId,
+        generationId: activeGenerationId,
         revisionId,
+        artifactRevisionIdentity: isRevisionIdentity(revisionIdentity)
+          ? revisionIdentity
+          : null,
+        associationRevisionIdentity: isRevisionIdentity(revisionIdentity)
+          ? revisionIdentity
+          : null,
+        artifactDigest: getGenerationArtifactDigest(),
         files: records,
       });
       addDuration('publish_metadata_ms', metaStart);
@@ -900,6 +1006,14 @@ export function beginGeneration(outDir, options = {}) {
       removed,
       mode: 'full',
       generationReused: false,
+      generationId: activeGenerationId,
+      artifactRevisionIdentity: isRevisionIdentity(revisionIdentity)
+        ? revisionIdentity
+        : null,
+      associationRevisionIdentity: isRevisionIdentity(revisionIdentity)
+        ? revisionIdentity
+        : null,
+      artifactDigest: getGenerationArtifactDigest(),
     };
     if (typeof api.onCommitted === 'function') api.onCommitted(outcome);
     return outcome;
@@ -918,13 +1032,27 @@ export function beginGeneration(outDir, options = {}) {
     // re-installing it would rewrite every artifact for no semantic change. The
     // revision is still recorded - a revision and a generation are not the same
     // thing, and a revision is not required to force a new generation.
-    if (isByteIdenticalGeneration()) {
+    if (isByteIdenticalGeneration() && !forceNewGeneration) {
       const metaStart = perfNow();
+      const artifactRevisionIdentity = isRevisionIdentity(
+        previousState?.artifactRevisionIdentity,
+      )
+        ? previousState.artifactRevisionIdentity
+        : null;
+      const associationRevisionIdentity = isRevisionIdentity(revisionIdentity)
+        ? revisionIdentity
+        : isRevisionIdentity(previousState?.associationRevisionIdentity)
+          ? previousState.associationRevisionIdentity
+          : null;
+      const artifactDigest = getGenerationArtifactDigest();
       writeJsonAtomic(statePath, {
         ...(previousState ?? {}),
         version: STATE_VERSION,
         generationId: previousState?.generationId ?? null,
         revisionId,
+        artifactRevisionIdentity,
+        associationRevisionIdentity,
+        artifactDigest,
         files: records,
       });
       rmrf(stagingDir);
@@ -940,6 +1068,10 @@ export function beginGeneration(outDir, options = {}) {
         removed,
         mode: 'delta',
         generationReused: true,
+        generationId: previousGenerationId,
+        artifactRevisionIdentity,
+        associationRevisionIdentity,
+        artifactDigest,
       });
     }
 
@@ -947,8 +1079,15 @@ export function beginGeneration(outDir, options = {}) {
     const metaStart = perfNow();
     writeJsonAtomic(pendingStatePath, {
       version: STATE_VERSION,
-      generationId,
+      generationId: activeGenerationId,
       revisionId,
+      artifactRevisionIdentity: isRevisionIdentity(revisionIdentity)
+        ? revisionIdentity
+        : null,
+      associationRevisionIdentity: isRevisionIdentity(revisionIdentity)
+        ? revisionIdentity
+        : null,
+      artifactDigest: getGenerationArtifactDigest(),
       files: records,
     });
     rmrf(backupDir);
@@ -995,6 +1134,14 @@ export function beginGeneration(outDir, options = {}) {
       removed,
       mode: 'delta',
       generationReused: false,
+      generationId: activeGenerationId,
+      artifactRevisionIdentity: isRevisionIdentity(revisionIdentity)
+        ? revisionIdentity
+        : null,
+      associationRevisionIdentity: isRevisionIdentity(revisionIdentity)
+        ? revisionIdentity
+        : null,
+      artifactDigest: getGenerationArtifactDigest(),
     });
   }
 

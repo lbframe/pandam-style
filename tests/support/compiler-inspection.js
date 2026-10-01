@@ -102,6 +102,8 @@ export {
 } from '../../packages/compiler/src/project/mutations/transaction.js';
 export { createProjectSession } from '../../packages/compiler/src/project/session/index.js';
 export { createProjectSession as createPublicProjectSession } from '../../packages/compiler/src/api/project.js';
+export { projectServiceResourceStats } from '../../packages/compiler/src/api/project.js';
+export { createHostBridge } from '../../packages/compiler/src/api/host.js';
 export {
   Provenance,
   isAdmitted,
