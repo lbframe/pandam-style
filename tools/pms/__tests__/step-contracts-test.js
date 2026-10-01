@@ -65,6 +65,7 @@ const REAL_RUN = {
   pilot: { status: 'passed', exitCode: 0 },
   artifacts: { status: 'passed', exitCode: 0 },
   'donor-closure': { status: 'passed', exitCode: 0 },
+  'package-qualification': { status: 'passed', exitCode: 0 },
 };
 
 const TEST_STEPS = [
@@ -79,6 +80,7 @@ const NON_TEST_STEPS = [
   'pilot',
   'artifacts',
   'donor-closure',
+  'package-qualification',
 ];
 const CURRENT_NON_TEST_STEPS = [...NON_TEST_STEPS];
 
@@ -262,6 +264,7 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
       'build',
       'donor-closure',
       'install',
+      'package-qualification',
       'pandamstyle',
       'pandamstyle-core',
       'pilot',
@@ -313,6 +316,17 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
     const verdict = assessFromLog('donor-closure', { artifactPresent: false });
     expect(verdict.verdict).toBe('failed');
     expect(verdict.findings.map((f) => f.code)).toContain('ARTIFACT_MISSING');
+  });
+
+  test('package qualification fails when its consumer report is absent', () => {
+    const verdict = assessFromLog('package-qualification', {
+      artifactPresent: false,
+    });
+    expect(verdict.verdict).toBe('failed');
+    expect(verdict.findings.map((f) => f.code)).toContain('ARTIFACT_MISSING');
+    expect(STEP_CONTRACTS['package-qualification'].artifact).toBe(
+      'package-qualification/report.json',
+    );
   });
 
   test('the pilot step does not require a dist, and the reason is recorded', () => {
@@ -374,15 +388,15 @@ describe('step-contracts: a whole run', () => {
   // Case 9. The run that exposed the defect, reconstructed from the logs and
   // the step table the verified run produced. Before the fix this shape produced
   // `complete: false` with `incomplete`, which is the defect.
-  test('nine green steps with four sets of counts are verified', () => {
+  test('ten green steps with four sets of counts are verified', () => {
     const { assessRun } = require('../test-counts');
     const integrity = Object.entries(REAL_RUN).map(([step, s]) =>
       assessFromLog(step, { ...s, artifactPresent: true }),
     );
-    expect(integrity.map((s) => s.verdict)).toEqual(Array(9).fill('verified'));
+    expect(integrity.map((s) => s.verdict)).toEqual(Array(10).fill('verified'));
     const run = assessRun(integrity);
     expect(run.verdict).toBe('verified');
-    expect(run.stepsVerified).toBe(9);
+    expect(run.stepsVerified).toBe(10);
     expect(run.stepsFailed).toEqual([]);
     expect(run.stepsIncomplete).toEqual([]);
     expect(run.stepsUnverified).toEqual([]);

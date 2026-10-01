@@ -135,6 +135,10 @@ const STEP_CONTRACTS = {
     kind: 'artifact-check',
     artifact: 'donor-closure/report.json',
   },
+  'package-qualification': {
+    kind: 'artifact-check',
+    artifact: 'package-qualification/report.json',
+  },
 };
 
 /**

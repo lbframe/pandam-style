@@ -34,6 +34,7 @@ const ORDER = [
   'pilot',
   'artifacts',
   'donor-closure',
+  'package-qualification',
 ];
 let fixture;
 
@@ -44,7 +45,7 @@ function write(relative, text, executable = false) {
 }
 
 beforeAll(() => {
-  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-nine-step-'));
+  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-ten-step-'));
   write('verify-pms.sh', fs.readFileSync(path.join(ROOT, 'verify-pms.sh')));
   write('jest.config.js', fs.readFileSync(path.join(ROOT, 'jest.config.js')));
   for (const name of [
@@ -69,6 +70,18 @@ const path = require('path');
 const output = process.argv[process.argv.length - 1];
 fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, JSON.stringify({ pass: true, findings: [] }) + '\\n');
+`,
+  );
+  write(
+    'tools/pms/package-qualification.js',
+    `const fs = require('fs');
+const path = require('path');
+const root = path.resolve(__dirname, '../..');
+if (fs.readFileSync(path.join(root, 'mode'), 'utf8') !== 'qualification-missing') {
+  const output = process.argv[2];
+  fs.mkdirSync(output, { recursive: true });
+  fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify({ pass: true }) + '\\n');
+}
 `,
   );
   write('yarn.lock', '# fixture lockfile\n');
@@ -175,7 +188,7 @@ process.stderr.write(log);
     execFileSync('git', args, { cwd: fixture, env: gitEnv, stdio: 'pipe' });
   git('init', '-q');
   git('add', '.');
-  git('commit', '-qm', 'nine-step fixture');
+  git('commit', '-qm', 'ten-step fixture');
   git('branch', 'fixture-base');
 });
 
@@ -225,12 +238,12 @@ function run(mode = 'green', env = {}, omitted = false, reuseOutput = false) {
   };
 }
 
-test('the real summary accepts a green nine-step fixture with separate and summed counts', () => {
+test('the real summary accepts a green ten-step fixture with separate and summed counts', () => {
   const { status, stdout, summary } = run();
   if (status !== 0) throw new Error(`${stdout}\n${summary?.failedSteps ?? ''}`);
   expect(stdout).toContain('VERIFICATION OK');
   expect(Object.keys(summary.steps)).toEqual(ORDER);
-  expect(summary.requiredStepCount).toBe(9);
+  expect(summary.requiredStepCount).toBe(10);
   expect(summary.requiredStepOrder).toEqual(ORDER);
   expect(summary.omittedRequiredSteps).toEqual([]);
   expect(summary.complete).toBe(true);
@@ -245,6 +258,7 @@ test('the real summary accepts a green nine-step fixture with separate and summe
   expect(summary.steps['semantic-oracle'].counts.testsPassed).toBe(2);
   expect(summary.steps.pandamstyle.counts.testsPassed).toBe(514);
   expect(summary.steps['donor-closure'].kind).toBe('artifact-check');
+  expect(summary.steps['package-qualification'].kind).toBe('artifact-check');
   expect(summary.steps['pandamstyle-core'].kind).toBe('test');
   expect(summary.steps['pandamstyle-core'].counts.testsPassed).toBe(14);
   expect(summary.verification.testsPassed).toBe(573);
@@ -257,8 +271,23 @@ test('the real summary accepts a green nine-step fixture with separate and summe
     'pilot',
     'artifacts',
     'donor-closure',
+    'package-qualification',
   ])
     expect(summary.steps[name].counts).toBeNull();
+});
+
+test('package qualification requires a report even when its command exits zero', () => {
+  const { status, summary } = run('qualification-missing');
+  expect(status).not.toBe(0);
+  expect(summary.steps['package-qualification'].exitCode).toBe(0);
+  expect(summary.steps['package-qualification'].verification.verdict).toBe(
+    'failed',
+  );
+  expect(
+    summary.steps['package-qualification'].verification.findings.map(
+      (item) => item.code,
+    ),
+  ).toContain('ARTIFACT_MISSING');
 });
 
 test('donor detection reads module syntax and ignores comments and matcher strings', () => {
