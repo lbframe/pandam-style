@@ -35,6 +35,12 @@ import {
 } from '../../protocol/diagnostics-result';
 import { buildDesignSystem } from '../../design-system/registry/build-system';
 import { generateDesignSystemModule } from '../../artifacts/javascript/design-module';
+import { generateDesignSystemDeclarations } from '../../artifacts/types/design-declarations';
+import {
+  createArtifactSet,
+  designDeclarationFile,
+  withDesignSystemCssIdentity,
+} from '../../artifacts/metadata/artifact-set';
 import { withGeneration } from '../../artifacts/publication/transaction';
 import {
   clearModuleCache,
@@ -325,6 +331,10 @@ function createCompilerSessionInContext(config, graphContext) {
   const designSystemSource = phase('ds_module_codegen_ms', () =>
     generateDesignSystemModule({ designSystem }),
   );
+  const designDeclarationsFile = designDeclarationFile(designSystemFile);
+  const designDeclarationsSource = phase('ds_types_codegen_ms', () =>
+    generateDesignSystemDeclarations(designSystem.snapshot),
+  );
 
   // The generated design system module must be RESOLVABLE while the pages are
   // compiled, because that is how a design system is recognized. It is served
@@ -365,6 +375,8 @@ function createCompilerSessionInContext(config, graphContext) {
     engineOptions,
     designSystemFile,
     designSystemSource,
+    designDeclarationsFile,
+    designDeclarationsSource,
     generatedModulePath,
     get coveredFiles() {
       return runGraph(() =>
@@ -632,7 +644,10 @@ function buildProjectInContext(config) {
         }
 
         // Single CSS circuit: the fork's own rule processor.
-        const css = session.renderCss(allRules);
+        const css = withDesignSystemCssIdentity(
+          session.renderCss(allRules),
+          designSystem.snapshot.identity,
+        );
 
         const buildReport = {
           documentKind: BUILD_REPORT_KIND,
@@ -698,16 +713,30 @@ function buildProjectInContext(config) {
           entries: coverage,
         });
 
-        const manifestWithDigest = {
-          ...designSystem.manifest,
-          registryDigest,
-          designSystemModule: relativeToCwd(designSystemPath),
-        };
+        const manifestWithDigest = designSystem.snapshot.tooling.manifest;
+        const manifestText = phase(
+          'ds_manifest_codegen_ms',
+          () => JSON.stringify(manifestWithDigest, null, 2) + '\n',
+        );
+        const artifactSet = phase('ds_artifact_set_ms', () =>
+          createArtifactSet(designSystem.snapshot, {
+            designModuleFile: designSystemFile,
+            declarationsFile: session.designDeclarationsFile,
+            designModule: session.designSystemSource,
+            declarations: session.designDeclarationsSource,
+            manifest: manifestText,
+            css,
+          }),
+        );
 
         for (const { file, code } of outputs) {
           gen.stage(outputRelFor(file), code);
         }
         gen.stage('styles.css', css);
+        gen.stage(
+          session.designDeclarationsFile,
+          session.designDeclarationsSource,
+        );
         gen.stage(
           'build-report.json',
           JSON.stringify(buildReport, null, 2) + '\n',
@@ -716,10 +745,8 @@ function buildProjectInContext(config) {
           COVERAGE_REPORT_FILE,
           JSON.stringify(coverageDoc, null, 2) + '\n',
         );
-        gen.stage(
-          'manifest.json',
-          JSON.stringify(manifestWithDigest, null, 2) + '\n',
-        );
+        gen.stage('manifest.json', manifestText);
+        gen.stage('artifacts.json', artifactSet.text);
 
         return {
           css,
@@ -735,9 +762,11 @@ function buildProjectInContext(config) {
           published: [
             ...outputs.map(({ file }) => outputRelFor(file)),
             'styles.css',
+            session.designDeclarationsFile,
             'build-report.json',
             COVERAGE_REPORT_FILE,
             'manifest.json',
+            'artifacts.json',
             designSystemFile,
           ],
         };

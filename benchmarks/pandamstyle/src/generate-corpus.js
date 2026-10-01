@@ -997,7 +997,7 @@ function generate(options) {
     ' * directly, so the re-export walk is exercised by every component.',
     ' */',
     'export {',
-    '  __PMS_DESIGN_SYSTEM__,',
+    '  __pandamstyle,',
     '  create,',
     '  token,',
     '  recipes,',

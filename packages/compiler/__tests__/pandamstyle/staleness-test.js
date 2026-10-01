@@ -102,8 +102,8 @@ describe('removing a token invalidates its stale usages', () => {
           path.join(project, 'generated/design.pandamstyle.js'),
           'utf8',
         )
-        .match(/__PMS_DESIGN_SYSTEM__ = (\{[\s\S]*?\n\});/)[1];
-      expect(JSON.parse(marker).registryDigest).toBe(
+        .match(/__pandamstyle = (\{[\s\S]*?\n\});/)[1];
+      expect(JSON.parse(marker).designSystem.registryDigest).toBe(
         firstManifest.registryDigest,
       );
     });

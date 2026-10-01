@@ -34,7 +34,7 @@ import {
   workEliminated,
 } from '../../observability/metrics';
 
-export const DESIGN_SYSTEM_MARKER = '__PMS_DESIGN_SYSTEM__';
+export const DESIGN_SYSTEM_MARKER = '__pandamstyle';
 
 const SOURCE_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.cjs'];
 
@@ -406,8 +406,46 @@ function collectOwnExports(ast) {
   return [...names];
 }
 
+function markerLiteral(node) {
+  if (
+    node?.type === 'StringLiteral' ||
+    node?.type === 'NumericLiteral' ||
+    node?.type === 'BooleanLiteral'
+  ) {
+    return { ok: true, value: node.value };
+  }
+  if (node?.type === 'NullLiteral') return { ok: true, value: null };
+  if (node?.type === 'ArrayExpression') {
+    const values = node.elements.map((element) => markerLiteral(element));
+    return values.every((value) => value.ok)
+      ? { ok: true, value: values.map((value) => value.value) }
+      : { ok: false };
+  }
+  if (node?.type === 'ObjectExpression') {
+    const value = {};
+    for (const property of node.properties) {
+      if (
+        property.type !== 'ObjectProperty' ||
+        property.computed === true ||
+        property.method === true
+      ) {
+        return { ok: false };
+      }
+      const key =
+        property.key.type === 'Identifier'
+          ? property.key.name
+          : property.key.value;
+      const entry = markerLiteral(property.value);
+      if (!entry.ok) return { ok: false };
+      value[key] = entry.value;
+    }
+    return { ok: true, value };
+  }
+  return { ok: false };
+}
+
 function extractMarker(ast) {
-  // `export const __PMS_DESIGN_SYSTEM__ = { ... }` with strict JSON literals.
+  // `export const __pandamstyle = { ... }` with strict JSON literals.
   for (const node of ast.program.body) {
     if (node.type !== 'ExportNamedDeclaration' || node.declaration == null) {
       continue;
@@ -418,15 +456,8 @@ function extractMarker(ast) {
       if (d.id.type !== 'Identifier' || d.id.name !== DESIGN_SYSTEM_MARKER) {
         continue;
       }
-      const init = d.init;
-      if (init == null || init.type !== 'ObjectExpression') return null;
-      const out = {};
-      for (const p of init.properties) {
-        if (p.type !== 'ObjectProperty') continue;
-        const key = p.key.type === 'Identifier' ? p.key.name : p.key.value;
-        out[key] = p.value.value;
-      }
-      return out;
+      const marker = markerLiteral(d.init);
+      return marker.ok ? marker.value : null;
     }
   }
   return null;

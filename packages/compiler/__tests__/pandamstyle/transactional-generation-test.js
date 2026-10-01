@@ -420,12 +420,12 @@ describe('BC-5/BC-9: a failing CLI build publishes no mix', () => {
       'utf8',
     );
     const marker = JSON.parse(
-      moduleSource.match(/__PMS_DESIGN_SYSTEM__ = (\{[\s\S]*?\n\});/)[1],
+      moduleSource.match(/__pandamstyle = (\{[\s\S]*?\n\});/)[1],
     );
 
     expect(manifest.registryDigest).toBe(beforeDigest);
     expect(report.registryDigest).toBe(beforeDigest);
-    expect(marker.registryDigest).toBe(beforeDigest);
+    expect(marker.designSystem.registryDigest).toBe(beforeDigest);
     // And the stylesheet still describes the same generation.
     expect(fs.readFileSync(path.join(out, 'styles.css'), 'utf8')).toContain(
       '--x',

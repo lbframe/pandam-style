@@ -14,6 +14,7 @@
 import { props as coreProps } from '@pandamstyle/core';
 
 import { buildRegistry } from './index';
+import { createCanonicalDesignSystemSnapshot } from './snapshot';
 import {
   compileTokens,
   compileStyles,
@@ -65,7 +66,7 @@ export function buildDesignSystem(definition, options = {}) {
 
   const recipes = {};
   perfPhase('ds_recipe_compile_ms', () => {
-    for (const recipeId of Object.keys(registry.recipes)) {
+    for (const recipeId of registry.vocabularyDomains.allRecipeIds) {
       recipes[recipeId] = defineRecipe(
         {
           recipeId,
@@ -109,50 +110,26 @@ export function buildDesignSystem(definition, options = {}) {
       }),
     );
 
-  const publicTokens = Object.keys(registry.tokens).filter(
-    (id) => registry.tokens[id].visibility === 'public',
+  const snapshot = perfPhase('ds_snapshot_build_ms', () =>
+    createCanonicalDesignSystemSnapshot({
+      registry,
+      varsByToken,
+      themeClasses,
+      themes,
+      recipes,
+      cssRules: injected,
+      supportedProperties: supportedProperties(),
+    }),
   );
-
-  const manifest = perfPhase('ds_manifest_ms', () => ({
-    schemaVersion: 1,
-    systemId: registry.systemId,
-    registryDigest: registry.registryDigest,
-    compilerContractVersion: 'pms-0.1',
-    capabilities: {
-      slots: false,
-      compoundVariants: false,
-      patterns: false,
-      rawDynamicStyles: false,
-    },
-    tokens: Object.fromEntries(
-      publicTokens.map((id) => [
-        id,
-        { category: registry.tokens[id].category },
-      ]),
-    ),
-    conditions: Object.keys(registry.conditions),
-    themes: Object.keys(themeClasses).filter((t) => t !== 'base'),
-    recipes: Object.fromEntries(
-      Object.keys(recipes)
-        .filter((id) => registry.recipes[id].visibility === 'public')
-        .map((id) => [
-          id,
-          {
-            axes: recipes[id].variantMap,
-            axisOrder: recipes[id].axisOrder,
-            defaults: registry.recipes[id].defaultVariants,
-          },
-        ]),
-    ),
-    supportedProperties: supportedProperties(),
-  }));
+  const manifest = perfPhase('ds_manifest_ms', () => snapshot.tooling.manifest);
 
   return {
-    registry,
-    varsByToken,
-    themes,
-    themeClasses,
-    recipes,
+    snapshot,
+    registry: snapshot.registry,
+    varsByToken: snapshot.compiled.varsByToken,
+    themes: snapshot.compiled.themes,
+    themeClasses: snapshot.compiled.themeClasses,
+    recipes: snapshot.compiled.recipes,
     create,
     token,
     props,

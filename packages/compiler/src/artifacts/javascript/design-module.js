@@ -26,6 +26,7 @@
  */
 
 import { DESIGN_SYSTEM_MARKER } from '../../project/graph/resolution';
+import { runtimeProjectionOf } from '../../design-system/registry/snapshot';
 import { toRecipeSpec, toThemeRefs } from './refs';
 
 const BANNER = [
@@ -41,26 +42,29 @@ function jsonLiteral(value) {
   return JSON.stringify(value, null, 2);
 }
 
-export function generateDesignSystemModule({
-  designSystem,
-  contractVersion = 'pms-0.1',
-}) {
-  const systemId = designSystem.registry.systemId;
+export function generateDesignSystemModule({ designSystem }) {
+  const runtime = runtimeProjectionOf(designSystem.snapshot);
+  const systemId = runtime.identity.systemId;
   const marker = {
-    systemId: designSystem.registry.systemId,
-    registryDigest: designSystem.registry.registryDigest,
-    contractVersion,
+    abiVersion: runtime.identity.abiVersion,
+    compilerContractVersion: runtime.identity.compilerContractVersion,
+    designSystem: {
+      systemId,
+      registryDigest: runtime.identity.registryDigest,
+    },
+    manifestSchemaVersion: runtime.identity.manifestSchemaVersion,
+    capabilities: {
+      slots: false,
+      compoundVariants: false,
+      patterns: false,
+      rawDynamicStyles: false,
+    },
   };
 
   const recipeEntries = [];
-  const consumerRecipeIds = Object.keys(designSystem.recipes)
-    .filter(
-      (recipeId) =>
-        designSystem.registry.recipes[recipeId].visibility === 'public',
-    )
-    .sort();
-  for (const recipeId of consumerRecipeIds) {
-    const spec = toRecipeSpec(designSystem.recipes[recipeId], systemId);
+  const consumerRecipeIds = runtime.recipes.map(([recipeId]) => recipeId);
+  for (const [recipeId, recipe] of runtime.recipes) {
+    const spec = toRecipeSpec(recipe, systemId);
     recipeEntries.push(
       [
         `const __pmsRecipe_${recipeId} = defineRecipeSelector(${jsonLiteral(spec)});`,
@@ -78,11 +82,13 @@ export function generateDesignSystemModule({
     '',
     `export const ${DESIGN_SYSTEM_MARKER} = ${jsonLiteral(marker)};`,
     '',
-    `export const manifest = ${jsonLiteral(designSystem.manifest)};`,
+    `export const manifest = ${jsonLiteral(runtime.manifest)};`,
     '',
     'export const props = __pmsProps;',
     '',
-    `export const themes = ${jsonLiteral(toThemeRefs(designSystem.themes, systemId))};`,
+    `export const themes = ${jsonLiteral(
+      toThemeRefs(Object.fromEntries(runtime.themes), systemId),
+    )};`,
     '',
     ...recipeEntries,
     `export const recipes = { ${consumerRecipeIds

@@ -399,7 +399,7 @@ export function recoverPublishedGeneration(outDir) {
  * single changed artifact is the build report has written no JavaScript at all,
  * and "1 output changed" does not say that.
  */
-const OUTPUT_KINDS = ['js', 'css', 'metadata', 'other'];
+const OUTPUT_KINDS = ['js', 'css', 'types', 'metadata', 'other'];
 
 function emptyKind() {
   return {

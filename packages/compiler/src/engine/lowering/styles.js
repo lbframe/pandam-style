@@ -28,17 +28,15 @@ import {
   structuralDomain,
 } from '../../design-system/policy/properties';
 // Benchmark-only measurement hooks (Spike 1).
-import {
-  count,
-  perfCollector,
-  workEliminated,
-} from '../../observability/metrics';
+import { count, perfCollector } from '../../observability/metrics';
 
 // Stable variable identity: systemId + tokenId (D-03). The upstream hash
 // is computed over `${exportId}.${key}`, independent of the checkout path.
 function varKeyOf(tokenId) {
   return tokenId.replace(/[.-]/g, '_');
 }
+
+const lexicalCompare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
 /**
  * Compiles the registry tokens into CSS variables + theme classes.
@@ -47,7 +45,9 @@ function varKeyOf(tokenId) {
 export function compileTokens(registry, options = {}) {
   const engineOptions = normalizeEngineOptions(options);
   const baseValues = {};
-  for (const tokenId of Object.keys(registry.tokens)) {
+  const tokenIds =
+    registry.vocabularyDomains?.allTokenIds ?? Object.keys(registry.tokens);
+  for (const tokenId of tokenIds) {
     baseValues[varKeyOf(tokenId)] = registry.resolvedValues[tokenId];
   }
   const [varsObj, varsStyles] = lowerTokenVariables(baseValues, {
@@ -56,15 +56,20 @@ export function compileTokens(registry, options = {}) {
   });
 
   const varsByToken = {};
-  for (const tokenId of Object.keys(registry.tokens)) {
+  for (const tokenId of tokenIds) {
     varsByToken[tokenId] = varsObj[varKeyOf(tokenId)];
   }
 
   const injected = { ...varsStyles };
   const themeClasses = { base: varsObj.__varGroupHash__ };
-  for (const themeName of Object.keys(registry.themes)) {
+  const themeNames =
+    registry.vocabularyDomains?.themeNames ??
+    Object.keys(registry.themes).sort(lexicalCompare);
+  for (const themeName of themeNames) {
     const overrides = {};
-    for (const tokenId of Object.keys(registry.themes[themeName])) {
+    for (const tokenId of Object.keys(registry.themes[themeName]).sort(
+      lexicalCompare,
+    )) {
       overrides[varKeyOf(tokenId)] = registry.themes[themeName][tokenId];
     }
     if (Object.keys(overrides).length === 0) {
@@ -107,11 +112,18 @@ function admittedTokens(registry, category, allowPrivateTokens) {
   const key = `${category}|${allowPrivateTokens ? 'all' : 'public'}`;
   const hit = byKey.get(key);
   if (hit !== undefined) return hit;
-  const list = Object.keys(registry.tokens).filter(
-    (id) =>
-      registry.tokens[id].category === category &&
-      (allowPrivateTokens || registry.tokens[id].visibility === 'public'),
-  );
+  const canonicalDomains = registry.vocabularyDomains;
+  const list = allowPrivateTokens
+    ? (canonicalDomains?.allTokenIdsByCategory?.[category] ??
+      Object.keys(registry.tokens).filter(
+        (id) => registry.tokens[id].category === category,
+      ))
+    : (canonicalDomains?.publicTokenIdsByCategory?.[category] ??
+      Object.keys(registry.tokens).filter(
+        (id) =>
+          registry.tokens[id].category === category &&
+          registry.tokens[id].visibility === 'public',
+      ));
   byKey.set(key, list);
   return list;
 }
@@ -151,7 +163,9 @@ function expandValue(property, value, registry, source, refKind, diagnostics) {
             context: {
               property,
               condition: condName,
-              admitted: Object.keys(registry.conditions),
+              admitted:
+                registry.vocabularyDomains?.conditionNames ??
+                Object.keys(registry.conditions),
             },
           }),
         );
@@ -247,16 +261,7 @@ function checkValue({
   // is identical: same members, same order, same diagnostic text. Only the
   // number of times it is computed changes.
   //
-  // The baseline branch is left in place, not deleted: `babel_current` must
-  // remain the code it is, and a benchmark that "optimises" the reference engine
-  // has nothing left to compare against.
-  const admitted = workEliminated()
-    ? admittedTokens(registry, category, allowPrivateTokens)
-    : Object.keys(registry.tokens).filter(
-        (id) =>
-          registry.tokens[id].category === category &&
-          (allowPrivateTokens || registry.tokens[id].visibility === 'public'),
-      );
+  const admitted = admittedTokens(registry, category, allowPrivateTokens);
 
   // The `compiler` mode accepts ONLY compiler-stamped TokenRefs: a page object
   // imitating the internal shape is not proof.
@@ -390,7 +395,9 @@ export function compileStyles({
               rule: 'conditions.named-only',
               context: {
                 condition: condName,
-                admitted: Object.keys(registry.conditions),
+                admitted:
+                  registry.vocabularyDomains?.conditionNames ??
+                  Object.keys(registry.conditions),
               },
             }),
           );

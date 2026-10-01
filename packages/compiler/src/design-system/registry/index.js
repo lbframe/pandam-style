@@ -17,6 +17,8 @@
 import { createHash } from 'crypto';
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 
+const lexicalCompare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
 function canonicalize(value) {
   if (Array.isArray(value)) {
     // Semantic order preserved (axisOrder, cycle paths...)
@@ -238,6 +240,7 @@ export function buildRegistry(definition) {
 
   // Conditions: name -> canonical definition, P0 subset (D-14).
   const conds = {};
+  const conditionOrder = [];
   for (const name of Object.keys(conditions)) {
     const c = conditions[name];
     const def = typeof c === 'string' ? c : (c?.selector ?? c?.atRule);
@@ -252,7 +255,17 @@ export function buildRegistry(definition) {
       );
       continue;
     }
-    conds[name] = { name, definition: def };
+    const kind =
+      typeof c === 'object' &&
+      c != null &&
+      c.selector == null &&
+      c.atRule != null
+        ? 'at-rule'
+        : def.trimStart().startsWith('@')
+          ? 'at-rule'
+          : 'selector';
+    conds[name] = { name, definition: def, kind };
+    conditionOrder.push(name);
   }
 
   // Recipes: base + axes + defaults; axisOrder = declaration order (ARC-10).
@@ -289,7 +302,36 @@ export function buildRegistry(definition) {
     resolved,
     themeDefs,
     conds,
+    // Condition order is retained because it can affect stable projection and
+    // cascade tie-breaking even though the condition map is canonicalized by
+    // key for the digest.
+    conditionOrder,
     recs,
+  };
+  const allTokenIds = Object.keys(tokensOut);
+  const publicTokenIds = allTokenIds.filter(
+    (tokenId) => tokensOut[tokenId].visibility === 'public',
+  );
+  const allTokenIdsByCategory = {};
+  const publicTokenIdsByCategory = {};
+  for (const tokenId of allTokenIds) {
+    const { category, visibility } = tokensOut[tokenId];
+    (allTokenIdsByCategory[category] ??= []).push(tokenId);
+    if (visibility === 'public') {
+      (publicTokenIdsByCategory[category] ??= []).push(tokenId);
+    }
+  }
+  const vocabularyDomains = {
+    allTokenIds,
+    publicTokenIds,
+    allTokenIdsByCategory,
+    publicTokenIdsByCategory,
+    conditionNames: [...conditionOrder],
+    themeNames: Object.keys(themeDefs).sort(lexicalCompare),
+    allRecipeIds: Object.keys(recs).sort(lexicalCompare),
+    publicRecipeIds: Object.keys(recs)
+      .filter((recipeId) => recs[recipeId].visibility === 'public')
+      .sort(lexicalCompare),
   };
   return {
     systemId,
@@ -297,7 +339,9 @@ export function buildRegistry(definition) {
     resolvedValues: resolved,
     themes: themeDefs,
     conditions: conds,
+    conditionOrder,
     recipes: recs,
+    vocabularyDomains,
     diagnostics,
     registryDigest: registryDigest(payload),
   };

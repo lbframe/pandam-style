@@ -253,7 +253,7 @@ function transformRecipeCall(callPath, ctx, ds) {
       `Unknown recipe: ${recipeId ?? access?.slice(1).join('.') ?? '?'}.`,
       callPath,
       'registry.recipes',
-      { recipeId, admitted: Object.keys(ds.recipes) },
+      { recipeId, admitted: ds.snapshot.vocabulary.publicRecipeIds },
     );
     return;
   }

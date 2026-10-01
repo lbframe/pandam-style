@@ -178,14 +178,14 @@ describe('helper resolution follows binding and module', () => {
 
 describe('generated design system module', () => {
   test('carries the generation marker and the same digest as the manifest', () => {
-    expect(artifacts.designSystem).toContain('__PMS_DESIGN_SYSTEM__');
+    expect(artifacts.designSystem).toContain('__pandamstyle');
     const marker = JSON.parse(
-      artifacts.designSystem.match(
-        /__PMS_DESIGN_SYSTEM__ = (\{[\s\S]*?\n\});/,
-      )[1],
+      artifacts.designSystem.match(/__pandamstyle = (\{[\s\S]*?\n\});/)[1],
     );
-    expect(marker.registryDigest).toBe(artifacts.manifest.registryDigest);
-    expect(marker.systemId).toBe(artifacts.manifest.systemId);
+    expect(marker.designSystem.registryDigest).toBe(
+      artifacts.manifest.registryDigest,
+    );
+    expect(marker.designSystem.systemId).toBe(artifacts.manifest.systemId);
   });
 
   test('exposes the documented consumption surface', () => {
@@ -222,14 +222,14 @@ describe('generated design system module', () => {
 describe('generation coherence and coverage report', () => {
   test('every artifact references the same registryDigest', () => {
     const marker = JSON.parse(
-      artifacts.designSystem.match(
-        /__PMS_DESIGN_SYSTEM__ = (\{[\s\S]*?\n\});/,
-      )[1],
+      artifacts.designSystem.match(/__pandamstyle = (\{[\s\S]*?\n\});/)[1],
     );
     expect(artifacts.manifest.registryDigest).toBe(
       artifacts.report.registryDigest,
     );
-    expect(marker.registryDigest).toBe(artifacts.report.registryDigest);
+    expect(marker.designSystem.registryDigest).toBe(
+      artifacts.report.registryDigest,
+    );
   });
 
   test('coverage lists the declared roots and the analysed files', () => {

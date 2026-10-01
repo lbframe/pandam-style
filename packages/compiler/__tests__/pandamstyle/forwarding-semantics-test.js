@@ -55,7 +55,7 @@ describe('Babel binding identity at forwarded API access', () => {
       },
     });
     expect(info.exports.slice().sort()).toEqual([
-      '__PMS_DESIGN_SYSTEM__',
+      '__pandamstyle',
       'create',
       'manifest',
       'props',

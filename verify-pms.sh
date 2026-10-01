@@ -132,6 +132,7 @@ refuse_outside_repo "$PMS_OUT_DIR"
 mkdir -p "$PMS_OUT_DIR"
 PMS_OUT_DIR="$(cd "$PMS_OUT_DIR" && pwd)"
 refuse_outside_repo "$PMS_OUT_DIR"
+export PMS_OUT_DIR
 LOG_DIR="$PMS_OUT_DIR"
 ARTIFACT_DIR="$PMS_OUT_DIR/artifacts"
 mkdir -p "$ARTIFACT_DIR"
@@ -378,7 +379,7 @@ collect_artifacts() (
   node "$REPO_ROOT/tools/pms/core-package-proof.js" \
     "$PMS_OUT_DIR/core-package-proof"
   cp -R "$PMS_OUT_DIR/core-package-proof" "$ARTIFACT_DIR/core-package-proof"
-  # One valid fixture build, for the CSS/JS/manifest triple.
+  # One valid fixture build, for the complete canonical artifact set.
   (cd "$REPO_ROOT/packages/compiler/__tests__/pandamstyle/fixtures/valid" \
     && node "$REPO_ROOT/packages/compiler/bin/pms-build.js" \
        --config ./pandamstyle.config.js)

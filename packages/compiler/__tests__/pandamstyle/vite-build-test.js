@@ -265,10 +265,10 @@ describe('BC-3/BC-5: a real vite build publishes one coherent generation', () =>
       'utf8',
     );
     const marker = JSON.parse(
-      moduleSource.match(/__PMS_DESIGN_SYSTEM__ = (\{[\s\S]*?\n\});/)[1],
+      moduleSource.match(/__pandamstyle = (\{[\s\S]*?\n\});/)[1],
     );
     expect(manifest.registryDigest).toBe(report.registryDigest);
-    expect(marker.registryDigest).toBe(report.registryDigest);
+    expect(marker.designSystem.registryDigest).toBe(report.registryDigest);
   });
 
   test('the report shows the expected-vs-analysed cross-check as clean', () => {

@@ -97,6 +97,16 @@ import {
 import { createFilesystemWatcher } from '../../hosts/watcher/index';
 import { buildDesignSystem } from '../../design-system/registry/build-system';
 import { generateDesignSystemModule } from '../../artifacts/javascript/design-module';
+import { generateDesignSystemDeclarations } from '../../artifacts/types/design-declarations';
+import {
+  createArtifactSet,
+  designDeclarationFile,
+  withDesignSystemCssIdentity,
+} from '../../artifacts/metadata/artifact-set';
+import {
+  candidateDomainOf,
+  repairDomainOf,
+} from '../../design-system/registry/snapshot';
 import { PmsError, Codes, diagnostic } from '../../protocol/diagnostics';
 import {
   BUILD_REPORT_KIND,
@@ -343,6 +353,8 @@ export function createProjectSession(config) {
     config: normalizeConfig(config),
     designSystem: null,
     designSystemSource: null,
+    designDeclarationsFile: null,
+    designDeclarationsSource: null,
     generatedModulePath: null,
     overlay: new Map(),
     fileStates: new Map(),
@@ -468,6 +480,10 @@ export function createProjectSession(config) {
     const designSystemSource = phase('ds_module_codegen_ms', () =>
       generateDesignSystemModule({ designSystem }),
     );
+    const declarationsFile = designDeclarationFile(cfg.designSystemFile);
+    const declarationsSource = phase('ds_types_codegen_ms', () =>
+      generateDesignSystemDeclarations(designSystem.snapshot),
+    );
 
     // The generated module must be RESOLVABLE while the pages are compiled and
     // must NOT be on disk yet: that is the whole of the transactional
@@ -482,6 +498,8 @@ export function createProjectSession(config) {
 
     state.designSystem = designSystem;
     state.designSystemSource = designSystemSource;
+    state.designDeclarationsFile = declarationsFile;
+    state.designDeclarationsSource = declarationsSource;
     state.generatedModulePath = generatedModulePath;
     state.overlay = overlay;
   }
@@ -2656,7 +2674,10 @@ export function createProjectSession(config) {
           kind: 'metadata',
         });
 
-        const css = aggregateCss(active, cfg, variant);
+        const css = withDesignSystemCssIdentity(
+          aggregateCss(active, cfg, variant),
+          designSystem.snapshot.identity,
+        );
         count('css_bytes_written', Buffer.byteLength(css, 'utf8'));
 
         // The project-wide coverage snapshot is a SEPARATE document (Spike 4,
@@ -2804,11 +2825,21 @@ export function createProjectSession(config) {
           };
         }
 
-        const manifestWithDigest = {
-          ...designSystem.manifest,
-          registryDigest,
-          designSystemModule: relativeToCwd(state.generatedModulePath),
-        };
+        const manifestWithDigest = designSystem.snapshot.tooling.manifest;
+        const manifestText = phase(
+          'ds_manifest_codegen_ms',
+          () => JSON.stringify(manifestWithDigest, null, 2) + '\n',
+        );
+        const artifactSet = phase('ds_artifact_set_ms', () =>
+          createArtifactSet(designSystem.snapshot, {
+            designModuleFile: cfg.designSystemFile,
+            declarationsFile: state.designDeclarationsFile,
+            designModule: state.designSystemSource,
+            declarations: state.designDeclarationsSource,
+            manifest: manifestText,
+            css,
+          }),
+        );
 
         for (const { file, code, codeDigest, codeBytes } of active.outputs) {
           put(gen, outputRelFor(file), code, {
@@ -2822,6 +2853,10 @@ export function createProjectSession(config) {
           });
         }
         put(gen, 'styles.css', css, { owner: 'styles', kind: 'css' });
+        put(gen, state.designDeclarationsFile, state.designDeclarationsSource, {
+          owner: 'design-system',
+          kind: 'types',
+        });
 
         // The coverage detail, when and only when the caller asked for it
         // BEFORE publishing. Requested after publication it is written outside
@@ -2865,15 +2900,14 @@ export function createProjectSession(config) {
           owner: 'metadata',
           kind: 'metadata',
         });
-        put(
-          gen,
-          'manifest.json',
-          JSON.stringify(manifestWithDigest, null, 2) + '\n',
-          {
-            owner: 'metadata',
-            kind: 'metadata',
-          },
-        );
+        put(gen, 'manifest.json', manifestText, {
+          owner: 'metadata',
+          kind: 'metadata',
+        });
+        put(gen, 'artifacts.json', artifactSet.text, {
+          owner: 'metadata',
+          kind: 'metadata',
+        });
         count(
           'metadata_bytes_written',
           Buffer.byteLength(reportText, 'utf8') +
@@ -2881,6 +2915,8 @@ export function createProjectSession(config) {
               JSON.stringify(manifestWithDigest, null, 2),
               'utf8',
             ) +
+            Buffer.byteLength(artifactSet.text, 'utf8') +
+            Buffer.byteLength(state.designDeclarationsSource, 'utf8') +
             Buffer.byteLength(state.designSystemSource, 'utf8'),
         );
 
@@ -2893,8 +2929,10 @@ export function createProjectSession(config) {
           published: [
             ...active.outputs.map(({ file }) => outputRelFor(file)),
             'styles.css',
+            state.designDeclarationsFile,
             'build-report.json',
             'manifest.json',
+            'artifacts.json',
             cfg.designSystemFile,
             // Only when it was actually staged above. A `published` list that
             // named an artifact nobody wrote would be a list of intentions, and
@@ -3639,8 +3677,8 @@ export function createProjectSession(config) {
      * either truncating silently or asking for everything at once.
      */
     candidateTokens(query = {}) {
-      const registry = state.designSystem?.registry;
-      if (registry == null) {
+      const snapshot = state.designSystem?.snapshot;
+      if (snapshot == null) {
         throw new Error(
           'pandamstyle: candidateTokens() was called before a design system ' +
             'existed for this session.',
@@ -3653,13 +3691,9 @@ export function createProjectSession(config) {
         ? Math.max(0, query.offset)
         : 0;
       const allowPrivate = query.allowPrivate === true;
-      const all = Object.keys(registry.tokens).filter((id) => {
-        const entry = registry.tokens[id];
-        if (query.category != null && entry.category !== query.category) {
-          return false;
-        }
-        if (!allowPrivate && entry.visibility !== 'public') return false;
-        return true;
+      const all = candidateDomainOf(snapshot, {
+        category: query.category,
+        allowPrivate,
       });
       return {
         category: query.category ?? null,
@@ -3685,15 +3719,25 @@ export function createProjectSession(config) {
     },
 
     _candidateTokenEntries(ids) {
-      const tokens = state.designSystem?.registry?.tokens ?? {};
+      const tokens = new Map(
+        (state.designSystem?.snapshot?.vocabulary.tokens ?? []).map((token) => [
+          token.tokenId,
+          token,
+        ]),
+      );
       return ids.map((tokenId) => {
-        const token = tokens[tokenId];
+        const token = tokens.get(tokenId);
         return Object.freeze({
           tokenId,
           category: token?.category ?? null,
           visibility: token?.visibility ?? null,
         });
       });
+    },
+
+    _repairDomain(query = {}) {
+      const snapshot = state.designSystem?.snapshot;
+      return snapshot == null ? null : repairDomainOf(snapshot, query);
     },
 
     _artifactFor(file) {
@@ -3720,7 +3764,10 @@ export function createProjectSession(config) {
       }
       // This is a candidate read. It must not update the incremental CSS
       // owner state or read an older committed stylesheet from disk.
-      return aggregateCssFull(active.allRules, state.config);
+      return withDesignSystemCssIdentity(
+        aggregateCssFull(active.allRules, state.config),
+        state.designSystem.snapshot.identity,
+      );
     },
 
     _publicationCandidateDigest() {
@@ -3745,8 +3792,12 @@ export function createProjectSession(config) {
           registryDigest: state.designSystem?.registry?.registryDigest ?? null,
           designSystemSource: state.designSystemSource,
           outputs,
-          css: aggregateCssFull(active.allRules, state.config),
+          css: withDesignSystemCssIdentity(
+            aggregateCssFull(active.allRules, state.config),
+            state.designSystem.snapshot.identity,
+          ),
           manifest: state.designSystem?.manifest ?? null,
+          declarations: state.designDeclarationsSource,
           coverage: active.coverage ?? [],
           auditRequested: active.auditRequested === true,
         }),

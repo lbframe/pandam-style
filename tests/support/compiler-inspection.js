@@ -23,7 +23,20 @@ export {
   withGeneration,
 } from '../../packages/compiler/src/artifacts/publication/transaction.js';
 export { generateDesignSystemModule } from '../../packages/compiler/src/artifacts/javascript/design-module.js';
+export { generateDesignSystemDeclarations } from '../../packages/compiler/src/artifacts/types/design-declarations.js';
+export {
+  createArtifactSet,
+  designDeclarationFile,
+  validateArtifactSet,
+  withDesignSystemCssIdentity,
+} from '../../packages/compiler/src/artifacts/metadata/artifact-set.js';
 export { buildDesignSystem } from '../../packages/compiler/src/design-system/registry/build-system.js';
+export {
+  candidateDomainOf,
+  createCanonicalDesignSystemSnapshot,
+  repairDomainOf,
+  runtimeProjectionOf,
+} from '../../packages/compiler/src/design-system/registry/snapshot.js';
 export {
   buildRegistry,
   registryDigest,

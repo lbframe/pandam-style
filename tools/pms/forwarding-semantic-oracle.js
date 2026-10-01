@@ -235,7 +235,7 @@ const cases = [
   },
   {
     name: 'metadata alias has no helper authority',
-    relay: `export { manifest as create, __PMS_DESIGN_SYSTEM__ as token } from '${DS}';\n`,
+    relay: `export { manifest as create, __pandamstyle as token } from '${DS}';\n`,
     expected: expected({}, 'ordinary'),
   },
   {

@@ -987,17 +987,20 @@ describe('Spike 3 Phase A: the publication variants are selectable and separate'
     expect(publication.byKind.metadata.reused).toBe(0);
     expect(publication.byKind.css.reused).toBe(0);
     // The generation's own file list, not the oracle's fingerprint: the
-    // fingerprint deliberately leaves the two metadata documents out, because
+    // fingerprint deliberately leaves the metadata documents out, because
     // they are compared as audit state, and this assertion is about what is on
     // disk. jsCount JavaScript outputs, the stylesheet, the design-system
-    // module, the manifest, and the build report. The coverage detail is NOT
+    // module, its declaration, the manifest, artifact digests, and the build
+    // report. The coverage detail is NOT
     // among them: this variant was not asked for it, and publishing evidence
     // nobody requested is what Phase C removed from the hot path.
     expect([...readTree(h.outDir).keys()].sort()).toEqual(
       [
         ...jsOutputs(h),
+        'artifacts.json',
         'build-report.json',
         'design.pandamstyle.js',
+        'design.pandamstyle.d.ts',
         'manifest.json',
         'styles.css',
       ].sort(),

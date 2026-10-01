@@ -1,10 +1,9 @@
 # Generated design-system ABI v1
 
 Status: Accepted target contract after canonical
-[master-plan reconciliation](master-plan-reconciliation.md). ABI version: `1`.
-This specification is not the existing donor-shaped runtime representation and
-is not yet implemented. No permanent donor namespace is admitted. See
-[public API](public-api-v0.1.md) for syntax/selection semantics and
+[master-plan reconciliation](master-plan-reconciliation.md), implemented by
+PandamStyle Phase 6. ABI version: `1`. No permanent donor namespace is admitted.
+See [public API](public-api-v0.1.md) for syntax/selection semantics and
 [package architecture](package-architecture-v1.md) for ownership.
 
 ## Parties and artifact set (ARCH-13, ARCH-17)
@@ -224,10 +223,11 @@ IDs to categories without a runtime object tree. Generated recipes use finite
 unions including boolean axes, never unrestricted strings/records. No private
 vocabulary appears in consumer declarations.
 
-Declarations import runtime types from core, encode literal ABI `1` and system
-identity metadata, and share manifest/artifact digests. A mismatch requires
-regeneration; casts do not bypass compiler validation. Generation is Phase 6,
-not a Phase 0 `.d.ts` implementation. Reserved features produce no declaration
-claim until capability verification. Tests must cover completion/category
-errors, tsc cost/size and JS/type parity without claiming existing types are
-shipped.
+Declarations import runtime types from core and encode literal ABI `1` and
+system identity metadata. `artifacts.json` records their digest alongside the
+JavaScript, manifest and CSS digests. A mismatch requires regeneration; casts do
+not bypass compiler validation. Phase 6 generates these declarations alongside
+the application artifact set; they are not part of the Phase 0 compiler package
+exports. Reserved features produce no declaration claim until capability
+verification. Tests cover completion/category errors, tsc cost/size and JS/type
+parity.

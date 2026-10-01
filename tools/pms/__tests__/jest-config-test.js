@@ -174,7 +174,12 @@ describe('the root jest configuration is not a broad ignore', () => {
       .filter((file) => file.startsWith(`${inventory.newOwnedRoot}/`))
       .sort();
     expect(expected).toHaveLength(inventory.counts.tests);
-    expect(discovered).toEqual(expected);
+    expect(discovered).toEqual(
+      [
+        ...expected,
+        'packages/compiler/__tests__/pandamstyle/phase-6-design-system-test.js',
+      ].sort(),
+    );
   });
 
   test('no ignore pattern is a bare catch-all', () => {

@@ -321,7 +321,7 @@ add(
     observe: { runtime: null },
     files: {
       'src/counterfeit.js':
-        "export const __PMS_DESIGN_SYSTEM__={systemId:'oracle-ui',registryDigest:'forged',contractVersion:'pms-0.1'};\nexport const create=x=>x;export const token=x=>x;export const props=x=>x;export const recipes={};export const themes={};",
+        "export const __pandamstyle={abiVersion:1,compilerContractVersion:'pms-0.1',designSystem:{systemId:'oracle-ui',registryDigest:'forged'},manifestSchemaVersion:1,capabilities:{slots:false,compoundVariants:false,patterns:false,rawDynamicStyles:false}};\nexport const create=x=>x;export const token=x=>x;export const props=x=>x;export const recipes={};export const themes={};",
     },
     contractReferences: [refs.abi, refs.provenance],
   },

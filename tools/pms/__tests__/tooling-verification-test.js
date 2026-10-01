@@ -142,8 +142,8 @@ if (args.includes('--listTests')) {
   console.log(JSON.stringify(mode === 'discovery-missing' ? files.slice(1) : files));
   process.exit(0);
 }
-let tests = tooling ? 43 : core ? 14 : semantic ? 2 : pandamstyle ? 510 : 1007;
-let suites = tooling ? 3 : core ? 1 : semantic ? 1 : pandamstyle ? 23 : 42;
+let tests = tooling ? 43 : core ? 14 : semantic ? 2 : pandamstyle ? 514 : 1007;
+let suites = tooling ? 3 : core ? 1 : semantic ? 1 : pandamstyle ? 24 : 42;
 let log = 'Test Suites: ' + suites + ' passed, ' + (tests === 1007 ? '1 skipped, ' : '') + (suites + (tests === 1007 ? 1 : 0)) + ' total\\nTests: ' + tests + ' passed, ' + (tests === 1007 ? '64 skipped, ' : '') + (tests + (tests === 1007 ? 64 : 0)) + ' total\\n';
 if (tooling) {
   if (mode === 'command-fails') process.exit(2);
@@ -243,12 +243,12 @@ test('the real summary accepts a green nine-step fixture with separate and summe
   expect(summary.steps['tooling-tests'].counts.testsPassed).toBe(43);
   expect(summary.steps['semantic-oracle'].kind).toBe('test');
   expect(summary.steps['semantic-oracle'].counts.testsPassed).toBe(2);
-  expect(summary.steps.pandamstyle.counts.testsPassed).toBe(510);
+  expect(summary.steps.pandamstyle.counts.testsPassed).toBe(514);
   expect(summary.steps['donor-closure'].kind).toBe('artifact-check');
   expect(summary.steps['pandamstyle-core'].kind).toBe('test');
   expect(summary.steps['pandamstyle-core'].counts.testsPassed).toBe(14);
-  expect(summary.verification.testsPassed).toBe(569);
-  expect(summary.verification.suitesPassed).toBe(28);
+  expect(summary.verification.testsPassed).toBe(573);
+  expect(summary.verification.suitesPassed).toBe(29);
   expect(summary.verification.testsSkipped).toBe(0);
   expect(summary.verification.suitesSkipped).toBe(0);
   for (const name of [
