@@ -10,6 +10,7 @@
 #   PMS_SKIP_INSTALL=1 ./verify-pms.sh  # reuse an existing node_modules (dev only)
 #   PMS_SKIP_PILOT=1 ./verify-pms.sh    # skip the Vite pilot
 #   PMS_OUT_DIR=<path> ./verify-pms.sh  # override the run directory
+#   PMS_PILOT_DIR=<path> ./verify-pms.sh # override external pilot scratch
 #   PMS_BATCH_BASE_REF=<ref> ./verify-pms.sh
 #                                       # override the ref the batch base is
 #                                       # derived from (default HEAD)
@@ -111,6 +112,7 @@ fi
 
 # ------------------------------------------------------------------- output ---
 PMS_OUT_DIR="${PMS_OUT_DIR:-$REPO_ROOT/evidence/native}"
+PMS_PILOT_DIR="${PMS_PILOT_DIR:-/tmp/pandamstyle-pilot-${TESTED_COMMIT}-$$}"
 
 # Refuse to write outside the repository: an accidental escape would make the
 # evidence untraceable. Checked before any directory is created, and again on
@@ -270,6 +272,7 @@ cat > "$PMS_OUT_DIR/env.json" <<EOF
   "pandamstyleBatchBaseRef": "$PANDAMSTYLE_BASE_RESOLVED",
   "pandamstyleBatchBase": "$PANDAMSTYLE_BASE",
   "outDir": "$PMS_OUT_DIR",
+  "pilotDir": "$PMS_PILOT_DIR",
   "toolchain": {
     "node": "$(node -v)",
     "yarn": "$YARN_VERSION",
@@ -305,12 +308,12 @@ else
 fi
 
 # --------------------------------------------------------------------- 2. build ---
-build_delivered_packages() {
+build_delivered_packages() (
   set -e
   # The delivered PandamStyle-owned compiler, built by its own Rollup config.
   (cd "$REPO_ROOT/packages/compiler" \
     && "$REPO_ROOT/node_modules/.bin/rollup" --config ./rollup.config.mjs)
-}
+)
 
 if is_filtered_out "build"; then
   skip_step "build" "not selected by PMS_ONLY_STEPS"
@@ -358,11 +361,11 @@ if [ "${PMS_SKIP_PILOT:-0}" = "1" ]; then
 elif is_filtered_out "pilot"; then
   skip_step "pilot" "not selected by PMS_ONLY_STEPS"
 else
-  run_step "pilot" bash "$REPO_ROOT/tools/pilot/run-pilot.sh" "${PMS_PILOT_DIR:-$PMS_OUT_DIR/pilot}"
+  run_step "pilot" bash "$REPO_ROOT/tools/pilot/run-pilot.sh" "$PMS_PILOT_DIR"
 fi
 
 # ---------------------------------------------------------------- 9. artifacts ---
-collect_artifacts() {
+collect_artifacts() (
   set -e
   rm -rf "$ARTIFACT_DIR"
   mkdir -p "$ARTIFACT_DIR"
@@ -384,12 +387,12 @@ collect_artifacts() {
   node "$REPO_ROOT/tools/pms/generated-runtime-imports.js" \
     "$ARTIFACT_DIR/valid-fixture-generation" \
     "$ARTIFACT_DIR/generated-runtime-imports.json"
-  if [ -d "${PMS_PILOT_DIR:-$PMS_OUT_DIR/pilot}/app/dist" ]; then
-    cp -R "${PMS_PILOT_DIR:-$PMS_OUT_DIR/pilot}/app/dist" "$ARTIFACT_DIR/pilot-dist"
+  if [ -d "$PMS_PILOT_DIR/app/dist" ]; then
+    cp -R "$PMS_PILOT_DIR/app/dist" "$ARTIFACT_DIR/pilot-dist"
   fi
   (cd "$ARTIFACT_DIR" && find . -type f ! -name digests.txt -print0 \
     | sort -z | xargs -0 shasum -a 256 > digests.txt)
-}
+)
 
 if is_filtered_out "artifacts"; then
   skip_step "artifacts" "not selected by PMS_ONLY_STEPS"
@@ -404,7 +407,7 @@ if is_filtered_out "donor-closure"; then
 else
   run_step "donor-closure" node "$REPO_ROOT/tools/pms/donor-closure.js" \
     "$REPO_ROOT" \
-    "${PMS_PILOT_DIR:-$PMS_OUT_DIR/pilot}" \
+    "$PMS_PILOT_DIR" \
     "$ARTIFACT_DIR/valid-fixture-generation" \
     "$PMS_OUT_DIR/donor-closure/report.json"
 fi

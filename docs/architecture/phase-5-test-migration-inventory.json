@@ -1418,8 +1418,8 @@
       "dependencies": [
         "../_shared/design.pms.config.mjs"
       ],
-      "pathAssumptionsChanged": false,
-      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Added a fixture-local package.json with type=commonjs so Node keeps loading this .js build config as CommonJS inside the compiler's ESM package boundary.",
       "fixtureImportsChanged": false,
       "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
       "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",

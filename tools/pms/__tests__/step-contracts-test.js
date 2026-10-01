@@ -21,15 +21,14 @@
  * answer is `verified`: a verifier that can only ever fail is not a verifier,
  * and the case that proved it was one where a green run could not be reported.
  *
- * The fixtures are the real logs of the run that exposed the defect, read from
- * `evidence/native/`, so "a realistic full run" here means the run that actually
- * happened rather than a log invented to be easy.
+ * These are the four Jest summary lines recorded by the Phase 4 run that
+ * exposed the defect. Keeping the small parser fixtures here makes this test
+ * independent of ignored, locally generated evidence files. They exercise the
+ * summary parser only; current qualification comes from the current verifier
+ * run and is never inferred from these historical counts.
  */
 
 'use strict';
-
-const fs = require('fs');
-const path = require('path');
 
 const { parseJestCounts } = require('../test-counts');
 const {
@@ -39,21 +38,23 @@ const {
   contractFor,
 } = require('../step-contracts');
 
-const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const NATIVE_DIR = path.join(
-  REPO_ROOT,
-  'evidence',
-  'phase-4-engine-absorption',
-  'verify',
-);
+const HISTORICAL_JEST_SUMMARIES = {
+  pandamstyle:
+    'Test Suites: 22 passed, 22 total\nTests: 500 passed, 500 total\n',
+  'pandamstyle-core':
+    'Test Suites: 1 passed, 1 total\nTests: 14 passed, 14 total\n',
+  'semantic-oracle':
+    'Test Suites: 20 passed, 20 total\nTests: 148 passed, 148 total\n',
+  'tooling-tests':
+    'Test Suites: 5 passed, 5 total\nTests: 76 passed, 76 total\n',
+};
 
-/** A real log from the run under discussion, or null when it is not committed. */
-function realLog(step) {
-  const p = path.join(NATIVE_DIR, `${step}.log`);
-  return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;
+/** A compact parser fixture copied from the historical run's Jest summary. */
+function historicalJestSummary(step) {
+  return HISTORICAL_JEST_SUMMARIES[step] ?? null;
 }
 
-/** Historical owned-suite logs exercise the current evidence contracts. */
+/** The historical run's step table exercises the current evidence contracts. */
 const REAL_RUN = {
   install: { status: 'passed', exitCode: 0 },
   build: { status: 'passed', exitCode: 0 },
@@ -98,7 +99,7 @@ function assessFromLog(
   const kind = contractFor(step)?.kind;
   const counts =
     KIND_EVIDENCE[kind]?.requiresCounts === true
-      ? parseJestCounts(realLog(step) ?? '')
+      ? parseJestCounts(historicalJestSummary(step) ?? '')
       : null;
   return assessStep({
     step,
@@ -111,10 +112,10 @@ function assessFromLog(
 
 describe('step-contracts: a test-bearing step is judged on its counts', () => {
   test('valid Jest counts and exit 0 verify the step', () => {
-    // Case 1. The three Jest steps, on the counts the verified run actually
-    // reported - 1007/64 over 42 suites, 99 over 4, 460 over 20.
+    // Case 1. Four Jest steps, using the summaries recorded by the verified
+    // run: 500/22, 14/1, 148/20, and 76/5 tests/suites.
     for (const step of TEST_STEPS) {
-      const counts = parseJestCounts(realLog(step) ?? '');
+      const counts = parseJestCounts(historicalJestSummary(step) ?? '');
       expect(counts).not.toBeNull();
       const verdict = assessStep({
         step,
@@ -436,7 +437,7 @@ describe('step-contracts: a whole run', () => {
         exitCode: 0,
         counts:
           KIND_EVIDENCE[contractFor(step)?.kind]?.requiresCounts === true
-            ? parseJestCounts(realLog(step) ?? '')
+            ? parseJestCounts(historicalJestSummary(step) ?? '')
             : null,
         evidence: { acceptance: 'passed', artifactPresent: true },
       }),
