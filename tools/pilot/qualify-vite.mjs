@@ -1070,6 +1070,31 @@ async function runDevQualification() {
         );
       }
       assert.equal(observation.outcome, 'full-reload');
+      assert.equal(
+        observation.revisionAfter.revisionId,
+        observation.revisionBefore.revisionId + 1,
+      );
+      assert.equal(
+        observation.generationAfter,
+        observation.generationBefore + 1,
+      );
+      assert.equal(observation.fullFallbackReason, 'design-system-definition');
+      assert.equal(observation.counters.fullFallback, 1);
+      assert.equal(
+        events
+          .slice(cursor)
+          .filter(
+            (event) =>
+              event.type === 'custom' && event.event === 'pandamstyle:revision',
+          ).length,
+        1,
+      );
+      const canonical = await canonicalArtifacts(appRoot);
+      const metadata = JSON.parse(canonical['artifacts.json']);
+      for (const item of Object.values(metadata.artifacts)) {
+        assert.equal(digest(canonical[item.file]), item.sha256);
+        assert.equal(Buffer.byteLength(canonical[item.file]), item.bytes);
+      }
       report.dev.push({
         label,
         revisionBefore: observation.revisionBefore,
@@ -1463,7 +1488,7 @@ async function runProductionQualification() {
       'utf8',
     );
     if (
-      /@pandamstyle\/compiler|@pandamstyle\/vite|node:(?:fs|path|crypto|url)/.test(
+      /@pandamstyle\/(?:compiler|vite)|@babel\/|@stylexjs\/|@pandacss\/|node:[a-z]/.test(
         contents,
       )
     )

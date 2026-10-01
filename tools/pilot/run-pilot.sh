@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Pack and qualify the real PandamStyle Vite adapter in an app outside the repo.
 set -euo pipefail
+unset NODE_PATH
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 WORK_DIR="${1:-${PMS_PILOT_DIR:-/tmp/pandamstyle-vite-pilot}}"
@@ -106,9 +107,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const repoRoot = path.resolve(process.argv[2]);
 const packages = [];
+assert.equal(process.env.NODE_PATH, undefined);
 for (const name of ['@pandamstyle/compiler', '@pandamstyle/core', '@pandamstyle/vite']) {
   const packagePath = require.resolve(`${name}/package.json`);
   const real = fs.realpathSync(path.dirname(packagePath));
+  assert.equal(fs.lstatSync(path.dirname(packagePath)).isSymbolicLink(), false);
   assert.ok(!real.startsWith(`${repoRoot}${path.sep}`), `${name} resolved inside repository: ${real}`);
   const manifest = require(packagePath);
   console.log(`${name}@${manifest.version}: ${real}`);
@@ -125,6 +128,8 @@ fs.writeFileSync(path.resolve(process.cwd(), '..', 'external-install-proof.json'
   repository: repoRoot,
   app: process.cwd(),
   viteVersion: require('vite/package.json').version,
+  nodePathUnset: process.env.NODE_PATH === undefined,
+  workspaceSymlinks: false,
   packages,
 }, null, 2)}\n`);
 NODE

@@ -81,7 +81,11 @@ const root = path.resolve(__dirname, '../..');
 if (fs.readFileSync(path.join(root, 'mode'), 'utf8') !== 'qualification-missing') {
   const output = process.argv[2];
   fs.mkdirSync(output, { recursive: true });
-  fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify({ pass: true }) + '\\n');
+  const names = fs.readFileSync(path.join(root, 'mode'), 'utf8') === 'qualification-without-vite'
+    ? ['@pandamstyle/core', '@pandamstyle/compiler']
+    : ['@pandamstyle/core', '@pandamstyle/compiler', '@pandamstyle/vite'];
+  const packages = Object.fromEntries(names.map(name => [name, { tarballContents: 'passed', reproducibility: { contentDigestsStable: true } }]));
+  fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify({ pass: true, packages, externalConsumer: { vite: { pass: true }, typeScript: { viteOptions: 'passed' } } }) + '\\n');
 }
 `,
   );
@@ -221,7 +225,9 @@ function run(mode = 'green', env = {}, omitted = false, reuseOutput = false) {
     omitted
       ? original.replace(
           new RegExp(
-            'if is_filtered_out "' +
+            (omitted === 'pilot'
+              ? 'if \\[ "\\$\\{PMS_SKIP_PILOT:-0\\}" = "1" \\]; then[\\s\\S]*?elif is_filtered_out "'
+              : 'if is_filtered_out "') +
               (omitted === true ? 'tooling-tests' : omitted) +
               '"; then[\\s\\S]*?\\nfi\\n',
           ),
@@ -305,6 +311,44 @@ test('package qualification requires a report even when its command exits zero',
       (item) => item.code,
     ),
   ).toContain('ARTIFACT_MISSING');
+});
+
+test('the real verifier rejects package qualification that omits Vite', () => {
+  const { status, summary } = run('qualification-without-vite');
+  expect(status).not.toBe(0);
+  expect(summary.failedSteps).toContain('package-qualification');
+});
+
+test.each(['build', 'pilot', 'package-qualification'])(
+  'a required %s step cannot be omitted from a green run',
+  (step) => {
+    const { status, summary } = run('green', {}, step);
+    expect(status).not.toBe(0);
+    expect(summary.omittedRequiredSteps).toContain(step);
+    expect(summary.complete).toBe(false);
+  },
+);
+
+test('the verifier builds Vite and its pilot installs all three public tarballs', () => {
+  const verifier = fs.readFileSync(path.join(ROOT, 'verify-pms.sh'), 'utf8');
+  const pilot = fs.readFileSync(
+    path.join(ROOT, 'tools/pilot/run-pilot.sh'),
+    'utf8',
+  );
+  const qualification = fs.readFileSync(
+    path.join(ROOT, 'tools/pms/package-qualification.js'),
+    'utf8',
+  );
+  expect(verifier).toContain(
+    'node --check "$REPO_ROOT/packages/vite/src/index.js"',
+  );
+  expect(pilot).toContain('for package in compiler core vite; do');
+  expect(pilot).toContain("await import('@pandamstyle/vite')");
+  expect(pilot).toContain('.qualify-vite.mjs');
+  expect(qualification).toContain("'@pandamstyle/vite': {");
+  expect(fs.existsSync(path.join(ROOT, 'tools/pilot/vite-seam.js'))).toBe(
+    false,
+  );
 });
 
 test('donor detection reads module syntax and ignores comments and matcher strings', () => {

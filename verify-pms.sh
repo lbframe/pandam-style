@@ -437,11 +437,34 @@ fi
 
 # The public packages must pass an isolated npm-tarball consumer check. Its
 # report is the step's deliverable and is required by the evidence contract.
+qualify_public_packages() (
+  set -e
+  node "$REPO_ROOT/tools/pms/package-qualification.js" "$PMS_OUT_DIR/package-qualification"
+  # A successful command must qualify each public package, including Vite.
+  node - "$PMS_OUT_DIR/package-qualification/report.json" <<'NODE'
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const file = process.argv[2];
+// Absence is reported by the artifact contract in the summary.
+if (!fs.existsSync(file)) process.exit(0);
+const report = JSON.parse(fs.readFileSync(file, 'utf8'));
+assert.equal(report.pass, true);
+assert.deepEqual(Object.keys(report.packages).sort(), [
+  '@pandamstyle/compiler', '@pandamstyle/core', '@pandamstyle/vite',
+]);
+for (const item of Object.values(report.packages)) {
+  assert.equal(item.tarballContents, 'passed');
+  assert.equal(item.reproducibility.contentDigestsStable, true);
+}
+assert.equal(report.externalConsumer.vite.pass, true);
+assert.equal(report.externalConsumer.typeScript.viteOptions, 'passed');
+NODE
+)
+
 if is_filtered_out "package-qualification"; then
   skip_step "package-qualification" "not selected by PMS_ONLY_STEPS"
 else
-  run_step "package-qualification" node "$REPO_ROOT/tools/pms/package-qualification.js" \
-    "$PMS_OUT_DIR/package-qualification"
+  run_step "package-qualification" qualify_public_packages
 fi
 
 # --------------------------------------------------------------------- summary ---

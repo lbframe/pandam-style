@@ -30,11 +30,35 @@ const COMPILER_DIR = path.join(REPO, 'packages/compiler');
 const EXPECTED = {
   '@pandamstyle/core': {
     directory: CORE_DIR,
+    slug: 'core',
+    allowedFiles: /^(?:package\.json|LICENSE|ATTRIBUTIONS\.md|src\/[^/]+)$/,
+    requiredFiles: ['src/index.js', 'src/types.ts'],
     exports: ['.', './package.json'],
   },
   '@pandamstyle/compiler': {
     directory: COMPILER_DIR,
+    slug: 'compiler',
+    allowedFiles:
+      /^(?:package\.json|LICENSE|ATTRIBUTIONS\.md|(?:lib|bin|types|LICENSES)\/[^/]+|docs\/architecture\/phase-4-(?:derived-source-provenance|engine-absorption-map)\.md)$/,
+    requiredFiles: [
+      'lib/index.mjs',
+      'lib/config.mjs',
+      'lib/host.mjs',
+      'lib/cli.mjs',
+      'bin/pms-build.js',
+      'types/index.d.ts',
+      'types/config.d.ts',
+      'types/host.d.ts',
+    ],
     exports: ['.', './config', './host', './package.json'],
+  },
+  '@pandamstyle/vite': {
+    directory: path.join(REPO, 'packages/vite'),
+    slug: 'vite',
+    allowedFiles:
+      /^(?:package\.json|LICENSE|ATTRIBUTIONS\.md|src\/index\.js|types\/index\.d\.ts)$/,
+    requiredFiles: ['src/index.js', 'types/index.d.ts'],
+    exports: ['.', './package.json'],
   },
 };
 const TOOL_VERSIONS = {
@@ -42,10 +66,13 @@ const TOOL_VERSIONS = {
   rollup: '4.59.0',
   '@rollup/plugin-node-resolve': '15.3.0',
   node: '20.0.0',
+  'node20-vite': 'npm:node@20.19.0',
+  'node22-vite': 'npm:node@22.12.0',
+  '@types/node': '22.19.15',
 };
 const DONOR_RE = /^@(stylexjs|pandacss)\//;
 const BUNDLE_FORBIDDEN_RE =
-  /@pandamstyle\/compiler|@babel\/|@stylexjs\/|@pandacss\//;
+  /@pandamstyle\/(?:compiler|vite)|@babel\/|@stylexjs\/|@pandacss\//;
 
 function sha256(bytes) {
   return crypto.createHash('sha256').update(bytes).digest('hex');
@@ -221,10 +248,7 @@ function packageManifestAudit(name, manifest, unpackedPackage) {
     manifest.repository?.url,
     'https://github.com/lbframe/pandam-style.git',
   );
-  assert.equal(
-    manifest.repository?.directory,
-    `packages/${name.endsWith('/core') ? 'core' : 'compiler'}`,
-  );
+  assert.equal(manifest.repository?.directory, `packages/${expected.slug}`);
 
   const targets = [];
   for (const [subpath, targetValue] of Object.entries(manifest.exports)) {
@@ -276,12 +300,22 @@ function packageManifestAudit(name, manifest, unpackedPackage) {
   const dependencies = manifest.dependencies ?? {};
   const peerDependencies = manifest.peerDependencies ?? {};
   const optionalDependencies = manifest.optionalDependencies ?? {};
+  const allowedPandamStyle = {
+    '@pandamstyle/core': [],
+    '@pandamstyle/compiler': ['@pandamstyle/core'],
+    '@pandamstyle/vite': ['@pandamstyle/compiler'],
+  }[name];
   for (const [kind, values] of Object.entries({
     dependencies,
     peerDependencies,
     optionalDependencies,
   })) {
     for (const [dependency, version] of Object.entries(values)) {
+      if (dependency.startsWith('@pandamstyle/'))
+        assert(
+          allowedPandamStyle.includes(dependency),
+          `${name} has a forbidden/private edge to ${dependency}`,
+        );
       assert(
         !/^workspace:|^file:/i.test(version),
         `${name} ${kind} has a workspace/local reference: ${dependency}=${version}`,
@@ -302,13 +336,22 @@ function packageManifestAudit(name, manifest, unpackedPackage) {
     );
     assert.equal(manifest.exports['.'].import, './src/index.js');
     assert.equal(manifest.exports['.'].types, './src/types.ts');
-  } else {
+  } else if (name === '@pandamstyle/compiler') {
     assert.equal(manifest.engines?.node, '>=20.0.0');
     assert.equal(manifest.dependencies['@pandamstyle/core'], '0.1.0');
     assert.equal(manifest.exports['.'].import, './lib/index.mjs');
     assert.equal(manifest.exports['./config'].import, './lib/config.mjs');
     assert.equal(manifest.exports['./host'].import, './lib/host.mjs');
     assert.equal(manifest.bin?.['pms-build'], './bin/pms-build.js');
+    assert(!Object.hasOwn(dependencies, '@pandamstyle/vite'));
+  } else {
+    assert.equal(manifest.engines?.node, '^20.19.0 || >=22.12.0');
+    assert.equal(manifest.sideEffects, false);
+    assert.deepEqual(dependencies, { '@pandamstyle/compiler': '0.1.0' });
+    assert.deepEqual(peerDependencies, { vite: '7.3.2' });
+    assert.deepEqual(optionalDependencies, {});
+    assert.equal(manifest.exports['.'].import, './src/index.js');
+    assert.equal(manifest.exports['.'].types, './types/index.d.ts');
   }
   return {
     name,
@@ -327,27 +370,14 @@ function packageManifestAudit(name, manifest, unpackedPackage) {
     engines: manifest.engines ?? null,
     license: manifest.license,
     repository: manifest.repository,
+    description: manifest.description,
+    keywords: manifest.keywords ?? [],
   };
 }
 
 function assertTarballContents(name, inventory) {
-  const allowed =
-    name === '@pandamstyle/core'
-      ? (file) =>
-          file === 'package.json' ||
-          file === 'LICENSE' ||
-          file === 'ATTRIBUTIONS.md' ||
-          file.startsWith('src/')
-      : (file) =>
-          file === 'package.json' ||
-          file === 'LICENSE' ||
-          file === 'ATTRIBUTIONS.md' ||
-          file.startsWith('lib/') ||
-          file.startsWith('bin/') ||
-          file.startsWith('types/') ||
-          file.startsWith('LICENSES/') ||
-          file === 'docs/architecture/phase-4-derived-source-provenance.md' ||
-          file === 'docs/architecture/phase-4-engine-absorption-map.md';
+  const descriptor = EXPECTED[name];
+  const allowed = (file) => descriptor.allowedFiles.test(file);
   const paths = inventory.map((item) => item.path);
   const accidental = paths.filter((file) => !allowed(file));
   assert.deepEqual(
@@ -384,9 +414,16 @@ function assertTarballContents(name, inventory) {
         paths.includes('types/config.d.ts') &&
         paths.includes('types/host.d.ts'),
     );
-  } else {
-    assert(paths.includes('src/index.js') && paths.includes('src/types.ts'));
   }
+  for (const file of [
+    'LICENSE',
+    'ATTRIBUTIONS.md',
+    ...descriptor.requiredFiles,
+  ])
+    assert(
+      paths.includes(file),
+      `${name} missing required packed file ${file}`,
+    );
 }
 
 function packOne(name, destination, suffix, commandLog) {
@@ -481,7 +518,7 @@ function resolveInstalledPackage(parentDir, name) {
 }
 
 function installedDependencyGraph(consumerDir) {
-  const roots = ['@pandamstyle/core', '@pandamstyle/compiler'];
+  const roots = Object.keys(EXPECTED);
   const visited = new Map();
   const queue = roots.map((name) => ({
     name,
@@ -706,6 +743,10 @@ import type {
 } from '@pandamstyle/compiler';
 import { createHostBridge } from '@pandamstyle/compiler/host';
 import type { ArtifactResult, HostBridge } from '@pandamstyle/compiler/host';
+import type { GeneratedArtifactSet } from '@pandamstyle/compiler';
+import { pandamstyle } from '@pandamstyle/vite';
+import type { PandamStyleOptions } from '@pandamstyle/vite';
+import type { Plugin } from 'vite';
 import { create, recipes, themes, token as generatedToken } from './generated/design.js';
 
 const style: StyleRef = {
@@ -760,19 +801,25 @@ const mutation: MutationTransaction = {
   added: [],
   removed: [],
   renamed: [],
+  sourceOverlays: [{ file: 'src/app.tsx', source: 'export const x = 1;' }],
 };
 const diagnostics: Promise<DiagnosticsResult> = session.validate(revision);
 const publication: Promise<PublicationReceipt> = session.compile(revision);
 const read: Promise<ArtifactResult> = session.readArtifact(revision, 'src/app.tsx');
 const host: HostBridge = createHostBridge(session);
 const hostRead: Promise<ArtifactResult> = host.readArtifact(revision, 'src/app.tsx');
+const generatedRead: Promise<GeneratedArtifactSet> = session.readGeneratedArtifacts(revision);
+const hostGeneratedRead: Promise<GeneratedArtifactSet> = host.readGeneratedArtifacts(revision);
+const sourceDigest: Promise<string> = read.then(artifact => artifact.sourceDigest);
+const viteOptions: PandamStyleOptions = { definition, roots: ['./src'], outDir: './vite-generated' };
+const vitePlugin: Plugin = pandamstyle(viteOptions);
 const authored = defineConfig({ systemId: 'typed@1', token: token('spacing.md') });
 const generatedStyle = create({ pad: { padding: generatedToken('spacing.md') } });
 const generatedResponsiveStyle = create({ responsive: { padding: { base: generatedToken('spacing.md'), wide: generatedToken('spacing.lg') } } });
 const generatedRecipe: StyleRef = recipes.button({ tone: 'brand', size: 'sm' });
 const generatedTheme: ThemeRef = themes.light;
 
-void [coreToken, runtimeDiagnostic, runtimeError, abi, config, mutation, diagnostics, publication, read, hostRead, authored, generatedStyle, generatedResponsiveStyle, generatedRecipe, generatedTheme];
+void [coreToken, runtimeDiagnostic, runtimeError, abi, config, mutation, diagnostics, publication, read, hostRead, generatedRead, hostGeneratedRead, sourceDigest, vitePlugin, authored, generatedStyle, generatedResponsiveStyle, generatedRecipe, generatedTheme];
 `,
   );
   fs.writeFileSync(
@@ -799,6 +846,10 @@ const invalidComposition: CompositionInput = { className: 'invented' };
 const invalidStyle: StyleRef = { kind: 'pandamstyle-style-ref', abiVersion: 2, systemId: 'x', entries: [] };
 // @ts-expect-error props only accepts compiled references and omissions
 props({ className: 'invented' });
+// @ts-expect-error Vite options require covered source roots
+import('@pandamstyle/vite').then(({ pandamstyle }) => pandamstyle({ definition: './design-system.mjs' }));
+// @ts-expect-error Vite owns rootDir
+import('@pandamstyle/vite').then(({ pandamstyle }) => pandamstyle({ definition: './design-system.mjs', roots: ['./src'], rootDir: '.' }));
 
 void [invalidComposition, invalidStyle, invalidCondition];
 `,
@@ -889,6 +940,7 @@ let hostCalls = 0;
 const fakeProject = {
   marker: 4,
   async readArtifact() { hostCalls += this.marker; return 'read'; },
+  async readGeneratedArtifacts() { hostCalls += this.marker; return 'generated'; },
   async preparePublication() { hostCalls += this.marker; return 'ticket'; },
   async commitPrepared() { hostCalls += this.marker; return 'committed'; },
   async abortPrepared() { hostCalls += this.marker; return true; },
@@ -896,10 +948,11 @@ const fakeProject = {
 const host = createHostBridge(fakeProject);
 assert.equal(Object.isFrozen(host), true);
 assert.equal(await host.readArtifact({}), 'read');
+assert.equal(await host.readGeneratedArtifacts({}), 'generated');
 assert.equal(await host.preparePublication({}), 'ticket');
 assert.equal(await host.commitPrepared({}), 'committed');
 assert.equal(await host.abortPrepared({}), true);
-assert.equal(hostCalls, 16);
+assert.equal(hostCalls, 20);
 assert.throws(() => createHostBridge({}), TypeError);
 
 const outDir = path.join(root, 'generated');
@@ -940,6 +993,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createProjectSession } from '@pandamstyle/compiler';
 import { createHostBridge } from '@pandamstyle/compiler/host';
+import { createHash } from 'node:crypto';
 import definition from './design-system.mjs';
 
 const rootDir = process.cwd();
@@ -998,7 +1052,27 @@ try {
   const editedReceipt = await bridge.commitPrepared(editedTicket);
   assert(editedReceipt.generationId > hostReceipt.generationId);
   assert.equal((await project.current()).generation.generationId, editedReceipt.generationId);
-  console.log(JSON.stringify({ initialize: 'passed', applyChanges: 'passed', validate: 'passed', compile: 'passed', current: 'passed', agentResult: 'passed', candidateTokens: 'passed', requestFullAudit: 'passed', prepareAbortCommit: 'passed', hostReadCommit: 'passed', sameContentGenerationReuse: 'passed', changedContentGenerationAdvance: 'passed', revision: editedValidation.revision, generationId: editedReceipt.generationId }));
+  const diskSource = fs.readFileSync(appPath, 'utf8');
+  const overlaySource = diskSource.replace("token('spacing.lg')", "token('spacing.sm')");
+  assert.notEqual(overlaySource, diskSource);
+  const overlay = await project.applyChanges({ baseRevision: editedValidation.revision, mode: 'verified-explicit', changed: ['src/app.tsx'], added: [], removed: [], renamed: [], sourceOverlays: [{ file: 'src/app.tsx', source: overlaySource }] });
+  const overlayValidation = await project.validate(overlay.revision);
+  assert.equal(overlayValidation.ok, true, JSON.stringify(overlayValidation.diagnostics));
+  const overlayArtifact = await bridge.readArtifact(overlay.revision, 'src/app.tsx');
+  assert.equal(overlayArtifact.sourceDigest, createHash('sha256').update(overlaySource).digest('hex'));
+  assert.equal(fs.readFileSync(appPath, 'utf8'), diskSource);
+  const canonical = await project.readGeneratedArtifacts(overlay.revision);
+  assert.deepEqual(await bridge.readGeneratedArtifacts(overlay.revision), canonical);
+  assert.equal(Object.isFrozen(canonical), true);
+  assert.deepEqual(canonical.files.map(item => item.file).sort(), ['artifacts.json', 'design.d.ts', 'design.js', 'manifest.json', 'styles.css']);
+  await project.compile(overlay.revision);
+  for (const item of canonical.files) assert.equal(fs.readFileSync(path.join(rootDir, 'generated', item.file), 'utf8'), item.content);
+  const restored = await project.applyChanges({ baseRevision: overlay.revision, mode: 'verified-explicit', changed: ['src/app.tsx'], added: [], removed: [], renamed: [] });
+  await assert.rejects(project.readGeneratedArtifacts(overlay.revision), error => error.diagnostics?.some(item => item.code === 'PMS_STALE_REVISION'));
+  assert.equal((await project.validate(restored.revision)).ok, true);
+  assert.equal((await bridge.readArtifact(restored.revision, 'src/app.tsx')).sourceDigest, createHash('sha256').update(diskSource).digest('hex'));
+  await project.compile(restored.revision);
+  console.log(JSON.stringify({ initialize: 'passed', applyChanges: 'passed', validate: 'passed', compile: 'passed', current: 'passed', agentResult: 'passed', candidateTokens: 'passed', requestFullAudit: 'passed', prepareAbortCommit: 'passed', hostReadCommit: 'passed', sourceOverlays: 'passed', sourceDigest: 'passed', readGeneratedArtifacts: 'passed', staleGeneratedRead: 'rejected', sameContentGenerationReuse: 'passed', changedContentGenerationAdvance: 'passed', revision: restored.revision, generationId: editedReceipt.generationId }));
 } finally {
   await project.close();
 }
@@ -1426,7 +1500,7 @@ function runTypeChecks(consumerDir) {
     strictNoEmit: true,
     positiveCoreAndSdk: 'passed',
     positiveGeneratedDesignSystem: 'passed',
-    negativeCases: 9,
+    negativeCases: 11,
     negativeCaseNames: [
       'private-token',
       'unknown-token',
@@ -1437,7 +1511,11 @@ function runTypeChecks(consumerDir) {
       'invalid-composition-object',
       'wrong-abi-version',
       'unverified-props-input',
+      'vite-missing-roots',
+      'vite-owned-root-dir',
     ],
+    viteOptions: 'passed',
+    phase8SdkTypes: 'passed',
     negativeCasesRejected: true,
     elapsedMs: Number((performance.now() - started).toFixed(3)),
     commandDurationMs: result.durationMs,
@@ -1714,6 +1792,11 @@ function licenseAndProvenanceReport(packages) {
     .replace(/\s+/g, ' ');
   assert(coreAttributions.includes('no third-party runtime dependency'));
   assert(coreAttributions.includes('no StyleX or Panda implementation'));
+  const viteDir = packages['@pandamstyle/vite'].first.packageDir;
+  assert.deepEqual(
+    fs.readFileSync(path.join(viteDir, 'ATTRIBUTIONS.md')),
+    fs.readFileSync(path.join(REPO, 'packages/vite/ATTRIBUTIONS.md')),
+  );
   return {
     pass: true,
     core: {
@@ -1731,6 +1814,130 @@ function licenseAndProvenanceReport(packages) {
       ],
     },
     donorSourceTreesShipped: false,
+    vite: {
+      license: 'LICENSE is byte-identical to repository LICENSE',
+      attribution: 'package-specific host provenance byte-identical',
+      donorImplementation: 'none shipped',
+    },
+  };
+}
+
+function runVitePackageChecks(consumerDir, packages, commandLog) {
+  const source = fs.readFileSync(
+    path.join(packages['@pandamstyle/vite'].first.packageDir, 'src/index.js'),
+    'utf8',
+  );
+  const imports = importsOf(source);
+  const compilerImports = imports.filter((item) =>
+    item.startsWith('@pandamstyle/compiler'),
+  );
+  const privateCompilerImports = compilerImports.filter(
+    (item) =>
+      !['@pandamstyle/compiler', '@pandamstyle/compiler/host'].includes(item),
+  );
+  assert.deepEqual(privateCompilerImports, []);
+  assert.deepEqual([...new Set(compilerImports)].sort(), [
+    '@pandamstyle/compiler',
+    '@pandamstyle/compiler/host',
+  ]);
+  const upstream = readJson(
+    path.join(consumerDir, 'node_modules/vite/package.json'),
+  );
+  assert.equal(upstream.version, '7.3.2');
+  assert.equal(upstream.engines.node, '^20.19.0 || >=22.12.0');
+  const fixtureRoot = path.join(consumerDir, 'vite-app');
+  fs.mkdirSync(path.join(fixtureRoot, 'src'), { recursive: true });
+  fs.writeFileSync(
+    path.join(fixtureRoot, 'index.html'),
+    '<div id="app"></div><script type="module" src="/src/app.js"></script>',
+  );
+  fs.writeFileSync(
+    path.join(fixtureRoot, 'src/app.js'),
+    "import { create, token, props } from '../generated/design.js';\nconst styles = create({ root: { padding: token('spacing.md') } });\ndocument.querySelector('#app').className = props(styles.root).className;\n",
+  );
+  const script = path.join(consumerDir, 'vite-package-smoke.mjs');
+  fs.writeFileSync(
+    script,
+    String.raw`import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import * as adapter from '@pandamstyle/vite';
+import definition from './design-system.mjs';
+assert.deepEqual(Object.keys(adapter).sort(), ['default', 'pandamstyle']);
+assert.equal(adapter.default, adapter.pandamstyle);
+const root = path.join(process.cwd(), 'vite-app');
+const options = { definition, roots: ['./src'], outDir: './generated', designSystemFile: 'design.js' };
+const plugin = adapter.pandamstyle(options);
+assert.equal(typeof plugin, 'object');
+await assert.rejects(import('@pandamstyle/vite/src/index.js'), error => error.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED');
+const require = createRequire(import.meta.url);
+const realpath = fs.realpathSync(path.dirname(require.resolve('@pandamstyle/vite/package.json')));
+if (process.argv.includes('--adapter-only')) {
+  console.log(JSON.stringify({ node: process.version, import: 'passed', construction: 'passed', realpath, privateSubpath: 'rejected', integrationSupported: false, reason: 'Node 20.0.0 is below Vite 7.3.2 upstream engines; adapter import alone does not qualify Vite runtime' }));
+} else {
+  const { createServer, build } = await import('vite');
+  const config = { root, configFile: false, logLevel: 'silent', plugins: [adapter.pandamstyle(options)], server: { port: 0, host: '127.0.0.1' }, build: { outDir: './dist' } };
+  const server = await createServer(config);
+  try {
+    await server.listen();
+    const transformed = await server.transformRequest('/src/app.js');
+    assert(transformed?.code.includes('__pmsProps'));
+    const address = server.httpServer.address();
+    const response = await fetch('http://127.0.0.1:' + address.port, { headers: { Connection: 'close' } });
+    assert.equal(response.status, 200);
+    await response.text();
+    await server.waitForRequestsIdle();
+  } finally { await server.close(); }
+  await build({ ...config, plugins: [adapter.pandamstyle(options)] });
+  for (const file of ['design.js', 'design.d.ts', 'manifest.json', 'styles.css', 'artifacts.json']) assert(fs.existsSync(path.join(root, 'generated', file)));
+  console.log(JSON.stringify({ node: process.version, import: 'passed', construction: 'passed', realpath, privateSubpath: 'rejected', integrationSupported: true, dev: 'passed', transform: 'passed', production: 'passed', canonicalSet: 'passed' }));
+}
+`,
+  );
+  const runtimes = [
+    {
+      binary: path.join(consumerDir, 'node_modules/node/bin/node'),
+      expected: 'v20.0.0',
+      adapterOnly: true,
+    },
+    {
+      binary: path.join(consumerDir, 'node_modules/node20-vite/bin/node'),
+      expected: 'v20.19.0',
+    },
+    {
+      binary: path.join(consumerDir, 'node_modules/node22-vite/bin/node'),
+      expected: 'v22.12.0',
+    },
+    { binary: process.execPath, expected: 'v22.22.0' },
+  ];
+  const matrix = runtimes.map((runtime) => {
+    assert.equal(
+      requireSuccess(runtime.binary, ['--version']).stdout.trim(),
+      runtime.expected,
+    );
+    const result = requireSuccess(
+      runtime.binary,
+      [script, ...(runtime.adapterOnly ? ['--adapter-only'] : [])],
+      { cwd: consumerDir },
+    );
+    commandLog.push({
+      name: `external-vite-${runtime.expected}`,
+      exitCode: 0,
+      durationMs: result.durationMs,
+    });
+    return {
+      ...JSON.parse(result.stdout.trim().split('\n').at(-1)),
+      durationMs: result.durationMs,
+    };
+  });
+  return {
+    pass: true,
+    peer: upstream.version,
+    engines: upstream.engines,
+    imports,
+    privateCompilerImportCount: privateCompilerImports.length,
+    matrix,
   };
 }
 
@@ -1761,6 +1968,10 @@ function writeQualificationReports(output, report) {
     source: 'external compiler SDK session exercised through createHostBridge',
   });
   writeJson(path.join(output, 'typescript-report.json'), external.typeScript);
+  writeJson(path.join(output, 'vite-package-report.json'), {
+    ...external.vite,
+    types: external.typeScript.viteOptions,
+  });
   writeJson(path.join(output, 'generated-design-system-types.json'), {
     canonicalArtifacts: external.cli.canonicalFiles,
     declarationBytes: external.typeScript.declarationBytes,
@@ -1777,10 +1988,12 @@ function writeQualificationReports(output, report) {
     path.join(output, 'browser-runtime-scan.json'),
     external.browserSafety,
   );
-  writeJson(
-    path.join(output, 'node-compatibility-matrix.json'),
-    external.runtimeMatrix,
-  );
+  writeJson(path.join(output, 'node-compatibility-matrix.json'), {
+    compilerCore: external.runtimeMatrix,
+    vite: external.vite.matrix,
+    compilerEngines: '>=20.0.0',
+    viteEngines: external.vite.engines,
+  });
   writeJson(
     path.join(output, 'license-provenance-report.json'),
     report.licensesAndProvenance,
@@ -1813,10 +2026,9 @@ async function runExternalConsumer(
   commandLog,
 ) {
   externalFixtureFiles(consumerDir);
-  const packageTarballs = [
-    packages['@pandamstyle/compiler'].first.archive,
-    packages['@pandamstyle/core'].first.archive,
-  ];
+  const packageTarballs = Object.values(packages).map(
+    (item) => item.first.archive,
+  );
   const install = requireSuccess(
     'npm',
     [
@@ -1826,12 +2038,13 @@ async function runExternalConsumer(
       '--no-fund',
       '--save-exact',
       ...packageTarballs,
+      'vite@7.3.2',
     ],
     { cwd: consumerDir },
   );
   commandLog.push({
     name: 'external-install-tarballs',
-    command: 'npm install <compiler.tgz> <core.tgz>',
+    command: 'npm install <core.tgz> <compiler.tgz> <vite.tgz> vite@7.3.2',
     exitCode: 0,
     durationMs: install.durationMs,
   });
@@ -1879,6 +2092,7 @@ async function runExternalConsumer(
     commandLog,
   );
   const sdk = await runSdkChecks(consumerDir, commandLog);
+  const vite = runVitePackageChecks(consumerDir, packages, commandLog);
   const typeScript = runTypeChecks(consumerDir);
   const bundleSetup = makeBundleHarness(consumerDir);
   const treeShaking = runTreeShaking(consumerDir);
@@ -1976,7 +2190,7 @@ async function runExternalConsumer(
       }).stdout.trim(),
     },
     install: {
-      command: 'npm install <local compiler tarball> <local core tarball>',
+      command: 'npm install <core.tgz> <compiler.tgz> <vite.tgz> vite@7.3.2',
       status: 'passed',
       externalConsumer: consumerDir,
       packageJson: packageRoot,
@@ -1987,6 +2201,7 @@ async function runExternalConsumer(
     cli,
     runtimeMatrix,
     sdk,
+    vite,
     typeScript,
     treeShaking,
     browserSafety,
@@ -2040,7 +2255,7 @@ async function main() {
   const output = path.resolve(
     process.argv[2] ??
       process.env.PMS_PACKAGE_QUALIFICATION_OUT ??
-      'evidence/phase-9-release-qualification/package-qualification',
+      'evidence/phase-8-9-checkpoint/package-qualification',
   );
   const reportPath = path.join(output, 'report.json');
   const commandLog = [];
@@ -2051,7 +2266,7 @@ async function main() {
     cwd: REPO,
   }).stdout.trim();
   const scratchRoot = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'pandamstyle-phase-9-'),
+    path.join(os.tmpdir(), 'pandamstyle-phase-8-9-'),
   );
   const tarballsRoot = path.join(scratchRoot, 'tarballs');
   const consumerDir = path.join(scratchRoot, 'consumer');
@@ -2082,19 +2297,13 @@ async function main() {
     for (const name of Object.keys(EXPECTED)) {
       const pack1 = packOne(
         name,
-        path.join(
-          tarballsRoot,
-          name.endsWith('/core') ? 'core-pack-1' : 'compiler-pack-1',
-        ),
+        path.join(tarballsRoot, `${EXPECTED[name].slug}-pack-1`),
         'first',
         commandLog,
       );
       const pack2 = packOne(
         name,
-        path.join(
-          tarballsRoot,
-          name.endsWith('/core') ? 'core-pack-2' : 'compiler-pack-2',
-        ),
+        path.join(tarballsRoot, `${EXPECTED[name].slug}-pack-2`),
         'second',
         commandLog,
       );
@@ -2147,14 +2356,12 @@ async function main() {
       ),
     );
     report.licensesAndProvenance = licenseAndProvenanceReport(packages);
-    writeJson(path.join(output, 'npm-pack-core.json'), {
-      first: packages['@pandamstyle/core'].first.entry,
-      second: packages['@pandamstyle/core'].second.entry,
-    });
-    writeJson(path.join(output, 'npm-pack-compiler.json'), {
-      first: packages['@pandamstyle/compiler'].first.entry,
-      second: packages['@pandamstyle/compiler'].second.entry,
-    });
+    for (const [name, item] of Object.entries(packages)) {
+      writeJson(path.join(output, `npm-pack-${EXPECTED[name].slug}.json`), {
+        first: item.first.entry,
+        second: item.second.entry,
+      });
+    }
     writeJson(
       path.join(output, 'tarball-inventories.json'),
       Object.fromEntries(
