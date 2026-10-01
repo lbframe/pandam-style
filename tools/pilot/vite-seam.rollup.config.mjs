@@ -13,6 +13,7 @@
 import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import { createRequire } from 'node:module';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,6 +22,7 @@ const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../..',
 );
+const require = createRequire(import.meta.url);
 const seam = path.join(repoRoot, 'tools/pilot/vite-seam.js');
 const compilerSource = path.join(repoRoot, 'packages/compiler/src');
 const externalPackages = new Set([
@@ -59,10 +61,20 @@ export default {
       babelrc: false,
       configFile: false,
       presets: [
-        ['@babel/preset-env', { targets: { node: '20' }, modules: false }],
-        '@babel/preset-flow',
+        [
+          require.resolve('@babel/preset-env'),
+          { targets: { node: '20' }, modules: false },
+        ],
+        require.resolve('@babel/preset-flow'),
       ],
-      plugins: [['babel-plugin-syntax-hermes-parser', { flow: 'detect' }]],
+      plugins: [
+        [
+          require.resolve('babel-plugin-syntax-hermes-parser'),
+          {
+            flow: 'detect',
+          },
+        ],
+      ],
       include: [seam, `${compilerSource}/**/*`],
     }),
     nodeResolve({
