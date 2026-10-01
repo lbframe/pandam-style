@@ -1,0 +1,20 @@
+{
+  "name": "@pandamstyle/core",
+  "version": "0.1.0",
+  "private": false,
+  "description": "PandamStyle compiled style reference runtime and composition ABI.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "types": "./src/types.ts",
+  "exports": {
+    ".": {
+      "types": "./src/types.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src"
+  ]
+}
