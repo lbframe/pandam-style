@@ -68,7 +68,9 @@ function freshCopyOf(projectName) {
   const tmp = fs.mkdtempSync(path.join(tempRoot(), 'copy-'));
   fs.cpSync(FIXTURES, tmp, {
     recursive: true,
-    filter: (src) => !src.includes(`${path.sep}generated`),
+    filter: (src) =>
+      !src.includes(`${path.sep}generated`) &&
+      !/^\.generated\.pms-state(?:\.pending)?\.json$/.test(path.basename(src)),
   });
   // The design system definition requires '@pandamstyle/compiler' the way a
   // real application would. Link it into the temp root so Node resolution

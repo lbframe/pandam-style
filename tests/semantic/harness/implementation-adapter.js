@@ -435,19 +435,25 @@ async function run(spec, lane) {
         validation.negativeResolutionCount = negativeResolutionCount;
       }
       const system = compiler.buildDesignSystem(definition(input));
-      results.push(
-        observe(
-          root,
-          out,
-          validation,
-          session,
-          spec,
-          system,
-          publicResult ?? publicValidation.agentResult,
-          publicSession,
-          publicRoot,
-        ),
+      const observed = observe(
+        root,
+        out,
+        validation,
+        session,
+        spec,
+        system,
+        publicResult ?? publicValidation.agentResult,
+        publicSession,
+        publicRoot,
       );
+      results.push(observed);
+      if (publicSession !== incrementalPublicSession) {
+        await publicSession.close();
+        ephemeralPublicSessions.splice(
+          ephemeralPublicSessions.indexOf(publicSession),
+          1,
+        );
+      }
     }
     return results;
   } finally {

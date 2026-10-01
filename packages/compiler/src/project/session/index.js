@@ -2604,12 +2604,23 @@ export function createProjectSession(config) {
     return publish(active, options);
   }
 
-  function publish(active, { revisionIdentity = null } = {}) {
+  function publish(
+    active,
+    {
+      revisionIdentity = null,
+      generationId = null,
+      candidateDigest = null,
+    } = {},
+  ) {
     const cfg = state.config;
     const absOut = path.resolve(cfg.outDir);
     const sourceBase = commonBase(cfg.roots);
     const variant = cfg.publishVariant;
     const incremental = publishesDelta(variant);
+    const targetGenerationId =
+      Number.isSafeInteger(generationId) && generationId > 0
+        ? generationId
+        : state.generationId + 1;
     const outputRelFor = (file) => {
       const rel = path.relative(sourceBase, file);
       const safe = rel.startsWith('..') ? path.basename(file) : rel;
@@ -2638,7 +2649,7 @@ export function createProjectSession(config) {
       (gen) => {
         const designSystem = state.designSystem;
         const registryDigest = designSystem.registry.registryDigest;
-        const nextGenerationId = state.generationId + 1;
+        const nextGenerationId = targetGenerationId;
 
         put(gen, cfg.designSystemFile, state.designSystemSource, {
           owner: 'design-system',
@@ -2916,9 +2927,10 @@ export function createProjectSession(config) {
       {
         commitMarker: 'manifest.json',
         mode: incremental ? 'delta' : 'full',
-        generationId: state.generationId + 1,
+        generationId: targetGenerationId,
         revisionId: active.revisionId,
         revisionIdentity,
+        candidateDigest,
         failAt: cfg.publishFailAt ?? null,
       },
     );
@@ -2960,6 +2972,7 @@ export function createProjectSession(config) {
       associationRevisionIdentity:
         committed?.associationRevisionIdentity ?? revisionIdentity,
       artifactDigest: committed?.artifactDigest ?? null,
+      candidateDigest: committed?.candidateDigest ?? candidateDigest ?? null,
       publication: {
         mode: result.mode,
         variant,
@@ -3640,16 +3653,14 @@ export function createProjectSession(config) {
         ? Math.max(0, query.offset)
         : 0;
       const allowPrivate = query.allowPrivate === true;
-      const all = Object.keys(registry.tokens)
-        .filter((id) => {
-          const entry = registry.tokens[id];
-          if (query.category != null && entry.category !== query.category) {
-            return false;
-          }
-          if (!allowPrivate && entry.visibility !== 'public') return false;
-          return true;
-        })
-        .sort((left, right) => (left < right ? -1 : left > right ? 1 : 0));
+      const all = Object.keys(registry.tokens).filter((id) => {
+        const entry = registry.tokens[id];
+        if (query.category != null && entry.category !== query.category) {
+          return false;
+        }
+        if (!allowPrivate && entry.visibility !== 'public') return false;
+        return true;
+      });
       return {
         category: query.category ?? null,
         allowPrivate,

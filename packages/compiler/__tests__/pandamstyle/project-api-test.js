@@ -348,11 +348,32 @@ describe('stable project SDK lifecycle', () => {
 
       const nextValidation = await second.validate(reopened.revision);
       const nextReceipt = await second.compile(nextValidation.revision);
-      expect(nextReceipt.generationId).toBeGreaterThan(
-        firstReceipt.generationId,
+      expect(nextReceipt.generationId).toBe(firstReceipt.generationId);
+      expect(nextReceipt.artifactRevision).toEqual(
+        firstReceipt.artifactRevision,
       );
-      expect(nextReceipt.artifactRevision.sessionId).toBe(
-        reopened.revision.sessionId,
+      expect(nextReceipt.associationRevision).toEqual(reopened.revision);
+
+      const page = fixture.src('src/page.js');
+      const source = fs.readFileSync(page, 'utf8');
+      const changed = source.replace(
+        "gap: token('spacing.sm'),",
+        "gap: token('spacing.xl'),",
+      );
+      expect(changed).not.toBe(source);
+      fs.writeFileSync(page, changed, 'utf8');
+      const changedRevision = await second.applyChanges({
+        ...emptyMutation(reopened.revision, 'verified-explicit'),
+        changed: ['src/page.js'],
+      });
+      const changedValidation = await second.validate(changedRevision.revision);
+      expect(changedValidation.ok).toBe(true);
+      const changedReceipt = await second.compile(changedValidation.revision);
+      expect(changedReceipt.generationId).toBeGreaterThan(
+        nextReceipt.generationId,
+      );
+      expect(changedReceipt.artifactRevision).toEqual(
+        changedValidation.revision,
       );
     } finally {
       await first.close();

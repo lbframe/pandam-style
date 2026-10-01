@@ -385,6 +385,8 @@ export function recoverPublishedGeneration(outDir) {
       typeof state.artifactDigest === 'string'
         ? state.artifactDigest
         : artifactDigestOf(state.files),
+    candidateDigest:
+      typeof state.candidateDigest === 'string' ? state.candidateDigest : null,
     designSystem,
   });
 }
@@ -450,6 +452,7 @@ export function beginGeneration(outDir, options = {}) {
     generationId = null,
     revisionId = null,
     revisionIdentity = null,
+    candidateDigest = null,
     // Test seam. A point name, or a `(point) => void` that may throw. See
     // `maybeFail` below. Never set in a production path.
     failAt = null,
@@ -535,7 +538,9 @@ export function beginGeneration(outDir, options = {}) {
 
   // ---- the previous generation ---------------------------------------------
   const hadOutDir = isDir(absOut);
-  const previousState = recovery.state;
+  // A state sidecar describes the output tree beside it. If that tree has been
+  // removed, the sidecar alone is not evidence of a committed generation.
+  const previousState = hadOutDir ? recovery.state : null;
   const previousRecords =
     previousState != null &&
     previousState.version === STATE_VERSION &&
@@ -545,9 +550,12 @@ export function beginGeneration(outDir, options = {}) {
   const previousGenerationId = Number.isSafeInteger(previousState?.generationId)
     ? previousState.generationId
     : null;
+  const sameCandidate =
+    typeof candidateDigest === 'string' &&
+    candidateDigest === previousState?.candidateDigest;
   const activeGenerationId =
     typeof generationId === 'number' && previousGenerationId != null
-      ? Math.max(generationId, previousGenerationId + 1)
+      ? Math.max(generationId, previousGenerationId + (sameCandidate ? 0 : 1))
       : generationId;
   const forceNewGeneration =
     revisionIdentity != null &&
@@ -987,6 +995,8 @@ export function beginGeneration(outDir, options = {}) {
           ? revisionIdentity
           : null,
         artifactDigest: getGenerationArtifactDigest(),
+        candidateDigest:
+          typeof candidateDigest === 'string' ? candidateDigest : null,
         files: records,
       });
       addDuration('publish_metadata_ms', metaStart);
@@ -1014,6 +1024,8 @@ export function beginGeneration(outDir, options = {}) {
         ? revisionIdentity
         : null,
       artifactDigest: getGenerationArtifactDigest(),
+      candidateDigest:
+        typeof candidateDigest === 'string' ? candidateDigest : null,
     };
     if (typeof api.onCommitted === 'function') api.onCommitted(outcome);
     return outcome;
@@ -1053,6 +1065,10 @@ export function beginGeneration(outDir, options = {}) {
         artifactRevisionIdentity,
         associationRevisionIdentity,
         artifactDigest,
+        candidateDigest:
+          typeof candidateDigest === 'string'
+            ? candidateDigest
+            : (previousState?.candidateDigest ?? null),
         files: records,
       });
       rmrf(stagingDir);
@@ -1072,6 +1088,10 @@ export function beginGeneration(outDir, options = {}) {
         artifactRevisionIdentity,
         associationRevisionIdentity,
         artifactDigest,
+        candidateDigest:
+          typeof candidateDigest === 'string'
+            ? candidateDigest
+            : (previousState?.candidateDigest ?? null),
       });
     }
 
@@ -1088,6 +1108,8 @@ export function beginGeneration(outDir, options = {}) {
         ? revisionIdentity
         : null,
       artifactDigest: getGenerationArtifactDigest(),
+      candidateDigest:
+        typeof candidateDigest === 'string' ? candidateDigest : null,
       files: records,
     });
     rmrf(backupDir);
@@ -1142,6 +1164,8 @@ export function beginGeneration(outDir, options = {}) {
         ? revisionIdentity
         : null,
       artifactDigest: getGenerationArtifactDigest(),
+      candidateDigest:
+        typeof candidateDigest === 'string' ? candidateDigest : null,
     });
   }
 

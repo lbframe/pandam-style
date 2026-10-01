@@ -255,6 +255,7 @@ export function createProjectSession(config) {
   let closed = false;
   let leaseAcquired = false;
   let association = null;
+  let lastCandidateDigest = null;
   let nextTicketSequence = 1;
   const tickets = new Map();
   const watchers = new Set();
@@ -424,6 +425,7 @@ export function createProjectSession(config) {
       initialized = true;
       revisionId = value.revisionId;
       association = recovered ?? implementation.current();
+      lastCandidateDigest = recovered?.candidateDigest ?? null;
       return summary(value);
     } catch (error) {
       implementation?.close();
@@ -487,7 +489,7 @@ export function createProjectSession(config) {
     }
   }
 
-  async function compile(expectedRevision) {
+  async function compile(expectedRevision, options = {}) {
     requireRevision(expectedRevision, 'compile()');
     if (
       validated == null ||
@@ -501,13 +503,31 @@ export function createProjectSession(config) {
       throw new PmsError(result?.diagnostics ?? []);
     }
     try {
-      const result = implementation.compile({ revisionIdentity: revision() });
-      const generationId = result.generationId ?? null;
+      const candidateDigest =
+        options.candidateDigest ?? implementation._publicationCandidateDigest();
+      const previousGenerationId = Number.isSafeInteger(
+        association?.generationId,
+      )
+        ? association.generationId
+        : 0;
+      const targetGenerationId =
+        previousGenerationId > 0 &&
+        candidateDigest != null &&
+        candidateDigest === lastCandidateDigest
+          ? previousGenerationId
+          : previousGenerationId + 1;
+      const result = implementation.compile({
+        revisionIdentity: revision(),
+        generationId: targetGenerationId,
+        candidateDigest,
+      });
+      const committedGenerationId = result.generationId ?? null;
       const artifactRevision =
         snapshotRevision(result.artifactRevisionIdentity) ?? revision();
       const artifactDigest = result.artifactDigest ?? null;
+      lastCandidateDigest = result.candidateDigest ?? candidateDigest;
       association = immutableCopy({
-        generationId,
+        generationId: committedGenerationId,
         artifactRevision,
         associationRevision:
           snapshotRevision(result.associationRevisionIdentity) ?? revision(),
@@ -523,7 +543,7 @@ export function createProjectSession(config) {
         revision: revision(),
         artifactRevision,
         artifactDigest,
-        generationId,
+        generationId: committedGenerationId,
         designSystem: association.designSystem,
         publication: association.publication,
       });
@@ -570,7 +590,14 @@ export function createProjectSession(config) {
       truncated: result.truncated,
       candidates: implementation
         ._candidateTokenEntries(result.tokens)
-        .map(({ tokenId, category }) => Object.freeze({ tokenId, category })),
+        .map(({ tokenId, category }) => Object.freeze({ tokenId, category }))
+        .sort((left, right) =>
+          left.tokenId < right.tokenId
+            ? -1
+            : left.tokenId > right.tokenId
+              ? 1
+              : 0,
+        ),
     });
   }
 
@@ -831,7 +858,9 @@ export function createProjectSession(config) {
       );
     }
     tickets.delete(ticket.ticketId);
-    return compile(ticket.revision);
+    return compile(ticket.revision, {
+      candidateDigest: currentTicket.candidateDigest,
+    });
   }
 
   async function abortPrepared(inputTicket) {

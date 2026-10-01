@@ -303,9 +303,17 @@ describe('BC-5/BC-9: a failing CLI build publishes no mix', () => {
     {
       label: 'an internal error injected during publication staging',
       extraArgs: ['--inject-failure=after-compile'],
-      breakIt() {
-        // Nothing is wrong with the sources: the failure is raised inside the
-        // publication window, which is exactly what a real build cannot do.
+      breakIt(project) {
+        const page = path.join(project, 'src/page.js');
+        const before = fs.readFileSync(page, 'utf8');
+        fs.writeFileSync(
+          page,
+          before.replace(
+            "gap: token('spacing.sm'),",
+            "gap: token('spacing.xl'),",
+          ),
+          'utf8',
+        );
       },
     },
     {
@@ -356,6 +364,13 @@ describe('BC-5/BC-9: a failing CLI build publishes no mix', () => {
   test('the injected failure is a real diagnostic on a real process', () => {
     const project = freshCopyOf('valid');
     expect(runBuild(project).status).toBe(0);
+    const page = path.join(project, 'src/page.js');
+    const before = fs.readFileSync(page, 'utf8');
+    fs.writeFileSync(
+      page,
+      before.replace("gap: token('spacing.sm'),", "gap: token('spacing.xl'),"),
+      'utf8',
+    );
     const result = runBuild(project, ['--inject-failure=after-compile']);
     expect(result.status).toBe(1);
     expect(result.codes).toContain('PMS_INJECTED_FAILURE');
