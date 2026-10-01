@@ -7,19 +7,20 @@ behavior is unchanged by Phase 0.
 
 ## Public release boundaries (ARCH-01, ARCH-02)
 
-Accept four packages: `@pandamstyle/core`, `@pandamstyle/compiler`,
-`@pandamstyle/vite`, `@pandamstyle/next`. These are distinct browser-runtime,
+Accept five packages: `@pandamstyle/core`, `@pandamstyle/compiler`,
+`@pandamstyle/vite`, `@pandamstyle/next`, `@pandamstyle/rsbuild`. These are distinct browser-runtime,
 build-service and host lifecycle/release boundaries. Internal domains are
-directories, not packages. Next is a target package, not a present support
-claim. CLI/config/ watcher SDK does not warrant another package; generated
+directories, not packages. Next and Rsbuild are target packages, not present
+support claims until their implementation and qualification phases close. CLI/config/ watcher SDK does not warrant another package; generated
 vocabulary is a project artifact, not an npm meta-package.
 
 | Package  | Purpose and exports                                                                                                                                                                                                                                                | Classification/importers                                                            | Allowed dependencies                                                                                                        | Forbidden dependencies/importers                                                                                                                  | Version responsibility                                                                                  |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| core     | Compiled ref ABI, props, finite recipe selection/factory, theme refs, runtime selection error, public runtime types. Root exports ABI helpers `defineRecipeSelector`, `assertAbi`, types and `props`; create/token are generated sentinels, not core value exports | Browser-safe runtime; generated facade imports values, application may import types | No mandatory runtime dependencies initially; any future small browser utility requires explicit size/semantic justification | Compiler, fs/Node builtins, Babel, config/graphs/sessions, Vite, Next, React, donor packages. Build service must not be pulled into browser       | Owns ABI v1 implementation and runtime semver; changed conflict/selection semantics requires ABI review |
-| compiler | createProjectSession, config/definition source API, diagnostics/protocols/types, CLI; advanced `/host` adapter bridge                                                                                                                                              | Node build-time; CLI, watcher, agents, adapters, design-system authors              | core for shared finite selection/ABI; parser/transformer, resolution, CSS-value/format tools, Node fs                       | Donor CSS-library packages, Vite/Next/framework runtimes; application browser/server component value imports; runtime transitive compiler imports | SDK, protocols and generated JS/metadata/declarations; private refactors do not change public contract  |
+| core     | Compiled ref ABI, props, finite recipe selection/factory, theme refs, runtime selection error, public runtime types. Root exports ABI helpers `defineRecipeSelector`, `assertAbi`, types and `props`; create/token are generated sentinels, not core value exports | Browser-safe runtime; generated facade imports values, application may import types | No mandatory runtime dependencies initially; any future small browser utility requires explicit size/semantic justification | Compiler, fs/Node builtins, Babel, config/graphs/sessions, Vite, Next, Rsbuild, React, donor packages. Build service must not be pulled into browser | Owns ABI v1 implementation and runtime semver; changed conflict/selection semantics requires ABI review |
+| compiler | createProjectSession, config/definition source API, diagnostics/protocols/types, CLI; advanced `/host` adapter bridge                                                                                                                                              | Node build-time; CLI, watcher, agents, adapters, design-system authors              | core for shared finite selection/ABI; parser/transformer, resolution, CSS-value/format tools, Node fs                       | Donor CSS-library packages, Vite/Next/Rsbuild/framework runtimes; application browser/server component value imports; runtime transitive compiler imports | SDK, protocols and generated JS/metadata/declarations; private refactors do not change public contract  |
 | vite     | `pandamstyle(options)` plugin entry backed by canonical service; types for options                                                                                                                                                                                 | Build-time; Vite configuration only                                                 | compiler public SDK dependency; Vite peer; its public host types                                                            | Core semantics implementation, compiler private paths, alternate graph/cache/publisher, donor packages; application modules                       | Adapter semver and declared supported Vite/SDK range; backend behavior verified per range               |
 | next     | `withPandamStyle(options)` build-config integration, explicit backend option/capabilities and types                                                                                                                                                                | Build-time; Next configuration only                                                 | compiler public SDK dependency; Next peer; webpack public integration APIs where supported                                  | React runtime component API, private compiler paths, second semantics/cache/publisher, donor packages; app components                             | Separate tested webpack and Turbopack capability/range matrix; no implied parity                        |
+| rsbuild  | `pandamstyle(options)` Rsbuild plugin entry backed by the canonical service; types for options                                                                                                                                                                     | Build-time; Rsbuild configuration only                                              | compiler public SDK dependency; Rsbuild peer; public Rsbuild/Rspack host APIs as required                                    | Core semantics implementation, compiler private paths, alternate graph/cache/publisher, donor packages; application modules                       | Adapter semver and declared supported Rsbuild/compiler SDK range; backend behavior verified per range    |
 
 Names follow responsibilities. `core` denotes browser ABI/composition and leaves
 compile-time CSS authoring bound to generated vocabulary. `css` suggests a
@@ -36,6 +37,7 @@ flowchart TD
   DS --> Core["@pandamstyle/core"]
   Vite["@pandamstyle/vite"] --> SDK[Compiler public SDK]
   Next["@pandamstyle/next"] --> SDK
+  Rsbuild["@pandamstyle/rsbuild"] --> SDK
   CLI[CLI / watcher / agent host] --> SDK
   SDK --> Internal[Compiler internals]
   Internal --> Engine[PandamStyle-owned semantic / CSS engine]
@@ -44,7 +46,7 @@ flowchart TD
 
 Application type-only imports from core do not add runtime edges. Definition
 source imports compiler/config at build time. Adapters import only exported SDK
-subpaths. Disallow core → compiler, Node filesystem, Babel, Vite, Next or React;
+subpaths. Disallow core → compiler, Node filesystem, Babel, Vite, Next, Rsbuild or React;
 compiler → host adapters; app → compiler internals; adapter → private compiler
 implementation. All final production dependencies, optional dependencies, peers,
 bundled imports and generated import specifiers must contain zero `@stylexjs/*`
@@ -53,8 +55,8 @@ imports is insufficient. Adapted engine behavior becomes owned internal source.
 
 ## One project authority (ARCH-18, ARCH-19)
 
-CLI, Vite, Next, watcher and agent hosts consume one revision-based project
-service. Multiple consumers share a service handle/coordinator for the same
+CLI, Vite, Next, Rsbuild, watcher and agent hosts consume one revision-based
+project service. Multiple consumers share a service handle/coordinator for the same
 project/output; an out-of-process transport may relay this exact SDK but owns no
 semantic state. Separate output projects may use separate service instances.
 Process-global module overlays/caches must become session-owned during
@@ -84,15 +86,24 @@ generation artifacts; production bundling settlement may gate canonical commit
 via a ticket. Failure after staging aborts the ticket; the previously committed
 generation stays valid. Advanced HMR/coordinated whole-host output atomicity is
 deferred, with compiler transaction safety mandatory. No promise of atomic
-Vite/Next chunk directories is implied by PandamStyle generation publication.
+Vite/Next/Rsbuild chunk directories is implied by PandamStyle generation publication.
 
 Next webpack and Next Turbopack are separate backends. Backend option must be
 explicit (`webpack` or `turbopack`); unsupported backend/version rejects before
 compilation. Implementing webpack is not Turbopack support. Backend adapters
 live inside next, consume the same service, and own only backend
-hooks/transport. The large Next pilot is forbidden before standalone packaging
-and the plan's earlier gates. No Next implementation or native frontend
-commitment occurs here.
+hooks/transport.
+
+Rsbuild is a separate host adapter over the same service. It may use public
+Rsbuild/Rspack lifecycle APIs, but it must not reconstruct compiler semantics,
+coverage, CSS ownership, design-system vocabulary or publication state. Its
+supported Rsbuild/Rspack range is an evidence-backed package contract, not
+inferred from Vite or webpack behavior.
+
+Large Vite, Next and Rsbuild pilots are forbidden until their relevant adapters
+and standalone package checkpoints have closed. Pilot success must be proven in
+real external applications from packed public packages; host-specific fixes
+must later converge into one canonical tree.
 
 ## Internal domains
 
@@ -137,7 +148,7 @@ packages/compiler/src/
 ```
 
 Folders do not authorize independent releases. The frontend/engine can evolve
-without changing author APIs; Rust/Oxc/SWC selection stays Phase 13 and
+without changing author APIs; Rust/Oxc/SWC selection stays Phase 16 and
 evidence-gated. Existing warm-path architecture must survive source relocation;
 do not turn a structural migration into repeated cold/global rebuilds.
 
@@ -151,8 +162,8 @@ do not turn a structural migration into repeated cold/global rebuilds.
 | INV-07, INV-08, INV-09, INV-17 | Independent semantic oracles plus fresh/incremental equivalence; no weakened/deleted failing test for migration convenience |
 | INV-10, INV-11                 | One project service, no host-owned semantic truth/cache                                                                     |
 | INV-12                         | Internal directories do not imply public packages                                                                           |
-| INV-13                         | Standalone packaging gates large Next pilot                                                                                 |
-| INV-14                         | Native selection requires measured evidence in Phase 13                                                                     |
+| INV-13                         | Qualified host adapters and standalone packaging gate large external Vite, Next and Rsbuild pilots                               |
+| INV-14                         | Native selection requires measured evidence in Phase 16                                                                     |
 | INV-16                         | Binding/provenance identity required; ambiguity fails closed                                                                |
 | INV-18                         | Verified warm-path work/invalidation/publication behavior retained                                                          |
 | INV-20                         | Each batch declares moved/deleted/temporary/final assets and remaining dependencies                                         |
