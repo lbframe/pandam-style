@@ -1,45 +1,42 @@
 # PandamStyle
 
-Library with a constrained vocabulary: **StyleX fork + selected and adapted
-Panda CSS modules**. The goal: agents compose with an authorized design
-vocabulary instead of reinventing micro-decisions.
+PandamStyle is a compiler and runtime for composing applications from an
+authorized design vocabulary.
 
-Current technical checkpoint after performance Spikes 1–4:
-[Strategic checkpoint — September 2026](docs/strategic-checkpoint-2026-09.md).
-It records the final Phase D architecture, metric boundaries, semantic/product
-gaps and next implementation order. Earlier measurements below remain historical
-examples; P0 is still not validated.
+The [strategic checkpoint — September 2026](docs/strategic-checkpoint-2026-09.md)
+records the product architecture, metric boundaries and known gaps. Phase 4
+engine absorption is complete. Phase 5 cleanup and qualification are recorded
+in [the Phase 5 delivery](docs/architecture/phase-5-delivery.md).
 
 ## Repository contents
 
-| Path                                                     | Contents                                                                                                                                                                                                                     |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/@stylexjs/*`                                   | StyleX fork code (upstream remote → facebook/stylex)                                                                                                                                                                         |
-| `packages/compiler/`                                     | Installable `@pandamstyle/compiler`: stable project SDK, compiler domains and `pms-build`; no temporary runtime or Vite export                                                                                               |
-| `tools/pilot/vite-seam.js`                               | Qualification-only Vite seam used by the pilot; Phase 8 still owns public Vite support                                                                                                                                        |
-| `benchmarks/pandamstyle/`                                | The benchmark laboratory: corpus generator, campaign runner, the engine-vs-engine oracle, the incremental-vs-fresh-rebuild oracle, the long-session memory trace, the agent-loop campaign and the Phase C correctness oracle |
-| `packages/@stylexjs/babel-plugin/__tests__/pandamstyle/` | Current PandamStyle integration tests and fixture projects; their later move is a Phase 5 deletion precondition                                                                                                                |
-| `packages/compiler/__tests__/engine-absorption-test.js` | PandamStyle-owned engine behavior tests added in Phase 4                                                                                                                                                                       |
-| `pilot/vite-react/`                                      | Vite + React pilot application, installed from local `npm pack` tarballs                                                                                                                                                     |
-| `docs/pandamstyle-specification-v0.1/`                   | Specification v0.1 (architecture, P0 scope, acceptance, decisions)                                                                                                                                                           |
-| `evidence/l0/`, `evidence/demo/`                         | Historical L0 baseline and demo evidence (kept unchanged)                                                                                                                                                                    |
-| `evidence/phase-4-engine-absorption/`                    | Phase 4 closure evidence: verifier, oracle, package graph, browser/SSR, isolation and performance                                                                                                                                 |
-| `upstream/panda/`                                        | Vendored Panda CSS donor (comparison source)                                                                                                                                                                                 |
-| `tools/pilot/run-pilot.sh`                               | Pilot driver: pack, install outside the workspace, build                                                                                                                                                                     |
-| `tools/pms/`                                             | Verification reporting: the Jest-output reader that decides a run's verdict from suite AND test counts                                                                                                                       |
-| `verify-pms.sh`                                          | Verification entry point                                                                                                                                                                                                     |
+| Path                                                | Contents                                                                                                      |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `packages/core/`                                    | Installable `@pandamstyle/core` runtime and composition ABI                                                   |
+| `packages/compiler/`                                | Installable `@pandamstyle/compiler`, stable project SDK, compiler domains, and `pms-build`                    |
+| `packages/compiler/__tests__/pandamstyle/`          | PandamStyle integration suites and their consuming-project fixtures                                          |
+| `packages/compiler/__tests__/engine-absorption-test.js` | Owned tests for static evaluation and the absorbed CSS engine                                                 |
+| `tools/pilot/vite-seam.js`                          | Private qualification-only Vite seam                                                                          |
+| `examples/pilots/vite-react/`                       | Vite + React pilot that installs local `npm pack` tarballs                                                    |
+| `benchmarks/pandamstyle/`                           | Owned compiler and incremental behavior benchmarks                                                           |
+| `tests/semantic/`                                   | Independent 129-case semantic oracle with browser and SSR/hydration checks                                   |
+| `docs/pandamstyle-specification-v0.1/`               | Specification v0.1 (architecture, P0 scope, acceptance, decisions)                                           |
+| `evidence/l0/`, `evidence/demo/`                     | Historical L0 baseline and demo evidence                                                                      |
+| `evidence/phase-4-engine-absorption/`                | Historical Phase 4 verifier, oracle, package graph, browser/SSR, isolation, and performance evidence           |
+| `tools/pilot/run-pilot.sh`                          | Pilot driver: pack, install outside the workspace, build                                                     |
+| `tools/pms/`                                        | Verification reporting and donor-closure checks                                                               |
+| `verify-pms.sh`                                     | Official verification entry point                                                                            |
 
 ## Verify the work
 
 ```bash
-PMS_OUT_DIR=evidence/phase-4-engine-absorption/verify \
-  PMS_BATCH_BASE_REF=feat/pandamstyle-native-compiler ./verify-pms.sh
+PMS_OUT_DIR=evidence/phase-5-donor-cleanup/verify ./verify-pms.sh
 ```
 
-The required verifier runs 11 steps: dependency install, build, upstream
-reference suites, PandamStyle and core suites, semantic oracle, tooling tests,
-the packed Vite pilot, artifact collection, and donor closure. The command above
-stores qualification output under the Phase 4 evidence directory.
+The required verifier runs nine steps: dependency install, owned package build,
+PandamStyle and core suites, semantic oracle, tooling tests, the packed Vite
+pilot, artifact collection, and donor closure. The command above stores output
+under the Phase 5 evidence directory.
 
 Use **Node 22** — the major pinned by `.nvmrc`. On that major
 `yarn install --frozen-lockfile` completes with no `--ignore-engines`, which the
@@ -49,7 +46,8 @@ historical Node 26 baseline required.
 and is refused otherwise. `PMS_SKIP_INSTALL=1` and `PMS_SKIP_PILOT=1` skip a
 step; both are recorded in `summary.json` rather than hidden.
 
-The Phase 4 delivery document records the exact final test and suite counts.
+The Phase 4 delivery document records the exact historical test and suite
+counts. Phase 5 writes fresh evidence for the donor-free tree.
 
 ## Incremental compilation (project session)
 

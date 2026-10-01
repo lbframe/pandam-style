@@ -61,16 +61,12 @@ module.exports = {
     'build',
     'coverage',
     'dist',
-    'flow-typed',
     'lib',
-    'flow_modules',
     'node_modules',
-    'next-env.d.ts',
-    'next.config.js',
+    // Third-party Flow declarations provide types, not repository source.
+    'flow-typed/',
     '**/__mocks__/snapshot*',
-    '**/storybook-static/**',
     '**/*.d.ts',
-    '**/pages.gen.ts',
   ],
   overrides: [
     {

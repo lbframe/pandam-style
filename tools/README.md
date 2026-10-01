@@ -1,50 +1,16 @@
-# Tools
+# Repository tools
 
-Tools used to manage monorepo tasks like pre-commit hooks and npm releases.
+The tools in this directory support PandamStyle development and qualification.
 
-## How to create a release
+- `tools/pms/` contains the official verifier's reporting, test discovery,
+  package closure, and evidence helpers.
+- `tools/semantic-oracle/` runs the independently inventoried semantic cases.
+- `tools/pilot/` packs the owned packages and installs them into the Vite
+  qualification app outside the workspace.
+- `tools/husky/` contains the local commit hooks.
+- `tools/eslint/` contains lint support used by the repository.
 
-The release script (run from the monorepo root) must be used to create and
-publish releases. All releases must follow semver versioning standards, e.g.,
-`0.20.1`.
-
-Checkout a release branch from latest `main`:
-
-```shell
-git checkout main
-git pull origin main
-git checkout -b release/<version>
-```
-
-You can perform a dry run by only specifying the new version for a release:
-
-```shell
-npm run release -- --pkg-version <version>
-```
-
-Modify the CHANGELOG.md with new changes. Then commit the release:
-
-```shell
-npm run release -- --pkg-version <version> --commit
-```
-
-Push the branch up for review:
-
-```shell
-git push origin release/<version>
-```
-
-Once the branch has been merged, update `main` and the git-tag.
-
-```shell
-git checkout main
-git pull origin main
-git tag -am <version> "<version>"
-git push --tags origin main
-```
-
-To publish the release:
-
-```shell
-npm run release -- --pkg-version <version> --publish --otp 123456
-```
+Run the full required qualification from the repository root with
+`./verify-pms.sh`. Package publication is handled only after the later release
+qualification phase; this repository currently keeps its root workspace
+private.

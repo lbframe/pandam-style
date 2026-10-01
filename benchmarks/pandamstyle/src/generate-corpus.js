@@ -505,7 +505,7 @@ function tokenPathFor(definition, raw) {
 }
 
 /**
- * Property kinds, mirroring packages/@stylexjs/babel-plugin/pandamstyle/policy.js.
+ * Property kinds, matching packages/compiler/src/design-system/policy/properties.js.
  *
  * A structural property (`display`, `alignItems`, ...) admits a FINITE literal
  * domain; a category property (`padding`, `color`, ...) admits a token of one

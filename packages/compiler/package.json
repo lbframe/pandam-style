@@ -43,9 +43,12 @@
     "@babel/preset-typescript": "^7.26.0",
     "@babel/traverse": "^7.26.8",
     "@babel/types": "^7.26.8",
+    "@csstools/css-tokenizer": "^3.0.3",
     "postcss-value-parser": "^4.1.0"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.26.8",
+    "@babel/preset-flow": "^7.26.8",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-json": "^6.1.0",

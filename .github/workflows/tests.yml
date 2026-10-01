@@ -21,7 +21,7 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn flow
 
-  packages:
+  pandamstyle:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -31,11 +31,7 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: yarn.lock
       - run: corepack prepare yarn@1.22.22 --activate
-      - run: yarn install --frozen-lockfile
-      - run: yarn test:packages
-      - run: yarn workspace @stylexjs/devtools-extension build
-      - run: yarn workspace @stylexjs/devtools-extension verify:build
-      - run: yarn workspace @stylexjs/devtools-extension web-ext:lint
+      - run: ./verify-pms.sh
 
   prettier:
     runs-on: ubuntu-latest

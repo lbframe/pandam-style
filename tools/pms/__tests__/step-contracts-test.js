@@ -40,7 +40,12 @@ const {
 } = require('../step-contracts');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const NATIVE_DIR = path.join(REPO_ROOT, 'evidence', 'native');
+const NATIVE_DIR = path.join(
+  REPO_ROOT,
+  'evidence',
+  'phase-4-engine-absorption',
+  'verify',
+);
 
 /** A real log from the run under discussion, or null when it is not committed. */
 function realLog(step) {
@@ -48,20 +53,33 @@ function realLog(step) {
   return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;
 }
 
-/** The real run: seven steps, all green, exactly as `verify-pms.sh` recorded. */
+/** Historical owned-suite logs exercise the current evidence contracts. */
 const REAL_RUN = {
   install: { status: 'passed', exitCode: 0 },
   build: { status: 'passed', exitCode: 0 },
-  'upstream-babel-plugin': { status: 'passed', exitCode: 0 },
-  'upstream-stylex': { status: 'passed', exitCode: 0 },
   pandamstyle: { status: 'passed', exitCode: 0 },
+  'pandamstyle-core': { status: 'passed', exitCode: 0 },
+  'semantic-oracle': { status: 'passed', exitCode: 0 },
+  'tooling-tests': { status: 'passed', exitCode: 0 },
   pilot: { status: 'passed', exitCode: 0 },
   artifacts: { status: 'passed', exitCode: 0 },
+  'donor-closure': { status: 'passed', exitCode: 0 },
 };
 
-const TEST_STEPS = ['upstream-babel-plugin', 'upstream-stylex', 'pandamstyle'];
-const NON_TEST_STEPS = ['install', 'build', 'pilot', 'artifacts'];
-const CURRENT_NON_TEST_STEPS = [...NON_TEST_STEPS, 'donor-closure'];
+const TEST_STEPS = [
+  'pandamstyle',
+  'pandamstyle-core',
+  'semantic-oracle',
+  'tooling-tests',
+];
+const NON_TEST_STEPS = [
+  'install',
+  'build',
+  'pilot',
+  'artifacts',
+  'donor-closure',
+];
+const CURRENT_NON_TEST_STEPS = [...NON_TEST_STEPS];
 
 /**
  * The conjunction `summary.json`'s `complete` is computed from, restated here so
@@ -134,7 +152,7 @@ describe('step-contracts: a test-bearing step is judged on its counts', () => {
     // Case 3. The Phase A/B defect, re-asserted through the new dispatcher so
     // that routing a test step through `assessStep` cannot quietly drop it.
     const verdict = assessStep({
-      step: 'upstream-babel-plugin',
+      step: 'pandamstyle',
       status: 'passed',
       exitCode: 0,
       counts: parseJestCounts(`
@@ -187,7 +205,7 @@ Tests:       1007 passed, 1071 total
     for (const [code, suiteLine, testLine] of cases) {
       const text = [suiteLine, testLine].filter((l) => l != null).join('\n');
       const verdict = assessStep({
-        step: 'upstream-stylex',
+        step: 'pandamstyle',
         // Exit 0 for every case, so the suite line is the only thing deciding.
         status: 'passed',
         exitCode: 0,
@@ -248,8 +266,6 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
       'pilot',
       'semantic-oracle',
       'tooling-tests',
-      'upstream-babel-plugin',
-      'upstream-stylex',
     ]);
     for (const [, { kind }] of classified) {
       expect(KIND_EVIDENCE[kind]).toBeDefined();
@@ -260,14 +276,7 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
         .filter(([, c]) => c.kind === 'test')
         .map(([n]) => n)
         .sort(),
-    ).toEqual(
-      [
-        ...TEST_STEPS,
-        'pandamstyle-core',
-        'semantic-oracle',
-        'tooling-tests',
-      ].sort(),
-    );
+    ).toEqual([...TEST_STEPS].sort());
     expect(
       classified
         .filter(([, c]) => c.kind !== 'test')
@@ -364,35 +373,34 @@ describe('step-contracts: a whole run', () => {
   // Case 9. The run that exposed the defect, reconstructed from the logs and
   // the step table the verified run produced. Before the fix this shape produced
   // `complete: false` with `incomplete`, which is the defect.
-  test('seven green steps with three sets of counts are verified', () => {
+  test('nine green steps with four sets of counts are verified', () => {
     const { assessRun } = require('../test-counts');
     const integrity = Object.entries(REAL_RUN).map(([step, s]) =>
       assessFromLog(step, { ...s, artifactPresent: true }),
     );
-    expect(integrity.map((s) => s.verdict)).toEqual(Array(7).fill('verified'));
+    expect(integrity.map((s) => s.verdict)).toEqual(Array(9).fill('verified'));
     const run = assessRun(integrity);
     expect(run.verdict).toBe('verified');
-    expect(run.stepsVerified).toBe(7);
+    expect(run.stepsVerified).toBe(9);
     expect(run.stepsFailed).toEqual([]);
     expect(run.stepsIncomplete).toEqual([]);
     expect(run.stepsUnverified).toEqual([]);
     // No step was skipped and none failed, so `complete` reduces to the verdict.
     expect(completeFor({ failed: 0, runVerdict: run.verdict })).toBe(true);
-    // The totals are sums over the three steps that run tests, and the run says
+    // The totals are sums over the four steps that run tests, and the run says
     // which three so the denominator is not hidden from a reader.
     expect(run.testSteps.sort()).toEqual([...TEST_STEPS].sort());
     expect(run.nonTestSteps.sort()).toEqual([...NON_TEST_STEPS].sort());
-    // 1007 + 64 skipped = 1071, plus 99, plus 460: 1566 passed and 64 skipped,
-    // over 42 + 4 + 20 = 66 suites passed, 1 skipped, 0 failed anywhere.
-    expect(run.testsPassed).toBe(1566);
+    // Historical Phase 4 logs: 500 + 14 + 148 + 76 = 738 tests across 48 suites.
+    expect(run.testsPassed).toBe(738);
     expect(run.testsFailed).toBe(0);
-    expect(run.testsSkipped).toBe(64);
-    expect(run.suitesPassed).toBe(66);
+    expect(run.testsSkipped).toBe(0);
+    expect(run.suitesPassed).toBe(48);
     expect(run.suitesFailed).toBe(0);
-    expect(run.suitesSkipped).toBe(1);
+    expect(run.suitesSkipped).toBe(0);
   });
 
-  test('the four non-test steps contribute no counts to the totals', () => {
+  test('the five non-test steps contribute no counts to the totals', () => {
     // If a non-test step's log were parsed and found a `Tests:` line - a build
     // tool that printed one, a lockfile entry - its numbers would enter a
     // delivery's totals as though suites had run. Asserted against a log that

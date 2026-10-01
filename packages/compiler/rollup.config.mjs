@@ -32,6 +32,7 @@ const external = [
   '@babel/preset-react',
   '@babel/preset-typescript',
   '@pandamstyle/core',
+  '@csstools/css-tokenizer',
   'postcss-value-parser',
   'node:crypto',
   'node:fs',

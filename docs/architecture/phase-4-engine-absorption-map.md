@@ -150,4 +150,4 @@ Row 14, `packages/@stylexjs/babel-plugin/pandamstyle/vite.js`, is a qualificatio
 
 ## Provenance
 
-The donor package manifests identify the source as Facebook StyleX `0.19.1`, MIT licensed, repository `facebook/stylex`; `upstream/README.md` records donor commit `fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2`. The exact PandamStyle base commit/tree is also recorded above. Moved or refactored files retain their required MIT headers and are mapped to owned targets in `phase-4-derived-source-provenance.md`.
+The donor package manifests identify the source as Facebook StyleX `0.19.1`, MIT licensed, repository `facebook/stylex`; the recorded source commit is `fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2`. The exact PandamStyle base commit/tree is also recorded above. Moved or refactored files retain their required MIT headers and are mapped to owned targets in `phase-4-derived-source-provenance.md`. Phase 5 removes the source checkouts; the revision and license records are retained in `ATTRIBUTIONS.md` and `LICENSES/`.

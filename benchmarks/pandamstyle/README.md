@@ -187,7 +187,7 @@ A monkey patch could time `resolveRelativeFile`. It could not time
 performed a parse, and could not attribute a diagnostic to the phase that raised
 it. A phase boundary only the compiler itself can report honestly is a compiler
 concern, so the hooks live in
-`packages/@stylexjs/babel-plugin/pandamstyle/perf.js`. They are additive and
+`packages/compiler/src/observability/metrics.js`. They are additive and
 inert without a collector: every call is one null check, and a build that
 installs no collector executes the same work in the same order.
 
@@ -480,17 +480,15 @@ node --test tests/bench.test.js
 Useful flags: `--scenarios`, `--cache-states`, `--engines`, `--work-dir`,
 `--timeout-ms`, `--run-kind`.
 
-### The baseline worktree
+### Historical Spike 1 baseline
 
-`babel_current` needs a checkout of the baseline:
+The `babel_current` comparison used the historical baseline commit
+`d5702374ac5a685499d14a53bf323d8533e6982d`. Its source layout predates the
+owned `packages/compiler/` package and is not part of the Phase 5 workspace.
+The committed Spike 4 report and correctness oracle preserve that comparison.
+Phase 5 performance checks run the current compiler from `packages/compiler/`
+against the committed Phase 4 counters; they do not build the old baseline.
 
-```bash
-git worktree add ../pms-baseline d5702374ac5a685499d14a53bf323d8533e6982d
-```
-
-Apply the instrumentation patch from this branch to that worktree (it is
-additive), give it the same `node_modules` (a symlink is enough), and build
-`packages/@pandamstyle/compiler`. `PMS_BASELINE_ROOT` overrides the path.
 
 ---
 

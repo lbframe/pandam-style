@@ -1,11 +1,10 @@
 [files]
 extend-exclude = [
   "*.snap",
+  # Third-party Flow declarations contain external API names.
   "flow-typed/*",
   # Too many false positives on inline snapshots
   "packages/**/__tests__/",
-  # Fixture data has lots of typos
-  "packages/benchmarks/**/fixtures/",
 ]
 
 [default.extend-words]

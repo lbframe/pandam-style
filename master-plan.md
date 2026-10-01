@@ -955,23 +955,15 @@ For every future implementation brief:
 
 ---
 
-# 11. Current next action
+# 11. Current execution state
 
-**Status correction, 2026-10-01:** The initial next action below was not updated
-after the subsequent phase deliveries and is stale. The accepted Phase 4
-delivery records tested commit `7b6b58ee2a430d8495a2acbed67fb631fc43f577`,
-final branch head `44bbdb4c323cfaae9abc69f524d4fc8b5ceb4133`, and Phase 5
-readiness. The repository is therefore at the Phase 5 gate: Phase 4 is complete
-and Phase 5 is authorized to begin, but Phase 5 is not yet complete. This
-correction updates execution status only; it does not change product contracts,
-phase ordering, or exit criteria. Phase 6 and Phase 7 remain unauthorized until
-every Phase 5 exit gate is verified.
+Phase 4 is complete. Phase 5 cleanup and qualification are being carried on
+`chore/pandamstyle-phase-5-donor-cleanup-2026-10`, from the accepted Phase 4
+head `44bbdb4c323cfaae9abc69f524d4fc8b5ceb4133`. The Phase 5 delivery record is
+the authority for its tested commit, evidence, exit-gate result, and subsequent
+phase authorization. Phase 6 and Phase 7 remain unauthorized unless that record
+reports every Phase 5 gate passed.
 
-The former initial action was: **Phase 0 — Freeze product architecture and
-public contracts.** That prerequisite is represented by the accepted Phase 0
-contracts and their delivery records; it is no longer the current next action.
-
-**Next required phase: Phase 5 — Delete donor/legacy repository structure.**
-
-Follow the Phase 5 deletion-readiness record and require the complete Phase 5
-exit gate before authorizing later phases.
+The next authorized work follows the Phase 5 delivery record and the controlled
+parallelism rules above. This execution note does not change product contracts,
+phase ordering, or exit criteria.

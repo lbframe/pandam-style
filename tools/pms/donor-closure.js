@@ -22,6 +22,21 @@ const DONOR_PATH_PARTS = [
   `${path.sep}upstream${path.sep}stylex${path.sep}`,
   `${path.sep}upstream${path.sep}panda${path.sep}`,
 ];
+const FORBIDDEN_REPOSITORY_PATHS = [
+  'packages/@stylexjs',
+  'packages/style-value-parser',
+  'upstream/stylex',
+  'upstream/panda',
+  'legacy',
+  'archive',
+  'vendor',
+  'old-stylex',
+  'stylex-reference',
+  'panda-reference',
+  'reference-copy',
+  'vendor-history',
+  'donor-backup',
+];
 // The compiler CLI deliberately loads the consuming project's build config.
 // This is the package's documented user-input boundary, not an engine or
 // compiler dependency. Keep its cardinality pinned so any other computed
@@ -55,6 +70,27 @@ function filesBelow(root, extensions = SOURCE_EXTENSIONS) {
 function isDonorPath(file) {
   const absolute = path.resolve(file);
   return DONOR_PATH_PARTS.some((part) => absolute.includes(part));
+}
+
+function inspectForbiddenRepositoryPaths(repoRoot, findings) {
+  const paths = FORBIDDEN_REPOSITORY_PATHS.map((relativePath) => {
+    const fullPath = path.join(repoRoot, relativePath);
+    const exists = fs.existsSync(fullPath);
+    if (exists)
+      addFinding(
+        findings,
+        'FORBIDDEN_REPOSITORY_PATH_PRESENT',
+        relativePath,
+        'forbidden donor or archive path exists',
+      );
+    return { path: relativePath, exists };
+  });
+  return {
+    checked: paths.length,
+    absentCount: paths.filter((item) => !item.exists).length,
+    present: paths.filter((item) => item.exists).map((item) => item.path),
+    paths,
+  };
 }
 
 function isDonorSpecifier(specifier) {
@@ -174,6 +210,124 @@ function inspectManifest(manifestPath, label, findings) {
       Object.entries(dependencies).sort(([a], [b]) => a.localeCompare(b)),
     ),
     donorDependencies: Object.keys(dependencies).filter(isDonorSpecifier),
+  };
+}
+
+function inspectRootWorkspace(repoRoot, findings) {
+  const manifestPath = path.join(repoRoot, 'package.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const expectedWorkspaces = [
+    { path: 'packages/compiler', name: '@pandamstyle/compiler' },
+    { path: 'packages/core', name: '@pandamstyle/core' },
+  ];
+  const workspaces = Array.isArray(manifest.workspaces)
+    ? manifest.workspaces
+    : (manifest.workspaces?.packages ?? []);
+
+  if (manifest.name !== 'pandamstyle-workspace')
+    addFinding(
+      findings,
+      'ROOT_PACKAGE_IDENTITY_INVALID',
+      manifestPath,
+      `expected pandamstyle-workspace, found ${manifest.name ?? 'unnamed'}`,
+    );
+  if (manifest.private !== true)
+    addFinding(
+      findings,
+      'ROOT_WORKSPACE_PACKAGE_MUST_BE_PRIVATE',
+      manifestPath,
+      'the root workspace must not become a public package',
+    );
+  if (manifest.packageManager !== 'yarn@1.22.22')
+    addFinding(
+      findings,
+      'ROOT_PACKAGE_MANAGER_INVALID',
+      manifestPath,
+      `expected yarn@1.22.22, found ${manifest.packageManager ?? 'unset'}`,
+    );
+  if (
+    workspaces.length !== expectedWorkspaces.length ||
+    expectedWorkspaces.some((item) => !workspaces.includes(item.path))
+  ) {
+    addFinding(
+      findings,
+      'ROOT_WORKSPACE_SET_INVALID',
+      manifestPath,
+      `expected ${expectedWorkspaces.map((item) => item.path).join(', ')}, found ${workspaces.join(', ')}`,
+    );
+  }
+
+  const workspacePackages = [];
+  for (const { path: relativePath, name: expectedName } of expectedWorkspaces) {
+    const packagePath = path.join(repoRoot, relativePath, 'package.json');
+    if (!fs.existsSync(packagePath)) {
+      addFinding(
+        findings,
+        'ROOT_WORKSPACE_PACKAGE_MISSING',
+        relativePath,
+        'workspace entry has no package manifest',
+      );
+      continue;
+    }
+    const workspaceManifest = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+    if (workspaceManifest.name !== expectedName)
+      addFinding(
+        findings,
+        'ROOT_WORKSPACE_PACKAGE_IDENTITY_INVALID',
+        relativePath,
+        `expected ${expectedName}, found ${workspaceManifest.name ?? 'unnamed'}`,
+      );
+    workspacePackages.push({
+      path: relativePath,
+      name: workspaceManifest.name ?? null,
+    });
+  }
+
+  const scripts = manifest.scripts ?? {};
+  const dependencies = {
+    ...manifest.dependencies,
+    ...manifest.devDependencies,
+    ...manifest.optionalDependencies,
+  };
+  const donorDependencies = Object.keys(dependencies)
+    .filter(isDonorSpecifier)
+    .sort();
+  for (const dependency of donorDependencies)
+    addFinding(
+      findings,
+      'DONOR_ROOT_TOOL_DEPENDENCY',
+      manifestPath,
+      dependency,
+    );
+  const forbiddenScriptReference =
+    /@stylexjs\/|@pandacss\/|style-value-parser|upstream\/(stylex|panda)|packages\/(?:@stylexjs|style-value-parser)/i;
+  for (const [name, command] of Object.entries(scripts)) {
+    if (/^(?:release|publish)(?::|$)/i.test(name))
+      addFinding(
+        findings,
+        'DONOR_RELEASE_SCRIPT_ACTIVE',
+        `${manifestPath}#scripts.${name}`,
+        'root release/publish machinery is outside Phase 5 scope',
+      );
+    if (forbiddenScriptReference.test(command))
+      addFinding(
+        findings,
+        'DONOR_SCRIPT_REFERENCE',
+        `${manifestPath}#scripts.${name}`,
+        command,
+      );
+  }
+
+  return {
+    path: manifestPath,
+    name: manifest.name ?? null,
+    packageManager: manifest.packageManager ?? null,
+    private: manifest.private === true,
+    workspaces,
+    workspacePackages,
+    dependencyNames: Object.keys(dependencies).sort(),
+    donorDependencies,
+    scripts: Object.keys(scripts).sort(),
   };
 }
 
@@ -558,6 +712,8 @@ function inspectBuiltCompiler(libDir, findings) {
 
 async function verify(repoRoot, pilotDir, generatedDir) {
   const findings = [];
+  const repositoryPaths = inspectForbiddenRepositoryPaths(repoRoot, findings);
+  const rootWorkspace = inspectRootWorkspace(repoRoot, findings);
   const coreManifest = inspectManifest(
     path.join(repoRoot, 'packages/core/package.json'),
     'core source manifest',
@@ -591,13 +747,15 @@ async function verify(repoRoot, pilotDir, generatedDir) {
   const generatedRuntime = inspectGeneratedRuntime(generatedDir, findings);
   const packed = inspectPackedPackages(repoRoot, pilotDir, findings);
   return {
-    documentKind: 'pandamstyle-phase-4-donor-closure',
+    documentKind: 'pandamstyle-phase-5-donor-closure',
     repo: path.basename(repoRoot),
     generatedAt: new Date().toISOString(),
     pass: findings.length === 0,
     productionDonorEngineEdges: findings.filter((finding) =>
       /DONOR_/.test(finding.code),
     ).length,
+    repositoryPaths,
+    rootWorkspace,
     findings,
     core: { manifest: coreManifest, sources: coreSources },
     compiler: {
@@ -646,9 +804,11 @@ if (require.main === module) {
 module.exports = {
   inspectBuiltCompiler,
   inspectGeneratedRuntime,
+  inspectForbiddenRepositoryPaths,
   inspectManifest,
   inspectPackedPackages,
   inspectRollupGraph,
+  inspectRootWorkspace,
   inspectSourceTree,
   isDonorPath,
   isDonorSpecifier,

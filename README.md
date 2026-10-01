@@ -1,101 +1,41 @@
-# StyleX &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/facebook/stylex/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/@stylexjs/stylex.svg?style=flat)](https://www.npmjs.com/package/@stylexjs/stylex) [![tests](https://github.com/facebook/stylex/actions/workflows/tests.yml/badge.svg)](https://github.com/facebook/stylex/actions/workflows/tests.yml) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/facebook/stylex/blob/main/.github/CONTRIBUTING.md)
+# PandamStyle
 
-StyleX is a JavaScript library for defining styles for optimized user
-interfaces.
+PandamStyle compiles JavaScript and TypeScript style declarations against an
+explicit design system and emits static CSS and application code. Its public
+packages are `@pandamstyle/core` and `@pandamstyle/compiler`.
 
-## Documentation
+The current API and repository status are documented in
+[`PANDAMSTYLE.md`](PANDAMSTYLE.md). The frozen package and semantic contracts
+are in [`docs/architecture/`](docs/architecture/).
 
-[Documentation Website](https://stylexjs.com)
+## Packages
 
-Documentation for individual packages can be found in their respective README
-files. Start with
-[`@stylexjs/stylex`](https://github.com/facebook/stylex/blob/main/packages/@stylexjs/stylex).
+- [`@pandamstyle/core`](packages/core/): runtime composition helpers and the
+  generated design-system ABI.
+- [`@pandamstyle/compiler`](packages/compiler/): compiler SDK, project service,
+  configuration API, host API, and the `pms-build` command.
 
-### Example
-
-Here is a simple example of StyleX use:
-
-```js
-import * as stylex from '@stylexjs/stylex';
-
-const styles = stylex.create({
-  root: {
-    padding: 10,
-  },
-  element: {
-    backgroundColor: 'red',
-  },
-});
-
-const styleProps = stylex.props(styles.root, styles.element);
-```
+The Vite React application in [`examples/pilots/vite-react/`](examples/pilots/vite-react/)
+is a qualification pilot. It installs the packages produced by `npm pack` and
+does not add a public Vite integration.
 
 ## Development
 
-This is the development monorepo for StyleX.
+Use Node 22 as pinned in `.nvmrc` and Yarn 1 as declared by `packageManager`.
 
-### Structure
+```sh
+yarn install --frozen-lockfile
+./verify-pms.sh
+```
 
-- `.github`
-  - Contains workflows used by GitHub Actions.
-  - Contains issue templates and contribution guidelines.
-- `examples`
-  - Contains examples using StyleX and its integration with build tools.
-- `packages`
-  - Contains the public and private packages managed in the monorepo.
-  - [babel-plugin](https://github.com/facebook/stylex/blob/main/packages/@stylexjs/babel-plugin)
-  - [benchmarks](https://github.com/facebook/stylex/blob/main/packages/benchmarks)
-  - [cli](https://github.com/facebook/stylex/blob/main/packages/@stylexjs/cli)
-  - [docs](https://github.com/facebook/stylex/blob/main/packages/docs)
-  - [eslint-plugin](https://github.com/facebook/stylex/blob/main/packages/@stylexjs/eslint-plugin)
-  - [postcss-plugin](https://github.com/facebook/stylex/blob/main/packages/@stylexjs/postcss-plugin)
-  - [rollup-plugin](https://github.com/facebook/stylex/blob/main/packages/@stylexjs/rollup-plugin)
-  - [scripts](https://github.com/facebook/stylex/blob/main/packages/scripts)
-  - [shared](https://github.com/facebook/stylex/blob/main/packages/@stylexjs/babel-plugin/shared)
-  - [style-value-parser](https://github.com/facebook/stylex/blob/main/packages/style-value-parser)
-  - [stylex](https://github.com/facebook/stylex/blob/main/packages/@stylexjs/stylex)
+The official verifier installs dependencies, builds the owned compiler,
+executes the PandamStyle and core suites, checks the semantic oracle and
+verification tools, builds the packed pilot, collects artifacts, and verifies
+donor closure. Static checks are available through `yarn flow`,
+`yarn prettier:report`, and `yarn lint:report`.
 
+## License and provenance
 
-### Tasks
-
-First, `yarn install` the yarn workspace.
-
-- `build`
-  - Use `yarn build` to run the build script in every package.
-  - Use `yarn workspace <package-name> build` to run the build script for a
-    specific package.
-- `test`
-  - Use `yarn test` to run tests for every package.
-  - Use `yarn workspace <package-name> test` to run the test script for a
-    specific package. More details can be found in the contributing guide below.
-
-## Contributing
-
-Development happens in the open on GitHub and we are grateful for contributions
-including bug fixes, improvements, and ideas.
-
-### Code of Conduct
-
-This project expects all participants to adhere to Meta's OSS
-[Code of Conduct](https://opensource.fb.com/code-of-conduct/). Please read
-the full text so that you can understand what actions will and will not be
-tolerated.
-
-### Contributing Guide
-
-Read the
-[contributing guide](https://github.com/facebook/stylex/blob/main/.github/CONTRIBUTING.md)
-to learn about our development process, how to propose bug fixes and
-improvements, and how to build and test your changes.
-
-### Architectural Principles
-
-Before proposing a change or addition to the StyleX API, you should familiarize
-yourself with the
-[goals and architectural principles](https://stylexjs.com/docs/learn/thinking-in-stylex/)
-of the project.
-
-### License
-
-StyleX is [MIT licensed](./LICENSE).
-
+PandamStyle is MIT licensed. Third-party attribution, source revisions and
+retained notices are recorded in [`ATTRIBUTIONS.md`](ATTRIBUTIONS.md) and
+[`LICENSES/`](LICENSES/).

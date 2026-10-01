@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PandamStyle - verification entry point for the engine absorption batch.
+# PandamStyle - Phase 5 verification entry point.
 #
 # Every step propagates its failure. There is no `|| true`, no output filtering
 # and no partial success: if a required step fails, this script exits non-zero
@@ -12,8 +12,7 @@
 #   PMS_OUT_DIR=<path> ./verify-pms.sh  # override the run directory
 #   PMS_BATCH_BASE_REF=<ref> ./verify-pms.sh
 #                                       # override the ref the batch base is
-#                                       # derived from (default
-#                                       # feat/pandamstyle-native-compiler)
+#                                       # derived from (default HEAD)
 #   PMS_ONLY_STEPS=a,b ./verify-pms.sh  # run a subset of steps (used by the
 #                                       # runner's own test; a partial run is
 #                                       # reported as incomplete, never as passed)
@@ -89,7 +88,7 @@ fi
 # commits long: the committed evidence was generated when it resolved to
 # 38b2e459 instead of the real base. The merge base with the source branch is a
 # relation, so it does not move when the batch grows.
-PANDAMSTYLE_BASE_REF="${PMS_BATCH_BASE_REF:-feat/pandamstyle-native-compiler}"
+PANDAMSTYLE_BASE_REF="${PMS_BATCH_BASE_REF:-HEAD}"
 PANDAMSTYLE_BASE_RESOLVED=""
 for base_candidate in "$PANDAMSTYLE_BASE_REF" "refs/remotes/origin/$PANDAMSTYLE_BASE_REF"; do
   if git -C "$REPO_ROOT" rev-parse --verify --quiet "$base_candidate^{commit}" >/dev/null 2>&1; then
@@ -247,22 +246,17 @@ fi
 
 if command -v yarn >/dev/null 2>&1; then
   YARN_VERSION="$(yarn --version 2>/dev/null || echo unknown)"
+  YARN_MAJOR="${YARN_VERSION%%.*}"
+  if [ "$YARN_MAJOR" != "1" ]; then
+    log "yarn 1 is required (found $YARN_VERSION)."
+    exit 2
+  fi
 else
   log "yarn 1 is required (the repository lockfile is yarn.lock)."
   exit 2
 fi
 
 # The Git state was captured above, before the run directory existed.
-# The fork base is the merge base with the real StyleX upstream, not a string
-# copied out of a document.
-STYLEX_FORK_BASE="$(git -C "$REPO_ROOT" merge-base HEAD upstream/main 2>/dev/null || echo unknown)"
-# The vendored Panda donor is a source copy in this checkout, with no Git
-# metadata: report that honestly instead of inheriting an unrelated SHA.
-if [ -e "$REPO_ROOT/upstream/panda/.git" ]; then
-  PANDA_DONOR_SHA="$(git -C "$REPO_ROOT/upstream/panda" rev-parse HEAD 2>/dev/null || echo unknown)"
-else
-  PANDA_DONOR_SHA="no-git-metadata-in-this-checkout (pinned SHA recorded in docs/pandamstyle-specification-v0.1/specs/01-ARCHITECTURE.md)"
-fi
 
 # ------------------------------------------------------------------- env.json ---
 cat > "$PMS_OUT_DIR/env.json" <<EOF
@@ -275,8 +269,6 @@ cat > "$PMS_OUT_DIR/env.json" <<EOF
   "gitWorkTree": $GIT_IN_WORK_TREE_JSON,
   "pandamstyleBatchBaseRef": "$PANDAMSTYLE_BASE_RESOLVED",
   "pandamstyleBatchBase": "$PANDAMSTYLE_BASE",
-  "stylexUpstreamMergeBase": "$STYLEX_FORK_BASE",
-  "pandaDonorCommit": "$PANDA_DONOR_SHA",
   "outDir": "$PMS_OUT_DIR",
   "toolchain": {
     "node": "$(node -v)",
@@ -301,8 +293,7 @@ log ""
 
 # ------------------------------------------------------------------- 1. install ---
 # A targeted install is explicit: it runs the dependency install and then builds
-# exactly the packages this delivery ships. It is NOT presented as a successful
-# upstream full build; the upstream suite results are reported separately below.
+# exactly the packages this repository owns and ships.
 if [ "${PMS_SKIP_INSTALL:-0}" = "1" ]; then
   skip_step "install" "PMS_SKIP_INSTALL=1"
 elif is_filtered_out "install"; then
@@ -316,18 +307,6 @@ fi
 # --------------------------------------------------------------------- 2. build ---
 build_delivered_packages() {
   set -e
-  (cd "$REPO_ROOT/packages/style-value-parser" \
-    && "$REPO_ROOT/node_modules/.bin/babel" src --out-dir lib \
-       --ignore "**/__tests__/**","**/__benchmarks__/**")
-  (cd "$REPO_ROOT/packages/@stylexjs/shared" \
-    && "$REPO_ROOT/node_modules/.bin/babel" src/ --out-dir lib/)
-  (cd "$REPO_ROOT/packages/@stylexjs/stylex" \
-    && "$REPO_ROOT/node_modules/.bin/cross-env" BABEL_ENV=cjs \
-       "$REPO_ROOT/node_modules/.bin/rollup" -c ./rollup.config.mjs \
-    && "$REPO_ROOT/node_modules/.bin/cross-env" BABEL_ENV=esm \
-       "$REPO_ROOT/node_modules/.bin/rollup" -c ./rollup.config.mjs)
-  (cd "$REPO_ROOT/packages/@stylexjs/babel-plugin" \
-    && "$REPO_ROOT/node_modules/.bin/rollup" --config ./rollup.config.mjs)
   # The delivered PandamStyle-owned compiler, built by its own Rollup config.
   (cd "$REPO_ROOT/packages/compiler" \
     && "$REPO_ROOT/node_modules/.bin/rollup" --config ./rollup.config.mjs)
@@ -340,25 +319,14 @@ else
 fi
 
 # -------------------------------------------------------------------- 3. suites ---
-# Upstream reference suites and the PandamStyle suites are separate steps so the
-# two results are never conflated or double counted.
-if is_filtered_out "upstream-babel-plugin"; then
-  skip_step "upstream-babel-plugin" "not selected by PMS_ONLY_STEPS"
-else
-  run_step "upstream-babel-plugin" \
-    bash -c "cd '$REPO_ROOT/packages/@stylexjs/babel-plugin' && '$REPO_ROOT/node_modules/.bin/jest' --ci --testPathIgnorePatterns '/__tests__/pandamstyle/'"
-fi
-if is_filtered_out "upstream-stylex"; then
-  skip_step "upstream-stylex" "not selected by PMS_ONLY_STEPS"
-else
-  run_step "upstream-stylex" \
-    bash -c "cd '$REPO_ROOT/packages/@stylexjs/stylex' && '$REPO_ROOT/node_modules/.bin/cross-env' BABEL_ENV=test '$REPO_ROOT/node_modules/.bin/jest' --ci"
-fi
 if is_filtered_out "pandamstyle"; then
   skip_step "pandamstyle" "not selected by PMS_ONLY_STEPS"
 else
   run_step "pandamstyle" \
-    bash -c "cd '$REPO_ROOT/packages/@stylexjs/babel-plugin' && '$REPO_ROOT/node_modules/.bin/jest' --ci '__tests__/pandamstyle/.*-test.js' '$REPO_ROOT/packages/compiler/__tests__/engine-absorption-test.js'"
+    "$REPO_ROOT/node_modules/.bin/jest" --config "$REPO_ROOT/jest.config.js" \
+      --ci --runInBand \
+      "$REPO_ROOT/packages/compiler/__tests__/pandamstyle" \
+      "$REPO_ROOT/packages/compiler/__tests__/engine-absorption-test.js"
 fi
 
 if is_filtered_out "pandamstyle-core"; then
@@ -408,10 +376,10 @@ collect_artifacts() {
     "$PMS_OUT_DIR/core-package-proof"
   cp -R "$PMS_OUT_DIR/core-package-proof" "$ARTIFACT_DIR/core-package-proof"
   # One valid fixture build, for the CSS/JS/manifest triple.
-  (cd "$REPO_ROOT/packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid" \
+  (cd "$REPO_ROOT/packages/compiler/__tests__/pandamstyle/fixtures/valid" \
     && node "$REPO_ROOT/packages/compiler/bin/pms-build.js" \
        --config ./pandamstyle.config.js)
-  cp -R "$REPO_ROOT/packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/generated" \
+  cp -R "$REPO_ROOT/packages/compiler/__tests__/pandamstyle/fixtures/valid/generated" \
      "$ARTIFACT_DIR/valid-fixture-generation"
   node "$REPO_ROOT/tools/pms/generated-runtime-imports.js" \
     "$ARTIFACT_DIR/valid-fixture-generation" \
@@ -517,8 +485,11 @@ const {
 
 // A missing row is missing required work, even if every recorded row passed.
 // Keep the required population in the same table as its evidence contracts.
-for (const name of Object.keys(STEP_CONTRACTS)) {
+const requiredStepOrder = Object.keys(STEP_CONTRACTS);
+const omittedRequiredSteps = [];
+for (const name of requiredStepOrder) {
   if (!rows.some(([recorded]) => recorded === name)) {
+    omittedRequiredSteps.push(name);
     rows.push([name, 'skipped', '-', 'required step omitted from step table']);
   }
 }
@@ -604,6 +575,9 @@ const summary = {
   // relation that produced it is not re-checkable by a reader.
   pandamstyleBatchBaseRef: baseRef,
   pandamstyleBatchBase: base,
+  requiredStepCount: requiredStepOrder.length,
+  requiredStepOrder,
+  omittedRequiredSteps,
   outDir: out,
   toolchain: env.toolchain,
   // A run with a skipped step is NOT a complete run. This flag exists so a

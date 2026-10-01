@@ -10,10 +10,6 @@ module.exports = {
   testEnvironment: 'node',
   transform: {},
   testMatch: ['<rootDir>/tests/semantic/__tests__/*-test.js'],
-  modulePathIgnorePatterns: [
-    '<rootDir>/evidence/',
-    '<rootDir>/upstream/',
-    '<rootDir>/examples/',
-  ],
+  modulePathIgnorePatterns: ['<rootDir>/evidence/', '<rootDir>/examples/'],
   testTimeout: 120000,
 };

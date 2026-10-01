@@ -37,6 +37,9 @@ const { execFileSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const config = require(path.join(REPO_ROOT, 'jest.config.js'));
+const semanticConfig = require(
+  path.join(REPO_ROOT, 'tools/semantic-oracle/jest.config.js'),
+);
 
 /** Runs Jest at the root and returns its `--listTests` output. */
 function listTests(extraArgs = []) {
@@ -123,6 +126,12 @@ describe('the root jest configuration excludes the generated trees', () => {
     // `_assertNoDuplicates` crash, found here rather than inside a suite.
     expect(found).toEqual(['packages/compiler/package.json']);
   });
+});
+
+test('the semantic oracle does not ignore the deleted donor checkout', () => {
+  expect(semanticConfig.modulePathIgnorePatterns).not.toContain(
+    '<rootDir>/upstream/',
+  );
 });
 
 describe('the root jest configuration is not a broad ignore', () => {

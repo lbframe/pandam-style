@@ -11,6 +11,14 @@
     "fixtureFiles": 84,
     "total": 108
   },
+  "ownedSuiteVerification": {
+    "command": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle packages/compiler/__tests__/engine-absorption-test.js",
+    "status": "passed",
+    "testSuites": 23,
+    "tests": 510,
+    "includesAllMigratedTests": true,
+    "includesEngineAbsorptionRegressions": true
+  },
   "pathPreservation": "Fixture directory topology is preserved. Only test/helper repository-root, compiler/core, tools/pms, and compiler-inspection references listed in pathAssumptionNotes are retargeted.",
   "records": [
     {

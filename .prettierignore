@@ -1,16 +1,11 @@
-.build
-.docusaurus
-.next
-.stylex
 build
 coverage
 dist
 lib
-flow_modules
 node_modules
+# Third-party Flow declarations provide types, not repository source.
+flow-typed/
 **/__mocks__/snapshot*
-flow-typed
-**/storybook-static/**
 
 # PandamStyle regenerable run output is not source, so it is outside the format
 # surface. This is the same boundary as the ignorePatterns in .eslintrc.js, and

@@ -31,6 +31,7 @@ const externalPackages = new Set([
   '@babel/preset-typescript',
   '@babel/traverse',
   '@babel/types',
+  '@csstools/css-tokenizer',
   '@pandamstyle/core',
   'postcss-value-parser',
 ]);

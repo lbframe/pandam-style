@@ -4,7 +4,7 @@
 
 The donor package manifests identify StyleX source release `0.19.1`, repository `facebook/stylex`, under the MIT license. `upstream/README.md` records donor commit `fe0be7f0e76ccc585385f0fa56d9b50053ff9ca2`; the Phase 4 starting snapshot is PandamStyle commit `902f4e89cb11faae54fa02bb4883e5e05159454a`, tree `a32339cac578f50142156734811d78492f538243`. The vendored Panda comparison source is pinned there at `1a310482ff18102c44b2a478b7644b064a80d7c6` and is not part of the absorbed engine.
 
-Copied or refactored source retains its existing MIT attribution header. New wrappers and extracted code identify the exact donor path in source comments. The source trees remain in place for Phase 5; no donor legal material is removed.
+Copied or refactored source retains its existing MIT attribution header. New wrappers and extracted code identify the exact donor path in source comments. Phase 5 removes the StyleX and Panda source trees rather than archiving them. Durable attribution and license records are maintained in [`ATTRIBUTIONS.md`](../../ATTRIBUTIONS.md) and [`LICENSES/`](../../LICENSES/); Git history retains the removed repository trees.
 
 ## Subsystem mapping
 

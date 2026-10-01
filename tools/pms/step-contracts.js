@@ -125,8 +125,6 @@ const KIND_EVIDENCE = {
 const STEP_CONTRACTS = {
   install: { kind: 'command' },
   build: { kind: 'command' },
-  'upstream-babel-plugin': { kind: 'test' },
-  'upstream-stylex': { kind: 'test' },
   pandamstyle: { kind: 'test' },
   'pandamstyle-core': { kind: 'test' },
   'semantic-oracle': { kind: 'test' },

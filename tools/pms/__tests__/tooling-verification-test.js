@@ -13,6 +13,8 @@ const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 const {
   inspectManifest,
+  inspectForbiddenRepositoryPaths,
+  inspectRootWorkspace,
   inspectSourceTree,
   isDonorPath,
   isDonorSpecifier,
@@ -25,8 +27,6 @@ const ROOT = path.resolve(__dirname, '../../..');
 const ORDER = [
   'install',
   'build',
-  'upstream-babel-plugin',
-  'upstream-stylex',
   'pandamstyle',
   'pandamstyle-core',
   'semantic-oracle',
@@ -44,8 +44,9 @@ function write(relative, text, executable = false) {
 }
 
 beforeAll(() => {
-  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-eleven-step-'));
+  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-nine-step-'));
   write('verify-pms.sh', fs.readFileSync(path.join(ROOT, 'verify-pms.sh')));
+  write('jest.config.js', fs.readFileSync(path.join(ROOT, 'jest.config.js')));
   for (const name of [
     'test-counts.js',
     'step-contracts.js',
@@ -80,9 +81,8 @@ fs.writeFileSync(output, JSON.stringify({ pass: true, findings: [] }) + '\\n');
     '#!/bin/sh\nif [ "$1" = "--version" ]; then echo 1.22.22; fi\n',
     true,
   );
-  for (const name of ['babel', 'rollup'])
+  for (const name of ['rollup'])
     write(`node_modules/.bin/${name}`, '#!/bin/sh\nexit 0\n', true);
-  write('node_modules/.bin/cross-env', '#!/bin/sh\nshift\nexec "$@"\n', true);
   write(
     'node_modules/.bin/jest',
     '#!/bin/sh\nexec node "$(dirname "$0")/../jest/bin/jest.js" "$@"\n',
@@ -100,14 +100,6 @@ fs.writeFileSync(output, JSON.stringify({ pass: true, findings: [] }) + '\\n');
   }
   for (const name of ['a', 'b', 'c'])
     write(`tools/pms/__tests__/${name}-test.js`, '// fixture suite\n');
-  for (const name of [
-    'style-value-parser',
-    '@stylexjs/shared',
-    '@stylexjs/stylex',
-    '@stylexjs/babel-plugin',
-  ]) {
-    fs.mkdirSync(path.join(fixture, 'packages', name), { recursive: true });
-  }
   write('packages/compiler/lib/index.mjs', '// delivered build\n');
   write('packages/compiler/package.json', '{"name":"@pandamstyle/compiler"}\n');
   write('packages/core/package.json', '{"name":"@pandamstyle/core"}\n');
@@ -123,11 +115,11 @@ fs.writeFileSync(path.join(output, 'proof.json'), '{}\\n');
   );
   write('packages/compiler/bin/pms-build.js', '// fixture generator\n');
   write(
-    'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/generated/fixture.css',
+    'packages/compiler/__tests__/pandamstyle/fixtures/valid/generated/fixture.css',
     '.fixture{}\n',
   );
   write(
-    'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/generated/design.pandamstyle.js',
+    'packages/compiler/__tests__/pandamstyle/fixtures/valid/generated/design.pandamstyle.js',
     "import { props } from '@pandamstyle/core';\nexport { props };\n",
   );
   write('tools/pilot/run-pilot.sh', '#!/bin/sh\nexit 0\n', true);
@@ -141,15 +133,17 @@ const path = require('path');
 const root = path.resolve(__dirname, '../../..');
 const mode = fs.readFileSync(path.join(root, 'mode'), 'utf8');
 const args = process.argv.slice(2);
-const tooling = args.includes('tools/pms/__tests__');
+const tooling = args.some(a => a.includes('tools/pms/__tests__'));
 const core = args.some(a => a.includes('/packages/core/__tests__/core-test.js'));
+const semantic = args.some(a => a.includes('semantic-oracle'));
+const pandamstyle = args.some(a => a.includes('/packages/compiler/__tests__/pandamstyle'));
 const files = ['a', 'b', 'c'].map(n => path.join(root, 'tools/pms/__tests__', n + '-test.js'));
 if (args.includes('--listTests')) {
   console.log(JSON.stringify(mode === 'discovery-missing' ? files.slice(1) : files));
   process.exit(0);
 }
-let tests = tooling ? 43 : core ? 14 : process.cwd().endsWith('/stylex') ? 99 : args.some(a => a.startsWith('__tests__/pandamstyle')) ? 504 : 1007;
-let suites = tooling ? 3 : core ? 1 : tests === 99 ? 4 : tests === 504 ? 22 : 42;
+let tests = tooling ? 43 : core ? 14 : semantic ? 2 : pandamstyle ? 510 : 1007;
+let suites = tooling ? 3 : core ? 1 : semantic ? 1 : pandamstyle ? 23 : 42;
 let log = 'Test Suites: ' + suites + ' passed, ' + (tests === 1007 ? '1 skipped, ' : '') + (suites + (tests === 1007 ? 1 : 0)) + ' total\\nTests: ' + tests + ' passed, ' + (tests === 1007 ? '64 skipped, ' : '') + (tests + (tests === 1007 ? 64 : 0)) + ' total\\n';
 if (tooling) {
   if (mode === 'command-fails') process.exit(2);
@@ -181,7 +175,7 @@ process.stderr.write(log);
     execFileSync('git', args, { cwd: fixture, env: gitEnv, stdio: 'pipe' });
   git('init', '-q');
   git('add', '.');
-  git('commit', '-qm', 'eleven-step fixture');
+  git('commit', '-qm', 'nine-step fixture');
   git('branch', 'fixture-base');
 });
 
@@ -231,11 +225,14 @@ function run(mode = 'green', env = {}, omitted = false, reuseOutput = false) {
   };
 }
 
-test('the real summary accepts a green eleven-step fixture with separate and summed counts', () => {
+test('the real summary accepts a green nine-step fixture with separate and summed counts', () => {
   const { status, stdout, summary } = run();
   if (status !== 0) throw new Error(`${stdout}\n${summary?.failedSteps ?? ''}`);
   expect(stdout).toContain('VERIFICATION OK');
   expect(Object.keys(summary.steps)).toEqual(ORDER);
+  expect(summary.requiredStepCount).toBe(9);
+  expect(summary.requiredStepOrder).toEqual(ORDER);
+  expect(summary.omittedRequiredSteps).toEqual([]);
   expect(summary.complete).toBe(true);
   expect(summary.verification.verdict).toBe('verified');
   expect(summary.failedSteps).toEqual([]);
@@ -246,14 +243,14 @@ test('the real summary accepts a green eleven-step fixture with separate and sum
   expect(summary.steps['tooling-tests'].counts.testsPassed).toBe(43);
   expect(summary.steps['semantic-oracle'].kind).toBe('test');
   expect(summary.steps['semantic-oracle'].counts.testsPassed).toBe(2);
-  expect(summary.steps.pandamstyle.counts.testsPassed).toBe(504);
+  expect(summary.steps.pandamstyle.counts.testsPassed).toBe(510);
   expect(summary.steps['donor-closure'].kind).toBe('artifact-check');
   expect(summary.steps['pandamstyle-core'].kind).toBe('test');
   expect(summary.steps['pandamstyle-core'].counts.testsPassed).toBe(14);
-  expect(summary.verification.testsPassed).toBe(1669);
-  expect(summary.verification.suitesPassed).toBe(73);
-  expect(summary.verification.testsSkipped).toBe(64);
-  expect(summary.verification.suitesSkipped).toBe(1);
+  expect(summary.verification.testsPassed).toBe(569);
+  expect(summary.verification.suitesPassed).toBe(28);
+  expect(summary.verification.testsSkipped).toBe(0);
+  expect(summary.verification.suitesSkipped).toBe(0);
   for (const name of [
     'install',
     'build',
@@ -287,6 +284,75 @@ test('donor detection reads module syntax and ignores comments and matcher strin
   expect(
     isDonorPath(path.join(ROOT, 'packages/style-value-parser/src/index.js')),
   ).toBe(true);
+});
+
+test('repository closure fails when a forbidden donor source tree exists', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-forbidden-path-'));
+  try {
+    fs.mkdirSync(path.join(root, 'packages', '@stylexjs'), {
+      recursive: true,
+    });
+    const findings = [];
+    const paths = inspectForbiddenRepositoryPaths(root, findings);
+    expect(paths.present).toEqual(['packages/@stylexjs']);
+    expect(findings).toEqual([
+      {
+        code: 'FORBIDDEN_REPOSITORY_PATH_PRESENT',
+        location: 'packages/@stylexjs',
+        detail: 'forbidden donor or archive path exists',
+      },
+    ]);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('root workspace closure records only real PandamStyle packages', () => {
+  const findings = [];
+  const workspace = inspectRootWorkspace(ROOT, findings);
+  expect(findings).toEqual([]);
+  expect(workspace).toMatchObject({
+    name: 'pandamstyle-workspace',
+    packageManager: 'yarn@1.22.22',
+    private: true,
+    workspaces: ['packages/core', 'packages/compiler'],
+    workspacePackages: [
+      { path: 'packages/compiler', name: '@pandamstyle/compiler' },
+      { path: 'packages/core', name: '@pandamstyle/core' },
+    ],
+  });
+  expect(workspace.scripts).not.toContain('release');
+});
+
+test('root workspace closure rejects donor workspace and release machinery', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-workspace-test-'));
+  try {
+    fs.writeFileSync(
+      path.join(root, 'package.json'),
+      JSON.stringify({
+        name: 'stylex-monorepo',
+        private: false,
+        packageManager: 'yarn@1.22.22',
+        workspaces: ['packages/@stylexjs/*'],
+        scripts: { release: 'node tools/npm/release.js' },
+        devDependencies: { '@stylexjs/babel-plugin': '1.0.0' },
+      }),
+    );
+    const findings = [];
+    inspectRootWorkspace(root, findings);
+    expect(findings.map((finding) => finding.code)).toEqual(
+      expect.arrayContaining([
+        'ROOT_PACKAGE_IDENTITY_INVALID',
+        'ROOT_WORKSPACE_PACKAGE_MUST_BE_PRIVATE',
+        'ROOT_WORKSPACE_SET_INVALID',
+        'ROOT_WORKSPACE_PACKAGE_MISSING',
+        'DONOR_RELEASE_SCRIPT_ACTIVE',
+        'DONOR_ROOT_TOOL_DEPENDENCY',
+      ]),
+    );
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('the module scanner parses TypeScript declaration files as TypeScript', () => {
