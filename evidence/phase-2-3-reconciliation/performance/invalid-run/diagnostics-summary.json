@@ -1,0 +1,66 @@
+{
+  "environment": {
+    "label": "phase-2-3-reconciliation-diagnostics",
+    "corpus": "c10000-t1000-r100-s307",
+    "node": "v22.22.0",
+    "platform": "linux-x64",
+    "cpuModel": "AMD Ryzen 7 5800X3D 8-Core Processor",
+    "cpuCount": 16,
+    "totalMemoryBytes": 33556586496,
+    "diskAvailBytesBefore": 119685668864,
+    "diskTotalBytes": 980666998784
+  },
+  "diskAvailBytesAfter": 118837194752,
+  "cells": [
+    {
+      "corpus": "/home/kyle/work/pandam-style-phase-3-compiler-2026-10/.pms-bench/corpora/c10000-t1000-r100-s307-phase3",
+      "corpusName": "c10000-t1000-r100-s307",
+      "variant": "compact_agent_result",
+      "scenario": "one_file_existing_atoms",
+      "iteration": 0,
+      "wallClockMs": 48438.098396,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style-phase-3-compiler-2026-10/.pms-bench/corpora/c10000-t1000-r100-s307-phase3",
+      "corpusName": "c10000-t1000-r100-s307",
+      "variant": "compact_agent_result",
+      "scenario": "import_change",
+      "iteration": 0,
+      "wallClockMs": 37694.641158,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style-phase-3-compiler-2026-10/.pms-bench/corpora/c10000-t1000-r100-s307-phase3",
+      "corpusName": "c10000-t1000-r100-s307",
+      "variant": "compact_agent_result",
+      "scenario": "reexport_change",
+      "iteration": 0,
+      "wallClockMs": 91288.997078,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style-phase-3-compiler-2026-10/.pms-bench/corpora/c10000-t1000-r100-s307-phase3",
+      "corpusName": "c10000-t1000-r100-s307",
+      "variant": "compact_agent_result",
+      "scenario": "unresolved_import_then_file_appears",
+      "iteration": 0,
+      "wallClockMs": 47363.592259,
+      "childExitStatus": 0
+    },
+    {
+      "corpus": "/home/kyle/work/pandam-style-phase-3-compiler-2026-10/.pms-bench/corpora/c10000-t1000-r100-s307-phase3",
+      "corpusName": "c10000-t1000-r100-s307",
+      "variant": "compact_agent_result",
+      "scenario": "no_change",
+      "iteration": 0,
+      "wallClockMs": 3901.426273,
+      "childExitStatus": 0
+    }
+  ],
+  "rows": 5,
+  "cellFailures": 0,
+  "metrics": [
+    "harness_failure"
+  ]
+}

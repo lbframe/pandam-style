@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "documentKind": "pandamstyle-project-isolation-proof",
+  "testedCommit": "fa292c0ec4ea7c14c1c09b34f6bdb4fe4f87ba61",
+  "testedTree": "a9db412f9ecb61ec00a9c54004dc903010b45449",
+  "passed": true,
+  "scenarios": [
+    "two independent project roots with overlapping src/page.js relative paths",
+    "distinct project and session identities",
+    "foreign revision rejected",
+    "rootDir-relative mutation of left src/page.js",
+    "right artifact and revision unchanged after left mutation"
+  ],
+  "targetedTestsPassed": 1,
+  "targetedTestsFailed": 0,
+  "sourceTest": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/project-api-test.js",
+  "officialSuiteStep": "pandamstyle"
+}

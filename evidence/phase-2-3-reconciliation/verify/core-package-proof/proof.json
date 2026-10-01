@@ -1,0 +1,45 @@
+{
+  "package": "@pandamstyle/core",
+  "version": "0.1.0",
+  "tarball": "evidence/phase-2-3-reconciliation/verify/core-package-proof/tarball/pandamstyle-core-0.1.0.tgz",
+  "tarballBytes": 5251,
+  "installedPath": "/tmp/pandamstyle-core-consumer-2z3uG3/node_modules/@pandamstyle/core/src/index.js",
+  "fixturePath": "/tmp/pandamstyle-core-consumer-2z3uG3",
+  "workspaceLeakage": false,
+  "exports": [
+    ".",
+    "./package.json"
+  ],
+  "runtimeDependencies": {},
+  "dependencyGraph": [
+    "@pandamstyle/core"
+  ],
+  "stylexDependencyCount": 0,
+  "pandacssDependencyCount": 0,
+  "nodeBuiltinImports": [],
+  "donorRuntimeImports": [],
+  "runtimeChecks": {
+    "composition": "passed",
+    "recipeSelection": "passed",
+    "malformedRefCode": "PMS_UNVERIFIED_PROPS_SOURCE",
+    "unsupportedAbiCode": "PMS_ABI_MISMATCH"
+  },
+  "benchmark": {
+    "singleStyleRef": {
+      "iterations": 10000,
+      "elapsedMs": 18.439
+    },
+    "multipleStyleRefs": {
+      "iterations": 10000,
+      "elapsedMs": 21.944
+    },
+    "recipeSelection": {
+      "iterations": 10000,
+      "elapsedMs": 17.792
+    },
+    "largeRepeatedComposition": {
+      "iterations": 1000,
+      "elapsedMs": 24.963
+    }
+  }
+}

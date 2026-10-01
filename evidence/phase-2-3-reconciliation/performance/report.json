@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "documentKind": "pandamstyle-phase-2-3-reconciliation-performance-guards",
+  "testedCommit": "fa292c0ec4ea7c14c1c09b34f6bdb4fe4f87ba61",
+  "testedTree": "a9db412f9ecb61ec00a9c54004dc903010b45449",
+  "corpusAdaptation": "corpus-adaptation.json",
+  "environment": {
+    "label": "phase-2-3-reconciliation-diagnostics",
+    "corpus": "c10000-t1000-r100-s307",
+    "node": "v22.22.0",
+    "platform": "linux-x64",
+    "cpuModel": "AMD Ryzen 7 5800X3D 8-Core Processor",
+    "cpuCount": 16,
+    "totalMemoryBytes": 33556586496,
+    "diskAvailBytesBefore": 118660354048,
+    "diskTotalBytes": 980666998784
+  },
+  "profileCells": 8,
+  "profileCellFailures": 0,
+  "rowCount": 481,
+  "errorRows": 0,
+  "phase3Comparison": {
+    "style": 61.98,
+    "import": 22.15,
+    "reexport": 105.59,
+    "repair": 64.7,
+    "noChange": 60.29,
+    "generationReady": 511.5,
+    "generationCommitted": 633.45
+  },
+  "cases": {
+    "style": {
+      "scenario": "one_file_existing_atoms#edit",
+      "diagnosticsMs": [
+        56.865202
+      ],
+      "phase3MedianMs": 61.98,
+      "deltaPercent": -8.3,
+      "work": {
+        "closureNodesExamined": 1,
+        "closureNodesReused": 10002,
+        "dsvFilesRecomputed": 0,
+        "fullFallback": 0
+      }
+    },
+    "import": {
+      "scenario": "import_change#import",
+      "diagnosticsMs": [
+        37.634584
+      ],
+      "phase3MedianMs": 22.15,
+      "deltaPercent": 69.9,
+      "work": {
+        "closureNodesExamined": 1,
+        "closureNodesReused": 10002,
+        "dsvFilesRecomputed": 1,
+        "fullFallback": 0
+      }
+    },
+    "reexport": {
+      "scenario": "reexport_change#reexport",
+      "diagnosticsMs": [
+        110.664184
+      ],
+      "phase3MedianMs": 105.59,
+      "deltaPercent": 4.8,
+      "work": {
+        "closureNodesExamined": 1,
+        "closureNodesReused": 10002,
+        "dsvFilesRecomputed": 3334,
+        "fullFallback": 0
+      },
+      "medianMs": 104.34085,
+      "deltaVsPhase3MedianPercent": -1.2
+    },
+    "unresolved": {
+      "scenario": "unresolved_import_then_file_appears#unresolved",
+      "diagnosticsMs": [
+        19.485991
+      ],
+      "phase3MedianMs": null,
+      "deltaPercent": null,
+      "work": {
+        "closureNodesExamined": 1,
+        "closureNodesReused": 10002,
+        "dsvFilesRecomputed": 1,
+        "fullFallback": 0
+      }
+    },
+    "repair": {
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "diagnosticsMs": [
+        66.126081
+      ],
+      "phase3MedianMs": 64.7,
+      "deltaPercent": 2.2,
+      "work": {
+        "closureNodesExamined": 2,
+        "closureNodesReused": 10002,
+        "dsvFilesRecomputed": 2,
+        "fullFallback": 0
+      }
+    },
+    "noChange": {
+      "scenario": "no_change#declared_unchanged",
+      "diagnosticsMs": [
+        58.563456
+      ],
+      "phase3MedianMs": 60.29,
+      "deltaPercent": -2.9,
+      "work": {
+        "closureNodesExamined": 0,
+        "closureNodesReused": 10003,
+        "dsvFilesRecomputed": 0,
+        "fullFallback": 0
+      }
+    }
+  },
+  "publication": {
+    "generationReadyMs": 476.840967,
+    "generationCommittedMs": 592.52078,
+    "work": {
+      "closureNodesExamined": 1,
+      "closureNodesReused": 10002,
+      "dsvFilesRecomputed": 0,
+      "fullFallback": 0
+    },
+    "readyDeltaVsPhase3Percent": -6.8,
+    "committedDeltaVsPhase3Percent": -6.5
+  },
+  "closureWorkIncreased": false,
+  "unexpectedWholeProjectFallback": false,
+  "semanticRegression": false,
+  "comparableCaveat": "The corpus differs from Phase 3 by 33 recipe defaults repaired to satisfy frozen ABI v1 domain validation; all 10,000 components and graph paths are retained. Most scenarios have one observation, and wall-clock process times vary with filesystem state."
+}

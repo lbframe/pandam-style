@@ -1,0 +1,473 @@
+{
+  "id": "coverage.closure-no-helper",
+  "area": "coverage",
+  "status": "MUST_PRESERVE",
+  "gapId": null,
+  "fresh": {
+    "applicable": true
+  },
+  "incremental": {
+    "applicable": true
+  },
+  "freshMatchesExpected": true,
+  "incrementalMatchesExpected": true,
+  "freshMatchesIncremental": true,
+  "revisions": [
+    {
+      "revision": 1,
+      "label": "initial",
+      "fresh": {
+        "accepted": false,
+        "codes": [
+          "PMS_FORBIDDEN_STYLE_CHANNEL"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_FORBIDDEN_STYLE_CHANNEL",
+            "severity": "error",
+            "phase": "coverage",
+            "source": "lib/unsafe.js",
+            "location": {
+              "file": "lib/unsafe.js",
+              "line": 1,
+              "column": 29,
+              "role": "page"
+            },
+            "rule": "profile.closed.style-channel",
+            "context": {
+              "attribute": "style"
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": null,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": null,
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "29f325221f326d3f"
+          },
+          "abiVersion": 1,
+          "ok": false,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [
+            {
+              "schemaVersion": 1,
+              "code": "PMS_FORBIDDEN_STYLE_CHANNEL",
+              "severity": "error",
+              "phase": "coverage",
+              "rule": "profile.closed.style-channel",
+              "message": "The inline style attribute is refused in the closed profile; declare styles with create() and compose with props().",
+              "source": {
+                "file": "lib/unsafe.js",
+                "line": 1,
+                "column": 29,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "location": {
+                "file": "lib/unsafe.js",
+                "line": 1,
+                "column": 29,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "role": "page",
+              "context": {
+                "attribute": "style"
+              },
+              "expected": {
+                "category": null,
+                "visibility": null,
+                "static": null,
+                "domain": null
+              },
+              "candidates": [],
+              "candidatesTotal": 0,
+              "candidatesTruncated": false,
+              "candidatesQuery": {
+                "method": "candidateTokens",
+                "category": null,
+                "offset": 0,
+                "limit": 32,
+                "revision": {
+                  "projectId": "oracle-project",
+                  "sessionId": "oracle-session",
+                  "revisionId": 1
+                }
+              },
+              "repair": {
+                "kind": "remove-the-channel",
+                "applicable": true,
+                "target": null,
+                "expected": {
+                  "allowedChannels": [
+                    "tokens",
+                    "recipes"
+                  ]
+                },
+                "reason": null
+              },
+              "autofix": null,
+              "affectedRegion": {
+                "file": "lib/unsafe.js",
+                "namespace": null,
+                "property": null,
+                "conditionPath": []
+              },
+              "coverage": {
+                "analysed": true,
+                "origin": "closure:import",
+                "failed": true
+              },
+              "revision": {
+                "projectId": "oracle-project",
+                "sessionId": "oracle-session",
+                "revisionId": 1
+              }
+            }
+          ],
+          "diagnosticsTotal": 1,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "lib/unsafe.js",
+                "role": "page"
+              },
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 2,
+            "truncated": false
+          },
+          "generation": {
+            "published": false,
+            "generationId": null,
+            "artifactRevision": null,
+            "artifactDigest": null,
+            "associationRevision": null
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": false,
+            "generationCommitted": false,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "lib/unsafe.js",
+            "origin": "closure:import"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "incremental": {
+        "accepted": false,
+        "codes": [
+          "PMS_FORBIDDEN_STYLE_CHANNEL"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_FORBIDDEN_STYLE_CHANNEL",
+            "severity": "error",
+            "phase": "coverage",
+            "source": "lib/unsafe.js",
+            "location": {
+              "file": "lib/unsafe.js",
+              "line": 1,
+              "column": 29,
+              "role": "page"
+            },
+            "rule": "profile.closed.style-channel",
+            "context": {
+              "attribute": "style"
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": 1,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": {
+          "filesChanged": 0,
+          "filesAdded": 1,
+          "filesRemoved": 0,
+          "filesReparsed": 3,
+          "filesRecompiled": 1,
+          "filesCompiled": 2,
+          "filesReused": 0,
+          "coverageSummariesReused": 0,
+          "coverageSummariesRebuilt": 3,
+          "reverseDependentsInvalidated": 0,
+          "negativeResolutionsInvalidated": 0,
+          "fullFallback": 1,
+          "fullFallbackReason": "design-system-definition",
+          "newlyCoveredFiles": 1,
+          "coveredFileCount": 3,
+          "fileStateCount": 3,
+          "dirtyFilesDeclared": 0,
+          "dirtyFilesRead": 1,
+          "dirtyFilesHashed": 1,
+          "dirtyFilesUnchanged": 0
+        },
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "29f325221f326d3f"
+          },
+          "abiVersion": 1,
+          "ok": false,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [
+            {
+              "schemaVersion": 1,
+              "code": "PMS_FORBIDDEN_STYLE_CHANNEL",
+              "severity": "error",
+              "phase": "coverage",
+              "rule": "profile.closed.style-channel",
+              "message": "The inline style attribute is refused in the closed profile; declare styles with create() and compose with props().",
+              "source": {
+                "file": "lib/unsafe.js",
+                "line": 1,
+                "column": 29,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "location": {
+                "file": "lib/unsafe.js",
+                "line": 1,
+                "column": 29,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "role": "page",
+              "context": {
+                "attribute": "style"
+              },
+              "expected": {
+                "category": null,
+                "visibility": null,
+                "static": null,
+                "domain": null
+              },
+              "candidates": [],
+              "candidatesTotal": 0,
+              "candidatesTruncated": false,
+              "candidatesQuery": {
+                "method": "candidateTokens",
+                "category": null,
+                "offset": 0,
+                "limit": 32,
+                "revision": {
+                  "projectId": "oracle-project",
+                  "sessionId": "oracle-session",
+                  "revisionId": 1
+                }
+              },
+              "repair": {
+                "kind": "remove-the-channel",
+                "applicable": true,
+                "target": null,
+                "expected": {
+                  "allowedChannels": [
+                    "tokens",
+                    "recipes"
+                  ]
+                },
+                "reason": null
+              },
+              "autofix": null,
+              "affectedRegion": {
+                "file": "lib/unsafe.js",
+                "namespace": null,
+                "property": null,
+                "conditionPath": []
+              },
+              "coverage": {
+                "analysed": true,
+                "origin": "closure:import",
+                "failed": true
+              },
+              "revision": {
+                "projectId": "oracle-project",
+                "sessionId": "oracle-session",
+                "revisionId": 1
+              }
+            }
+          ],
+          "diagnosticsTotal": 1,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "lib/unsafe.js",
+                "role": "page"
+              },
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 2,
+            "truncated": false
+          },
+          "generation": {
+            "published": false,
+            "generationId": null,
+            "artifactRevision": null,
+            "artifactDigest": null,
+            "associationRevision": null
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": false,
+            "generationCommitted": false,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "lib/unsafe.js",
+            "origin": "closure:import"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "freshChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_FORBIDDEN_STYLE_CHANNEL"
+          ],
+          "op": "equal",
+          "matches": true
+        }
+      ],
+      "incrementalChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_FORBIDDEN_STYLE_CHANNEL"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "revisionId",
+          "value": 1,
+          "matches": true
+        }
+      ],
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    }
+  ],
+  "contractReferences": [
+    "docs/architecture/public-api-v0.1.md",
+    "docs/architecture/generated-design-system-abi-v1.md"
+  ],
+  "classificationVerified": true
+}

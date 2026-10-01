@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "documentKind": "pandamstyle-phase-2-3-reconciliation-summary",
+  "branch": "integration/pandamstyle-phase-2-3-reconciliation-2026-10",
+  "phase2": {
+    "head": "b2b079b84be502dcd65d08a4f09dbe61f5f9a9e2",
+    "tree": "c947a7e20f826ce45bc3a77bfa38804dfe0abb29"
+  },
+  "phase3": {
+    "head": "5fee68e335bdc698ab48dbb80660f83dbe851f96",
+    "tree": "67d5f0cc9870066870fb12663e41eabf46287b98"
+  },
+  "testedCommit": "fa292c0ec4ea7c14c1c09b34f6bdb4fe4f87ba61",
+  "testedTree": "a9db412f9ecb61ec00a9c54004dc903010b45449",
+  "verifier": {
+    "complete": true,
+    "verdict": "verified",
+    "requiredStepCount": 10,
+    "stepOrder": [
+      "install",
+      "build",
+      "upstream-babel-plugin",
+      "upstream-stylex",
+      "pandamstyle",
+      "pandamstyle-core",
+      "semantic-oracle",
+      "tooling-tests",
+      "pilot",
+      "artifacts"
+    ],
+    "failedSteps": [],
+    "skippedSteps": [],
+    "testsPassed": 1837,
+    "suitesPassed": 94
+  },
+  "semantic": {
+    "total": 129,
+    "mustPreserve": 125,
+    "knownGap": 0,
+    "deferred": 4,
+    "failed": 0,
+    "unknown": 0
+  },
+  "core": {
+    "package": "@pandamstyle/core",
+    "version": "0.1.0",
+    "workspaceLeakage": false,
+    "donorDependencyCount": 0,
+    "nodeBuiltinImports": [],
+    "runtimeChecks": {
+      "composition": "passed",
+      "recipeSelection": "passed",
+      "malformedRefCode": "PMS_UNVERIFIED_PROPS_SOURCE",
+      "unsupportedAbiCode": "PMS_ABI_MISMATCH"
+    }
+  },
+  "generatedRuntimeImports": {
+    "@pandamstyle/core": 5,
+    "@stylexjs/*": 0,
+    "@pandacss/*": 0,
+    "@pandamstyle/compiler/runtime": 0
+  },
+  "projectIsolation": true,
+  "performance": {
+    "profileCells": 8,
+    "errorRows": 0,
+    "closureWorkIncreased": false,
+    "unexpectedWholeProjectFallback": false,
+    "reexportMedianMs": 104.34085,
+    "reexportDeltaVsPhase3Percent": -1.2
+  },
+  "remainingDirectDonorEdges": 14,
+  "donorInventory": "docs/architecture/phase-4-donor-edge-inventory.md",
+  "invalidPerformanceAttempts": "performance/invalid-run/",
+  "phase4ImplementationPerformed": false
+}

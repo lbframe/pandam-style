@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "documentKind": "pandamstyle-reconciliation-c10000-corpus-adaptation",
+  "testedCommit": "fa292c0ec4ea7c14c1c09b34f6bdb4fe4f87ba61",
+  "sourceCorpus": "/home/kyle/work/pandam-style-phase-3-compiler-2026-10/.pms-bench/corpora/c10000-t1000-r100-s307-phase3",
+  "profileCorpus": "/home/kyle/work/pandam-style/.pms-bench/corpora/c10000-t1000-r100-s307-reconciliation",
+  "changedFile": "design/design.pms.config.js",
+  "replacementCount": 33,
+  "reason": "Core ABI v1 validates recipe defaults against their declared domains; the historical performance corpus contains 33 tertiary defaults outside the primary/secondary/danger tone domain.",
+  "sourceSha256": "84a8c5dfa3a3dbfbb289bd56009b96abcdce3c0712213ce238d37261470b18f4",
+  "profileSha256": "b37d5f182e0e4f59091a81d2bb8ea51aaf4d619360cfe7ef6a1ca677d7775962",
+  "componentCount": 10000,
+  "recipeCount": 100,
+  "otherFilesChanged": 0
+}

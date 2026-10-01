@@ -1,0 +1,25 @@
+packages/@stylexjs/babel-plugin/pandamstyle/vite.js:21: *    `@stylexjs/stylex`. A file under a declared root is analysed whether or not
+packages/compiler/rollup.config.mjs:37:  '@stylexjs/stylex',
+packages/compiler/rollup.config.mjs:38:  '@stylexjs/shared',
+packages/compiler/rollup.config.mjs:62:const includeGlobs = ['../@stylexjs/babel-plugin/src/**/*', 'src/**/*'];
+packages/compiler/rollup.config.mjs:76:      // accepts; this mirrors packages/@stylexjs/babel-plugin/.babelrc.
+packages/compiler/rollup.config.mjs:119:    input: '../@stylexjs/babel-plugin/pandamstyle/vite.js',
+packages/compiler/package.json:48:    "@stylexjs/shared": "0.19.1",
+packages/compiler/package.json:49:    "@stylexjs/stylex": "0.19.1",
+packages/compiler/src/design-system/registry/index.js:10: * Token semantics carried over from @pandacss/token-dictionary
+packages/compiler/src/engine/lowering/styles.js:15:import styleXCreateSet from '../../../../@stylexjs/babel-plugin/src/shared/stylex-create';
+packages/compiler/src/engine/lowering/styles.js:16:import styleXDefineVars from '../../../../@stylexjs/babel-plugin/src/shared/stylex-define-vars';
+packages/compiler/src/engine/lowering/styles.js:17:import styleXCreateTheme from '../../../../@stylexjs/babel-plugin/src/shared/stylex-create-theme';
+packages/compiler/src/engine/lowering/styles.js:18:import { defaultOptions } from '../../../../@stylexjs/babel-plugin/src/shared/utils/default-options';
+packages/compiler/src/frontend/babel/evaluate.js:22:import { evaluate as stylexEvaluate } from '../../../../@stylexjs/babel-plugin/src/utils/evaluate-path';
+packages/compiler/src/frontend/babel/evaluate.js:41:  { test: (s) => s === '@stylexjs/stylex', reason: 'upstream-stylex-entry' },
+packages/compiler/src/frontend/babel/evaluate.js:43:    test: (s) => s.startsWith('@stylexjs/stylex/'),
+packages/compiler/src/frontend/babel/evaluate.js:46:  { test: (s) => s === '@stylexjs/atoms', reason: 'stylex-atoms-entry' },
+packages/compiler/src/frontend/babel/evaluate.js:49:      s === '@stylexjs/babel-plugin' || s.startsWith('@stylexjs/babel-plugin/'),
+packages/compiler/src/frontend/babel/evaluate.js:53:    test: (s) => s === '@pandacss/dev-runtime' || s.startsWith('@pandacss/'),
+packages/compiler/src/frontend/babel/plugin.js:25:import StateManager from '../../../../@stylexjs/babel-plugin/src/utils/state-manager';
+packages/compiler/src/project/graph/resolution.js:11: * Import discovery is NOT a text filter looking for `@stylexjs/stylex`: it
+packages/compiler/src/frontend/babel/compile-file.js:11:import styleXTransform from '../../../../@stylexjs/babel-plugin/src/index';
+packages/compiler/src/project/css-state/index.js:72:import styleXTransform from '../../../../@stylexjs/babel-plugin/src/index';
+packages/compiler/src/project/session/fresh.js:25:import styleXTransform from '../../../../@stylexjs/babel-plugin/src/index';
+packages/compiler/src/project/session/index.js:89:import styleXTransform from '../../../../@stylexjs/babel-plugin/src/index';

@@ -1,0 +1,484 @@
+{
+  "documentKind": "pandamstyle-run-summary",
+  "testedCommit": "fa292c0ec4ea7c14c1c09b34f6bdb4fe4f87ba61",
+  "testedTree": "a9db412f9ecb61ec00a9c54004dc903010b45449",
+  "workingTree": "clean",
+  "pandamstyleBatchBaseRef": "5fee68e335bdc698ab48dbb80660f83dbe851f96",
+  "pandamstyleBatchBase": "5fee68e335bdc698ab48dbb80660f83dbe851f96",
+  "outDir": "/home/kyle/work/pandam-style/evidence/phase-2-3-reconciliation/verify",
+  "toolchain": {
+    "node": "v22.22.0",
+    "yarn": "1.22.22",
+    "npm": "11.11.1"
+  },
+  "complete": true,
+  "verification": {
+    "verdict": "verified",
+    "stepsVerified": 10,
+    "stepsFailed": [],
+    "stepsIncomplete": [],
+    "stepsUnverified": [],
+    "testsPassed": 1837,
+    "testsFailed": 0,
+    "testsSkipped": 64,
+    "suitesPassed": 94,
+    "suitesFailed": 0,
+    "suitesSkipped": 1,
+    "testSteps": [
+      "upstream-babel-plugin",
+      "upstream-stylex",
+      "pandamstyle",
+      "pandamstyle-core",
+      "semantic-oracle",
+      "tooling-tests"
+    ],
+    "nonTestSteps": [
+      "install",
+      "build",
+      "pilot",
+      "artifacts"
+    ]
+  },
+  "stepIntegrityFindings": [],
+  "suiteIntegrityFailures": [],
+  "skippedSteps": [],
+  "failedSteps": [],
+  "steps": {
+    "install": {
+      "kind": "command",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null,
+      "verification": {
+        "step": "install",
+        "kind": "command",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": null
+      }
+    },
+    "build": {
+      "kind": "command",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null,
+      "verification": {
+        "step": "build",
+        "kind": "command",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": null
+      }
+    },
+    "upstream-babel-plugin": {
+      "kind": "test",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 1007,
+          "failed": null,
+          "skipped": 64,
+          "total": 1071
+        },
+        "suites": {
+          "passed": 42,
+          "failed": null,
+          "skipped": 1,
+          "total": 43
+        },
+        "testsPassed": 1007,
+        "testsFailed": 0,
+        "testsSkipped": 64,
+        "suitesPassed": 42,
+        "suitesFailed": 0,
+        "suitesSkipped": 1,
+        "testsAccountedFor": 1071,
+        "testsTotal": 1071,
+        "suitesAccountedFor": 43,
+        "suitesTotal": 43
+      },
+      "verification": {
+        "step": "upstream-babel-plugin",
+        "kind": "test",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": {
+          "tests": {
+            "passed": 1007,
+            "failed": null,
+            "skipped": 64,
+            "total": 1071
+          },
+          "suites": {
+            "passed": 42,
+            "failed": null,
+            "skipped": 1,
+            "total": 43
+          },
+          "testsPassed": 1007,
+          "testsFailed": 0,
+          "testsSkipped": 64,
+          "suitesPassed": 42,
+          "suitesFailed": 0,
+          "suitesSkipped": 1,
+          "testsAccountedFor": 1071,
+          "testsTotal": 1071,
+          "suitesAccountedFor": 43,
+          "suitesTotal": 43
+        }
+      }
+    },
+    "upstream-stylex": {
+      "kind": "test",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 99,
+          "failed": null,
+          "skipped": null,
+          "total": 99
+        },
+        "suites": {
+          "passed": 4,
+          "failed": null,
+          "skipped": null,
+          "total": 4
+        },
+        "testsPassed": 99,
+        "testsFailed": 0,
+        "testsSkipped": 0,
+        "suitesPassed": 4,
+        "suitesFailed": 0,
+        "suitesSkipped": 0,
+        "testsAccountedFor": 99,
+        "testsTotal": 99,
+        "suitesAccountedFor": 4,
+        "suitesTotal": 4
+      },
+      "verification": {
+        "step": "upstream-stylex",
+        "kind": "test",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": {
+          "tests": {
+            "passed": 99,
+            "failed": null,
+            "skipped": null,
+            "total": 99
+          },
+          "suites": {
+            "passed": 4,
+            "failed": null,
+            "skipped": null,
+            "total": 4
+          },
+          "testsPassed": 99,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "suitesPassed": 4,
+          "suitesFailed": 0,
+          "suitesSkipped": 0,
+          "testsAccountedFor": 99,
+          "testsTotal": 99,
+          "suitesAccountedFor": 4,
+          "suitesTotal": 4
+        }
+      }
+    },
+    "pandamstyle": {
+      "kind": "test",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 500,
+          "failed": null,
+          "skipped": null,
+          "total": 500
+        },
+        "suites": {
+          "passed": 22,
+          "failed": null,
+          "skipped": null,
+          "total": 22
+        },
+        "testsPassed": 500,
+        "testsFailed": 0,
+        "testsSkipped": 0,
+        "suitesPassed": 22,
+        "suitesFailed": 0,
+        "suitesSkipped": 0,
+        "testsAccountedFor": 500,
+        "testsTotal": 500,
+        "suitesAccountedFor": 22,
+        "suitesTotal": 22
+      },
+      "verification": {
+        "step": "pandamstyle",
+        "kind": "test",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": {
+          "tests": {
+            "passed": 500,
+            "failed": null,
+            "skipped": null,
+            "total": 500
+          },
+          "suites": {
+            "passed": 22,
+            "failed": null,
+            "skipped": null,
+            "total": 22
+          },
+          "testsPassed": 500,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "suitesPassed": 22,
+          "suitesFailed": 0,
+          "suitesSkipped": 0,
+          "testsAccountedFor": 500,
+          "testsTotal": 500,
+          "suitesAccountedFor": 22,
+          "suitesTotal": 22
+        }
+      }
+    },
+    "pandamstyle-core": {
+      "kind": "test",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 14,
+          "failed": null,
+          "skipped": null,
+          "total": 14
+        },
+        "suites": {
+          "passed": 1,
+          "failed": null,
+          "skipped": null,
+          "total": 1
+        },
+        "testsPassed": 14,
+        "testsFailed": 0,
+        "testsSkipped": 0,
+        "suitesPassed": 1,
+        "suitesFailed": 0,
+        "suitesSkipped": 0,
+        "testsAccountedFor": 14,
+        "testsTotal": 14,
+        "suitesAccountedFor": 1,
+        "suitesTotal": 1
+      },
+      "verification": {
+        "step": "pandamstyle-core",
+        "kind": "test",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": {
+          "tests": {
+            "passed": 14,
+            "failed": null,
+            "skipped": null,
+            "total": 14
+          },
+          "suites": {
+            "passed": 1,
+            "failed": null,
+            "skipped": null,
+            "total": 1
+          },
+          "testsPassed": 14,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "suitesPassed": 1,
+          "suitesFailed": 0,
+          "suitesSkipped": 0,
+          "testsAccountedFor": 14,
+          "testsTotal": 14,
+          "suitesAccountedFor": 1,
+          "suitesTotal": 1
+        }
+      }
+    },
+    "semantic-oracle": {
+      "kind": "test",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 148,
+          "failed": null,
+          "skipped": null,
+          "total": 148
+        },
+        "suites": {
+          "passed": 20,
+          "failed": null,
+          "skipped": null,
+          "total": 20
+        },
+        "testsPassed": 148,
+        "testsFailed": 0,
+        "testsSkipped": 0,
+        "suitesPassed": 20,
+        "suitesFailed": 0,
+        "suitesSkipped": 0,
+        "testsAccountedFor": 148,
+        "testsTotal": 148,
+        "suitesAccountedFor": 20,
+        "suitesTotal": 20
+      },
+      "verification": {
+        "step": "semantic-oracle",
+        "kind": "test",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": {
+          "tests": {
+            "passed": 148,
+            "failed": null,
+            "skipped": null,
+            "total": 148
+          },
+          "suites": {
+            "passed": 20,
+            "failed": null,
+            "skipped": null,
+            "total": 20
+          },
+          "testsPassed": 148,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "suitesPassed": 20,
+          "suitesFailed": 0,
+          "suitesSkipped": 0,
+          "testsAccountedFor": 148,
+          "testsTotal": 148,
+          "suitesAccountedFor": 20,
+          "suitesTotal": 20
+        }
+      }
+    },
+    "tooling-tests": {
+      "kind": "test",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": {
+        "tests": {
+          "passed": 69,
+          "failed": null,
+          "skipped": null,
+          "total": 69
+        },
+        "suites": {
+          "passed": 5,
+          "failed": null,
+          "skipped": null,
+          "total": 5
+        },
+        "testsPassed": 69,
+        "testsFailed": 0,
+        "testsSkipped": 0,
+        "suitesPassed": 5,
+        "suitesFailed": 0,
+        "suitesSkipped": 0,
+        "testsAccountedFor": 69,
+        "testsTotal": 69,
+        "suitesAccountedFor": 5,
+        "suitesTotal": 5
+      },
+      "verification": {
+        "step": "tooling-tests",
+        "kind": "test",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": {
+          "tests": {
+            "passed": 69,
+            "failed": null,
+            "skipped": null,
+            "total": 69
+          },
+          "suites": {
+            "passed": 5,
+            "failed": null,
+            "skipped": null,
+            "total": 5
+          },
+          "testsPassed": 69,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "suitesPassed": 5,
+          "suitesFailed": 0,
+          "suitesSkipped": 0,
+          "testsAccountedFor": 69,
+          "testsTotal": 69,
+          "suitesAccountedFor": 5,
+          "suitesTotal": 5
+        }
+      }
+    },
+    "pilot": {
+      "kind": "pilot",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null,
+      "verification": {
+        "step": "pilot",
+        "kind": "pilot",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": null
+      }
+    },
+    "artifacts": {
+      "kind": "artifact-check",
+      "status": "passed",
+      "exitCode": 0,
+      "acceptance": "passed",
+      "note": null,
+      "counts": null,
+      "verification": {
+        "step": "artifacts",
+        "kind": "artifact-check",
+        "verdict": "verified",
+        "exitCode": 0,
+        "findings": [],
+        "counts": null
+      }
+    }
+  }
+}
