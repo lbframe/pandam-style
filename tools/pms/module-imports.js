@@ -11,12 +11,18 @@ const parser = require('@babel/parser');
 const hermesParser = require('hermes-parser');
 
 function parseTypeScriptProgram(source, filename) {
+  const declarationFile = /\.d\.(?:ts|mts|cts)$/.test(filename);
   return parser.parse(source, {
     sourceType: 'unambiguous',
     sourceFilename: filename,
     allowAwaitOutsideFunction: true,
     allowReturnOutsideFunction: true,
-    plugins: ['jsx', 'typescript', 'decorators-legacy', 'dynamicImport'],
+    plugins: [
+      'jsx',
+      ['typescript', { dts: declarationFile }],
+      'decorators-legacy',
+      'dynamicImport',
+    ],
   }).program;
 }
 

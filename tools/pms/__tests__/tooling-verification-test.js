@@ -292,7 +292,7 @@ test('donor detection reads module syntax and ignores comments and matcher strin
 test('the module scanner parses TypeScript declaration files as TypeScript', () => {
   const imports = parseModuleImports(
     "import type { Donor } from '@stylexjs/shared';\n" +
-      'export declare const Codes: Readonly<Record<string, string>>;\n',
+      'export const Codes: Readonly<Record<string, string>>;\n',
     'types/index.d.ts',
   );
   expect(imports.map((item) => [item.specifier, item.typeOnly])).toEqual([
