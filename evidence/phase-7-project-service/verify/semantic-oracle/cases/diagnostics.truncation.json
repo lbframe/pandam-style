@@ -1,0 +1,460 @@
+{
+  "id": "diagnostics.truncation",
+  "area": "diagnostics",
+  "status": "MUST_PRESERVE",
+  "gapId": null,
+  "fresh": null,
+  "incremental": {
+    "applicable": true
+  },
+  "freshMatchesExpected": null,
+  "incrementalMatchesExpected": true,
+  "freshMatchesIncremental": null,
+  "revisions": [
+    {
+      "revision": 1,
+      "label": "initial",
+      "fresh": null,
+      "incremental": {
+        "accepted": false,
+        "codes": [
+          "PMS_FORBIDDEN_VALUE"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_FORBIDDEN_VALUE",
+            "severity": "error",
+            "phase": "policy",
+            "source": "src/page.js (page)",
+            "location": {
+              "file": "src/page.js",
+              "line": 2,
+              "column": 30,
+              "role": "page"
+            },
+            "rule": "category-strict",
+            "context": {
+              "property": "gap",
+              "category": "spacing",
+              "value": "9px",
+              "systemId": "oracle-ui",
+              "candidates": [
+                "spacing.sm",
+                "spacing.md",
+                "spacing.lg",
+                "spacing.v00",
+                "spacing.v01",
+                "spacing.v02",
+                "spacing.v03",
+                "spacing.v04",
+                "spacing.v05",
+                "spacing.v06",
+                "spacing.v07",
+                "spacing.v08",
+                "spacing.v09",
+                "spacing.v10",
+                "spacing.v11",
+                "spacing.v12",
+                "spacing.v13",
+                "spacing.v14",
+                "spacing.v15",
+                "spacing.v16",
+                "spacing.v17",
+                "spacing.v18",
+                "spacing.v19",
+                "spacing.v20",
+                "spacing.v21",
+                "spacing.v22",
+                "spacing.v23",
+                "spacing.v24",
+                "spacing.v25",
+                "spacing.v26",
+                "spacing.v27",
+                "spacing.v28",
+                "spacing.v29",
+                "spacing.v30",
+                "spacing.v31",
+                "spacing.v32",
+                "spacing.v33"
+              ],
+              "conditionPath": []
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": 1,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": {
+          "filesChanged": 0,
+          "filesAdded": 1,
+          "filesRemoved": 0,
+          "filesReparsed": 2,
+          "filesRecompiled": 0,
+          "filesCompiled": 1,
+          "filesReused": 0,
+          "coverageSummariesReused": 0,
+          "coverageSummariesRebuilt": 2,
+          "reverseDependentsInvalidated": 0,
+          "negativeResolutionsInvalidated": 0,
+          "fullFallback": 1,
+          "fullFallbackReason": "design-system-definition",
+          "newlyCoveredFiles": 1,
+          "coveredFileCount": 2,
+          "fileStateCount": 2,
+          "dirtyFilesDeclared": 0,
+          "dirtyFilesRead": 1,
+          "dirtyFilesHashed": 1,
+          "dirtyFilesUnchanged": 0
+        },
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "716a0aca18fddc0f"
+          },
+          "abiVersion": 1,
+          "ok": false,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [
+            {
+              "schemaVersion": 1,
+              "code": "PMS_FORBIDDEN_VALUE",
+              "severity": "error",
+              "phase": "policy",
+              "rule": "category-strict",
+              "message": "Valeur interdite pour gap : \"9px\". Un token spacing est requis.",
+              "source": {
+                "file": "src/page.js",
+                "line": 2,
+                "column": 30,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "location": {
+                "file": "src/page.js",
+                "line": 2,
+                "column": 30,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "role": "page",
+              "context": {
+                "property": "gap",
+                "value": "9px",
+                "systemId": "oracle-ui",
+                "conditionPath": []
+              },
+              "expected": {
+                "category": "spacing",
+                "visibility": "public",
+                "static": true,
+                "domain": null
+              },
+              "candidates": [
+                {
+                  "tokenId": "spacing.lg",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.md",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.sm",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v00",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v01",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v02",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v03",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v04",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v05",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v06",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v07",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v08",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v09",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v10",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v11",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v12",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v13",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v14",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v15",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v16",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v17",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v18",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v19",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v20",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v21",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v22",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v23",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v24",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v25",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v26",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v27",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.v28",
+                  "category": "spacing"
+                }
+              ],
+              "candidatesTotal": 37,
+              "candidatesTruncated": true,
+              "candidatesQuery": {
+                "method": "candidateTokens",
+                "category": "spacing",
+                "offset": 0,
+                "limit": 32,
+                "revision": {
+                  "projectId": "oracle-project",
+                  "sessionId": "oracle-session",
+                  "revisionId": 1
+                }
+              },
+              "repair": {
+                "kind": "replace-with-token",
+                "applicable": true,
+                "target": {
+                  "property": "gap"
+                },
+                "expected": {
+                  "category": "spacing"
+                },
+                "reason": null
+              },
+              "autofix": null,
+              "affectedRegion": {
+                "file": "src/page.js",
+                "namespace": null,
+                "property": "gap",
+                "conditionPath": []
+              },
+              "coverage": {
+                "analysed": true,
+                "origin": "root",
+                "failed": true
+              },
+              "revision": {
+                "projectId": "oracle-project",
+                "sessionId": "oracle-session",
+                "revisionId": 1
+              }
+            }
+          ],
+          "diagnosticsTotal": 1,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 1,
+            "truncated": false
+          },
+          "generation": {
+            "published": false,
+            "generationId": null,
+            "artifactRevision": null,
+            "artifactDigest": null,
+            "associationRevision": null
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": false,
+            "generationCommitted": false,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "freshChecks": null,
+      "incrementalChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_FORBIDDEN_VALUE"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "protocol/diagnostics/0/candidates",
+          "value": 32,
+          "op": "length",
+          "matches": true
+        },
+        {
+          "path": "protocol/diagnostics/0/candidatesTotal",
+          "value": 37,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "protocol/diagnostics/0/candidatesTruncated",
+          "value": true,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "protocol/diagnostics/0/autofix",
+          "value": null,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "protocol/revisionId",
+          "value": 1,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "revisionId",
+          "value": 1,
+          "matches": true
+        }
+      ],
+      "freshMatchesExpected": null,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": null
+    }
+  ],
+  "contractReferences": [
+    "docs/architecture/public-api-v0.1.md",
+    "docs/architecture/generated-design-system-abi-v1.md"
+  ],
+  "classificationVerified": true
+}

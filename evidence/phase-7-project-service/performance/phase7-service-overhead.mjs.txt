@@ -1,0 +1,211 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import { pathToFileURL } from 'node:url';
+
+const repo = process.cwd();
+const corpusDir = path.resolve(
+  process.argv[2] ?? '.pms-bench/corpora/c10000-t1000-r100-s307-f8',
+);
+const projectDir = path.resolve(
+  process.argv[3] ?? '.pms-bench/run/phase7-service-project',
+);
+const require = createRequire(import.meta.url);
+const internals = require(path.join(repo, '.pms-test-support/compiler-inspection.cjs'));
+
+function copyTree(source, target) {
+  fs.rmSync(target, { recursive: true, force: true });
+  fs.mkdirSync(target, { recursive: true });
+  for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
+    if (entry.name === 'node_modules') continue;
+    const from = path.join(source, entry.name);
+    const to = path.join(target, entry.name);
+    if (entry.isDirectory()) copyTree(from, to);
+    else if (entry.isFile()) {
+      fs.mkdirSync(path.dirname(to), { recursive: true });
+      fs.copyFileSync(from, to);
+    }
+  }
+}
+
+function makeCollector() {
+  const durations = new Map();
+  const counts = new Map();
+  let parses = 0;
+  return {
+    addDuration(name, ns) {
+      durations.set(name, (durations.get(name) ?? 0) + ns);
+    },
+    addCount(name, value = 1) {
+      counts.set(name, (counts.get(name) ?? 0) + value);
+    },
+    addParse() {
+      parses += 1;
+    },
+    sampleMemory() {},
+    reset() {
+      durations.clear();
+      counts.clear();
+      parses = 0;
+    },
+    snapshot() {
+      return {
+        durations_ms: Object.fromEntries(
+          [...durations].map(([name, ns]) => [name, ns / 1e6]),
+        ),
+        counters: Object.fromEntries(counts),
+        parses,
+      };
+    },
+  };
+}
+
+async function timed(operation, fn, collector) {
+  collector.reset();
+  const start = process.hrtime.bigint();
+  const value = await fn();
+  const wallMs = Number(process.hrtime.bigint() - start) / 1e6;
+  const snapshot = collector.snapshot();
+  return {
+    operation,
+    wallMs,
+    queueWaitMs: snapshot.durations_ms.project_service_queue_wait_ms ?? 0,
+    queueRunMs: snapshot.durations_ms.project_service_queue_run_ms ?? 0,
+    counters: snapshot.counters,
+    value,
+  };
+}
+
+copyTree(corpusDir, projectDir);
+const packageScope = path.join(projectDir, 'node_modules', '@pandamstyle');
+fs.mkdirSync(packageScope, { recursive: true });
+const compilerLink = path.join(packageScope, 'compiler');
+if (!fs.existsSync(compilerLink)) {
+  fs.symlinkSync(path.join(repo, 'packages/compiler'), compilerLink, 'dir');
+}
+
+const rawConfig = require(path.join(projectDir, 'pandamstyle.config.js'));
+const definitionPath = path.resolve(projectDir, rawConfig.definition);
+const definitionModule = await import(pathToFileURL(definitionPath).href);
+const definition = definitionModule.default ?? definitionModule;
+const roots = rawConfig.roots.map((root) => path.resolve(projectDir, root));
+const outDir = path.resolve(projectDir, rawConfig.outDir);
+const config = {
+  ...rawConfig,
+  projectId: 'phase7-c10000-service-overhead',
+  rootDir: projectDir,
+  definition,
+  roots,
+  outDir,
+};
+
+const collector = makeCollector();
+internals.installPerfCollector(collector);
+const project = internals.createPublicProjectSession(config);
+const host = internals.createHostBridge(project);
+const initialize = await project.initialize();
+const warmValidation = await project.validate(initialize.revision);
+if (!warmValidation.ok) throw new Error('c10000 warmup validation failed');
+await project.compile(warmValidation.revision);
+
+const page = path.join(projectDir, 'src/components/Component0.tsx');
+const before = fs.readFileSync(page, 'utf8');
+const spacingKeys = Object.keys(definition.tokens.spacing).filter(
+  (key) => definition.tokens.spacing[key].visibility !== 'private',
+);
+const from = before.match(/token\('(spacing\.[^']+)'\)/)?.[1];
+const to = spacingKeys.map((key) => `spacing.${key}`).find((key) => key !== from);
+if (from == null || to == null) throw new Error('could not prepare a style edit');
+const after = before.replace(`token('${from}')`, `token('${to}')`);
+if (after === before) throw new Error('style edit did not change a token reference');
+fs.writeFileSync(page, after, 'utf8');
+
+const apply = await timed(
+  'applyChanges',
+  () => project.applyChanges({
+    baseRevision: initialize.revision,
+    mode: 'verified-explicit',
+    changed: ['src/components/Component0.tsx'],
+    added: [],
+    removed: [],
+    renamed: [],
+  }),
+  collector,
+);
+const validation = await timed(
+  'validate',
+  () => project.validate(apply.value.revision),
+  collector,
+);
+if (!validation.value.ok) throw new Error('style edit validation failed');
+const artifactRead = await timed(
+  'host.readArtifact',
+  () => host.readArtifact(validation.value.revision, 'src/components/Component0.tsx'),
+  collector,
+);
+const prepared = await timed(
+  'preparePublication',
+  () => host.preparePublication(validation.value.revision),
+  collector,
+);
+const committed = await timed(
+  'commitPrepared',
+  () => host.commitPrepared(prepared.value),
+  collector,
+);
+
+await project.close();
+const afterClose = internals.projectServiceResourceStats();
+internals.installPerfCollector(null);
+const corpusManifest = JSON.parse(
+  fs.readFileSync(path.join(corpusDir, 'corpus-manifest.json'), 'utf8'),
+);
+process.stdout.write(
+  `${JSON.stringify(
+    {
+      documentKind: 'pandamstyle-phase-7-service-overhead',
+      schemaVersion: 1,
+      corpus: {
+        name: corpusManifest.name,
+        contentHash: corpusManifest.contentHash,
+        designSystemHash: corpusManifest.designSystemHash,
+        parameters: corpusManifest.parameters,
+        counts: corpusManifest.counts,
+      },
+      measurements: [
+        { ...apply, value: { revision: apply.value.revision } },
+        {
+          ...validation,
+          value: {
+            ok: validation.value.ok,
+            revision: validation.value.revision,
+            agentDiagnosticsMs:
+              validation.value.agentResult?.timings?.agent_edit_to_diagnostics_ms ?? null,
+          },
+        },
+        {
+          ...artifactRead,
+          value: {
+            source: artifactRead.value.source,
+            javascriptBytes: Buffer.byteLength(artifactRead.value.javascript),
+            cssBytes: artifactRead.value.css.reduce(
+              (sum, item) => sum + Buffer.byteLength(item.content),
+              0,
+            ),
+          },
+        },
+        {
+          ...prepared,
+          value: {
+            ticketId: prepared.value.ticketId,
+            candidateDigest: prepared.value.candidateDigest,
+          },
+        },
+        { ...committed, value: committed.value },
+      ],
+      closeResourceStats: afterClose,
+    },
+    null,
+    2,
+  )}\n`,
+);

@@ -1,0 +1,253 @@
+{
+  "documentKind": "pandamstyle-phase-7-service-overhead",
+  "schemaVersion": 1,
+  "corpus": {
+    "name": "c10000-t1000-r100-s307-f8",
+    "contentHash": "91ad54984875a9226624413db899415bad8ff7427810099f234350e927c964da",
+    "designSystemHash": "b37d5f182e0e4f59091a81d2bb8ea51aaf4d619360cfe7ef6a1ca677d7775962",
+    "parameters": {
+      "components": 10000,
+      "tokens": 1000,
+      "recipes": 100,
+      "seed": 307,
+      "fanout": 8
+    },
+    "counts": {
+      "sourceFiles": 10020,
+      "componentFiles": 10000,
+      "aliasModules": 4,
+      "fanoutModules": 8,
+      "bridgeModules": 1,
+      "definitionModules": 1,
+      "invalidTraces": 4,
+      "styleSites": 70828,
+      "tokenReferences": 43329,
+      "recipeCalls": 4001,
+      "conditions": 8,
+      "themes": 2,
+      "recipeDefinitions": 100,
+      "tokenCategories": 2,
+      "tokenPaths": 132,
+      "privateTokenPaths": 30
+    }
+  },
+  "measurements": [
+    {
+      "operation": "applyChanges",
+      "wallMs": 5.163591,
+      "queueWaitMs": 0.01192,
+      "queueRunMs": 5.06875,
+      "counters": {
+        "session_revisions": 1,
+        "dirty_input_mode_verified_explicit": 1,
+        "dirty_files_declared": 1,
+        "read_bytes": 793,
+        "read_calls": 1,
+        "dirty_files_read": 1,
+        "dirty_files_hashed": 1,
+        "files_changed": 1,
+        "project_files_scanned": 0
+      },
+      "value": {
+        "revision": {
+          "projectId": "phase7-c10000-service-overhead",
+          "sessionId": "de49673a-ef18-4933-836f-239e63b12df6",
+          "revisionId": 2
+        }
+      }
+    },
+    {
+      "operation": "validate",
+      "wallMs": 57.167559,
+      "queueWaitMs": 0.0106,
+      "queueRunMs": 57.123798,
+      "counters": {
+        "resolution_keys_scoped": 0,
+        "resolution_keys_rechecked": 0,
+        "parse_calls": 3,
+        "parsed_files": 3,
+        "files_reparsed": 1,
+        "coverage_summaries_rebuilt": 1,
+        "closure_nodes_examined": 1,
+        "closure_nodes_reused": 10002,
+        "closure_nodes_added": 0,
+        "closure_nodes_removed": 0,
+        "closure_nodes_entering_coverage": 0,
+        "closure_nodes_leaving_coverage": 0,
+        "closure_edges_recomputed": 0,
+        "closure_reachability_updates": 0,
+        "closure_nodes_pruned": 0,
+        "closure_graph_revision": 1,
+        "closure_update_ms": 0.564596,
+        "dsv_files_examined": 1,
+        "dsv_files_recomputed": 0,
+        "dsv_files_reused": 1,
+        "dsv_consumers_invalidated": 0,
+        "dsv_relay_nodes_touched": 3,
+        "dsv_update_ms": 0.099281,
+        "files_recompiled": 1,
+        "semantic_builds": 1,
+        "stat_calls": 9,
+        "resolution_probes": 9,
+        "atoms": 2,
+        "atom_contributions": 2,
+        "diagnostics": 0,
+        "pass1_calls": 1,
+        "pass2_calls": 1,
+        "files_reused": 10001,
+        "session_compile_affected_ms": 5.829515,
+        "session_reuse_iteration_ms": 3.95935,
+        "session_coverage_entries_ms": 5.661333,
+        "covered_entries_iterated": 10003,
+        "session_file_states": 10003,
+        "session_resolution_keys": 5,
+        "session_resolution_dirs": 0,
+        "agent_result_build_ms": 0.0528
+      },
+      "value": {
+        "ok": true,
+        "revision": {
+          "projectId": "phase7-c10000-service-overhead",
+          "sessionId": "de49673a-ef18-4933-836f-239e63b12df6",
+          "revisionId": 2
+        },
+        "agentDiagnosticsMs": null
+      }
+    },
+    {
+      "operation": "host.readArtifact",
+      "wallMs": 115.54702,
+      "queueWaitMs": 0.01057,
+      "queueRunMs": 115.48754,
+      "counters": {},
+      "value": {
+        "source": "src/components/Component0.tsx",
+        "javascriptBytes": 1218,
+        "cssBytes": 27082
+      }
+    },
+    {
+      "operation": "preparePublication",
+      "wallMs": 162.386917,
+      "queueWaitMs": 0.00862,
+      "queueRunMs": 162.322606,
+      "counters": {},
+      "value": {
+        "ticketId": "de49673a-ef18-4933-836f-239e63b12df6:1",
+        "candidateDigest": "97c6f4efe0ce430192a91366e92e35d77459b7796b309bca144de189fbd41faf"
+      }
+    },
+    {
+      "operation": "commitPrepared",
+      "wallMs": 605.316573,
+      "queueWaitMs": 0.01013,
+      "queueRunMs": 605.225952,
+      "counters": {
+        "publication_hardlinks": 10004,
+        "output_files_reused": 10004,
+        "output_bytes_reused": 11220628,
+        "css_rules_reused": 326,
+        "css_rules_added": 0,
+        "css_rules_removed": 0,
+        "css_rules_refcount_changed": 4,
+        "css_incremental_update_ms": 0.910649,
+        "css_order_maintenance_ms": 0.106872,
+        "css_final_serialize_ms": 0.01139,
+        "css_bytes_written": 54164,
+        "css_generation_reused": 1,
+        "build_report_build_ms": 0.04705,
+        "output_files_changed": 2,
+        "output_bytes_written": 4338,
+        "write_calls": 2,
+        "written_bytes": 4338,
+        "build_report_serialize_ms": 0.01578,
+        "build_report_bytes": 3120,
+        "metadata_bytes_written": 482446,
+        "output_files_removed": 0,
+        "output_bytes_deleted": 0,
+        "generation_materialized": 1
+      },
+      "value": {
+        "projectId": "phase7-c10000-service-overhead",
+        "sessionId": "de49673a-ef18-4933-836f-239e63b12df6",
+        "revision": {
+          "projectId": "phase7-c10000-service-overhead",
+          "sessionId": "de49673a-ef18-4933-836f-239e63b12df6",
+          "revisionId": 2
+        },
+        "artifactRevision": {
+          "projectId": "phase7-c10000-service-overhead",
+          "sessionId": "de49673a-ef18-4933-836f-239e63b12df6",
+          "revisionId": 2
+        },
+        "artifactDigest": "9c0114baa0c5b265b60bec9a9c6bf9f036130bd75740df2e9efa9ced8a8c915c",
+        "associationRevision": {
+          "projectId": "phase7-c10000-service-overhead",
+          "sessionId": "de49673a-ef18-4933-836f-239e63b12df6",
+          "revisionId": 2
+        },
+        "generationId": 2,
+        "designSystem": {
+          "systemId": "corpus-c10000-t1000-r100-s307-f8@0.1",
+          "registryDigest": "77d020d5e1a1fc79"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 0,
+          "outputsChanged": 2,
+          "outputsReused": 10004,
+          "outputsRemoved": 0,
+          "bytesWritten": 4338,
+          "bytesReused": 11220628,
+          "bytesDeleted": 0,
+          "hardlinks": 10004,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 0,
+              "changed": 1,
+              "reused": 10001,
+              "removed": 0,
+              "bytesWritten": 1218,
+              "bytesReused": 10714219,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 0,
+              "changed": 0,
+              "reused": 1,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 27082,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 0,
+              "changed": 1,
+              "reused": 2,
+              "removed": 0,
+              "bytesWritten": 3120,
+              "bytesReused": 479327,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      }
+    }
+  ],
+  "closeResourceStats": {
+    "activePublisherLeases": 0
+  }
+}

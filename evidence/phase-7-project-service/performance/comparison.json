@@ -1,0 +1,395 @@
+{
+  "documentKind": "pandamstyle-phase-7-performance-comparison",
+  "schemaVersion": 1,
+  "baseline": {
+    "testedCommit": "cf2a1403ed6e651fdc23c950a40b4d639c504ef5",
+    "testedTree": "aedce15ebfc9a2d0ca33f9e8ab7e6c6404c03478",
+    "source": "evidence/phase-5-donor-cleanup/performance",
+    "corpusContentHash": "91ad54984875a9226624413db899415bad8ff7427810099f234350e927c964da"
+  },
+  "current": {
+    "testedCommit": "4e72cf32e498d5f4c3be0a9153c1d9c9aaba1d0a",
+    "testedTree": "1a2de11b4b1accb454e2ac5702d5c0de074d5e74",
+    "corpusName": "c10000-t1000-r100-s307-f8",
+    "corpusContentHash": "91ad54984875a9226624413db899415bad8ff7427810099f234350e927c964da",
+    "harness": "phase-d-profile.js + agent-loop.js",
+    "iterations": 3,
+    "processIsolation": "one child process per cell"
+  },
+  "cases": [
+    {
+      "label": "style edit",
+      "scenario": "one_file_existing_atoms#edit",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "baselineP50Ms": 65.617115,
+      "currentP50Ms": 59.099722,
+      "deltaMs": -6.517,
+      "changePercent": -9.93,
+      "baselineN": 3,
+      "currentN": 3
+    },
+    {
+      "label": "import edit",
+      "scenario": "import_change#import",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "baselineP50Ms": 31.859011,
+      "currentP50Ms": 21.573557,
+      "deltaMs": -10.285,
+      "changePercent": -32.28,
+      "baselineN": 3,
+      "currentN": 3
+    },
+    {
+      "label": "re-export edit",
+      "scenario": "reexport_change#reexport",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "baselineP50Ms": 113.371877,
+      "currentP50Ms": 111.121105,
+      "deltaMs": -2.251,
+      "changePercent": -1.99,
+      "baselineN": 3,
+      "currentN": 3
+    },
+    {
+      "label": "unresolved import repair",
+      "scenario": "unresolved_import_then_file_appears#appears",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "baselineP50Ms": 77.018383,
+      "currentP50Ms": 63.031075,
+      "deltaMs": -13.987,
+      "changePercent": -18.16,
+      "baselineN": 3,
+      "currentN": 3
+    },
+    {
+      "label": "no change",
+      "scenario": "no_change#declared_unchanged",
+      "metric": "agent_edit_to_diagnostics_ms",
+      "baselineP50Ms": 61.617717,
+      "currentP50Ms": 58.959169,
+      "deltaMs": -2.659,
+      "changePercent": -4.31,
+      "baselineN": 3,
+      "currentN": 3
+    },
+    {
+      "label": "publication ready",
+      "scenario": "one_file_existing_atoms#edit",
+      "metric": "agent_edit_to_generation_ready_ms",
+      "baselineP50Ms": 563.465017,
+      "currentP50Ms": 507.406505,
+      "deltaMs": -56.059,
+      "changePercent": -9.95,
+      "baselineN": 3,
+      "currentN": 3
+    },
+    {
+      "label": "publication committed",
+      "scenario": "one_file_existing_atoms#edit",
+      "metric": "agent_edit_to_generation_committed_ms",
+      "baselineP50Ms": 700.907946,
+      "currentP50Ms": 629.549056,
+      "deltaMs": -71.359,
+      "changePercent": -10.18,
+      "baselineN": 3,
+      "currentN": 3
+    }
+  ],
+  "workShape": {
+    "comparisonCount": 40,
+    "counters": [
+      {
+        "scenario": "style edit",
+        "metric": "files_recompiled",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "style edit",
+        "metric": "files_reused",
+        "baselineP50": 10001,
+        "currentP50": 10001,
+        "delta": 0
+      },
+      {
+        "scenario": "style edit",
+        "metric": "full_fallback",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:closure_nodes_examined",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:closure_nodes_reused",
+        "baselineP50": 10002,
+        "currentP50": 10002,
+        "delta": 0
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:dsv_files_examined",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "style edit",
+        "metric": "counter:dsv_files_recomputed",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "style edit",
+        "metric": "covered_entries_iterated",
+        "baselineP50": 10003,
+        "currentP50": 10003,
+        "delta": 0
+      },
+      {
+        "scenario": "import edit",
+        "metric": "files_recompiled",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "import edit",
+        "metric": "files_reused",
+        "baselineP50": 10002,
+        "currentP50": 10002,
+        "delta": 0
+      },
+      {
+        "scenario": "import edit",
+        "metric": "full_fallback",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "import edit",
+        "metric": "counter:closure_nodes_examined",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "import edit",
+        "metric": "counter:closure_nodes_reused",
+        "baselineP50": 10002,
+        "currentP50": 10002,
+        "delta": 0
+      },
+      {
+        "scenario": "import edit",
+        "metric": "counter:dsv_files_examined",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "import edit",
+        "metric": "counter:dsv_files_recomputed",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "import edit",
+        "metric": "covered_entries_iterated",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "re-export edit",
+        "metric": "files_recompiled",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "re-export edit",
+        "metric": "files_reused",
+        "baselineP50": 10001,
+        "currentP50": 10001,
+        "delta": 0
+      },
+      {
+        "scenario": "re-export edit",
+        "metric": "full_fallback",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "re-export edit",
+        "metric": "counter:closure_nodes_examined",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "re-export edit",
+        "metric": "counter:closure_nodes_reused",
+        "baselineP50": 10002,
+        "currentP50": 10002,
+        "delta": 0
+      },
+      {
+        "scenario": "re-export edit",
+        "metric": "counter:dsv_files_examined",
+        "baselineP50": 3335,
+        "currentP50": 3335,
+        "delta": 0
+      },
+      {
+        "scenario": "re-export edit",
+        "metric": "counter:dsv_files_recomputed",
+        "baselineP50": 3334,
+        "currentP50": 3334,
+        "delta": 0
+      },
+      {
+        "scenario": "re-export edit",
+        "metric": "covered_entries_iterated",
+        "baselineP50": 10003,
+        "currentP50": 10003,
+        "delta": 0
+      },
+      {
+        "scenario": "unresolved repair",
+        "metric": "files_recompiled",
+        "baselineP50": 2,
+        "currentP50": 2,
+        "delta": 0
+      },
+      {
+        "scenario": "unresolved repair",
+        "metric": "files_reused",
+        "baselineP50": 10001,
+        "currentP50": 10001,
+        "delta": 0
+      },
+      {
+        "scenario": "unresolved repair",
+        "metric": "full_fallback",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "unresolved repair",
+        "metric": "counter:closure_nodes_examined",
+        "baselineP50": 2,
+        "currentP50": 2,
+        "delta": 0
+      },
+      {
+        "scenario": "unresolved repair",
+        "metric": "counter:closure_nodes_reused",
+        "baselineP50": 10002,
+        "currentP50": 10002,
+        "delta": 0
+      },
+      {
+        "scenario": "unresolved repair",
+        "metric": "counter:dsv_files_examined",
+        "baselineP50": 2,
+        "currentP50": 2,
+        "delta": 0
+      },
+      {
+        "scenario": "unresolved repair",
+        "metric": "counter:dsv_files_recomputed",
+        "baselineP50": 2,
+        "currentP50": 2,
+        "delta": 0
+      },
+      {
+        "scenario": "unresolved repair",
+        "metric": "covered_entries_iterated",
+        "baselineP50": 10004,
+        "currentP50": 10004,
+        "delta": 0
+      },
+      {
+        "scenario": "no change",
+        "metric": "files_recompiled",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "no change",
+        "metric": "files_reused",
+        "baselineP50": 10001,
+        "currentP50": 10001,
+        "delta": 0
+      },
+      {
+        "scenario": "no change",
+        "metric": "full_fallback",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:closure_nodes_examined",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:closure_nodes_reused",
+        "baselineP50": 10003,
+        "currentP50": 10003,
+        "delta": 0
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:dsv_files_examined",
+        "baselineP50": 1,
+        "currentP50": 1,
+        "delta": 0
+      },
+      {
+        "scenario": "no change",
+        "metric": "counter:dsv_files_recomputed",
+        "baselineP50": 0,
+        "currentP50": 0,
+        "delta": 0
+      },
+      {
+        "scenario": "no change",
+        "metric": "covered_entries_iterated",
+        "baselineP50": 10003,
+        "currentP50": 10003,
+        "delta": 0
+      }
+    ]
+  },
+  "status": {
+    "rows": 1956,
+    "errors": 0,
+    "failedCells": 0,
+    "cells": 30,
+    "contentHashMatchesBaseline": true
+  },
+  "limitations": [
+    "Latency comparison is between the current low-level incremental-session benchmark path and the Phase 5 c10k run on byte-identical corpus content; it does not represent the Project Service wrapper.",
+    "Three independent cold cell processes per case; no confidence interval is computed.",
+    "Project Service API/host costs are recorded separately in service-overhead.json; one measured style transaction, no baseline wrapper comparator."
+  ]
+}

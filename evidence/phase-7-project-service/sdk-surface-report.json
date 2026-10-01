@@ -1,0 +1,20 @@
+{
+  "documentKind": "pandamstyle-phase-7-sdk-surface",
+  "schemaVersion": 1,
+  "testedCommit": "4e72cf32e498d5f4c3be0a9153c1d9c9aaba1d0a",
+  "runtimeExports": {
+    ".": [
+      "COMPILER_ABI_VERSION",
+      "Codes",
+      "DIAGNOSTICS_RESULT_KIND",
+      "DIAGNOSTICS_RESULT_SCHEMA_VERSION",
+      "PmsError",
+      "createProjectSession",
+      "formatDiagnostic"
+    ],
+    "./config": ["defineConfig", "token"],
+    "./host": ["createHostBridge"]
+  },
+  "declarations": "TypeScript strict no-emit check passed for index.d.ts, config.d.ts, and host.d.ts.",
+  "exportMap": "Verified by build and artifact verifier; no low-level graph, cache, or session export is present at the root."
+}
