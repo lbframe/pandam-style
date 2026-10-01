@@ -92,7 +92,6 @@ export function pandamstyle(userOptions = {}) {
       session = createCompilerSession({
         definition,
         roots: (options.roots ?? ['.']).map((r) => path.resolve(root, r)),
-        runtimeModule: options.runtimeModule,
         designSystemFile: options.designSystemFile,
         engineOptions: options.engineOptions,
         useCSSLayers: options.useCSSLayers === true,

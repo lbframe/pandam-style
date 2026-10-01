@@ -156,7 +156,6 @@ const CONTRACT_VERSION = 'pms-0.1';
  * output is shaped. A change to any of them is a counted full fallback.
  */
 const SEMANTIC_CONFIG_KEYS = [
-  'runtimeModule',
   'designSystemFile',
   'engineOptions',
   'useCSSLayers',
@@ -222,7 +221,6 @@ function normalizeConfig(input) {
     definition: input.definition,
     roots: (input.roots ?? []).map((r) => path.resolve(r)),
     outDir: path.resolve(input.outDir ?? '.pandamstyle'),
-    runtimeModule: input.runtimeModule ?? '@pandamstyle/compiler/runtime',
     designSystemFile: input.designSystemFile ?? 'design.pandamstyle.js',
     engineOptions: input.engineOptions ?? {},
     useCSSLayers: input.useCSSLayers === true,
@@ -465,10 +463,7 @@ export function createProjectSession(config) {
       buildDesignSystem(cfg.definition, { ...cfg.engineOptions }),
     );
     const designSystemSource = phase('ds_module_codegen_ms', () =>
-      generateDesignSystemModule({
-        designSystem,
-        runtimeModule: cfg.runtimeModule,
-      }),
+      generateDesignSystemModule({ designSystem }),
     );
 
     // The generated module must be RESOLVABLE while the pages are compiled and
@@ -2458,7 +2453,6 @@ export function createProjectSession(config) {
       projectSemanticEpoch: state.semanticEpoch,
       engineOptionsDigest: digestOf(cfg.engineOptions),
       useCSSLayers: cfg.useCSSLayers,
-      runtimeModule: cfg.runtimeModule,
       resolutionDigest: digestOf(
         [...fileState.edgeResolution.entries()].sort((a, b) =>
           a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0,

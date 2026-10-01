@@ -17,7 +17,7 @@
  *  - the generation marker (systemId + registryDigest + contract version),
  *    which the compiler reads without executing the module;
  *  - theme objects and recipe selectors built on FINITE precompiled data;
- *  - `props`, forwarded to the fork's composition runtime.
+ *  - `props`, forwarded to @pandamstyle/core.
  *
  * What it deliberately does not contain: the registry, the policy tables, the
  * Babel plugin, the CSS validator, or any CSS-object interpreter. `create()`
@@ -26,6 +26,7 @@
  */
 
 import { DESIGN_SYSTEM_MARKER } from '../../project/graph/resolution';
+import { toRecipeSpec, toThemeRefs } from './refs';
 
 const BANNER = [
   '/**',
@@ -43,9 +44,8 @@ function jsonLiteral(value) {
 export function generateDesignSystemModule({
   designSystem,
   contractVersion = 'pms-0.1',
-  runtimeModule,
-  stylexModule = '@stylexjs/stylex',
 }) {
+  const systemId = designSystem.registry.systemId;
   const marker = {
     systemId: designSystem.registry.systemId,
     registryDigest: designSystem.registry.registryDigest,
@@ -60,7 +60,7 @@ export function generateDesignSystemModule({
     )
     .sort();
   for (const recipeId of consumerRecipeIds) {
-    const spec = designSystem.recipes[recipeId].spec;
+    const spec = toRecipeSpec(designSystem.recipes[recipeId], systemId);
     recipeEntries.push(
       [
         `const __pmsRecipe_${recipeId} = defineRecipeSelector(${jsonLiteral(spec)});`,
@@ -72,16 +72,17 @@ export function generateDesignSystemModule({
   const lines = [
     BANNER,
     '',
-    `import { props as __pmsStylexProps } from '${stylexModule}';`,
-    `import { defineRecipeSelector } from '${runtimeModule}';`,
+    "import { assertAbi, defineRecipeSelector, props as __pmsProps, PmsSelectionError } from '@pandamstyle/core';",
+    '',
+    'assertAbi(1);',
     '',
     `export const ${DESIGN_SYSTEM_MARKER} = ${jsonLiteral(marker)};`,
     '',
     `export const manifest = ${jsonLiteral(designSystem.manifest)};`,
     '',
-    'export const props = __pmsStylexProps;',
+    'export const props = __pmsProps;',
     '',
-    `export const themes = ${jsonLiteral(designSystem.themes)};`,
+    `export const themes = ${jsonLiteral(toThemeRefs(designSystem.themes, systemId))};`,
     '',
     ...recipeEntries,
     `export const recipes = { ${consumerRecipeIds
@@ -91,11 +92,11 @@ export function generateDesignSystemModule({
     '// Compile-time only: reaching either at runtime means the PandamStyle',
     '// compiler did not transform this file.',
     'export const token = function token(path) {',
-    "  throw new Error('PMS_TOKEN_RUNTIME: token() is compile-time only, got ' + path);",
+    "  throw new PmsSelectionError({ code: 'PMS_TOKEN_RUNTIME', message: 'token() is compile-time only.', rule: 'generated.token-runtime', context: { path } });",
     '};',
     '',
     'export const create = function create() {',
-    "  throw new Error('PMS_UNCOMPILED_CREATE: create() must be transformed by the PandamStyle compiler');",
+    "  throw new PmsSelectionError({ code: 'PMS_UNCOMPILED_CREATE', message: 'create() must be transformed by the PandamStyle compiler.', rule: 'generated.create-runtime', context: {} });",
     '};',
     '',
   ];

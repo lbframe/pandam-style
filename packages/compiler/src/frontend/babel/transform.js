@@ -16,10 +16,14 @@
  */
 
 import * as t from '@babel/types';
-import { convertObjectToAST } from '../../../../@stylexjs/babel-plugin/src/utils/js-to-ast';
+import { defineRecipeSelector } from '@pandamstyle/core';
 import { compileStyles } from '../../engine/lowering/styles';
 import { diagnostic, Codes } from '../../protocol/diagnostics';
-import { selectRecipeRefs } from '../../../../@stylexjs/babel-plugin/pandamstyle/recipe-select';
+import {
+  toRecipeSpec,
+  toRuntimeRefs,
+  toThemeRef,
+} from '../../artifacts/javascript/refs';
 import {
   FAIL,
   evaluateValue,
@@ -33,7 +37,7 @@ import { isAdmitted, provenanceOf } from '../../semantics/provenance/index';
 // Benchmark-only measurement hooks (Spike 1).
 import { phase as perfPhase } from '../../observability/metrics';
 
-const STYLEX_PROPS_LOCAL = '__pmsProps';
+const CORE_PROPS_LOCAL = '__pmsProps';
 
 function lineOnly(ctx, nodePath) {
   return {
@@ -78,11 +82,24 @@ function addNamedImport(programPath, source, imported, local) {
 }
 
 function literalOf(value) {
+  if (Array.isArray(value)) {
+    return t.arrayExpression(value.map((item) => literalOf(item)));
+  }
   if (typeof value === 'string') return t.stringLiteral(value);
   if (typeof value === 'number') return t.numericLiteral(value);
   if (typeof value === 'boolean') return t.booleanLiteral(value);
   if (value === null) return t.nullLiteral();
-  return convertObjectToAST(value);
+  if (value === undefined) return t.identifier('undefined');
+  return t.objectExpression(
+    Object.entries(value).map(([key, item]) =>
+      t.objectProperty(
+        t.isValidIdentifier(key, false)
+          ? t.identifier(key)
+          : t.stringLiteral(key),
+        literalOf(item),
+      ),
+    ),
+  );
 }
 
 /** Records the rules emitted by the engine in the file metadata. */
@@ -210,7 +227,9 @@ function transformCreateCall(callPath, ctx, ds) {
   }
   if (ctx.diags.length > priorCount) return;
   registerRules(ctx.pluginPass, result.injected);
-  callPath.replaceWith(convertObjectToAST(result.compiled));
+  callPath.replaceWith(
+    literalOf(toRuntimeRefs(result.compiled, ds.registry.systemId)),
+  );
   ctx.used = true;
 }
 
@@ -263,10 +282,12 @@ function transformRecipeCall(callPath, ctx, ds) {
     return;
   }
 
-  let refs;
+  let selected;
   try {
-    refs = perfPhase('recipe_ms', () =>
-      selectRecipeRefs(recipe.spec, staticSelection),
+    selected = perfPhase('recipe_ms', () =>
+      defineRecipeSelector(toRecipeSpec(recipe, ds.registry.systemId))(
+        staticSelection,
+      ),
     );
   } catch (err) {
     if (err != null && Array.isArray(err.diagnostics)) {
@@ -279,9 +300,22 @@ function transformRecipeCall(callPath, ctx, ds) {
       }
       return;
     }
+    if (err != null && typeof err.code === 'string') {
+      ctx.diags.push(
+        diagnostic({
+          code: err.code,
+          phase: 'build-selection',
+          message: err.message,
+          source: fullLoc(ctx, args[0]),
+          rule: err.rule ?? 'recipe.bounded-domain',
+          context: err.context ?? {},
+        }),
+      );
+      return;
+    }
     throw err;
   }
-  callPath.replaceWith(t.arrayExpression(refs.map((r) => literalOf(r))));
+  callPath.replaceWith(literalOf(selected));
   ctx.used = true;
 }
 
@@ -342,19 +376,20 @@ function transformThemeAccess(memberPath, ctx, ds) {
     );
     return true;
   }
-  memberPath.replaceWith(convertObjectToAST(theme));
+  memberPath.replaceWith(
+    literalOf(toThemeRef(themeName, theme, ds.registry.systemId, ds.themes)),
+  );
   ctx.used = true;
   return true;
 }
 
 /**
- * `props(...)` becomes the call to the fork's composition runtime.
+ * `props(...)` becomes the call to core's composition runtime.
  *
  * The rewrite happens ONLY for an argument whose provenance was already proven
  * (pandamstyle/provenance.js, run as a pre-pass in the plugin). The re-check
- * here is deliberate: the fork runtime accepts uncompiled objects and turns
- * them into inline styles, so this function is the last place where a raw
- * object could still slip through if the pass order ever changed.
+ * here is deliberate: the compiler must reject unproven values even though
+ * core independently validates the runtime ref shape.
  */
 function transformPropsCall(callPath, ctx, programPath) {
   const args = callPath.get('arguments');
@@ -378,9 +413,9 @@ function transformPropsCall(callPath, ctx, programPath) {
 
   const local = addNamedImport(
     programPath,
-    '@stylexjs/stylex',
+    '@pandamstyle/core',
     'props',
-    STYLEX_PROPS_LOCAL,
+    CORE_PROPS_LOCAL,
   );
   callPath.node.callee = t.identifier(local);
   ctx.used = true;

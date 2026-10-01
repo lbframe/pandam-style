@@ -16,7 +16,6 @@ export interface ProjectConfig {
   roots: readonly string[];
   outDir?: string;
   designSystemFile?: string;
-  runtimeModule?: string;
   useCSSLayers?: boolean;
 }
 

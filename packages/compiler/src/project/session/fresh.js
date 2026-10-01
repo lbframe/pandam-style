@@ -308,7 +308,6 @@ function createCompilerSessionInContext(config, graphContext) {
   const {
     definition,
     roots = [],
-    runtimeModule = '@pandamstyle/compiler/runtime',
     designSystemFile = 'design.pandamstyle.js',
     engineOptions = {},
     useCSSLayers = false,
@@ -321,10 +320,7 @@ function createCompilerSessionInContext(config, graphContext) {
     buildDesignSystem(definition, { ...engineOptions }),
   );
   const designSystemSource = phase('ds_module_codegen_ms', () =>
-    generateDesignSystemModule({
-      designSystem,
-      runtimeModule,
-    }),
+    generateDesignSystemModule({ designSystem }),
   );
 
   // The generated design system module must be RESOLVABLE while the pages are
@@ -364,7 +360,6 @@ function createCompilerSessionInContext(config, graphContext) {
     role,
     useCSSLayers,
     engineOptions,
-    runtimeModule,
     designSystemFile,
     designSystemSource,
     generatedModulePath,
@@ -432,7 +427,6 @@ function createCompilerSessionInContext(config, graphContext) {
  * @param {object} config.definition       design system definition object
  * @param {string[]} config.roots          declared covered roots (absolute or cwd-relative)
  * @param {string}   config.outDir         output directory
- * @param {string}   [config.runtimeModule] module specifier the generated design system imports
  * @param {string}   [config.designSystemFile] filename of the generated design system module
  * @param {Function} [config.onStage]      test seam, called once every source is
  *                                         compiled and BEFORE anything is
@@ -451,7 +445,6 @@ function buildProjectInContext(config) {
     definition,
     roots = [],
     outDir,
-    runtimeModule = '@pandamstyle/compiler/runtime',
     designSystemFile = 'design.pandamstyle.js',
     engineOptions = {},
     useCSSLayers = false,
@@ -471,7 +464,6 @@ function buildProjectInContext(config) {
         const session = createCompilerSession({
           definition,
           roots,
-          runtimeModule,
           designSystemFile,
           engineOptions,
           useCSSLayers,

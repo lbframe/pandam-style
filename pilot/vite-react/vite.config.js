@@ -23,7 +23,6 @@ export default defineConfig({
       designSystem: './design.pandamstyle.config.js',
       roots: ['./src/pages'],
       outDir: './.pandamstyle',
-      runtimeModule: '@pandamstyle/compiler/runtime',
       role: 'page',
     }),
   ],

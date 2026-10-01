@@ -8,8 +8,8 @@
 /**
  * Rollup build for @pandamstyle/compiler.
  *
- * Build the stable SDK/config/host surfaces plus explicit temporary Phase 2
- * runtime and Phase 8 Vite verifier bridges.
+ * Build the stable SDK/config/host surfaces plus the temporary Phase 8 Vite
+ * verifier bridge.
  */
 
 import { nodeResolve } from '@rollup/plugin-node-resolve';
@@ -33,6 +33,7 @@ const external = [
   '@babel/preset-react',
   '@babel/preset-typescript',
   '@dual-bundle/import-meta-resolve',
+  '@pandamstyle/core',
   '@stylexjs/stylex',
   '@stylexjs/shared',
   'postcss-value-parser',
@@ -50,6 +51,11 @@ const external = [
   'url',
   'util',
 ];
+// The private CommonJS inspection bundle used by the existing Jest suites
+// needs the ESM-only core inlined. Public compiler bundles keep core external.
+const inspectionExternal = external.filter(
+  (specifier) => specifier !== '@pandamstyle/core',
+);
 
 // Both the fork sources and the PandamStyle modules must be transpiled:
 // the fork is Flow, the PandamStyle modules are ESM.
@@ -108,14 +114,6 @@ export default [
     plugins: plugins(),
   },
   {
-    // Temporary Phase 2 bridge. Generated modules will import @pandamstyle/core
-    // when the independently qualified Phase 2 branch is reconciled.
-    input: '../@stylexjs/babel-plugin/pandamstyle/runtime.js',
-    external: ['@stylexjs/stylex'],
-    output: [{ file: './lib/runtime.mjs', format: 'es' }],
-    plugins: plugins(),
-  },
-  {
     // Temporary Vite verifier seam. Phase 8 moves this implementation to
     // @pandamstyle/vite and removes this compiler subpath.
     input: '../@stylexjs/babel-plugin/pandamstyle/vite.js',
@@ -126,7 +124,7 @@ export default [
   {
     // Tests use this private bundle instead of expanding the stable SDK root.
     input: '../../tests/support/compiler-inspection.js',
-    external,
+    external: inspectionExternal,
     output: [
       {
         file: '../../.pms-test-support/compiler-inspection.cjs',

@@ -13,7 +13,8 @@
  * precompiled branches and a bounded runtime selector.
  */
 
-import { selectRecipeRefs } from '../../../../@stylexjs/babel-plugin/pandamstyle/recipe-select';
+import { defineRecipeSelector } from '@pandamstyle/core';
+import { toRecipeSpec } from '../../artifacts/javascript/refs';
 
 function compact(obj) {
   const out = {};
@@ -58,15 +59,10 @@ export function defineRecipe(config, compileStyleObject) {
     branches: compiledBranches,
   };
 
-  // One single selection implementation, shared with the runtime.
-  function resolve(props) {
-    return selectRecipeRefs(spec, props);
-  }
+  const selector = defineRecipeSelector(toRecipeSpec(spec, config.systemId));
 
   function cvaFn(props) {
-    // Opaque StyleRef: ordered list of compiled refs; only the fork runtime
-    // (props) composes them. No CSS string, no free-form merge.
-    return Object.freeze({ __pmsStyleRef: true, refs: resolve(props) });
+    return selector(props);
   }
 
   function splitVariantProps(props) {
@@ -85,7 +81,6 @@ export function defineRecipe(config, compileStyleObject) {
   });
 
   return Object.assign(cvaFn, {
-    __pmsRecipe: true,
     recipeId,
     variantMap,
     variantKeys,
@@ -100,6 +95,8 @@ export function defineRecipe(config, compileStyleObject) {
 
 export function isStyleRef(value) {
   return (
-    value !== null && typeof value === 'object' && value.__pmsStyleRef === true
+    value !== null &&
+    typeof value === 'object' &&
+    value.kind === 'pandamstyle-style-ref'
   );
 }

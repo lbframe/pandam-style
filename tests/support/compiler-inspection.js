@@ -113,11 +113,6 @@ export {
   tokenPathOf,
 } from '../../packages/compiler/src/design-system/tokens/ref.js';
 export {
-  selectRecipeRefs,
-  makeRecipeSpec,
-} from '../../packages/@stylexjs/babel-plugin/pandamstyle/recipe-select.js';
-export { defineRecipeSelector } from '../../packages/@stylexjs/babel-plugin/pandamstyle/runtime.js';
-export {
   count,
   installPerfCollector,
   perfCollector,

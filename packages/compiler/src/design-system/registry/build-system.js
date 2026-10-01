@@ -11,7 +11,7 @@
  * les styles passent tous par le moteur du fork.
  */
 
-import { props as stylexProps } from '@stylexjs/stylex';
+import { props as coreProps } from '@pandamstyle/core';
 
 import { buildRegistry } from './index';
 import {
@@ -19,7 +19,8 @@ import {
   compileStyles,
   renderCss,
 } from '../../engine/lowering/styles';
-import { defineRecipe, isStyleRef } from '../recipes/compile';
+import { defineRecipe } from '../recipes/compile';
+import { toRuntimeRefs, toThemeRefs } from '../../artifacts/javascript/refs';
 import { token } from '../tokens/ref';
 import { supportedProperties } from '../policy/properties';
 import { PmsError } from '../../protocol/diagnostics';
@@ -66,7 +67,11 @@ export function buildDesignSystem(definition, options = {}) {
   perfPhase('ds_recipe_compile_ms', () => {
     for (const recipeId of Object.keys(registry.recipes)) {
       recipes[recipeId] = defineRecipe(
-        { recipeId, ...registry.recipes[recipeId] },
+        {
+          recipeId,
+          systemId: registry.systemId,
+          ...registry.recipes[recipeId],
+        },
         compileStyleObject,
       );
     }
@@ -92,15 +97,17 @@ export function buildDesignSystem(definition, options = {}) {
   for (const name of Object.keys(themeClasses)) {
     themes[name] = { $$css: true, [varGroupHash]: themeClasses[name] };
   }
+  const coreThemes = toThemeRefs(themes, registry.systemId);
 
-  const props = (...args) => {
-    const compiled = args.map((a) => {
-      if (a == null || a === false) return null;
-      if (isStyleRef(a)) return a.refs;
-      return a;
-    });
-    return stylexProps(...compiled);
-  };
+  const props = (...args) =>
+    coreProps(
+      ...args.map((arg) => {
+        const themeId = Object.keys(themes).find((id) => themes[id] === arg);
+        return themeId === undefined
+          ? toRuntimeRefs(arg, registry.systemId)
+          : coreThemes[themeId];
+      }),
+    );
 
   const publicTokens = Object.keys(registry.tokens).filter(
     (id) => registry.tokens[id].visibility === 'public',
