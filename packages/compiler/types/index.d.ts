@@ -33,9 +33,22 @@ export interface MutationTransaction {
   readonly added: readonly string[];
   readonly removed: readonly string[];
   readonly renamed: readonly { readonly from: string; readonly to: string }[];
+  /**
+   * Optional host-provided source bytes for changed/added paths. The compiler
+   * treats these bytes as the source input for this revision and retains them
+   * only in the owning project session until that path is changed again.
+   */
+  readonly sourceOverlays?: readonly SourceOverlay[];
   readonly definition?: Definition;
   readonly config?: ProjectConfigChanges;
   readonly forceFullDiscovery?: boolean;
+}
+
+export interface SourceOverlay {
+  /** Project-relative POSIX path, also present in changed/added/renamed.to. */
+  readonly file: string;
+  /** Exact source text supplied by the host for this revision. */
+  readonly source: string;
 }
 
 export interface ProjectConfigChanges {
@@ -191,10 +204,33 @@ export interface MutationAuditResult {
 
 export interface ArtifactResult {
   readonly source: string;
+  /** SHA-256 digest of the exact source bytes compiled for this revision. */
+  readonly sourceDigest: string;
   readonly javascript: string;
   readonly sourceMap: string | null;
   readonly css: readonly Readonly<{ file: string; content: string }>[];
   readonly dependencies: readonly string[];
+  readonly revision: RevisionIdentity;
+  readonly designSystem: Readonly<{
+    systemId: string;
+    registryDigest: string | null;
+  }>;
+  readonly abiVersion: 1;
+}
+
+export interface GeneratedArtifactFile {
+  readonly file: string;
+  readonly kind:
+    | 'design-module'
+    | 'declarations'
+    | 'manifest'
+    | 'css'
+    | 'artifact-metadata';
+  readonly content: string;
+}
+
+export interface GeneratedArtifactSet {
+  readonly files: readonly GeneratedArtifactFile[];
   readonly revision: RevisionIdentity;
   readonly designSystem: Readonly<{
     systemId: string;
@@ -240,6 +276,9 @@ export interface ProjectSession {
     revision: RevisionIdentity,
     moduleId: string,
   ): Promise<ArtifactResult>;
+  readGeneratedArtifacts(
+    revision: RevisionIdentity,
+  ): Promise<GeneratedArtifactSet>;
   preparePublication(revision: RevisionIdentity): Promise<PublicationTicket>;
   commitPrepared(ticket: PublicationTicket): Promise<PublicationReceipt>;
   abortPrepared(ticket: PublicationTicket): Promise<boolean>;

@@ -7,6 +7,7 @@
 
 const HOST_OPERATIONS = Object.freeze([
   'readArtifact',
+  'readGeneratedArtifacts',
   'preparePublication',
   'commitPrepared',
   'abortPrepared',

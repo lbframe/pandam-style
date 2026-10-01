@@ -216,7 +216,52 @@ function snapshotMutation(transaction) {
     renamed: Array.isArray(transaction.renamed)
       ? transaction.renamed.map((move) => ({ ...move }))
       : transaction.renamed,
+    sourceOverlays: Array.isArray(transaction.sourceOverlays)
+      ? transaction.sourceOverlays.map((entry) => ({ ...entry }))
+      : transaction.sourceOverlays,
   };
+}
+
+function resolveSourceOverlays(overlays, mutation, rootDir, outDir) {
+  if (overlays === undefined) return [];
+  if (!Array.isArray(overlays)) {
+    throw new TypeError('sourceOverlays must be an array.');
+  }
+  const writablePaths = new Set([
+    ...mutation.changed,
+    ...mutation.added,
+    ...mutation.renamed.map(({ to }) => to),
+  ]);
+  const seen = new Set();
+  return overlays.map((entry) => {
+    if (
+      entry == null ||
+      typeof entry.file !== 'string' ||
+      entry.file === '' ||
+      path.isAbsolute(entry.file) ||
+      typeof entry.source !== 'string'
+    ) {
+      throw new TypeError(
+        'Each source overlay requires a project-relative file and string source.',
+      );
+    }
+    const file = canonicalPath(path.resolve(rootDir, entry.file));
+    if (!isWithin(rootDir, file) || isWithin(outDir, file)) {
+      throw new TypeError(
+        `Source overlay must stay inside rootDir and outside outDir: ${entry.file}`,
+      );
+    }
+    if (!writablePaths.has(file)) {
+      throw new TypeError(
+        `Source overlay path must be listed as changed, added or renamed.to: ${entry.file}`,
+      );
+    }
+    if (seen.has(file)) {
+      throw new TypeError(`Duplicate source overlay path: ${entry.file}`);
+    }
+    seen.add(file);
+    return { file, source: entry.source };
+  });
 }
 
 function snapshotTicket(ticket) {
@@ -463,8 +508,15 @@ export function createProjectSession(config) {
       normalized.rootDir,
       normalized.outDir,
     );
+    const sourceOverlays = resolveSourceOverlays(
+      transaction?.sourceOverlays,
+      mutation,
+      normalized.rootDir,
+      normalized.outDir,
+    );
     const value = implementation.applyChanges({
       mutation,
+      sourceOverlays,
       definition: transaction?.definition,
       config: resolveConfigChanges(transaction?.config, normalized),
     });
@@ -763,6 +815,7 @@ export function createProjectSession(config) {
         .relative(normalized.rootDir, source)
         .split(path.sep)
         .join('/'),
+      sourceDigest: compiled.sourceHash,
       javascript: compiled.code,
       sourceMap: null,
       css: [{ file: 'styles.css', content: css }],
@@ -773,6 +826,21 @@ export function createProjectSession(config) {
         registryDigest: identity?.registryDigest ?? null,
       },
       abiVersion: 1,
+    });
+  }
+
+  async function readGeneratedArtifacts(expectedRevision) {
+    requireValidated(expectedRevision, 'readGeneratedArtifacts()', true);
+    const generated = implementation._canonicalArtifactsForCurrentRevision();
+    if (generated == null) {
+      throw lifecycleError(
+        Codes.INVALID_REVISION,
+        'No canonical generated artifacts are available for the current revision.',
+      );
+    }
+    return immutableCopy({
+      ...generated,
+      revision: revision(),
     });
   }
 
@@ -951,6 +1019,10 @@ export function createProjectSession(config) {
     readArtifact: (expectedRevision, moduleId) => {
       const snapshot = snapshotRevision(expectedRevision);
       return enqueue(() => readArtifact(snapshot, moduleId));
+    },
+    readGeneratedArtifacts: (expectedRevision) => {
+      const snapshot = snapshotRevision(expectedRevision);
+      return enqueue(() => readGeneratedArtifacts(snapshot));
     },
     preparePublication: (expectedRevision) => {
       const snapshot = snapshotRevision(expectedRevision);

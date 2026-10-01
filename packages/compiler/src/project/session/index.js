@@ -357,6 +357,11 @@ export function createProjectSession(config) {
     designDeclarationsSource: null,
     generatedModulePath: null,
     overlay: new Map(),
+    // Source text explicitly supplied by a host is scoped to this Project
+    // Service session and participates in the ordinary source hash, graph and
+    // compiler path. A filesystem mutation for the same path clears it unless
+    // the transaction supplies a replacement overlay.
+    hostSourceOverlays: new Map(),
     fileStates: new Map(),
     // module path -> the files whose design-system view TRAVERSES it. This is
     // the relay-chain index: a file is a member of every module its walk
@@ -460,6 +465,21 @@ export function createProjectSession(config) {
   // it and `state.dsv` five times is five chances to read the wrong object.
   const dsv = state.dsv;
 
+  function refreshModuleOverlay() {
+    const overlay = new Map(state.hostSourceOverlays);
+    if (state.generatedModulePath != null && state.designSystemSource != null) {
+      overlay.set(state.generatedModulePath, state.designSystemSource);
+    }
+    state.overlay = overlay;
+    setModuleOverlay(overlay);
+    if (state.generatedModulePath != null && state.designSystemSource != null) {
+      registerServiceOwnedGeneratedArtifact(
+        state.generatedModulePath,
+        state.designSystemSource,
+      );
+    }
+  }
+
   // ------------------------------------------------------------ design ------
 
   function rebuildDesignSystem() {
@@ -489,19 +509,12 @@ export function createProjectSession(config) {
     // must NOT be on disk yet: that is the whole of the transactional
     // publication guarantee. The overlay serves it, exactly as the full build
     // does. See module-graph.js and generation.js.
-    const overlay = new Map([[generatedModulePath, designSystemSource]]);
-    setModuleOverlay(overlay);
-    registerServiceOwnedGeneratedArtifact(
-      generatedModulePath,
-      designSystemSource,
-    );
-
     state.designSystem = designSystem;
     state.designSystemSource = designSystemSource;
     state.designDeclarationsFile = declarationsFile;
     state.designDeclarationsSource = declarationsSource;
     state.generatedModulePath = generatedModulePath;
-    state.overlay = overlay;
+    refreshModuleOverlay();
   }
 
   // --------------------------------------------------------- resolution -----
@@ -862,6 +875,9 @@ export function createProjectSession(config) {
   function readSource(file) {
     if (file === state.generatedModulePath) {
       return { text: state.designSystemSource, ok: true };
+    }
+    if (state.hostSourceOverlays.has(file)) {
+      return { text: state.hostSourceOverlays.get(file), ok: true };
     }
     try {
       return { text: fs.readFileSync(file, 'utf8'), ok: true };
@@ -1676,6 +1692,21 @@ export function createProjectSession(config) {
     }
     const active = beginRevision();
     const previousConfig = state.config;
+    let sourceOverlayChanged = false;
+    const hostMutation = changes.mutation ?? null;
+    for (const file of hostMutation == null ? [] : touchedPaths(hostMutation)) {
+      if (state.hostSourceOverlays.delete(path.resolve(file))) {
+        sourceOverlayChanged = true;
+      }
+    }
+    for (const entry of changes.sourceOverlays ?? []) {
+      const file = path.resolve(entry.file);
+      if (state.hostSourceOverlays.get(file) !== entry.source) {
+        state.hostSourceOverlays.set(file, entry.source);
+        sourceOverlayChanged = true;
+      }
+    }
+    if (sourceOverlayChanged) refreshModuleOverlay();
 
     // ---- global fallback decision, before anything is read ---------------
     let nextConfig = previousConfig;
@@ -3747,6 +3778,64 @@ export function createProjectSession(config) {
       });
     },
 
+    _canonicalArtifactsForCurrentRevision() {
+      const active = state.active;
+      const snapshot = state.designSystem?.snapshot;
+      if (
+        active == null ||
+        active.validated !== true ||
+        active.ok !== true ||
+        !Array.isArray(active.allRules) ||
+        snapshot == null
+      ) {
+        return null;
+      }
+      const css = withDesignSystemCssIdentity(
+        aggregateCssFull(active.allRules, state.config),
+        snapshot.identity,
+      );
+      const manifest =
+        JSON.stringify(snapshot.tooling.manifest, null, 2) + '\n';
+      const artifactSet = createArtifactSet(snapshot, {
+        designModuleFile: state.config.designSystemFile,
+        declarationsFile: state.designDeclarationsFile,
+        designModule: state.designSystemSource,
+        declarations: state.designDeclarationsSource,
+        manifest,
+        css,
+      });
+      return Object.freeze({
+        designSystem: Object.freeze({
+          systemId: snapshot.identity.systemId,
+          registryDigest: snapshot.identity.registryDigest,
+        }),
+        abiVersion: snapshot.identity.abiVersion,
+        files: Object.freeze([
+          Object.freeze({
+            file: state.config.designSystemFile,
+            kind: 'design-module',
+            content: state.designSystemSource,
+          }),
+          Object.freeze({
+            file: state.designDeclarationsFile,
+            kind: 'declarations',
+            content: state.designDeclarationsSource,
+          }),
+          Object.freeze({
+            file: 'manifest.json',
+            kind: 'manifest',
+            content: manifest,
+          }),
+          Object.freeze({ file: 'styles.css', kind: 'css', content: css }),
+          Object.freeze({
+            file: 'artifacts.json',
+            kind: 'artifact-metadata',
+            content: artifactSet.text,
+          }),
+        ]),
+      });
+    },
+
     _cssForCurrentRevision() {
       const active = state.active;
       if (
@@ -4131,6 +4220,7 @@ export function createProjectSession(config) {
       clearModuleCache();
       state.overlay.clear();
       state.overlay = new Map();
+      state.hostSourceOverlays.clear();
       state.fileStates.clear();
       state.dsConsumers.clear();
       state.dsImportConsumers.clear();

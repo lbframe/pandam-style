@@ -1,5 +1,6 @@
 import type {
   ArtifactResult,
+  GeneratedArtifactSet,
   ProjectSession,
   PublicationReceipt,
   PublicationTicket,
@@ -8,6 +9,7 @@ import type {
 
 export type {
   ArtifactResult,
+  GeneratedArtifactSet,
   PublicationReceipt,
   PublicationTicket,
   RevisionIdentity,
@@ -18,6 +20,9 @@ export interface HostBridge {
     revision: RevisionIdentity,
     moduleId: string,
   ): Promise<ArtifactResult>;
+  readGeneratedArtifacts(
+    revision: RevisionIdentity,
+  ): Promise<GeneratedArtifactSet>;
   preparePublication(revision: RevisionIdentity): Promise<PublicationTicket>;
   commitPrepared(ticket: PublicationTicket): Promise<PublicationReceipt>;
   abortPrepared(ticket: PublicationTicket): Promise<boolean>;

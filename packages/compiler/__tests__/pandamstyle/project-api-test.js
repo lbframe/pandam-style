@@ -59,6 +59,7 @@ describe('stable project SDK lifecycle', () => {
         'src/page.js',
       );
       expect(artifact.source).toBe('src/page.js');
+      expect(artifact.sourceDigest).toMatch(/^[a-f0-9]{64}$/);
       expect(artifact.javascript).toContain('__pmsProps');
       expect(artifact.css).toEqual([
         expect.objectContaining({
@@ -264,6 +265,9 @@ describe('stable project SDK lifecycle', () => {
       expect(
         (await leftHost.readArtifact(leftValid.revision, 'src/page.js'))
           .revision,
+      ).toEqual(leftValid.revision);
+      expect(
+        (await leftHost.readGeneratedArtifacts(leftValid.revision)).revision,
       ).toEqual(leftValid.revision);
 
       await expect(
@@ -688,6 +692,106 @@ describe('stable project SDK lifecycle', () => {
       await project.close();
       fs.rmSync(fixture.project, { recursive: true, force: true });
       fs.rmSync(outside, { force: true });
+    }
+  });
+
+  test('host source overlays are revision-bound and CSS remains compiler-owned', async () => {
+    const fixture = openProject('valid');
+    const project = fixture.openPublicSession();
+    const page = fixture.src('src/page.js');
+    try {
+      const initial = await project.initialize();
+      const validated = await project.validate(initial.revision);
+      expect(validated.ok).toBe(true);
+      const originalSource = fs.readFileSync(page, 'utf8');
+      const originalArtifacts = await project.readGeneratedArtifacts(
+        validated.revision,
+      );
+      const originalCss = originalArtifacts.files.find(
+        ({ kind }) => kind === 'css',
+      );
+      expect(originalArtifacts.files.map(({ kind }) => kind)).toEqual([
+        'design-module',
+        'declarations',
+        'manifest',
+        'css',
+        'artifact-metadata',
+      ]);
+      const overlaySource = originalSource.replace(
+        "gap: token('spacing.sm')",
+        "gap: token('spacing.lg')",
+      );
+      expect(overlaySource).not.toBe(originalSource);
+
+      const overlaid = await project.applyChanges({
+        ...emptyMutation(validated.revision, 'verified-explicit'),
+        changed: ['src/page.js'],
+        sourceOverlays: [{ file: 'src/page.js', source: overlaySource }],
+      });
+      const overlayValidation = await project.validate(overlaid.revision);
+      expect(overlayValidation.ok).toBe(true);
+      const overlayArtifact = await project.readArtifact(
+        overlayValidation.revision,
+        'src/page.js',
+      );
+      const overlayArtifacts = await project.readGeneratedArtifacts(
+        overlayValidation.revision,
+      );
+      const overlayCss = overlayArtifacts.files.find(
+        ({ kind }) => kind === 'css',
+      );
+      expect(overlayArtifact.revision).toEqual(overlayValidation.revision);
+      expect(overlayArtifacts.revision).toEqual(overlayValidation.revision);
+      expect(overlayCss.content).not.toBe(originalCss.content);
+      expect(fs.readFileSync(page, 'utf8')).toBe(originalSource);
+
+      const filesystemRevision = await project.applyChanges({
+        ...emptyMutation(overlayValidation.revision, 'verified-explicit'),
+        changed: ['src/page.js'],
+      });
+      const filesystemValidation = await project.validate(
+        filesystemRevision.revision,
+      );
+      expect(filesystemValidation.ok).toBe(true);
+      const filesystemArtifacts = await project.readGeneratedArtifacts(
+        filesystemValidation.revision,
+      );
+      expect(
+        filesystemArtifacts.files.find(({ kind }) => kind === 'css').content,
+      ).toBe(originalCss.content);
+    } finally {
+      await project.close();
+      fs.rmSync(fixture.project, { recursive: true, force: true });
+    }
+  });
+
+  test('invalid host source overlays cannot serve CSS or prepare publication', async () => {
+    const fixture = openProject('valid');
+    const project = fixture.openPublicSession();
+    try {
+      const initial = await project.initialize();
+      const valid = await project.validate(initial.revision);
+      const page = fs.readFileSync(fixture.src('src/page.js'), 'utf8');
+      const invalid = page.replace("gap: token('spacing.sm')", "gap: '12px'");
+      const changed = await project.applyChanges({
+        ...emptyMutation(valid.revision, 'verified-explicit'),
+        changed: ['src/page.js'],
+        sourceOverlays: [{ file: 'src/page.js', source: invalid }],
+      });
+      const result = await project.validate(changed.revision);
+      expect(result.ok).toBe(false);
+      const diagnostics = await project.agentResult(result.revision);
+      expect(diagnostics.documentKind).toBe('pandamstyle-diagnostics-result');
+      expect(diagnostics.ok).toBe(false);
+      await expect(
+        project.readGeneratedArtifacts(result.revision),
+      ).rejects.toThrow(/requires a valid current revision/);
+      await expect(project.preparePublication(result.revision)).rejects.toThrow(
+        /Invalid revisions cannot prepare publication/,
+      );
+    } finally {
+      await project.close();
+      fs.rmSync(fixture.project, { recursive: true, force: true });
     }
   });
 
