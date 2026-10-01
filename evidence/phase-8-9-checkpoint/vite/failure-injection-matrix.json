@@ -1,0 +1,43 @@
+{
+  "testedCommit": "487ddeef5233d778f7fb50296b369e950584e003",
+  "testedTree": "eff7e713ea9a7ba6a8cb7ee2a5498cf6653d680e",
+  "pass": true,
+  "failures": [
+    {
+      "point": "invalid-source-before-transform",
+      "message": "[pandamstyle] PMS_FORBIDDEN_VALUE: Valeur interdite pour gap : \"12px\". Un token spacing est requis. (/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx:36:10)"
+    },
+    {
+      "point": "transform",
+      "message": "[pandamstyle-pilot-failure-injection] PMS_INJECTED_TRANSFORM_FAILURE\nfile: /tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx"
+    },
+    {
+      "point": "renderStart",
+      "message": "[pandamstyle-pilot-failure-injection] PMS_INJECTED_RENDERSTART_FAILURE"
+    },
+    {
+      "point": "generateBundle",
+      "message": "[pandamstyle-pilot-failure-injection] PMS_INJECTED_GENERATEBUNDLE_FAILURE"
+    },
+    {
+      "point": "writeBundle",
+      "message": "[pandamstyle-pilot-failure-injection] PMS_INJECTED_WRITEBUNDLE_FAILURE"
+    },
+    {
+      "point": "commitPrepared",
+      "message": "-pilot/app/node_modules/vite/dist/node/chunks/config.js:33747:13)\n    at file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/rollup/dist/es/shared/node-entry.js:23333:40\n    at async Promise.all (index 2)\n    at async PluginDriver.hookParallel (file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/rollup/dist/es/shared/node-entry.js:23243:9)\n    at async file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/rollup/dist/es/shared/node-entry.js:24329:13\n    at async catchUnfinishedHookActions (file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/rollup/dist/es/shared/node-entry.js:23687:16)\n    at async buildEnvironment (file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/vite/dist/node/chunks/config.js:33547:64)\n    at async Object.build (file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/vite/dist/node/chunks/config.js:33904:19)\n    at async Object.buildApp (file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/vite/dist/node/chunks/config.js:33901:153)\n    at async CAC.<anonymous> (file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/vite/dist/node/cli.js:629:3)"
+    },
+    {
+      "point": "edit-during-prepared-publication",
+      "message": "g gzip size...\n\n(node:1520751) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:\n--import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/.prepared-mutation-loader.mjs\", pathToFileURL(\"./\"));'\n(Use `node --trace-warnings ...` to show where the warning was created)\n\n/pandamstyle/styles.css doesn't exist at build time, it will remain unchanged to be resolved at runtime\n\u2717 Build failed in 1.02s\nerror during build:\n[pandamstyle] PMS_STALE_REVISION: Publication ticket is stale, revoked, or no longer matches its candidate.\n    at lifecycleError (file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/compiler/lib/index.mjs:14297:10)\n    at commitPrepared (file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/compiler/lib/index.mjs:14795:13)\n    at file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/compiler/lib/index.mjs:14892:28\n    at file:///tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/compiler/lib/index.mjs:14329:22"
+    },
+    {
+      "point": "build.write-false",
+      "message": "PMS_UNSUPPORTED_FEATURE: PandamStyle publication requires Vite to write its output. build.write: false is unsupported."
+    },
+    {
+      "point": "multiple-outputs",
+      "message": "PMS_UNSUPPORTED_FEATURE: PandamStyle supports one Vite/Rollup output per build."
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "testedCommit": "487ddeef5233d778f7fb50296b369e950584e003",
+  "testedTree": "eff7e713ea9a7ba6a8cb7ee2a5498cf6653d680e",
+  "viteBrowserBundles": {
+    "javascriptFiles": [
+      "assets/index-gD_LIHSi.js"
+    ],
+    "forbiddenFiles": []
+  },
+  "generatedRuntime": {
+    "fileCount": 6,
+    "counts": {
+      "@pandamstyle/core": 5,
+      "@stylexjs/*": 0,
+      "@pandacss/*": 0,
+      "@pandamstyle/compiler/runtime": 0
+    },
+    "imports": [
+      {
+        "file": "design.pandamstyle.js",
+        "specifier": "@pandamstyle/core",
+        "kind": "import",
+        "typeOnly": false,
+        "line": 8,
+        "column": 0
+      },
+      {
+        "file": "js/src/barrel.js",
+        "specifier": "../generated/design.pandamstyle",
+        "kind": "re-export",
+        "typeOnly": false,
+        "line": 2,
+        "column": 0
+      },
+      {
+        "file": "js/src/namespace-import.js",
+        "specifier": "@pandamstyle/core",
+        "kind": "import",
+        "typeOnly": false,
+        "line": 1,
+        "column": 0
+      },
+      {
+        "file": "js/src/only-recipe.js",
+        "specifier": "@pandamstyle/core",
+        "kind": "import",
+        "typeOnly": false,
+        "line": 1,
+        "column": 0
+      },
+      {
+        "file": "js/src/page.js",
+        "specifier": "@pandamstyle/core",
+        "kind": "import",
+        "typeOnly": false,
+        "line": 1,
+        "column": 0
+      },
+      {
+        "file": "js/src/renamed.js",
+        "specifier": "@pandamstyle/core",
+        "kind": "import",
+        "typeOnly": false,
+        "line": 1,
+        "column": 0
+      }
+    ]
+  },
+  "externalPackageBrowserScan": {
+    "pass": true,
+    "inspected": [
+      {
+        "artifact": "core-tarball",
+        "file": "src/abi.js",
+        "imports": [
+          "./selection-error.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/index.js",
+        "imports": [
+          "./abi.js",
+          "./props.js",
+          "./recipe.js",
+          "./selection-error.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/props.js",
+        "imports": [
+          "./abi.js",
+          "./selection-error.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/recipe-select.js",
+        "imports": [
+          "./abi.js",
+          "./selection-error.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/recipe.js",
+        "imports": [
+          "./recipe-select.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/selection-error.js",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/types.ts",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "generated-runtime",
+        "file": "design.d.ts",
+        "imports": [
+          "@pandamstyle/core"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "generated-runtime",
+        "file": "design.js",
+        "imports": [
+          "@pandamstyle/core"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "generated-runtime",
+        "file": "js/src/app.tsx",
+        "imports": [
+          "@pandamstyle/core",
+          "react/jsx-runtime"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "dynamic-axis.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "multiple-recipes.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "one-recipe.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "one-theme.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "props-only.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "unused-core.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      }
+    ]
+  },
+  "adapterImports": [
+    "node:crypto",
+    "node:fs",
+    "node:fs/promises",
+    "node:path",
+    "node:url",
+    "@pandamstyle/compiler",
+    "@pandamstyle/compiler/host"
+  ],
+  "privateCompilerImportCount": 0
+}

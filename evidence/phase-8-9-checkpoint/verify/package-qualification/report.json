@@ -1,0 +1,3898 @@
+{
+  "documentKind": "pandamstyle-standalone-package-qualification-v1",
+  "testedCommit": "487ddeef5233d778f7fb50296b369e950584e003",
+  "testedTree": "eff7e713ea9a7ba6a8cb7ee2a5498cf6653d680e",
+  "startedAt": "2026-10-01T21:59:05.616Z",
+  "status": "passed",
+  "commandLog": [
+    {
+      "name": "build-compiler",
+      "command": "yarn workspace @pandamstyle/compiler run build",
+      "exitCode": 0,
+      "durationMs": 3954.184
+    },
+    {
+      "name": "npm-pack-@pandamstyle/core-first",
+      "command": "npm pack --json",
+      "exitCode": 0,
+      "durationMs": 220.052
+    },
+    {
+      "name": "npm-pack-@pandamstyle/core-second",
+      "command": "npm pack --json",
+      "exitCode": 0,
+      "durationMs": 220.464
+    },
+    {
+      "name": "npm-pack-@pandamstyle/compiler-first",
+      "command": "npm pack --json",
+      "exitCode": 0,
+      "durationMs": 273.317
+    },
+    {
+      "name": "npm-pack-@pandamstyle/compiler-second",
+      "command": "npm pack --json",
+      "exitCode": 0,
+      "durationMs": 271.817
+    },
+    {
+      "name": "npm-pack-@pandamstyle/vite-first",
+      "command": "npm pack --json",
+      "exitCode": 0,
+      "durationMs": 214.76
+    },
+    {
+      "name": "npm-pack-@pandamstyle/vite-second",
+      "command": "npm pack --json",
+      "exitCode": 0,
+      "durationMs": 212.947
+    },
+    {
+      "name": "external-install-tarballs",
+      "command": "npm install <core.tgz> <compiler.tgz> <vite.tgz> vite@7.3.2",
+      "exitCode": 0,
+      "durationMs": 2782.054
+    },
+    {
+      "name": "external-install-tooling",
+      "command": "npm install --save-dev typescript@5.9.3 rollup@4.59.0 @rollup/plugin-node-resolve@15.3.0 node@20.0.0 node20-vite@npm:node@20.19.0 node22-vite@npm:node@22.12.0 @types/node@22.19.15",
+      "exitCode": 0,
+      "durationMs": 3462.063
+    },
+    {
+      "name": "external-runtime-repository-node",
+      "command": "v22.22.0 runtime-smoke + pms-build",
+      "exitCode": 0,
+      "durationMs": 874.138
+    },
+    {
+      "name": "external-runtime-minimum-node",
+      "command": "v20.0.0 runtime-smoke + pms-build",
+      "exitCode": 0,
+      "durationMs": 1073.6999999999998
+    },
+    {
+      "name": "external-sdk",
+      "command": "node sdk-consumer.mjs",
+      "exitCode": 0,
+      "durationMs": 1416.41
+    },
+    {
+      "name": "external-vite-v20.0.0",
+      "exitCode": 0,
+      "durationMs": 176.667
+    },
+    {
+      "name": "external-vite-v20.19.0",
+      "exitCode": 0,
+      "durationMs": 934.399
+    },
+    {
+      "name": "external-vite-v22.12.0",
+      "exitCode": 0,
+      "durationMs": 3045.111
+    },
+    {
+      "name": "external-vite-v22.22.0",
+      "exitCode": 0,
+      "durationMs": 935.802
+    },
+    {
+      "name": "external-prune-dev-dependencies",
+      "command": "npm prune --omit=dev",
+      "exitCode": 0,
+      "durationMs": 828.043
+    }
+  ],
+  "toolchain": {
+    "node": "v22.22.0",
+    "npm": "11.11.1",
+    "packageManager": "npm"
+  },
+  "packages": {
+    "@pandamstyle/core": {
+      "manifest": {
+        "name": "@pandamstyle/core",
+        "version": "0.1.0",
+        "private": false,
+        "type": "module",
+        "exports": {
+          ".": {
+            "types": "./src/types.ts",
+            "import": "./src/index.js"
+          },
+          "./package.json": "./package.json"
+        },
+        "exportTargets": [
+          {
+            "subpath": ".",
+            "target": "./src/types.ts"
+          },
+          {
+            "subpath": ".",
+            "target": "./src/index.js"
+          },
+          {
+            "subpath": "./package.json",
+            "target": "./package.json"
+          }
+        ],
+        "types": "./src/types.ts",
+        "bin": null,
+        "files": [
+          "src",
+          "LICENSE",
+          "ATTRIBUTIONS.md"
+        ],
+        "sideEffects": false,
+        "dependencies": {},
+        "peerDependencies": {},
+        "optionalDependencies": {},
+        "engines": null,
+        "license": "MIT",
+        "repository": {
+          "type": "git",
+          "url": "https://github.com/lbframe/pandam-style.git",
+          "directory": "packages/core"
+        },
+        "description": "PandamStyle compiled style reference runtime and composition ABI.",
+        "keywords": []
+      },
+      "npmPack": {
+        "first": {
+          "id": "@pandamstyle/core@0.1.0",
+          "name": "@pandamstyle/core",
+          "version": "0.1.0",
+          "size": 6397,
+          "unpackedSize": 23365,
+          "shasum": "b1ed941c9696c4e1e7402a57bc1588055c1a9238",
+          "integrity": "sha512-FkO9WXnDIMzZrIYlj5ih2PSRcdf5hXE5GTrai2M8LnE8ZX/keB2RrZu83bK885CMAGJICxkCRwdOmvlI33ksyQ==",
+          "filename": "pandamstyle-core-0.1.0.tgz",
+          "files": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 618,
+              "mode": 420
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "mode": 420
+            },
+            {
+              "path": "package.json",
+              "size": 597,
+              "mode": 420
+            },
+            {
+              "path": "src/abi.js",
+              "size": 2728,
+              "mode": 420
+            },
+            {
+              "path": "src/index.js",
+              "size": 389,
+              "mode": 420
+            },
+            {
+              "path": "src/props.js",
+              "size": 2589,
+              "mode": 420
+            },
+            {
+              "path": "src/recipe-select.js",
+              "size": 7143,
+              "mode": 420
+            },
+            {
+              "path": "src/recipe.js",
+              "size": 1769,
+              "mode": 420
+            },
+            {
+              "path": "src/selection-error.js",
+              "size": 1913,
+              "mode": 420
+            },
+            {
+              "path": "src/types.ts",
+              "size": 4531,
+              "mode": 420
+            }
+          ],
+          "entryCount": 10,
+          "bundled": [],
+          "packageName": "@pandamstyle/core",
+          "packDurationMs": 220.052,
+          "archivePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/core-pack-1/pandamstyle-core-0.1.0.tgz",
+          "unpackedPackagePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/core-pack-1/unpacked/package",
+          "contentInventoryDigest": "0bf87645305f7574acc85475b68e29e3e5b11aa77e6921218778b7de3f515a37",
+          "unpackedFileCount": 10,
+          "completeFileList": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 618,
+              "sha256": "3b6462b3230857a1a4b338989815a1ac87900f5adeae4d48ed3179706462f84a"
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+            },
+            {
+              "path": "package.json",
+              "size": 597,
+              "sha256": "596889af6b16283c472e39da6fc54d9b0dfe8b50cefe7983bd58c781833c4d58"
+            },
+            {
+              "path": "src/abi.js",
+              "size": 2728,
+              "sha256": "d064c7afcd2c413fb7585bb8a2f7f24d26e9f2b467f75a213c7f4b6399cdb2b3"
+            },
+            {
+              "path": "src/index.js",
+              "size": 389,
+              "sha256": "18cc50fc8f30369d4432fbd3cd1912a9353ccb02d984cbf211967ed5424ce724"
+            },
+            {
+              "path": "src/props.js",
+              "size": 2589,
+              "sha256": "b06b1192d16e673dc0dfe991064d70e0de89573960a8cf20073d5484e463acaf"
+            },
+            {
+              "path": "src/recipe-select.js",
+              "size": 7143,
+              "sha256": "8cbb0b8f424addd7c2720861f4da93dd45973570b9a055abf048bdb1582de03f"
+            },
+            {
+              "path": "src/recipe.js",
+              "size": 1769,
+              "sha256": "730e8fae521001cc96fec058dc44c49db7c50e7599acbe4de0e49fa07c71b257"
+            },
+            {
+              "path": "src/selection-error.js",
+              "size": 1913,
+              "sha256": "c5c9181e825a5bec45d91491966e0717322de0400dc28e2bf538c13fd1e0ebd4"
+            },
+            {
+              "path": "src/types.ts",
+              "size": 4531,
+              "sha256": "ec1ff431b5dd46fa527f7797351ff4758b22e58d1ebcf04fb2ba7c557c18be2b"
+            }
+          ]
+        },
+        "second": {
+          "id": "@pandamstyle/core@0.1.0",
+          "name": "@pandamstyle/core",
+          "version": "0.1.0",
+          "size": 6397,
+          "unpackedSize": 23365,
+          "shasum": "b1ed941c9696c4e1e7402a57bc1588055c1a9238",
+          "integrity": "sha512-FkO9WXnDIMzZrIYlj5ih2PSRcdf5hXE5GTrai2M8LnE8ZX/keB2RrZu83bK885CMAGJICxkCRwdOmvlI33ksyQ==",
+          "filename": "pandamstyle-core-0.1.0.tgz",
+          "files": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 618,
+              "mode": 420
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "mode": 420
+            },
+            {
+              "path": "package.json",
+              "size": 597,
+              "mode": 420
+            },
+            {
+              "path": "src/abi.js",
+              "size": 2728,
+              "mode": 420
+            },
+            {
+              "path": "src/index.js",
+              "size": 389,
+              "mode": 420
+            },
+            {
+              "path": "src/props.js",
+              "size": 2589,
+              "mode": 420
+            },
+            {
+              "path": "src/recipe-select.js",
+              "size": 7143,
+              "mode": 420
+            },
+            {
+              "path": "src/recipe.js",
+              "size": 1769,
+              "mode": 420
+            },
+            {
+              "path": "src/selection-error.js",
+              "size": 1913,
+              "mode": 420
+            },
+            {
+              "path": "src/types.ts",
+              "size": 4531,
+              "mode": 420
+            }
+          ],
+          "entryCount": 10,
+          "bundled": [],
+          "packageName": "@pandamstyle/core",
+          "packDurationMs": 220.464,
+          "archivePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/core-pack-2/pandamstyle-core-0.1.0.tgz",
+          "unpackedPackagePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/core-pack-2/unpacked/package",
+          "contentInventoryDigest": "0bf87645305f7574acc85475b68e29e3e5b11aa77e6921218778b7de3f515a37",
+          "unpackedFileCount": 10,
+          "completeFileList": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 618,
+              "sha256": "3b6462b3230857a1a4b338989815a1ac87900f5adeae4d48ed3179706462f84a"
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+            },
+            {
+              "path": "package.json",
+              "size": 597,
+              "sha256": "596889af6b16283c472e39da6fc54d9b0dfe8b50cefe7983bd58c781833c4d58"
+            },
+            {
+              "path": "src/abi.js",
+              "size": 2728,
+              "sha256": "d064c7afcd2c413fb7585bb8a2f7f24d26e9f2b467f75a213c7f4b6399cdb2b3"
+            },
+            {
+              "path": "src/index.js",
+              "size": 389,
+              "sha256": "18cc50fc8f30369d4432fbd3cd1912a9353ccb02d984cbf211967ed5424ce724"
+            },
+            {
+              "path": "src/props.js",
+              "size": 2589,
+              "sha256": "b06b1192d16e673dc0dfe991064d70e0de89573960a8cf20073d5484e463acaf"
+            },
+            {
+              "path": "src/recipe-select.js",
+              "size": 7143,
+              "sha256": "8cbb0b8f424addd7c2720861f4da93dd45973570b9a055abf048bdb1582de03f"
+            },
+            {
+              "path": "src/recipe.js",
+              "size": 1769,
+              "sha256": "730e8fae521001cc96fec058dc44c49db7c50e7599acbe4de0e49fa07c71b257"
+            },
+            {
+              "path": "src/selection-error.js",
+              "size": 1913,
+              "sha256": "c5c9181e825a5bec45d91491966e0717322de0400dc28e2bf538c13fd1e0ebd4"
+            },
+            {
+              "path": "src/types.ts",
+              "size": 4531,
+              "sha256": "ec1ff431b5dd46fa527f7797351ff4758b22e58d1ebcf04fb2ba7c557c18be2b"
+            }
+          ]
+        }
+      },
+      "tarballInventory": [
+        {
+          "path": "ATTRIBUTIONS.md",
+          "size": 618,
+          "sha256": "3b6462b3230857a1a4b338989815a1ac87900f5adeae4d48ed3179706462f84a"
+        },
+        {
+          "path": "LICENSE",
+          "size": 1088,
+          "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+        },
+        {
+          "path": "package.json",
+          "size": 597,
+          "sha256": "596889af6b16283c472e39da6fc54d9b0dfe8b50cefe7983bd58c781833c4d58"
+        },
+        {
+          "path": "src/abi.js",
+          "size": 2728,
+          "sha256": "d064c7afcd2c413fb7585bb8a2f7f24d26e9f2b467f75a213c7f4b6399cdb2b3"
+        },
+        {
+          "path": "src/index.js",
+          "size": 389,
+          "sha256": "18cc50fc8f30369d4432fbd3cd1912a9353ccb02d984cbf211967ed5424ce724"
+        },
+        {
+          "path": "src/props.js",
+          "size": 2589,
+          "sha256": "b06b1192d16e673dc0dfe991064d70e0de89573960a8cf20073d5484e463acaf"
+        },
+        {
+          "path": "src/recipe-select.js",
+          "size": 7143,
+          "sha256": "8cbb0b8f424addd7c2720861f4da93dd45973570b9a055abf048bdb1582de03f"
+        },
+        {
+          "path": "src/recipe.js",
+          "size": 1769,
+          "sha256": "730e8fae521001cc96fec058dc44c49db7c50e7599acbe4de0e49fa07c71b257"
+        },
+        {
+          "path": "src/selection-error.js",
+          "size": 1913,
+          "sha256": "c5c9181e825a5bec45d91491966e0717322de0400dc28e2bf538c13fd1e0ebd4"
+        },
+        {
+          "path": "src/types.ts",
+          "size": 4531,
+          "sha256": "ec1ff431b5dd46fa527f7797351ff4758b22e58d1ebcf04fb2ba7c557c18be2b"
+        }
+      ],
+      "tarballContents": "passed",
+      "reproducibility": {
+        "fileListStable": true,
+        "contentDigestsStable": true,
+        "archiveByteIdentical": true,
+        "archiveSha256": [
+          "6ed9ee5078a071c543d8972c35567be5c311173531f88b06a2de5f110e021b58",
+          "6ed9ee5078a071c543d8972c35567be5c311173531f88b06a2de5f110e021b58"
+        ],
+        "contentInventoryDigest": "0bf87645305f7574acc85475b68e29e3e5b11aa77e6921218778b7de3f515a37"
+      }
+    },
+    "@pandamstyle/compiler": {
+      "manifest": {
+        "name": "@pandamstyle/compiler",
+        "version": "0.1.0",
+        "private": false,
+        "type": "module",
+        "exports": {
+          ".": {
+            "types": "./types/index.d.ts",
+            "import": "./lib/index.mjs"
+          },
+          "./config": {
+            "types": "./types/config.d.ts",
+            "import": "./lib/config.mjs"
+          },
+          "./host": {
+            "types": "./types/host.d.ts",
+            "import": "./lib/host.mjs"
+          },
+          "./package.json": "./package.json"
+        },
+        "exportTargets": [
+          {
+            "subpath": ".",
+            "target": "./types/index.d.ts"
+          },
+          {
+            "subpath": ".",
+            "target": "./lib/index.mjs"
+          },
+          {
+            "subpath": "./config",
+            "target": "./types/config.d.ts"
+          },
+          {
+            "subpath": "./config",
+            "target": "./lib/config.mjs"
+          },
+          {
+            "subpath": "./host",
+            "target": "./types/host.d.ts"
+          },
+          {
+            "subpath": "./host",
+            "target": "./lib/host.mjs"
+          },
+          {
+            "subpath": "./package.json",
+            "target": "./package.json"
+          }
+        ],
+        "types": "./types/index.d.ts",
+        "bin": {
+          "pms-build": "./bin/pms-build.js"
+        },
+        "files": [
+          "lib",
+          "bin",
+          "types",
+          "LICENSE",
+          "ATTRIBUTIONS.md",
+          "LICENSES",
+          "docs/architecture/phase-4-derived-source-provenance.md",
+          "docs/architecture/phase-4-engine-absorption-map.md"
+        ],
+        "sideEffects": null,
+        "dependencies": {
+          "@pandamstyle/core": "0.1.0",
+          "@babel/core": "^7.26.8",
+          "@babel/helper-module-imports": "^7.25.9",
+          "@babel/parser": "^7.28.5",
+          "@babel/preset-react": "^7.27.1",
+          "@babel/preset-typescript": "^7.26.0",
+          "@babel/traverse": "^7.26.8",
+          "@babel/types": "^7.26.8",
+          "@csstools/css-tokenizer": "^3.0.3",
+          "postcss-value-parser": "^4.1.0"
+        },
+        "peerDependencies": {},
+        "optionalDependencies": {},
+        "engines": {
+          "node": ">=20.0.0"
+        },
+        "license": "MIT",
+        "repository": {
+          "type": "git",
+          "url": "https://github.com/lbframe/pandam-style.git",
+          "directory": "packages/compiler"
+        },
+        "description": "PandamStyle compiler and revision-based project service.",
+        "keywords": []
+      },
+      "npmPack": {
+        "first": {
+          "id": "@pandamstyle/compiler@0.1.0",
+          "name": "@pandamstyle/compiler",
+          "version": "0.1.0",
+          "size": 234994,
+          "unpackedSize": 1132973,
+          "shasum": "0eeb1df150393cf334c4d0258271e83e9f64d34e",
+          "integrity": "sha512-lHgTaKzMyFLaazEbFko6d79BZccGq2UbU7oEmxRK4XQGCP2+kpd+tP5+HxC6EG8FAvOQsfx/f0fH+E20algbQA==",
+          "filename": "pandamstyle-compiler-0.1.0.tgz",
+          "files": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 1811,
+              "mode": 420
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "mode": 420
+            },
+            {
+              "path": "LICENSES/PANDA-MIT-LICENSE.md",
+              "size": 1070,
+              "mode": 420
+            },
+            {
+              "path": "bin/pms-build.js",
+              "size": 363,
+              "mode": 493
+            },
+            {
+              "path": "docs/architecture/phase-4-derived-source-provenance.md",
+              "size": 9410,
+              "mode": 420
+            },
+            {
+              "path": "docs/architecture/phase-4-engine-absorption-map.md",
+              "size": 22565,
+              "mode": 420
+            },
+            {
+              "path": "lib/cli.mjs",
+              "size": 543428,
+              "mode": 420
+            },
+            {
+              "path": "lib/config.mjs",
+              "size": 343,
+              "mode": 420
+            },
+            {
+              "path": "lib/host.mjs",
+              "size": 504,
+              "mode": 420
+            },
+            {
+              "path": "lib/index.mjs",
+              "size": 539580,
+              "mode": 420
+            },
+            {
+              "path": "package.json",
+              "size": 1949,
+              "mode": 420
+            },
+            {
+              "path": "types/config.d.ts",
+              "size": 341,
+              "mode": 420
+            },
+            {
+              "path": "types/host.d.ts",
+              "size": 794,
+              "mode": 420
+            },
+            {
+              "path": "types/index.d.ts",
+              "size": 9727,
+              "mode": 420
+            }
+          ],
+          "entryCount": 14,
+          "bundled": [],
+          "packageName": "@pandamstyle/compiler",
+          "packDurationMs": 273.317,
+          "archivePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/compiler-pack-1/pandamstyle-compiler-0.1.0.tgz",
+          "unpackedPackagePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/compiler-pack-1/unpacked/package",
+          "contentInventoryDigest": "566d9b85d3e3abee6159cf4607b2d08cb5f55116e25c456fd35892013614cd31",
+          "unpackedFileCount": 14,
+          "completeFileList": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 1811,
+              "sha256": "04b378415e9ae8ed76dfb4b8e37f1ea0a2b237ebb5dac04448e9dc56f9344708"
+            },
+            {
+              "path": "bin/pms-build.js",
+              "size": 363,
+              "sha256": "d1b614fd5ab30744abc912dd15e0d1a81ec0c6576993b90cbefe99a7aaedf1c0"
+            },
+            {
+              "path": "docs/architecture/phase-4-derived-source-provenance.md",
+              "size": 9410,
+              "sha256": "437d0998914d21acd31d8cb20428d48b1a3faaf7fbffc846db7443cf1b548d6d"
+            },
+            {
+              "path": "docs/architecture/phase-4-engine-absorption-map.md",
+              "size": 22565,
+              "sha256": "2016db23457adbc2adb93fea7bbfdee8ecbc981259261b3b9247163d5cbf264d"
+            },
+            {
+              "path": "lib/cli.mjs",
+              "size": 543428,
+              "sha256": "206d749d0893a6eeb48ad4ffed10615266ec6f918b77d38fbb094e8a2e174c23"
+            },
+            {
+              "path": "lib/config.mjs",
+              "size": 343,
+              "sha256": "90035af26389412fab653edf36b08086e0e2278d34783068ddd6e41efc507175"
+            },
+            {
+              "path": "lib/host.mjs",
+              "size": 504,
+              "sha256": "744d138a48be9cf1207a24f3de86b0dbf3f1f3bb0cd2a9257d165dc9eccab019"
+            },
+            {
+              "path": "lib/index.mjs",
+              "size": 539580,
+              "sha256": "ba1a310926f3b77a1bfdfe7df851e5e5f0b67e07c56b2f1f751901f4e39817c8"
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+            },
+            {
+              "path": "LICENSES/PANDA-MIT-LICENSE.md",
+              "size": 1070,
+              "sha256": "94fac7d7284588389b95e9f06583d3569c9f774ed597f8750dded1df3586d801"
+            },
+            {
+              "path": "package.json",
+              "size": 1949,
+              "sha256": "3dca66a9871db5dc907980607545800bd44ac9dd887aeee355c9155e6ba8ef06"
+            },
+            {
+              "path": "types/config.d.ts",
+              "size": 341,
+              "sha256": "92d49bf22cc35df65893f07047e5facce70f3eee159e301763b5f0a5edf2acd6"
+            },
+            {
+              "path": "types/host.d.ts",
+              "size": 794,
+              "sha256": "518ed109fe35cdc4fb920029ef20cecb09fa726fd6965267b473914811fd69ae"
+            },
+            {
+              "path": "types/index.d.ts",
+              "size": 9727,
+              "sha256": "c9d080d72c97905e845897cb80ff14e0910a909506261f7b91e25c19f0d90ca5"
+            }
+          ]
+        },
+        "second": {
+          "id": "@pandamstyle/compiler@0.1.0",
+          "name": "@pandamstyle/compiler",
+          "version": "0.1.0",
+          "size": 234994,
+          "unpackedSize": 1132973,
+          "shasum": "0eeb1df150393cf334c4d0258271e83e9f64d34e",
+          "integrity": "sha512-lHgTaKzMyFLaazEbFko6d79BZccGq2UbU7oEmxRK4XQGCP2+kpd+tP5+HxC6EG8FAvOQsfx/f0fH+E20algbQA==",
+          "filename": "pandamstyle-compiler-0.1.0.tgz",
+          "files": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 1811,
+              "mode": 420
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "mode": 420
+            },
+            {
+              "path": "LICENSES/PANDA-MIT-LICENSE.md",
+              "size": 1070,
+              "mode": 420
+            },
+            {
+              "path": "bin/pms-build.js",
+              "size": 363,
+              "mode": 493
+            },
+            {
+              "path": "docs/architecture/phase-4-derived-source-provenance.md",
+              "size": 9410,
+              "mode": 420
+            },
+            {
+              "path": "docs/architecture/phase-4-engine-absorption-map.md",
+              "size": 22565,
+              "mode": 420
+            },
+            {
+              "path": "lib/cli.mjs",
+              "size": 543428,
+              "mode": 420
+            },
+            {
+              "path": "lib/config.mjs",
+              "size": 343,
+              "mode": 420
+            },
+            {
+              "path": "lib/host.mjs",
+              "size": 504,
+              "mode": 420
+            },
+            {
+              "path": "lib/index.mjs",
+              "size": 539580,
+              "mode": 420
+            },
+            {
+              "path": "package.json",
+              "size": 1949,
+              "mode": 420
+            },
+            {
+              "path": "types/config.d.ts",
+              "size": 341,
+              "mode": 420
+            },
+            {
+              "path": "types/host.d.ts",
+              "size": 794,
+              "mode": 420
+            },
+            {
+              "path": "types/index.d.ts",
+              "size": 9727,
+              "mode": 420
+            }
+          ],
+          "entryCount": 14,
+          "bundled": [],
+          "packageName": "@pandamstyle/compiler",
+          "packDurationMs": 271.817,
+          "archivePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/compiler-pack-2/pandamstyle-compiler-0.1.0.tgz",
+          "unpackedPackagePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/compiler-pack-2/unpacked/package",
+          "contentInventoryDigest": "566d9b85d3e3abee6159cf4607b2d08cb5f55116e25c456fd35892013614cd31",
+          "unpackedFileCount": 14,
+          "completeFileList": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 1811,
+              "sha256": "04b378415e9ae8ed76dfb4b8e37f1ea0a2b237ebb5dac04448e9dc56f9344708"
+            },
+            {
+              "path": "bin/pms-build.js",
+              "size": 363,
+              "sha256": "d1b614fd5ab30744abc912dd15e0d1a81ec0c6576993b90cbefe99a7aaedf1c0"
+            },
+            {
+              "path": "docs/architecture/phase-4-derived-source-provenance.md",
+              "size": 9410,
+              "sha256": "437d0998914d21acd31d8cb20428d48b1a3faaf7fbffc846db7443cf1b548d6d"
+            },
+            {
+              "path": "docs/architecture/phase-4-engine-absorption-map.md",
+              "size": 22565,
+              "sha256": "2016db23457adbc2adb93fea7bbfdee8ecbc981259261b3b9247163d5cbf264d"
+            },
+            {
+              "path": "lib/cli.mjs",
+              "size": 543428,
+              "sha256": "206d749d0893a6eeb48ad4ffed10615266ec6f918b77d38fbb094e8a2e174c23"
+            },
+            {
+              "path": "lib/config.mjs",
+              "size": 343,
+              "sha256": "90035af26389412fab653edf36b08086e0e2278d34783068ddd6e41efc507175"
+            },
+            {
+              "path": "lib/host.mjs",
+              "size": 504,
+              "sha256": "744d138a48be9cf1207a24f3de86b0dbf3f1f3bb0cd2a9257d165dc9eccab019"
+            },
+            {
+              "path": "lib/index.mjs",
+              "size": 539580,
+              "sha256": "ba1a310926f3b77a1bfdfe7df851e5e5f0b67e07c56b2f1f751901f4e39817c8"
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+            },
+            {
+              "path": "LICENSES/PANDA-MIT-LICENSE.md",
+              "size": 1070,
+              "sha256": "94fac7d7284588389b95e9f06583d3569c9f774ed597f8750dded1df3586d801"
+            },
+            {
+              "path": "package.json",
+              "size": 1949,
+              "sha256": "3dca66a9871db5dc907980607545800bd44ac9dd887aeee355c9155e6ba8ef06"
+            },
+            {
+              "path": "types/config.d.ts",
+              "size": 341,
+              "sha256": "92d49bf22cc35df65893f07047e5facce70f3eee159e301763b5f0a5edf2acd6"
+            },
+            {
+              "path": "types/host.d.ts",
+              "size": 794,
+              "sha256": "518ed109fe35cdc4fb920029ef20cecb09fa726fd6965267b473914811fd69ae"
+            },
+            {
+              "path": "types/index.d.ts",
+              "size": 9727,
+              "sha256": "c9d080d72c97905e845897cb80ff14e0910a909506261f7b91e25c19f0d90ca5"
+            }
+          ]
+        }
+      },
+      "tarballInventory": [
+        {
+          "path": "ATTRIBUTIONS.md",
+          "size": 1811,
+          "sha256": "04b378415e9ae8ed76dfb4b8e37f1ea0a2b237ebb5dac04448e9dc56f9344708"
+        },
+        {
+          "path": "bin/pms-build.js",
+          "size": 363,
+          "sha256": "d1b614fd5ab30744abc912dd15e0d1a81ec0c6576993b90cbefe99a7aaedf1c0"
+        },
+        {
+          "path": "docs/architecture/phase-4-derived-source-provenance.md",
+          "size": 9410,
+          "sha256": "437d0998914d21acd31d8cb20428d48b1a3faaf7fbffc846db7443cf1b548d6d"
+        },
+        {
+          "path": "docs/architecture/phase-4-engine-absorption-map.md",
+          "size": 22565,
+          "sha256": "2016db23457adbc2adb93fea7bbfdee8ecbc981259261b3b9247163d5cbf264d"
+        },
+        {
+          "path": "lib/cli.mjs",
+          "size": 543428,
+          "sha256": "206d749d0893a6eeb48ad4ffed10615266ec6f918b77d38fbb094e8a2e174c23"
+        },
+        {
+          "path": "lib/config.mjs",
+          "size": 343,
+          "sha256": "90035af26389412fab653edf36b08086e0e2278d34783068ddd6e41efc507175"
+        },
+        {
+          "path": "lib/host.mjs",
+          "size": 504,
+          "sha256": "744d138a48be9cf1207a24f3de86b0dbf3f1f3bb0cd2a9257d165dc9eccab019"
+        },
+        {
+          "path": "lib/index.mjs",
+          "size": 539580,
+          "sha256": "ba1a310926f3b77a1bfdfe7df851e5e5f0b67e07c56b2f1f751901f4e39817c8"
+        },
+        {
+          "path": "LICENSE",
+          "size": 1088,
+          "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+        },
+        {
+          "path": "LICENSES/PANDA-MIT-LICENSE.md",
+          "size": 1070,
+          "sha256": "94fac7d7284588389b95e9f06583d3569c9f774ed597f8750dded1df3586d801"
+        },
+        {
+          "path": "package.json",
+          "size": 1949,
+          "sha256": "3dca66a9871db5dc907980607545800bd44ac9dd887aeee355c9155e6ba8ef06"
+        },
+        {
+          "path": "types/config.d.ts",
+          "size": 341,
+          "sha256": "92d49bf22cc35df65893f07047e5facce70f3eee159e301763b5f0a5edf2acd6"
+        },
+        {
+          "path": "types/host.d.ts",
+          "size": 794,
+          "sha256": "518ed109fe35cdc4fb920029ef20cecb09fa726fd6965267b473914811fd69ae"
+        },
+        {
+          "path": "types/index.d.ts",
+          "size": 9727,
+          "sha256": "c9d080d72c97905e845897cb80ff14e0910a909506261f7b91e25c19f0d90ca5"
+        }
+      ],
+      "tarballContents": "passed",
+      "reproducibility": {
+        "fileListStable": true,
+        "contentDigestsStable": true,
+        "archiveByteIdentical": true,
+        "archiveSha256": [
+          "31f146f5f2fa9641a399c694e4caad1f7dde323c37a1ea36ba619d4569a9e618",
+          "31f146f5f2fa9641a399c694e4caad1f7dde323c37a1ea36ba619d4569a9e618"
+        ],
+        "contentInventoryDigest": "566d9b85d3e3abee6159cf4607b2d08cb5f55116e25c456fd35892013614cd31"
+      }
+    },
+    "@pandamstyle/vite": {
+      "manifest": {
+        "name": "@pandamstyle/vite",
+        "version": "0.1.0",
+        "private": false,
+        "type": "module",
+        "exports": {
+          ".": {
+            "types": "./types/index.d.ts",
+            "import": "./src/index.js"
+          },
+          "./package.json": "./package.json"
+        },
+        "exportTargets": [
+          {
+            "subpath": ".",
+            "target": "./types/index.d.ts"
+          },
+          {
+            "subpath": ".",
+            "target": "./src/index.js"
+          },
+          {
+            "subpath": "./package.json",
+            "target": "./package.json"
+          }
+        ],
+        "types": "./types/index.d.ts",
+        "bin": null,
+        "files": [
+          "src/*",
+          "types/*",
+          "LICENSE",
+          "ATTRIBUTIONS.md"
+        ],
+        "sideEffects": false,
+        "dependencies": {
+          "@pandamstyle/compiler": "0.1.0"
+        },
+        "peerDependencies": {
+          "vite": "7.3.2"
+        },
+        "optionalDependencies": {},
+        "engines": {
+          "node": "^20.19.0 || >=22.12.0"
+        },
+        "license": "MIT",
+        "repository": {
+          "type": "git",
+          "url": "https://github.com/lbframe/pandam-style.git",
+          "directory": "packages/vite"
+        },
+        "description": "Vite host adapter for the PandamStyle Project Service.",
+        "keywords": [
+          "vite-plugin"
+        ]
+      },
+      "npmPack": {
+        "first": {
+          "id": "@pandamstyle/vite@0.1.0",
+          "name": "@pandamstyle/vite",
+          "version": "0.1.0",
+          "size": 10817,
+          "unpackedSize": 41911,
+          "shasum": "f5f753b132b43cee9aed754e05303b4dd6b17766",
+          "integrity": "sha512-Vpt6V3/bSiY00jplsEf8pIdEmwWmw/pPwPfXwwTLtYhTFJrCFCMEeoxpImBt95gs0kEU+KhN90e3xG3iyPu5tw==",
+          "filename": "pandamstyle-vite-0.1.0.tgz",
+          "files": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 488,
+              "mode": 420
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "mode": 420
+            },
+            {
+              "path": "package.json",
+              "size": 817,
+              "mode": 420
+            },
+            {
+              "path": "src/index.js",
+              "size": 38886,
+              "mode": 420
+            },
+            {
+              "path": "types/index.d.ts",
+              "size": 632,
+              "mode": 420
+            }
+          ],
+          "entryCount": 5,
+          "bundled": [],
+          "packageName": "@pandamstyle/vite",
+          "packDurationMs": 214.76,
+          "archivePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/vite-pack-1/pandamstyle-vite-0.1.0.tgz",
+          "unpackedPackagePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/vite-pack-1/unpacked/package",
+          "contentInventoryDigest": "d80d2085ad525fd3e680e4901afcb67232021aa1d42952a3fc6b82a9edd0985c",
+          "unpackedFileCount": 5,
+          "completeFileList": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 488,
+              "sha256": "8eb82679448907986d88dcc289e1287662c77cbb126ef22d9fd169d0bd00b18e"
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+            },
+            {
+              "path": "package.json",
+              "size": 817,
+              "sha256": "cff361c850e004e99e13b6660ff8c956605729a0c95ae538e1e3bee36b170bbe"
+            },
+            {
+              "path": "src/index.js",
+              "size": 38886,
+              "sha256": "925ffbf0b67b11368f253e484d558fc1d4fb7c76dca48b654f089abe29b43149"
+            },
+            {
+              "path": "types/index.d.ts",
+              "size": 632,
+              "sha256": "d9e130964eaf8a91816fdf904d958d8ff433e0af7c1ecbba4851d8a72a55a5b8"
+            }
+          ]
+        },
+        "second": {
+          "id": "@pandamstyle/vite@0.1.0",
+          "name": "@pandamstyle/vite",
+          "version": "0.1.0",
+          "size": 10817,
+          "unpackedSize": 41911,
+          "shasum": "f5f753b132b43cee9aed754e05303b4dd6b17766",
+          "integrity": "sha512-Vpt6V3/bSiY00jplsEf8pIdEmwWmw/pPwPfXwwTLtYhTFJrCFCMEeoxpImBt95gs0kEU+KhN90e3xG3iyPu5tw==",
+          "filename": "pandamstyle-vite-0.1.0.tgz",
+          "files": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 488,
+              "mode": 420
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "mode": 420
+            },
+            {
+              "path": "package.json",
+              "size": 817,
+              "mode": 420
+            },
+            {
+              "path": "src/index.js",
+              "size": 38886,
+              "mode": 420
+            },
+            {
+              "path": "types/index.d.ts",
+              "size": 632,
+              "mode": 420
+            }
+          ],
+          "entryCount": 5,
+          "bundled": [],
+          "packageName": "@pandamstyle/vite",
+          "packDurationMs": 212.947,
+          "archivePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/vite-pack-2/pandamstyle-vite-0.1.0.tgz",
+          "unpackedPackagePath": "/tmp/pandamstyle-phase-8-9-wXnbXO/tarballs/vite-pack-2/unpacked/package",
+          "contentInventoryDigest": "d80d2085ad525fd3e680e4901afcb67232021aa1d42952a3fc6b82a9edd0985c",
+          "unpackedFileCount": 5,
+          "completeFileList": [
+            {
+              "path": "ATTRIBUTIONS.md",
+              "size": 488,
+              "sha256": "8eb82679448907986d88dcc289e1287662c77cbb126ef22d9fd169d0bd00b18e"
+            },
+            {
+              "path": "LICENSE",
+              "size": 1088,
+              "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+            },
+            {
+              "path": "package.json",
+              "size": 817,
+              "sha256": "cff361c850e004e99e13b6660ff8c956605729a0c95ae538e1e3bee36b170bbe"
+            },
+            {
+              "path": "src/index.js",
+              "size": 38886,
+              "sha256": "925ffbf0b67b11368f253e484d558fc1d4fb7c76dca48b654f089abe29b43149"
+            },
+            {
+              "path": "types/index.d.ts",
+              "size": 632,
+              "sha256": "d9e130964eaf8a91816fdf904d958d8ff433e0af7c1ecbba4851d8a72a55a5b8"
+            }
+          ]
+        }
+      },
+      "tarballInventory": [
+        {
+          "path": "ATTRIBUTIONS.md",
+          "size": 488,
+          "sha256": "8eb82679448907986d88dcc289e1287662c77cbb126ef22d9fd169d0bd00b18e"
+        },
+        {
+          "path": "LICENSE",
+          "size": 1088,
+          "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+        },
+        {
+          "path": "package.json",
+          "size": 817,
+          "sha256": "cff361c850e004e99e13b6660ff8c956605729a0c95ae538e1e3bee36b170bbe"
+        },
+        {
+          "path": "src/index.js",
+          "size": 38886,
+          "sha256": "925ffbf0b67b11368f253e484d558fc1d4fb7c76dca48b654f089abe29b43149"
+        },
+        {
+          "path": "types/index.d.ts",
+          "size": 632,
+          "sha256": "d9e130964eaf8a91816fdf904d958d8ff433e0af7c1ecbba4851d8a72a55a5b8"
+        }
+      ],
+      "tarballContents": "passed",
+      "reproducibility": {
+        "fileListStable": true,
+        "contentDigestsStable": true,
+        "archiveByteIdentical": true,
+        "archiveSha256": [
+          "37f95ab7b47523f281ea895270d6de7fa4f3fe936fe36744c6590534c0748b5a",
+          "37f95ab7b47523f281ea895270d6de7fa4f3fe936fe36744c6590534c0748b5a"
+        ],
+        "contentInventoryDigest": "d80d2085ad525fd3e680e4901afcb67232021aa1d42952a3fc6b82a9edd0985c"
+      }
+    }
+  },
+  "licensesAndProvenance": {
+    "pass": true,
+    "core": {
+      "license": "LICENSE is byte-identical to repository LICENSE",
+      "attribution": "package-specific runtime provenance present",
+      "donorImplementation": "none shipped"
+    },
+    "compiler": {
+      "license": "LICENSE is byte-identical to repository LICENSE",
+      "attributions": "repository ATTRIBUTIONS.md byte-identical",
+      "pandaLicense": "LICENSES/PANDA-MIT-LICENSE.md byte-identical",
+      "derivedSourceMapping": [
+        "docs/architecture/phase-4-derived-source-provenance.md",
+        "docs/architecture/phase-4-engine-absorption-map.md"
+      ]
+    },
+    "donorSourceTreesShipped": false,
+    "vite": {
+      "license": "LICENSE is byte-identical to repository LICENSE",
+      "attribution": "package-specific host provenance byte-identical",
+      "donorImplementation": "none shipped"
+    }
+  },
+  "externalConsumer": {
+    "packageManager": {
+      "name": "npm",
+      "version": "11.11.1"
+    },
+    "install": {
+      "command": "npm install <core.tgz> <compiler.tgz> <vite.tgz> vite@7.3.2",
+      "status": "passed",
+      "externalConsumer": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer",
+      "packageJson": {
+        "name": "pandamstyle-phase-9-external-consumer",
+        "private": true,
+        "type": "module",
+        "scripts": {
+          "build": "pms-build --config ./pandamstyle.config.mjs"
+        },
+        "dependencies": {
+          "@pandamstyle/compiler": "file:../tarballs/compiler-pack-1/pandamstyle-compiler-0.1.0.tgz",
+          "@pandamstyle/core": "file:../tarballs/core-pack-1/pandamstyle-core-0.1.0.tgz",
+          "@pandamstyle/vite": "file:../tarballs/vite-pack-1/pandamstyle-vite-0.1.0.tgz",
+          "vite": "7.3.2"
+        },
+        "devDependencies": {
+          "@rollup/plugin-node-resolve": "15.3.0",
+          "@types/node": "22.19.15",
+          "node": "20.0.0",
+          "node20-vite": "npm:node@20.19.0",
+          "node22-vite": "npm:node@22.12.0",
+          "rollup": "4.59.0",
+          "typescript": "5.9.3"
+        }
+      },
+      "dependencyGraph": [
+        {
+          "name": "@pandamstyle/compiler",
+          "version": "0.1.0",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/code-frame",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-validator-identifier",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "js-tokens",
+          "version": "4.0.0",
+          "problems": []
+        },
+        {
+          "name": "picocolors",
+          "version": "1.1.1",
+          "problems": []
+        },
+        {
+          "name": "@babel/generator",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/parser",
+          "version": "7.29.9",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@jridgewell/gen-mapping",
+          "version": "0.3.13",
+          "problems": []
+        },
+        {
+          "name": "@jridgewell/sourcemap-codec",
+          "version": "1.6.0",
+          "problems": []
+        },
+        {
+          "name": "@jridgewell/trace-mapping",
+          "version": "0.3.31",
+          "problems": []
+        },
+        {
+          "name": "@jridgewell/trace-mapping",
+          "version": "0.3.31",
+          "problems": []
+        },
+        {
+          "name": "@jridgewell/resolve-uri",
+          "version": "3.1.2",
+          "problems": []
+        },
+        {
+          "name": "@jridgewell/sourcemap-codec",
+          "version": "1.6.0",
+          "problems": []
+        },
+        {
+          "name": "jsesc",
+          "version": "3.1.0",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-compilation-targets",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/compat-data",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-validator-option",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "browserslist",
+          "version": "4.29.3",
+          "problems": []
+        },
+        {
+          "name": "baseline-browser-mapping",
+          "version": "2.11.27",
+          "problems": []
+        },
+        {
+          "name": "caniuse-lite",
+          "version": "1.0.30001814",
+          "problems": []
+        },
+        {
+          "name": "electron-to-chromium",
+          "version": "1.5.443",
+          "problems": []
+        },
+        {
+          "name": "node-releases",
+          "version": "2.0.57",
+          "problems": []
+        },
+        {
+          "name": "update-browserslist-db",
+          "version": "1.3.3",
+          "problems": []
+        },
+        {
+          "name": "browserslist",
+          "version": "4.29.3",
+          "problems": []
+        },
+        {
+          "name": "escalade",
+          "version": "3.2.0",
+          "problems": []
+        },
+        {
+          "name": "picocolors",
+          "version": "1.1.1",
+          "problems": []
+        },
+        {
+          "name": "lru-cache",
+          "version": "5.1.1",
+          "problems": []
+        },
+        {
+          "name": "yallist",
+          "version": "3.1.1",
+          "problems": []
+        },
+        {
+          "name": "semver",
+          "version": "6.3.1",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-module-transforms",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-module-imports",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-validator-identifier",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/helpers",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/template",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/parser",
+          "version": "7.29.9",
+          "problems": []
+        },
+        {
+          "name": "@babel/template",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/code-frame",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/parser",
+          "version": "7.29.9",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@jridgewell/remapping",
+          "version": "2.3.5",
+          "problems": []
+        },
+        {
+          "name": "@jridgewell/gen-mapping",
+          "version": "0.3.13",
+          "problems": []
+        },
+        {
+          "name": "@jridgewell/trace-mapping",
+          "version": "0.3.31",
+          "problems": []
+        },
+        {
+          "name": "convert-source-map",
+          "version": "2.0.0",
+          "problems": []
+        },
+        {
+          "name": "debug",
+          "version": "4.4.3",
+          "problems": []
+        },
+        {
+          "name": "ms",
+          "version": "2.1.3",
+          "problems": []
+        },
+        {
+          "name": "gensync",
+          "version": "1.0.0-beta.2",
+          "problems": []
+        },
+        {
+          "name": "json5",
+          "version": "2.2.3",
+          "problems": []
+        },
+        {
+          "name": "semver",
+          "version": "6.3.1",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-module-imports",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/parser",
+          "version": "7.29.9",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/preset-react",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-validator-option",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-transform-react-display-name",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-transform-react-jsx-development",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-transform-react-jsx",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-transform-react-jsx",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-annotate-as-pure",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-module-imports",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-syntax-jsx",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-transform-react-pure-annotations",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-annotate-as-pure",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/preset-typescript",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-validator-option",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-syntax-jsx",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-transform-modules-commonjs",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-module-transforms",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-transform-typescript",
+          "version": "7.29.9",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-annotate-as-pure",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-create-class-features-plugin",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-annotate-as-pure",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-member-expression-to-functions",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-optimise-call-expression",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-replace-supers",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-member-expression-to-functions",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-optimise-call-expression",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-skip-transparent-expression-wrappers",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "semver",
+          "version": "6.3.1",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-skip-transparent-expression-wrappers",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/plugin-syntax-typescript",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/code-frame",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/generator",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-globals",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/parser",
+          "version": "7.29.9",
+          "problems": []
+        },
+        {
+          "name": "@babel/template",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "debug",
+          "version": "4.4.3",
+          "problems": []
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-string-parser",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@babel/helper-validator-identifier",
+          "version": "7.29.7",
+          "problems": []
+        },
+        {
+          "name": "@csstools/css-tokenizer",
+          "version": "3.0.4",
+          "problems": []
+        },
+        {
+          "name": "@pandamstyle/core",
+          "version": "0.1.0",
+          "problems": []
+        },
+        {
+          "name": "postcss-value-parser",
+          "version": "4.2.0",
+          "problems": []
+        },
+        {
+          "name": "@pandamstyle/core",
+          "version": "0.1.0",
+          "problems": []
+        },
+        {
+          "name": "@pandamstyle/vite",
+          "version": "0.1.0",
+          "problems": []
+        },
+        {
+          "name": "@pandamstyle/compiler",
+          "version": "0.1.0",
+          "problems": []
+        },
+        {
+          "name": "vite",
+          "version": "7.3.2",
+          "problems": []
+        },
+        {
+          "name": "vite",
+          "version": "7.3.2",
+          "problems": []
+        },
+        {
+          "name": "@types/node",
+          "version": "22.19.15",
+          "problems": []
+        },
+        {
+          "name": "undici-types",
+          "version": "6.21.0",
+          "problems": []
+        },
+        {
+          "name": "esbuild",
+          "version": "0.27.7",
+          "problems": []
+        },
+        {
+          "name": "@esbuild/aix-ppc64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/android-arm",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/android-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/android-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/darwin-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/darwin-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/freebsd-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/freebsd-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/linux-arm",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/linux-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/linux-ia32",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/linux-loong64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/linux-mips64el",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/linux-ppc64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/linux-riscv64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/linux-s390x",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/linux-x64",
+          "version": "0.27.7",
+          "problems": []
+        },
+        {
+          "name": "@esbuild/netbsd-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/netbsd-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/openbsd-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/openbsd-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/openharmony-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/sunos-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/win32-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/win32-ia32",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@esbuild/win32-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "fdir",
+          "version": "6.5.0",
+          "problems": []
+        },
+        {
+          "name": "picomatch",
+          "version": "4.0.7",
+          "problems": []
+        },
+        {
+          "name": "fsevents",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "jiti",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "less",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "lightningcss",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "picomatch",
+          "version": "4.0.7",
+          "problems": []
+        },
+        {
+          "name": "postcss",
+          "version": "8.5.28",
+          "problems": []
+        },
+        {
+          "name": "nanoid",
+          "version": "3.3.19",
+          "problems": []
+        },
+        {
+          "name": "picocolors",
+          "version": "1.1.1",
+          "problems": []
+        },
+        {
+          "name": "source-map-js",
+          "version": "1.2.2",
+          "problems": []
+        },
+        {
+          "name": "rollup",
+          "version": "4.59.0",
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-android-arm-eabi",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-android-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-darwin-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-darwin-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-freebsd-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-freebsd-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-arm-gnueabihf",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-arm-musleabihf",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-arm64-gnu",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-arm64-musl",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-loong64-gnu",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-loong64-musl",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-ppc64-gnu",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-ppc64-musl",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-riscv64-gnu",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-riscv64-musl",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-s390x-gnu",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-x64-gnu",
+          "version": "4.59.0",
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-linux-x64-musl",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-openbsd-x64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-openharmony-arm64",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-win32-arm64-msvc",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-win32-ia32-msvc",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-win32-x64-gnu",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@rollup/rollup-win32-x64-msvc",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "@types/estree",
+          "version": "1.0.8",
+          "problems": []
+        },
+        {
+          "name": "fsevents",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "sass-embedded",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "sass",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "stylus",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "sugarss",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "terser",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "tinyglobby",
+          "version": "0.2.17",
+          "problems": []
+        },
+        {
+          "name": "fdir",
+          "version": "6.5.0",
+          "problems": []
+        },
+        {
+          "name": "picomatch",
+          "version": "4.0.7",
+          "problems": []
+        },
+        {
+          "name": "tsx",
+          "version": null,
+          "problems": []
+        },
+        {
+          "name": "yaml",
+          "version": null,
+          "problems": []
+        }
+      ],
+      "productionDependencyGraph": {
+        "complete": true,
+        "packages": [
+          {
+            "name": "@babel/code-frame",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/code-frame",
+            "sizeBytes": 34632
+          },
+          {
+            "name": "@babel/compat-data",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/compat-data",
+            "sizeBytes": 68207
+          },
+          {
+            "name": "@babel/core",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/core",
+            "sizeBytes": 810551
+          },
+          {
+            "name": "@babel/generator",
+            "version": "7.29.8",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/generator",
+            "sizeBytes": 539451
+          },
+          {
+            "name": "@babel/helper-annotate-as-pure",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-annotate-as-pure",
+            "sizeBytes": 4042
+          },
+          {
+            "name": "@babel/helper-compilation-targets",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-compilation-targets",
+            "sizeBytes": 53791
+          },
+          {
+            "name": "@babel/helper-create-class-features-plugin",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-create-class-features-plugin",
+            "sizeBytes": 441219
+          },
+          {
+            "name": "@babel/helper-globals",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-globals",
+            "sizeBytes": 23079
+          },
+          {
+            "name": "@babel/helper-member-expression-to-functions",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-member-expression-to-functions",
+            "sizeBytes": 54889
+          },
+          {
+            "name": "@babel/helper-module-imports",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-module-imports",
+            "sizeBytes": 63720
+          },
+          {
+            "name": "@babel/helper-module-transforms",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-module-transforms",
+            "sizeBytes": 161712
+          },
+          {
+            "name": "@babel/helper-optimise-call-expression",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-optimise-call-expression",
+            "sizeBytes": 6672
+          },
+          {
+            "name": "@babel/helper-plugin-utils",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-plugin-utils",
+            "sizeBytes": 11761
+          },
+          {
+            "name": "@babel/helper-replace-supers",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-replace-supers",
+            "sizeBytes": 43292
+          },
+          {
+            "name": "@babel/helper-skip-transparent-expression-wrappers",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-skip-transparent-expression-wrappers",
+            "sizeBytes": 6001
+          },
+          {
+            "name": "@babel/helper-string-parser",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-string-parser",
+            "sizeBytes": 31816
+          },
+          {
+            "name": "@babel/helper-validator-identifier",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-validator-identifier",
+            "sizeBytes": 48813
+          },
+          {
+            "name": "@babel/helper-validator-option",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-validator-option",
+            "sizeBytes": 11775
+          },
+          {
+            "name": "@babel/helpers",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helpers",
+            "sizeBytes": 877305
+          },
+          {
+            "name": "@babel/parser",
+            "version": "7.29.9",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/parser",
+            "sizeBytes": 2000784
+          },
+          {
+            "name": "@babel/plugin-syntax-jsx",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-syntax-jsx",
+            "sizeBytes": 4155
+          },
+          {
+            "name": "@babel/plugin-syntax-typescript",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-syntax-typescript",
+            "sizeBytes": 6945
+          },
+          {
+            "name": "@babel/plugin-transform-modules-commonjs",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-modules-commonjs",
+            "sizeBytes": 41587
+          },
+          {
+            "name": "@babel/plugin-transform-react-display-name",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-react-display-name",
+            "sizeBytes": 12466
+          },
+          {
+            "name": "@babel/plugin-transform-react-jsx",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-react-jsx",
+            "sizeBytes": 83253
+          },
+          {
+            "name": "@babel/plugin-transform-react-jsx-development",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-react-jsx-development",
+            "sizeBytes": 3369
+          },
+          {
+            "name": "@babel/plugin-transform-react-pure-annotations",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-react-pure-annotations",
+            "sizeBytes": 8304
+          },
+          {
+            "name": "@babel/plugin-transform-typescript",
+            "version": "7.29.9",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-typescript",
+            "sizeBytes": 143258
+          },
+          {
+            "name": "@babel/preset-react",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/preset-react",
+            "sizeBytes": 12455
+          },
+          {
+            "name": "@babel/preset-typescript",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/preset-typescript",
+            "sizeBytes": 25715
+          },
+          {
+            "name": "@babel/template",
+            "version": "7.29.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/template",
+            "sizeBytes": 70678
+          },
+          {
+            "name": "@babel/traverse",
+            "version": "7.29.8",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/traverse",
+            "sizeBytes": 708138
+          },
+          {
+            "name": "@babel/types",
+            "version": "7.29.8",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/types",
+            "sizeBytes": 2750769
+          },
+          {
+            "name": "@csstools/css-tokenizer",
+            "version": "3.0.4",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@csstools/css-tokenizer",
+            "sizeBytes": 72983
+          },
+          {
+            "name": "@esbuild/linux-x64",
+            "version": "0.27.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@esbuild/linux-x64",
+            "sizeBytes": 11121301
+          },
+          {
+            "name": "@jridgewell/gen-mapping",
+            "version": "0.3.13",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/gen-mapping",
+            "sizeBytes": 93797
+          },
+          {
+            "name": "@jridgewell/remapping",
+            "version": "2.3.5",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/remapping",
+            "sizeBytes": 59366
+          },
+          {
+            "name": "@jridgewell/resolve-uri",
+            "version": "3.1.2",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/resolve-uri",
+            "sizeBytes": 53153
+          },
+          {
+            "name": "@jridgewell/sourcemap-codec",
+            "version": "1.6.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/sourcemap-codec",
+            "sizeBytes": 96626
+          },
+          {
+            "name": "@jridgewell/trace-mapping",
+            "version": "0.3.31",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/trace-mapping",
+            "sizeBytes": 146724
+          },
+          {
+            "name": "@pandamstyle/compiler",
+            "version": "0.1.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler",
+            "sizeBytes": 1132973
+          },
+          {
+            "name": "@pandamstyle/core",
+            "version": "0.1.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/core",
+            "sizeBytes": 23365
+          },
+          {
+            "name": "@pandamstyle/vite",
+            "version": "0.1.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+            "sizeBytes": 41911
+          },
+          {
+            "name": "@rollup/rollup-linux-x64-gnu",
+            "version": "4.59.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@rollup/rollup-linux-x64-gnu",
+            "sizeBytes": 2031255
+          },
+          {
+            "name": "@types/estree",
+            "version": "1.0.8",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/rollup/node_modules/@types/estree",
+            "sizeBytes": 26173
+          },
+          {
+            "name": "@types/node",
+            "version": "22.19.15",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@types/node",
+            "sizeBytes": 2422650
+          },
+          {
+            "name": "baseline-browser-mapping",
+            "version": "2.11.27",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/baseline-browser-mapping",
+            "sizeBytes": 135770
+          },
+          {
+            "name": "browserslist",
+            "version": "4.29.3",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/browserslist",
+            "sizeBytes": 70780
+          },
+          {
+            "name": "caniuse-lite",
+            "version": "1.0.30001814",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/caniuse-lite",
+            "sizeBytes": 1485070
+          },
+          {
+            "name": "convert-source-map",
+            "version": "2.0.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/convert-source-map",
+            "sizeBytes": 15854
+          },
+          {
+            "name": "debug",
+            "version": "4.4.3",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/debug",
+            "sizeBytes": 42793
+          },
+          {
+            "name": "electron-to-chromium",
+            "version": "1.5.443",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/electron-to-chromium",
+            "sizeBytes": 203316
+          },
+          {
+            "name": "esbuild",
+            "version": "0.27.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/esbuild",
+            "sizeBytes": 143823
+          },
+          {
+            "name": "escalade",
+            "version": "3.2.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/escalade",
+            "sizeBytes": 12385
+          },
+          {
+            "name": "fdir",
+            "version": "6.5.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/fdir",
+            "sizeBytes": 53291
+          },
+          {
+            "name": "gensync",
+            "version": "1.0.0-beta.2",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/gensync",
+            "sizeBytes": 28891
+          },
+          {
+            "name": "js-tokens",
+            "version": "4.0.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/js-tokens",
+            "sizeBytes": 15069
+          },
+          {
+            "name": "jsesc",
+            "version": "3.1.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/jsesc",
+            "sizeBytes": 32280
+          },
+          {
+            "name": "json5",
+            "version": "2.2.3",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/json5",
+            "sizeBytes": 235198
+          },
+          {
+            "name": "lru-cache",
+            "version": "5.1.1",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/lru-cache",
+            "sizeBytes": 15714
+          },
+          {
+            "name": "ms",
+            "version": "2.1.3",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/ms",
+            "sizeBytes": 6721
+          },
+          {
+            "name": "nanoid",
+            "version": "3.3.19",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/nanoid",
+            "sizeBytes": 25291
+          },
+          {
+            "name": "node-releases",
+            "version": "2.0.57",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/node-releases",
+            "sizeBytes": 62032
+          },
+          {
+            "name": "picocolors",
+            "version": "1.1.1",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/picocolors",
+            "sizeBytes": 6373
+          },
+          {
+            "name": "picomatch",
+            "version": "4.0.7",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/picomatch",
+            "sizeBytes": 93759
+          },
+          {
+            "name": "postcss",
+            "version": "8.5.28",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/postcss",
+            "sizeBytes": 218290
+          },
+          {
+            "name": "postcss-value-parser",
+            "version": "4.2.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/postcss-value-parser",
+            "sizeBytes": 27193
+          },
+          {
+            "name": "rollup",
+            "version": "4.59.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/rollup",
+            "sizeBytes": 2807219
+          },
+          {
+            "name": "semver",
+            "version": "6.3.1",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/semver",
+            "sizeBytes": 68343
+          },
+          {
+            "name": "source-map-js",
+            "version": "1.2.2",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/source-map-js",
+            "sizeBytes": 142723
+          },
+          {
+            "name": "tinyglobby",
+            "version": "0.2.17",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/tinyglobby",
+            "sizeBytes": 39288
+          },
+          {
+            "name": "undici-types",
+            "version": "6.21.0",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/undici-types",
+            "sizeBytes": 83680
+          },
+          {
+            "name": "update-browserslist-db",
+            "version": "1.3.3",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/update-browserslist-db",
+            "sizeBytes": 23332
+          },
+          {
+            "name": "vite",
+            "version": "7.3.2",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/vite",
+            "sizeBytes": 2235281
+          },
+          {
+            "name": "yallist",
+            "version": "3.1.1",
+            "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/yallist",
+            "sizeBytes": 14766
+          }
+        ],
+        "packageCount": 75,
+        "installedProductionBytes": 34831406,
+        "donorPackages": [],
+        "workspaceFileReferences": [],
+        "repositoryPathLeakage": [],
+        "installedPandamStyleRealpaths": {
+          "@pandamstyle/core": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/core",
+          "@pandamstyle/compiler": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler",
+          "@pandamstyle/vite": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite"
+        }
+      }
+    },
+    "realpaths": {
+      "@pandamstyle/core": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/core",
+      "@pandamstyle/compiler": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler",
+      "@pandamstyle/vite": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite"
+    },
+    "cli": {
+      "binary": "node_modules/.bin/pms-build",
+      "successfulBuild": "passed",
+      "repeatedBuildContentIdentical": true,
+      "invalidSourceExitCode": 1,
+      "invalidSourceDiagnosticCodes": [
+        "PMS_UNKNOWN_TOKEN"
+      ],
+      "structuredDiagnostics": "passed",
+      "missingConfigExitCode": 2,
+      "missingDefinitionExitCode": 2,
+      "invalidConfigExitCode": 2,
+      "cleanOutputAndRecovery": "passed",
+      "node20Cli": "passed",
+      "canonicalFiles": [
+        "design.js",
+        "design.d.ts",
+        "manifest.json",
+        "styles.css",
+        "artifacts.json"
+      ],
+      "canonicalDigests": {
+        "design.js": "83f46fde1a15b64df993dd855871e821cafa9075ebaf6e21306e8dabdd046f90",
+        "design.d.ts": "86f2af829d53cfd1e4d5bad66e5ff9de529c14801634ae1b0d0c7abc4d96ad6b",
+        "manifest.json": "8424af7aea1dd66bb202be00f2ec042105c1891709ab1156c2c8c065a004c2c7",
+        "styles.css": "434c6555706c039412c2e34b8c3136a7fe0f7b4e44a57b6ab2320bd61e441fa3",
+        "artifacts.json": "e9f188b46001870f397b531ed760726a3bda651eb4392d66a733f0d0e056fe3d"
+      }
+    },
+    "runtimeMatrix": [
+      {
+        "label": "repository-node",
+        "node": "v22.22.0",
+        "esmImportsRuntimeConfigHost": "passed",
+        "externalRealpaths": "passed",
+        "coreRuntimeAndAbiErrors": "passed",
+        "canonicalArtifactIdentity": "passed",
+        "esmSmokeElapsedMs": 538.551,
+        "cliBuild": "passed",
+        "cliBuildElapsedMs": 335.587,
+        "smoke": {
+          "resolved": {
+            "@pandamstyle/core": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/core/src/index.js",
+            "@pandamstyle/compiler": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler/lib/index.mjs",
+            "@pandamstyle/compiler/config": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler/lib/config.mjs",
+            "@pandamstyle/compiler/host": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler/lib/host.mjs",
+            "@pandamstyle/compiler/package.json": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler/package.json"
+          },
+          "exports": {
+            "core": [
+              "ABI_VERSION",
+              "PmsSelectionError",
+              "assertAbi",
+              "defineRecipeSelector",
+              "props"
+            ],
+            "compiler": [
+              "COMPILER_ABI_VERSION",
+              "Codes",
+              "DIAGNOSTICS_RESULT_KIND",
+              "DIAGNOSTICS_RESULT_SCHEMA_VERSION",
+              "PmsError",
+              "createProjectSession",
+              "formatDiagnostic"
+            ],
+            "config": [
+              "defineConfig",
+              "token"
+            ],
+            "host": [
+              "createHostBridge"
+            ]
+          },
+          "privateSubpathsRejected": [
+            "@pandamstyle/core/src/props.js",
+            "@pandamstyle/compiler/lib/index.mjs",
+            "@pandamstyle/compiler/private"
+          ],
+          "runtime": "passed",
+          "abiMismatchCode": "PMS_ABI_MISMATCH",
+          "artifactSet": "f63cb355037608552b877c3ef91baeef43cfe794620aaba72ffb7a213417a089",
+          "canonicalArtifacts": [
+            "design.js",
+            "design.d.ts",
+            "manifest.json",
+            "styles.css",
+            "artifacts.json"
+          ]
+        },
+        "cliOutput": "pandamstyle build ok registryDigest=2787949e69dc8110 files=2 cssBytes=1175"
+      },
+      {
+        "label": "minimum-node",
+        "node": "v20.0.0",
+        "esmImportsRuntimeConfigHost": "passed",
+        "externalRealpaths": "passed",
+        "coreRuntimeAndAbiErrors": "passed",
+        "canonicalArtifactIdentity": "passed",
+        "esmSmokeElapsedMs": 624.545,
+        "cliBuild": "passed",
+        "cliBuildElapsedMs": 449.155,
+        "smoke": {
+          "resolved": {
+            "@pandamstyle/core": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/core/src/index.js",
+            "@pandamstyle/compiler": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler/lib/index.mjs",
+            "@pandamstyle/compiler/config": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler/lib/config.mjs",
+            "@pandamstyle/compiler/host": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler/lib/host.mjs",
+            "@pandamstyle/compiler/package.json": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler/package.json"
+          },
+          "exports": {
+            "core": [
+              "ABI_VERSION",
+              "PmsSelectionError",
+              "assertAbi",
+              "defineRecipeSelector",
+              "props"
+            ],
+            "compiler": [
+              "COMPILER_ABI_VERSION",
+              "Codes",
+              "DIAGNOSTICS_RESULT_KIND",
+              "DIAGNOSTICS_RESULT_SCHEMA_VERSION",
+              "PmsError",
+              "createProjectSession",
+              "formatDiagnostic"
+            ],
+            "config": [
+              "defineConfig",
+              "token"
+            ],
+            "host": [
+              "createHostBridge"
+            ]
+          },
+          "privateSubpathsRejected": [
+            "@pandamstyle/core/src/props.js",
+            "@pandamstyle/compiler/lib/index.mjs",
+            "@pandamstyle/compiler/private"
+          ],
+          "runtime": "passed",
+          "abiMismatchCode": "PMS_ABI_MISMATCH",
+          "artifactSet": "f63cb355037608552b877c3ef91baeef43cfe794620aaba72ffb7a213417a089",
+          "canonicalArtifacts": [
+            "design.js",
+            "design.d.ts",
+            "manifest.json",
+            "styles.css",
+            "artifacts.json"
+          ]
+        },
+        "cliOutput": "pandamstyle build ok registryDigest=2787949e69dc8110 files=2 cssBytes=1175"
+      }
+    ],
+    "sdk": {
+      "initialize": "passed",
+      "applyChanges": "passed",
+      "validate": "passed",
+      "compile": "passed",
+      "current": "passed",
+      "agentResult": "passed",
+      "candidateTokens": "passed",
+      "requestFullAudit": "passed",
+      "prepareAbortCommit": "passed",
+      "hostReadCommit": "passed",
+      "sourceOverlays": "passed",
+      "sourceDigest": "passed",
+      "readGeneratedArtifacts": "passed",
+      "staleGeneratedRead": "rejected",
+      "sameContentGenerationReuse": "passed",
+      "changedContentGenerationAdvance": "passed",
+      "revision": {
+        "projectId": "phase-9-sdk-consumer",
+        "sessionId": "b8577713-be45-42a7-a2cf-5ef7195db45f",
+        "revisionId": 5
+      },
+      "generationId": 3,
+      "elapsedMs": 1711.699,
+      "generatedArtifactMismatch": {
+        "result": "rejected",
+        "expectedCode": "PMS_GENERATED_ARTIFACT_MISMATCH",
+        "codes": [
+          "PMS_GENERATED_ARTIFACT_MISMATCH"
+        ]
+      }
+    },
+    "vite": {
+      "pass": true,
+      "peer": "7.3.2",
+      "engines": {
+        "node": "^20.19.0 || >=22.12.0"
+      },
+      "imports": [
+        "node:crypto",
+        "node:fs",
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "@pandamstyle/compiler",
+        "@pandamstyle/compiler/host"
+      ],
+      "privateCompilerImportCount": 0,
+      "matrix": [
+        {
+          "node": "v20.0.0",
+          "import": "passed",
+          "construction": "passed",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+          "privateSubpath": "rejected",
+          "integrationSupported": false,
+          "reason": "Node 20.0.0 is below Vite 7.3.2 upstream engines; adapter import alone does not qualify Vite runtime",
+          "durationMs": 176.667
+        },
+        {
+          "node": "v20.19.0",
+          "import": "passed",
+          "construction": "passed",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+          "privateSubpath": "rejected",
+          "integrationSupported": true,
+          "dev": "passed",
+          "transform": "passed",
+          "production": "passed",
+          "canonicalSet": "passed",
+          "durationMs": 934.399
+        },
+        {
+          "node": "v22.12.0",
+          "import": "passed",
+          "construction": "passed",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+          "privateSubpath": "rejected",
+          "integrationSupported": true,
+          "dev": "passed",
+          "transform": "passed",
+          "production": "passed",
+          "canonicalSet": "passed",
+          "durationMs": 3045.111
+        },
+        {
+          "node": "v22.22.0",
+          "import": "passed",
+          "construction": "passed",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+          "privateSubpath": "rejected",
+          "integrationSupported": true,
+          "dev": "passed",
+          "transform": "passed",
+          "production": "passed",
+          "canonicalSet": "passed",
+          "durationMs": 935.802
+        }
+      ]
+    },
+    "typeScript": {
+      "compiler": "typescript@5.9.3",
+      "strictNoEmit": true,
+      "positiveCoreAndSdk": "passed",
+      "positiveGeneratedDesignSystem": "passed",
+      "negativeCases": 11,
+      "negativeCaseNames": [
+        "private-token",
+        "unknown-token",
+        "invalid-recipe-axis-value",
+        "invalid-recipe-size-value",
+        "unknown-condition",
+        "unknown-theme",
+        "invalid-composition-object",
+        "wrong-abi-version",
+        "unverified-props-input",
+        "vite-missing-roots",
+        "vite-owned-root-dir"
+      ],
+      "viteOptions": "passed",
+      "phase8SdkTypes": "passed",
+      "negativeCasesRejected": true,
+      "elapsedMs": 1704.899,
+      "commandDurationMs": 1704.862,
+      "declarationBytes": 11231
+    },
+    "treeShaking": {
+      "bundler": "rollup@4.59.0",
+      "elapsedMs": 546.74,
+      "compiledApplicationSources": {
+        "one-recipe": {
+          "supported": true,
+          "diagnostics": [],
+          "javascriptBytes": 318
+        },
+        "one-theme": {
+          "supported": true,
+          "diagnostics": [],
+          "javascriptBytes": 292
+        },
+        "multiple-recipes": {
+          "supported": true,
+          "diagnostics": [],
+          "javascriptBytes": 496
+        },
+        "dynamic-axis": {
+          "supported": true,
+          "diagnostics": [],
+          "javascriptBytes": 221
+        },
+        "dynamic-namespace": {
+          "supported": false,
+          "diagnostics": [
+            "PMS_UNVERIFIED_PROPS_SOURCE"
+          ]
+        }
+      },
+      "cases": {
+        "props-only": {
+          "bytes": 7201,
+          "gzipBytes": 2224,
+          "moduleCount": 4
+        },
+        "one-recipe": {
+          "bytes": 7304,
+          "gzipBytes": 2310,
+          "moduleCount": 4
+        },
+        "one-theme": {
+          "bytes": 7278,
+          "gzipBytes": 2267,
+          "moduleCount": 4
+        },
+        "multiple-recipes": {
+          "bytes": 7477,
+          "gzipBytes": 2339,
+          "moduleCount": 4
+        },
+        "unused-core": {
+          "bytes": 1,
+          "gzipBytes": 21,
+          "moduleCount": 1
+        },
+        "dynamic-axis": {
+          "bytes": 18944,
+          "gzipBytes": 4468,
+          "moduleCount": 7
+        }
+      },
+      "dynamicSelectionVocabulary": {
+        "selectedRecipe": "button",
+        "unrelatedRecipeDataRetained": true,
+        "unrelatedRecipeIds": [
+          "notice"
+        ],
+        "unrelatedThemeDataRetained": false,
+        "reason": "runtime dynamic axis selection keeps the generated recipes aggregate reachable; Rollup retains its finite object members"
+      },
+      "assertions": {
+        "propsOnly": "passed",
+        "oneRecipeDropsNoticeRecipe": "passed",
+        "oneThemeDropsDarkTheme": "passed",
+        "multipleRecipesRetainAdditionalCompiledOutput": "passed",
+        "dynamicAxisRetainsBoundedSelectorData": "passed",
+        "dynamicNamespaceAccess": "not-supported-by-compiler",
+        "unusedCoreExportRemoved": "passed"
+      },
+      "caseModules": {
+        "props-only": [
+          "node_modules/@pandamstyle/core/src/selection-error.js",
+          "node_modules/@pandamstyle/core/src/abi.js",
+          "node_modules/@pandamstyle/core/src/props.js",
+          "bundle-entries/props-only.mjs"
+        ],
+        "one-recipe": [
+          "node_modules/@pandamstyle/core/src/selection-error.js",
+          "node_modules/@pandamstyle/core/src/abi.js",
+          "node_modules/@pandamstyle/core/src/props.js",
+          "bundle-entries/one-recipe.mjs"
+        ],
+        "one-theme": [
+          "node_modules/@pandamstyle/core/src/selection-error.js",
+          "node_modules/@pandamstyle/core/src/abi.js",
+          "node_modules/@pandamstyle/core/src/props.js",
+          "bundle-entries/one-theme.mjs"
+        ],
+        "multiple-recipes": [
+          "node_modules/@pandamstyle/core/src/selection-error.js",
+          "node_modules/@pandamstyle/core/src/abi.js",
+          "node_modules/@pandamstyle/core/src/props.js",
+          "bundle-entries/multiple-recipes.mjs"
+        ],
+        "unused-core": [
+          "bundle-entries/unused-core.mjs"
+        ],
+        "dynamic-axis": [
+          "node_modules/@pandamstyle/core/src/selection-error.js",
+          "node_modules/@pandamstyle/core/src/abi.js",
+          "node_modules/@pandamstyle/core/src/props.js",
+          "node_modules/@pandamstyle/core/src/recipe-select.js",
+          "node_modules/@pandamstyle/core/src/recipe.js",
+          "generated/design.js",
+          "bundle-entries/dynamic-axis.mjs"
+        ]
+      }
+    },
+    "browserSafety": {
+      "pass": true,
+      "inspected": [
+        {
+          "artifact": "core-tarball",
+          "file": "src/abi.js",
+          "imports": [
+            "./selection-error.js"
+          ],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "core-tarball",
+          "file": "src/index.js",
+          "imports": [
+            "./abi.js",
+            "./props.js",
+            "./recipe.js",
+            "./selection-error.js"
+          ],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "core-tarball",
+          "file": "src/props.js",
+          "imports": [
+            "./abi.js",
+            "./selection-error.js"
+          ],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "core-tarball",
+          "file": "src/recipe-select.js",
+          "imports": [
+            "./abi.js",
+            "./selection-error.js"
+          ],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "core-tarball",
+          "file": "src/recipe.js",
+          "imports": [
+            "./recipe-select.js"
+          ],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "core-tarball",
+          "file": "src/selection-error.js",
+          "imports": [],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "core-tarball",
+          "file": "src/types.ts",
+          "imports": [],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "generated-runtime",
+          "file": "design.d.ts",
+          "imports": [
+            "@pandamstyle/core"
+          ],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "generated-runtime",
+          "file": "design.js",
+          "imports": [
+            "@pandamstyle/core"
+          ],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "generated-runtime",
+          "file": "js/src/app.tsx",
+          "imports": [
+            "@pandamstyle/core",
+            "react/jsx-runtime"
+          ],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "browser-bundles",
+          "file": "dynamic-axis.mjs",
+          "imports": [],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "browser-bundles",
+          "file": "multiple-recipes.mjs",
+          "imports": [],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "browser-bundles",
+          "file": "one-recipe.mjs",
+          "imports": [],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "browser-bundles",
+          "file": "one-theme.mjs",
+          "imports": [],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "browser-bundles",
+          "file": "props-only.mjs",
+          "imports": [],
+          "forbiddenImports": [],
+          "processReferences": []
+        },
+        {
+          "artifact": "browser-bundles",
+          "file": "unused-core.mjs",
+          "imports": [],
+          "forbiddenImports": [],
+          "processReferences": []
+        }
+      ]
+    },
+    "installedDependencyGraph": {
+      "complete": true,
+      "packages": [
+        {
+          "name": "@babel/code-frame",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/code-frame",
+          "sizeBytes": 34632
+        },
+        {
+          "name": "@babel/compat-data",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/compat-data",
+          "sizeBytes": 68207
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/core",
+          "sizeBytes": 810551
+        },
+        {
+          "name": "@babel/generator",
+          "version": "7.29.8",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/generator",
+          "sizeBytes": 539451
+        },
+        {
+          "name": "@babel/helper-annotate-as-pure",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-annotate-as-pure",
+          "sizeBytes": 4042
+        },
+        {
+          "name": "@babel/helper-compilation-targets",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-compilation-targets",
+          "sizeBytes": 53791
+        },
+        {
+          "name": "@babel/helper-create-class-features-plugin",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-create-class-features-plugin",
+          "sizeBytes": 441219
+        },
+        {
+          "name": "@babel/helper-globals",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-globals",
+          "sizeBytes": 23079
+        },
+        {
+          "name": "@babel/helper-member-expression-to-functions",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-member-expression-to-functions",
+          "sizeBytes": 54889
+        },
+        {
+          "name": "@babel/helper-module-imports",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-module-imports",
+          "sizeBytes": 63720
+        },
+        {
+          "name": "@babel/helper-module-transforms",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-module-transforms",
+          "sizeBytes": 161712
+        },
+        {
+          "name": "@babel/helper-optimise-call-expression",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-optimise-call-expression",
+          "sizeBytes": 6672
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-plugin-utils",
+          "sizeBytes": 11761
+        },
+        {
+          "name": "@babel/helper-replace-supers",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-replace-supers",
+          "sizeBytes": 43292
+        },
+        {
+          "name": "@babel/helper-skip-transparent-expression-wrappers",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-skip-transparent-expression-wrappers",
+          "sizeBytes": 6001
+        },
+        {
+          "name": "@babel/helper-string-parser",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-string-parser",
+          "sizeBytes": 31816
+        },
+        {
+          "name": "@babel/helper-validator-identifier",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-validator-identifier",
+          "sizeBytes": 48813
+        },
+        {
+          "name": "@babel/helper-validator-option",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helper-validator-option",
+          "sizeBytes": 11775
+        },
+        {
+          "name": "@babel/helpers",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/helpers",
+          "sizeBytes": 877305
+        },
+        {
+          "name": "@babel/parser",
+          "version": "7.29.9",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/parser",
+          "sizeBytes": 2000784
+        },
+        {
+          "name": "@babel/plugin-syntax-jsx",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-syntax-jsx",
+          "sizeBytes": 4155
+        },
+        {
+          "name": "@babel/plugin-syntax-typescript",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-syntax-typescript",
+          "sizeBytes": 6945
+        },
+        {
+          "name": "@babel/plugin-transform-modules-commonjs",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-modules-commonjs",
+          "sizeBytes": 41587
+        },
+        {
+          "name": "@babel/plugin-transform-react-display-name",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-react-display-name",
+          "sizeBytes": 12466
+        },
+        {
+          "name": "@babel/plugin-transform-react-jsx",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-react-jsx",
+          "sizeBytes": 83253
+        },
+        {
+          "name": "@babel/plugin-transform-react-jsx-development",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-react-jsx-development",
+          "sizeBytes": 3369
+        },
+        {
+          "name": "@babel/plugin-transform-react-pure-annotations",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-react-pure-annotations",
+          "sizeBytes": 8304
+        },
+        {
+          "name": "@babel/plugin-transform-typescript",
+          "version": "7.29.9",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/plugin-transform-typescript",
+          "sizeBytes": 143258
+        },
+        {
+          "name": "@babel/preset-react",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/preset-react",
+          "sizeBytes": 12455
+        },
+        {
+          "name": "@babel/preset-typescript",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/preset-typescript",
+          "sizeBytes": 25715
+        },
+        {
+          "name": "@babel/template",
+          "version": "7.29.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/template",
+          "sizeBytes": 70678
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/traverse",
+          "sizeBytes": 708138
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@babel/types",
+          "sizeBytes": 2750769
+        },
+        {
+          "name": "@csstools/css-tokenizer",
+          "version": "3.0.4",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@csstools/css-tokenizer",
+          "sizeBytes": 72983
+        },
+        {
+          "name": "@esbuild/linux-x64",
+          "version": "0.27.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@esbuild/linux-x64",
+          "sizeBytes": 11121301
+        },
+        {
+          "name": "@jridgewell/gen-mapping",
+          "version": "0.3.13",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/gen-mapping",
+          "sizeBytes": 93797
+        },
+        {
+          "name": "@jridgewell/remapping",
+          "version": "2.3.5",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/remapping",
+          "sizeBytes": 59366
+        },
+        {
+          "name": "@jridgewell/resolve-uri",
+          "version": "3.1.2",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/resolve-uri",
+          "sizeBytes": 53153
+        },
+        {
+          "name": "@jridgewell/sourcemap-codec",
+          "version": "1.6.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/sourcemap-codec",
+          "sizeBytes": 96626
+        },
+        {
+          "name": "@jridgewell/trace-mapping",
+          "version": "0.3.31",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@jridgewell/trace-mapping",
+          "sizeBytes": 146724
+        },
+        {
+          "name": "@pandamstyle/compiler",
+          "version": "0.1.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler",
+          "sizeBytes": 1132973
+        },
+        {
+          "name": "@pandamstyle/core",
+          "version": "0.1.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/core",
+          "sizeBytes": 23365
+        },
+        {
+          "name": "@pandamstyle/vite",
+          "version": "0.1.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+          "sizeBytes": 41911
+        },
+        {
+          "name": "@rollup/rollup-linux-x64-gnu",
+          "version": "4.59.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@rollup/rollup-linux-x64-gnu",
+          "sizeBytes": 2031255
+        },
+        {
+          "name": "@types/estree",
+          "version": "1.0.8",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/rollup/node_modules/@types/estree",
+          "sizeBytes": 26173
+        },
+        {
+          "name": "@types/node",
+          "version": "22.19.15",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@types/node",
+          "sizeBytes": 2422650
+        },
+        {
+          "name": "baseline-browser-mapping",
+          "version": "2.11.27",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/baseline-browser-mapping",
+          "sizeBytes": 135770
+        },
+        {
+          "name": "browserslist",
+          "version": "4.29.3",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/browserslist",
+          "sizeBytes": 70780
+        },
+        {
+          "name": "caniuse-lite",
+          "version": "1.0.30001814",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/caniuse-lite",
+          "sizeBytes": 1485070
+        },
+        {
+          "name": "convert-source-map",
+          "version": "2.0.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/convert-source-map",
+          "sizeBytes": 15854
+        },
+        {
+          "name": "debug",
+          "version": "4.4.3",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/debug",
+          "sizeBytes": 42793
+        },
+        {
+          "name": "electron-to-chromium",
+          "version": "1.5.443",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/electron-to-chromium",
+          "sizeBytes": 203316
+        },
+        {
+          "name": "esbuild",
+          "version": "0.27.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/esbuild",
+          "sizeBytes": 143823
+        },
+        {
+          "name": "escalade",
+          "version": "3.2.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/escalade",
+          "sizeBytes": 12385
+        },
+        {
+          "name": "fdir",
+          "version": "6.5.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/fdir",
+          "sizeBytes": 53291
+        },
+        {
+          "name": "gensync",
+          "version": "1.0.0-beta.2",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/gensync",
+          "sizeBytes": 28891
+        },
+        {
+          "name": "js-tokens",
+          "version": "4.0.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/js-tokens",
+          "sizeBytes": 15069
+        },
+        {
+          "name": "jsesc",
+          "version": "3.1.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/jsesc",
+          "sizeBytes": 32280
+        },
+        {
+          "name": "json5",
+          "version": "2.2.3",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/json5",
+          "sizeBytes": 235198
+        },
+        {
+          "name": "lru-cache",
+          "version": "5.1.1",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/lru-cache",
+          "sizeBytes": 15714
+        },
+        {
+          "name": "ms",
+          "version": "2.1.3",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/ms",
+          "sizeBytes": 6721
+        },
+        {
+          "name": "nanoid",
+          "version": "3.3.19",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/nanoid",
+          "sizeBytes": 25291
+        },
+        {
+          "name": "node-releases",
+          "version": "2.0.57",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/node-releases",
+          "sizeBytes": 62032
+        },
+        {
+          "name": "picocolors",
+          "version": "1.1.1",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/picocolors",
+          "sizeBytes": 6373
+        },
+        {
+          "name": "picomatch",
+          "version": "4.0.7",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/picomatch",
+          "sizeBytes": 93759
+        },
+        {
+          "name": "postcss",
+          "version": "8.5.28",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/postcss",
+          "sizeBytes": 218290
+        },
+        {
+          "name": "postcss-value-parser",
+          "version": "4.2.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/postcss-value-parser",
+          "sizeBytes": 27193
+        },
+        {
+          "name": "rollup",
+          "version": "4.59.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/rollup",
+          "sizeBytes": 2807219
+        },
+        {
+          "name": "semver",
+          "version": "6.3.1",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/semver",
+          "sizeBytes": 68343
+        },
+        {
+          "name": "source-map-js",
+          "version": "1.2.2",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/source-map-js",
+          "sizeBytes": 142723
+        },
+        {
+          "name": "tinyglobby",
+          "version": "0.2.17",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/tinyglobby",
+          "sizeBytes": 39288
+        },
+        {
+          "name": "undici-types",
+          "version": "6.21.0",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/undici-types",
+          "sizeBytes": 83680
+        },
+        {
+          "name": "update-browserslist-db",
+          "version": "1.3.3",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/update-browserslist-db",
+          "sizeBytes": 23332
+        },
+        {
+          "name": "vite",
+          "version": "7.3.2",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/vite",
+          "sizeBytes": 2235281
+        },
+        {
+          "name": "yallist",
+          "version": "3.1.1",
+          "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/yallist",
+          "sizeBytes": 14766
+        }
+      ],
+      "packageCount": 75,
+      "installedProductionBytes": 34831406,
+      "donorPackages": [],
+      "workspaceFileReferences": [],
+      "repositoryPathLeakage": [],
+      "installedPandamStyleRealpaths": {
+        "@pandamstyle/core": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/core",
+        "@pandamstyle/compiler": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler",
+        "@pandamstyle/vite": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite"
+      }
+    },
+    "compilerRuntimeImports": {
+      "emittedImports": [
+        "@babel/core",
+        "@babel/parser",
+        "@babel/preset-react",
+        "@babel/preset-typescript",
+        "@babel/traverse",
+        "@babel/types",
+        "@csstools/css-tokenizer",
+        "@pandamstyle/core",
+        "crypto",
+        "fs",
+        "node:async_hooks",
+        "node:crypto",
+        "node:fs",
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "path",
+        "postcss-value-parser"
+      ],
+      "undeclaredImports": []
+    },
+    "workspaceLeakage": {
+      "repositoryPathStrings": 0,
+      "nodePathUsed": false,
+      "sourcesUnavailableDuringTests": true
+    },
+    "packageLockFileReferences": "local tarballs are in an external temporary directory; no package or lock reference points into the repository",
+    "performance": {
+      "coldCompilerImportMs": 538.551,
+      "coldCliStartupMs": 195.619,
+      "generatedTypecheckMs": 1704.899,
+      "npmInstallMs": 6244.117
+    },
+    "bundleFiles": [
+      {
+        "path": "dynamic-axis.mjs",
+        "size": 18944,
+        "sha256": "8e9db90838559aa58834c9032d11a19b454e2e67fa0ed0ad42bdae664d27df06"
+      },
+      {
+        "path": "multiple-recipes.mjs",
+        "size": 7477,
+        "sha256": "e4abf4c3ce60692da647e6bdd327cbd6bd18b63fb988994fdd3da2d71e9ba6d9"
+      },
+      {
+        "path": "one-recipe.mjs",
+        "size": 7304,
+        "sha256": "bf8ac4d6404f6d8de26e6630473a60b7cee6b5cfe8bd91e3dbee8211af53af2f"
+      },
+      {
+        "path": "one-theme.mjs",
+        "size": 7278,
+        "sha256": "d8deba5684c37e299fa8f6f85278c98cd5b6f595671975c4a1b46112b6962e7b"
+      },
+      {
+        "path": "props-only.mjs",
+        "size": 7201,
+        "sha256": "94dc2fe3a18978f964feb2717f99dd340a1318f41eb02faf67025fab98d6e2c1"
+      },
+      {
+        "path": "unused-core.mjs",
+        "size": 1,
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+      }
+    ]
+  },
+  "pass": true,
+  "completedAt": "2026-10-01T21:59:31.377Z",
+  "scratchRoot": "/tmp/pandamstyle-phase-8-9-wXnbXO"
+}

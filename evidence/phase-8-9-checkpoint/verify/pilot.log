@@ -1,0 +1,41 @@
+== pack the compiler, core runtime, and Vite adapter ==
+pandamstyle-compiler-0.1.0.tgz
+pandamstyle-core-0.1.0.tgz
+pandamstyle-vite-0.1.0.tgz
+== verify packed exports and the explicit Vite peer ==
+@pandamstyle/compiler@0.1.0: 14 packed files
+@pandamstyle/core@0.1.0: 10 packed files
+@pandamstyle/vite@0.1.0: 5 packed files
+== install packed packages into a temporary external Vite app ==
+
+added 86 packages in 4s
+== prove the app resolves installed tarballs outside the repo ==
+@pandamstyle/compiler@0.1.0: /tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/compiler
+@pandamstyle/core@0.1.0: /tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/core
+@pandamstyle/vite@0.1.0: /tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/vite
+public compiler SDK and @pandamstyle/vite exports load from installed tarballs
+== run the Vite development, HMR, isolation, and production qualification ==
+{
+  "viteVersion": "7.3.2",
+  "devRows": 30,
+  "productionRows": 5,
+  "failurePoints": [
+    "invalid-source-before-transform",
+    "transform",
+    "renderStart",
+    "generateBundle",
+    "writeBundle",
+    "commitPrepared",
+    "edit-during-prepared-publication",
+    "build.write-false",
+    "multiple-outputs"
+  ],
+  "bundleScan": {
+    "javascriptFiles": [
+      "assets/index-gD_LIHSi.js"
+    ],
+    "forbiddenFiles": []
+  }
+}
+
+PILOT OK: /tmp/pandamstyle-phase-8-9-checkpoint-pilot/app

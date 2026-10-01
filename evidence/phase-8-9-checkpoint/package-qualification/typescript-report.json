@@ -1,0 +1,26 @@
+{
+  "compiler": "typescript@5.9.3",
+  "strictNoEmit": true,
+  "positiveCoreAndSdk": "passed",
+  "positiveGeneratedDesignSystem": "passed",
+  "negativeCases": 11,
+  "negativeCaseNames": [
+    "private-token",
+    "unknown-token",
+    "invalid-recipe-axis-value",
+    "invalid-recipe-size-value",
+    "unknown-condition",
+    "unknown-theme",
+    "invalid-composition-object",
+    "wrong-abi-version",
+    "unverified-props-input",
+    "vite-missing-roots",
+    "vite-owned-root-dir"
+  ],
+  "viteOptions": "passed",
+  "phase8SdkTypes": "passed",
+  "negativeCasesRejected": true,
+  "elapsedMs": 1704.899,
+  "commandDurationMs": 1704.862,
+  "declarationBytes": 11231
+}

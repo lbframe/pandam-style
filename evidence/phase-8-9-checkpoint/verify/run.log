@@ -1,0 +1,276 @@
+PandamStyle native verification
+  repo root      : /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10
+  tested commit  : 487ddeef5233d778f7fb50296b369e950584e003
+  tested tree    : eff7e713ea9a7ba6a8cb7ee2a5498cf6653d680e
+  branch         : integration/pandamstyle-phase-8-9-checkpoint-2026-10
+  working tree   : clean (as found, before this run wrote anything)
+  batch base ref : 2c60997e854de7d880d03694a4ccab74832514ee
+  batch base     : 2c60997e854de7d880d03694a4ccab74832514ee
+  out dir        : /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/evidence/phase-8-9-checkpoint/verify
+
+== install ==
+$ env NODE_OPTIONS= yarn install --frozen-lockfile --non-interactive
+yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+$ husky install tools/husky
+husky - Git hooks installed
+Done in 1.16s.
+   ok (exit 0)
+== build ==
+$ build_delivered_packages
+
+./src/api/cli.js → ./lib/cli.mjs...
+created ./lib/cli.mjs in 2.7s
+
+./src/api/index.js → ./lib/index.mjs...
+created ./lib/index.mjs in 1.1s
+
+./src/api/config.js → ./lib/config.mjs...
+created ./lib/config.mjs in 240ms
+
+./src/api/host.js → ./lib/host.mjs...
+created ./lib/host.mjs in 128ms
+
+../../tests/support/compiler-inspection.js → ../../.pms-test-support/compiler-inspection.cjs...
+created ../../.pms-test-support/compiler-inspection.cjs in 959ms
+   ok (exit 0)
+== pandamstyle ==
+$ /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/node_modules/.bin/jest --config /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/jest.config.js --ci --runInBand /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/packages/compiler/__tests__/pandamstyle /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/packages/compiler/__tests__/engine-absorption-test.js
+PASS packages/compiler/__tests__/pandamstyle/phase-d-agent-loop-test.js (114.922 s)
+  ● Console
+
+    console.log
+      LONG-SESSION {"first":{"revision":0,"nodes":14,"covered":14,"forward":9,"reverse":8,"support":14,"fileStates":14,"dsConsumers":6,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":280629248},"last":{"revision":1000,"nodes":14,"covered":14,"forward":9,"reverse":8,"support":14,"fileStates":14,"dsConsumers":6,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":326963200},"samples":11}
+
+      at Object.log (packages/compiler/__tests__/pandamstyle/phase-d-agent-loop-test.js:385:13)
+
+PASS packages/compiler/__tests__/pandamstyle/incremental-publication-test.js (6.232 s)
+PASS packages/compiler/__tests__/pandamstyle/negative-builds-test.js (9.783 s)
+PASS packages/compiler/__tests__/pandamstyle/agent-result-test.js (14.523 s)
+PASS packages/compiler/__tests__/pandamstyle/transactional-generation-test.js (8.262 s)
+PASS packages/compiler/__tests__/pandamstyle/vite-build-test.js (6.447 s)
+PASS packages/compiler/__tests__/pandamstyle/incremental-session-test.js (5.777 s)
+PASS packages/compiler/__tests__/pandamstyle/forwarding-semantics-test.js
+PASS packages/compiler/__tests__/pandamstyle/provenance-props-test.js
+PASS packages/compiler/__tests__/pandamstyle/coverage-graph-test.js
+PASS packages/compiler/__tests__/pandamstyle/design-system-view-test.js
+PASS packages/compiler/__tests__/pandamstyle/runner-status-test.js
+PASS packages/compiler/__tests__/pandamstyle/agent-dirty-input-test.js
+PASS packages/compiler/__tests__/pandamstyle/incremental-css-test.js
+PASS packages/compiler/__tests__/pandamstyle/incremental-coverage-closure-test.js
+PASS packages/compiler/__tests__/pandamstyle/watcher-provider-test.js
+PASS packages/compiler/__tests__/pandamstyle/staleness-test.js
+PASS packages/compiler/__tests__/pandamstyle/phase-6-design-system-test.js
+PASS packages/compiler/__tests__/pandamstyle/project-api-test.js
+PASS packages/compiler/__tests__/pandamstyle/native-compile-test.js
+PASS packages/compiler/__tests__/pandamstyle/phase-6-7-reconciliation-test.js
+PASS packages/compiler/__tests__/pandamstyle/recipe-contract-test.js
+PASS packages/compiler/__tests__/engine-absorption-test.js
+PASS packages/compiler/__tests__/pandamstyle/chain-test.js
+PASS packages/compiler/__tests__/pandamstyle/artifacts-test.js
+
+Test Suites: 25 passed, 25 total
+Tests:       547 passed, 547 total
+Snapshots:   0 total
+Time:        207.352 s
+Ran all test suites matching /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/packages/compiler/__tests__/pandamstyle|/home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/packages/compiler/__tests__/engine-absorption-test.js.
+   ok (exit 0)
+== pandamstyle-core ==
+$ /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/node_modules/.bin/jest --config /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/jest.config.js --ci --runInBand --runTestsByPath /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/packages/core/__tests__/core-test.js
+PASS packages/core/__tests__/core-test.js
+  @pandamstyle/core ABI v1
+    ✓ assertAbi accepts v1 and rejects unsupported versions structurally (2 ms)
+    ✓ empty composition and false/null/undefined omissions return no classes (1 ms)
+    ✓ nested refs flatten left to right and the last conflict wins (1 ms)
+    ✓ tombstones cancel an earlier key and duplicate classes keep their last position (1 ms)
+    ✓ themes replace the same variable group while styles remain independent
+    ✓ cross-system composition and malformed runtime sources fail closed (11 ms)
+    ✓ unsupported reference ABI fails with PMS_ABI_MISMATCH (1 ms)
+    ✓ cyclic nested input arrays are rejected deterministically (1 ms)
+  finite generated recipe selectors
+    ✓ returns one StyleRef with base and selected branches in axis order (1 ms)
+    ✓ undefined uses defaults, absent defaults add no branch, and false is a value (1 ms)
+    ✓ selection helpers expose readonly metadata and split declared axes (1 ms)
+    ✓ unknown axes/values and explicit null fail with structured errors (1 ms)
+    ✓ numeric scalar values retain baseline coercion to finite string keys (2 ms)
+    ✓ malformed recipe data and cross-system branches are rejected at factory time (3 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       14 passed, 14 total
+Snapshots:   0 total
+Time:        0.72 s, estimated 1 s
+Ran all test suites within paths "/home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/packages/core/__tests__/core-test.js".
+   ok (exit 0)
+== semantic-oracle ==
+$ node /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/tools/semantic-oracle/run.js /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/evidence/phase-8-9-checkpoint/verify/semantic-oracle
+PASS tests/semantic/__tests__/browser-test.js (23.883 s)
+PASS tests/semantic/__tests__/props-test.js (9.964 s)
+PASS tests/semantic/__tests__/recipes-test.js (11.268 s)
+PASS tests/semantic/__tests__/forwarding-test.js (9.762 s)
+PASS tests/semantic/__tests__/tokens-test.js (7.811 s)
+PASS tests/semantic/__tests__/create-test.js (7.775 s)
+PASS tests/semantic/__tests__/themes-test.js (5.757 s)
+PASS tests/semantic/__tests__/conditions-test.js (5.711 s)
+PASS tests/semantic/__tests__/incremental-css-test.js (8.152 s)
+PASS tests/semantic/__tests__/coverage-test.js (5.249 s)
+PASS tests/semantic/__tests__/publication-test.js
+PASS tests/semantic/__tests__/revisions-test.js (5.345 s)
+PASS tests/semantic/__tests__/module-resolution-test.js
+PASS tests/semantic/__tests__/multi-revision-test.js
+PASS tests/semantic/__tests__/negative-resolution-test.js
+PASS tests/semantic/__tests__/provenance-test.js
+PASS tests/semantic/__tests__/diagnostics-test.js
+PASS tests/semantic/__tests__/syntax-test.js
+PASS tests/semantic/__tests__/harness-integrity-test.js
+PASS tests/semantic/__tests__/deferred-test.js
+
+Test Suites: 20 passed, 20 total
+Tests:       148 passed, 148 total
+Snapshots:   0 total
+Time:        120.321 s, estimated 124 s
+Ran all test suites.
+Test results written to: evidence/phase-8-9-checkpoint/verify/semantic-oracle/semantic-jest-results.json
+   ok (exit 0)
+== tooling-tests ==
+$ node /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/tools/pms/run-tooling-tests.js /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/evidence/phase-8-9-checkpoint/verify
+PASS tools/pms/__tests__/tooling-verification-test.js (19.259 s)
+PASS tools/pms/__tests__/jest-config-test.js
+PASS tools/pms/__tests__/step-contracts-test.js
+PASS tools/pms/__tests__/semantic-verification-test.js
+PASS tools/pms/__tests__/test-counts-test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       91 passed, 91 total
+Snapshots:   0 total
+Time:        20.64 s, estimated 29 s
+Ran all test suites matching tools/pms/__tests__.
+Test results written to: evidence/phase-8-9-checkpoint/verify/tooling-jest-results.json
+   ok (exit 0)
+== pilot ==
+$ bash /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/tools/pilot/run-pilot.sh /tmp/pandamstyle-phase-8-9-checkpoint-pilot
+== pack the compiler, core runtime, and Vite adapter ==
+pandamstyle-compiler-0.1.0.tgz
+pandamstyle-core-0.1.0.tgz
+pandamstyle-vite-0.1.0.tgz
+== verify packed exports and the explicit Vite peer ==
+@pandamstyle/compiler@0.1.0: 14 packed files
+@pandamstyle/core@0.1.0: 10 packed files
+@pandamstyle/vite@0.1.0: 5 packed files
+== install packed packages into a temporary external Vite app ==
+
+added 86 packages in 4s
+== prove the app resolves installed tarballs outside the repo ==
+@pandamstyle/compiler@0.1.0: /tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/compiler
+@pandamstyle/core@0.1.0: /tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/core
+@pandamstyle/vite@0.1.0: /tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/node_modules/@pandamstyle/vite
+public compiler SDK and @pandamstyle/vite exports load from installed tarballs
+== run the Vite development, HMR, isolation, and production qualification ==
+{
+  "viteVersion": "7.3.2",
+  "devRows": 30,
+  "productionRows": 5,
+  "failurePoints": [
+    "invalid-source-before-transform",
+    "transform",
+    "renderStart",
+    "generateBundle",
+    "writeBundle",
+    "commitPrepared",
+    "edit-during-prepared-publication",
+    "build.write-false",
+    "multiple-outputs"
+  ],
+  "bundleScan": {
+    "javascriptFiles": [
+      "assets/index-gD_LIHSi.js"
+    ],
+    "forbiddenFiles": []
+  }
+}
+
+PILOT OK: /tmp/pandamstyle-phase-8-9-checkpoint-pilot/app
+   ok (exit 0)
+== artifacts ==
+$ collect_artifacts
+{
+  "package": "@pandamstyle/core",
+  "version": "0.1.0",
+  "tarball": "evidence/phase-8-9-checkpoint/verify/core-package-proof/tarball/pandamstyle-core-0.1.0.tgz",
+  "tarballBytes": 6397,
+  "installedPath": "/tmp/pandamstyle-core-consumer-8tMpDP/node_modules/@pandamstyle/core/src/index.js",
+  "fixturePath": "/tmp/pandamstyle-core-consumer-8tMpDP",
+  "workspaceLeakage": false,
+  "exports": [
+    ".",
+    "./package.json"
+  ],
+  "runtimeDependencies": {},
+  "dependencyGraph": [
+    "@pandamstyle/core"
+  ],
+  "stylexDependencyCount": 0,
+  "pandacssDependencyCount": 0,
+  "nodeBuiltinImports": [],
+  "donorRuntimeImports": [],
+  "runtimeChecks": {
+    "composition": "passed",
+    "recipeSelection": "passed",
+    "malformedRefCode": "PMS_UNVERIFIED_PROPS_SOURCE",
+    "unsupportedAbiCode": "PMS_ABI_MISMATCH"
+  },
+  "benchmark": {
+    "singleStyleRef": {
+      "iterations": 10000,
+      "elapsedMs": 18.039
+    },
+    "multipleStyleRefs": {
+      "iterations": 10000,
+      "elapsedMs": 22.344
+    },
+    "recipeSelection": {
+      "iterations": 10000,
+      "elapsedMs": 17.956
+    },
+    "largeRepeatedComposition": {
+      "iterations": 1000,
+      "elapsedMs": 25.182
+    }
+  }
+}
+pandamstyle build ok registryDigest=ff7363bedaa095d8 files=10 cssBytes=2671
+   ok (exit 0)
+== donor-closure ==
+$ node /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/tools/pms/donor-closure.js /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10 /tmp/pandamstyle-phase-8-9-checkpoint-pilot /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/evidence/phase-8-9-checkpoint/verify/artifacts/valid-fixture-generation /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/evidence/phase-8-9-checkpoint/verify/donor-closure/report.json
+donor closure: PASS (0 findings)
+   ok (exit 0)
+== package-qualification ==
+$ qualify_public_packages
+package qualification: PASS (3 packages, external consumer, 75 production dependencies)
+   ok (exit 0)
+step install: passed (exit 0) 
+step build: passed (exit 0) 
+step pandamstyle: passed (exit 0) 
+step pandamstyle-core: passed (exit 0) 
+step semantic-oracle: passed (exit 0) 
+step tooling-tests: passed (exit 0) 
+step pilot: passed (exit 0) 
+step artifacts: passed (exit 0) 
+step donor-closure: passed (exit 0) 
+step package-qualification: passed (exit 0) 
+
+run directory: /home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/evidence/phase-8-9-checkpoint/verify
+tests:  800 passed, 0 failed, 0 skipped
+suites: 51 passed, 0 failed, 0 skipped
+verification verdict: verified
+  install: passed, command, verified
+  build: passed, command, verified
+  pandamstyle: passed, test, verified
+  pandamstyle-core: passed, test, verified
+  semantic-oracle: passed, test, verified
+  tooling-tests: passed, test, verified
+  pilot: passed, pilot, verified
+  artifacts: passed, artifact-check, verified
+  donor-closure: passed, artifact-check, verified
+  package-qualification: passed, artifact-check, verified
+VERIFICATION OK

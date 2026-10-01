@@ -1,0 +1,81 @@
+{
+  "testedCommit": "487ddeef5233d778f7fb50296b369e950584e003",
+  "testedTree": "eff7e713ea9a7ba6a8cb7ee2a5498cf6653d680e",
+  "pass": true,
+  "production": [
+    {
+      "label": "clean build",
+      "hostBuildMs": 995.8379029999996,
+      "artifactDigests": {
+        "design.pandamstyle.js": "77c370af7317d287c04f43a8215d5ff9e5cb2e3edc8ee2a2c473c2f0aab5920f",
+        "design.pandamstyle.d.ts": "a657d1a0fe19c77dce74a7df2597fe514e44de5bcec2bdae607fa0a1c5f5a539",
+        "manifest.json": "c775a30272640b17b9717e6e14a2314e2b958d7c2e3c0fd005a5062843d97dcd",
+        "styles.css": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a",
+        "artifacts.json": "cd36abb582518e3832a11cf8eb2bd6bdba1c8c3ce76232e358c9161722f7b1af"
+      },
+      "cssDigest": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a"
+    },
+    {
+      "label": "repeated byte-identical build",
+      "hostBuildMs": 625.1010040000001,
+      "artifactDigests": {
+        "design.pandamstyle.js": "77c370af7317d287c04f43a8215d5ff9e5cb2e3edc8ee2a2c473c2f0aab5920f",
+        "design.pandamstyle.d.ts": "a657d1a0fe19c77dce74a7df2597fe514e44de5bcec2bdae607fa0a1c5f5a539",
+        "manifest.json": "c775a30272640b17b9717e6e14a2314e2b958d7c2e3c0fd005a5062843d97dcd",
+        "styles.css": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a",
+        "artifacts.json": "cd36abb582518e3832a11cf8eb2bd6bdba1c8c3ce76232e358c9161722f7b1af"
+      }
+    },
+    {
+      "label": "changed build",
+      "hostBuildMs": 579.3272919999999,
+      "cssDigest": "dccec137123e7eb811f54507f9944fe15a57df16f453c16ead488202ffff56b2",
+      "artifactDigests": {
+        "design.pandamstyle.js": "27525075a6f13c2bab13c8b90d6152e674d0431d5ed74cd1e96389f9540ea53b",
+        "design.pandamstyle.d.ts": "93e683813b834803d7956356289e0fba69531bb52bf4de34258bed199c1acb00",
+        "manifest.json": "c33894f6004dfe00a66430b6ab6c9a7fb89ef48fbe36b9917b39f322336f9f22",
+        "styles.css": "dccec137123e7eb811f54507f9944fe15a57df16f453c16ead488202ffff56b2",
+        "artifacts.json": "4cea2a8a886a227cf5e5591bcdd0a001863abc140860a89563c512e645f488b7"
+      }
+    },
+    {
+      "label": "failure matrix preserves previous generation and rejects stale tickets",
+      "beforeDigests": {
+        "artifacts.json": "cd36abb582518e3832a11cf8eb2bd6bdba1c8c3ce76232e358c9161722f7b1af",
+        "build-report.json": "02bc91a8a34acd8ef65236efa040179a1e1ffff8d178a82886e7f301128c4f59",
+        "design.pandamstyle.d.ts": "a657d1a0fe19c77dce74a7df2597fe514e44de5bcec2bdae607fa0a1c5f5a539",
+        "design.pandamstyle.js": "77c370af7317d287c04f43a8215d5ff9e5cb2e3edc8ee2a2c473c2f0aab5920f",
+        "js/src/main.jsx": "f65e04362449d18aba09db4db16d35e9cac2219eeff4ad295fcd9a2d76780692",
+        "js/src/pages/App.jsx": "0039550374424c677ab281c441a7d502dbdf0a52195be0063063e3666fce8939",
+        "js/src/pages/bridge.js": "e6d76415817b2e29f403d121ec832cdd6d288269edaa24ab4b9dcee5efff4852",
+        "js/src/pages/forward.js": "1979a711da138396bd12a7752d9703b001fd2fec5df5b1c4fed0ea36cb9cdf22",
+        "js/src/pages/missing.js": "b04a9a1c685e2ad94e5988b3acdd8c172cba51289581c570ea3df29934e9e509",
+        "manifest.json": "c775a30272640b17b9717e6e14a2314e2b958d7c2e3c0fd005a5062843d97dcd",
+        "styles.css": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a"
+      },
+      "failurePoints": [
+        "invalid-source-before-transform",
+        "transform",
+        "renderStart",
+        "generateBundle",
+        "writeBundle",
+        "commitPrepared",
+        "edit-during-prepared-publication",
+        "build.write-false",
+        "multiple-outputs"
+      ],
+      "recoveryBuildMs": 566.6250350000009
+    },
+    {
+      "label": "restored build",
+      "hostBuildMs": 553.8139700000011,
+      "artifactDigests": {
+        "design.pandamstyle.js": "77c370af7317d287c04f43a8215d5ff9e5cb2e3edc8ee2a2c473c2f0aab5920f",
+        "design.pandamstyle.d.ts": "a657d1a0fe19c77dce74a7df2597fe514e44de5bcec2bdae607fa0a1c5f5a539",
+        "manifest.json": "c775a30272640b17b9717e6e14a2314e2b958d7c2e3c0fd005a5062843d97dcd",
+        "styles.css": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a",
+        "artifacts.json": "cd36abb582518e3832a11cf8eb2bd6bdba1c8c3ce76232e358c9161722f7b1af"
+      }
+    }
+  ]
+}

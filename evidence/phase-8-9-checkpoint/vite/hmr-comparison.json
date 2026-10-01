@@ -1,0 +1,35 @@
+{
+  "testedCommit": "487ddeef5233d778f7fb50296b369e950584e003",
+  "testedTree": "eff7e713ea9a7ba6a8cb7ee2a5498cf6653d680e",
+  "historicalSource": "Phase 8 tested tree 188c4aeb6523f7757f9fb11fbdfc194ecd293994, comparison only",
+  "historical": {
+    "coldDevServerReadyMs": 329.497165,
+    "firstTransformMs": 22.27126499999997,
+    "initialCssDigest": "06cf5ae91c4ed923b6d409c173b70a74eb66f14d063f0c25e3159254ede67908",
+    "matrixRows": 30,
+    "revisionEvents": 34,
+    "hmrUpdates": 11,
+    "fullReloads": 20
+  },
+  "integrated": {
+    "coldDevServerReadyMs": 327.65352,
+    "firstTransformMs": 22.07785100000001,
+    "initialCssDigest": "06cf5ae91c4ed923b6d409c173b70a74eb66f14d063f0c25e3159254ede67908",
+    "matrixRows": 30,
+    "revisionEvents": 33,
+    "hmrUpdates": 9,
+    "fullReloads": 21
+  },
+  "namedRowOutcomeChanges": [],
+  "burstAcceptedRevisions": {
+    "historical": 3,
+    "integrated": 1
+  },
+  "burstFinalCssRevision": {
+    "historical": "30fad834-293a-4553-b30a-1089165ff480-11",
+    "integrated": "74f16c88-c8f1-4be4-8e8b-714395e7440c-10"
+  },
+  "finalSourceAndCssDigestsEqual": true,
+  "explanation": "All named scenario outcomes are unchanged. Historical rapid burst accepted three watcher HMR revisions (9,10,11); integrated burst accepted one watcher HMR revision (9), then settled CSS at revision 10. The unchanged adapter reconciles differing transform source via sourceOverlays, emits one revision observation classified full-reload and calls emitReload (packages/vite/src/index.js:495-543). Inference from the recorded revision sequence and that code path: watcher coalescing followed by final-transform reconciliation accounts for two fewer HMR messages, one more reload, and one fewer revision overall (34/11/20 -> 33/9/21). Final source and CSS digests are identical. No HMR policy change or fixed numeric target.",
+  "adapterSourceComparedToPhase8": "unchanged: only package metadata/legal material changes"
+}

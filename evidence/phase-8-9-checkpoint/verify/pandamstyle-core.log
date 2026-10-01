@@ -1,0 +1,23 @@
+PASS packages/core/__tests__/core-test.js
+  @pandamstyle/core ABI v1
+    ✓ assertAbi accepts v1 and rejects unsupported versions structurally (2 ms)
+    ✓ empty composition and false/null/undefined omissions return no classes (1 ms)
+    ✓ nested refs flatten left to right and the last conflict wins (1 ms)
+    ✓ tombstones cancel an earlier key and duplicate classes keep their last position (1 ms)
+    ✓ themes replace the same variable group while styles remain independent
+    ✓ cross-system composition and malformed runtime sources fail closed (11 ms)
+    ✓ unsupported reference ABI fails with PMS_ABI_MISMATCH (1 ms)
+    ✓ cyclic nested input arrays are rejected deterministically (1 ms)
+  finite generated recipe selectors
+    ✓ returns one StyleRef with base and selected branches in axis order (1 ms)
+    ✓ undefined uses defaults, absent defaults add no branch, and false is a value (1 ms)
+    ✓ selection helpers expose readonly metadata and split declared axes (1 ms)
+    ✓ unknown axes/values and explicit null fail with structured errors (1 ms)
+    ✓ numeric scalar values retain baseline coercion to finite string keys (2 ms)
+    ✓ malformed recipe data and cross-system branches are rejected at factory time (3 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       14 passed, 14 total
+Snapshots:   0 total
+Time:        0.72 s, estimated 1 s
+Ran all test suites within paths "/home/kyle/work/pandam-style-phase-8-9-checkpoint-2026-10/packages/core/__tests__/core-test.js".

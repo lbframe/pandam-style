@@ -1,0 +1,77 @@
+{
+  "testedCommit": "487ddeef5233d778f7fb50296b369e950584e003",
+  "testedTree": "eff7e713ea9a7ba6a8cb7ee2a5498cf6653d680e",
+  "packages": [
+    {
+      "name": "@pandamstyle/compiler",
+      "version": "0.1.0",
+      "tarball": "pandamstyle-compiler-0.1.0.tgz",
+      "packedBytes": 234994,
+      "fileCount": 14,
+      "exports": {
+        ".": {
+          "types": "./types/index.d.ts",
+          "import": "./lib/index.mjs"
+        },
+        "./config": {
+          "types": "./types/config.d.ts",
+          "import": "./lib/config.mjs"
+        },
+        "./host": {
+          "types": "./types/host.d.ts",
+          "import": "./lib/host.mjs"
+        },
+        "./package.json": "./package.json"
+      },
+      "dependencies": {
+        "@pandamstyle/core": "0.1.0",
+        "@babel/core": "^7.26.8",
+        "@babel/helper-module-imports": "^7.25.9",
+        "@babel/parser": "^7.28.5",
+        "@babel/preset-react": "^7.27.1",
+        "@babel/preset-typescript": "^7.26.0",
+        "@babel/traverse": "^7.26.8",
+        "@babel/types": "^7.26.8",
+        "@csstools/css-tokenizer": "^3.0.3",
+        "postcss-value-parser": "^4.1.0"
+      },
+      "peerDependencies": {}
+    },
+    {
+      "name": "@pandamstyle/core",
+      "version": "0.1.0",
+      "tarball": "pandamstyle-core-0.1.0.tgz",
+      "packedBytes": 6397,
+      "fileCount": 10,
+      "exports": {
+        ".": {
+          "types": "./src/types.ts",
+          "import": "./src/index.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "dependencies": {},
+      "peerDependencies": {}
+    },
+    {
+      "name": "@pandamstyle/vite",
+      "version": "0.1.0",
+      "tarball": "pandamstyle-vite-0.1.0.tgz",
+      "packedBytes": 10817,
+      "fileCount": 5,
+      "exports": {
+        ".": {
+          "types": "./types/index.d.ts",
+          "import": "./src/index.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "dependencies": {
+        "@pandamstyle/compiler": "0.1.0"
+      },
+      "peerDependencies": {
+        "vite": "7.3.2"
+      }
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "pass": true,
+  "peer": "7.3.2",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "imports": [
+    "node:crypto",
+    "node:fs",
+    "node:fs/promises",
+    "node:path",
+    "node:url",
+    "@pandamstyle/compiler",
+    "@pandamstyle/compiler/host"
+  ],
+  "privateCompilerImportCount": 0,
+  "matrix": [
+    {
+      "node": "v20.0.0",
+      "import": "passed",
+      "construction": "passed",
+      "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+      "privateSubpath": "rejected",
+      "integrationSupported": false,
+      "reason": "Node 20.0.0 is below Vite 7.3.2 upstream engines; adapter import alone does not qualify Vite runtime",
+      "durationMs": 176.667
+    },
+    {
+      "node": "v20.19.0",
+      "import": "passed",
+      "construction": "passed",
+      "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+      "privateSubpath": "rejected",
+      "integrationSupported": true,
+      "dev": "passed",
+      "transform": "passed",
+      "production": "passed",
+      "canonicalSet": "passed",
+      "durationMs": 934.399
+    },
+    {
+      "node": "v22.12.0",
+      "import": "passed",
+      "construction": "passed",
+      "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+      "privateSubpath": "rejected",
+      "integrationSupported": true,
+      "dev": "passed",
+      "transform": "passed",
+      "production": "passed",
+      "canonicalSet": "passed",
+      "durationMs": 3045.111
+    },
+    {
+      "node": "v22.22.0",
+      "import": "passed",
+      "construction": "passed",
+      "realpath": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite",
+      "privateSubpath": "rejected",
+      "integrationSupported": true,
+      "dev": "passed",
+      "transform": "passed",
+      "production": "passed",
+      "canonicalSet": "passed",
+      "durationMs": 935.802
+    }
+  ],
+  "types": "passed"
+}

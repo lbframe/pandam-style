@@ -1,0 +1,7 @@
+{
+  "failedGate": "pilot",
+  "cause": "Overbroad node: matcher matched React object property {node:n}",
+  "fixCommit": "487ddeef5233d778f7fb50296b369e950584e003",
+  "fix": "Match quoted Node specifiers; retain compiler/Vite/Babel/donor checks",
+  "verification": "Full ten-step verifier rerun on corrected clean commit; earlier evidence is not reused as final qualification"
+}

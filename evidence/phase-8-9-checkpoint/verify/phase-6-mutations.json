@@ -1,0 +1,136 @@
+{
+  "documentKind": "pandamstyle-phase-6-design-system-mutation-performance",
+  "revisionCount": 13,
+  "designSystemBuildCount": 13,
+  "globalFallbackCount": 12,
+  "phaseDurationsMs": {
+    "ds_build_registry_ms": 1.287916,
+    "ds_token_compile_ms": 0.762226,
+    "atomic_lower_ms": 4.521385,
+    "policy_ms": 1.836192,
+    "ds_recipe_compile_ms": 5.762594,
+    "ds_snapshot_build_ms": 2.765437,
+    "ds_manifest_ms": 0.00827,
+    "boundary_ms": 10.979818,
+    "ds_module_codegen_ms": 1.086646,
+    "ds_types_codegen_ms": 2.445994,
+    "io_ms": 0.282923,
+    "session_scan_ms": 1.496548,
+    "session_resolve_ms": 0.756736,
+    "session_closure_ms": 39.642365,
+    "session_dsv_view_ms": 26.297932,
+    "semantic_ms": 10.569892,
+    "recipe_ms": 1.126033,
+    "ir_lower_ms": 14.969724,
+    "session_compile_files_ms": 104.292721,
+    "publish_prepare_ms": 10.463906,
+    "publish_materialize_ms": 4.961069,
+    "rule_sort_ms": 0.553294,
+    "styleq_ms": 0.132232,
+    "css_join_ms": 0.629141,
+    "css_serialize_ms": 1.890601,
+    "session_aggregate_ms": 1.960661,
+    "build_report_build_ms": 0.138701,
+    "ds_manifest_codegen_ms": 0.268314,
+    "ds_artifact_set_ms": 1.588239,
+    "publish_cleanup_ms": 71.470492,
+    "publish_commit_ms": 75.994571,
+    "publish_ms": 100.08806,
+    "publish_io_ms": 80.562488
+  },
+  "revisions": [
+    {
+      "revision": "initial",
+      "applyElapsedMs": null,
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "artifactSetBytes": 22978
+    },
+    {
+      "revision": "token-added",
+      "applyElapsedMs": 1.526159,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 23218
+    },
+    {
+      "revision": "token-removed",
+      "applyElapsedMs": 1.285587,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 22994
+    },
+    {
+      "revision": "token-renamed",
+      "applyElapsedMs": 1.341398,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 23239
+    },
+    {
+      "revision": "token-category-changed",
+      "applyElapsedMs": 1.473479,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 23344
+    },
+    {
+      "revision": "semantic-alias-retargeted",
+      "applyElapsedMs": 1.352688,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 23341
+    },
+    {
+      "revision": "theme-override-changed",
+      "applyElapsedMs": 1.290108,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 23336
+    },
+    {
+      "revision": "condition-definition-changed",
+      "applyElapsedMs": 1.251798,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 23412
+    },
+    {
+      "revision": "recipe-axis-added",
+      "applyElapsedMs": 1.363648,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 24197
+    },
+    {
+      "revision": "recipe-axis-removed",
+      "applyElapsedMs": 1.155897,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 23412
+    },
+    {
+      "revision": "recipe-domain-changed",
+      "applyElapsedMs": 1.256698,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 23950
+    },
+    {
+      "revision": "private-recipe-made-public",
+      "applyElapsedMs": 1.233348,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 26070
+    },
+    {
+      "revision": "recipe-made-private",
+      "applyElapsedMs": 1.182987,
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "artifactSetBytes": 23950
+    }
+  ],
+  "artifactSetBytesLastRevision": 23950,
+  "memoryBytes": 961371336
+}

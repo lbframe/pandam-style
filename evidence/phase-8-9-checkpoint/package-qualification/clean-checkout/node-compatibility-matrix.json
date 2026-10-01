@@ -1,0 +1,181 @@
+{
+  "compilerCore": [
+    {
+      "label": "repository-node",
+      "node": "v22.22.0",
+      "esmImportsRuntimeConfigHost": "passed",
+      "externalRealpaths": "passed",
+      "coreRuntimeAndAbiErrors": "passed",
+      "canonicalArtifactIdentity": "passed",
+      "esmSmokeElapsedMs": 506.698,
+      "cliBuild": "passed",
+      "cliBuildElapsedMs": 308.607,
+      "smoke": {
+        "resolved": {
+          "@pandamstyle/core": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/core/src/index.js",
+          "@pandamstyle/compiler": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/compiler/lib/index.mjs",
+          "@pandamstyle/compiler/config": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/compiler/lib/config.mjs",
+          "@pandamstyle/compiler/host": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/compiler/lib/host.mjs",
+          "@pandamstyle/compiler/package.json": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/compiler/package.json"
+        },
+        "exports": {
+          "core": [
+            "ABI_VERSION",
+            "PmsSelectionError",
+            "assertAbi",
+            "defineRecipeSelector",
+            "props"
+          ],
+          "compiler": [
+            "COMPILER_ABI_VERSION",
+            "Codes",
+            "DIAGNOSTICS_RESULT_KIND",
+            "DIAGNOSTICS_RESULT_SCHEMA_VERSION",
+            "PmsError",
+            "createProjectSession",
+            "formatDiagnostic"
+          ],
+          "config": [
+            "defineConfig",
+            "token"
+          ],
+          "host": [
+            "createHostBridge"
+          ]
+        },
+        "privateSubpathsRejected": [
+          "@pandamstyle/core/src/props.js",
+          "@pandamstyle/compiler/lib/index.mjs",
+          "@pandamstyle/compiler/private"
+        ],
+        "runtime": "passed",
+        "abiMismatchCode": "PMS_ABI_MISMATCH",
+        "artifactSet": "f63cb355037608552b877c3ef91baeef43cfe794620aaba72ffb7a213417a089",
+        "canonicalArtifacts": [
+          "design.js",
+          "design.d.ts",
+          "manifest.json",
+          "styles.css",
+          "artifacts.json"
+        ]
+      },
+      "cliOutput": "pandamstyle build ok registryDigest=2787949e69dc8110 files=2 cssBytes=1175"
+    },
+    {
+      "label": "minimum-node",
+      "node": "v20.0.0",
+      "esmImportsRuntimeConfigHost": "passed",
+      "externalRealpaths": "passed",
+      "coreRuntimeAndAbiErrors": "passed",
+      "canonicalArtifactIdentity": "passed",
+      "esmSmokeElapsedMs": 463.777,
+      "cliBuild": "passed",
+      "cliBuildElapsedMs": 287.222,
+      "smoke": {
+        "resolved": {
+          "@pandamstyle/core": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/core/src/index.js",
+          "@pandamstyle/compiler": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/compiler/lib/index.mjs",
+          "@pandamstyle/compiler/config": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/compiler/lib/config.mjs",
+          "@pandamstyle/compiler/host": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/compiler/lib/host.mjs",
+          "@pandamstyle/compiler/package.json": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/compiler/package.json"
+        },
+        "exports": {
+          "core": [
+            "ABI_VERSION",
+            "PmsSelectionError",
+            "assertAbi",
+            "defineRecipeSelector",
+            "props"
+          ],
+          "compiler": [
+            "COMPILER_ABI_VERSION",
+            "Codes",
+            "DIAGNOSTICS_RESULT_KIND",
+            "DIAGNOSTICS_RESULT_SCHEMA_VERSION",
+            "PmsError",
+            "createProjectSession",
+            "formatDiagnostic"
+          ],
+          "config": [
+            "defineConfig",
+            "token"
+          ],
+          "host": [
+            "createHostBridge"
+          ]
+        },
+        "privateSubpathsRejected": [
+          "@pandamstyle/core/src/props.js",
+          "@pandamstyle/compiler/lib/index.mjs",
+          "@pandamstyle/compiler/private"
+        ],
+        "runtime": "passed",
+        "abiMismatchCode": "PMS_ABI_MISMATCH",
+        "artifactSet": "f63cb355037608552b877c3ef91baeef43cfe794620aaba72ffb7a213417a089",
+        "canonicalArtifacts": [
+          "design.js",
+          "design.d.ts",
+          "manifest.json",
+          "styles.css",
+          "artifacts.json"
+        ]
+      },
+      "cliOutput": "pandamstyle build ok registryDigest=2787949e69dc8110 files=2 cssBytes=1175"
+    }
+  ],
+  "vite": [
+    {
+      "node": "v20.0.0",
+      "import": "passed",
+      "construction": "passed",
+      "realpath": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/vite",
+      "privateSubpath": "rejected",
+      "integrationSupported": false,
+      "reason": "Node 20.0.0 is below Vite 7.3.2 upstream engines; adapter import alone does not qualify Vite runtime",
+      "durationMs": 179.035
+    },
+    {
+      "node": "v20.19.0",
+      "import": "passed",
+      "construction": "passed",
+      "realpath": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/vite",
+      "privateSubpath": "rejected",
+      "integrationSupported": true,
+      "dev": "passed",
+      "transform": "passed",
+      "production": "passed",
+      "canonicalSet": "passed",
+      "durationMs": 638.2
+    },
+    {
+      "node": "v22.12.0",
+      "import": "passed",
+      "construction": "passed",
+      "realpath": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/vite",
+      "privateSubpath": "rejected",
+      "integrationSupported": true,
+      "dev": "passed",
+      "transform": "passed",
+      "production": "passed",
+      "canonicalSet": "passed",
+      "durationMs": 631.669
+    },
+    {
+      "node": "v22.22.0",
+      "import": "passed",
+      "construction": "passed",
+      "realpath": "/tmp/pandamstyle-phase-8-9-o5Kxta/consumer/node_modules/@pandamstyle/vite",
+      "privateSubpath": "rejected",
+      "integrationSupported": true,
+      "dev": "passed",
+      "transform": "passed",
+      "production": "passed",
+      "canonicalSet": "passed",
+      "durationMs": 622.933
+    }
+  ],
+  "compilerEngines": ">=20.0.0",
+  "viteEngines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

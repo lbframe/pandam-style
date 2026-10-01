@@ -1,0 +1,59 @@
+{
+  "testedCommit": "487ddeef5233d778f7fb50296b369e950584e003",
+  "testedTree": "eff7e713ea9a7ba6a8cb7ee2a5498cf6653d680e",
+  "qualificationPassed": true,
+  "requiredStepCount": 10,
+  "packages": [
+    "@pandamstyle/core",
+    "@pandamstyle/compiler",
+    "@pandamstyle/vite"
+  ],
+  "realpaths": {
+    "@pandamstyle/core": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/core",
+    "@pandamstyle/compiler": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/compiler",
+    "@pandamstyle/vite": "/tmp/pandamstyle-phase-8-9-wXnbXO/consumer/node_modules/@pandamstyle/vite"
+  },
+  "privateCompilerImportCount": 0,
+  "nodeSupportTruthful": true,
+  "phase8SdkExtensions": {
+    "sourceOverlays": "passed",
+    "sourceDigest": "passed",
+    "readGeneratedArtifacts": "passed"
+  },
+  "dev": {
+    "coldDevServerReadyMs": 327.65352,
+    "firstTransformMs": 22.07785100000001,
+    "initialCssDigest": "06cf5ae91c4ed923b6d409c173b70a74eb66f14d063f0c25e3159254ede67908",
+    "matrixRows": 30,
+    "revisionEvents": 33,
+    "hmrUpdates": 9,
+    "fullReloads": 21
+  },
+  "failureInjectionPoints": [
+    "invalid-source-before-transform",
+    "transform",
+    "renderStart",
+    "generateBundle",
+    "writeBundle",
+    "commitPrepared",
+    "edit-during-prepared-publication",
+    "build.write-false",
+    "multiple-outputs"
+  ],
+  "semanticOracle": {
+    "caseCount": 129,
+    "mustPreserveCount": 125,
+    "knownGapCount": 0,
+    "deferredCount": 4,
+    "failedCount": 0,
+    "unknownCount": 0
+  },
+  "browserSsrCases": 6,
+  "protectedWorktreesUnchanged": true,
+  "mainUnchanged": true,
+  "finalGitDelivery": "complete only after evidence closure commit, push and readback",
+  "phase10Implementation": "absent",
+  "pr": false,
+  "merge": false,
+  "publish": false
+}

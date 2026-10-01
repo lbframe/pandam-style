@@ -1,0 +1,2198 @@
+{
+  "testedCommit": "487ddeef5233d778f7fb50296b369e950584e003",
+  "testedTree": "eff7e713ea9a7ba6a8cb7ee2a5498cf6653d680e",
+  "pass": true,
+  "dev": [
+    {
+      "label": "one-file style edit and existing atom edit",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 1
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 2
+      },
+      "generationBefore": 1,
+      "generationAfter": 2,
+      "invalidatedModules": [
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx"
+      ],
+      "mutation": {
+        "changed": [
+          "src/pages/App.jsx"
+        ],
+        "added": [],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "hmr",
+      "counters": {
+        "filesChanged": 1,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 3,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 5,
+        "fileStateCount": 5,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 2
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-2"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-2",
+      "hostQueueWaitMs": 0.6883340000000544,
+      "hostValidationMs": 15.505809,
+      "projectDiagnosticsMs": 15.577749,
+      "hostCompileMs": 3.5010519999999588,
+      "hostCssSettledMs": 20.44509000000005,
+      "cssDigest": "e3858b85ae2026bd6902f0b025d996a6af37efc57e969e5fe40d4f9917420ac3",
+      "hmrMessages": [
+        {
+          "type": "update",
+          "updates": [
+            {
+              "type": "js-update",
+              "timestamp": 1790891923629,
+              "path": "/src/pages/App.jsx",
+              "acceptedPath": "/src/pages/App.jsx",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "new atom",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 2
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 3
+      },
+      "generationBefore": 2,
+      "generationAfter": 3,
+      "invalidatedModules": [
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx"
+      ],
+      "mutation": {
+        "changed": [
+          "src/pages/App.jsx"
+        ],
+        "added": [],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "hmr",
+      "counters": {
+        "filesChanged": 1,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 3,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 5,
+        "fileStateCount": 5,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 3
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-3"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-3",
+      "hostQueueWaitMs": 0.37551200000007157,
+      "hostValidationMs": 15.1755169999999,
+      "projectDiagnosticsMs": 15.278037,
+      "hostCompileMs": 2.8672780000000557,
+      "hostCssSettledMs": 19.192011999999977,
+      "cssDigest": "b17aa346ac89b8fd3255eeccf2de443256f769fe71191eb2d36c9baafe4537cb",
+      "hmrMessages": [
+        {
+          "type": "update",
+          "updates": [
+            {
+              "type": "js-update",
+              "timestamp": 1790891923757,
+              "path": "/src/pages/App.jsx",
+              "acceptedPath": "/src/pages/App.jsx",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "import edit",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 3
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 4
+      },
+      "generationBefore": 3,
+      "generationAfter": 4,
+      "invalidatedModules": [
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx"
+      ],
+      "mutation": {
+        "changed": [
+          "src/pages/App.jsx"
+        ],
+        "added": [],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "hmr",
+      "counters": {
+        "filesChanged": 1,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 3,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 1,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 5,
+        "fileStateCount": 5,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 4
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-4"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-4",
+      "hostQueueWaitMs": 0.2743520000000217,
+      "hostValidationMs": 13.492876000000024,
+      "projectDiagnosticsMs": 13.539076,
+      "hostCompileMs": 2.750417000000084,
+      "hostCssSettledMs": 17.128878999999984,
+      "cssDigest": "b17aa346ac89b8fd3255eeccf2de443256f769fe71191eb2d36c9baafe4537cb",
+      "hmrMessages": [
+        {
+          "type": "update",
+          "updates": [
+            {
+              "type": "js-update",
+              "timestamp": 1790891923880,
+              "path": "/src/pages/App.jsx",
+              "acceptedPath": "/src/pages/App.jsx",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "import edit restore",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 4
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 5
+      },
+      "generationBefore": 4,
+      "generationAfter": 5,
+      "invalidatedModules": [
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx"
+      ],
+      "mutation": {
+        "changed": [
+          "src/pages/App.jsx"
+        ],
+        "added": [],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "hmr",
+      "counters": {
+        "filesChanged": 1,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 3,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 1,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 5,
+        "fileStateCount": 5,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 5
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-5"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-5",
+      "hostQueueWaitMs": 0.3039019999999937,
+      "hostValidationMs": 11.184800999999993,
+      "projectDiagnosticsMs": 11.115011,
+      "hostCompileMs": 2.510776000000078,
+      "hostCssSettledMs": 14.582232999999974,
+      "cssDigest": "b17aa346ac89b8fd3255eeccf2de443256f769fe71191eb2d36c9baafe4537cb",
+      "hmrMessages": [
+        {
+          "type": "update",
+          "updates": [
+            {
+              "type": "js-update",
+              "timestamp": 1790891923982,
+              "path": "/src/pages/App.jsx",
+              "acceptedPath": "/src/pages/App.jsx",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "watcher edit while transform is pending",
+      "revisionBefore": null,
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 8
+      },
+      "transformRevision": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 7
+      },
+      "transformedSourceDigest": "502c2bceec5484fb9f2789314dd557e2b1043734cc0242bc54d77b6a8cc11705",
+      "expectedSourceDigests": [
+        "502c2bceec5484fb9f2789314dd557e2b1043734cc0242bc54d77b6a8cc11705",
+        "7848488d7c3fc36b7a0c1dc2c692c4123def7302044a120f286446588821646f"
+      ],
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-7",
+      "settledSourceDigest": "7848488d7c3fc36b7a0c1dc2c692c4123def7302044a120f286446588821646f",
+      "settledCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-8",
+      "revisionEvents": [
+        {
+          "revisionBefore": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 5
+          },
+          "revisionAfter": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 6
+          },
+          "generationBefore": 5,
+          "generationAfter": 6,
+          "hostQueueWaitMs": 0.3176019999999653,
+          "hostValidationMs": 11.484953000000019,
+          "hostCompileMs": 2.5611659999999574,
+          "projectDiagnosticsMs": 11.585633,
+          "hostCssSettledMs": 14.935394999999971,
+          "counters": {
+            "filesChanged": 1,
+            "filesAdded": 0,
+            "filesRemoved": 0,
+            "filesReparsed": 1,
+            "filesRecompiled": 1,
+            "filesCompiled": 1,
+            "filesReused": 3,
+            "coverageSummariesReused": 0,
+            "coverageSummariesRebuilt": 1,
+            "reverseDependentsInvalidated": 0,
+            "negativeResolutionsInvalidated": 0,
+            "fullFallback": 0,
+            "fullFallbackReason": null,
+            "newlyCoveredFiles": 0,
+            "coveredFileCount": 5,
+            "fileStateCount": 5,
+            "dirtyFilesDeclared": 1,
+            "dirtyFilesRead": 1,
+            "dirtyFilesHashed": 1,
+            "dirtyFilesUnchanged": 0
+          },
+          "fullFallback": false,
+          "fullFallbackReason": null,
+          "mutation": {
+            "changed": [
+              "src/pages/App.jsx"
+            ],
+            "added": [],
+            "removed": [],
+            "renamed": []
+          },
+          "invalidatedModules": [
+            "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx",
+            "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-race=1790891924083"
+          ],
+          "outcome": "hmr"
+        },
+        {
+          "revisionBefore": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 6
+          },
+          "revisionAfter": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 7
+          },
+          "generationBefore": 6,
+          "generationAfter": 7,
+          "hostQueueWaitMs": 0.3305330000000595,
+          "hostValidationMs": 11.636704000000009,
+          "hostCompileMs": 3.401431999999886,
+          "projectDiagnosticsMs": 11.662584,
+          "hostCssSettledMs": 15.893822,
+          "counters": {
+            "filesChanged": 1,
+            "filesAdded": 0,
+            "filesRemoved": 0,
+            "filesReparsed": 1,
+            "filesRecompiled": 1,
+            "filesCompiled": 1,
+            "filesReused": 3,
+            "coverageSummariesReused": 0,
+            "coverageSummariesRebuilt": 1,
+            "reverseDependentsInvalidated": 0,
+            "negativeResolutionsInvalidated": 0,
+            "fullFallback": 0,
+            "fullFallbackReason": null,
+            "newlyCoveredFiles": 0,
+            "coveredFileCount": 5,
+            "fileStateCount": 5,
+            "dirtyFilesDeclared": 1,
+            "dirtyFilesRead": 1,
+            "dirtyFilesHashed": 1,
+            "dirtyFilesUnchanged": 0
+          },
+          "fullFallback": false,
+          "fullFallbackReason": null,
+          "invalidatedModules": [
+            "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx"
+          ],
+          "outcome": "full-reload"
+        },
+        {
+          "revisionBefore": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 7
+          },
+          "revisionAfter": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 8
+          },
+          "generationBefore": 7,
+          "generationAfter": 8,
+          "hostQueueWaitMs": 0.30074199999990014,
+          "hostValidationMs": 9.184578000000101,
+          "hostCompileMs": 2.5028259999999136,
+          "projectDiagnosticsMs": 9.34138,
+          "hostCssSettledMs": 12.53977000000009,
+          "counters": {
+            "filesChanged": 1,
+            "filesAdded": 0,
+            "filesRemoved": 0,
+            "filesReparsed": 1,
+            "filesRecompiled": 1,
+            "filesCompiled": 1,
+            "filesReused": 3,
+            "coverageSummariesReused": 0,
+            "coverageSummariesRebuilt": 1,
+            "reverseDependentsInvalidated": 0,
+            "negativeResolutionsInvalidated": 0,
+            "fullFallback": 0,
+            "fullFallbackReason": null,
+            "newlyCoveredFiles": 0,
+            "coveredFileCount": 5,
+            "fileStateCount": 5,
+            "dirtyFilesDeclared": 1,
+            "dirtyFilesRead": 1,
+            "dirtyFilesHashed": 1,
+            "dirtyFilesUnchanged": 0
+          },
+          "fullFallback": false,
+          "fullFallbackReason": null,
+          "invalidatedModules": [
+            "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx"
+          ],
+          "outcome": "full-reload"
+        }
+      ],
+      "outcome": "serialized"
+    },
+    {
+      "label": "rapid edit burst",
+      "revisions": [
+        {
+          "revisionBefore": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 8
+          },
+          "revisionAfter": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 9
+          },
+          "generationBefore": 8,
+          "generationAfter": 9,
+          "outcome": "hmr",
+          "counters": {
+            "filesChanged": 1,
+            "filesAdded": 0,
+            "filesRemoved": 0,
+            "filesReparsed": 1,
+            "filesRecompiled": 1,
+            "filesCompiled": 1,
+            "filesReused": 3,
+            "coverageSummariesReused": 0,
+            "coverageSummariesRebuilt": 1,
+            "reverseDependentsInvalidated": 0,
+            "negativeResolutionsInvalidated": 0,
+            "fullFallback": 0,
+            "fullFallbackReason": null,
+            "newlyCoveredFiles": 0,
+            "coveredFileCount": 5,
+            "fileStateCount": 5,
+            "dirtyFilesDeclared": 1,
+            "dirtyFilesRead": 1,
+            "dirtyFilesHashed": 1,
+            "dirtyFilesUnchanged": 0
+          },
+          "fullFallback": false
+        }
+      ],
+      "finalSourceDigest": "0a242a955f0ea841c567e7761274090a74823f70acd1e503ac42c5df3f192f1b",
+      "finalCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-10",
+      "finalCssDigest": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a"
+    },
+    {
+      "label": "module add",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 10
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 11
+      },
+      "generationBefore": 10,
+      "generationAfter": 11,
+      "invalidatedModules": [],
+      "mutation": {
+        "changed": [],
+        "added": [
+          "src/pages/Added.jsx"
+        ],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "full-reload",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 1,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 4,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 1,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 11
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-11"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-11",
+      "hostQueueWaitMs": 0.5268129999999474,
+      "hostValidationMs": 3.6901840000000448,
+      "projectDiagnosticsMs": 4.001265,
+      "hostCompileMs": 2.664177000000109,
+      "hostCssSettledMs": 7.390366999999969,
+      "cssDigest": "bae0d2fd2d6356b73049e8d58fd6e12383a60451cd6a5b1d66251c97dd8be0ad",
+      "hmrMessages": [
+        {
+          "type": "full-reload"
+        }
+      ]
+    },
+    {
+      "label": "shared rule owner A added",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 11
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 12
+      },
+      "generationBefore": 11,
+      "generationAfter": 12,
+      "invalidatedModules": [],
+      "mutation": {
+        "changed": [],
+        "added": [
+          "src/pages/SharedA.jsx"
+        ],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "full-reload",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 1,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 5,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 1,
+        "coveredFileCount": 7,
+        "fileStateCount": 7,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 12
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-12"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-12",
+      "hostQueueWaitMs": 0.2499920000000202,
+      "hostValidationMs": 3.070118999999977,
+      "projectDiagnosticsMs": 3.16515,
+      "hostCompileMs": 2.307405000000017,
+      "hostCssSettledMs": 6.1255089999999655,
+      "cssDigest": "7b50b9876b03ec09e194c0a07797ba352cad5098a7bfec11640c4dbf936cb42d",
+      "hmrMessages": [
+        {
+          "type": "full-reload"
+        }
+      ]
+    },
+    {
+      "label": "shared rule owner B added",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 12
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 13
+      },
+      "generationBefore": 12,
+      "generationAfter": 13,
+      "invalidatedModules": [],
+      "mutation": {
+        "changed": [],
+        "added": [
+          "src/pages/SharedB.jsx"
+        ],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "full-reload",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 1,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 6,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 1,
+        "coveredFileCount": 8,
+        "fileStateCount": 8,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 13
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-13"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-13",
+      "hostQueueWaitMs": 0.1898310000001402,
+      "hostValidationMs": 2.9833889999999883,
+      "projectDiagnosticsMs": 3.04372,
+      "hostCompileMs": 134.7444800000003,
+      "hostCssSettledMs": 138.40327300000035,
+      "cssDigest": "7b50b9876b03ec09e194c0a07797ba352cad5098a7bfec11640c4dbf936cb42d",
+      "hmrMessages": [
+        {
+          "type": "full-reload"
+        }
+      ]
+    },
+    {
+      "label": "shared rule owner A removed",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 13
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 14
+      },
+      "generationBefore": 13,
+      "generationAfter": 14,
+      "invalidatedModules": [],
+      "mutation": {
+        "changed": [],
+        "added": [],
+        "removed": [
+          "src/pages/SharedA.jsx"
+        ],
+        "renamed": []
+      },
+      "outcome": "full-reload",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 1,
+        "filesReparsed": 0,
+        "filesRecompiled": 0,
+        "filesCompiled": 0,
+        "filesReused": 6,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 7,
+        "fileStateCount": 7,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 14
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-14"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-14",
+      "hostQueueWaitMs": 0.19770100000005186,
+      "hostValidationMs": 0.41184300000031726,
+      "projectDiagnosticsMs": 0.444322,
+      "hostCompileMs": 28.044398999999885,
+      "hostCssSettledMs": 29.23367700000017,
+      "cssDigest": "7b50b9876b03ec09e194c0a07797ba352cad5098a7bfec11640c4dbf936cb42d",
+      "hmrMessages": [
+        {
+          "type": "full-reload"
+        }
+      ]
+    },
+    {
+      "label": "last shared rule owner removed",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 14
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 15
+      },
+      "generationBefore": 14,
+      "generationAfter": 15,
+      "invalidatedModules": [],
+      "mutation": {
+        "changed": [],
+        "added": [],
+        "removed": [
+          "src/pages/SharedB.jsx"
+        ],
+        "renamed": []
+      },
+      "outcome": "full-reload",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 1,
+        "filesReparsed": 0,
+        "filesRecompiled": 0,
+        "filesCompiled": 0,
+        "filesReused": 5,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 15
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-15"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-15",
+      "hostQueueWaitMs": 0.1764719999996487,
+      "hostValidationMs": 0.2557310000001962,
+      "projectDiagnosticsMs": 0.301332,
+      "hostCompileMs": 154.1288239999999,
+      "hostCssSettledMs": 155.08953999999994,
+      "cssDigest": "bae0d2fd2d6356b73049e8d58fd6e12383a60451cd6a5b1d66251c97dd8be0ad",
+      "hmrMessages": [
+        {
+          "type": "full-reload"
+        }
+      ]
+    },
+    {
+      "label": "dependent module import added",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 15
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 16
+      },
+      "generationBefore": 15,
+      "generationAfter": 16,
+      "invalidatedModules": [
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-race=1790891924083",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-race-settled=1790891924389",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-burst=1790891924727"
+      ],
+      "mutation": {
+        "changed": [
+          "src/pages/App.jsx"
+        ],
+        "added": [],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "hmr",
+      "counters": {
+        "filesChanged": 1,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 4,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 1,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 16
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-16"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-16",
+      "hostQueueWaitMs": 0.15914100000009057,
+      "hostValidationMs": 8.029620999999679,
+      "projectDiagnosticsMs": 8.079482,
+      "hostCompileMs": 222.60795100000087,
+      "hostCssSettledMs": 231.32452599999942,
+      "cssDigest": "bae0d2fd2d6356b73049e8d58fd6e12383a60451cd6a5b1d66251c97dd8be0ad",
+      "hmrMessages": [
+        {
+          "type": "update",
+          "updates": [
+            {
+              "type": "js-update",
+              "timestamp": 1790891927252,
+              "path": "/src/pages/App.jsx",
+              "acceptedPath": "/src/pages/App.jsx",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891927252,
+              "path": "/src/pages/App.jsx?phase8-race=1790891924083",
+              "acceptedPath": "/src/pages/App.jsx?phase8-race=1790891924083",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891927252,
+              "path": "/src/pages/App.jsx?phase8-race-settled=1790891924389",
+              "acceptedPath": "/src/pages/App.jsx?phase8-race-settled=1790891924389",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891927252,
+              "path": "/src/pages/App.jsx?phase8-burst=1790891924727",
+              "acceptedPath": "/src/pages/App.jsx?phase8-burst=1790891924727",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "module rename with dependent import edit",
+      "revisions": [
+        {
+          "revisionBefore": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 16
+          },
+          "revisionAfter": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 17
+          },
+          "generationBefore": 16,
+          "generationAfter": 17,
+          "hostQueueWaitMs": 0.3718930000004548,
+          "hostValidationMs": 9.433599999999387,
+          "hostCompileMs": 51.11317599999984,
+          "projectDiagnosticsMs": 9.503921,
+          "hostCssSettledMs": 61.44955300000038,
+          "counters": {
+            "filesChanged": 0,
+            "filesAdded": 1,
+            "filesRemoved": 1,
+            "filesReparsed": 2,
+            "filesRecompiled": 2,
+            "filesCompiled": 2,
+            "filesReused": 3,
+            "coverageSummariesReused": 0,
+            "coverageSummariesRebuilt": 3,
+            "reverseDependentsInvalidated": 1,
+            "negativeResolutionsInvalidated": 1,
+            "fullFallback": 0,
+            "fullFallbackReason": null,
+            "newlyCoveredFiles": 1,
+            "coveredFileCount": 6,
+            "fileStateCount": 6,
+            "dirtyFilesDeclared": 2,
+            "dirtyFilesRead": 1,
+            "dirtyFilesHashed": 1,
+            "dirtyFilesUnchanged": 0
+          },
+          "fullFallback": false,
+          "fullFallbackReason": null,
+          "mutation": {
+            "changed": [],
+            "added": [],
+            "removed": [],
+            "renamed": [
+              {
+                "from": "src/pages/Added.jsx",
+                "to": "src/pages/Renamed.jsx"
+              }
+            ]
+          },
+          "invalidatedModules": [],
+          "outcome": "full-reload"
+        },
+        {
+          "revisionBefore": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 17
+          },
+          "revisionAfter": {
+            "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+            "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+            "revisionId": 18
+          },
+          "generationBefore": 17,
+          "generationAfter": 18,
+          "hostQueueWaitMs": 0.15647100000023784,
+          "hostValidationMs": 5.559976000000461,
+          "hostCompileMs": 127.5742339999997,
+          "projectDiagnosticsMs": 5.602046,
+          "hostCssSettledMs": 133.77417400000013,
+          "counters": {
+            "filesChanged": 0,
+            "filesAdded": 0,
+            "filesRemoved": 0,
+            "filesReparsed": 0,
+            "filesRecompiled": 1,
+            "filesCompiled": 1,
+            "filesReused": 4,
+            "coverageSummariesReused": 0,
+            "coverageSummariesRebuilt": 0,
+            "reverseDependentsInvalidated": 0,
+            "negativeResolutionsInvalidated": 0,
+            "fullFallback": 0,
+            "fullFallbackReason": null,
+            "newlyCoveredFiles": 0,
+            "coveredFileCount": 6,
+            "fileStateCount": 6,
+            "dirtyFilesDeclared": 1,
+            "dirtyFilesRead": 1,
+            "dirtyFilesHashed": 1,
+            "dirtyFilesUnchanged": 1
+          },
+          "fullFallback": false,
+          "fullFallbackReason": null,
+          "mutation": {
+            "changed": [
+              "src/pages/App.jsx"
+            ],
+            "added": [],
+            "removed": [],
+            "renamed": []
+          },
+          "invalidatedModules": [
+            "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx",
+            "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-race=1790891924083",
+            "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-race-settled=1790891924389",
+            "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-burst=1790891924727"
+          ],
+          "outcome": "hmr"
+        }
+      ],
+      "finalTransformRevision": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 18
+      },
+      "finalSourceDigest": "71b32b0de6858c33f6911385b30f16c7a24a43bcbbb984b222192b8228aec457",
+      "finalCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-18",
+      "outcome": "serialized"
+    },
+    {
+      "label": "dependent import restore",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 18
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 19
+      },
+      "generationBefore": 18,
+      "generationAfter": 19,
+      "invalidatedModules": [
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-race=1790891924083",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-race-settled=1790891924389",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-burst=1790891924727",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-rename=1790891928528"
+      ],
+      "mutation": {
+        "changed": [
+          "src/pages/App.jsx"
+        ],
+        "added": [],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "hmr",
+      "counters": {
+        "filesChanged": 1,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 4,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 1,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 19
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-19"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-19",
+      "hostQueueWaitMs": 0.14300100000036764,
+      "hostValidationMs": 7.445687999999791,
+      "projectDiagnosticsMs": 7.424837,
+      "hostCompileMs": 2.9837689999994836,
+      "hostCssSettledMs": 11.124431000000186,
+      "cssDigest": "bae0d2fd2d6356b73049e8d58fd6e12383a60451cd6a5b1d66251c97dd8be0ad",
+      "hmrMessages": [
+        {
+          "type": "update",
+          "updates": [
+            {
+              "type": "js-update",
+              "timestamp": 1790891928542,
+              "path": "/src/pages/App.jsx",
+              "acceptedPath": "/src/pages/App.jsx",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891928542,
+              "path": "/src/pages/App.jsx?phase8-race=1790891924083",
+              "acceptedPath": "/src/pages/App.jsx?phase8-race=1790891924083",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891928542,
+              "path": "/src/pages/App.jsx?phase8-race-settled=1790891924389",
+              "acceptedPath": "/src/pages/App.jsx?phase8-race-settled=1790891924389",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891928542,
+              "path": "/src/pages/App.jsx?phase8-burst=1790891924727",
+              "acceptedPath": "/src/pages/App.jsx?phase8-burst=1790891924727",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891928542,
+              "path": "/src/pages/App.jsx?phase8-rename=1790891928528",
+              "acceptedPath": "/src/pages/App.jsx?phase8-rename=1790891928528",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "module delete",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 19
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 20
+      },
+      "generationBefore": 19,
+      "generationAfter": 20,
+      "invalidatedModules": [],
+      "mutation": {
+        "changed": [],
+        "added": [],
+        "removed": [
+          "src/pages/Renamed.jsx"
+        ],
+        "renamed": []
+      },
+      "outcome": "full-reload",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 1,
+        "filesReparsed": 0,
+        "filesRecompiled": 0,
+        "filesCompiled": 0,
+        "filesReused": 4,
+        "coverageSummariesReused": 1,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 1,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 5,
+        "fileStateCount": 5,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 20
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-20"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-20",
+      "hostQueueWaitMs": 0.16558100000020204,
+      "hostValidationMs": 0.4026130000002013,
+      "projectDiagnosticsMs": 0.437222,
+      "hostCompileMs": 1.960402000000613,
+      "hostCssSettledMs": 2.9383990000005724,
+      "cssDigest": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a",
+      "hmrMessages": [
+        {
+          "type": "full-reload"
+        }
+      ]
+    },
+    {
+      "label": "invalid diagnostic no-publication",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 20
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 21
+      },
+      "generationBefore": 20,
+      "generationAfter": 20,
+      "outcome": "diagnostic",
+      "diagnostics": {
+        "documentKind": "pandamstyle-diagnostics-result",
+        "schemaVersion": 1,
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 21
+        },
+        "designSystem": {
+          "systemId": "pilot@0.1",
+          "registryDigest": "e08d07ae7c36a551"
+        },
+        "abiVersion": 1,
+        "ok": false,
+        "completeness": {
+          "status": "complete",
+          "scope": "declared-project",
+          "discovery": "watcher",
+          "evidence": "watcher-journal",
+          "resyncRequired": false
+        },
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_FORBIDDEN_VALUE",
+            "severity": "error",
+            "phase": "policy",
+            "rule": "category-strict",
+            "message": "Valeur interdite pour gap : \"12px\". Un token spacing est requis.",
+            "source": {
+              "file": "src/pages/App.jsx",
+              "line": 36,
+              "column": 10,
+              "endLine": null,
+              "endColumn": null,
+              "label": null
+            },
+            "location": {
+              "file": "src/pages/App.jsx",
+              "line": 36,
+              "column": 10,
+              "endLine": null,
+              "endColumn": null,
+              "label": null
+            },
+            "role": "page",
+            "context": {
+              "property": "gap",
+              "value": "12px",
+              "systemId": "pilot@0.1",
+              "conditionPath": []
+            },
+            "expected": {
+              "category": "spacing",
+              "visibility": "public",
+              "static": true,
+              "domain": null
+            },
+            "candidates": [
+              {
+                "tokenId": "spacing.lg",
+                "category": "spacing"
+              },
+              {
+                "tokenId": "spacing.md",
+                "category": "spacing"
+              },
+              {
+                "tokenId": "spacing.sm",
+                "category": "spacing"
+              },
+              {
+                "tokenId": "spacing.zero",
+                "category": "spacing"
+              }
+            ],
+            "candidatesTotal": 4,
+            "candidatesTruncated": false,
+            "candidatesQuery": {
+              "method": "candidateTokens",
+              "category": "spacing",
+              "offset": 0,
+              "limit": 32,
+              "revision": {
+                "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+                "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+                "revisionId": 21
+              }
+            },
+            "repair": {
+              "kind": "replace-with-token",
+              "applicable": true,
+              "target": {
+                "property": "gap"
+              },
+              "expected": {
+                "category": "spacing"
+              },
+              "reason": null
+            },
+            "autofix": null,
+            "affectedRegion": {
+              "file": "src/pages/App.jsx",
+              "namespace": null,
+              "property": "gap",
+              "conditionPath": []
+            },
+            "coverage": {
+              "analysed": true,
+              "origin": "root",
+              "failed": true
+            },
+            "revision": {
+              "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+              "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+              "revisionId": 21
+            }
+          }
+        ],
+        "diagnosticsTotal": 1,
+        "diagnosticsTruncated": false,
+        "affected": {
+          "entries": [
+            {
+              "file": "src/pages/App.jsx",
+              "role": "page"
+            }
+          ],
+          "total": 1,
+          "truncated": false
+        },
+        "generation": {
+          "published": false,
+          "generationId": null,
+          "artifactRevision": null,
+          "artifactDigest": null,
+          "associationRevision": null
+        },
+        "milestones": {
+          "diagnosticsReady": true,
+          "generationReady": false,
+          "generationCommitted": false,
+          "auditReportReady": false
+        },
+        "audit": {
+          "requested": false,
+          "materialized": false,
+          "document": null
+        },
+        "incremental": {
+          "fullFallback": false,
+          "reason": null
+        }
+      },
+      "cssDigest": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a"
+    },
+    {
+      "label": "invalid to repair",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 21
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 22
+      },
+      "generationBefore": 20,
+      "generationAfter": 21,
+      "invalidatedModules": [
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-race=1790891924083",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-race-settled=1790891924389",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-burst=1790891924727",
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/App.jsx?phase8-rename=1790891928528"
+      ],
+      "mutation": {
+        "changed": [
+          "src/pages/App.jsx"
+        ],
+        "added": [],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "hmr",
+      "counters": {
+        "filesChanged": 1,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 1,
+        "filesCompiled": 1,
+        "filesReused": 3,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 5,
+        "fileStateCount": 5,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 22
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-22"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-22",
+      "hostQueueWaitMs": 0.15031099999941944,
+      "hostValidationMs": 6.355599999999868,
+      "projectDiagnosticsMs": 6.392161,
+      "hostCompileMs": 2.018822999999429,
+      "hostCssSettledMs": 8.929156999999577,
+      "cssDigest": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a",
+      "hmrMessages": [
+        {
+          "type": "update",
+          "updates": [
+            {
+              "type": "js-update",
+              "timestamp": 1790891929232,
+              "path": "/src/pages/App.jsx",
+              "acceptedPath": "/src/pages/App.jsx",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891929232,
+              "path": "/src/pages/App.jsx?phase8-race=1790891924083",
+              "acceptedPath": "/src/pages/App.jsx?phase8-race=1790891924083",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891929232,
+              "path": "/src/pages/App.jsx?phase8-race-settled=1790891924389",
+              "acceptedPath": "/src/pages/App.jsx?phase8-race-settled=1790891924389",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891929232,
+              "path": "/src/pages/App.jsx?phase8-burst=1790891924727",
+              "acceptedPath": "/src/pages/App.jsx?phase8-burst=1790891924727",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            },
+            {
+              "type": "js-update",
+              "timestamp": 1790891929232,
+              "path": "/src/pages/App.jsx?phase8-rename=1790891928528",
+              "acceptedPath": "/src/pages/App.jsx?phase8-rename=1790891928528",
+              "explicitImportRequired": false,
+              "isWithinCircularImport": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "named re-export to star re-export",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 22
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 23
+      },
+      "generationBefore": 21,
+      "generationAfter": 22,
+      "invalidatedModules": [
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/bridge.js"
+      ],
+      "mutation": {
+        "changed": [
+          "src/pages/bridge.js"
+        ],
+        "added": [],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "hmr",
+      "counters": {
+        "filesChanged": 1,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 1,
+        "filesRecompiled": 2,
+        "filesCompiled": 2,
+        "filesReused": 2,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 1,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 5,
+        "fileStateCount": 5,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 23
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-23"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-23",
+      "hostQueueWaitMs": 0.133031000000301,
+      "hostValidationMs": 8.03461200000038,
+      "projectDiagnosticsMs": 8.069521,
+      "hostCompileMs": 2.0703730000004725,
+      "hostCssSettledMs": 10.655778000000282,
+      "cssDigest": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a",
+      "hmrMessages": [
+        {
+          "type": "full-reload",
+          "triggeredBy": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/bridge.js",
+          "path": "*"
+        }
+      ]
+    },
+    {
+      "label": "unresolved import diagnostic",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 23
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 24
+      },
+      "generationBefore": 22,
+      "generationAfter": 22,
+      "invalidatedModules": [
+        "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app/src/pages/forward.js"
+      ],
+      "mutation": {
+        "changed": [
+          "src/pages/forward.js"
+        ],
+        "added": [],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "diagnostic",
+      "counters": {
+        "filesChanged": 1,
+        "filesAdded": 0,
+        "filesRemoved": 1,
+        "filesReparsed": 1,
+        "filesRecompiled": 0,
+        "filesCompiled": 0,
+        "filesReused": 4,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 1,
+        "reverseDependentsInvalidated": 1,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 4,
+        "fileStateCount": 4,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": null,
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-23",
+      "hostQueueWaitMs": 0.14497099999971397,
+      "hostValidationMs": 1.1344770000005155,
+      "projectDiagnosticsMs": 1.081087,
+      "cssDigest": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a",
+      "hmrMessages": []
+    },
+    {
+      "label": "previously unresolved import becomes resolvable after module add",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 25
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 26
+      },
+      "generationBefore": 22,
+      "generationAfter": 23,
+      "invalidatedModules": [],
+      "mutation": {
+        "changed": [],
+        "added": [
+          "src/pages/missing.js"
+        ],
+        "removed": [],
+        "renamed": []
+      },
+      "outcome": "full-reload",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 1,
+        "filesRemoved": 0,
+        "filesReparsed": 2,
+        "filesRecompiled": 3,
+        "filesCompiled": 3,
+        "filesReused": 2,
+        "coverageSummariesReused": 1,
+        "coverageSummariesRebuilt": 2,
+        "reverseDependentsInvalidated": 1,
+        "negativeResolutionsInvalidated": 1,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 1,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false,
+      "fullFallbackReason": null,
+      "cssUpdate": {
+        "revision": {
+          "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+          "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+          "revisionId": 26
+        },
+        "href": "/__pandamstyle.css?pms=74f16c88-c8f1-4be4-8e8b-714395e7440c-26"
+      },
+      "servedCssRevision": "74f16c88-c8f1-4be4-8e8b-714395e7440c-26",
+      "hostQueueWaitMs": 0.13354100000015023,
+      "hostValidationMs": 11.016770999999608,
+      "projectDiagnosticsMs": 11.05223,
+      "hostCompileMs": 2.132112999999663,
+      "hostCssSettledMs": 13.703647999999703,
+      "cssDigest": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a",
+      "hmrMessages": [
+        {
+          "type": "full-reload"
+        }
+      ]
+    },
+    {
+      "label": "unresolved import repaired by adding its target module",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 25
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 26
+      },
+      "generationBefore": 22,
+      "generationAfter": 23,
+      "outcome": "full-reload",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 1,
+        "filesRemoved": 0,
+        "filesReparsed": 2,
+        "filesRecompiled": 3,
+        "filesCompiled": 3,
+        "filesReused": 2,
+        "coverageSummariesReused": 1,
+        "coverageSummariesRebuilt": 2,
+        "reverseDependentsInvalidated": 1,
+        "negativeResolutionsInvalidated": 1,
+        "fullFallback": 0,
+        "fullFallbackReason": null,
+        "newlyCoveredFiles": 1,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 1,
+        "dirtyFilesRead": 1,
+        "dirtyFilesHashed": 1,
+        "dirtyFilesUnchanged": 0
+      },
+      "fullFallback": false
+    },
+    {
+      "label": "design system token value change",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 26
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 27
+      },
+      "generationBefore": 23,
+      "generationAfter": 24,
+      "outcome": "full-reload",
+      "registryDigestBefore": "e08d07ae7c36a551",
+      "registryDigestAfter": "d72c57bee7ff2b56",
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 0,
+        "filesRecompiled": 5,
+        "filesCompiled": 5,
+        "filesReused": 0,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 0,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 1,
+        "fullFallbackReason": "design-system-definition",
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 0,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "hostQueueWaitMs": 1.678541000000223,
+      "hostValidationMs": 13.215114999999969,
+      "projectDiagnosticsMs": 14.743104,
+      "hostCompileMs": 2.3500850000000355,
+      "cssDigest": "ebabc9bc3c24b91e0c574d96b9954cf001337a2d8c4937a829ceac0c6ed2a5ec",
+      "hostCssSettledMs": 17.66710300000068
+    },
+    {
+      "label": "semantic-token alias change",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 27
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 28
+      },
+      "generationBefore": 24,
+      "generationAfter": 25,
+      "outcome": "full-reload",
+      "registryDigestBefore": "d72c57bee7ff2b56",
+      "registryDigestAfter": "e2cb3af2db799535",
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 0,
+        "filesRecompiled": 5,
+        "filesCompiled": 5,
+        "filesReused": 0,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 0,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 1,
+        "fullFallbackReason": "design-system-definition",
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 0,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "hostQueueWaitMs": 2.152074000000539,
+      "hostValidationMs": 17.319499999999607,
+      "projectDiagnosticsMs": 19.257243,
+      "hostCompileMs": 2.489966000000095,
+      "cssDigest": "182f2f5efb00fb255f5d6ce88a1bd119108d4eff4d274f1bb9996d89bb4c1bdc",
+      "hostCssSettledMs": 22.435123000000203
+    },
+    {
+      "label": "theme change",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 28
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 29
+      },
+      "generationBefore": 25,
+      "generationAfter": 26,
+      "outcome": "full-reload",
+      "registryDigestBefore": "e2cb3af2db799535",
+      "registryDigestAfter": "cc7a575983691cd8",
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 0,
+        "filesRecompiled": 5,
+        "filesCompiled": 5,
+        "filesReused": 0,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 0,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 1,
+        "fullFallbackReason": "design-system-definition",
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 0,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "hostQueueWaitMs": 1.5419499999998152,
+      "hostValidationMs": 15.585000000000036,
+      "projectDiagnosticsMs": 16.962408,
+      "hostCompileMs": 2.404924999999821,
+      "cssDigest": "80ed50570aaa96a4478feb8dd6a76a7b427d64246916bafcbbefbfa2d2ba4326",
+      "hostCssSettledMs": 19.974307999999837
+    },
+    {
+      "label": "condition change",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 29
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 30
+      },
+      "generationBefore": 26,
+      "generationAfter": 27,
+      "outcome": "full-reload",
+      "registryDigestBefore": "cc7a575983691cd8",
+      "registryDigestAfter": "54d4d93801e03edc",
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 0,
+        "filesRecompiled": 5,
+        "filesCompiled": 5,
+        "filesReused": 0,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 0,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 1,
+        "fullFallbackReason": "design-system-definition",
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 0,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "hostQueueWaitMs": 1.5949609999997847,
+      "hostValidationMs": 15.684879999999794,
+      "projectDiagnosticsMs": 17.118019,
+      "hostCompileMs": 2.4757950000002893,
+      "cssDigest": "4292d138c37db31831ae39fdf0223a1989f6093f96bd46b99e4f0bceef78a6c7",
+      "hostCssSettledMs": 20.20415899999989
+    },
+    {
+      "label": "media condition change",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 30
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 31
+      },
+      "generationBefore": 27,
+      "generationAfter": 28,
+      "outcome": "full-reload",
+      "registryDigestBefore": "54d4d93801e03edc",
+      "registryDigestAfter": "013117e52ab92f3f",
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 0,
+        "filesRecompiled": 5,
+        "filesCompiled": 5,
+        "filesReused": 0,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 0,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 1,
+        "fullFallbackReason": "design-system-definition",
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 0,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "hostQueueWaitMs": 1.390878999999586,
+      "hostValidationMs": 13.197933999999805,
+      "projectDiagnosticsMs": 14.430572,
+      "hostCompileMs": 2.4136459999999715,
+      "cssDigest": "4e6a91af53f076ca013980de52c9b27402c28357a22c11ddfdb27799d346bc40",
+      "hostCssSettledMs": 17.456121999999596
+    },
+    {
+      "label": "recipe value change",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 31
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 32
+      },
+      "generationBefore": 28,
+      "generationAfter": 29,
+      "outcome": "full-reload",
+      "registryDigestBefore": "013117e52ab92f3f",
+      "registryDigestAfter": "f7051f7ca9819179",
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 0,
+        "filesRecompiled": 5,
+        "filesCompiled": 5,
+        "filesReused": 0,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 0,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 1,
+        "fullFallbackReason": "design-system-definition",
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 0,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "hostQueueWaitMs": 1.2828979999994772,
+      "hostValidationMs": 13.123274000000492,
+      "projectDiagnosticsMs": 14.247181,
+      "hostCompileMs": 2.4340760000004593,
+      "cssDigest": "739a1e9dfa5061b0247139ffe1c11f76974f9e2e0b54bbeeb2b71c7f42c95a4e",
+      "hostCssSettledMs": 17.272911000000022
+    },
+    {
+      "label": "recipe variant domain change",
+      "revisionBefore": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 32
+      },
+      "revisionAfter": {
+        "projectId": "/tmp/pandamstyle-phase-8-9-checkpoint-pilot/app",
+        "sessionId": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+        "revisionId": 33
+      },
+      "generationBefore": 29,
+      "generationAfter": 30,
+      "outcome": "full-reload",
+      "registryDigestBefore": "f7051f7ca9819179",
+      "registryDigestAfter": "51c6f42b10f12f97",
+      "fullFallback": true,
+      "fullFallbackReason": "design-system-definition",
+      "counters": {
+        "filesChanged": 0,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesReparsed": 0,
+        "filesRecompiled": 5,
+        "filesCompiled": 5,
+        "filesReused": 0,
+        "coverageSummariesReused": 0,
+        "coverageSummariesRebuilt": 0,
+        "reverseDependentsInvalidated": 0,
+        "negativeResolutionsInvalidated": 0,
+        "fullFallback": 1,
+        "fullFallbackReason": "design-system-definition",
+        "newlyCoveredFiles": 0,
+        "coveredFileCount": 6,
+        "fileStateCount": 6,
+        "dirtyFilesDeclared": 0,
+        "dirtyFilesRead": 0,
+        "dirtyFilesHashed": 0,
+        "dirtyFilesUnchanged": 0
+      },
+      "hostQueueWaitMs": 1.3671489999996993,
+      "hostValidationMs": 15.232027000000016,
+      "projectDiagnosticsMs": 16.430265,
+      "hostCompileMs": 2.3980249999995067,
+      "cssDigest": "abfc4cd75ea07a81b1fc90ae46bbc9e95e3bc598f5602fabdf12b6d302aa795d",
+      "hostCssSettledMs": 19.444893999999294
+    },
+    {
+      "label": "server close with transform pending",
+      "settlement": {
+        "result": "rejected-closed",
+        "code": "ERR_CLOSED_SERVER",
+        "message": "The server is being restarted or closed. Request is outdated"
+      },
+      "elapsedMs": 300.4837899999993,
+      "postCloseProjectEvents": 0
+    },
+    {
+      "label": "close and reopen",
+      "sessionIdBefore": "74f16c88-c8f1-4be4-8e8b-714395e7440c",
+      "sessionIdAfter": "937964e8-cf33-4f50-9d12-b52a2cd75a6a",
+      "coldDevServerReadyMs": 36.54957300000024,
+      "cssDigest": "d59cc13c64170dcfd42c835bd35189e861413f8da5a463923b701578e0e3b61a"
+    }
+  ]
+}

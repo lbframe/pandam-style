@@ -1,0 +1,32 @@
+{
+  "initialize": "passed",
+  "applyChanges": "passed",
+  "validate": "passed",
+  "compile": "passed",
+  "current": "passed",
+  "agentResult": "passed",
+  "candidateTokens": "passed",
+  "requestFullAudit": "passed",
+  "prepareAbortCommit": "passed",
+  "hostReadCommit": "passed",
+  "sourceOverlays": "passed",
+  "sourceDigest": "passed",
+  "readGeneratedArtifacts": "passed",
+  "staleGeneratedRead": "rejected",
+  "sameContentGenerationReuse": "passed",
+  "changedContentGenerationAdvance": "passed",
+  "revision": {
+    "projectId": "phase-9-sdk-consumer",
+    "sessionId": "b8577713-be45-42a7-a2cf-5ef7195db45f",
+    "revisionId": 5
+  },
+  "generationId": 3,
+  "elapsedMs": 1711.699,
+  "generatedArtifactMismatch": {
+    "result": "rejected",
+    "expectedCode": "PMS_GENERATED_ARTIFACT_MISMATCH",
+    "codes": [
+      "PMS_GENERATED_ARTIFACT_MISMATCH"
+    ]
+  }
+}
