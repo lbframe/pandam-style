@@ -18,7 +18,7 @@ const { freshCopyOf, runBuild } = require('./pms-helpers');
 const build = require(
   path.resolve(
     __dirname,
-    '../../../../../.pms-test-support/compiler-inspection.cjs',
+    '../../../../.pms-test-support/compiler-inspection.cjs',
   ),
 );
 

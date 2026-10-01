@@ -15,7 +15,7 @@ WORK_DIR="${1:-${PMS_PILOT_DIR:-/tmp/pandamstyle-pilot}}"
 # The pilot lives outside every workspace glob on purpose: as a workspace
 # member, the root install would try to resolve @pandamstyle/compiler from
 # the registry instead of linking the local workspace copy.
-PILOT_SRC="${REPO_ROOT}/pilot/vite-react"
+PILOT_SRC="${REPO_ROOT}/examples/pilots/vite-react"
 
 echo "== 1/6 pack the PandamStyle compiler and core =="
 rm -rf "${WORK_DIR}"
@@ -104,10 +104,11 @@ echo "== 5/6 prove the app resolves the INSTALLED package, not the sources =="
 node -e '
 const fs = require("fs");
 const path = require("path");
+const repoRoot = path.resolve(process.argv[1]);
 const pkgDir = path.dirname(require.resolve("@pandamstyle/compiler/package.json"));
 const real = fs.realpathSync(pkgDir);
-if (real.includes("/packages/@stylexjs/babel-plugin/")) {
-  console.error("resolved to monorepo sources: " + real);
+if (real === repoRoot || real.startsWith(repoRoot + path.sep)) {
+  console.error("resolved inside the repository workspace: " + real);
   process.exit(1);
 }
 const manifest = require("@pandamstyle/compiler/package.json");
@@ -115,12 +116,12 @@ console.log("resolved tarball at:", real);
 console.log("version:", manifest.version);
 const coreDir = path.dirname(require.resolve("@pandamstyle/core/package.json"));
 const coreReal = fs.realpathSync(coreDir);
-if (coreReal.includes("/packages/core/")) {
-  console.error("core resolved to monorepo sources: " + coreReal);
+if (coreReal === repoRoot || coreReal.startsWith(repoRoot + path.sep)) {
+  console.error("core resolved inside the repository workspace: " + coreReal);
   process.exit(1);
 }
 console.log("resolved packed core at:", coreReal);
-'
+' "$REPO_ROOT"
 
 node --input-type=module -e '
 await import("@pandamstyle/compiler");

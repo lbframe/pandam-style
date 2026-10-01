@@ -21,8 +21,8 @@ const os = require('os');
 const path = require('path');
 
 const FIXTURES = path.resolve(__dirname, 'fixtures');
-// __dirname is packages/@stylexjs/babel-plugin/__tests__/pandamstyle
-const COMPILER_PKG = path.resolve(__dirname, '../../../../compiler');
+// __dirname is packages/compiler/__tests__/pandamstyle
+const COMPILER_PKG = path.resolve(__dirname, '../..');
 const BUILD_BIN = path.join(COMPILER_PKG, 'bin', 'pms-build.js');
 const TEST_FAILURE_BIN = path.join(
   path.resolve(COMPILER_PKG, '../..'),
@@ -149,7 +149,7 @@ function evaluateDefinitionText(
       const compiler = require(
         path.resolve(
           __dirname,
-          '../../../../../.pms-test-support/compiler-inspection.cjs',
+          '../../../../.pms-test-support/compiler-inspection.cjs',
         ),
       );
       return { token: compiler.token, defineConfig: (config) => config };

@@ -25,10 +25,10 @@ evidence/**/artifacts/
 evidence/**/pilot/
 # Raw step logs are evidence and stay tracked, like the historical ones.
 !evidence/*/*.log
-pilot/vite-react/.pandamstyle/
-pilot/vite-react/dist/
-pilot/vite-react/node_modules/
-packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/*/generated/
+examples/pilots/vite-react/.pandamstyle/
+examples/pilots/vite-react/dist/
+examples/pilots/vite-react/node_modules/
+packages/compiler/__tests__/pandamstyle/fixtures/*/generated/
 
 # PandamStyle benchmark scratch: generated corpora, per-job project copies and
 # the raw observation stream. Everything here is REGENERABLE from the committed

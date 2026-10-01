@@ -9,14 +9,7 @@ lib
 flow_modules
 node_modules
 **/__mocks__/snapshot*
-packages/benchmarks/size/fixtures/lotsOfStyles.js
 flow-typed
-examples/example-storybook/storybook-static
-examples/example-cli/src
-packages/docs/.source
-devtools-extension/extension
-**/devtools-extension/extension/assets/**
-examples/example-sveltekit/.svelte-kit/**
 **/storybook-static/**
 
 # PandamStyle regenerable run output is not source, so it is outside the format
@@ -33,14 +26,11 @@ evidence/*/pilot/
 # A run directory can be nested deeper than `evidence/<batch>/`; same rule.
 evidence/**/artifacts/
 evidence/**/pilot/
-pilot/vite-react/.pandamstyle/
+examples/pilots/vite-react/.pandamstyle/
 
-# Mirrors .eslintrc.js: the vendored third-party donor and the PandamStyle
-# fixture projects stand in for third-party code, so neither is formatted with
-# this repository's config. The fixtures entry also covers each fixture's build
-# output (fixtures/*/generated/).
-upstream/panda/
-packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/
+# Fixture projects stand in for consuming applications, so they keep their own
+# source formatting. This also ignores fixture build output (fixtures/*/generated/).
+packages/compiler/__tests__/pandamstyle/fixtures/
 
 # PandamStyle benchmark scratch root. The generated corpora are fixtures whose
 # byte content IS the benchmark input: reformatting them would change the

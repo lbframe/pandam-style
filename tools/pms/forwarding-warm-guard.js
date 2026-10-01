@@ -11,7 +11,7 @@
 const fs = require('fs');
 const {
   openProject,
-} = require('../../packages/@stylexjs/babel-plugin/__tests__/pandamstyle/session-helpers');
+} = require('../../packages/compiler/__tests__/pandamstyle/session-helpers');
 const samples = {};
 const named =
   "export { create, token, props, themes } from '../generated/design.pandamstyle';\n";

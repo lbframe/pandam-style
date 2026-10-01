@@ -15,7 +15,7 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const REPO_ROOT = path.resolve(__dirname, '../../../../..');
+const REPO_ROOT = path.resolve(__dirname, '../../../..');
 const VITE_SEAM = path.join(REPO_ROOT, '.pms-test-support/vite-seam.mjs');
 const VITE_SEAM_ROLLUP_CONFIG = path.join(
   REPO_ROOT,

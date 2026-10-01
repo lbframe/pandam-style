@@ -34,9 +34,7 @@ module.exports = {
     // PandamStyle fixture projects stand in for third-party application code,
     // so they deliberately do not carry this repository's copyright header.
     // This covers each fixture's build output too (fixtures/*/generated/).
-    'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures',
-    // Vendored third-party donors are not linted with this repository's config.
-    'upstream/panda',
+    'packages/compiler/__tests__/pandamstyle/fixtures',
     // PandamStyle regenerable run output is not source. These are the run
     // directories described in .gitignore. Only the rebuildable outputs are
     // skipped: the run directory itself keeps its durable evidence (REPORT.md,
@@ -71,10 +69,8 @@ module.exports = {
     'next.config.js',
     '**/__mocks__/snapshot*',
     '**/storybook-static/**',
-    '**/examples/example-cli/src/**',
     '**/*.d.ts',
     '**/pages.gen.ts',
-    '**/devtools-extension/extension/**',
   ],
   overrides: [
     {

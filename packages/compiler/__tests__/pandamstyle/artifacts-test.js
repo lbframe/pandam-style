@@ -25,11 +25,10 @@ import {
   conformanceDefinition,
   token,
   PmsError,
-} from '../../../../../.pms-test-support/compiler-inspection.cjs';
+} from '../../../../.pms-test-support/compiler-inspection.cjs';
 
-const OUT =
-  process.env.PMS_OUT_DIR ??
-  path.resolve(__dirname, '../../../../../../evidence/demo');
+const REPO_ROOT = path.resolve(__dirname, '../../../..');
+const OUT = path.join(REPO_ROOT, 'out-pandamstyle', 'artifacts-test');
 
 function write(name, content) {
   fs.mkdirSync(OUT, { recursive: true });
@@ -39,7 +38,7 @@ function write(name, content) {
 function gitSha() {
   try {
     return execSync('git rev-parse HEAD', {
-      cwd: path.resolve(__dirname, '../../../../../..'),
+      cwd: REPO_ROOT,
     })
       .toString()
       .trim();

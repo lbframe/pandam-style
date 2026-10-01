@@ -27,10 +27,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
-const TESTS = path.join(
-  REPO_ROOT,
-  'packages/@stylexjs/babel-plugin/__tests__/pandamstyle',
-);
+const TESTS = path.join(REPO_ROOT, 'packages/compiler/__tests__/pandamstyle');
 const FIXTURES = path.join(TESTS, 'fixtures');
 const BUILD_BIN = path.join(REPO_ROOT, 'packages/compiler/bin/pms-build.js');
 

@@ -11,7 +11,7 @@ jest.autoMockOff();
 const {
   cases,
   runCase,
-} = require('../../../../../tools/pms/forwarding-semantic-oracle');
+} = require('../../../../tools/pms/forwarding-semantic-oracle');
 const babel = require('@babel/core');
 const fs = require('fs');
 const { openProject } = require('./session-helpers');
@@ -19,7 +19,7 @@ const {
   createUsageContext,
   readModuleFacts,
   resolvePmsAccess,
-} = require('../../../../../.pms-test-support/compiler-inspection.cjs');
+} = require('../../../../.pms-test-support/compiler-inspection.cjs');
 
 describe('PandamStyle independent forwarding semantic oracle', () => {
   test.each(cases.map((fixture) => [fixture.name, fixture]))(

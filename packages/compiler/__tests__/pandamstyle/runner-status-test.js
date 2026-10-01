@@ -14,7 +14,7 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const REPO_ROOT = path.resolve(__dirname, '../../../../..');
+const REPO_ROOT = path.resolve(__dirname, '../../../..');
 const RUNNER = path.join(REPO_ROOT, 'verify-pms.sh');
 
 jest.setTimeout(120000);

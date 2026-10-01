@@ -1,0 +1,1969 @@
+{
+  "documentKind": "pandamstyle-phase-5-test-migration-inventory",
+  "schemaVersion": 1,
+  "sourceCommit": "44bbdb4c323cfaae9abc69f524d4fc8b5ceb4133",
+  "oldRoot": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle",
+  "newOwnedRoot": "packages/compiler/__tests__/pandamstyle",
+  "plannedVerificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+  "counts": {
+    "tests": 22,
+    "helpers": 2,
+    "fixtureFiles": 84,
+    "total": 108
+  },
+  "pathPreservation": "Fixture directory topology is preserved. Only test/helper repository-root, compiler/core, tools/pms, and compiler-inspection references listed in pathAssumptionNotes are retargeted.",
+  "records": [
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/agent-dirty-input-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/agent-dirty-input-test.js",
+      "kind": "test",
+      "purpose": "Declared change inputs, content hashing, no-op edits, add/delete/rename, audit trust and fallback.",
+      "currentSuiteCategory": "mutations",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "./session-helpers",
+        "fs",
+        "os",
+        "path"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/agent-dirty-input-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f71750df6e47cb17b4bc8f6b490b61ddaefcfa708c7fcbb361ed83a6c9a62329"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/agent-result-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/agent-result-test.js",
+      "kind": "test",
+      "purpose": "Revision-bound diagnostics, structured repairs, milestones, bounded results and audit requests.",
+      "currentSuiteCategory": "diagnostics",
+      "dependencies": [
+        "./pms-helpers",
+        "./session-helpers",
+        "fs",
+        "path",
+        "the host edited one file"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/agent-result-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "3da53ea8f6373f8dfa505623b25eecb29c5bcc62a22118f2f63147e83b331603"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/artifacts-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/artifacts-test.js",
+      "kind": "test",
+      "purpose": "Builds a conformance project and inspects emitted artifacts and rejection behavior.",
+      "currentSuiteCategory": "artifacts",
+      "dependencies": [
+        "../../../../../.pms-test-support/compiler-inspection.cjs",
+        "child_process",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Move the compiler inspection import to the new depth and correct repository-root/evidence/Git cwd derivation to the new owned test root.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/artifacts-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "e94944aff478f38b5bb07e941ff3ace437e903cb997242df3240ecfd5bc632ff"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/chain-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/chain-test.js",
+      "kind": "test",
+      "purpose": "Token/theme/condition/recipe registry references, validation and projection.",
+      "currentSuiteCategory": "design-system",
+      "dependencies": [
+        "../../../../../.pms-test-support/compiler-inspection.cjs"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Move the compiler inspection import from five parent segments to four.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/chain-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "0666ffd371dc098bc6b43cfdba2c7992f225c3b478e56c7d7bc69ada2b9ffe8d"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/coverage-graph-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/coverage-graph-test.js",
+      "kind": "test",
+      "purpose": "Re-export closure, dynamic requests, relay violations and graph coverage.",
+      "currentSuiteCategory": "coverage and resolution",
+      "dependencies": [
+        "));\n    expect(result.status).toBe(1);\n    // The coverage closure reads the graph BEFORE any page is compiled, so it is\n    // the first reader to refuse. The build therefore never reaches the plugin,\n    // which is the intended order: a gap in the graph is not a per-file problem.\n    const gaps = result.diagnostics.filter(\n      (x) => x.code === ",
+        ");\n      expect(g.context.request).toBe(",
+        ", ",
+        "./b.js",
+        "./c.js",
+        "./d.js",
+        "./e.js",
+        "./f.js",
+        "./pms-helpers",
+        "@stylexjs/stylex",
+        "]));\n    } finally {\n      fs.rmSync(dir, { recursive: true, force: true });\n    }\n  });\n\n  test(",
+        "],\n    [",
+        "],\n  ];\n\n  test.each(cases)(",
+        "fs",
+        "os",
+        "path"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Move the compiler inspection import from five parent segments to four.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/coverage-graph-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "234c4f1ebb023ec370f631d0f48d4b93ff03210c35ed90a54cce99699257e8b4"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/design-system-view-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/design-system-view-test.js",
+      "kind": "test",
+      "purpose": "Forwarding views, binding/export contracts, relay repair and invalidation.",
+      "currentSuiteCategory": "incremental design-system views",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "./barrel",
+        "./late",
+        "./namespace-relay",
+        "./plain",
+        "./session-helpers",
+        "./star-barrel",
+        "./star-relay",
+        "fs",
+        "path",
+        "this file has no view at all"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/design-system-view-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "2dfbe01cc61344b440b585711d47197178d5d583e833bc9751d1001435966e00"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/_shared/design.pms.config.mjs",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/_shared/design.pms.config.mjs",
+      "kind": "fixture",
+      "purpose": "Shared conformance design-system definition with tokens, themes, conditions and recipe vocabulary. File role: design.pms.config.mjs.",
+      "currentSuiteCategory": "fixture:_shared",
+      "dependencies": [
+        "@pandamstyle/compiler/config"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "d5e4c56938fe1081d5492adaac0a2837161c41ab99bfa33fcbf4231e7f5b3674"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-composite-form/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-composite-form/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects unsupported composite border declarations. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-composite-form",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-composite-form/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-composite-form/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects unsupported composite border declarations. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-composite-form",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "1020ba560416d060c1d26276be90172f437410f6a860ef0ea904b2750b27ab74"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-dynamic-import-local/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import-local/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Follows a literal dynamic import to a forbidden inline-style source. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-dynamic-import-local",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-dynamic-import-local/src/lazy.jsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import-local/src/lazy.jsx",
+      "kind": "fixture",
+      "purpose": "Follows a literal dynamic import to a forbidden inline-style source. File role: src/lazy.jsx.",
+      "currentSuiteCategory": "fixture:neg-dynamic-import-local",
+      "dependencies": [
+        "./lazy.js"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "d0c84747d2445f3aab17d700d11902bb100236719a27dd7205212492e33ab70a"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-dynamic-import-local/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import-local/src/page.js",
+      "kind": "fixture",
+      "purpose": "Follows a literal dynamic import to a forbidden inline-style source. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-dynamic-import-local",
+      "dependencies": [
+        "./lazy.js"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "5a5383e160e08cee984a9141568e87cfb06563741ecd65065556613f0ae5b8f4"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-dynamic-import/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Reports an incomplete coverage gap for a computed dynamic import. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-dynamic-import",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-dynamic-import/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import/src/page.js",
+      "kind": "fixture",
+      "purpose": "Reports an incomplete coverage gap for a computed dynamic import. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-dynamic-import",
+      "dependencies": [],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "43630b86404312e7679537110b3ff383ffe4b7e22db6da4e0b127f1c4cb79178"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-forbidden-import/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-import/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects direct donor StyleX/atoms imports. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-forbidden-import",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-forbidden-import/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-import/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects direct donor StyleX/atoms imports. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-forbidden-import",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "@stylexjs/atoms",
+        "@stylexjs/stylex"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "d8847bae55887ed2eb7a71d303e21c492fea6b1198f0a14c5d2f7f453d7cd8d9"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-forbidden-value-ts/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-value-ts/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Proves TypeScript casts do not grant value authority. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-forbidden-value-ts",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-forbidden-value-ts/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-value-ts/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Proves TypeScript casts do not grant value authority. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-forbidden-value-ts",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "9134fee283830e8f4d307d7869f2447f450699da1afb3a07eb275f06a1410008"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-forbidden-value/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-value/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects raw values, forged variables/refs, aliases, computed keys and spreads. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-forbidden-value",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-forbidden-value/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-value/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects raw values, forged variables/refs, aliases, computed keys and spreads. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-forbidden-value",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "ecae12be8cf0b405ce594b29cfd3a192e74f7f46dcf1d4d1b9663654478a414c"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-helper-shadowed/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-helper-shadowed/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Distinguishes real helper bindings from shadowed aliases. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-helper-shadowed",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-helper-shadowed/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-helper-shadowed/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Distinguishes real helper bindings from shadowed aliases. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-helper-shadowed",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "22bc585ed1c5df5aadb106dedf18531b1f76829fd0f1471014b54c6f17513ac5"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-invalid-variant/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-invalid-variant/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects invalid literal recipe selections. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-invalid-variant",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-invalid-variant/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-invalid-variant/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects invalid literal recipe selections. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-invalid-variant",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "3d5bafc275cede3e6ed2cbbc804efc3f9494a94c5f5efe208555f55ae6d0cca6"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-jsx-spread/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-jsx-spread/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects an unproven JSX props spread. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-jsx-spread",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-jsx-spread/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-jsx-spread/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Rejects an unproven JSX props spread. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-jsx-spread",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "7fbb59c9980cc7fb36e2ee036ef8bebfaa2659c7553e2d28375dfe12b71103bf"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-non-static/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-non-static/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects local token impostors and dynamic values. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-non-static",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-non-static/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-non-static/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects local token impostors and dynamic values. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-non-static",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "19ac2447982e0f7d4fcc465452120351100b1fd95e0674a0fe9237990c3919bb"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-private-token/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-private-token/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects consumer access to private tokens. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-private-token",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-private-token/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-private-token/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects consumer access to private tokens. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-private-token",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "191cf3c73e009be3031d164362d29c69254449e3bcb8e082ad4f57883188bab2"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-escaped/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-escaped/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects composition identity after unknown escape or reflective mutation. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-props-escaped",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-escaped/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-escaped/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Rejects composition identity after unknown escape or reflective mutation. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-props-escaped",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "1dda1a26df78c6cbbe1f806bbc111a50ab1dc793de4dc36138daac6fa7c41061"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-mutated/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-mutated/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects composition identity after member mutation. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-props-mutated",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-mutated/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-mutated/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Rejects composition identity after member mutation. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-props-mutated",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f1cedee0379aa1501bcde9569082757104075c503ca69bf9efdbc1eb5d818482"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-raw-object/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-raw-object/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects raw props objects while preserving the admitted control. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-props-raw-object",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-raw-object/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-raw-object/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects raw props objects while preserving the admitted control. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-props-raw-object",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "b726ab7c696e4cf747f69e30784ad76758be97676ab8dcfc0b3e733bcfb47a6e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-raw-reference/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-raw-reference/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects local object/spread values without provenance. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-props-raw-reference",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-raw-reference/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-raw-reference/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects local object/spread values without provenance. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-props-raw-reference",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "ae6c3aeab0f169e759020dfcdf010bbdd34c822c7cb88d6f491770b3981ab179"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-reassigned/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-reassigned/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects helper identity after reassignment. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-props-reassigned",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-reassigned/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-reassigned/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Rejects helper identity after reassignment. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-props-reassigned",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "c29aee7d8cf2d34fad4b9e3faf94f4009001e6d3be2da46dd63a12ee54de4103"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-shadowing/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-shadowing/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects shadowed parameters in place of proven bindings. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-props-shadowing",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-props-shadowing/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-shadowing/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Rejects shadowed parameters in place of proven bindings. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-props-shadowing",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "1e31bdc30e061a10ba4c05cf9b84ab1b07b16e4482df5a1ff9387880144b18ad"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/bridge/a.ts",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/bridge/a.ts",
+      "kind": "fixture",
+      "purpose": "Checks two-hop export closure outside declared roots. File role: bridge/a.ts.",
+      "currentSuiteCategory": "fixture:neg-relay-barrel-chain",
+      "dependencies": [
+        "./b"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "d1412cdffe3d2a444a669ac8031dd7434cd696de1458689ad47ba33e7d699813"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/bridge/b.ts",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/bridge/b.ts",
+      "kind": "fixture",
+      "purpose": "Checks two-hop export closure outside declared roots. File role: bridge/b.ts.",
+      "currentSuiteCategory": "fixture:neg-relay-barrel-chain",
+      "dependencies": [
+        "../outside/Unsafe"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "128a4cc48fe8bab2908ea135ad0740a6976a1eef8f3a8638d84f62a49ba244d5"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/outside/Unsafe.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/outside/Unsafe.tsx",
+      "kind": "fixture",
+      "purpose": "Checks two-hop export closure outside declared roots. File role: outside/Unsafe.tsx.",
+      "currentSuiteCategory": "fixture:neg-relay-barrel-chain",
+      "dependencies": [
+        "./theme.css"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "152d7d00328a088c5581e42dcc062089a28671ad392e559934c04ebd5aeca1e1"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/outside/theme.css",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/outside/theme.css",
+      "kind": "fixture",
+      "purpose": "Checks two-hop export closure outside declared roots. File role: outside/theme.css.",
+      "currentSuiteCategory": "fixture:neg-relay-barrel-chain",
+      "dependencies": [],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "e4ebf74ef1d511d2689dad2e4a46d2203461295d6f2bef2521ee5559eb68cce7"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Checks two-hop export closure outside declared roots. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-relay-barrel-chain",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Checks two-hop export closure outside declared roots. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-relay-barrel-chain",
+      "dependencies": [
+        "../bridge/a"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "e8bd10f8fa5a543b26505cf9a3f55e3f06ea91fcf8d1c27ce24a0805a65b635e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/bridge/index.ts",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/bridge/index.ts",
+      "kind": "fixture",
+      "purpose": "Checks named re-export closure and outside-root sources. File role: bridge/index.ts.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-named",
+      "dependencies": [
+        "../outside/Unsafe"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "ae22506be68fee5fb23eef2c80e761f3e7f843d860bd26f5285291d65ad469a9"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/outside/Unsafe.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/outside/Unsafe.tsx",
+      "kind": "fixture",
+      "purpose": "Checks named re-export closure and outside-root sources. File role: outside/Unsafe.tsx.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-named",
+      "dependencies": [
+        "./theme.css"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "152d7d00328a088c5581e42dcc062089a28671ad392e559934c04ebd5aeca1e1"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/outside/theme.css",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/outside/theme.css",
+      "kind": "fixture",
+      "purpose": "Checks named re-export closure and outside-root sources. File role: outside/theme.css.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-named",
+      "dependencies": [],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "e4ebf74ef1d511d2689dad2e4a46d2203461295d6f2bef2521ee5559eb68cce7"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Checks named re-export closure and outside-root sources. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-named",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Checks named re-export closure and outside-root sources. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-named",
+      "dependencies": [
+        "../bridge/index",
+        "../outside/Unsafe"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "19a930efc6e97a9bda7896d5bcde38ed2bab4b4b1b165235206e16ba3a0ad652"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/bridge/index.ts",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/bridge/index.ts",
+      "kind": "fixture",
+      "purpose": "Checks star re-export closure and outside-root sources. File role: bridge/index.ts.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-star",
+      "dependencies": [
+        "../outside/Unsafe"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "51259f9e693edd9f734fa391e8406205444ab059d7c4775dd72af789466b9fe0"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/outside/Unsafe.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/outside/Unsafe.tsx",
+      "kind": "fixture",
+      "purpose": "Checks star re-export closure and outside-root sources. File role: outside/Unsafe.tsx.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-star",
+      "dependencies": [
+        "./theme.css"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "152d7d00328a088c5581e42dcc062089a28671ad392e559934c04ebd5aeca1e1"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/outside/theme.css",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/outside/theme.css",
+      "kind": "fixture",
+      "purpose": "Checks star re-export closure and outside-root sources. File role: outside/theme.css.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-star",
+      "dependencies": [],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "e4ebf74ef1d511d2689dad2e4a46d2203461295d6f2bef2521ee5559eb68cce7"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Checks star re-export closure and outside-root sources. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-star",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Checks star re-export closure and outside-root sources. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-relay-reexport-star",
+      "dependencies": [
+        "../bridge/index",
+        "../outside/Unsafe"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "19a930efc6e97a9bda7896d5bcde38ed2bab4b4b1b165235206e16ba3a0ad652"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-reserved-authority/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-reserved-authority/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects source claims to reserved compiler authority. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-reserved-authority",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-reserved-authority/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-reserved-authority/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects source claims to reserved compiler authority. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-reserved-authority",
+      "dependencies": [],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "99af8229d720f2aaefc8e2df77960048c5e50b7336a8afadddde77babd30b4e3"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-role-violation/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-role-violation/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects invalid author/consumer role use. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-role-violation",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-role-violation/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-role-violation/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects invalid author/consumer role use. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-role-violation",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "@stylexjs/babel-plugin"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "c86e5e1cd5ecc7cdd96b3f9c8f573f005b9cc4cd3e06c2311aa44e3002153a4c"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-style-channel/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-style-channel/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects inline style and unapproved stylesheet channels. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-style-channel",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-style-channel/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-style-channel/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Rejects inline style and unapproved stylesheet channels. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:neg-style-channel",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "../theme.css"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "7d23624f3e641460db492434c388ecbfadc2c6fb3e73a867c20c5a6058596794"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-style-channel/src/theme.css",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-style-channel/src/theme.css",
+      "kind": "fixture",
+      "purpose": "Rejects inline style and unapproved stylesheet channels. File role: src/theme.css.",
+      "currentSuiteCategory": "fixture:neg-style-channel",
+      "dependencies": [],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "20261fbb12eeebbee85eb2e63fa566ca4e76e3e4f7681f5ec381114b66845d7a"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/bridge/index.ts",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/bridge/index.ts",
+      "kind": "fixture",
+      "purpose": "Finds forbidden stylesheets reached through a clean relay. File role: bridge/index.ts.",
+      "currentSuiteCategory": "fixture:neg-stylesheet-via-relay",
+      "dependencies": [
+        "../outside/with-css"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "16e69ddd8dfabb7caee6a46c22c4672c909b88f195696325bca836966250ebc0"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/outside/theme.css",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/outside/theme.css",
+      "kind": "fixture",
+      "purpose": "Finds forbidden stylesheets reached through a clean relay. File role: outside/theme.css.",
+      "currentSuiteCategory": "fixture:neg-stylesheet-via-relay",
+      "dependencies": [],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "e4ebf74ef1d511d2689dad2e4a46d2203461295d6f2bef2521ee5559eb68cce7"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/outside/with-css.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/outside/with-css.js",
+      "kind": "fixture",
+      "purpose": "Finds forbidden stylesheets reached through a clean relay. File role: outside/with-css.js.",
+      "currentSuiteCategory": "fixture:neg-stylesheet-via-relay",
+      "dependencies": [
+        "./theme.css"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "712568cf9c504efe3b3779e67df5ec6044b70032d177544781c27f0bfe80915a"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Finds forbidden stylesheets reached through a clean relay. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-stylesheet-via-relay",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/src/page.js",
+      "kind": "fixture",
+      "purpose": "Finds forbidden stylesheets reached through a clean relay. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-stylesheet-via-relay",
+      "dependencies": [
+        "../bridge/index"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "551642ba8e7c906c5540164a3bba4670559f47627d6615ddc2833189d72180f5"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-token-category/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-token-category/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects use of a token from the wrong category. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-token-category",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-token-category/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-token-category/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects use of a token from the wrong category. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-token-category",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "7e41401036dc5c3d28ec00054f1def84fbccdc0a9920f24870ffec7782aef80c"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-unknown-condition/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unknown-condition/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects an undeclared named condition. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-unknown-condition",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-unknown-condition/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unknown-condition/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects an undeclared named condition. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-unknown-condition",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "917084d89a49d4010ee348a845831fb306879d75633cdbeba3a93dfdc725a1a9"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-unknown-token/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unknown-token/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects an absent token path. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-unknown-token",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-unknown-token/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unknown-token/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects an absent token path. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-unknown-token",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "65235ca71bdb916e243b0d86098506180156583c489615713f2cdd04a1c9c0d7"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-unresolved-import/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unresolved-import/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Reports a local import resolution failure. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-unresolved-import",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-unresolved-import/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unresolved-import/src/page.js",
+      "kind": "fixture",
+      "purpose": "Reports a local import resolution failure. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-unresolved-import",
+      "dependencies": [
+        "./does-not-exist"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "8b3ca5098f7fc196b9b3cbb3a0041e8fb0edc3b92a3ef3bf9dcc1899c62877ec"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-unsupported-property/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unsupported-property/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Rejects an unsupported style property. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:neg-unsupported-property",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/neg-unsupported-property/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unsupported-property/src/page.js",
+      "kind": "fixture",
+      "purpose": "Rejects an unsupported style property. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:neg-unsupported-property",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f89de285cd623e0e83301fcf8441f907900ab5be0a73e87ce614da4b13adfcd4"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/pandamstyle.config.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/pandamstyle.config.js",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: pandamstyle.config.js.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [
+        "../_shared/design.pms.config.mjs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/src/barrel.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/barrel.js",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: src/barrel.js.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "7a474fd0f2b3db9514ff076afed585c39733f71a3fdc437025acbc5535da46b4"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/src/business-data.ts",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/business-data.ts",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: src/business-data.ts.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "441cbb3b7e673a6af192f7be27dbfe0b5142292485ec8e2bdd0eaaa0680a9302"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/src/conditional-props.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/conditional-props.tsx",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: src/conditional-props.tsx.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "a9640f2f0b3852865848353baf0b13dd6a915f81cbde7f9fb0c76d86d9fe88a5"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/src/namespace-import.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/namespace-import.js",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: src/namespace-import.js.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "25185dbd82268a8c83e57519102e3663d3b22ed6a28e6c97bb16993253ff1670"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/src/only-recipe.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/only-recipe.js",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: src/only-recipe.js.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "c4cb49706194e35880eaccbc517af33ef6191a283781cf4abe10198faed6d6a5"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/src/page.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/page.js",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: src/page.js.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "2d2802799d720ffa72c027c118d64ab01c4e705768787a4045496214f91c88e6"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/src/page.ts",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/page.ts",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: src/page.ts.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "49572bda2e67d64cfba036998b6db620dea7f853c8933f246d2f70917a741440"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/src/page.tsx",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/page.tsx",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: src/page.tsx.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [
+        "../generated/design.pandamstyle"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "52cb3c7d1fdc411e545b9983da27eac461ff8846d5392918bdad1198896d3792"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/src/renamed.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/renamed.js",
+      "kind": "fixture",
+      "purpose": "Positive compilation project covering JS/TS/TSX, aliases, barrels, recipes, conditions, themes and props. File role: src/renamed.js.",
+      "currentSuiteCategory": "fixture:valid",
+      "dependencies": [
+        "./barrel.js"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No path change planned: the fixture subtree moves intact and preserves all relative fixture/config/source links.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "No fixture imports change when the directory topology is preserved. Forbidden donor imports are intentionally retained as negative test input.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "5d30298d1bd07d84adbb768bb6aa89fb3d824241afa068ddc86ea348332940cb"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/forwarding-semantics-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/forwarding-semantics-test.js",
+      "kind": "test",
+      "purpose": "Independent forwarding oracle and Babel binding identity.",
+      "currentSuiteCategory": "forwarding and provenance",
+      "dependencies": [
+        ", () => {\n    expect(\n      accesses(\n        ",
+        "../../../../../.pms-test-support/compiler-inspection.cjs",
+        "../../../../../tools/pms/forwarding-semantic-oracle",
+        "../generated/design.pandamstyle",
+        "./binding-relay",
+        "./session-helpers",
+        "@babel/core",
+        "fs"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Move tools/pms and compiler inspection imports from five parent segments to four.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/forwarding-semantics-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "937ba8d93b71186f907f45754ad36944160422ef38b827115f61349f7f624acf"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/incremental-coverage-closure-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/incremental-coverage-closure-test.js",
+      "kind": "test",
+      "purpose": "Persistent graph closure, resolution repair, roots, fallback and fresh traversal equivalence.",
+      "currentSuiteCategory": "incremental graph",
+      "dependencies": [
+        "../shared/late",
+        "../shared/later-outside",
+        "../shared/left",
+        "../shared/right",
+        "../shared/x",
+        "./base",
+        "./gone-soon",
+        "./later",
+        "./page",
+        "./session-helpers",
+        "./shared-base",
+        "./target-one",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/incremental-coverage-closure-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "a4a3365e14251eea6194a6fd2d08f9b1144937068793fa30880df894edd6b41c"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/incremental-css-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/incremental-css-test.js",
+      "kind": "test",
+      "purpose": "CSS rule ownership, deduplication, cascade order, fallback and full-build equivalence.",
+      "currentSuiteCategory": "incremental CSS",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "./session-helpers",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/incremental-css-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "2b860e9f1d7b98431f924cae3bcae4d4330c43862d7ba8ee715d25e752b30253"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/incremental-publication-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/incremental-publication-test.js",
+      "kind": "test",
+      "purpose": "Delta publication, file reuse, removals, rollback, recovery and generation variants.",
+      "currentSuiteCategory": "publication",
+      "dependencies": [
+        ", () => {\n    const out = path.join(\n      fs.mkdtempSync(path.join(os.tmpdir(), ",
+        "../generated/design.pandamstyle",
+        "./later-module",
+        "./only-recipe",
+        "./session-helpers",
+        "fs",
+        "os",
+        "path",
+        "the file changed"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Move the compiler inspection import from five parent segments to four.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/incremental-publication-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "7b9b34c3afe937dedc98e8a3408321987b5d879968c22e4013b0e681494deab9"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/incremental-session-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/incremental-session-test.js",
+      "kind": "test",
+      "purpose": "Content reuse, graph repair, reverse dependencies, transactions and bounded work.",
+      "currentSuiteCategory": "incremental session",
+      "dependencies": [
+        ");\n    expect(unresolved.validation.ok).toBe(false);\n    const later = h.src(",
+        "../generated/design.pandamstyle",
+        "./barrel",
+        "./later-module",
+        "./plain",
+        "./session-helpers",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/incremental-session-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "8844d50318923c7eba10a03995d2ecab158b4d15650dfcd1493028b5c26760eb"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/native-compile-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/native-compile-test.js",
+      "kind": "test",
+      "purpose": "Real JS/TS/TSX compilation, generated contract, digest and coverage coherence.",
+      "currentSuiteCategory": "compiler integration",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "./pms-helpers",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/native-compile-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "f9dcb8c64def60d1754caf4a0d5858e5d05a590b60e694d68b402eb236f7c8a2"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/negative-builds-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/negative-builds-test.js",
+      "kind": "test",
+      "purpose": "Nonzero builds, policy diagnostics and refusal of invalid source projects.",
+      "currentSuiteCategory": "negative compilation",
+      "dependencies": [
+        ",\n    ",
+        "./pms-helpers",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/negative-builds-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "08aed0a1193e670c49cc68241c03cd869ab5b261db472d915a80a8fd5192a164"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/phase-d-agent-loop-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/phase-d-agent-loop-test.js",
+      "kind": "test",
+      "purpose": "End-to-end mutations, graph/views, validation and publication.",
+      "currentSuiteCategory": "agent loop",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "./session-helpers",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/phase-d-agent-loop-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "4ed1251420ae9ebaf73cd8328b70082537e1576540d29750b2780d44b9205c0c"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/pms-helpers.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/pms-helpers.js",
+      "kind": "helper",
+      "purpose": "Shared real-build harness, pristine fixture copier, diagnostics helpers and compiler path setup.",
+      "currentSuiteCategory": "test helper",
+      "dependencies": [
+        "@babel/core",
+        "@babel/plugin-transform-modules-commonjs",
+        "child_process",
+        "fs",
+        "module",
+        "os",
+        "path"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Resolve the compiler package and injected-failure support from the new owned root; move the inspection import from five parent segments to four.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "6961701997d97a63cf0e7e0f92044d19995f70de4dd8861121f5e4af27236191"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/project-api-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/project-api-test.js",
+      "kind": "test",
+      "purpose": "Public SDK initialization, revisions, validation, compile/publication, audit and disposal.",
+      "currentSuiteCategory": "project API",
+      "dependencies": [
+        "./session-helpers",
+        "fs"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/project-api-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "aa6dcfe82622c07a7a6eb9dc0be91934359db9b36be800b0dcfaf8d18a0e4671"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/provenance-props-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/provenance-props-test.js",
+      "kind": "test",
+      "purpose": "Unverified props refusal, binding provenance, mutations, escapes, shadowing and authority.",
+      "currentSuiteCategory": "provenance and composition",
+      "dependencies": [
+        "./pms-helpers",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Move the compiler inspection import from five parent segments to four.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/provenance-props-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "de68040a5c62d29253cd1c1a63b97a9cadf00753c58c6daad29c20089344de86"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/recipe-contract-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/recipe-contract-test.js",
+      "kind": "test",
+      "purpose": "Finite selection, axis order/defaults, runtime guards and composition.",
+      "currentSuiteCategory": "recipe and core ABI",
+      "dependencies": [
+        "../../../../core/package.json",
+        "./pms-helpers",
+        "@babel/core",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Retarget direct core imports to the new relative depth.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/recipe-contract-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "e8c836ab432ca8584a24e9c77a9a75ac57301e08d030c11c008a68f5c7adc901"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/runner-status-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/runner-status-test.js",
+      "kind": "test",
+      "purpose": "Skip truthfulness, pre-write Git state and merge-base evidence.",
+      "currentSuiteCategory": "verifier integrity",
+      "dependencies": [
+        "child_process",
+        "fs",
+        "os",
+        "path"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Resolve repository root four parent segments above the new test root instead of five.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/runner-status-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "985cdc9e853efac0a83af69ccfb8e21626aace34a0526c79c5e5ccf59a212b27"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/session-helpers.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/session-helpers.js",
+      "kind": "helper",
+      "purpose": "Shared compiler inspection/session harness, metrics and artifact/audit differential checks.",
+      "currentSuiteCategory": "test helper",
+      "dependencies": [
+        "./pms-helpers",
+        "crypto",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Move the compiler inspection import from five parent segments to four.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand packages/compiler/__tests__/pandamstyle",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "bf5813755ec966e37ce6476156b1cddfd2fc2eda5bb24505da7bdce6e4012de1"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/staleness-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/staleness-test.js",
+      "kind": "test",
+      "purpose": "Removed-token refusal, publication preservation and stable variable identity.",
+      "currentSuiteCategory": "token staleness",
+      "dependencies": [
+        "./pms-helpers",
+        "fs",
+        "path"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/staleness-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "b71e262bd22ef7f005c8477a1861579fa551ab4c6dad90ee4395051d2761d427"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/transactional-generation-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/transactional-generation-test.js",
+      "kind": "test",
+      "purpose": "Generation atomicity, rollback/recovery, CLI failures and deterministic output.",
+      "currentSuiteCategory": "transactional publication",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "./no-such-module",
+        "./pms-helpers",
+        "crypto",
+        "fs",
+        "os",
+        "path"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Move the compiler inspection import from five parent segments to four.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/transactional-generation-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "7266d03157b977e9418d544765f4266c9c44ce3d99adb4ae51fe814b84c741f9"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/vite-build-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/vite-build-test.js",
+      "kind": "test",
+      "purpose": "Packed-package Vite builds, generated CSS, failure rollback and upfront refusal.",
+      "currentSuiteCategory": "Vite pilot qualification",
+      "dependencies": [
+        "../../.pandamstyle/design.pandamstyle.js",
+        "../../outside/Unsafe.jsx",
+        "../bridge/index.js",
+        "./pages/App.jsx",
+        "@vitejs/plugin-react",
+        "child_process",
+        "crypto",
+        "fs",
+        "os",
+        "path",
+        "react-dom/client",
+        "vite"
+      ],
+      "pathAssumptionsChanged": true,
+      "pathAssumptionNotes": "Resolve repository root four parent segments above the new test root instead of five.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/vite-build-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "2ec8da584acbae0ca4112aa0b54d354c9d19ab4bacdd94ce19d21d042584f69a"
+    },
+    {
+      "oldPath": "packages/@stylexjs/babel-plugin/__tests__/pandamstyle/watcher-provider-test.js",
+      "newPath": "packages/compiler/__tests__/pandamstyle/watcher-provider-test.js",
+      "kind": "test",
+      "purpose": "Journal classification/coalescing/rename, resync, exclusions and rebuild equivalence.",
+      "currentSuiteCategory": "watcher and incremental provider",
+      "dependencies": [
+        "../generated/design.pandamstyle",
+        "./session-helpers",
+        "crypto",
+        "fs",
+        "os",
+        "path"
+      ],
+      "pathAssumptionsChanged": false,
+      "pathAssumptionNotes": "No repository-root path assumption identified; validate relative imports against the moved helper tree.",
+      "fixtureImportsChanged": false,
+      "fixtureImportNotes": "Fixture project paths remain at the same relative depth under the moved test root; verify suite path setup after relocation.",
+      "verificationCommand": "node node_modules/jest/bin/jest.js --config jest.config.js --ci --runInBand --runTestsByPath packages/compiler/__tests__/pandamstyle/watcher-provider-test.js",
+      "verificationStatusAtInventory": "pending migration and owned-suite execution",
+      "sourceSha256": "4db557a6e0034d06c23389f87eb565b1b447e649a1d33a2e7b654aa4b9b3d4c5"
+    }
+  ]
+}

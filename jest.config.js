@@ -21,9 +21,8 @@
  *
  * A gitignored build artifact must not be able to break the test suite, and the
  * fix is to keep those directories out of the module map in the first place.
- * `evidence` is generated output, `upstream` and `examples` are reference trees
- * rather than sources, and both are excluded from lint and format checks for
- * the same reason they are excluded here.
+ * `evidence` is generated output and `examples` contains an install-from-
+ * tarballs pilot rather than Jest suites.
  *
  * Only these keys are set. Everything else keeps Jest's defaults, so this
  * config cannot change which tests run or how they are transformed - it can
@@ -46,29 +45,27 @@ const path = require('path');
  * from its own working directory, so this file governs root-level runs and
  * leaves every per-package `jest` invocation exactly as it was.
  */
-const BABEL_ROOT = path.join(__dirname, 'packages/@stylexjs/babel-plugin');
+const BABEL_ROOT = path.join(__dirname, 'packages/compiler');
 
 module.exports = {
-  // The repository's own convention, and the one the packages already use: a
-  // test file is named `*-test.js`. The `*.test.js` spelling exists in three
-  // places in `style-value-parser` and `unplugin`, so it is admitted explicitly
-  // rather than left to be discovered by accident.
+  // The repository's own convention is a test file named `*-test.js`. The
+  // second spelling is retained for existing `*.test.js` suites.
   testMatch: ['**/__tests__/**/*-test.js', '**/?(*.)+(spec|test).js'],
   modulePathIgnorePatterns: [
     '<rootDir>/evidence/',
-    '<rootDir>/upstream/',
+    '<rootDir>/.pms-bench/',
     '<rootDir>/examples/',
     '<rootDir>/\\.unpacked/',
   ],
-  watchPathIgnorePatterns: ['<rootDir>/evidence/', '<rootDir>/\\.unpacked/'],
+  watchPathIgnorePatterns: [
+    '<rootDir>/evidence/',
+    '<rootDir>/.pms-bench/',
+    '<rootDir>/\\.unpacked/',
+  ],
   testPathIgnorePatterns: [
     '<rootDir>/evidence/',
-    '<rootDir>/upstream/',
     // Fixture projects are real application sources read by the build, and the
-    // build writes their compiled output into them. Neither is a test. The
-    // package's own config ignores the same two paths, and the two must not
-    // drift: a root run that collects a fixture as a suite while the package
-    // run does not is how 128 phantom failures appear.
+    // build writes their compiled output into them. Neither is a test.
     '/__fixtures__/',
     '/pandamstyle/fixtures/',
     '/fixtures/',
@@ -76,7 +73,14 @@ module.exports = {
   transform: {
     '^.+\\.[cm]?[jt]sx?$': [
       'babel-jest',
-      { root: BABEL_ROOT, babelrcRoots: [BABEL_ROOT, __dirname] },
+      {
+        root: BABEL_ROOT,
+        babelrcRoots: [
+          BABEL_ROOT,
+          path.join(__dirname, 'packages/core'),
+          __dirname,
+        ],
+      },
     ],
   },
 };

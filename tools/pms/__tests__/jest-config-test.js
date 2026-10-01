@@ -66,7 +66,7 @@ describe('the root jest configuration excludes the generated trees', () => {
       ...(config.testPathIgnorePatterns ?? []),
       ...(config.watchPathIgnorePatterns ?? []),
     ].join('\n');
-    for (const dir of ['evidence/', 'upstream/', 'examples/', '.unpacked/']) {
+    for (const dir of ['evidence/', '.pms-bench/', 'examples/', '.unpacked/']) {
       expect(patterns).toContain(dir);
     }
   });
@@ -76,7 +76,6 @@ describe('the root jest configuration excludes the generated trees', () => {
     expect(tests.length).toBeGreaterThan(0);
     for (const test of tests) {
       expect(test.startsWith('evidence/')).toBe(false);
-      expect(test.startsWith('upstream/')).toBe(false);
       expect(test.startsWith('examples/')).toBe(false);
       expect(test.includes('/.unpacked/')).toBe(false);
     }
@@ -88,7 +87,7 @@ describe('the root jest configuration excludes the generated trees', () => {
     // of packages answering to this name goes above one and the assertion
     // fails BEFORE the suites that load a design system do.
     const name = '@pandamstyle/compiler';
-    const roots = ['evidence', 'upstream', 'examples', 'packages', 'tools'];
+    const roots = ['evidence', 'examples', 'packages', 'tools'];
     const found = [];
     for (const root of roots) {
       const dir = path.join(REPO_ROOT, root);
@@ -133,18 +132,40 @@ describe('the root jest configuration is not a broad ignore', () => {
     // by accident, one of these goes missing and the run reports a smaller
     // suite than the repository has.
     const expected = [
-      'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/agent-result-test.js',
-      'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/agent-dirty-input-test.js',
-      'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/incremental-publication-test.js',
-      'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/watcher-provider-test.js',
-      'packages/@stylexjs/babel-plugin/__tests__/transform-stylex-props-test.js',
-      'packages/@stylexjs/stylex/__tests__/stylex-test.js',
-      'packages/style-value-parser/src/properties/__tests__/border-radius.test.js',
+      'packages/compiler/__tests__/pandamstyle/agent-result-test.js',
+      'packages/compiler/__tests__/pandamstyle/agent-dirty-input-test.js',
+      'packages/compiler/__tests__/pandamstyle/incremental-publication-test.js',
+      'packages/compiler/__tests__/pandamstyle/watcher-provider-test.js',
+      'packages/compiler/__tests__/engine-absorption-test.js',
+      'packages/core/__tests__/core-test.js',
+      'tests/semantic/__tests__/browser-test.js',
       'tools/pms/__tests__/test-counts-test.js',
     ];
     for (const file of expected) {
       expect(tests).toContain(file);
     }
+  });
+
+  test('every migrated PandamStyle suite remains discoverable', () => {
+    const tests = listTests();
+    const inventory = JSON.parse(
+      fs.readFileSync(
+        path.join(
+          REPO_ROOT,
+          'docs/architecture/phase-5-test-migration-inventory.json',
+        ),
+        'utf8',
+      ),
+    );
+    const expected = inventory.records
+      .filter((record) => record.kind === 'test')
+      .map((record) => record.newPath)
+      .sort();
+    const discovered = tests
+      .filter((file) => file.startsWith(`${inventory.newOwnedRoot}/`))
+      .sort();
+    expect(expected).toHaveLength(inventory.counts.tests);
+    expect(discovered).toEqual(expected);
   });
 
   test('no ignore pattern is a bare catch-all', () => {
@@ -186,22 +207,10 @@ describe('the root jest configuration is not a broad ignore', () => {
     // `testMatch` is what stops Jest's default from treating every file under a
     // `__tests__` directory as a test - which is how 128 fixture projects
     // became 128 failed suites. It must therefore name the convention
-    // explicitly, and it must be the SAME convention the babel-plugin's own
-    // config uses: two configs that disagree about what a test file is will
-    // eventually disagree about whether a suite exists.
-    const pluginConfig = require(
-      path.join(
-        REPO_ROOT,
-        'packages',
-        '@stylexjs',
-        'babel-plugin',
-        'jest.config.js',
-      ),
-    );
+    // explicitly, so the set of discovered suites is deliberate.
     // `testMatch` is a GLOB; Jest's `testRegex` is the regular expression. So
     // the check is on the pattern strings, and on the NAMES of what was
     // discovered.
-    expect(config.testMatch[0]).toBe(pluginConfig.testMatch[0]);
     expect(config.testMatch[0]).toBe('**/__tests__/**/*-test.js');
     const offenders = listTests().filter((test) => {
       const base = test.slice(test.lastIndexOf('/') + 1);

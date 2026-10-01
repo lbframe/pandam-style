@@ -52,7 +52,7 @@ function loadCoreRuntime(entry) {
 }
 
 const runtime = loadCoreRuntime(
-  path.resolve(__dirname, '../../../../core/src/index.js'),
+  path.resolve(__dirname, '../../../core/src/index.js'),
 );
 
 let project;
@@ -77,12 +77,12 @@ beforeAll(() => {
 describe('the consumer runtime is dependency-light', () => {
   test('the core runtime stays ESM and donor-free', () => {
     const files = fs
-      .readdirSync(path.join(__dirname, '../../../../core/src'))
+      .readdirSync(path.join(__dirname, '../../../core/src'))
       .filter((name) => name.endsWith('.js'));
     const source = files
       .map((name) =>
         fs.readFileSync(
-          path.join(__dirname, '../../../../core/src', name),
+          path.join(__dirname, '../../../core/src', name),
           'utf8',
         ),
       )
@@ -96,7 +96,7 @@ describe('the consumer runtime is dependency-light', () => {
   });
 
   test('core ships no runtime dependencies', () => {
-    const manifest = require('../../../../core/package.json');
+    const manifest = require('../../../core/package.json');
     expect(manifest.type).toBe('module');
     expect(manifest.sideEffects).toBe(false);
     expect(manifest.dependencies ?? {}).toEqual({});

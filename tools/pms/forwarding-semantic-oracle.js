@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const {
   openProject,
-} = require('../../packages/@stylexjs/babel-plugin/__tests__/pandamstyle/session-helpers');
+} = require('../../packages/compiler/__tests__/pandamstyle/session-helpers');
 const DS = '../generated/design.pandamstyle';
 const named = `export { create, token } from '${DS}';\n`;
 const ordinary =
