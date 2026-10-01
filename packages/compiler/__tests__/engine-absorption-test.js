@@ -14,6 +14,10 @@ const babel = require('@babel/core');
 const engine = require(
   path.resolve(__dirname, '../../../.pms-test-support/compiler-inspection.cjs'),
 );
+const splitCssValue =
+  require('../src/engine/atomic/utils/split-css-value').default;
+const transformValue =
+  require('../src/engine/atomic/utils/transform-value').default;
 
 function evaluateInitializer(source, name, parserPlugins = []) {
   let result = null;
@@ -61,6 +65,22 @@ describe('PandamStyle absorbed static evaluator and pass state', () => {
     );
     expect(imported.confident).toBe(false);
     expect(reassigned.confident).toBe(false);
+  });
+
+  test('refuses reflective escapes without executing their payload', () => {
+    const payloadKey = '__pandamstyleEvaluatorPayload';
+    delete globalThis[payloadKey];
+    const vectors = [
+      '({}).constructor.constructor("globalThis.__pandamstyleEvaluatorPayload = 1")()',
+      'Object.getPrototypeOf({})',
+      'Math.random()',
+    ];
+    for (const vector of vectors) {
+      const result = evaluateInitializer(`const result = ${vector};`, 'result');
+      expect(result.confident).toBe(false);
+    }
+    expect(globalThis[payloadKey]).toBeUndefined();
+    delete globalThis[payloadKey];
   });
 
   test('creates isolated, immutable state for each Babel pass', () => {
@@ -135,6 +155,68 @@ describe('PandamStyle absorbed atomic and variable engine', () => {
         expect.stringContaining('{margin-inline-start:4px}'),
       ]),
     );
+  });
+
+  test('keeps stable atom hashes and null shorthand overrides', () => {
+    const options = engine.normalizeEngineOptions();
+    const [namespace, rules] = engine.lowerAtomicStyles(
+      { card: { padding: 8 } },
+      options,
+    );
+    expect(namespace.card).toMatchObject({ kmVPX3: 'xe8ttls', $$css: true });
+    expect(rules).toEqual({
+      xe8ttls: {
+        priority: 1000,
+        ltr: '.xe8ttls{padding:8px}',
+        rtl: null,
+      },
+    });
+
+    const [, nullOverrideRules] = engine.lowerAtomicStyles(
+      { box: { padding: 8, paddingTop: null } },
+      options,
+    );
+    expect(Object.values(nullOverrideRules).map((rule) => rule.ltr)).toEqual([
+      '.xe8ttls{padding:8px}',
+    ]);
+  });
+
+  test('splits CSS functions and normalizes retained values deterministically', () => {
+    expect(
+      splitCssValue('calc((100% - 50px) * 0.5) var(--rightpadding, 20px)'),
+    ).toEqual(['calc((100% - 50px) * 0.5)', 'var(--rightpadding,20px)']);
+    const options = engine.normalizeEngineOptions();
+    expect(transformValue('content', 'He said "hello"', options)).toBe(
+      '"He said \\"hello\\""',
+    );
+    expect(transformValue('padding', 0, options)).toBe('0');
+    expect(transformValue('lineHeight', 1.25, options)).toBe('1.25');
+  });
+
+  test('orders same-property breakpoints in mobile-first cascade order', () => {
+    const compare = engine.createRuleComparator({});
+    const min700 = [
+      'min700',
+      { ltr: '@media (min-width: 700px){.min700{padding:1px}}' },
+      1000,
+    ];
+    const min1000 = [
+      'min1000',
+      { ltr: '@media (min-width: 1000px){.min1000{padding:2px}}' },
+      1000,
+    ];
+    const max1200 = [
+      'max1200',
+      { ltr: '@media (max-width: 1200px){.max1200{padding:3px}}' },
+      1000,
+    ];
+    const max800 = [
+      'max800',
+      { ltr: '@media (max-width: 800px){.max800{padding:4px}}' },
+      1000,
+    ];
+    expect(compare(min700, min1000)).toBeLessThan(0);
+    expect(compare(max1200, max800)).toBeLessThan(0);
   });
 
   test('lowers stable token variables and projects themes onto one variable group', () => {
