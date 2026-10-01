@@ -1,0 +1,22 @@
+{
+  "compiler": "typescript@5.9.3",
+  "strictNoEmit": true,
+  "positiveCoreAndSdk": "passed",
+  "positiveGeneratedDesignSystem": "passed",
+  "negativeCases": 9,
+  "negativeCaseNames": [
+    "private-token",
+    "unknown-token",
+    "invalid-recipe-axis-value",
+    "invalid-recipe-size-value",
+    "unknown-condition",
+    "unknown-theme",
+    "invalid-composition-object",
+    "wrong-abi-version",
+    "unverified-props-input"
+  ],
+  "negativeCasesRejected": true,
+  "elapsedMs": 842.854,
+  "commandDurationMs": 842.816,
+  "declarationBytes": 11231
+}

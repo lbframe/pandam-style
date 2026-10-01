@@ -1,0 +1,539 @@
+{
+  "id": "token.unknown",
+  "area": "tokens",
+  "status": "MUST_PRESERVE",
+  "gapId": null,
+  "fresh": {
+    "applicable": true
+  },
+  "incremental": {
+    "applicable": true
+  },
+  "freshMatchesExpected": true,
+  "incrementalMatchesExpected": true,
+  "freshMatchesIncremental": true,
+  "revisions": [
+    {
+      "revision": 1,
+      "label": "initial",
+      "fresh": {
+        "accepted": false,
+        "codes": [
+          "PMS_UNKNOWN_TOKEN"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_UNKNOWN_TOKEN",
+            "severity": "error",
+            "phase": "policy",
+            "source": "src/page.js (page)",
+            "location": {
+              "file": "src/page.js",
+              "line": 2,
+              "column": 36,
+              "role": "page"
+            },
+            "rule": "registry.tokens",
+            "context": {
+              "property": "gap",
+              "tokenId": "spacing.absent",
+              "systemId": "oracle-ui",
+              "category": null,
+              "visibility": null,
+              "candidates": [
+                "spacing.sm",
+                "spacing.md",
+                "spacing.lg"
+              ],
+              "conditionPath": []
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": null,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": null,
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "62c1f84c2058efed"
+          },
+          "abiVersion": 1,
+          "ok": false,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [
+            {
+              "schemaVersion": 1,
+              "code": "PMS_UNKNOWN_TOKEN",
+              "severity": "error",
+              "phase": "policy",
+              "rule": "registry.tokens",
+              "message": "Token inconnu : spacing.absent.",
+              "source": {
+                "file": "src/page.js",
+                "line": 2,
+                "column": 36,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "location": {
+                "file": "src/page.js",
+                "line": 2,
+                "column": 36,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "role": "page",
+              "context": {
+                "property": "gap",
+                "tokenId": "spacing.absent",
+                "systemId": "oracle-ui",
+                "visibility": null,
+                "conditionPath": []
+              },
+              "expected": {
+                "category": "spacing",
+                "visibility": null,
+                "static": null,
+                "domain": null
+              },
+              "candidates": [
+                {
+                  "tokenId": "spacing.lg",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.md",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.sm",
+                  "category": "spacing"
+                }
+              ],
+              "candidatesTotal": 3,
+              "candidatesTruncated": false,
+              "candidatesQuery": {
+                "method": "candidateTokens",
+                "category": "spacing",
+                "offset": 0,
+                "limit": 32,
+                "revision": {
+                  "projectId": "oracle-project",
+                  "sessionId": "oracle-session",
+                  "revisionId": 1
+                }
+              },
+              "repair": {
+                "kind": "use-declared-token",
+                "applicable": true,
+                "target": {
+                  "property": "gap"
+                },
+                "expected": {
+                  "declared": true,
+                  "category": "spacing"
+                },
+                "reason": null
+              },
+              "autofix": null,
+              "affectedRegion": {
+                "file": "src/page.js",
+                "namespace": null,
+                "property": "gap",
+                "conditionPath": []
+              },
+              "coverage": {
+                "analysed": true,
+                "origin": "root",
+                "failed": true
+              },
+              "revision": {
+                "projectId": "oracle-project",
+                "sessionId": "oracle-session",
+                "revisionId": 1
+              }
+            }
+          ],
+          "diagnosticsTotal": 1,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 1,
+            "truncated": false
+          },
+          "generation": {
+            "published": false,
+            "generationId": null,
+            "artifactRevision": null,
+            "artifactDigest": null,
+            "associationRevision": null
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": false,
+            "generationCommitted": false,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "incremental": {
+        "accepted": false,
+        "codes": [
+          "PMS_UNKNOWN_TOKEN"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_UNKNOWN_TOKEN",
+            "severity": "error",
+            "phase": "policy",
+            "source": "src/page.js (page)",
+            "location": {
+              "file": "src/page.js",
+              "line": 2,
+              "column": 36,
+              "role": "page"
+            },
+            "rule": "registry.tokens",
+            "context": {
+              "property": "gap",
+              "tokenId": "spacing.absent",
+              "systemId": "oracle-ui",
+              "category": null,
+              "visibility": null,
+              "candidates": [
+                "spacing.sm",
+                "spacing.md",
+                "spacing.lg"
+              ],
+              "conditionPath": []
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": 1,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": {
+          "filesChanged": 0,
+          "filesAdded": 1,
+          "filesRemoved": 0,
+          "filesReparsed": 2,
+          "filesRecompiled": 0,
+          "filesCompiled": 1,
+          "filesReused": 0,
+          "coverageSummariesReused": 0,
+          "coverageSummariesRebuilt": 2,
+          "reverseDependentsInvalidated": 0,
+          "negativeResolutionsInvalidated": 0,
+          "fullFallback": 1,
+          "fullFallbackReason": "design-system-definition",
+          "newlyCoveredFiles": 1,
+          "coveredFileCount": 2,
+          "fileStateCount": 2,
+          "dirtyFilesDeclared": 0,
+          "dirtyFilesRead": 1,
+          "dirtyFilesHashed": 1,
+          "dirtyFilesUnchanged": 0
+        },
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "62c1f84c2058efed"
+          },
+          "abiVersion": 1,
+          "ok": false,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [
+            {
+              "schemaVersion": 1,
+              "code": "PMS_UNKNOWN_TOKEN",
+              "severity": "error",
+              "phase": "policy",
+              "rule": "registry.tokens",
+              "message": "Token inconnu : spacing.absent.",
+              "source": {
+                "file": "src/page.js",
+                "line": 2,
+                "column": 36,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "location": {
+                "file": "src/page.js",
+                "line": 2,
+                "column": 36,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "role": "page",
+              "context": {
+                "property": "gap",
+                "tokenId": "spacing.absent",
+                "systemId": "oracle-ui",
+                "visibility": null,
+                "conditionPath": []
+              },
+              "expected": {
+                "category": "spacing",
+                "visibility": null,
+                "static": null,
+                "domain": null
+              },
+              "candidates": [
+                {
+                  "tokenId": "spacing.lg",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.md",
+                  "category": "spacing"
+                },
+                {
+                  "tokenId": "spacing.sm",
+                  "category": "spacing"
+                }
+              ],
+              "candidatesTotal": 3,
+              "candidatesTruncated": false,
+              "candidatesQuery": {
+                "method": "candidateTokens",
+                "category": "spacing",
+                "offset": 0,
+                "limit": 32,
+                "revision": {
+                  "projectId": "oracle-project",
+                  "sessionId": "oracle-session",
+                  "revisionId": 1
+                }
+              },
+              "repair": {
+                "kind": "use-declared-token",
+                "applicable": true,
+                "target": {
+                  "property": "gap"
+                },
+                "expected": {
+                  "declared": true,
+                  "category": "spacing"
+                },
+                "reason": null
+              },
+              "autofix": null,
+              "affectedRegion": {
+                "file": "src/page.js",
+                "namespace": null,
+                "property": "gap",
+                "conditionPath": []
+              },
+              "coverage": {
+                "analysed": true,
+                "origin": "root",
+                "failed": true
+              },
+              "revision": {
+                "projectId": "oracle-project",
+                "sessionId": "oracle-session",
+                "revisionId": 1
+              }
+            }
+          ],
+          "diagnosticsTotal": 1,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 1,
+            "truncated": false
+          },
+          "generation": {
+            "published": false,
+            "generationId": null,
+            "artifactRevision": null,
+            "artifactDigest": null,
+            "associationRevision": null
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": false,
+            "generationCommitted": false,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "freshChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_UNKNOWN_TOKEN"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "diagnostics/0/context",
+          "value": {
+            "property": "gap",
+            "tokenId": "spacing.absent",
+            "candidates": [
+              "spacing.sm",
+              "spacing.md",
+              "spacing.lg"
+            ]
+          },
+          "op": "fields",
+          "matches": true
+        }
+      ],
+      "incrementalChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_UNKNOWN_TOKEN"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "diagnostics/0/context",
+          "value": {
+            "property": "gap",
+            "tokenId": "spacing.absent",
+            "candidates": [
+              "spacing.sm",
+              "spacing.md",
+              "spacing.lg"
+            ]
+          },
+          "op": "fields",
+          "matches": true
+        },
+        {
+          "path": "revisionId",
+          "value": 1,
+          "matches": true
+        }
+      ],
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    }
+  ],
+  "contractReferences": [
+    "docs/architecture/public-api-v0.1.md",
+    "docs/architecture/generated-design-system-abi-v1.md"
+  ],
+  "classificationVerified": true
+}

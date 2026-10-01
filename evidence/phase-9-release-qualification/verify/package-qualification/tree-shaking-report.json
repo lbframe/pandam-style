@@ -1,0 +1,120 @@
+{
+  "bundler": "rollup@4.59.0",
+  "elapsedMs": 780.158,
+  "compiledApplicationSources": {
+    "one-recipe": {
+      "supported": true,
+      "diagnostics": [],
+      "javascriptBytes": 318
+    },
+    "one-theme": {
+      "supported": true,
+      "diagnostics": [],
+      "javascriptBytes": 292
+    },
+    "multiple-recipes": {
+      "supported": true,
+      "diagnostics": [],
+      "javascriptBytes": 496
+    },
+    "dynamic-axis": {
+      "supported": true,
+      "diagnostics": [],
+      "javascriptBytes": 221
+    },
+    "dynamic-namespace": {
+      "supported": false,
+      "diagnostics": [
+        "PMS_UNVERIFIED_PROPS_SOURCE"
+      ]
+    }
+  },
+  "cases": {
+    "props-only": {
+      "bytes": 7201,
+      "gzipBytes": 2224,
+      "moduleCount": 4
+    },
+    "one-recipe": {
+      "bytes": 7304,
+      "gzipBytes": 2310,
+      "moduleCount": 4
+    },
+    "one-theme": {
+      "bytes": 7278,
+      "gzipBytes": 2267,
+      "moduleCount": 4
+    },
+    "multiple-recipes": {
+      "bytes": 7477,
+      "gzipBytes": 2339,
+      "moduleCount": 4
+    },
+    "unused-core": {
+      "bytes": 1,
+      "gzipBytes": 21,
+      "moduleCount": 1
+    },
+    "dynamic-axis": {
+      "bytes": 18944,
+      "gzipBytes": 4468,
+      "moduleCount": 7
+    }
+  },
+  "dynamicSelectionVocabulary": {
+    "selectedRecipe": "button",
+    "unrelatedRecipeDataRetained": true,
+    "unrelatedRecipeIds": [
+      "notice"
+    ],
+    "unrelatedThemeDataRetained": false,
+    "reason": "runtime dynamic axis selection keeps the generated recipes aggregate reachable; Rollup retains its finite object members"
+  },
+  "assertions": {
+    "propsOnly": "passed",
+    "oneRecipeDropsNoticeRecipe": "passed",
+    "oneThemeDropsDarkTheme": "passed",
+    "multipleRecipesRetainAdditionalCompiledOutput": "passed",
+    "dynamicAxisRetainsBoundedSelectorData": "passed",
+    "dynamicNamespaceAccess": "not-supported-by-compiler",
+    "unusedCoreExportRemoved": "passed"
+  },
+  "caseModules": {
+    "props-only": [
+      "node_modules/@pandamstyle/core/src/selection-error.js",
+      "node_modules/@pandamstyle/core/src/abi.js",
+      "node_modules/@pandamstyle/core/src/props.js",
+      "bundle-entries/props-only.mjs"
+    ],
+    "one-recipe": [
+      "node_modules/@pandamstyle/core/src/selection-error.js",
+      "node_modules/@pandamstyle/core/src/abi.js",
+      "node_modules/@pandamstyle/core/src/props.js",
+      "bundle-entries/one-recipe.mjs"
+    ],
+    "one-theme": [
+      "node_modules/@pandamstyle/core/src/selection-error.js",
+      "node_modules/@pandamstyle/core/src/abi.js",
+      "node_modules/@pandamstyle/core/src/props.js",
+      "bundle-entries/one-theme.mjs"
+    ],
+    "multiple-recipes": [
+      "node_modules/@pandamstyle/core/src/selection-error.js",
+      "node_modules/@pandamstyle/core/src/abi.js",
+      "node_modules/@pandamstyle/core/src/props.js",
+      "bundle-entries/multiple-recipes.mjs"
+    ],
+    "unused-core": [
+      "bundle-entries/unused-core.mjs"
+    ],
+    "dynamic-axis": [
+      "node_modules/@pandamstyle/core/src/selection-error.js",
+      "node_modules/@pandamstyle/core/src/abi.js",
+      "node_modules/@pandamstyle/core/src/props.js",
+      "node_modules/@pandamstyle/core/src/recipe-select.js",
+      "node_modules/@pandamstyle/core/src/recipe.js",
+      "generated/design.js",
+      "bundle-entries/dynamic-axis.mjs"
+    ]
+  }
+}

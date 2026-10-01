@@ -1,0 +1,73 @@
+{
+  "documentKind": "pandamstyle-phase-9-worktree-isolation-v1",
+  "phase9": {
+    "path": "/home/kyle/work/pandam-style-phase-9-release-qualification-2026-10",
+    "branch": "chore/pandamstyle-phase-9-release-qualification-2026-10",
+    "baseCommit": "ce6601d8bd02f31f893d0ea386c25874fb2e5011",
+    "baseTree": "c23e4fff23dfb1d8df331b5cc14a1815a6f14921",
+    "testedCommit": "cdbc08bb4471bfa7f0d51bda7bb7701b43f1a16b",
+    "testedTree": "93a478ea7e54395f6a83364639b5578f64ad3cc1",
+    "scope": "all Phase 9 reads, edits, package builds, external consumers, and verifier runs were executed from this worktree"
+  },
+  "protectedMain": {
+    "localRef": "71fcc045b18eb215f0c3a815bb8c8d15a9f99489",
+    "remoteRefAtFinalEvidenceCapture": "71fcc045b18eb215f0c3a815bb8c8d15a9f99489",
+    "unchanged": true
+  },
+  "preexistingWorktrees": [
+    {
+      "path": "/home/kyle/work/pandam-style",
+      "branch": "chore/pandamstyle-phase-5-donor-cleanup-2026-10",
+      "head": "dd93bd4da211333bacf4c470554e5daab009e84e",
+      "statusAtFinalEvidenceCapture": "clean"
+    },
+    {
+      "path": "/home/kyle/work/pandam-style-phase-6-design-system-2026-10",
+      "branch": "feat/pandamstyle-phase-6-canonical-design-system-2026-10",
+      "head": "345ff45aed5ad83a3b363633ea60a7c0bc82e283",
+      "statusAtFinalEvidenceCapture": "clean"
+    },
+    {
+      "path": "/home/kyle/work/pandam-style-phase-7-project-service-2026-10",
+      "branch": "refactor/pandamstyle-phase-7-project-service-2026-10",
+      "head": "7641b51b14881c7eb84f1772b879cc041868c2e0",
+      "statusAtFinalEvidenceCapture": "clean"
+    },
+    {
+      "path": "/home/kyle/work/pandam-style-phase-6-7-reconciliation-2026-10",
+      "branch": "integration/pandamstyle-phase-6-7-reconciliation-2026-10",
+      "head": "ce6601d8bd02f31f893d0ea386c25874fb2e5011",
+      "statusAtFinalEvidenceCapture": "clean"
+    },
+    {
+      "path": "/home/kyle/work/pandam-style-phase-8-vite-2026-10",
+      "branch": "feat/pandamstyle-phase-8-vite-2026-10",
+      "head": "ce6601d8bd02f31f893d0ea386c25874fb2e5011",
+      "statusAtFinalEvidenceCapture": "uncommitted Phase 8 work preserved",
+      "changedPathsAtFinalEvidenceCapture": [
+        "docs/architecture/public-api-v0.1.md",
+        "examples/pilots/vite-react/README.md",
+        "examples/pilots/vite-react/package.json",
+        "examples/pilots/vite-react/src/base.css (deleted)",
+        "examples/pilots/vite-react/src/main.jsx",
+        "examples/pilots/vite-react/src/pages/App.jsx",
+        "examples/pilots/vite-react/vite.config.js",
+        "package.json",
+        "packages/compiler/__tests__/pandamstyle/project-api-test.js",
+        "packages/compiler/src/api/host.js",
+        "packages/compiler/src/api/project.js",
+        "packages/compiler/src/project/session/index.js",
+        "packages/compiler/types/host.d.ts",
+        "packages/compiler/types/index.d.ts",
+        "tools/pilot/run-pilot.sh",
+        "docs/architecture/phase-8-host-contract-audit.md (untracked)",
+        "examples/pilots/vite-react/src/pages/bridge.js (untracked)",
+        "examples/pilots/vite-react/src/pages/forward.js (untracked)",
+        "packages/vite/ (untracked)",
+        "tools/pilot/qualify-vite.mjs (untracked)"
+      ],
+      "modifiedByPhase9": false,
+      "note": "The Phase 8 worktree remains separate at the reconciliation base. Its visible uncommitted work was preserved; Phase 9 commands ran only from the Phase 9 worktree."
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "compilerRuntimeImports": {
+    "emittedImports": [
+      "@babel/core",
+      "@babel/parser",
+      "@babel/preset-react",
+      "@babel/preset-typescript",
+      "@babel/traverse",
+      "@babel/types",
+      "@csstools/css-tokenizer",
+      "@pandamstyle/core",
+      "crypto",
+      "fs",
+      "node:async_hooks",
+      "node:crypto",
+      "node:fs",
+      "node:fs/promises",
+      "node:path",
+      "node:url",
+      "path",
+      "postcss-value-parser"
+    ],
+    "undeclaredImports": []
+  },
+  "browserRuntimeImports": {
+    "pass": true,
+    "inspected": [
+      {
+        "artifact": "core-tarball",
+        "file": "src/abi.js",
+        "imports": [
+          "./selection-error.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/index.js",
+        "imports": [
+          "./abi.js",
+          "./props.js",
+          "./recipe.js",
+          "./selection-error.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/props.js",
+        "imports": [
+          "./abi.js",
+          "./selection-error.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/recipe-select.js",
+        "imports": [
+          "./abi.js",
+          "./selection-error.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/recipe.js",
+        "imports": [
+          "./recipe-select.js"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/selection-error.js",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "core-tarball",
+        "file": "src/types.ts",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "generated-runtime",
+        "file": "design.d.ts",
+        "imports": [
+          "@pandamstyle/core"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "generated-runtime",
+        "file": "design.js",
+        "imports": [
+          "@pandamstyle/core"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "generated-runtime",
+        "file": "js/src/app.tsx",
+        "imports": [
+          "@pandamstyle/core",
+          "react/jsx-runtime"
+        ],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "dynamic-axis.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "multiple-recipes.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "one-recipe.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "one-theme.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "props-only.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      },
+      {
+        "artifact": "browser-bundles",
+        "file": "unused-core.mjs",
+        "imports": [],
+        "forbiddenImports": [],
+        "processReferences": []
+      }
+    ]
+  }
+}
