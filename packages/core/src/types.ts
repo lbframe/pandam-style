@@ -55,23 +55,23 @@ export type RecipeSelection = Readonly<
   Record<string, string | number | boolean | null | undefined>
 >;
 
-export type RecipeRef = Readonly<{
-  (_selection?: RecipeSelection | null): StyleRef;
-  recipeId: string;
-  axisOrder: readonly string[];
-  variantMap: Readonly<Record<string, readonly string[]>>;
-  variantKeys: readonly string[];
-  defaultVariants: Readonly<Record<string, string | boolean>>;
-  splitVariantProps(
-    _props?: Readonly<Record<string, unknown>>,
-  ): readonly [
-    Readonly<Record<string, unknown>>,
-    Readonly<Record<string, unknown>>,
-  ];
-  getVariantProps(
-    _selection?: RecipeSelection | null,
-  ): Readonly<Record<string, string | boolean>>;
-}>;
+export type RecipeRef = ((_selection?: RecipeSelection | null) => StyleRef) &
+  Readonly<{
+    recipeId: string;
+    axisOrder: readonly string[];
+    variantMap: Readonly<Record<string, readonly string[]>>;
+    variantKeys: readonly string[];
+    defaultVariants: Readonly<Record<string, string | boolean>>;
+    splitVariantProps(
+      _props?: Readonly<Record<string, unknown>>,
+    ): readonly [
+      Readonly<Record<string, unknown>>,
+      Readonly<Record<string, unknown>>,
+    ];
+    getVariantProps(
+      _selection?: RecipeSelection | null,
+    ): Readonly<Record<string, string | boolean>>;
+  }>;
 
 export type CompositionInput =
   | StyleRef
@@ -129,6 +129,17 @@ export type PmsRuntimeDiagnostic = Readonly<{
 }>;
 
 export declare class PmsSelectionError extends Error {
+  constructor(
+    _options: Readonly<{
+      code: string;
+      message?: string;
+      rule?: string | null;
+      context?: Readonly<Record<string, unknown>>;
+      expected?: Readonly<Record<string, unknown>> | null;
+      candidates?: readonly unknown[];
+      repair?: PmsRuntimeDiagnostic['repair'];
+    }>,
+  );
   readonly schemaVersion: 1;
   readonly code: string;
   readonly severity: 'error';

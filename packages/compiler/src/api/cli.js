@@ -27,7 +27,7 @@ function parseArgs(argv) {
 
 async function loadModule(file) {
   const namespace = await import(pathToFileURL(file).href);
-  return namespace.default ?? namespace;
+  return Object.hasOwn(namespace, 'default') ? namespace.default : namespace;
 }
 
 function printDiagnostics(diagnostics, format = formatDiagnostic) {

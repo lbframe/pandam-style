@@ -67,7 +67,7 @@ export function generateDesignSystemModule({ designSystem }) {
     const spec = toRecipeSpec(recipe, systemId);
     recipeEntries.push(
       [
-        `const __pmsRecipe_${recipeId} = defineRecipeSelector(${jsonLiteral(spec)});`,
+        `const __pmsRecipe_${recipeId} = /*#__PURE__*/ defineRecipeSelector(${jsonLiteral(spec)});`,
         '',
       ].join('\n'),
     );
