@@ -1488,7 +1488,7 @@ async function runProductionQualification() {
       'utf8',
     );
     if (
-      /@pandamstyle\/(?:compiler|vite)|@babel\/|@stylexjs\/|@pandacss\/|node:[a-z]/.test(
+      /@pandamstyle\/(?:compiler|vite)|@babel\/|@stylexjs\/|@pandacss\/|['"]node:[a-z]/.test(
         contents,
       )
     )
