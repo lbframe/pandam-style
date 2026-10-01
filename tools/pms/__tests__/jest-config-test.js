@@ -178,6 +178,7 @@ describe('the root jest configuration is not a broad ignore', () => {
       [
         ...expected,
         'packages/compiler/__tests__/pandamstyle/phase-6-design-system-test.js',
+        'packages/compiler/__tests__/pandamstyle/phase-6-7-reconciliation-test.js',
       ].sort(),
     );
   });

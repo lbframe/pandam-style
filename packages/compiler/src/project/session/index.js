@@ -3709,24 +3709,19 @@ export function createProjectSession(config) {
     // Private compiler SDK support. The public facade returns identity-bound
     // immutable views rather than exposing these registry objects.
     _designSystemIdentity() {
-      const registry = state.designSystem?.registry;
-      return registry == null
+      const identity = state.designSystem?.snapshot?.identity;
+      return identity == null
         ? null
         : Object.freeze({
-            systemId: registry.systemId,
-            registryDigest: registry.registryDigest,
+            systemId: identity.systemId,
+            registryDigest: identity.registryDigest,
           });
     },
 
     _candidateTokenEntries(ids) {
-      const tokens = new Map(
-        (state.designSystem?.snapshot?.vocabulary.tokens ?? []).map((token) => [
-          token.tokenId,
-          token,
-        ]),
-      );
+      const tokens = state.designSystem?.snapshot?.vocabulary.tokens ?? [];
       return ids.map((tokenId) => {
-        const token = tokens.get(tokenId);
+        const token = tokens.find((entry) => entry.tokenId === tokenId);
         return Object.freeze({
           tokenId,
           category: token?.category ?? null,
@@ -3786,18 +3781,26 @@ export function createProjectSession(config) {
           digest: codeDigest,
         }))
         .sort((a, b) => a.file.localeCompare(b.file));
+      const snapshot = state.designSystem.snapshot;
+      const css = withDesignSystemCssIdentity(
+        aggregateCssFull(active.allRules, state.config),
+        snapshot.identity,
+      );
+      const artifactSet = createArtifactSet(snapshot, {
+        designModuleFile: state.config.designSystemFile,
+        declarationsFile: state.designDeclarationsFile,
+        designModule: state.designSystemSource,
+        declarations: state.designDeclarationsSource,
+        manifest: JSON.stringify(snapshot.tooling.manifest, null, 2) + '\n',
+        css,
+      });
       return sha256(
         stableJson({
           revisionId: active.revisionId,
           registryDigest: state.designSystem?.registry?.registryDigest ?? null,
           designSystemSource: state.designSystemSource,
           outputs,
-          css: withDesignSystemCssIdentity(
-            aggregateCssFull(active.allRules, state.config),
-            state.designSystem.snapshot.identity,
-          ),
-          manifest: state.designSystem?.manifest ?? null,
-          declarations: state.designDeclarationsSource,
+          canonicalArtifactSet: artifactSet.text,
           coverage: active.coverage ?? [],
           auditRequested: active.auditRequested === true,
         }),
@@ -4142,6 +4145,8 @@ export function createProjectSession(config) {
       state.active = null;
       state.designSystem = null;
       state.designSystemSource = null;
+      state.designDeclarationsSource = null;
+      state.designDeclarationsFile = null;
       state.generatedModulePath = null;
       state.coverageGraph = createCoverageGraph();
       state.published = null;

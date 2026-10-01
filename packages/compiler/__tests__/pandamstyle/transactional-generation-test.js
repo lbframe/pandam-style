@@ -50,6 +50,8 @@ function digestTree(dir) {
 /** Artifacts the brief names explicitly, checked one by one. */
 const NAMED_ARTIFACTS = [
   'design.pandamstyle.js',
+  'design.pandamstyle.d.ts',
+  'artifacts.json',
   'manifest.json',
   'build-report.json',
   'styles.css',

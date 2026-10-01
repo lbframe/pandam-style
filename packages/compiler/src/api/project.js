@@ -383,6 +383,7 @@ export function createProjectSession(config) {
         registryDigest: identity?.registryDigest ?? null,
       },
       candidateLimit: options.candidateLimit,
+      repairDomain: (query) => implementation._repairDomain(query),
       rootDir: normalized.rootDir,
       artifactRevision: committed?.artifactRevision ?? null,
       artifactDigest: committed?.artifactDigest ?? null,
@@ -590,14 +591,7 @@ export function createProjectSession(config) {
       truncated: result.truncated,
       candidates: implementation
         ._candidateTokenEntries(result.tokens)
-        .map(({ tokenId, category }) => Object.freeze({ tokenId, category }))
-        .sort((left, right) =>
-          left.tokenId < right.tokenId
-            ? -1
-            : left.tokenId > right.tokenId
-              ? 1
-              : 0,
-        ),
+        .map(({ tokenId, category }) => Object.freeze({ tokenId, category })),
     });
   }
 

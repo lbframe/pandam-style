@@ -91,6 +91,7 @@ function repairOf(diagnostic, expected) {
       (context.property != null ? { property: context.property } : null),
     expected: {
       ...repairExpected,
+      ...(expected.domain == null ? {} : { domain: expected.domain }),
       ...(repairExpected?.category == null && expected.category != null
         ? { category: expected.category }
         : {}),
@@ -108,6 +109,8 @@ function candidatesOf(diagnostic, revision, candidateLimit) {
   const limit = Number.isInteger(candidateLimit)
     ? Math.max(0, candidateLimit)
     : 32;
+  // Protocol v1 retains its frozen compact presentation order. The canonical
+  // domain and paginated candidateTokens query retain declaration order.
   const ordered = [...raw].sort((left, right) => {
     const a = typeof left === 'string' ? left : (left?.tokenId ?? '');
     const b = typeof right === 'string' ? right : (right?.tokenId ?? '');
@@ -166,6 +169,54 @@ export function protocolDiagnostic(diagnostic, revision, options = {}) {
       context.admitted ??
       null,
   };
+  // Vocabulary is supplied by the revision's canonical snapshot. Diagnostic
+  // history provides observed facts and repair operations, never a catalog.
+  if (typeof options.repairDomain === 'function') {
+    const tokenCodes = [
+      'PMS_UNKNOWN_TOKEN',
+      'PMS_INVALID_TOKEN_CATEGORY',
+      'PMS_TOKEN_NOT_PUBLIC',
+      'PMS_FORBIDDEN_VALUE',
+    ];
+    if (expected.category != null && tokenCodes.includes(diagnostic?.code)) {
+      const domain =
+        options.repairDomain({ kind: 'token', category: expected.category }) ??
+        [];
+      diagnostic = {
+        ...diagnostic,
+        expected: { ...diagnostic.expected, category: expected.category },
+        candidates: domain.slice(
+          0,
+          Number.isInteger(options.candidateLimit)
+            ? Math.max(0, options.candidateLimit)
+            : 32,
+        ),
+        candidatesTotal: domain.length,
+      };
+    } else if (diagnostic?.code === 'PMS_UNKNOWN_CONDITION') {
+      const domain =
+        options.repairDomain({
+          kind: context.themeName == null ? 'condition' : 'theme',
+        }) ?? [];
+      expected.domain = domain;
+      if (context.admitted != null) context.admitted = domain;
+    } else if (
+      ['PMS_INVALID_VARIANT_KEY', 'PMS_INVALID_VARIANT_VALUE'].includes(
+        diagnostic?.code,
+      )
+    ) {
+      const recipe = options.repairDomain({
+        kind: 'recipe',
+        recipeId: context.recipeId,
+      });
+      const domain =
+        diagnostic.code === 'PMS_INVALID_VARIANT_VALUE'
+          ? (recipe?.values?.[context.axis ?? context.key] ?? [])
+          : (recipe?.axes ?? []);
+      expected.domain = domain;
+      if (context.admitted != null) context.admitted = domain;
+    }
+  }
   const source = sourceOf(diagnostic, options.rootDir);
   const coverage = normalizeContext(diagnostic?.file ?? null, options.rootDir);
   const candidates = candidatesOf(diagnostic, revision, options.candidateLimit);
@@ -209,9 +260,14 @@ export function buildDiagnosticsResult({
   artifactDigest = null,
   associationRevision = null,
   rootDir = null,
+  repairDomain = null,
 }) {
   const diagnostics = (legacy?.diagnostics ?? []).map((diagnostic) =>
-    protocolDiagnostic(diagnostic, revision, { candidateLimit, rootDir }),
+    protocolDiagnostic(diagnostic, revision, {
+      candidateLimit,
+      rootDir,
+      repairDomain,
+    }),
   );
   const mode = legacy?.mutation?.mode ?? 'full-discovery';
   const fullDiscovery = legacy?.incremental?.fullDiscovery === true;

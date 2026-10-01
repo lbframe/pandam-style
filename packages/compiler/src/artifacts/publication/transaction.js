@@ -143,6 +143,7 @@
 
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import { validateArtifactSet } from '../metadata/artifact-set';
 import * as path from 'path';
 // Benchmark-only measurement hooks (Spike 1).
 import { perfCollector, perfNow } from '../../observability/metrics';
@@ -774,6 +775,7 @@ export function beginGeneration(outDir, options = {}) {
       addCount('write_calls', 1);
       addCount('written_bytes', size);
       addDuration('publish_materialize_ms', start);
+      maybeFail(`after-stage:${rel}`);
       return { rel, reused: false, size, digest };
     },
 
@@ -808,6 +810,7 @@ export function beginGeneration(outDir, options = {}) {
         addCount('output_bytes_reused', previous.size ?? record.size);
         addDuration('publish_materialize_ms', start);
         markIoEnd();
+        maybeFail(`after-stage:${rel}`);
         return { rel, reused: true, size: record.size };
       }
 
@@ -828,6 +831,7 @@ export function beginGeneration(outDir, options = {}) {
       addCount('written_bytes', record.size);
       addDuration('publish_materialize_ms', start);
       markIoEnd();
+      maybeFail(`after-stage:${rel}`);
       return { rel, reused: false, size: record.size };
     },
 
@@ -870,6 +874,27 @@ export function beginGeneration(outDir, options = {}) {
      */
     commit() {
       ensureOpen();
+      // Check actual staged canonical members before durable commit intent.
+      // Both service and independent oracle use this single publisher.
+      if (staged.has('artifacts.json')) {
+        const metadata = JSON.parse(
+          fs.readFileSync(staged.get('artifacts.json'), 'utf8'),
+        );
+        const contents = {};
+        for (const [name, record] of Object.entries(metadata.artifacts ?? {})) {
+          const file = staged.get(record.file);
+          contents[name] = file == null ? null : fs.readFileSync(file, 'utf8');
+        }
+        validateArtifactSet(metadata, contents);
+        if (
+          sha256Of(fs.readFileSync(staged.get('artifacts.json'), 'utf8')) !==
+          records['artifacts.json'].digest
+        ) {
+          throw new Error(
+            'pandamstyle: staged artifact metadata changed after preparation',
+          );
+        }
+      }
 
       // `removed` first: it is a set difference over records, and the caller is
       // entitled to know what is about to disappear before it does.
