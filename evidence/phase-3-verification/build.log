@@ -1,0 +1,77 @@
+Successfully compiled 33 files with Babel (489ms).
+Successfully compiled 2 files with Babel (295ms).
+
+./src/stylex.js, ./src/inject.js → ./lib/cjs...
+created ./lib/cjs in 454ms
+
+./src/stylex.js, ./src/inject.js → ./lib/es/...
+created ./lib/es/ in 444ms
+
+./src/index.js → ./lib/index.js...
+created ./lib/index.js in 1.3s
+
+./src/index.js → ./lib/index.browser.js...
+(!) Missing exports
+https://rollupjs.org/troubleshooting/#error-name-is-not-exported-by-module
+src/visitors/stylex-create.js
+logicalExpression is not exported by @babel/types
+475: 
+476:               const guardedObjs = guardedProps.map(({ prop, expr }) =>
+477:                 t.logicalExpression(
+                       ^
+478:                   '&&',
+479:                   t.binaryExpression(
+src/visitors/stylex-create.js
+cloneNode is not exported by @babel/types
+479:                   t.binaryExpression(
+480:                     '!==',
+481:                     t.cloneNode(expr),
+                           ^
+482:                     t.identifier('undefined'),
+483:                   ),
+src/visitors/stylex-create.js
+cloneNode is not exported by @babel/types
+486:                     t.objectProperty(
+487:                       t.identifier('$$css'),
+488:                       t.cloneNode(cssTagValue),
+                             ^
+489:                     ),
+490:                   ]),
+src/visitors/stylex-props.js
+isLiteral is not exported by @babel/types
+528:         return false;
+529:       }
+530:     } else if (!t.isLiteral(val)) {
+                       ^
+531:       return false;
+532:     }
+src/index.js
+importNamespaceSpecifier is not exported by @babel/types
+446:     'body',
+447:     t.importDeclaration(
+448:       [t.importNamespaceSpecifier(t.identifier(stylexLocalName))],
+              ^
+449:       t.stringLiteral(importSource),
+450:     ),
+created ./lib/index.browser.js in 840ms
+
+./src/api/cli.js → ./lib/cli.mjs...
+created ./lib/cli.mjs in 1.7s
+
+./src/api/index.js → ./lib/index.mjs...
+created ./lib/index.mjs in 1s
+
+./src/api/config.js → ./lib/config.mjs...
+created ./lib/config.mjs in 12ms
+
+./src/api/host.js → ./lib/host.mjs...
+created ./lib/host.mjs in 6ms
+
+../@stylexjs/babel-plugin/pandamstyle/runtime.js → ./lib/runtime.mjs...
+created ./lib/runtime.mjs in 12ms
+
+../@stylexjs/babel-plugin/pandamstyle/vite.js → ./lib/vite.mjs...
+created ./lib/vite.mjs in 853ms
+
+../../tests/support/compiler-inspection.js → ../../.pms-test-support/compiler-inspection.cjs...
+created ../../.pms-test-support/compiler-inspection.cjs in 1s

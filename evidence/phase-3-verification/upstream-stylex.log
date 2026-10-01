@@ -1,0 +1,125 @@
+PASS __tests__/stylex-test.js
+  stylex
+    error handling
+      ✓ stylex.create (11 ms)
+      ✓ stylex.createTheme
+      ✓ stylex.defineConsts (1 ms)
+      ✓ stylex.defineVars (1 ms)
+      ✓ stylex.firstThatWorks
+      ✓ stylex.keyframes
+      ✓ stylex.positionTry (1 ms)
+      ✓ stylex.viewTransitionClass
+      ✓ stylex.defaultMarker (1 ms)
+      ✓ stylex.defineMarker (1 ms)
+      ✓ stylex.unstable_conditional
+      ✓ stylex.unstable_defineVarsNested
+      ✓ stylex.unstable_defineConstsNested
+      ✓ stylex.unstable_createThemeNested
+      ✓ stylex.typesangle
+      ✓ stylex.typescolor (1 ms)
+      ✓ stylex.typesurl (1 ms)
+      ✓ stylex.typesimage
+      ✓ stylex.typesinteger
+      ✓ stylex.typeslengthPercentage (1 ms)
+      ✓ stylex.typeslength
+      ✓ stylex.typespercentage
+      ✓ stylex.typesnumber (1 ms)
+      ✓ stylex.typesresolution
+      ✓ stylex.typestime
+      ✓ stylex.typestransformFunction
+      ✓ stylex.typestransformList (1 ms)
+      ✓ stylex.whenancestor
+      ✓ stylex.whendescendant (1 ms)
+      ✓ stylex.whensiblingBefore
+      ✓ stylex.whensiblingAfter (1 ms)
+      ✓ stylex.whenanySibling
+    props
+      ✓ basic resolve
+      ✓ merge order
+      ✓ with a top-level array of simple overridden classes (1 ms)
+      ✓ with nested arrays and pseudoClasses overriding things
+      ✓ with just pseudoclasses (1 ms)
+      ✓ with complicated set of arguments
+      ✓ with dynamic styles (2 ms)
+      ✓ data prop for source map data
+    attrs
+      ✓ basic resolve (1 ms)
+      ✓ with dynamic styles
+      ✓ legacyMerge merges classNames (1 ms)
+      ✓ legacyMerge exposes attrs
+
+PASS __tests__/inject-test.js
+  inject
+    ✓ @keyframes (1 ms)
+    ✓ @positionTry
+    ✓ ::view-transition (1 ms)
+    ✓ @media
+    ✓ ::before (1 ms)
+    ✓ :hover
+    ✓ ::before:hover (1 ms)
+    defineConsts runtime injection
+      ✓ registers a constant
+      ✓ inlines constant in CSS rule
+      ✓ inlines multiple constants in one rule (1 ms)
+      ✓ handles numeric constants
+      ✓ leaves unreferenced constants unchanged in CSS
+      ✓ handles constants in media queries
+      ✓ handles nested at-rules with constants (1 ms)
+      ✓ handles constants for container queries
+      ✓ handles constants for supports queries (1 ms)
+      ✓ handles constants in CSS variable definitions
+      ✓ handles constants with special characters in values
+      ✓ preserves other var() references that are not constants
+      ✓ updates dependent rules when constant changes
+      ✓ handles constants with zero values
+      ✓ handles constants in complex selectors
+      ✓ updates multiple dependent rules when constant changes (1 ms)
+      ✓ does not update dependent rules if constant value stays the same
+      ✓ updates dependent at-rules when constant changes
+      ✓ prevents duplicate dependency tracking (1 ms)
+      ✓ tracks dependencies for multiple constants in one rule
+      ✓ correctly updates stylesheet when constant value changes (1 ms)
+      ✓ handles constant updates with at-rules and regular properties
+      ✓ handles mixed constant and non-constant values (1 ms)
+
+PASS __tests__/createOrderedCSSStyleSheet-test.js
+  createOrderedCSSStyleSheet
+    #insert
+      ✓ does not throw on invalid rule (1 ms)
+      ✓ insertion of CSSStyleRule
+      ✓ insertion of CSSMediaRule (1 ms)
+      ✓ insertion of CSSMediaRule within CSSConditionRule
+      ✓ insertion order for same group (1 ms)
+      ✓ deduplication for same group
+      ✓ order for same group
+      ✓ insertion order for different groups
+    #update
+      ✓ updates an existing rule with same selector (1 ms)
+      ✓ updates a media query rule
+      ✓ updates multiple properties in a rule
+      ✓ inserts new rule if old rule does not exist (1 ms)
+      ✓ inserts new rule if selectors are different
+      ✓ updates rule in different group
+      ✓ updates nested at-rules (1 ms)
+      ✓ handles update when rule has specificity selectors
+    client-side hydration
+      ✓ from SSR CSS (2 ms)
+      ✓ works when the group marker is in single quotes (1 ms)
+
+PASS __tests__/createSheet-test.js
+  createSheet
+    client side
+      ✓ creates a sheet (1 ms)
+      ✓ creates multiple sheets (1 ms)
+      ✓ reuses existing sheet for given root
+      ✓ supports updating styles across multiple documents (7 ms)
+      ✓ update method updates rules across all sheets (4 ms)
+    server side
+      ✓ creates a sheet
+      ✓ creates multiple sheets (1 ms)
+
+Test Suites: 4 passed, 4 total
+Tests:       99 passed, 99 total
+Snapshots:   74 passed, 74 total
+Time:        0.759 s, estimated 1 s
+Ran all test suites.
