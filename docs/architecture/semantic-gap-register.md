@@ -1,11 +1,10 @@
 # Semantic gap register
 
-Status: Phase 1 discrepancy history with Phase 3 resolution recorded below.
-Target assertions remain unchanged in `tests/semantic/cases/`; the Phase 3
-oracle records repaired behavior and revision evidence. SG-01 through SG-11 and
-SG-13 are promoted to `MUST_PRESERVE`. SG-12 remains the Phase 2-owned
-`KNOWN_GAP`. The Phase 1 observations below are historical, not descriptions of
-the current implementation.
+Status: Phase 1 discrepancy history with Phase 2 and Phase 3 resolutions
+recorded below. Target assertions remain unchanged in `tests/semantic/cases/`;
+the reconciliation oracle checks the combined implementation. SG-01 through
+SG-13 are promoted to `MUST_PRESERVE`. The Phase 1 observations below are
+historical, not descriptions of the current implementation.
 
 The Phase 1 target behavior remains frozen for every entry. Phase 3 reviewed and
 promoted the repaired cases with their authored expectations intact. The Phase 1
@@ -197,7 +196,7 @@ observations explain the original migration risk.
 - Resolution: Phase 3 generated artifact authentication; case promoted to
   `MUST_PRESERVE`.
 
-## SG-12 — runtime malformed refs lack structured rejection — unresolved, Phase 2
+## SG-12 — runtime malformed refs lack structured rejection — resolved in Phase 2
 
 - Case: `props.runtime-malformed`.
 - Contract: [public API runtime malformed refs](public-api-v0.1.md),
@@ -209,8 +208,10 @@ observations explain the original migration risk.
   simulate rejection. Passing static spoofing tests do not establish this
   runtime guard.
 - Migration risk: new core inherits permissive donor format behavior.
-- Resolution: intentionally untouched in Phase 3; Phase 2 owns core
-  composition/runtime selection errors.
+- Resolution: Phase 2 `@pandamstyle/core` validates every runtime composition
+  input and raises `PMS_UNVERIFIED_PROPS_SOURCE` for the malformed object. The
+  reconciled generated facade imports core's `props`; the unchanged target
+  assertion is promoted from `KNOWN_GAP` to `MUST_PRESERVE`.
 
 ## SG-13 — smaller requested diagnostic bounds ignored — resolved in Phase 3
 
