@@ -289,6 +289,17 @@ test('donor detection reads module syntax and ignores comments and matcher strin
   ).toBe(true);
 });
 
+test('the module scanner parses TypeScript declaration files as TypeScript', () => {
+  const imports = parseModuleImports(
+    "import type { Donor } from '@stylexjs/shared';\n" +
+      'export declare const Codes: Readonly<Record<string, string>>;\n',
+    'types/index.d.ts',
+  );
+  expect(imports.map((item) => [item.specifier, item.typeOnly])).toEqual([
+    ['@stylexjs/shared', true],
+  ]);
+});
+
 test('the closure scanner fails on restored donor imports and manifest dependencies', () => {
   const root = fs.mkdtempSync(
     path.join(os.tmpdir(), 'pms-donor-closure-test-'),

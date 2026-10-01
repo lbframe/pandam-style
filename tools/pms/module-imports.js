@@ -10,7 +10,19 @@
 const parser = require('@babel/parser');
 const hermesParser = require('hermes-parser');
 
+function parseTypeScriptProgram(source, filename) {
+  return parser.parse(source, {
+    sourceType: 'unambiguous',
+    sourceFilename: filename,
+    allowAwaitOutsideFunction: true,
+    allowReturnOutsideFunction: true,
+    plugins: ['jsx', 'typescript', 'decorators-legacy', 'dynamicImport'],
+  }).program;
+}
+
 function parseProgram(source, filename = '<source>') {
+  if (/\.(?:ts|tsx|mts|cts)$/.test(filename))
+    return parseTypeScriptProgram(source, filename);
   try {
     return hermesParser.parse(source, {
       babel: true,
@@ -21,13 +33,7 @@ function parseProgram(source, filename = '<source>') {
     }).program;
   } catch (flowError) {
     try {
-      return parser.parse(source, {
-        sourceType: 'unambiguous',
-        sourceFilename: filename,
-        allowAwaitOutsideFunction: true,
-        allowReturnOutsideFunction: true,
-        plugins: ['jsx', 'typescript', 'decorators-legacy', 'dynamicImport'],
-      }).program;
+      return parseTypeScriptProgram(source, filename);
     } catch (typescriptError) {
       typescriptError.cause = flowError;
       throw typescriptError;
