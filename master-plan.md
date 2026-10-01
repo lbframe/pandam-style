@@ -47,7 +47,7 @@ These rules govern every implementation batch.
 10. All production hosts use one compiler/project authority.
 11. No host owns a second semantic cache or alternate truth model.
 12. No public npm package is created solely because an internal directory exists.
-13. The large Next.js pilot does not begin until standalone PandamStyle packaging is real.
+13. Large external host pilots do not begin until the relevant host adapters and standalone PandamStyle package boundaries are real and reconciled.
 14. Native rewrites are evidence-gated; no Rust/Oxc/SWC rewrite based on fashion or assumed speed.
 15. The final repository must look like a library designed as PandamStyle from day one.
 16. Binding/provenance semantics remain identity-based and fail closed on ambiguity.
@@ -67,6 +67,7 @@ The current target package model is:
 @pandamstyle/compiler
 @pandamstyle/vite
 @pandamstyle/next
+@pandamstyle/rsbuild
 ```
 
 These names are provisional until Phase 0 is formally accepted, but package responsibilities must remain separated by runtime/build/integration concerns.
@@ -89,7 +90,7 @@ Must not own:
 - filesystem access;
 - project graphs;
 - configuration loading;
-- Vite/Next integration;
+- Vite/Next/Rsbuild integration;
 - compiler session state.
 
 ## `@pandamstyle/compiler`
@@ -121,6 +122,12 @@ Must use the canonical compiler/project service. It must not contain an alternat
 Framework integration.
 
 Webpack and Turbopack support must be qualified separately. A webpack implementation is not Turbopack support.
+
+## `@pandamstyle/rsbuild`
+
+Thin Rsbuild host adapter.
+
+Must use the canonical compiler/project service. It must not contain an alternate compiler, graph, semantic cache, CSS authority or publisher. Rsbuild/Rspack lifecycle handling belongs to the adapter; PandamStyle semantics remain owned by the compiler.
 
 ---
 
@@ -625,24 +632,128 @@ multiple workers/processes
 
 Do not claim Turbopack support from a webpack plugin.
 
+The package is a thin host integration over the canonical Project Service. Webpack and Turbopack adapters own framework/backend hooks and transport only; they do not own alternate compiler, graph, cache, CSS or publication truth.
+
 ### Exit gate
 
 The supported Next backends are individually proven and documented.
 
 ---
 
-## Phase 11 — Large real Next.js pilot
+## Phase 11 — Build and qualify `@pandamstyle/rsbuild`
 
 ### Goal
 
-Test the intended product architecture in a substantial external application.
+Add a real Rsbuild integration as a thin host adapter over the canonical Project Service.
+
+TanStack Start supports both Vite and Rsbuild as build-tool paths; PandamStyle should preserve that host choice without duplicating semantic authority.
+
+### Required qualification
+
+- Rsbuild dev server;
+- production build;
+- local edits;
+- invalid → diagnostic → repair;
+- add/delete/rename;
+- re-export changes;
+- design-system changes;
+- CSS updates;
+- HMR/reload behavior;
+- multiple projects/workspaces;
+- revision consistency;
+- failure/publication recovery;
+- supported Rsbuild/Rspack version range.
+
+### Architecture
+
+```text
+Rsbuild
+   ↓
+@pandamstyle/rsbuild
+   ↓
+@pandamstyle/compiler public SDK / Project Service
+```
+
+The adapter must not own a second graph, semantic cache, CSS model, design-system registry or publisher.
+
+### Exit gate
+
+Rsbuild behavior is semantically equivalent to fresh compiler behavior, uses the same Project Service authority, and is qualified from packed external packages.
+
+---
+
+## Phase 10 + 11 integration checkpoint — Host adapter convergence
+
+### Goal
+
+Reconcile any shared compiler SDK, package or publication changes introduced independently by Next and Rsbuild before large real-world pilots.
+
+### Required result
+
+```text
+@pandamstyle/core
+@pandamstyle/compiler
+@pandamstyle/vite
+@pandamstyle/next
+@pandamstyle/rsbuild
+```
+
+coexist in one release-qualified tree, with no host-specific semantic authority.
+
+### Exit gate
+
+All implemented host adapters consume the same public Project Service contract and standalone package qualification remains green.
+
+---
+
+## Phase 12 — Large real Vite / TanStack Start pilot
+
+### Goal
+
+Test `@pandamstyle/vite` in a substantial real TanStack Start application rather than only synthetic/qualification fixtures.
 
 ### Scenario
 
 ```text
-real Next.js template/application
+real TanStack Start + Vite application
         ↓
 install packed PandamStyle packages
+        ↓
+baseline dev/build/SSR/hydration
+        ↓
+define or migrate design system
+        ↓
+migrate a meaningful styling/application slice
+        ↓
+agent edits project
+        ↓
+invalid → structured diagnostics → repair
+        ↓
+HMR + SSR + hydration + navigation + production build
+        ↓
+performance and correctness evidence
+```
+
+### Exit gate
+
+PandamStyle works as a real external library in a meaningful TanStack Start + Vite application, with no alternate host truth and no workspace/donor leakage.
+
+---
+
+## Phase 13 — Large real Next.js pilot
+
+### Goal
+
+Test `@pandamstyle/next` in a substantial external Next.js application after the adapter is qualified.
+
+### Scenario
+
+```text
+real Next.js application
+        ↓
+install packed PandamStyle packages
+        ↓
+baseline webpack/Turbopack behavior as applicable
         ↓
 define/migrate design system
         ↓
@@ -654,22 +765,68 @@ invalid → structured diagnostics → repair
         ↓
 dev + production build
         ↓
-SSR/hydration/navigation
+RSC/client + SSR/hydration/navigation/cache
         ↓
 performance and correctness evidence
 ```
 
 ### Exit gate
 
-PandamStyle works as a real external library in a meaningful Next.js application without donor CSS-library dependencies.
+PandamStyle works as a real external library in a meaningful Next.js application without donor CSS-library dependencies, and every claimed backend is evidenced separately.
 
 ---
 
-## Phase 12 — Expand design-system capabilities
+## Phase 14 — Large real Rsbuild / TanStack Start pilot
 
 ### Goal
 
-Resume product capability work only after the architecture is stable.
+Test `@pandamstyle/rsbuild` in a substantial real TanStack Start + Rsbuild application.
+
+### Scenario
+
+```text
+real TanStack Start + Rsbuild application
+        ↓
+install packed PandamStyle packages
+        ↓
+baseline dev/build/SSR/hydration
+        ↓
+define or migrate design system
+        ↓
+migrate a meaningful styling/application slice
+        ↓
+agent edits project
+        ↓
+invalid → structured diagnostics → repair
+        ↓
+HMR + SSR + hydration + navigation + production build
+        ↓
+performance and correctness evidence
+```
+
+### Exit gate
+
+PandamStyle works as a real external library in a meaningful TanStack Start + Rsbuild application, with the same compiler semantics and Project Service authority as the Vite path.
+
+---
+
+## Phase 12 + 13 + 14 validation checkpoint — Real-host convergence
+
+### Goal
+
+Reconcile any product fixes discovered independently by the three large pilots and prove one canonical release tree across Vite, Next and Rsbuild.
+
+### Exit gate
+
+All three real-host pilots are green against one reconciled PandamStyle tree. No fix exists only on one pilot branch, no host has a private semantic workaround, and package qualification remains green.
+
+---
+
+## Phase 15 — Expand design-system capabilities
+
+### Goal
+
+Resume product capability work only after the architecture and real-host integrations are stable.
 
 Candidate capabilities:
 
@@ -689,7 +846,7 @@ Each capability has semantic tests, generated type coverage, diagnostics, and in
 
 ---
 
-## Phase 13 — Cold/global architecture and native-code research
+## Phase 16 — Cold/global architecture and native-code research
 
 ### Goal
 
@@ -702,7 +859,7 @@ Optimize cold/global paths only after the product architecture and real integrat
 - large graph changes;
 - RSS/memory;
 - parallelism;
-- real host-visible build latency.
+- real host-visible build latency across Vite, Next and Rsbuild.
 
 ### Candidate experiments
 
@@ -742,14 +899,18 @@ Phase 6 + Phase 7 (controlled parallel work allowed)
   ↓
 Phase 8 + Phase 9 (partial parallel work allowed)
   ↓
-Phase 10
+Phase 10 + Phase 11 (Next + Rsbuild, controlled parallel work allowed)
   ↓
-Phase 11
+Phase 10 + 11 integration checkpoint
   ↓
-Phase 12
+Phase 12 + Phase 13 + Phase 14 (large host pilots, controlled parallel work allowed)
+  ↓
+Phase 12 + 13 + 14 validation checkpoint
+  ↓
+Phase 15
 ```
 
-Phase 13 research/profiling can start once the new compiler/project architecture is stable enough to measure, but native implementation must not race ahead of the product migration.
+Phase 16 research/profiling can start once the host architecture is stable enough to measure across real applications, but native implementation must not race ahead of the product migration.
 
 ---
 
@@ -760,7 +921,7 @@ Phase 13 research/profiling can start once the new compiler/project architecture
 Primary phases:
 
 ```text
-0 → 6 → 12
+0 → 6 → 15
 ```
 
 Owns:
@@ -807,7 +968,7 @@ Owns:
 Primary phases:
 
 ```text
-8 → 10 → 11
+8 → (10 + 11) → (12 + 13 + 14)
 ```
 
 Owns:
@@ -815,7 +976,8 @@ Owns:
 - Vite;
 - Next/webpack;
 - Next/Turbopack;
-- real external pilot.
+- Rsbuild/Rspack host integration;
+- large external Vite, Next and Rsbuild pilots.
 
 ## Lane E — Verification
 
@@ -890,21 +1052,32 @@ Can partially run in parallel:
 - Vite adapter work can proceed while package/tarball qualification is developed;
 - final Vite acceptance must use the actual standalone package shape from Phase 9.
 
-### Phase 10
+### Phase 10 and Phase 11
 
-Must wait for stable compiler SDK, standalone package closure, and project service.
+May run in controlled parallel after the Phase 8+9 checkpoint closes:
 
-### Phase 11
+- Phase 10 owns `@pandamstyle/next`, with webpack and Turbopack qualified separately;
+- Phase 11 owns `@pandamstyle/rsbuild`, backed only by the public Project Service.
 
-Strictly after Phase 10 acceptance. The pilot must test intended architecture, never temporary integration plumbing.
+Shared compiler SDK or publication changes require an explicit Phase 10+11 reconciliation checkpoint before any large real-host pilot begins.
 
-### Phase 12
+### Phase 12, Phase 13 and Phase 14
 
-Implementation should wait until Phase 11 closes. Research/spec work may occur earlier but must not destabilize the migration baseline.
+May run in controlled parallel only after the Phase 10+11 integration checkpoint closes:
 
-### Phase 13
+- Phase 12 is the large real Vite/TanStack Start pilot;
+- Phase 13 is the large real Next.js pilot;
+- Phase 14 is the large real Rsbuild/TanStack Start pilot.
 
-Profiling/research can run in parallel after the new architecture is stable enough to measure. Production native migration occurs only after evidence and explicit approval.
+Each pilot uses packed public packages, a pinned external application revision, an untouched baseline and independent correctness/performance evidence. Product fixes discovered by pilots must converge through the Phase 12+13+14 validation checkpoint before capability work resumes.
+
+### Phase 15
+
+Implementation should wait until the three real-host pilots and their validation checkpoint close. Research/spec work may occur earlier but must not destabilize the host-validation baseline.
+
+### Phase 16
+
+Profiling/research can run in parallel once the host architecture is stable enough to measure. Production native migration occurs only after measured evidence and explicit approval.
 
 ---
 
@@ -930,7 +1103,11 @@ The rework is not complete until all of the following are true:
 [ ] Packed external installation is donor-free.
 [ ] Next webpack support is independently qualified if claimed.
 [ ] Next Turbopack support is independently qualified if claimed.
+[ ] Rsbuild support is independently qualified if claimed.
+[ ] Large external Vite/TanStack Start pilot passes.
 [ ] Large external Next.js pilot passes.
+[ ] Large external Rsbuild/TanStack Start pilot passes.
+[ ] Real-host pilot fixes converge into one canonical release tree.
 [ ] No permanent compatibility or migration shim remains.
 [ ] No legacy/archive tree remains solely for historical reference.
 [ ] Any native rewrite decision is backed by measured PandamStyle evidence.
@@ -957,13 +1134,23 @@ For every future implementation brief:
 
 # 11. Current execution state
 
-Phase 4 is complete. Phase 5 cleanup and qualification are being carried on
-`chore/pandamstyle-phase-5-donor-cleanup-2026-10`, from the accepted Phase 4
-head `44bbdb4c323cfaae9abc69f524d4fc8b5ceb4133`. The Phase 5 delivery record is
-the authority for its tested commit, evidence, exit-gate result, and subsequent
-phase authorization. Phase 6 and Phase 7 remain unauthorized unless that record
-reports every Phase 5 gate passed.
+Phase 8 and Phase 9 are complete and their integration checkpoint is closed on
+`integration/pandamstyle-phase-8-9-checkpoint-2026-10`, final head
+`f0a8370db6337e7c116006fc47b9d186dfa91c9f`. The checkpoint verified the
+standalone `@pandamstyle/core`, `@pandamstyle/compiler` and
+`@pandamstyle/vite` package boundary from external tarballs.
 
-The next authorized work follows the Phase 5 delivery record and the controlled
-parallelism rules above. This execution note does not change product contracts,
-phase ordering, or exit criteria.
+Phase 10 (`@pandamstyle/next`) and Phase 11 (`@pandamstyle/rsbuild`) are now
+authorized for controlled parallel implementation from that checkpoint. They
+must use separate worktrees and must converge through the Phase 10+11
+integration checkpoint before any large real-host pilot begins.
+
+After that checkpoint, Phases 12, 13 and 14 are authorized as separate large
+external validation tracks for Vite/TanStack Start, Next.js and
+Rsbuild/TanStack Start respectively. Those pilot branches may run in controlled
+parallel, but any product fixes they discover must be reconciled through the
+Phase 12+13+14 validation checkpoint before Phase 15 capability expansion.
+
+This amendment adds Rsbuild and explicit large real-world host validation to the
+canonical roadmap. It does not claim Next, Rsbuild or any large real-host pilot
+is already implemented.
