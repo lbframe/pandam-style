@@ -18,6 +18,7 @@ const {
   inspectSourceTree,
   isDonorPath,
   isDonorSpecifier,
+  walkInstalledGraph,
 } = require('../donor-closure');
 const { assessStep } = require('../step-contracts');
 const { parseModuleImports } = require('../module-imports');
@@ -118,6 +119,22 @@ if (fs.readFileSync(path.join(root, 'mode'), 'utf8') !== 'qualification-missing'
   write('packages/core/package.json', '{"name":"@pandamstyle/core"}\n');
   write('packages/core/src/index.js', 'export {};\n');
   write(
+    'packages/vite/package.json',
+    JSON.stringify({
+      name: '@pandamstyle/vite',
+      type: 'module',
+      exports: {
+        '.': { types: './types/index.d.ts', import: './src/index.js' },
+      },
+      peerDependencies: { vite: '7.3.2' },
+    }) + '\n',
+  );
+  write('packages/vite/src/index.js', 'export function pandamstyle() {}\n');
+  write(
+    'packages/vite/types/index.d.ts',
+    'export declare function pandamstyle(): void;\n',
+  );
+  write(
     'tools/pms/core-package-proof.js',
     `const fs = require('fs');
 const path = require('path');
@@ -155,8 +172,8 @@ if (args.includes('--listTests')) {
   console.log(JSON.stringify(mode === 'discovery-missing' ? files.slice(1) : files));
   process.exit(0);
 }
-let tests = tooling ? 43 : core ? 14 : semantic ? 2 : pandamstyle ? 514 : 1007;
-let suites = tooling ? 3 : core ? 1 : semantic ? 1 : pandamstyle ? 24 : 42;
+let tests = tooling ? 43 : core ? 14 : semantic ? 2 : pandamstyle ? 547 : 1007;
+let suites = tooling ? 3 : core ? 1 : semantic ? 1 : pandamstyle ? 25 : 42;
 let log = 'Test Suites: ' + suites + ' passed, ' + (tests === 1007 ? '1 skipped, ' : '') + (suites + (tests === 1007 ? 1 : 0)) + ' total\\nTests: ' + tests + ' passed, ' + (tests === 1007 ? '64 skipped, ' : '') + (tests + (tests === 1007 ? 64 : 0)) + ' total\\n';
 if (tooling) {
   if (mode === 'command-fails') process.exit(2);
@@ -256,13 +273,13 @@ test('the real summary accepts a green ten-step fixture with separate and summed
   expect(summary.steps['tooling-tests'].counts.testsPassed).toBe(43);
   expect(summary.steps['semantic-oracle'].kind).toBe('test');
   expect(summary.steps['semantic-oracle'].counts.testsPassed).toBe(2);
-  expect(summary.steps.pandamstyle.counts.testsPassed).toBe(514);
+  expect(summary.steps.pandamstyle.counts.testsPassed).toBe(547);
   expect(summary.steps['donor-closure'].kind).toBe('artifact-check');
   expect(summary.steps['package-qualification'].kind).toBe('artifact-check');
   expect(summary.steps['pandamstyle-core'].kind).toBe('test');
   expect(summary.steps['pandamstyle-core'].counts.testsPassed).toBe(14);
-  expect(summary.verification.testsPassed).toBe(573);
-  expect(summary.verification.suitesPassed).toBe(29);
+  expect(summary.verification.testsPassed).toBe(606);
+  expect(summary.verification.suitesPassed).toBe(30);
   expect(summary.verification.testsSkipped).toBe(0);
   expect(summary.verification.suitesSkipped).toBe(0);
   for (const name of [
@@ -344,13 +361,73 @@ test('root workspace closure records only real PandamStyle packages', () => {
     name: 'pandamstyle-workspace',
     packageManager: 'yarn@1.22.22',
     private: true,
-    workspaces: ['packages/core', 'packages/compiler'],
+    workspaces: ['packages/core', 'packages/compiler', 'packages/vite'],
     workspacePackages: [
       { path: 'packages/compiler', name: '@pandamstyle/compiler' },
       { path: 'packages/core', name: '@pandamstyle/core' },
+      { path: 'packages/vite', name: '@pandamstyle/vite' },
     ],
   });
   expect(workspace.scripts).not.toContain('release');
+});
+
+test('installed closure records absent optional peers without failing the graph', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-installed-graph-'));
+  const packageDir = path.join(root, 'node_modules', 'fixture');
+  const installedDir = path.join(root, 'node_modules', 'required-package');
+  fs.mkdirSync(packageDir, { recursive: true });
+  fs.mkdirSync(installedDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(packageDir, 'package.json'),
+    JSON.stringify({
+      name: 'fixture',
+      dependencies: { 'required-package': '1.0.0' },
+      optionalDependencies: { 'optional-platform-package': '1.0.0' },
+      peerDependencies: { 'optional-peer-package': '1.0.0' },
+      peerDependenciesMeta: {
+        'optional-peer-package': { optional: true },
+      },
+    }),
+  );
+  fs.writeFileSync(
+    path.join(installedDir, 'package.json'),
+    JSON.stringify({ name: 'required-package', version: '1.0.0' }),
+  );
+  try {
+    const findings = [];
+    const graph = walkInstalledGraph(
+      new Map([['fixture', packageDir]]),
+      findings,
+    );
+    expect(graph.complete).toBe(true);
+    expect(graph.packages.map((item) => item.name).sort()).toEqual([
+      'fixture',
+      'required-package',
+    ]);
+    expect(graph.optionalMissingDependencies).toEqual([
+      { package: 'fixture', dependency: 'optional-platform-package' },
+      { package: 'fixture', dependency: 'optional-peer-package' },
+    ]);
+    expect(findings).toEqual([]);
+
+    const manifestPath = path.join(packageDir, 'package.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    manifest.dependencies['required-missing-package'] = '1.0.0';
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest));
+    const requiredFindings = [];
+    const incompleteGraph = walkInstalledGraph(
+      new Map([['fixture', packageDir]]),
+      requiredFindings,
+    );
+    expect(incompleteGraph.complete).toBe(false);
+    expect(requiredFindings).toContainEqual({
+      code: 'INSTALLED_DEPENDENCY_MISSING',
+      location: fs.realpathSync(packageDir),
+      detail: 'required-missing-package',
+    });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('root workspace closure rejects donor workspace and release machinery', () => {

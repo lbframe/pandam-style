@@ -105,6 +105,24 @@ function manifestProductionDependencies(manifest) {
   };
 }
 
+function manifestInstalledDependencyEdges(manifest) {
+  const edges = new Map();
+  for (const name of Object.keys(manifest.dependencies ?? {}))
+    edges.set(name, { name, optional: false });
+  for (const name of Object.keys(manifest.optionalDependencies ?? {})) {
+    if (!edges.has(name)) edges.set(name, { name, optional: true });
+  }
+  for (const name of Object.keys(manifest.peerDependencies ?? {})) {
+    const optional = manifest.peerDependenciesMeta?.[name]?.optional === true;
+    const previous = edges.get(name);
+    edges.set(name, {
+      name,
+      optional: previous ? previous.optional && optional : optional,
+    });
+  }
+  return [...edges.values()];
+}
+
 function addFinding(findings, code, location, detail) {
   findings.push({ code, location, detail });
 }
@@ -435,7 +453,14 @@ function inspectPackedPackages(repoRoot, pilotDir, findings) {
       tarDir,
       'pilot tarballs are absent',
     );
-    return { packages: [], installedGraph: { complete: false, packages: [] } };
+    return {
+      packages: [],
+      installedGraph: {
+        complete: false,
+        packages: [],
+        optionalMissingDependencies: [],
+      },
+    };
   }
   const tarballs = fs
     .readdirSync(tarDir)
@@ -554,6 +579,7 @@ function inspectPackedPackages(repoRoot, pilotDir, findings) {
     installedGraph: {
       complete: installedGraph.complete,
       packages: installedGraph.packages,
+      optionalMissingDependencies: installedGraph.optionalMissingDependencies,
       donorPackages: installedGraph.donorPackages,
       workspaceLeakage: findings.some(
         (finding) => finding.code === 'WORKSPACE_LEAKAGE',
@@ -577,6 +603,7 @@ function resolveInstalledPackage(parentDir, name) {
 function walkInstalledGraph(roots, findings) {
   const visited = new Set();
   const packages = [];
+  const optionalMissingDependencies = [];
   let complete = true;
   const queue = [...roots.entries()].map(([name, dir]) => ({ name, dir }));
   while (queue.length > 0) {
@@ -607,12 +634,19 @@ function walkInstalledGraph(roots, findings) {
         real,
         manifest.name ?? name,
       );
-    const deps = manifestProductionDependencies(manifest);
-    for (const dependency of Object.keys(deps)) {
+    for (const edge of manifestInstalledDependencyEdges(manifest)) {
+      const { name: dependency, optional } = edge;
       if (isDonorSpecifier(dependency))
         addFinding(findings, 'DONOR_INSTALLED_DEPENDENCY', real, dependency);
       const resolved = resolveInstalledPackage(real, dependency);
       if (resolved == null) {
+        if (optional) {
+          optionalMissingDependencies.push({
+            package: manifest.name ?? name,
+            dependency,
+          });
+          continue;
+        }
         complete = false;
         addFinding(findings, 'INSTALLED_DEPENDENCY_MISSING', real, dependency);
       } else queue.push({ name: dependency, dir: resolved });
@@ -621,6 +655,7 @@ function walkInstalledGraph(roots, findings) {
   return {
     complete,
     packages,
+    optionalMissingDependencies,
     donorPackages: [
       ...new Set(packages.map((item) => item.name).filter(isDonorSpecifier)),
     ].sort(),
@@ -808,6 +843,7 @@ module.exports = {
   inspectGeneratedRuntime,
   inspectForbiddenRepositoryPaths,
   inspectManifest,
+  manifestInstalledDependencyEdges,
   inspectPackedPackages,
   inspectRollupGraph,
   inspectRootWorkspace,
