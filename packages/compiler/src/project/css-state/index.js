@@ -69,7 +69,13 @@
  * group is re-serialised only when one of its members changed.
  */
 
-import styleXTransform from '../../../../@stylexjs/babel-plugin/src/index';
+import {
+  createRuleComparator,
+  layerHeader,
+  logicalFloatVars as computeLogicalFloatVars,
+  splitConstantRules,
+  transformRuleEntry,
+} from '../../engine/index';
 import { count, perfNow } from '../../observability/metrics';
 
 /** The owner key reserved for the design system's own injected rules. */
@@ -94,8 +100,8 @@ function digestOfRuleText(ltr, rtl) {
  *        comments or legacy layer disabling.
  */
 export function createCssState(config) {
-  const compare = styleXTransform.createRuleComparator(config);
-  const transform = styleXTransform.transformRuleEntry;
+  const compare = createRuleComparator(config);
+  const transform = transformRuleEntry;
 
   /** className -> record. */
   const records = new Map();
@@ -233,8 +239,7 @@ export function createCssState(config) {
     // The logical-float preamble, decided by the aggregator's own function for
     // this one rule. O(1) per new rule, and no second copy of the predicate.
     const hasLogicalFloat =
-      styleXTransform.logicalFloatVars([[className, styleObj, priority]]) !==
-      '';
+      computeLogicalFloatVars([[className, styleObj, priority]]) !== '';
     return {
       className,
       priority: priority ?? 0,
@@ -379,8 +384,7 @@ export function createCssState(config) {
     ordered = [];
     logicalFloatCount = 0;
     identityViolation = null;
-    const { constantRules } =
-      styleXTransform.splitConstantRules(designSystemRules);
+    const { constantRules } = splitConstantRules(designSystemRules);
     const { constsMap, sig } = buildConsts(constantRules);
     currentConsts = constsMap;
     constSig = sig;
@@ -550,7 +554,7 @@ export function createCssState(config) {
 
     const logicalFloatVars =
       logicalFloatCount > 0
-        ? styleXTransform.logicalFloatVars(
+        ? computeLogicalFloatVars(
             ordered.map((r) => [
               r.className,
               { ltr: r.ltr, rtl: r.rtl },
@@ -558,7 +562,7 @@ export function createCssState(config) {
             ]),
           )
         : '';
-    const header = styleXTransform.layerHeader(config, nextGroups.length);
+    const header = layerHeader(config, nextGroups.length);
     const collectedCSS = nextGroups.map((g) => g.text).join('\n');
     const serializeNs = perfNow() - serializeStart;
     groups = nextGroups;

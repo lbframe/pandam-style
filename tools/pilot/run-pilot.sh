@@ -43,13 +43,14 @@ EXTRACT_DIR="${WORK_DIR}/.unpacked"
 mkdir -p "${EXTRACT_DIR}"
 PMS_TGZ="${PACK_DIR}/${PMS_TARBALL}"
 tar -xzf "${PMS_TGZ}" -C "${EXTRACT_DIR}"
-# Vite is the temporary Phase 8 verifier seam.
+# Vite qualification uses a private tools/pilot seam; Phase 8 still owns the
+# future public Vite integration.
 node -e '
 const fs = require("fs");
 const path = require("path");
 const pkgDir = process.argv[1];
 const pkg = JSON.parse(fs.readFileSync(path.join(pkgDir, "package.json"), "utf8"));
-for (const key of [".", "./config", "./host", "./vite", "./package.json"]) {
+for (const key of [".", "./config", "./host", "./package.json"]) {
   if (pkg.exports[key] == null) {
     console.error("MISSING EXPORT in the packed package: " + key);
     process.exit(1);
@@ -95,6 +96,10 @@ function path(a, b) { return a + "/" + b; }
 
 npm install --no-audit --no-fund --loglevel=error
 
+echo "== build the private Phase 4 Vite qualification seam =="
+"${REPO_ROOT}/node_modules/.bin/rollup" \
+  --config "${REPO_ROOT}/tools/pilot/vite-seam.rollup.config.mjs"
+
 echo "== 5/6 prove the app resolves the INSTALLED package, not the sources =="
 node -e '
 const fs = require("fs");
@@ -103,10 +108,6 @@ const pkgDir = path.dirname(require.resolve("@pandamstyle/compiler/package.json"
 const real = fs.realpathSync(pkgDir);
 if (real.includes("/packages/@stylexjs/babel-plugin/")) {
   console.error("resolved to monorepo sources: " + real);
-  process.exit(1);
-}
-if (!fs.existsSync(path.join(pkgDir, "lib", "vite.mjs"))) {
-  console.error("installed package is missing lib/vite.mjs");
   process.exit(1);
 }
 const manifest = require("@pandamstyle/compiler/package.json");
@@ -126,12 +127,11 @@ await import("@pandamstyle/compiler");
 await import("@pandamstyle/compiler/config");
 await import("@pandamstyle/compiler/host");
 await import("@pandamstyle/core");
-await import("@pandamstyle/compiler/vite");
-console.log("installed compiler SDK, core and Vite verifier subpath import successfully");
+console.log("installed compiler SDK and core subpath imports successfully");
 '
 
 echo "== 6/6 run the real Vite production build =="
-npx vite build --logLevel warn
+PMS_VITE_SEAM_PATH="${REPO_ROOT}/.pms-test-support/vite-seam.mjs" npx vite build --logLevel warn
 
 echo
 echo "== pilot artifacts =="

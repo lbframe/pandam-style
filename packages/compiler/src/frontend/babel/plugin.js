@@ -22,7 +22,7 @@
  */
 
 import * as t from '@babel/types';
-import StateManager from '../../../../@stylexjs/babel-plugin/src/utils/state-manager';
+import { createPassState } from './pass-state';
 import { PmsError } from '../../protocol/diagnostics';
 import {
   createUsageContext,
@@ -389,9 +389,7 @@ export function pandamstyleBabelPlugin(api) {
             pluginPass.file?.opts?.filename ?? pluginPass.filename ?? 'unknown';
           const role = options.role ?? 'page';
 
-          // The fork's StateManager gives us its evaluator and its import path
-          // resolver; it is the same object the StyleX visitors use.
-          const state = new StateManager(pluginPass);
+          const state = createPassState(pluginPass);
 
           count('semantic_builds');
           const ctx = createUsageContext({

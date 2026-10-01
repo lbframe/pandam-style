@@ -7,15 +7,17 @@
 
 /**
  * PandamStyle - compilation pipeline (ARC-05).
- * Registre -> validation de politique -> abaissement vers le moteur du fork
- * (styleXDefineVars / styleXCreateTheme / styleXCreateSet de src/shared).
+ * Registry -> policy validation -> lowering through the canonical
+ * PandamStyle-owned atomic, token-variable, and theme engine.
  * No parallel CSS emission: every rule comes out of the engine.
  */
 
-import styleXCreateSet from '../../../../@stylexjs/babel-plugin/src/shared/stylex-create';
-import styleXDefineVars from '../../../../@stylexjs/babel-plugin/src/shared/stylex-define-vars';
-import styleXCreateTheme from '../../../../@stylexjs/babel-plugin/src/shared/stylex-create-theme';
-import { defaultOptions } from '../../../../@stylexjs/babel-plugin/src/shared/utils/default-options';
+import {
+  lowerAtomicStyles,
+  lowerTokenVariables,
+  normalizeEngineOptions,
+  projectTheme,
+} from '../index';
 
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 import { tokenPathOf } from '../../design-system/tokens/ref';
@@ -43,12 +45,12 @@ function varKeyOf(tokenId) {
  * Retourne { varsByToken, themeClasses, injected }.
  */
 export function compileTokens(registry, options = {}) {
-  const engineOptions = { ...defaultOptions, ...options };
+  const engineOptions = normalizeEngineOptions(options);
   const baseValues = {};
   for (const tokenId of Object.keys(registry.tokens)) {
     baseValues[varKeyOf(tokenId)] = registry.resolvedValues[tokenId];
   }
-  const [varsObj, varsStyles] = styleXDefineVars(baseValues, {
+  const [varsObj, varsStyles] = lowerTokenVariables(baseValues, {
     ...engineOptions,
     exportId: registry.systemId,
   });
@@ -69,7 +71,7 @@ export function compileTokens(registry, options = {}) {
       themeClasses[themeName] = varsObj.__varGroupHash__;
       continue;
     }
-    const [themeClassObj, themeStyles] = styleXCreateTheme(
+    const [themeClassObj, themeStyles] = projectTheme(
       varsObj,
       overrides,
       engineOptions,
@@ -487,8 +489,7 @@ export function compileStyles({
   }
 
   const engineOptions = {
-    ...defaultOptions,
-    ...options,
+    ...normalizeEngineOptions(options),
     __pmsCount: perfCollector() === null ? null : count,
   };
   // Atomic lowering is timed separately, so the policy figure EXCLUDES it.
@@ -496,7 +497,7 @@ export function compileStyles({
   // the two phases are disjoint here, which makes the split exact rather than
   // an estimate.
   const lowerStart = process.hrtime.bigint();
-  const [compiled, injected, classPaths] = styleXCreateSet(
+  const [compiled, injected, classPaths] = lowerAtomicStyles(
     normalized,
     engineOptions,
   );

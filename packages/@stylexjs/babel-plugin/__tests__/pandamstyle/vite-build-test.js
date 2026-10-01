@@ -16,13 +16,34 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '../../../../..');
-const COMPILER_PKG = path.join(REPO_ROOT, 'packages/compiler');
+const VITE_SEAM = path.join(REPO_ROOT, '.pms-test-support/vite-seam.mjs');
+const VITE_SEAM_ROLLUP_CONFIG = path.join(
+  REPO_ROOT,
+  'tools/pilot/vite-seam.rollup.config.mjs',
+);
 const SHARED_DEFINITION = path.resolve(
   __dirname,
   'fixtures/_shared/design.pms.config.mjs',
 );
 
 jest.setTimeout(180000);
+
+let viteSeamBuilt = false;
+
+function ensureViteSeamBundle() {
+  if (viteSeamBuilt && fs.existsSync(VITE_SEAM)) return;
+  const result = spawnSync(
+    path.join(REPO_ROOT, 'node_modules/.bin/rollup'),
+    ['--config', VITE_SEAM_ROLLUP_CONFIG],
+    { cwd: REPO_ROOT, encoding: 'utf8' },
+  );
+  if (result.status !== 0) {
+    throw new Error(
+      `failed to build the private Vite qualification seam:\n${result.stdout ?? ''}\n${result.stderr ?? ''}`,
+    );
+  }
+  viteSeamBuilt = true;
+}
 
 function sha256(file) {
   return crypto
@@ -92,6 +113,7 @@ createRoot(document.getElementById('root')).render(<App />);
  * the app root, so a fixture can add a relay barrel outside the covered root.
  */
 function makeApp(extraFiles = {}) {
+  ensureViteSeamBundle();
   const app = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-vite-'));
   fs.mkdirSync(path.join(app, 'src/pages'), { recursive: true });
   fs.writeFileSync(path.join(app, 'index.html'), HTML, 'utf8');
@@ -118,9 +140,7 @@ function makeApp(extraFiles = {}) {
     path.join(app, 'vite.config.mjs'),
     `import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { pandamstyle } from ${JSON.stringify(
-      path.join(COMPILER_PKG, 'lib/vite.mjs'),
-    )};
+import { pandamstyle } from ${JSON.stringify(VITE_SEAM)};
 
 const lateFailure = {
   name: 'pms-test-late-failure',
@@ -158,14 +178,7 @@ export default defineConfig({
   // would resolve them; NODE_PATH is not read by ESM, so link instead.
   const scope = path.join(app, 'node_modules');
   fs.mkdirSync(scope, { recursive: true });
-  for (const dep of [
-    'vite',
-    '@vitejs',
-    'react',
-    'react-dom',
-    '@stylexjs',
-    '@pandamstyle',
-  ]) {
+  for (const dep of ['vite', '@vitejs', 'react', 'react-dom', '@pandamstyle']) {
     const from = path.join(REPO_ROOT, 'node_modules', dep);
     if (!fs.existsSync(from)) continue;
     const to = path.join(scope, dep);
@@ -187,7 +200,11 @@ function runViteBuild(app, env = {}) {
   const result = spawnSync(process.execPath, [bin, 'build'], {
     cwd: app,
     encoding: 'utf8',
-    env: { ...process.env, ...env, NODE_ENV: 'production' },
+    env: {
+      ...process.env,
+      ...env,
+      NODE_ENV: 'production',
+    },
   });
   return {
     status: result.status,

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PandamStyle - verification entry point for the native compilation batch.
+# PandamStyle - verification entry point for the engine absorption batch.
 #
 # Every step propagates its failure. There is no `|| true`, no output filtering
 # and no partial success: if a required step fails, this script exits non-zero
@@ -328,8 +328,7 @@ build_delivered_packages() {
        "$REPO_ROOT/node_modules/.bin/rollup" -c ./rollup.config.mjs)
   (cd "$REPO_ROOT/packages/@stylexjs/babel-plugin" \
     && "$REPO_ROOT/node_modules/.bin/rollup" --config ./rollup.config.mjs)
-  # The delivered PandamStyle-owned compiler and its explicitly externalized
-  # Phase 4 donor dependencies, built by its own rollup config.
+  # The delivered PandamStyle-owned compiler, built by its own Rollup config.
   (cd "$REPO_ROOT/packages/compiler" \
     && "$REPO_ROOT/node_modules/.bin/rollup" --config ./rollup.config.mjs)
 }
@@ -359,7 +358,7 @@ if is_filtered_out "pandamstyle"; then
   skip_step "pandamstyle" "not selected by PMS_ONLY_STEPS"
 else
   run_step "pandamstyle" \
-    bash -c "cd '$REPO_ROOT/packages/@stylexjs/babel-plugin' && '$REPO_ROOT/node_modules/.bin/jest' --ci '__tests__/pandamstyle/.*-test.js'"
+    bash -c "cd '$REPO_ROOT/packages/@stylexjs/babel-plugin' && '$REPO_ROOT/node_modules/.bin/jest' --ci '__tests__/pandamstyle/.*-test.js' '$REPO_ROOT/packages/compiler/__tests__/engine-absorption-test.js'"
 fi
 
 if is_filtered_out "pandamstyle-core"; then
@@ -428,6 +427,18 @@ if is_filtered_out "artifacts"; then
   skip_step "artifacts" "not selected by PMS_ONLY_STEPS"
 else
   run_step "artifacts" collect_artifacts
+fi
+
+# Donor closure is a separate structural gate. It reads the tarballs installed
+# by the pilot and the generated runtime copied by the artifact step.
+if is_filtered_out "donor-closure"; then
+  skip_step "donor-closure" "not selected by PMS_ONLY_STEPS"
+else
+  run_step "donor-closure" node "$REPO_ROOT/tools/pms/donor-closure.js" \
+    "$REPO_ROOT" \
+    "${PMS_PILOT_DIR:-$PMS_OUT_DIR/pilot}" \
+    "$ARTIFACT_DIR/valid-fixture-generation" \
+    "$PMS_OUT_DIR/donor-closure/report.json"
 fi
 
 # --------------------------------------------------------------------- summary ---
@@ -548,10 +559,17 @@ for (const [name, status, code, note] of rows) {
       // `EXIT_CODE_DISAGREES` - and only a test step has counts to disagree.
       artifactPresent:
         contract?.kind === 'artifact-check'
-          ? fs.existsSync(path.join(out, 'artifacts', 'digests.txt')) &&
-            fs.statSync(path.join(out, 'artifacts', 'digests.txt')).size > 0
+          ? fs.existsSync(
+              path.join(out, contract.artifact ?? 'artifacts/digests.txt'),
+            ) &&
+            fs.statSync(
+              path.join(out, contract.artifact ?? 'artifacts/digests.txt'),
+            ).size > 0
           : undefined,
-      artifactPath: path.join(out, 'artifacts', 'digests.txt'),
+      artifactPath:
+        contract?.kind === 'artifact-check'
+          ? path.join(out, contract.artifact ?? 'artifacts/digests.txt')
+          : undefined,
     },
   });
   integrity.push(verdict);

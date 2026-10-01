@@ -8,8 +8,7 @@
 /**
  * Rollup build for @pandamstyle/compiler.
  *
- * Build the stable SDK/config/host surfaces plus the temporary Phase 8 Vite
- * verifier bridge.
+ * Build the stable SDK/config/host surfaces from PandamStyle-owned source.
  */
 
 import { nodeResolve } from '@rollup/plugin-node-resolve';
@@ -32,12 +31,8 @@ const external = [
   '@babel/helper-module-imports',
   '@babel/preset-react',
   '@babel/preset-typescript',
-  '@dual-bundle/import-meta-resolve',
   '@pandamstyle/core',
-  '@stylexjs/stylex',
-  '@stylexjs/shared',
   'postcss-value-parser',
-  'styleq',
   'node:crypto',
   'node:fs',
   'node:module',
@@ -57,9 +52,8 @@ const inspectionExternal = external.filter(
   (specifier) => specifier !== '@pandamstyle/core',
 );
 
-// Both the fork sources and the PandamStyle modules must be transpiled:
-// the fork is Flow, the PandamStyle modules are ESM.
-const includeGlobs = ['../@stylexjs/babel-plugin/src/**/*', 'src/**/*'];
+// The owned engine retains Flow annotations; no donor tree enters this build.
+const includeGlobs = ['src/**/*'];
 
 function plugins() {
   return [
@@ -72,8 +66,7 @@ function plugins() {
         ['@babel/preset-env', { targets: { node: '20' }, modules: false }],
         '@babel/preset-flow',
       ],
-      // The fork sources use Flow type predicates that only the Hermes parser
-      // accepts; this mirrors packages/@stylexjs/babel-plugin/.babelrc.
+      // The owned engine uses Flow type predicates parsed by Hermes.
       plugins: [['babel-plugin-syntax-hermes-parser', { flow: 'detect' }]],
       include: includeGlobs,
     }),
@@ -111,14 +104,6 @@ export default [
     input: './src/api/host.js',
     external,
     output: [{ file: './lib/host.mjs', format: 'es' }],
-    plugins: plugins(),
-  },
-  {
-    // Temporary Vite verifier seam. Phase 8 moves this implementation to
-    // @pandamstyle/vite and removes this compiler subpath.
-    input: '../@stylexjs/babel-plugin/pandamstyle/vite.js',
-    external: [...external, 'vite', 'rollup', '@rollup/pluginutils'],
-    output: [{ file: './lib/vite.mjs', format: 'es' }],
     plugins: plugins(),
   },
   {

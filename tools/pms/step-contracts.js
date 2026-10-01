@@ -17,10 +17,10 @@
  *
  * The cause was a single rule applied to every step alike: a step is verified
  * when its log carries Jest test and suite counts that add up. That rule is
- * correct for `upstream-babel-plugin`, `upstream-stylex` and `pandamstyle`,
- * which run Jest and do produce those counts. It is not a rule that
- * `install`, `build`, `pilot` or `artifacts` can ever satisfy, because none of
- * them runs a Jest suite, so none of them can emit a `Tests:` line.
+ * correct for the Jest-bearing suite steps, which run Jest and do produce
+ * those counts. It is not a rule that the command, pilot and artifact steps can
+ * ever satisfy, because none of them runs a Jest suite, so none can emit a
+ * `Tests:` line.
  *
  * So `complete: true` was unreachable. Not difficult to reach, not reachable:
  * a verifier that cannot report success is a verifier whose success report
@@ -89,7 +89,7 @@ const { assessSuiteIntegrity } = require('./test-counts');
  *            inspect afterwards, and pretending otherwise would be inventing a
  *            check. Exit code zero is the whole contract.
  *
- * `test`     the five Jest suite steps. The full Phase C integrity rule
+ * `test`     the Jest suite steps. The full Phase C integrity rule
  *            applies and is not relaxed in any way here.
  *
  * `pilot`    an end-to-end build of a real application through the delivered
@@ -98,10 +98,10 @@ const { assessSuiteIntegrity } = require('./test-counts');
  *            whether a pilot produced a `dist` depends on the pilot's mode, and
  *            a rule that demanded one would fail runs that are correct.
  *
- * `artifact-check`  collects the delivered artifacts and digests them. Its
- *            contract is that the digests exist, because that file IS the step's
- *            deliverable: a step that exits zero having written no digests has
- *            reported success on work it did not do.
+ * `artifact-check`  collects delivered artifacts or proves donor closure.
+ *            Its contract names the evidence file, because that file IS the
+ *            step's deliverable: a step that exits zero having written no
+ *            evidence has reported success on work it did not do.
  */
 const KIND_EVIDENCE = {
   command: { requiresCounts: false, requiresArtifact: false },
@@ -132,7 +132,11 @@ const STEP_CONTRACTS = {
   'semantic-oracle': { kind: 'test' },
   'tooling-tests': { kind: 'test' },
   pilot: { kind: 'pilot' },
-  artifacts: { kind: 'artifact-check' },
+  artifacts: { kind: 'artifact-check', artifact: 'artifacts/digests.txt' },
+  'donor-closure': {
+    kind: 'artifact-check',
+    artifact: 'donor-closure/report.json',
+  },
 };
 
 /**
@@ -291,7 +295,7 @@ function assessStep({ step, status, exitCode, counts = null, evidence = {} }) {
       code: 'ARTIFACT_MISSING',
       message:
         `${step}: the step exited ${exitCode} but ` +
-        `${String(evidence.artifactPath ?? 'its artifact')} is absent. This ` +
+        `${String(evidence.artifactPath ?? contract.artifact ?? 'its artifact')} is absent. This ` +
         "step's deliverable IS that artifact, so a run without it has not " +
         'been shown to have done the work the step exists to do.',
     });

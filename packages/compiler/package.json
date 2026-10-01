@@ -23,7 +23,6 @@
       "types": "./types/host.d.ts",
       "import": "./lib/host.mjs"
     },
-    "./vite": "./lib/vite.mjs",
     "./package.json": "./package.json"
   },
   "files": [
@@ -44,9 +43,6 @@
     "@babel/preset-typescript": "^7.26.0",
     "@babel/traverse": "^7.26.8",
     "@babel/types": "^7.26.8",
-    "@dual-bundle/import-meta-resolve": "^4.1.0",
-    "@stylexjs/shared": "0.19.1",
-    "@stylexjs/stylex": "0.19.1",
     "postcss-value-parser": "^4.1.0"
   },
   "devDependencies": {

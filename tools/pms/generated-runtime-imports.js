@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { parseModuleImports } = require('./module-imports');
 
 function generatedFiles(root) {
   const files = [];
@@ -34,11 +35,10 @@ function inspect(root) {
   const imports = [];
   for (const file of files) {
     const source = fs.readFileSync(file, 'utf8');
-    const pattern =
-      /\b(?:from\s*|import\s*\(\s*|require\s*\(\s*)['"]([^'"]+)['"]/g;
-    for (const match of source.matchAll(pattern)) {
-      const specifier = match[1];
-      imports.push({ file: path.relative(root, file), specifier });
+    for (const item of parseModuleImports(source, file)) {
+      if (item.typeOnly) continue;
+      const specifier = item.specifier;
+      imports.push({ file: path.relative(root, file), ...item });
       if (specifier === '@pandamstyle/core') counts['@pandamstyle/core']++;
       if (specifier.startsWith('@stylexjs/')) counts['@stylexjs/*']++;
       if (specifier.startsWith('@pandacss/')) counts['@pandacss/*']++;

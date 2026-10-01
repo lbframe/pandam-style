@@ -1,47 +1,64 @@
-# Phase 4 donor edge inventory after Phase 2 + Phase 3 reconciliation
+# Phase 4 donor edge inventory after absorption
 
-This is an input inventory, not a Phase 4 implementation. It records every
-direct production import/dependency from the owned compiler into `@stylexjs/*`,
-`@pandacss/*`, or `packages/@stylexjs/*` at the reconciled tested tree. The
-compiler still needs donor engine packages at build time. Generated application
-runtime imports core only. Relative import paths below are resolved against
-`packages/compiler/`. MOVE/REFACTOR/REWRITE are candidates for Phase 4 review,
-not decisions to migrate in this batch.
+## Closure result
 
-| # | Caller | Callee/source | Time | Why still required | Target Phase 4 owner domain | Candidate | Protection |
-| ---: | --- | --- | --- | --- | --- | --- | --- |
-| 1 | `package.json` | `@stylexjs/shared@0.19.1` | build-time dependency | Helpers used by the current StyleX-derived compiler engine and Vite bundle. | `engine/atomic`, `frontend/babel` after reachable closure analysis | REFACTOR | Full PandamStyle and upstream suites, pilot |
-| 2 | `package.json` | `@stylexjs/stylex@0.19.1` | build-time dependency | Current engine transform and integration bundle still resolve StyleX internals. | `engine/atomic`, `engine/lowering` | REFACTOR | Upstream StyleX suite, PandamStyle suite, pilot |
-| 3 | `src/frontend/babel/evaluate.js` | `packages/@stylexjs/babel-plugin/src/utils/evaluate-path` | build-time source import | Static evaluation of authenticated source expressions. | `frontend/babel` | MOVE | Provenance, forwarding and semantic oracle suites |
-| 4 | `src/frontend/babel/plugin.js` | `packages/@stylexjs/babel-plugin/src/utils/state-manager` | build-time source import | Babel traversal and rule metadata state. | `frontend/babel` | REFACTOR | Native compile, diagnostics and provenance suites |
-| 5 | `src/frontend/babel/compile-file.js` | `packages/@stylexjs/babel-plugin/src/index` | build-time source import | Legacy transform export is still part of the current compilation bundle. | `frontend/babel`, `engine/atomic` | REFACTOR | Native compile, semantic oracle |
-| 6 | `src/project/session/fresh.js` | `packages/@stylexjs/babel-plugin/src/index` | build-time source import | Fresh lane uses the same donor transform as the current engine. | `frontend/babel`, `engine/atomic` | REFACTOR | Fresh/incremental semantic comparisons |
-| 7 | `src/project/css-state/index.js` | `packages/@stylexjs/babel-plugin/src/index` | build-time source import | Current incremental CSS state inspects engine output. | `engine/ordering`, `project/css-state` | REFACTOR | Incremental CSS, shared-owner and publication suites |
-| 8 | `src/project/session/index.js` | `packages/@stylexjs/babel-plugin/src/index` | build-time source import | Project session currently invokes the engine transform. | `frontend/babel`, `project/session` | REFACTOR | Session, 10k guards, semantic oracle |
-| 9 | `src/engine/lowering/styles.js` | `packages/@stylexjs/babel-plugin/src/shared/stylex-create` | build-time source import | Atomic style lowering, hashing and rule emission. | `engine/atomic`, `engine/lowering`, `engine/ordering` | REFACTOR | CSS/cascade, browser and SSR semantic cases |
-| 10 | `src/engine/lowering/styles.js` | `packages/@stylexjs/babel-plugin/src/shared/stylex-define-vars` | build-time source import | Stable token variable generation. | `design-system/tokens`, `engine/lowering` | REFACTOR | Token/theme and rename-repair cases |
-| 11 | `src/engine/lowering/styles.js` | `packages/@stylexjs/babel-plugin/src/shared/stylex-create-theme` | build-time source import | Theme projection and shared variable identity. | `design-system/themes`, `engine/lowering` | REFACTOR | Theme composition, browser and SSR cases |
-| 12 | `src/engine/lowering/styles.js` | `packages/@stylexjs/babel-plugin/src/shared/utils/default-options` | build-time source import | Current engine defaults keep CSS ordering and direction stable. | `engine/ordering` | MOVE | CSS ordering and 10k guards |
-| 13 | `rollup.config.mjs` | `packages/@stylexjs/babel-plugin/src/**/*` transpilation include | build-time source closure | Flow donor modules reachable from rows 3–12 must be transpiled. | Same domains as reachable modules | REFACTOR | Compiler build, upstream suites, pilot |
-| 14 | `rollup.config.mjs` | `packages/@stylexjs/babel-plugin/pandamstyle/vite.js` | build-time adapter input | Current verifier/pilot need the temporary Vite adapter. | Phase 8 `packages/vite`, outside Phase 4 engine absorption | MOVE in Phase 8 | Vite build suite, packed pilot |
+The reconciled input inventory had **14 direct donor boundary edges**: 13
+engine/dependency edges assigned to Phase 4 and one temporary Vite qualification
+input assigned to Phase 8. Phase 4 moved the Vite seam to
+`tools/pilot/vite-seam.js` and removed the 13 engine edges from the owned
+compiler.
 
-Rows 1–2 also appear in Rollup's `external` array; those declarations represent
-the same package edges, not two extra dependencies. Rows 5–8 share the same
-callee but are separate production call sites. Row 13 is the build reachability
-boundary for donor source: Phase 4 must inventory its recursive useful module
-closure before choosing each subsystem's final MOVE/REFACTOR/REWRITE action.
-The original donor trees remain in place for this gate.
+| Production surface | `@stylexjs/*` | `@pandacss/*` | Donor source paths | Evidence |
+| --- | ---: | ---: | ---: | --- |
+| `packages/core` manifest and source | 0 | 0 | 0 | `donor-closure/report.json` |
+| `packages/compiler` manifest and source | 0 | 0 | 0 | `donor-closure/report.json` |
+| Compiler Rollup production graph | 0 | 0 | 0 | Four compiler entry graphs, no donor watch files or emitted specifiers |
+| Built compiler artifacts | 0 | 0 | 0 | Structural import scan of `packages/compiler/lib` |
+| Generated application runtime | 0 | 0 | 0 | Structural import scan of the generated fixture runtime |
+| Packed core/compiler packages and installed dependency graph | 0 | 0 | 0 | Tarball manifests, packed JS, installed graph; `workspaceLeakage: false` |
 
-The `@stylexjs/*` and `@pandacss/*` strings in
-`src/frontend/babel/evaluate.js` are **forbidden-import matchers**, not imports
-or dependencies. The donor names in comments and historical documentation are
-also not production edges. There are no direct production imports of
-`@pandacss/*` or `upstream/panda` from the owned compiler. The donor-shaped
-`vite.js` is the one remaining PandamStyle adapter seam, explicitly owned by
-Phase 8. No generated application JS imports any donor package.
+The production donor engine edge count is **0**. This is a source/build/package
+closure statement, not a claim that donor source has been deleted.
 
-To recheck the direct edge population, scan `packages/compiler/src`,
-`packages/compiler/package.json`, `packages/compiler/rollup.config.mjs`, and
-the remaining `packages/@stylexjs/babel-plugin/pandamstyle/vite.js` for static
-imports, package dependencies, and build inputs. The qualification evidence
-contains the raw bounded scan and generated-runtime import counts.
+## Reachable source closure
+
+The pre-edit source-root walk recorded 84 reachable donor JavaScript modules and
+one StyleX package manifest used for resolution metadata. The independent
+pre-edit Rollup watch graph recorded 74 donor source modules and that package
+manifest. The full path list and disposition decisions are in
+[`phase-4-engine-absorption-map.md`](phase-4-engine-absorption-map.md).
+
+Of the 84 modules under `packages/@stylexjs/`, 40 have retained PandamStyle
+behavior with an explicit MOVE, REFACTOR, or REWRITE mapping; the remaining 44
+are outside the supported engine contract and were not copied. The recursive
+workspace parser entry adds 19 source modules: 8 required media-query modules
+were absorbed and 11 unrelated property-parser modules were excluded. Across
+both closures, 103 source modules were mapped: 48 retained and 55 excluded.
+The StyleX package manifest was resolution metadata, not a source module; its
+compiler dependency was removed. No donor package was copied wholesale.
+
+## Remaining donor-tree uses
+
+These references remain outside the `@pandamstyle/core` and
+`@pandamstyle/compiler` production graphs:
+
+| Use | Paths / owner | Phase 5 disposition |
+| --- | --- | --- |
+| Upstream StyleX reference implementation and package family | `packages/@stylexjs/{atoms,babel-plugin,cli,create-stylex-app,devtools-extension,eslint-plugin,postcss-plugin,rollup-plugin,shared,stylex,unplugin}` | Keep through Phase 4 upstream reference suites; delete only after preserving any still-required upstream comparison tests. |
+| StyleX media-query parser workspace package | `packages/style-value-parser/`; after absorption only `packages/@stylexjs/babel-plugin` still imports its package entry | The compiler owns the eight-module parser closure. Keep the package for the Phase 4 upstream suite; review its workspace/tests when Phase 5 removes the donor plugin. |
+| PandamStyle integration tests and fixture projects | `packages/@stylexjs/babel-plugin/__tests__/pandamstyle/` | Relocate the product tests and fixtures into a PandamStyle-owned test location before deleting the donor Babel plugin package. The Phase 4 engine protection now also lives in `packages/compiler/__tests__/engine-absorption-test.js`. |
+| Test and oracle helpers that address the PandamStyle test tree | `tools/pms/collect-regression-cases.js`, `tools/pms/forwarding-semantic-oracle.js`, `tools/pms/forwarding-warm-guard.js`, `tools/pms/__tests__/jest-config-test.js`, `tools/pms/__tests__/tooling-verification-test.js`, and `verify-pms.sh` | Retarget when the product test tree moves; retain reference suites until their Phase 5 migration decision is recorded. |
+| Qualification-only Vite seam | `tools/pilot/vite-seam.js`, loaded by `pilot/vite-react/vite.config.js` through `PMS_VITE_SEAM_PATH` | Remains a test/pilot helper. It is not a compiler input/export or public package; Phase 8 still owns product Vite support. |
+| Legal attribution and source provenance | MIT headers on moved/refactored code; donor `LICENSE` files; `upstream/README.md`; `docs/architecture/phase-4-derived-source-provenance.md`; existing source maps | Preserve required notices and provenance before removing the corresponding donor trees. |
+| Historical evidence and documentation | `evidence/**`, `docs/**`, `benchmarks/pandamstyle/src/generate-corpus.js`, and donor-tree comments | Historical records and comparison paths; classify before any broad text cleanup. |
+| Vendored Panda reference source | `upstream/panda/` | No Phase 4 production import or dependency. Retain until Phase 5 verifies all recorded comparison/provenance uses and licensing. |
+
+`upstream/stylex/` is not present in the Phase 4 starting tree; the StyleX fork
+is stored under `packages/@stylexjs/*` with the separate
+`packages/style-value-parser/` workspace package. Phase 4 did not remove or
+relocate those trees, aside from moving the qualification-only Vite adapter.
+
+The donor names in `packages/compiler/src/frontend/babel/evaluate.js` are
+forbidden-import matcher values. The verifier parses module syntax and package
+manifests, so matcher strings, comments, license text, fixture text, and
+historical documentation do not create production edges.

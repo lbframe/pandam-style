@@ -15,14 +15,15 @@ examples; P0 is still not validated.
 | Path                                                     | Contents                                                                                                                                                                                                                     |
 | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/@stylexjs/*`                                   | StyleX fork code (upstream remote → facebook/stylex)                                                                                                                                                                         |
-| `packages/compiler/`                                     | Installable `@pandamstyle/compiler`: stable project SDK, compiler domains and `pms-build`; temporary `./runtime` and `./vite` seams remain assigned to Phases 2 and 8                                                        |
-| `packages/@stylexjs/babel-plugin/pandamstyle/`           | Temporary Phase 2 runtime and Phase 8 Vite adapter sources; compiler-owned implementation has moved under `packages/compiler/src/`                                                                                           |
+| `packages/compiler/`                                     | Installable `@pandamstyle/compiler`: stable project SDK, compiler domains and `pms-build`; no temporary runtime or Vite export                                                                                               |
+| `tools/pilot/vite-seam.js`                               | Qualification-only Vite seam used by the pilot; Phase 8 still owns public Vite support                                                                                                                                        |
 | `benchmarks/pandamstyle/`                                | The benchmark laboratory: corpus generator, campaign runner, the engine-vs-engine oracle, the incremental-vs-fresh-rebuild oracle, the long-session memory trace, the agent-loop campaign and the Phase C correctness oracle |
-| `packages/@stylexjs/babel-plugin/__tests__/pandamstyle/` | Tests and fixture projects: one valid project (JS/TS/TSX) and 14 negative projects, each built by a real process                                                                                                             |
+| `packages/@stylexjs/babel-plugin/__tests__/pandamstyle/` | Current PandamStyle integration tests and fixture projects; their later move is a Phase 5 deletion precondition                                                                                                                |
+| `packages/compiler/__tests__/engine-absorption-test.js` | PandamStyle-owned engine behavior tests added in Phase 4                                                                                                                                                                       |
 | `pilot/vite-react/`                                      | Vite + React pilot application, installed from local `npm pack` tarballs                                                                                                                                                     |
 | `docs/pandamstyle-specification-v0.1/`                   | Specification v0.1 (architecture, P0 scope, acceptance, decisions)                                                                                                                                                           |
 | `evidence/l0/`, `evidence/demo/`                         | Historical L0 baseline and demo evidence (kept unchanged)                                                                                                                                                                    |
-| `evidence/native/`                                       | This batch's run: report, environment, per-step logs, digests                                                                                                                                                                |
+| `evidence/phase-4-engine-absorption/`                    | Phase 4 closure evidence: verifier, oracle, package graph, browser/SSR, isolation and performance                                                                                                                                 |
 | `upstream/panda/`                                        | Vendored Panda CSS donor (comparison source)                                                                                                                                                                                 |
 | `tools/pilot/run-pilot.sh`                               | Pilot driver: pack, install outside the workspace, build                                                                                                                                                                     |
 | `tools/pms/`                                             | Verification reporting: the Jest-output reader that decides a run's verdict from suite AND test counts                                                                                                                       |
@@ -31,13 +32,14 @@ examples; P0 is still not validated.
 ## Verify the work
 
 ```bash
-./verify-pms.sh
+PMS_OUT_DIR=evidence/phase-4-engine-absorption/verify \
+  PMS_BATCH_BASE_REF=feat/pandamstyle-native-compiler ./verify-pms.sh
 ```
 
-Steps, each propagating its own failure: dependency install, build of the
-delivered packages, the upstream reference suites, the PandamStyle suites, the
-Vite pilot, then artifact collection with digests. Output lands in
-`evidence/native/` (`env.json`, `summary.json`, `steps.tsv`, one log per step).
+The required verifier runs 11 steps: dependency install, build, upstream
+reference suites, PandamStyle and core suites, semantic oracle, tooling tests,
+the packed Vite pilot, artifact collection, and donor closure. The command above
+stores qualification output under the Phase 4 evidence directory.
 
 Use **Node 22** — the major pinned by `.nvmrc`. On that major
 `yarn install --frozen-lockfile` completes with no `--ignore-engines`, which the
@@ -47,9 +49,7 @@ historical Node 26 baseline required.
 and is refused otherwise. `PMS_SKIP_INSTALL=1` and `PMS_SKIP_PILOT=1` skip a
 step; both are recorded in `summary.json` rather than hidden.
 
-Reference results: 1007 upstream babel-plugin tests (64 skipped, 887 snapshots),
-99 upstream stylex tests, 111 PandamStyle tests, plus a green pilot build. See
-`evidence/native/REPORT.md`.
+The Phase 4 delivery document records the exact final test and suite counts.
 
 ## Incremental compilation (project session)
 

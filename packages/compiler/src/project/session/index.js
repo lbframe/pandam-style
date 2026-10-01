@@ -86,7 +86,7 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import styleXTransform from '../../../../@stylexjs/babel-plugin/src/index';
+import { processStylexRules } from '../../engine/index';
 import { createCssState } from '../css-state/index';
 import {
   DEFAULT_DIRTY_INPUT_MODE,
@@ -2474,7 +2474,7 @@ export function createProjectSession(config) {
    */
   function aggregateCssFull(closureRules, cfg) {
     return phase('session_aggregate_ms', () =>
-      styleXTransform.processStylexRules(closureRules, {
+      processStylexRules(closureRules, {
         useLayers: cfg.useCSSLayers,
         __pmsPerfPhase: phase,
       }),

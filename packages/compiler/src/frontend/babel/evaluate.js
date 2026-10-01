@@ -19,7 +19,7 @@
  * acceptance.
  */
 
-import { evaluate as stylexEvaluate } from '../../../../@stylexjs/babel-plugin/src/utils/evaluate-path';
+import { evaluateStaticExpression } from './static-evaluator';
 import { diagnostic, Codes } from '../../protocol/diagnostics';
 import { mintTokenRef } from '../../design-system/tokens/ref';
 import {
@@ -108,8 +108,8 @@ export function createUsageContext({
   role = 'page',
 }) {
   return {
-    // `state` is the fork's StateManager (used by its evaluator);
-    // `pluginPass` is the Babel PluginPass (used for file metadata).
+    // `state` is a per-pass PandamStyle context for source identity;
+    // `pluginPass` is the Babel PluginPass used for file metadata.
     state,
     pluginPass,
     filename,
@@ -593,13 +593,9 @@ export function resolveDesignAccess(nodePath, ctx, root) {
   return null;
 }
 
-/** Folding delegated to the fork's evaluator. */
+/** Folding delegated to the PandamStyle-owned static evaluator. */
 function forkEvaluate(nodePath, ctx) {
-  return stylexEvaluate(nodePath, ctx.state, {
-    identifiers: {},
-    memberExpressions: {},
-    disableImports: true,
-  });
+  return evaluateStaticExpression(nodePath, ctx.state);
 }
 
 function nonStatic(ctx, nodePath, reason) {

@@ -61,6 +61,7 @@ const REAL_RUN = {
 
 const TEST_STEPS = ['upstream-babel-plugin', 'upstream-stylex', 'pandamstyle'];
 const NON_TEST_STEPS = ['install', 'build', 'pilot', 'artifacts'];
+const CURRENT_NON_TEST_STEPS = [...NON_TEST_STEPS, 'donor-closure'];
 
 /**
  * The conjunction `summary.json`'s `complete` is computed from, restated here so
@@ -217,7 +218,7 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
   // Cases 4 through 7. The four steps Phase D could not verify, each with the
   // evidence its kind actually declares: it executed, it passed, and - for the
   // one step whose deliverable is a file - the file is there.
-  test.each(NON_TEST_STEPS)(
+  test.each(CURRENT_NON_TEST_STEPS)(
     '%s verifies on exit 0 and acceptance, with counts null',
     (step) => {
       const verdict = assessFromLog(step, { artifactPresent: true });
@@ -230,7 +231,7 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
     },
   );
 
-  test('the four non-test steps are the four the runner actually has', () => {
+  test('every runner step has an explicit evidence contract', () => {
     // The classification is a table, and this asserts the table's shape rather
     // than the runner's behaviour: every step `verify-pms.sh` can run has a
     // contract, and each contract names a kind whose evidence requirements are
@@ -240,6 +241,7 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
     expect(classified.map(([name]) => name).sort()).toEqual([
       'artifacts',
       'build',
+      'donor-closure',
       'install',
       'pandamstyle',
       'pandamstyle-core',
@@ -271,7 +273,7 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
         .filter(([, c]) => c.kind !== 'test')
         .map(([n]) => n)
         .sort(),
-    ).toEqual([...NON_TEST_STEPS].sort());
+    ).toEqual([...CURRENT_NON_TEST_STEPS].sort());
   });
 
   test('a step with no contract is unverified rather than judged by a default', () => {
@@ -297,6 +299,12 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
     expect(verdict.findings.map((f) => f.code)).toContain('ARTIFACT_MISSING');
   });
 
+  test('donor closure fails when its structural report is absent', () => {
+    const verdict = assessFromLog('donor-closure', { artifactPresent: false });
+    expect(verdict.verdict).toBe('failed');
+    expect(verdict.findings.map((f) => f.code)).toContain('ARTIFACT_MISSING');
+  });
+
   test('the pilot step does not require a dist, and the reason is recorded', () => {
     // The pilot's own script fails when its build fails, so the exit code is
     // its acceptance. Whether a pilot produced a `dist` depends on the mode it
@@ -314,7 +322,7 @@ describe('step-contracts: a non-test step that fails, fails', () => {
   // Case 8, for every kind that is not a test step. This is the case that makes
   // the relaxation a contract rather than a loophole: dropping the count
   // requirement must not have dropped the failure requirement with it.
-  test.each(NON_TEST_STEPS)('%s exits non-zero => failed', (step) => {
+  test.each(CURRENT_NON_TEST_STEPS)('%s exits non-zero => failed', (step) => {
     const verdict = assessFromLog(step, {
       status: 'failed',
       exitCode: 2,

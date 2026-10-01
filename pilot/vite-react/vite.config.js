@@ -7,7 +7,6 @@
 
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { pandamstyle } from '@pandamstyle/compiler/vite';
 
 /**
  * Pilot build configuration.
@@ -16,18 +15,21 @@ import { pandamstyle } from '@pandamstyle/compiler/vite';
  * compiles the covered roots with the fork's engine and injects the static CSS
  * it collected. No upstream StyleX plugin is involved.
  */
-export default defineConfig({
-  plugins: [
-    react(),
-    pandamstyle({
-      designSystem: './design.pandamstyle.config.js',
-      roots: ['./src/pages'],
-      outDir: './.pandamstyle',
-      role: 'page',
-    }),
-  ],
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
-  },
+export default defineConfig(async () => {
+  const { pandamstyle } = await import(process.env.PMS_VITE_SEAM_PATH);
+  return {
+    plugins: [
+      react(),
+      pandamstyle({
+        designSystem: './design.pandamstyle.config.js',
+        roots: ['./src/pages'],
+        outDir: './.pandamstyle',
+        role: 'page',
+      }),
+    ],
+    build: {
+      outDir: 'dist',
+      emptyOutDir: true,
+    },
+  };
 });

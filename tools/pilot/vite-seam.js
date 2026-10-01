@@ -8,9 +8,9 @@
 /**
  * PandamStyle - Vite / Rollup integration (P0-09, P0-11, ARC-13).
  *
- * TEMPORARY PHASE 8 INTEGRATION SEAM: the compiler package bundles this
- * adapter only for the current verifier/pilot. Phase 8 moves it to
- * `packages/vite`; remove this source and the compiler `/vite` subpath then.
+ * TEST-ONLY PHASE 8 QUALIFICATION SEAM: this adapter lives under tools/pilot
+ * and is excluded from compiler package exports. Phase 8 owns a future public
+ * Vite integration package.
  *
  * This adapts the fork's integration rather than replacing it: rules are
  * collected in the same shape as StyleX and rendered by the fork's own
@@ -31,15 +31,15 @@ import {
   assertCoverageConsistency,
   createCompilerSession,
   collectCoveredFiles,
-} from '../../../compiler/src/project/session/fresh.js';
-import { beginGeneration } from '../../../compiler/src/artifacts/publication/transaction.js';
-import { clearModuleOverlay } from '../../../compiler/src/project/graph/resolution.js';
+} from '../../packages/compiler/src/project/session/fresh.js';
+import { beginGeneration } from '../../packages/compiler/src/artifacts/publication/transaction.js';
+import { clearModuleOverlay } from '../../packages/compiler/src/project/graph/resolution.js';
 import {
   PmsError,
   Codes,
   diagnostic,
   formatDiagnostic,
-} from '../../../compiler/src/protocol/diagnostics.js';
+} from '../../packages/compiler/src/protocol/diagnostics.js';
 
 const SOURCE_RE = /\.(jsx?|tsx?|mjs|cjs)$/;
 

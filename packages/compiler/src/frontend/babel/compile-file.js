@@ -8,8 +8,8 @@
 import babel from '@babel/core';
 import presetTypeScript from '@babel/preset-typescript';
 import presetReact from '@babel/preset-react';
-import styleXTransform from '../../../../@stylexjs/babel-plugin/src/index';
 import { pandamstyleBabelPlugin } from './plugin';
+import { normalizeEngineOptions } from '../../engine/index';
 import {
   count,
   perfNow,
@@ -23,6 +23,7 @@ const reactPreset = presetReact?.default ?? presetReact;
 
 /** Runs both Babel passes for one source module. */
 export function compileFile(code, filename, designSystem, engineOptions = {}) {
+  const ownedEngineOptions = normalizeEngineOptions(engineOptions);
   // Pass 1 parses the original source with TS and JSX intact so policy and
   // provenance checks see the syntax the author wrote.
   const pass1Start = perfNow();
@@ -34,7 +35,10 @@ export function compileFile(code, filename, designSystem, engineOptions = {}) {
       sourceType: 'module',
       parserOpts: { plugins: ['jsx', 'typescript'] },
       plugins: [
-        [pandamstyleBabelPlugin, { designSystem, role: 'page', engineOptions }],
+        [
+          pandamstyleBabelPlugin,
+          { designSystem, role: 'page', engineOptions: ownedEngineOptions },
+        ],
       ],
     }),
   );
@@ -66,5 +70,3 @@ export function compileFile(code, filename, designSystem, engineOptions = {}) {
   const out = pass2 ?? pass1;
   return { code: out.code, metadata: { ...out.metadata, ...pass1.metadata } };
 }
-
-export { styleXTransform };

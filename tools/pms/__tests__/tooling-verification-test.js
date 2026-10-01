@@ -11,7 +11,14 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
+const {
+  inspectManifest,
+  inspectSourceTree,
+  isDonorPath,
+  isDonorSpecifier,
+} = require('../donor-closure');
 const { assessStep } = require('../step-contracts');
+const { parseModuleImports } = require('../module-imports');
 const { parseJestCounts } = require('../test-counts');
 
 const ROOT = path.resolve(__dirname, '../../..');
@@ -26,6 +33,7 @@ const ORDER = [
   'tooling-tests',
   'pilot',
   'artifacts',
+  'donor-closure',
 ];
 let fixture;
 
@@ -36,12 +44,13 @@ function write(relative, text, executable = false) {
 }
 
 beforeAll(() => {
-  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-ten-step-'));
+  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-eleven-step-'));
   write('verify-pms.sh', fs.readFileSync(path.join(ROOT, 'verify-pms.sh')));
   for (const name of [
     'test-counts.js',
     'step-contracts.js',
     'run-tooling-tests.js',
+    'module-imports.js',
   ]) {
     write(
       `tools/pms/${name}`,
@@ -51,6 +60,15 @@ beforeAll(() => {
   write(
     'tools/pms/generated-runtime-imports.js',
     fs.readFileSync(path.join(ROOT, 'tools/pms/generated-runtime-imports.js')),
+  );
+  write(
+    'tools/pms/donor-closure.js',
+    `const fs = require('fs');
+const path = require('path');
+const output = process.argv[process.argv.length - 1];
+fs.mkdirSync(path.dirname(output), { recursive: true });
+fs.writeFileSync(output, JSON.stringify({ pass: true, findings: [] }) + '\\n');
+`,
   );
   write('yarn.lock', '# fixture lockfile\n');
   write(
@@ -74,6 +92,12 @@ beforeAll(() => {
     path.join(ROOT, 'node_modules/glob'),
     path.join(fixture, 'node_modules/glob'),
   );
+  for (const name of ['@babel/parser', 'hermes-parser']) {
+    const source = path.join(ROOT, 'node_modules', ...name.split('/'));
+    const target = path.join(fixture, 'node_modules', ...name.split('/'));
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.symlinkSync(source, target);
+  }
   for (const name of ['a', 'b', 'c'])
     write(`tools/pms/__tests__/${name}-test.js`, '// fixture suite\n');
   for (const name of [
@@ -124,8 +148,8 @@ if (args.includes('--listTests')) {
   console.log(JSON.stringify(mode === 'discovery-missing' ? files.slice(1) : files));
   process.exit(0);
 }
-let tests = tooling ? 43 : core ? 14 : process.cwd().endsWith('/stylex') ? 99 : args.some(a => a.startsWith('__tests__/pandamstyle')) ? 498 : 1007;
-let suites = tooling ? 3 : core ? 1 : tests === 99 ? 4 : tests === 498 ? 21 : 42;
+let tests = tooling ? 43 : core ? 14 : process.cwd().endsWith('/stylex') ? 99 : args.some(a => a.startsWith('__tests__/pandamstyle')) ? 504 : 1007;
+let suites = tooling ? 3 : core ? 1 : tests === 99 ? 4 : tests === 504 ? 22 : 42;
 let log = 'Test Suites: ' + suites + ' passed, ' + (tests === 1007 ? '1 skipped, ' : '') + (suites + (tests === 1007 ? 1 : 0)) + ' total\\nTests: ' + tests + ' passed, ' + (tests === 1007 ? '64 skipped, ' : '') + (tests + (tests === 1007 ? 64 : 0)) + ' total\\n';
 if (tooling) {
   if (mode === 'command-fails') process.exit(2);
@@ -157,7 +181,7 @@ process.stderr.write(log);
     execFileSync('git', args, { cwd: fixture, env: gitEnv, stdio: 'pipe' });
   git('init', '-q');
   git('add', '.');
-  git('commit', '-qm', 'ten-step fixture');
+  git('commit', '-qm', 'eleven-step fixture');
   git('branch', 'fixture-base');
 });
 
@@ -207,9 +231,9 @@ function run(mode = 'green', env = {}, omitted = false, reuseOutput = false) {
   };
 }
 
-test('the real summary accepts a green ten-step fixture with separate and summed counts', () => {
+test('the real summary accepts a green eleven-step fixture with separate and summed counts', () => {
   const { status, stdout, summary } = run();
-  expect(status).toBe(0);
+  if (status !== 0) throw new Error(`${stdout}\n${summary?.failedSteps ?? ''}`);
   expect(stdout).toContain('VERIFICATION OK');
   expect(Object.keys(summary.steps)).toEqual(ORDER);
   expect(summary.complete).toBe(true);
@@ -222,15 +246,121 @@ test('the real summary accepts a green ten-step fixture with separate and summed
   expect(summary.steps['tooling-tests'].counts.testsPassed).toBe(43);
   expect(summary.steps['semantic-oracle'].kind).toBe('test');
   expect(summary.steps['semantic-oracle'].counts.testsPassed).toBe(2);
-  expect(summary.steps.pandamstyle.counts.testsPassed).toBe(498);
+  expect(summary.steps.pandamstyle.counts.testsPassed).toBe(504);
+  expect(summary.steps['donor-closure'].kind).toBe('artifact-check');
   expect(summary.steps['pandamstyle-core'].kind).toBe('test');
   expect(summary.steps['pandamstyle-core'].counts.testsPassed).toBe(14);
-  expect(summary.verification.testsPassed).toBe(1663);
-  expect(summary.verification.suitesPassed).toBe(72);
+  expect(summary.verification.testsPassed).toBe(1669);
+  expect(summary.verification.suitesPassed).toBe(73);
   expect(summary.verification.testsSkipped).toBe(64);
   expect(summary.verification.suitesSkipped).toBe(1);
-  for (const name of ['install', 'build', 'pilot', 'artifacts'])
+  for (const name of [
+    'install',
+    'build',
+    'pilot',
+    'artifacts',
+    'donor-closure',
+  ])
     expect(summary.steps[name].counts).toBeNull();
+});
+
+test('donor detection reads module syntax and ignores comments and matcher strings', () => {
+  const imports = parseModuleImports(
+    "// import '@stylexjs/comment-only';\n" +
+      "const denied = '@pandacss/matcher';\n" +
+      "import type { Theme } from '@stylexjs/types';\n" +
+      "import { props } from '@pandamstyle/core';\n" +
+      'const config = import(configPath);\n' +
+      'const plugin = require(pluginName);\n' +
+      "export { value } from './owned.js';\n",
+    'fixture.js',
+  );
+  expect(imports.map((item) => [item.specifier, item.typeOnly])).toEqual([
+    ['@stylexjs/types', true],
+    ['@pandamstyle/core', false],
+    [null, false],
+    [null, false],
+    ['./owned.js', false],
+  ]);
+  expect(isDonorSpecifier('style-value-parser')).toBe(true);
+  expect(isDonorSpecifier('styleq')).toBe(true);
+  expect(
+    isDonorPath(path.join(ROOT, 'packages/style-value-parser/src/index.js')),
+  ).toBe(true);
+});
+
+test('the closure scanner fails on restored donor imports and manifest dependencies', () => {
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'pms-donor-closure-test-'),
+  );
+  try {
+    fs.writeFileSync(
+      path.join(root, 'owned.js'),
+      "// import '@stylexjs/comment-only';\n" +
+        "const matcher = '@pandacss/deny-list';\n" +
+        "import { props } from '@pandamstyle/core';\n",
+    );
+    const findings = [];
+    const source = inspectSourceTree(root, 'fixture', findings);
+    expect(source.imports.map((item) => item.specifier)).toEqual([
+      '@pandamstyle/core',
+    ]);
+    expect(findings).toEqual([]);
+
+    fs.writeFileSync(
+      path.join(root, 'computed-import.js'),
+      'const plugin = import(pluginName);\n',
+    );
+    inspectSourceTree(root, 'fixture', findings);
+    expect(findings.map((finding) => finding.code)).toContain(
+      'UNRESOLVED_MODULE_SPECIFIER',
+    );
+
+    fs.writeFileSync(
+      path.join(root, 'reintroduced.js'),
+      "export { props } from '@stylexjs/shared';\n" +
+        "import { MediaQuery } from 'style-value-parser';\n",
+    );
+    inspectSourceTree(root, 'fixture', findings);
+    expect(findings.map((finding) => finding.code)).toContain(
+      'DONOR_PACKAGE_IMPORT',
+    );
+    expect(findings.map((finding) => finding.detail)).toContain(
+      'style-value-parser',
+    );
+
+    const manifestPath = path.join(root, 'package.json');
+    fs.writeFileSync(
+      manifestPath,
+      JSON.stringify({
+        name: 'fixture',
+        dependencies: { '@pandacss/core': '1.0.0' },
+      }),
+    );
+    inspectManifest(manifestPath, 'fixture manifest', findings);
+    expect(findings.map((finding) => finding.code)).toContain(
+      'DONOR_PACKAGE_DEPENDENCY',
+    );
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('the one computed import for consumer config loading is explicitly pinned', () => {
+  const findings = [];
+  const source = inspectSourceTree(
+    path.join(ROOT, 'packages/compiler/src/api'),
+    'compiler CLI source',
+    findings,
+  );
+  expect(findings).toEqual([]);
+  expect(source.approvedDynamicImports).toEqual([
+    expect.objectContaining({
+      file: 'cli.js',
+      count: 1,
+      reason: expect.stringContaining('consuming project build config'),
+    }),
+  ]);
 });
 
 test.each([

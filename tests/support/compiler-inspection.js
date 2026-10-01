@@ -123,5 +123,21 @@ export {
   setPerfEngineName,
   workEliminated,
 } from '../../packages/compiler/src/observability/metrics.js';
-export { defaultOptions as engineDefaultOptions } from '../../packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js';
+export { defaultOptions as engineDefaultOptions } from '../../packages/compiler/src/engine/ordering/defaults.js';
+export {
+  addAncestorSelector,
+  addSpecificityLevel,
+  createRuleComparator,
+  layerHeader,
+  logicalFloatVars,
+  lowerAtomicStyles,
+  lowerTokenVariables,
+  normalizeEngineOptions,
+  processStylexRules,
+  projectTheme,
+  splitConstantRules,
+  transformRuleEntry,
+} from '../../packages/compiler/src/engine/index.js';
+export { evaluateStaticExpression } from '../../packages/compiler/src/frontend/babel/static-evaluator.js';
+export { createPassState } from '../../packages/compiler/src/frontend/babel/pass-state.js';
 export { conformanceDefinition } from '../fixtures/design-systems/conformance.js';

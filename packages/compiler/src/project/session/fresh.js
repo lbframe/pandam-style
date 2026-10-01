@@ -22,7 +22,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import styleXTransform from '../../../../@stylexjs/babel-plugin/src/index';
+import { processStylexRules } from '../../engine/index';
 import { PmsError, Codes, diagnostic } from '../../protocol/diagnostics';
 import {
   BUILD_REPORT_KIND,
@@ -389,7 +389,7 @@ function createCompilerSessionInContext(config, graphContext) {
         compileFile(code, filename, designSystem, { ...engineOptions, role }),
       ),
     renderCss: (rules) =>
-      styleXTransform.processStylexRules(rules, {
+      processStylexRules(rules, {
         useLayers: useCSSLayers,
         __pmsPerfPhase: phase,
       }),
