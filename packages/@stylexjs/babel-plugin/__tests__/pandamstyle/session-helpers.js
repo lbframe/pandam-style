@@ -337,7 +337,6 @@ function openExistingProject(project, options = {}) {
     definition,
     roots,
     outDir,
-    runtimeModule: config.runtimeModule,
     designSystemFile: config.designSystemFile,
     engineOptions: config.engineOptions,
     useCSSLayers: config.useCSSLayers === true,

@@ -155,7 +155,6 @@ describe('BC-3: dynamic requests are decided, not ignored', () => {
           path.join(FIXTURES, '_shared', 'design.pms.config.mjs'),
         ),
         roots: [file],
-        runtimeModule: '@pandamstyle/compiler/runtime',
       });
       let diags = null;
       try {
@@ -200,7 +199,6 @@ describe('BC-3: dynamic requests are decided, not ignored', () => {
           path.join(FIXTURES, '_shared', 'design.pms.config.mjs'),
         ),
         roots: [dir],
-        runtimeModule: '@pandamstyle/compiler/runtime',
       });
       let diags = null;
       try {

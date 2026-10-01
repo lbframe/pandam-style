@@ -141,7 +141,6 @@ export default defineConfig({
       designSystem: './design.pms.config.mjs',
       roots: ['./src/pages'],
       outDir: './.pandamstyle',
-      runtimeModule: '@pandamstyle/compiler/runtime',
       role: 'page',
     }),
     lateFailure,

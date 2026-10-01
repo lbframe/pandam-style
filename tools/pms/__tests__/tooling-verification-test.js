@@ -21,6 +21,7 @@ const ORDER = [
   'upstream-babel-plugin',
   'upstream-stylex',
   'pandamstyle',
+  'pandamstyle-core',
   'semantic-oracle',
   'tooling-tests',
   'pilot',
@@ -35,7 +36,7 @@ function write(relative, text, executable = false) {
 }
 
 beforeAll(() => {
-  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-nine-step-'));
+  fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-ten-step-'));
   write('verify-pms.sh', fs.readFileSync(path.join(ROOT, 'verify-pms.sh')));
   for (const name of [
     'test-counts.js',
@@ -47,6 +48,10 @@ beforeAll(() => {
       fs.readFileSync(path.join(ROOT, 'tools/pms', name)),
     );
   }
+  write(
+    'tools/pms/generated-runtime-imports.js',
+    fs.readFileSync(path.join(ROOT, 'tools/pms/generated-runtime-imports.js')),
+  );
   write('yarn.lock', '# fixture lockfile\n');
   write(
     'tools/semantic-oracle/run.js',
@@ -81,10 +86,25 @@ beforeAll(() => {
   }
   write('packages/compiler/lib/index.mjs', '// delivered build\n');
   write('packages/compiler/package.json', '{"name":"@pandamstyle/compiler"}\n');
+  write('packages/core/package.json', '{"name":"@pandamstyle/core"}\n');
+  write('packages/core/src/index.js', 'export {};\n');
+  write(
+    'tools/pms/core-package-proof.js',
+    `const fs = require('fs');
+const path = require('path');
+const output = process.argv[2];
+fs.mkdirSync(output, { recursive: true });
+fs.writeFileSync(path.join(output, 'proof.json'), '{}\\n');
+`,
+  );
   write('packages/compiler/bin/pms-build.js', '// fixture generator\n');
   write(
     'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/generated/fixture.css',
     '.fixture{}\n',
+  );
+  write(
+    'packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/generated/design.pandamstyle.js',
+    "import { props } from '@pandamstyle/core';\nexport { props };\n",
   );
   write('tools/pilot/run-pilot.sh', '#!/bin/sh\nexit 0\n', true);
   // Substitute costly commands, but exercise the actual shell runner, helper,
@@ -98,13 +118,14 @@ const root = path.resolve(__dirname, '../../..');
 const mode = fs.readFileSync(path.join(root, 'mode'), 'utf8');
 const args = process.argv.slice(2);
 const tooling = args.includes('tools/pms/__tests__');
+const core = args.some(a => a.includes('/packages/core/__tests__/core-test.js'));
 const files = ['a', 'b', 'c'].map(n => path.join(root, 'tools/pms/__tests__', n + '-test.js'));
 if (args.includes('--listTests')) {
   console.log(JSON.stringify(mode === 'discovery-missing' ? files.slice(1) : files));
   process.exit(0);
 }
-let tests = tooling ? 43 : process.cwd().endsWith('/stylex') ? 99 : args.some(a => a.startsWith('__tests__/pandamstyle')) ? 498 : 1007;
-let suites = tooling ? 3 : tests === 99 ? 4 : tests === 498 ? 21 : 42;
+let tests = tooling ? 43 : core ? 14 : process.cwd().endsWith('/stylex') ? 99 : args.some(a => a.startsWith('__tests__/pandamstyle')) ? 498 : 1007;
+let suites = tooling ? 3 : core ? 1 : tests === 99 ? 4 : tests === 498 ? 21 : 42;
 let log = 'Test Suites: ' + suites + ' passed, ' + (tests === 1007 ? '1 skipped, ' : '') + (suites + (tests === 1007 ? 1 : 0)) + ' total\\nTests: ' + tests + ' passed, ' + (tests === 1007 ? '64 skipped, ' : '') + (tests + (tests === 1007 ? 64 : 0)) + ' total\\n';
 if (tooling) {
   if (mode === 'command-fails') process.exit(2);
@@ -136,7 +157,7 @@ process.stderr.write(log);
     execFileSync('git', args, { cwd: fixture, env: gitEnv, stdio: 'pipe' });
   git('init', '-q');
   git('add', '.');
-  git('commit', '-qm', 'nine-step fixture');
+  git('commit', '-qm', 'ten-step fixture');
   git('branch', 'fixture-base');
 });
 
@@ -186,7 +207,7 @@ function run(mode = 'green', env = {}, omitted = false, reuseOutput = false) {
   };
 }
 
-test('the real summary accepts a green nine-step fixture with separate and summed counts', () => {
+test('the real summary accepts a green ten-step fixture with separate and summed counts', () => {
   const { status, stdout, summary } = run();
   expect(status).toBe(0);
   expect(stdout).toContain('VERIFICATION OK');
@@ -202,8 +223,10 @@ test('the real summary accepts a green nine-step fixture with separate and summe
   expect(summary.steps['semantic-oracle'].kind).toBe('test');
   expect(summary.steps['semantic-oracle'].counts.testsPassed).toBe(2);
   expect(summary.steps.pandamstyle.counts.testsPassed).toBe(498);
-  expect(summary.verification.testsPassed).toBe(1649);
-  expect(summary.verification.suitesPassed).toBe(71);
+  expect(summary.steps['pandamstyle-core'].kind).toBe('test');
+  expect(summary.steps['pandamstyle-core'].counts.testsPassed).toBe(14);
+  expect(summary.verification.testsPassed).toBe(1663);
+  expect(summary.verification.suitesPassed).toBe(72);
   expect(summary.verification.testsSkipped).toBe(64);
   expect(summary.verification.suitesSkipped).toBe(1);
   for (const name of ['install', 'build', 'pilot', 'artifacts'])

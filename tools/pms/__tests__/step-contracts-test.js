@@ -242,6 +242,7 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
       'build',
       'install',
       'pandamstyle',
+      'pandamstyle-core',
       'pilot',
       'semantic-oracle',
       'tooling-tests',
@@ -257,7 +258,14 @@ describe('step-contracts: a step that runs no tests is judged on what it owes', 
         .filter(([, c]) => c.kind === 'test')
         .map(([n]) => n)
         .sort(),
-    ).toEqual([...TEST_STEPS, 'semantic-oracle', 'tooling-tests'].sort());
+    ).toEqual(
+      [
+        ...TEST_STEPS,
+        'pandamstyle-core',
+        'semantic-oracle',
+        'tooling-tests',
+      ].sort(),
+    );
     expect(
       classified
         .filter(([, c]) => c.kind !== 'test')

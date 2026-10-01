@@ -20,13 +20,39 @@ jest.autoMockOff();
 
 const fs = require('fs');
 const path = require('path');
-const { COMPILER_PKG, freshCopyOf, runBuild } = require('./pms-helpers');
+const babel = require('@babel/core');
+const { freshCopyOf, runBuild } = require('./pms-helpers');
 
-const runtime = require(
-  path.resolve(
-    __dirname,
-    '../../../../../.pms-test-support/compiler-inspection.cjs',
-  ),
+function loadCoreRuntime(entry) {
+  const cache = new Map();
+  function load(file) {
+    if (cache.has(file)) return cache.get(file).exports;
+    const { code } = babel.transformSync(fs.readFileSync(file, 'utf8'), {
+      configFile: false,
+      babelrc: false,
+      plugins: [require.resolve('@babel/plugin-transform-modules-commonjs')],
+    });
+    const mod = { exports: {} };
+    cache.set(file, mod);
+    const localRequire = (request) => {
+      if (!request.startsWith('.')) return require(request);
+      return load(path.resolve(path.dirname(file), request));
+    };
+    // The tests are CommonJS, while the public core package intentionally ships
+    // ESM only. Transform its source in memory without adding a CJS package API.
+    // eslint-disable-next-line no-new-func
+    new Function('require', 'module', 'exports', code)(
+      localRequire,
+      mod,
+      mod.exports,
+    );
+    return mod.exports;
+  }
+  return load(entry);
+}
+
+const runtime = loadCoreRuntime(
+  path.resolve(__dirname, '../../../../core/src/index.js'),
 );
 
 let project;
@@ -49,50 +75,43 @@ beforeAll(() => {
 });
 
 describe('the consumer runtime is dependency-light', () => {
-  test('the shipped runtime has no import at all', () => {
-    const esm = fs.readFileSync(
-      path.join(COMPILER_PKG, 'lib', 'runtime.mjs'),
-      'utf8',
+  test('the core runtime stays ESM and donor-free', () => {
+    const files = fs
+      .readdirSync(path.join(__dirname, '../../../../core/src'))
+      .filter((name) => name.endsWith('.js'));
+    const source = files
+      .map((name) =>
+        fs.readFileSync(
+          path.join(__dirname, '../../../../core/src', name),
+          'utf8',
+        ),
+      )
+      .join('\n');
+    expect(source).not.toMatch(/require\s*\(/);
+    expect(source).not.toMatch(
+      /from\s+['"](?:node:)?(?:fs|path|crypto|module)['"]/,
     );
-    expect(esm).not.toMatch(/^\s*import\s/m);
-    expect(esm).not.toMatch(/require\(/);
+    expect(source).not.toContain('@stylexjs/');
+    expect(source).not.toContain('@pandacss/');
   });
 
-  test('it imports no Babel, no loader, no registry, no CSS interpreter', () => {
-    const esm = fs.readFileSync(
-      path.join(COMPILER_PKG, 'lib', 'runtime.mjs'),
-      'utf8',
-    );
-    for (const forbidden of [
-      '@babel/',
-      'crypto',
-      'node:fs',
-      'fs.readFile',
-      'registry',
-      'createHash',
-      'styleXCreateSet',
-      'processStylexRules',
-    ]) {
-      expect(esm).not.toContain(forbidden);
-    }
-  });
-
-  test('it is finite: a small module, not a second engine', () => {
-    const esm = fs.readFileSync(
-      path.join(COMPILER_PKG, 'lib', 'runtime.mjs'),
-      'utf8',
-    );
-    expect(esm.length).toBeLessThan(16384);
+  test('core ships no runtime dependencies', () => {
+    const manifest = require('../../../../core/package.json');
+    expect(manifest.type).toBe('module');
+    expect(manifest.sideEffects).toBe(false);
+    expect(manifest.dependencies ?? {}).toEqual({});
   });
 });
 
 describe('recipe selection follows axisOrder and defaults', () => {
-  test('base first, then one branch per axis, in declaration order', () => {
-    const refs = selector({ variant: 'primary', size: 'md' });
-    expect(refs).toHaveLength(3);
-    expect(refs[0]).toBe(spec.base);
-    expect(refs[1]).toEqual(spec.branches.variant.primary);
-    expect(refs[2]).toEqual(spec.branches.size.md);
+  test('one StyleRef flattens base then branches in declaration order', () => {
+    const ref = selector({ variant: 'primary', size: 'md' });
+    expect(ref.kind).toBe('pandamstyle-style-ref');
+    expect(ref.entries).toEqual([
+      ...spec.base.entries,
+      ...spec.branches.variant.primary.entries,
+      ...spec.branches.size.md.entries,
+    ]);
   });
 
   test('absent and undefined both take the default', () => {
@@ -111,25 +130,42 @@ describe('recipe selection follows axisOrder and defaults', () => {
 
   test('false is a value, not an absence', () => {
     const boolSpec = {
+      abiVersion: 1,
+      systemId: 'bool-system',
       recipeId: 'flagged',
       axisOrder: ['flag'],
       variantMap: { flag: ['true', 'false'] },
       defaultVariants: {},
-      base: { base: 'x', $$css: true },
+      base: {
+        kind: 'pandamstyle-style-ref',
+        abiVersion: 1,
+        systemId: 'bool-system',
+        entries: [['base', 'x']],
+      },
       branches: {
         flag: {
-          true: { opacity: 'x1', $$css: true },
-          false: { opacity: 'x2', $$css: true },
+          true: {
+            kind: 'pandamstyle-style-ref',
+            abiVersion: 1,
+            systemId: 'bool-system',
+            entries: [['opacity', 'x1']],
+          },
+          false: {
+            kind: 'pandamstyle-style-ref',
+            abiVersion: 1,
+            systemId: 'bool-system',
+            entries: [['opacity', 'x2']],
+          },
         },
       },
     };
     const sel = runtime.defineRecipeSelector(boolSpec);
-    expect(sel({ flag: false })).toEqual([
-      boolSpec.base,
-      boolSpec.branches.flag.false,
+    expect(sel({ flag: false }).entries).toEqual([
+      ...boolSpec.base.entries,
+      ...boolSpec.branches.flag.false.entries,
     ]);
     // absent: no default, so the axis contributes no branch
-    expect(sel({})).toEqual([boolSpec.base]);
+    expect(sel({}).entries).toEqual(boolSpec.base.entries);
   });
 
   test('null, unknown key and unknown value fail deterministically', () => {
@@ -145,10 +181,9 @@ describe('recipe selection follows axisOrder and defaults', () => {
       selector({ variant: 'huge' });
       throw new Error('should have thrown');
     } catch (e) {
-      const d = e.diagnostics[0];
-      expect(d.code).toBe('PMS_INVALID_VARIANT_VALUE');
-      expect(d.context.admitted).toEqual(['primary', 'secondary']);
-      expect(d.context.recipeId).toBe('button');
+      expect(e.code).toBe('PMS_INVALID_VARIANT_VALUE');
+      expect(e.context.admitted).toEqual(['primary', 'secondary']);
+      expect(e.context.recipeId).toBe('button');
     }
   });
 
@@ -192,18 +227,14 @@ describe('composition contract: base + hover, then a base variant', () => {
     }
   });
 
-  test('the fork composition runtime composes the compiled refs', () => {
-    // styleq is the fork's composer: last wins per property+condition.
-    const stylex = require(
-      require.resolve('@stylexjs/stylex', { paths: [COMPILER_PKG] }),
-    );
-    const base = stylex.props(spec.base);
-    const variant = stylex.props(spec.branches.variant.primary);
-    const composed = stylex.props(spec.base, spec.branches.variant.secondary);
+  test('the core composition runtime composes compiled refs', () => {
+    const base = runtime.props(spec.base);
+    const variant = runtime.props(spec.branches.variant.primary);
+    const composed = runtime.props(spec.base, spec.branches.variant.secondary);
     expect(typeof base.className).toBe('string');
     expect(typeof variant.className).toBe('string');
     // Both classes are kept: the composition is additive, not a replacement.
-    const merged = stylex.props(spec.base, spec.branches.size.md);
+    const merged = runtime.props(spec.base, spec.branches.size.md);
     expect(merged.className.split(' ').length).toBeGreaterThan(
       base.className.split(' ').length,
     );

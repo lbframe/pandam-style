@@ -356,7 +356,9 @@ function resultOf(h, source, bindings, ok, diagnostics) {
     diagnostics: codes,
     shape: !ok
       ? 'rejected'
-      : code.includes('$$css')
+      : code.includes('$$css') ||
+          code.includes('pandamstyle-style-ref') ||
+          code.includes('pandamstyle-theme-ref')
         ? 'style'
         : code.includes('var(--')
           ? 'token'
@@ -377,7 +379,6 @@ function runCase(fixture) {
     path.join(h.outDir, 'design.pandamstyle.js'),
     h.compiler.generateDesignSystemModule({
       designSystem: ds,
-      runtimeModule: '@pandamstyle/compiler/runtime',
     }),
   );
   const source = fixture.source ?? consumer();

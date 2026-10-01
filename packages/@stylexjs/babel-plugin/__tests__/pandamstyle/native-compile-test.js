@@ -104,13 +104,13 @@ describe('valid project builds through real files', () => {
     }
   });
 
-  test('the runtime import of the page is the fork composition runtime only', () => {
+  test('the runtime import of the page is the PandamStyle core composition runtime', () => {
     const code = fs.readFileSync(
       path.join(artifacts.emittedDir, 'src/page.js'),
       'utf8',
     );
     const imports = [...code.matchAll(/from\s+"([^"]+)"/g)].map((m) => m[1]);
-    expect(imports).toEqual(['@stylexjs/stylex']);
+    expect(imports).toEqual(['@pandamstyle/core']);
   });
 
   test('page sources are not mutated by the build', () => {
@@ -140,7 +140,7 @@ describe('helper resolution follows binding and module', () => {
     // pmsCreate/pmsToken are gone: the call was compiled.
     expect(code).not.toContain('pmsCreate(');
     expect(code).not.toContain('pmsToken(');
-    expect(code).toContain('$$css');
+    expect(code).toContain('pandamstyle-style-ref');
   });
 
   test('a page importing only a recipe is covered and compiled', () => {
@@ -152,7 +152,7 @@ describe('helper resolution follows binding and module', () => {
       path.join(artifacts.emittedDir, 'src/only-recipe.js'),
       'utf8',
     );
-    expect(code).toContain('$$css');
+    expect(code).toContain('pandamstyle-style-ref');
   });
 
   test('a namespace import is recognized', () => {
@@ -162,7 +162,8 @@ describe('helper resolution follows binding and module', () => {
     );
     expect(code).not.toContain('pms.token(');
     expect(code).not.toContain('pms.create(');
-    expect(code).toContain('$$css');
+    expect(code).toContain('pandamstyle-theme-ref');
+    expect(code).toContain('pandamstyle-style-ref');
   });
 
   test('a hoisted token constant is lowered, not left for the runtime', () => {

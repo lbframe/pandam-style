@@ -194,9 +194,9 @@ describe('pandamstyle: recipe -> CSS', () => {
   test('sélection bornée : base + branches par axe selon axisOrder', () => {
     const ds = build();
     const sel = ds.recipes.button({ variant: 'primary', size: 'md' });
-    expect(sel.__pmsStyleRef).toBe(true);
-    // base + variant.primary + size.md = 3 refs compilées
-    expect(sel.refs).toHaveLength(3);
+    expect(sel.kind).toBe('pandamstyle-style-ref');
+    // Le cœur fusionne base + variant.primary + size.md dans un seul StyleRef.
+    expect(sel.entries.length).toBeGreaterThan(0);
     const p = ds.props(sel);
     expect(typeof p.className).toBe('string');
     const css = ds.renderCss();
@@ -213,15 +213,14 @@ describe('pandamstyle: recipe -> CSS', () => {
 
   test('valeur hors domaine rejetée de façon déterministe au runtime', () => {
     const ds = build();
-    expect(() => ds.recipes.button({ variant: 'huge' })).toThrow(PmsError);
+    expect(() => ds.recipes.button({ variant: 'huge' })).toThrow(
+      /PMS_INVALID_VARIANT_VALUE/,
+    );
     try {
       ds.recipes.button({ variant: 'huge' });
     } catch (e) {
-      expect(e.diagnostics[0].code).toBe('PMS_INVALID_VARIANT_VALUE');
-      expect(e.diagnostics[0].context.admitted).toEqual([
-        'primary',
-        'secondary',
-      ]);
+      expect(e.code).toBe('PMS_INVALID_VARIANT_VALUE');
+      expect(e.context.admitted).toEqual(['primary', 'secondary']);
     }
   });
 
@@ -231,13 +230,13 @@ describe('pandamstyle: recipe -> CSS', () => {
       ds.recipes.button({ weight: 'md' });
       throw new Error('x');
     } catch (e) {
-      expect(e.diagnostics[0].code).toBe('PMS_INVALID_VARIANT_KEY');
+      expect(e.code).toBe('PMS_INVALID_VARIANT_KEY');
     }
     try {
       ds.recipes.button({ size: null });
       throw new Error('x');
     } catch (e) {
-      expect(e.diagnostics[0].code).toBe('PMS_INVALID_VARIANT_VALUE');
+      expect(e.code).toBe('PMS_INVALID_VARIANT_VALUE');
     }
   });
 

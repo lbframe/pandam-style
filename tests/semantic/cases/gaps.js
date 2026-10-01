@@ -372,13 +372,7 @@ add(
   ),
   { observe: { runtime: null, runtimeGuard: { className: 'invented' } } },
 );
-gap(
-  'props.runtime-malformed',
-  'SG-12',
-  'The current generated props wrapper accepts an arbitrary runtime object instead of raising the frozen structured selection error. Static provenance protection does not repair the runtime contract.',
-  ['runtimeGuard'],
-  [yes([], [c('runtimeGuard', { rejected: false, code: null })])],
-);
+// SG-12 is promoted to MUST_PRESERVE. The authored target above is unchanged.
 
 const protocol = cases.find((x) => x.id === 'diagnostics.protocol-v1');
 // Session allocation strings are opaque. Their association is semantic.

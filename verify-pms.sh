@@ -362,6 +362,14 @@ else
     bash -c "cd '$REPO_ROOT/packages/@stylexjs/babel-plugin' && '$REPO_ROOT/node_modules/.bin/jest' --ci '__tests__/pandamstyle/.*-test.js'"
 fi
 
+if is_filtered_out "pandamstyle-core"; then
+  skip_step "pandamstyle-core" "not selected by PMS_ONLY_STEPS"
+else
+  run_step "pandamstyle-core" \
+    "$REPO_ROOT/node_modules/.bin/jest" --config "$REPO_ROOT/jest.config.js" \
+    --ci --runInBand --runTestsByPath "$REPO_ROOT/packages/core/__tests__/core-test.js"
+fi
+
 # The semantic oracle reconciles a tracked explicit suite/case inventory with
 # filesystem, Jest discovery and actual execution. It cannot bless expectations.
 if is_filtered_out "semantic-oracle"; then
@@ -395,12 +403,20 @@ collect_artifacts() {
   cp -R "$REPO_ROOT/packages/compiler/lib" "$ARTIFACT_DIR/compiler-lib"
   cp "$REPO_ROOT/packages/compiler/package.json" \
      "$ARTIFACT_DIR/compiler-package.json"
+  cp -R "$REPO_ROOT/packages/core/src" "$ARTIFACT_DIR/core-src"
+  cp "$REPO_ROOT/packages/core/package.json" "$ARTIFACT_DIR/core-package.json"
+  node "$REPO_ROOT/tools/pms/core-package-proof.js" \
+    "$PMS_OUT_DIR/core-package-proof"
+  cp -R "$PMS_OUT_DIR/core-package-proof" "$ARTIFACT_DIR/core-package-proof"
   # One valid fixture build, for the CSS/JS/manifest triple.
   (cd "$REPO_ROOT/packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid" \
     && node "$REPO_ROOT/packages/compiler/bin/pms-build.js" \
        --config ./pandamstyle.config.js)
   cp -R "$REPO_ROOT/packages/@stylexjs/babel-plugin/__tests__/pandamstyle/fixtures/valid/generated" \
      "$ARTIFACT_DIR/valid-fixture-generation"
+  node "$REPO_ROOT/tools/pms/generated-runtime-imports.js" \
+    "$ARTIFACT_DIR/valid-fixture-generation" \
+    "$ARTIFACT_DIR/generated-runtime-imports.json"
   if [ -d "${PMS_PILOT_DIR:-$PMS_OUT_DIR/pilot}/app/dist" ]; then
     cp -R "${PMS_PILOT_DIR:-$PMS_OUT_DIR/pilot}/app/dist" "$ARTIFACT_DIR/pilot-dist"
   fi

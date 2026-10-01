@@ -105,7 +105,6 @@ describe('project session: reuse is decided by content, not by path', () => {
       'projectSemanticEpoch',
       'resolutionDigest',
       'role',
-      'runtimeModule',
       'sourceHash',
       'useCSSLayers',
     ]);

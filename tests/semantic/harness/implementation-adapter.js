@@ -116,6 +116,11 @@ function evaluate(root, out, entry) {
     const mod = { exports: {} };
     cache.set(file, mod);
     const req = (request) => {
+      if (request === '@pandamstyle/core') {
+        return load(
+          path.resolve(__dirname, '../../../packages/core/src/index.js'),
+        );
+      }
       if (!request.startsWith('.')) return require(request);
       const base = path.resolve(path.dirname(file), request);
       const candidates = [
@@ -211,7 +216,7 @@ function observe(
     result.runtime = {};
     for (const name of spec.observe.runtime.exports) {
       let value = spec.observe.runtime.styleRef
-        ? require('@stylexjs/stylex').props(
+        ? evaluate(root, out, '@design').props(
             exports[spec.observe.runtime.styleRef.export][
               spec.observe.runtime.styleRef.key
             ],
@@ -224,12 +229,12 @@ function observe(
         // TEST ONLY compiled-ref format translation. The source validator does
         // not admit arbitrary tombstone objects; this independent core vector
         // exercises the actual runtime using the compiler's own conflict keys.
-        const cancellation = Object.fromEntries(
-          Object.keys(original).map((conflict) => [
-            conflict,
-            conflict === '$$css' ? true : null,
-          ]),
-        );
+        const cancellation = {
+          kind: 'pandamstyle-style-ref',
+          abiVersion: 1,
+          systemId: original.systemId,
+          entries: original.entries.map(([conflict]) => [conflict, null]),
+        };
         value = evaluate(root, out, '@design').props(original, cancellation);
       }
       const classes = value?.className?.split(/\s+/).filter(Boolean) ?? [];
@@ -298,7 +303,6 @@ async function run(spec, lane) {
     definition: definition(input),
     roots: spec.roots.map((p) => path.join(root, p)),
     outDir: out,
-    runtimeModule: '@pandamstyle/compiler/runtime',
     ...(lane === 'incremental'
       ? {
           publishVariant: 'session_incremental_publish_css',
@@ -314,7 +318,6 @@ async function run(spec, lane) {
     rootDir: publicRoot,
     roots: spec.roots.map((p) => path.join(publicRoot, p)),
     outDir: publicOut,
-    runtimeModule: '@pandamstyle/compiler/runtime',
     publishVariant: 'session_incremental_publish_css',
     publishFailAt: injected,
   });

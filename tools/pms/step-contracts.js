@@ -128,6 +128,7 @@ const STEP_CONTRACTS = {
   'upstream-babel-plugin': { kind: 'test' },
   'upstream-stylex': { kind: 'test' },
   pandamstyle: { kind: 'test' },
+  'pandamstyle-core': { kind: 'test' },
   'semantic-oracle': { kind: 'test' },
   'tooling-tests': { kind: 'test' },
   pilot: { kind: 'pilot' },

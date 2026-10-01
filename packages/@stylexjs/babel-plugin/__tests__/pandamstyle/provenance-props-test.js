@@ -119,10 +119,10 @@ describe('BC-1: props() admits no raw CSS object', () => {
       const imports = [...emitted.matchAll(/from\s+"([^"]+)"/g)].map(
         (m) => m[1],
       );
-      // The fork composition runtime is the only style import. `react/jsx-runtime`
+      // The PandamStyle ABI runtime is the only style import. `react/jsx-runtime`
       // is the second pass lowering JSX and is not a style channel.
       expect(imports.filter((i) => i !== 'react/jsx-runtime')).toEqual([
-        '@stylexjs/stylex',
+        '@pandamstyle/core',
       ]);
       for (const forbidden of [
         '@babel/',
@@ -138,9 +138,9 @@ describe('BC-1: props() admits no raw CSS object', () => {
     });
 
     test('the whole theme of a props() call survives compilation', () => {
-      // `props(themes.dark, styles.shell)` keeps both arguments in the order
-      // the fork runtime expects, and `styles.shell` became a class literal.
-      expect(emitted).toContain('$$css');
+      // `props(themes.dark, styles.shell)` keeps both ABI references in order.
+      expect(emitted).toContain('pandamstyle-theme-ref');
+      expect(emitted).toContain('pandamstyle-style-ref');
       expect(emitted).toContain('styles.shell');
     });
   });
