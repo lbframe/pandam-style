@@ -1,0 +1,39 @@
+{
+  "testedCommit": "c4c6b07a7124370b4d9de04bafc8101a7a497c7d",
+  "testedTree": "a1ec19d6f9d13fb37496c2f8b2df036342937bd9",
+  "documentKind": "pandamstyle-generated-typescript-reconciliation",
+  "qualification": {
+    "documentKind": "pandamstyle-phase-6-typescript-qualification",
+    "positive": {
+      "status": "passed",
+      "elapsedMs": 663.078814
+    },
+    "negative": {
+      "status": "rejected-invalid-vocabulary",
+      "diagnosticCount": 11,
+      "invalidLines": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "elapsedMs": 738.759655
+    },
+    "declarationBytes": 9488,
+    "tokenLiterals": 5,
+    "recipeDomainLiterals": 4,
+    "memoryBytes": 430572848
+  },
+  "JS_type_parity": "verified by retained Phase 6 snapshot/type projection assertions",
+  "source": "verify/phase-6-typescript.json",
+  "suite": "packages/compiler/__tests__/pandamstyle/phase-6-design-system-test.js",
+  "testStep": "pandamstyle",
+  "result": "passed"
+}

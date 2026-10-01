@@ -1,0 +1,38 @@
+PASS packages/compiler/__tests__/pandamstyle/incremental-publication-test.js (7.898 s)
+PASS packages/compiler/__tests__/pandamstyle/agent-result-test.js (10.332 s)
+PASS packages/compiler/__tests__/pandamstyle/incremental-coverage-closure-test.js
+PASS packages/compiler/__tests__/pandamstyle/agent-dirty-input-test.js
+PASS packages/compiler/__tests__/pandamstyle/design-system-view-test.js
+PASS packages/compiler/__tests__/pandamstyle/watcher-provider-test.js
+PASS packages/compiler/__tests__/pandamstyle/incremental-session-test.js (10.922 s)
+PASS packages/compiler/__tests__/pandamstyle/incremental-css-test.js
+PASS packages/compiler/__tests__/pandamstyle/runner-status-test.js
+PASS packages/compiler/__tests__/pandamstyle/coverage-graph-test.js
+PASS packages/compiler/__tests__/pandamstyle/phase-d-agent-loop-test.js (28.856 s)
+  ● Console
+
+    console.log
+      LONG-SESSION {"first":{"revision":0,"nodes":14,"covered":14,"forward":9,"reverse":8,"support":14,"fileStates":14,"dsConsumers":6,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":935378944},"last":{"revision":1000,"nodes":14,"covered":14,"forward":9,"reverse":8,"support":14,"fileStates":14,"dsConsumers":6,"dsImportConsumers":2,"relayAnswers":3,"relayHops":2,"rss":941146112},"samples":11}
+
+      at Object.log (packages/compiler/__tests__/pandamstyle/phase-d-agent-loop-test.js:385:13)
+
+PASS packages/compiler/__tests__/pandamstyle/vite-build-test.js (8.63 s)
+PASS packages/compiler/__tests__/pandamstyle/provenance-props-test.js
+PASS packages/compiler/__tests__/pandamstyle/negative-builds-test.js (10.319 s)
+PASS packages/compiler/__tests__/engine-absorption-test.js
+PASS packages/compiler/__tests__/pandamstyle/native-compile-test.js
+PASS packages/compiler/__tests__/pandamstyle/chain-test.js
+PASS packages/compiler/__tests__/pandamstyle/recipe-contract-test.js
+PASS packages/compiler/__tests__/pandamstyle/staleness-test.js
+PASS packages/compiler/__tests__/pandamstyle/artifacts-test.js
+PASS packages/compiler/__tests__/pandamstyle/forwarding-semantics-test.js
+PASS packages/compiler/__tests__/pandamstyle/transactional-generation-test.js (8.167 s)
+PASS packages/compiler/__tests__/pandamstyle/phase-6-design-system-test.js
+PASS packages/compiler/__tests__/pandamstyle/project-api-test.js
+PASS packages/compiler/__tests__/pandamstyle/phase-6-7-reconciliation-test.js
+
+Test Suites: 25 passed, 25 total
+Tests:       545 passed, 545 total
+Snapshots:   0 total
+Time:        120.95 s
+Ran all test suites matching /home/kyle/work/pandam-style-phase-6-7-reconciliation-2026-10/packages/compiler/__tests__/pandamstyle|/home/kyle/work/pandam-style-phase-6-7-reconciliation-2026-10/packages/compiler/__tests__/engine-absorption-test.js.

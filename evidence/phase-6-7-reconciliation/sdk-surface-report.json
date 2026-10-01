@@ -1,0 +1,41 @@
+{
+  "testedCommit": "c4c6b07a7124370b4d9de04bafc8101a7a497c7d",
+  "testedTree": "a1ec19d6f9d13fb37496c2f8b2df036342937bd9",
+  "expected": {
+    "root": [
+      "COMPILER_ABI_VERSION",
+      "Codes",
+      "DIAGNOSTICS_RESULT_KIND",
+      "DIAGNOSTICS_RESULT_SCHEMA_VERSION",
+      "PmsError",
+      "createProjectSession",
+      "formatDiagnostic"
+    ],
+    "config": [
+      "defineConfig",
+      "token"
+    ],
+    "host": [
+      "createHostBridge"
+    ]
+  },
+  "observed": {
+    "root": [
+      "COMPILER_ABI_VERSION",
+      "Codes",
+      "DIAGNOSTICS_RESULT_KIND",
+      "DIAGNOSTICS_RESULT_SCHEMA_VERSION",
+      "PmsError",
+      "createProjectSession",
+      "formatDiagnostic"
+    ],
+    "config": [
+      "defineConfig",
+      "token"
+    ],
+    "host": [
+      "createHostBridge"
+    ]
+  },
+  "result": "passed"
+}

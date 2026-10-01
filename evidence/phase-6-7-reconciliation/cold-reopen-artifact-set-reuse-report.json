@@ -1,0 +1,1095 @@
+{
+  "testedCommit": "c4c6b07a7124370b4d9de04bafc8101a7a497c7d",
+  "testedTree": "a1ec19d6f9d13fb37496c2f8b2df036342937bd9",
+  "documentKind": "pandamstyle-cold-reopen-canonical-reuse",
+  "source": "verify/phase-6-7-qualification.json",
+  "scenarios": [
+    {
+      "scenario": "cold-reopen-identical",
+      "result": "passed",
+      "original": {
+        "projectId": "/tmp/pms-reconciliation-VATEdi",
+        "sessionId": "c3734693-a37c-40fa-8261-f2ee6701bc85",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-VATEdi",
+          "sessionId": "c3734693-a37c-40fa-8261-f2ee6701bc85",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-VATEdi",
+          "sessionId": "c3734693-a37c-40fa-8261-f2ee6701bc85",
+          "revisionId": 1
+        },
+        "artifactDigest": "1d1a49d2a2e61b850c7f94dd8b4bc0905f5474a4bd95523be5bbce36e6582e65",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-VATEdi",
+          "sessionId": "c3734693-a37c-40fa-8261-f2ee6701bc85",
+          "revisionId": 1
+        },
+        "generationId": 1,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 7,
+          "outputsChanged": 0,
+          "outputsReused": 0,
+          "outputsRemoved": 0,
+          "bytesWritten": 24601,
+          "bytesReused": 0,
+          "bytesDeleted": 0,
+          "hardlinks": 0,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 266,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 4,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "receipt": {
+        "projectId": "/tmp/pms-reconciliation-VATEdi",
+        "sessionId": "d187f2a5-65e7-461a-ab61-e616f79279d8",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-VATEdi",
+          "sessionId": "d187f2a5-65e7-461a-ab61-e616f79279d8",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-VATEdi",
+          "sessionId": "c3734693-a37c-40fa-8261-f2ee6701bc85",
+          "revisionId": 1
+        },
+        "artifactDigest": "1d1a49d2a2e61b850c7f94dd8b4bc0905f5474a4bd95523be5bbce36e6582e65",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-VATEdi",
+          "sessionId": "d187f2a5-65e7-461a-ab61-e616f79279d8",
+          "revisionId": 1
+        },
+        "generationId": 1,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 0,
+          "outputsChanged": 0,
+          "outputsReused": 7,
+          "outputsRemoved": 0,
+          "bytesWritten": 0,
+          "bytesReused": 24601,
+          "bytesDeleted": 0,
+          "hardlinks": 7,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 0,
+              "changed": 0,
+              "reused": 1,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 266,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 0,
+              "changed": 0,
+              "reused": 1,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 541,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 0,
+              "changed": 0,
+              "reused": 1,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 8920,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 0,
+              "changed": 0,
+              "reused": 4,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 14874,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "before": "0c446b2feb4b64d8c768f988d93a407880e7ae696dbdf8beaca0c16a80c0546b",
+      "after": "0c446b2feb4b64d8c768f988d93a407880e7ae696dbdf8beaca0c16a80c0546b",
+      "ticketDigest": "5b0958b6f00bced96924019d26a1d473d6b5b8164b849b73585af9be06714d29"
+    },
+    {
+      "scenario": "cold-reopen-token-value",
+      "result": "passed",
+      "original": {
+        "projectId": "/tmp/pms-reconciliation-IkPnv0",
+        "sessionId": "09abb87a-c9bc-4204-b1d3-2fc29810ac08",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-IkPnv0",
+          "sessionId": "09abb87a-c9bc-4204-b1d3-2fc29810ac08",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-IkPnv0",
+          "sessionId": "09abb87a-c9bc-4204-b1d3-2fc29810ac08",
+          "revisionId": 1
+        },
+        "artifactDigest": "71d93f0d2c84644d217c1d0c8cda2d39d8817597486897bff4fabe3ff5389cf3",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-IkPnv0",
+          "sessionId": "09abb87a-c9bc-4204-b1d3-2fc29810ac08",
+          "revisionId": 1
+        },
+        "generationId": 1,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 7,
+          "outputsChanged": 0,
+          "outputsReused": 0,
+          "outputsRemoved": 0,
+          "bytesWritten": 24601,
+          "bytesReused": 0,
+          "bytesDeleted": 0,
+          "hardlinks": 0,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 266,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 4,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "receipt": {
+        "projectId": "/tmp/pms-reconciliation-IkPnv0",
+        "sessionId": "c938f286-2dd0-4c91-9e86-265575045fdd",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-IkPnv0",
+          "sessionId": "c938f286-2dd0-4c91-9e86-265575045fdd",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-IkPnv0",
+          "sessionId": "c938f286-2dd0-4c91-9e86-265575045fdd",
+          "revisionId": 1
+        },
+        "artifactDigest": "33f6f7710260333a363076f3f7a9f0950c954de696f43867b38f22ed5291d81a",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-IkPnv0",
+          "sessionId": "c938f286-2dd0-4c91-9e86-265575045fdd",
+          "revisionId": 1
+        },
+        "generationId": 2,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "19ab3d418ee25c45"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 0,
+          "outputsChanged": 6,
+          "outputsReused": 1,
+          "outputsRemoved": 0,
+          "bytesWritten": 24335,
+          "bytesReused": 266,
+          "bytesDeleted": 0,
+          "hardlinks": 1,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 0,
+              "changed": 0,
+              "reused": 1,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 266,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 0,
+              "changed": 4,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "before": "0c446b2feb4b64d8c768f988d93a407880e7ae696dbdf8beaca0c16a80c0546b",
+      "after": "65bc2006c6d6938a71ed2f539d7d463ed1d9046981b93beec75479ffe499856d",
+      "ticketDigest": "c4b28760cd920858b391e0130138e00c32cf0e2a0289cdae156cf7aa3580e062"
+    },
+    {
+      "scenario": "cold-reopen-declaration-vocabulary-order",
+      "result": "passed",
+      "original": {
+        "projectId": "/tmp/pms-reconciliation-Ae6M5H",
+        "sessionId": "7515c684-eb6a-4193-b0b2-291014864a5b",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-Ae6M5H",
+          "sessionId": "7515c684-eb6a-4193-b0b2-291014864a5b",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-Ae6M5H",
+          "sessionId": "7515c684-eb6a-4193-b0b2-291014864a5b",
+          "revisionId": 1
+        },
+        "artifactDigest": "71122e38b05e8959e85a7d78fef60ebf45dfe726808451fb37dce921d816d989",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-Ae6M5H",
+          "sessionId": "7515c684-eb6a-4193-b0b2-291014864a5b",
+          "revisionId": 1
+        },
+        "generationId": 1,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 7,
+          "outputsChanged": 0,
+          "outputsReused": 0,
+          "outputsRemoved": 0,
+          "bytesWritten": 24601,
+          "bytesReused": 0,
+          "bytesDeleted": 0,
+          "hardlinks": 0,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 266,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 4,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "receipt": {
+        "projectId": "/tmp/pms-reconciliation-Ae6M5H",
+        "sessionId": "babc5e51-8277-4f4f-b087-74df8aabb161",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-Ae6M5H",
+          "sessionId": "babc5e51-8277-4f4f-b087-74df8aabb161",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-Ae6M5H",
+          "sessionId": "babc5e51-8277-4f4f-b087-74df8aabb161",
+          "revisionId": 1
+        },
+        "artifactDigest": "c5dca58dcc8dab9a7e44c16fa339ece45746f358820d37d9d49c9080a87c7ce9",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-Ae6M5H",
+          "sessionId": "babc5e51-8277-4f4f-b087-74df8aabb161",
+          "revisionId": 1
+        },
+        "generationId": 2,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 0,
+          "outputsChanged": 6,
+          "outputsReused": 1,
+          "outputsRemoved": 0,
+          "bytesWritten": 24335,
+          "bytesReused": 266,
+          "bytesDeleted": 0,
+          "hardlinks": 1,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 0,
+              "changed": 0,
+              "reused": 1,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 266,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 0,
+              "changed": 4,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "before": "0c446b2feb4b64d8c768f988d93a407880e7ae696dbdf8beaca0c16a80c0546b",
+      "after": "3c93530bfb7fae99c659960d56c2e4ad626b043db086d897f2ebb4b3132fa326",
+      "ticketDigest": "b8a9bf40e0661c186c1def744952eda37afdd9819bb0b9705d7299f0195f370a"
+    },
+    {
+      "scenario": "cold-reopen-recipe-domain",
+      "result": "passed",
+      "original": {
+        "projectId": "/tmp/pms-reconciliation-8MfsMM",
+        "sessionId": "eeaedd0e-4b9d-4c74-a89f-f9b1639b4642",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-8MfsMM",
+          "sessionId": "eeaedd0e-4b9d-4c74-a89f-f9b1639b4642",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-8MfsMM",
+          "sessionId": "eeaedd0e-4b9d-4c74-a89f-f9b1639b4642",
+          "revisionId": 1
+        },
+        "artifactDigest": "6a53f16a5020b3977dde41c59e20dd86d13ec882dc19c1f78c4615e79353f7d7",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-8MfsMM",
+          "sessionId": "eeaedd0e-4b9d-4c74-a89f-f9b1639b4642",
+          "revisionId": 1
+        },
+        "generationId": 1,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 7,
+          "outputsChanged": 0,
+          "outputsReused": 0,
+          "outputsRemoved": 0,
+          "bytesWritten": 24601,
+          "bytesReused": 0,
+          "bytesDeleted": 0,
+          "hardlinks": 0,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 266,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 4,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "receipt": {
+        "projectId": "/tmp/pms-reconciliation-8MfsMM",
+        "sessionId": "a484a16d-fbe6-490e-a414-6ee92c1e9afa",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-8MfsMM",
+          "sessionId": "a484a16d-fbe6-490e-a414-6ee92c1e9afa",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-8MfsMM",
+          "sessionId": "a484a16d-fbe6-490e-a414-6ee92c1e9afa",
+          "revisionId": 1
+        },
+        "artifactDigest": "d5bdd37d56a82df75d56cac094f942168e9568dbc1e2ab0738028da3347956ff",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-8MfsMM",
+          "sessionId": "a484a16d-fbe6-490e-a414-6ee92c1e9afa",
+          "revisionId": 1
+        },
+        "generationId": 2,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "4498b5b862194189"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 0,
+          "outputsChanged": 6,
+          "outputsReused": 1,
+          "outputsRemoved": 0,
+          "bytesWritten": 24660,
+          "bytesReused": 266,
+          "bytesDeleted": 0,
+          "hardlinks": 1,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 0,
+              "changed": 0,
+              "reused": 1,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 266,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8967,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 0,
+              "changed": 4,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 15152,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "before": "0c446b2feb4b64d8c768f988d93a407880e7ae696dbdf8beaca0c16a80c0546b",
+      "after": "74edc022fc9e99a06d2f4047c23e50781880af5508fc5ff4af6dac3ae2a84549",
+      "ticketDigest": "21207d9bb63f3740a99034399765018cf0a61eb957bce221f145ab1e04f81c18"
+    },
+    {
+      "scenario": "cold-reopen-theme",
+      "result": "passed",
+      "original": {
+        "projectId": "/tmp/pms-reconciliation-p7QRHH",
+        "sessionId": "6479be60-20e5-446c-9777-805c5dea231e",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-p7QRHH",
+          "sessionId": "6479be60-20e5-446c-9777-805c5dea231e",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-p7QRHH",
+          "sessionId": "6479be60-20e5-446c-9777-805c5dea231e",
+          "revisionId": 1
+        },
+        "artifactDigest": "df572ea3d9134161390eb94ce5cb055d0cefdfb601de7c938d696c52d628fba3",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-p7QRHH",
+          "sessionId": "6479be60-20e5-446c-9777-805c5dea231e",
+          "revisionId": 1
+        },
+        "generationId": 1,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 7,
+          "outputsChanged": 0,
+          "outputsReused": 0,
+          "outputsRemoved": 0,
+          "bytesWritten": 24601,
+          "bytesReused": 0,
+          "bytesDeleted": 0,
+          "hardlinks": 0,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 266,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 4,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "receipt": {
+        "projectId": "/tmp/pms-reconciliation-p7QRHH",
+        "sessionId": "682a9ac5-fe81-4f6d-9f05-c10c68ccb90d",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-p7QRHH",
+          "sessionId": "682a9ac5-fe81-4f6d-9f05-c10c68ccb90d",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-p7QRHH",
+          "sessionId": "682a9ac5-fe81-4f6d-9f05-c10c68ccb90d",
+          "revisionId": 1
+        },
+        "artifactDigest": "4a6dbfb4439e40279e5fcc51dc216f6a77de040405da3333fd8685c9357011c2",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-p7QRHH",
+          "sessionId": "682a9ac5-fe81-4f6d-9f05-c10c68ccb90d",
+          "revisionId": 1
+        },
+        "generationId": 2,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "c6a505f03bb26eed"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 0,
+          "outputsChanged": 6,
+          "outputsReused": 1,
+          "outputsRemoved": 0,
+          "bytesWritten": 24335,
+          "bytesReused": 266,
+          "bytesDeleted": 0,
+          "hardlinks": 1,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 0,
+              "changed": 0,
+              "reused": 1,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 266,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 0,
+              "changed": 4,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "before": "0c446b2feb4b64d8c768f988d93a407880e7ae696dbdf8beaca0c16a80c0546b",
+      "after": "1def76c38d2b6b9b01e4862d943fea23629074dad1a757c3f978e3d1c0ece9ec",
+      "ticketDigest": "050c496e1e29ec1d0277fca115add4fb6e31fba46dc44ed6e96d197f99599638"
+    },
+    {
+      "scenario": "cold-reopen-condition",
+      "result": "passed",
+      "original": {
+        "projectId": "/tmp/pms-reconciliation-cz1r2a",
+        "sessionId": "73b2c4b1-3e4c-4fcd-bf94-71298ef704f7",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-cz1r2a",
+          "sessionId": "73b2c4b1-3e4c-4fcd-bf94-71298ef704f7",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-cz1r2a",
+          "sessionId": "73b2c4b1-3e4c-4fcd-bf94-71298ef704f7",
+          "revisionId": 1
+        },
+        "artifactDigest": "842f1388ecdbc8011a680fa6bc11b6430731eeacaec793208277fd9f74ecee79",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-cz1r2a",
+          "sessionId": "73b2c4b1-3e4c-4fcd-bf94-71298ef704f7",
+          "revisionId": 1
+        },
+        "generationId": 1,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 7,
+          "outputsChanged": 0,
+          "outputsReused": 0,
+          "outputsRemoved": 0,
+          "bytesWritten": 24601,
+          "bytesReused": 0,
+          "bytesDeleted": 0,
+          "hardlinks": 0,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 266,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 1,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 4,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "receipt": {
+        "projectId": "/tmp/pms-reconciliation-cz1r2a",
+        "sessionId": "2858ce88-9665-4a3f-923f-58e6969420f0",
+        "revision": {
+          "projectId": "/tmp/pms-reconciliation-cz1r2a",
+          "sessionId": "2858ce88-9665-4a3f-923f-58e6969420f0",
+          "revisionId": 1
+        },
+        "artifactRevision": {
+          "projectId": "/tmp/pms-reconciliation-cz1r2a",
+          "sessionId": "2858ce88-9665-4a3f-923f-58e6969420f0",
+          "revisionId": 1
+        },
+        "artifactDigest": "81347b0b7d8f7a533d91e67da5b584d6ac23e97a7d11a90e289891fc5e4ca5f1",
+        "associationRevision": {
+          "projectId": "/tmp/pms-reconciliation-cz1r2a",
+          "sessionId": "2858ce88-9665-4a3f-923f-58e6969420f0",
+          "revisionId": 1
+        },
+        "generationId": 2,
+        "designSystem": {
+          "systemId": "shared-ui",
+          "registryDigest": "41d8c6d390a66194"
+        },
+        "abiVersion": 1,
+        "publication": {
+          "mode": "delta",
+          "variant": "session_incremental_publish_css",
+          "outputsAdded": 0,
+          "outputsChanged": 6,
+          "outputsReused": 1,
+          "outputsRemoved": 0,
+          "bytesWritten": 24335,
+          "bytesReused": 266,
+          "bytesDeleted": 0,
+          "hardlinks": 1,
+          "copies": 0,
+          "byKind": {
+            "js": {
+              "added": 0,
+              "changed": 0,
+              "reused": 1,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 266,
+              "bytesDeleted": 0
+            },
+            "css": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 541,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "types": {
+              "added": 0,
+              "changed": 1,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 8920,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "metadata": {
+              "added": 0,
+              "changed": 4,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 14874,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            },
+            "other": {
+              "added": 0,
+              "changed": 0,
+              "reused": 0,
+              "removed": 0,
+              "bytesWritten": 0,
+              "bytesReused": 0,
+              "bytesDeleted": 0
+            }
+          },
+          "removed": []
+        }
+      },
+      "before": "0c446b2feb4b64d8c768f988d93a407880e7ae696dbdf8beaca0c16a80c0546b",
+      "after": "238f3e759fd5a88369be9236376009b71db68671ad45f2ba2a352f6965e6b2ad",
+      "ticketDigest": "03da9d73d49256c1c1ca5089ebc77742757b7d1aa11af96dadfa3e076a7f6f34"
+    }
+  ],
+  "result": "passed"
+}

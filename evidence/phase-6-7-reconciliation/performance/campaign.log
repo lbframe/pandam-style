@@ -1,0 +1,20 @@
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result one_file_existing_atoms i0: 51 rows, exit 0, 28.9s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result one_file_existing_atoms i1: 51 rows, exit 0, 29.4s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result one_file_existing_atoms i2: 51 rows, exit 0, 29.8s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result import_change i0: 54 rows, exit 0, 29.3s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result import_change i1: 54 rows, exit 0, 29.2s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result import_change i2: 54 rows, exit 0, 28.8s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result reexport_change i0: 54 rows, exit 0, 29.4s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result reexport_change i1: 54 rows, exit 0, 29.5s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result reexport_change i2: 54 rows, exit 0, 30.6s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result unresolved_import_then_file_appears i0: 110 rows, exit 0, 29.7s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result unresolved_import_then_file_appears i1: 110 rows, exit 0, 30.1s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result unresolved_import_then_file_appears i2: 110 rows, exit 0, 29.5s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result no_change i0: 51 rows, exit 0, 29.9s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result no_change i1: 51 rows, exit 0, 29.8s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result no_change i2: 51 rows, exit 0, 28.9s
+phase-d: 960 rows from 15 cells, 0 failed cells -> evidence/phase-6-7-reconciliation/performance/local-diagnostics.jsonl
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result_plus_compact_publish_metadata one_file_existing_atoms i0: 53 rows, exit 0, 29.7s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result_plus_compact_publish_metadata one_file_existing_atoms i1: 53 rows, exit 0, 30.6s
+phase-d c10000-t1000-r100-s307-f8 compact_agent_result_plus_compact_publish_metadata one_file_existing_atoms i2: 53 rows, exit 0, 28.8s
+phase-d: 159 rows from 3 cells, 0 failed cells -> evidence/phase-6-7-reconciliation/performance/local-publication.jsonl

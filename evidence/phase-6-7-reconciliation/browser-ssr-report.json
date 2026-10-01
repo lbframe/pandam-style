@@ -1,0 +1,62 @@
+{
+  "documentKind": "pandamstyle-reconciliation-browser-ssr-report",
+  "testedCommit": "c4c6b07a7124370b4d9de04bafc8101a7a497c7d",
+  "testedTree": "a1ec19d6f9d13fb37496c2f8b2df036342937bd9",
+  "cases": [
+    {
+      "case": "browser.conflict",
+      "source": "verify/semantic-oracle/cases/browser.conflict.json",
+      "revisions": 1,
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true,
+      "result": "passed"
+    },
+    {
+      "case": "browser.media-cascade",
+      "source": "verify/semantic-oracle/cases/browser.media-cascade.json",
+      "revisions": 1,
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true,
+      "result": "passed"
+    },
+    {
+      "case": "browser.shorthand-longhand",
+      "source": "verify/semantic-oracle/cases/browser.shorthand-longhand.json",
+      "revisions": 1,
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true,
+      "result": "passed"
+    },
+    {
+      "case": "browser.ssr-hydration",
+      "source": "verify/semantic-oracle/cases/browser.ssr-hydration.json",
+      "revisions": 1,
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true,
+      "result": "passed"
+    },
+    {
+      "case": "browser.theme-scope",
+      "source": "verify/semantic-oracle/cases/browser.theme-scope.json",
+      "revisions": 1,
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true,
+      "result": "passed"
+    },
+    {
+      "case": "browser.token-values",
+      "source": "verify/semantic-oracle/cases/browser.token-values.json",
+      "revisions": 1,
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true,
+      "result": "passed"
+    }
+  ],
+  "result": "passed"
+}

@@ -1,0 +1,89 @@
+{
+  "documentKind": "pandamstyle-reconciliation-artifact-coherence-report",
+  "testedCommit": "c4c6b07a7124370b4d9de04bafc8101a7a497c7d",
+  "testedTree": "a1ec19d6f9d13fb37496c2f8b2df036342937bd9",
+  "sources": [
+    "performance/service-performance.json",
+    "performance/artifact-set.json",
+    "verify/phase-6-7-qualification.json"
+  ],
+  "publishedMetadata": {
+    "schemaVersion": 1,
+    "systemId": "corpus-c10000-t1000-r100-s307-f8@0.1",
+    "registryDigest": "7b1708be320a834b",
+    "abiVersion": 1,
+    "compilerContractVersion": "pms-0.1",
+    "manifestSchemaVersion": 1,
+    "artifactSetDigest": "7ee0e71049fe6880e9d53eaba58cbb5b12c2f86136352f9a20ad2184c2f78626",
+    "artifacts": {
+      "designModule": {
+        "file": "design.pandamstyle.js",
+        "sha256": "2e2d4740ab0cac35ffe80b3c12bafb7cc4c892965fa1ec06f7df95bf4ae39ec0",
+        "bytes": 424563
+      },
+      "declarations": {
+        "file": "design.pandamstyle.d.ts",
+        "sha256": "5ad6e3b3558f98c119f0fbdcc0a7eeda375d677af79f8f6e7f920e7ce1b062e5",
+        "bytes": 186436
+      },
+      "manifest": {
+        "file": "manifest.json",
+        "sha256": "e6cc292fd1cc50c1b95729a0b815b729dcc347b567e36909b3728c88deb4f5fc",
+        "bytes": 62631
+      },
+      "css": {
+        "file": "styles.css",
+        "sha256": "0166f4734c8c4da92a14fcccd04da53e3db85e73712de199ba3326f78099d77d",
+        "bytes": 27281
+      }
+    }
+  },
+  "validatedPayloadSidecars": [
+    "performance/designModule.txt",
+    "performance/declarations.txt",
+    "performance/manifest.txt",
+    "performance/css.txt"
+  ],
+  "metadataSidecar": "performance/artifact-set.json",
+  "sameSnapshotIdentity": {
+    "systemId": "corpus-c10000-t1000-r100-s307-f8@0.1",
+    "registryDigest": "7b1708be320a834b",
+    "abiVersion": 1,
+    "compilerContractVersion": "pms-0.1",
+    "manifestSchemaVersion": 1
+  },
+  "actualPublishedSetValidation": true,
+  "mixedSetRejections": [
+    {
+      "scenario": "mixed-set-designModule-rejected",
+      "result": "passed"
+    },
+    {
+      "scenario": "mixed-set-declarations-rejected",
+      "result": "passed"
+    },
+    {
+      "scenario": "mixed-set-manifest-rejected",
+      "result": "passed"
+    },
+    {
+      "scenario": "mixed-set-css-rejected",
+      "result": "passed"
+    },
+    {
+      "scenario": "mixed-set-metadata-digest-rejected",
+      "result": "passed"
+    }
+  ],
+  "atomicFailureAndRecoverySource": "publication-recovery-report.json",
+  "lifecycleFieldsAbsent": true,
+  "identitySeparation": {
+    "artifactSetDigest": "SHA-256 content identity of canonical projections including emitted CSS",
+    "artifactDigest": "Digest of all project publication members",
+    "generationId": "Durable project publication lineage",
+    "revisionId": "Accepted project state transition",
+    "artifactRevision": "Original revision that committed bytes",
+    "associationRevision": "Current revision associated with committed or reused generation"
+  },
+  "result": "passed"
+}

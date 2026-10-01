@@ -1,0 +1,1537 @@
+{
+  "id": "theme.token-override",
+  "area": "themes",
+  "status": "MUST_PRESERVE",
+  "gapId": null,
+  "fresh": {
+    "applicable": true
+  },
+  "incremental": {
+    "applicable": true
+  },
+  "freshMatchesExpected": true,
+  "incrementalMatchesExpected": true,
+  "freshMatchesIncremental": true,
+  "revisions": [
+    {
+      "revision": 1,
+      "label": "initial",
+      "fresh": {
+        "accepted": true,
+        "codes": [],
+        "diagnostics": [],
+        "rules": [
+          {
+            "selector": ":root, .base|light",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.ink)",
+                "#112233"
+              ],
+              [
+                "token(colors.paper)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.surface)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.text)",
+                "#112233"
+              ],
+              [
+                "token(spacing.lg)",
+                "24px"
+              ],
+              [
+                "token(spacing.md)",
+                "16px"
+              ],
+              [
+                "token(spacing.sm)",
+                "8px"
+              ]
+            ],
+            "themes": [
+              "base",
+              "light"
+            ]
+          },
+          {
+            "selector": ".dark.dark, .dark.dark:root",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.surface)",
+                "#112233"
+              ],
+              [
+                "token(colors.text)",
+                "#ffffff"
+              ]
+            ],
+            "themes": [
+              "dark"
+            ]
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.sm)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "color",
+                "token(colors.text)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "block"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "inline-flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "0.5"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "1"
+              ]
+            ],
+            "themes": []
+          }
+        ],
+        "manifest": {
+          "schemaVersion": 1,
+          "systemId": "oracle-ui",
+          "registryDigest": "62c1f84c2058efed",
+          "abiVersion": 1,
+          "compilerContractVersion": "pms-0.1",
+          "manifestSchemaVersion": 1,
+          "capabilities": {
+            "slots": false,
+            "compoundVariants": false,
+            "patterns": false,
+            "rawDynamicStyles": false
+          },
+          "tokens": {
+            "spacing.sm": {
+              "category": "spacing"
+            },
+            "spacing.md": {
+              "category": "spacing"
+            },
+            "spacing.lg": {
+              "category": "spacing"
+            },
+            "colors.text": {
+              "category": "colors"
+            },
+            "colors.surface": {
+              "category": "colors"
+            }
+          },
+          "semanticTokens": {
+            "colors.text": {
+              "category": "colors",
+              "kind": "alias"
+            },
+            "colors.surface": {
+              "category": "colors",
+              "kind": "alias"
+            }
+          },
+          "tokenCategories": [
+            "colors",
+            "spacing"
+          ],
+          "conditions": [
+            {
+              "name": "hover",
+              "definition": ":hover",
+              "kind": "selector"
+            },
+            {
+              "name": "wide",
+              "definition": "@media (min-width: 768px)",
+              "kind": "at-rule"
+            },
+            {
+              "name": "focus",
+              "definition": ":focus",
+              "kind": "selector"
+            }
+          ],
+          "themes": [
+            "dark",
+            "light"
+          ],
+          "recipes": {
+            "bare": {
+              "axisOrder": [],
+              "axes": {},
+              "defaults": {}
+            },
+            "button": {
+              "axisOrder": [
+                "tone",
+                "size",
+                "flag"
+              ],
+              "axes": {
+                "tone": [
+                  "quiet",
+                  "loud"
+                ],
+                "size": [
+                  "sm",
+                  "md"
+                ],
+                "flag": [
+                  "true",
+                  "false"
+                ]
+              },
+              "defaults": {
+                "tone": "quiet",
+                "size": "md"
+              }
+            }
+          },
+          "supportedProperties": {
+            "categories": {
+              "color": "colors",
+              "backgroundColor": "colors",
+              "borderColor": "colors",
+              "borderTopColor": "colors",
+              "borderRightColor": "colors",
+              "borderBottomColor": "colors",
+              "borderLeftColor": "colors",
+              "borderInlineColor": "colors",
+              "borderBlockColor": "colors",
+              "outlineColor": "colors",
+              "textDecorationColor": "colors",
+              "caretColor": "colors",
+              "fill": "colors",
+              "stroke": "colors",
+              "padding": "spacing",
+              "paddingTop": "spacing",
+              "paddingRight": "spacing",
+              "paddingBottom": "spacing",
+              "paddingLeft": "spacing",
+              "paddingInline": "spacing",
+              "paddingInlineStart": "spacing",
+              "paddingInlineEnd": "spacing",
+              "paddingBlock": "spacing",
+              "paddingBlockStart": "spacing",
+              "paddingBlockEnd": "spacing",
+              "margin": "spacing",
+              "marginTop": "spacing",
+              "marginRight": "spacing",
+              "marginBottom": "spacing",
+              "marginLeft": "spacing",
+              "marginInlineStart": "spacing",
+              "marginInlineEnd": "spacing",
+              "marginBlock": "spacing",
+              "marginBlockStart": "spacing",
+              "marginBlockEnd": "spacing",
+              "gap": "spacing",
+              "rowGap": "spacing",
+              "columnGap": "spacing",
+              "borderRadius": "radii",
+              "borderTopLeftRadius": "radii",
+              "borderTopRightRadius": "radii",
+              "borderBottomLeftRadius": "radii",
+              "borderBottomRightRadius": "radii",
+              "borderStartStartRadius": "radii",
+              "borderStartEndRadius": "radii",
+              "borderEndStartRadius": "radii",
+              "borderEndEndRadius": "radii",
+              "fontFamily": "fontFamilies",
+              "fontSize": "fontSizes",
+              "fontWeight": "fontWeights",
+              "lineHeight": "lineHeights",
+              "letterSpacing": "letterSpacings",
+              "boxShadow": "shadows",
+              "textShadow": "shadows",
+              "transitionDuration": "durations",
+              "transitionDelay": "durations",
+              "transitionTimingFunction": "easings",
+              "animationDuration": "durations",
+              "animationDelay": "durations",
+              "animationTimingFunction": "easings"
+            },
+            "structuralSets": {
+              "display": [
+                "flex",
+                "inline-flex",
+                "block",
+                "inline-block",
+                "grid",
+                "none"
+              ],
+              "flexDirection": [
+                "row",
+                "row-reverse",
+                "column",
+                "column-reverse"
+              ],
+              "alignItems": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "baseline",
+                "stretch"
+              ],
+              "justifyContent": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "space-between",
+                "space-around"
+              ],
+              "boxSizing": [
+                "border-box"
+              ],
+              "width": [
+                "100%"
+              ],
+              "marginInline": [
+                "auto"
+              ]
+            },
+            "structuralNumbers": {
+              "opacity": {
+                "min": 0,
+                "max": 1
+              },
+              "flex": {
+                "min": 0,
+                "max": null
+              },
+              "flexGrow": {
+                "min": 0,
+                "max": null
+              },
+              "flexShrink": {
+                "min": 0,
+                "max": null
+              }
+            },
+            "compositeFormsRejected": [
+              "background",
+              "border",
+              "font",
+              "animation",
+              "transition"
+            ]
+          }
+        },
+        "revisionId": null,
+        "current": null,
+        "publication": {
+          "exists": true,
+          "artifacts": [
+            "artifacts.json",
+            "build-report.json",
+            "coverage.json",
+            "design.pandamstyle.d.ts",
+            "design.pandamstyle.js",
+            "js/src/page.js",
+            "manifest.json",
+            "styles.css"
+          ]
+        },
+        "counters": null,
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "62c1f84c2058efed"
+          },
+          "abiVersion": 1,
+          "ok": true,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [],
+          "diagnosticsTotal": 0,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 1,
+            "truncated": false
+          },
+          "generation": {
+            "published": true,
+            "generationId": 1,
+            "artifactRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            },
+            "artifactDigest": "1a4cf10b8ed1d952da6e0ed5fc22be288e8d8d7e369328789ff5b1e35abe9dbb",
+            "associationRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            }
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": true,
+            "generationCommitted": true,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {
+          "artifacts.json": "2e57abadd327b24998dcc68c4cdf7b5d51c1d52d6c4dbd0e751c61075ffebb5d",
+          "build-report.json": "3832303d4304ad3a539fe70fb61d3325ceb3b111b42ecf3f7a40c2e9823eb3b7",
+          "coverage.json": "90ac47c5405d8fad7b9959a8ca400553e5e397a7e7d14cb0205ee24d0490d7a3",
+          "design.pandamstyle.d.ts": "ce9bef1ce5a651a1c817cb4eb0ef7202584a9a3229c92cf6edce1bc1a0cd8fb3",
+          "design.pandamstyle.js": "5ffa5b421647fd03e7583da900526f4dbdd912dedc2165079a475eea0460b17f",
+          "js/src/page.js": "afad67415cf3f6a0c629e53b77f5e360c0e0a44dc64bb948a89dd9a04d7d9a13",
+          "manifest.json": "2f39fd01bd3715e0dbe3ba540c2e78c2e032fd2e6f97ad2b274166de8f796100",
+          "styles.css": "272bb561efc7b91fe8713fbfaaebf72c1cd056d566c559c8ca80966d23eefbbe"
+        },
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "runtime": {
+          "result": {
+            "keys": [
+              "className"
+            ],
+            "rules": [
+              {
+                "selector": ":root, .base|light",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "token(colors.ink)",
+                    "#112233"
+                  ],
+                  [
+                    "token(colors.paper)",
+                    "#ffffff"
+                  ],
+                  [
+                    "token(colors.surface)",
+                    "#ffffff"
+                  ],
+                  [
+                    "token(colors.text)",
+                    "#112233"
+                  ],
+                  [
+                    "token(spacing.lg)",
+                    "24px"
+                  ],
+                  [
+                    "token(spacing.md)",
+                    "16px"
+                  ],
+                  [
+                    "token(spacing.sm)",
+                    "8px"
+                  ]
+                ],
+                "themes": [
+                  "base",
+                  "light"
+                ]
+              },
+              {
+                "selector": ".dark.dark, .dark.dark:root",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "token(colors.surface)",
+                    "#112233"
+                  ],
+                  [
+                    "token(colors.text)",
+                    "#ffffff"
+                  ]
+                ],
+                "themes": [
+                  "dark"
+                ]
+              },
+              {
+                "selector": "&:not(#\\#):not(#\\#)",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "color",
+                    "token(colors.text)"
+                  ]
+                ],
+                "themes": []
+              }
+            ],
+            "classOrder": [
+              [
+                {
+                  "selector": ".dark.dark, .dark.dark:root",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "token(colors.surface)",
+                      "#112233"
+                    ],
+                    [
+                      "token(colors.text)",
+                      "#ffffff"
+                    ]
+                  ],
+                  "themes": [
+                    "dark"
+                  ]
+                }
+              ],
+              [
+                {
+                  "selector": ":root, .base|light",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "token(colors.ink)",
+                      "#112233"
+                    ],
+                    [
+                      "token(colors.paper)",
+                      "#ffffff"
+                    ],
+                    [
+                      "token(colors.surface)",
+                      "#ffffff"
+                    ],
+                    [
+                      "token(colors.text)",
+                      "#112233"
+                    ],
+                    [
+                      "token(spacing.lg)",
+                      "24px"
+                    ],
+                    [
+                      "token(spacing.md)",
+                      "16px"
+                    ],
+                    [
+                      "token(spacing.sm)",
+                      "8px"
+                    ]
+                  ],
+                  "themes": [
+                    "base",
+                    "light"
+                  ]
+                }
+              ],
+              [
+                {
+                  "selector": "&:not(#\\#):not(#\\#)",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "color",
+                      "token(colors.text)"
+                    ]
+                  ],
+                  "themes": []
+                }
+              ]
+            ]
+          }
+        },
+        "artifactBytes": {
+          "artifacts.json": "{\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"62c1f84c2058efed\",\n  \"abiVersion\": 1,\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"manifestSchemaVersion\": 1,\n  \"artifactSetDigest\": \"b0bc04d3f1bea4bd177ca8e36513f35c1f21a4dc06e8b0d7745e82e8c8ce0611\",\n  \"artifacts\": {\n    \"designModule\": {\n      \"file\": \"design.pandamstyle.js\",\n      \"sha256\": \"5ffa5b421647fd03e7583da900526f4dbdd912dedc2165079a475eea0460b17f\",\n      \"bytes\": 9599\n    },\n    \"declarations\": {\n      \"file\": \"design.pandamstyle.d.ts\",\n      \"sha256\": \"ce9bef1ce5a651a1c817cb4eb0ef7202584a9a3229c92cf6edce1bc1a0cd8fb3\",\n      \"bytes\": 10722\n    },\n    \"manifest\": {\n      \"file\": \"manifest.json\",\n      \"sha256\": \"2f39fd01bd3715e0dbe3ba540c2e78c2e032fd2e6f97ad2b274166de8f796100\",\n      \"bytes\": 4942\n    },\n    \"css\": {\n      \"file\": \"styles.css\",\n      \"sha256\": \"272bb561efc7b91fe8713fbfaaebf72c1cd056d566c559c8ca80966d23eefbbe\",\n      \"bytes\": 736\n    }\n  }\n}\n",
+          "design.pandamstyle.d.ts": "/**\n * GENERATED BY PANDAMSTYLE - DO NOT EDIT.\n * Generated from the canonical design-system snapshot.\n */\nimport type { StyleRef, ThemeRef, TokenRef as CoreTokenRef } from '@pandamstyle/core';\nexport type PublicTokenPath = \"spacing.sm\" | \"spacing.md\" | \"spacing.lg\" | \"colors.text\" | \"colors.surface\";\nexport type PublicTokenCategory = \"colors\" | \"spacing\";\ntype TokenPathDomains = {\n  readonly \"colors\": \"colors.text\" | \"colors.surface\";\n  readonly \"spacing\": \"spacing.sm\" | \"spacing.md\" | \"spacing.lg\";\n};\nexport type TokenPathByCategory<Category extends PublicTokenCategory> = TokenPathDomains[Category];\nexport type ColorsTokenPath = TokenPathByCategory<\"colors\">;\nexport type SpacingTokenPath = TokenPathByCategory<\"spacing\">;\ntype TokenCategoryForPath<Path extends PublicTokenPath> = { [Category in PublicTokenCategory]: Path extends TokenPathByCategory<Category> ? Category : never }[PublicTokenCategory];\nexport type PandamStyleTokenRef<Category extends PublicTokenCategory, Path extends TokenPathByCategory<Category>> = CoreTokenRef<Category, Path>;\nexport type PmsConditionName = \"hover\" | \"wide\" | \"focus\";\nexport type ThemeName = \"base\" | \"dark\" | \"light\";\nexport type PublicRecipeId = \"bare\" | \"button\";\ntype RecipeAxes = {\n  readonly \"bare\": Readonly<Record<never, never>>;\n  readonly \"button\": {\n    readonly \"tone\": readonly [\"quiet\", \"loud\"];\n    readonly \"size\": readonly [\"sm\", \"md\"];\n    readonly \"flag\": readonly [\"true\", \"false\"];\n  };\n};\ntype RecipeSelection_0 = Readonly<{\n\n}>;\ntype RecipeDefaults_0 = Readonly<Record<never, never>>;\n\ntype RecipeSelection_1 = Readonly<{\n  readonly \"tone\"?: \"quiet\" | \"loud\";\n  readonly \"size\"?: \"sm\" | \"md\";\n  readonly \"flag\"?: boolean;\n}>;\ntype RecipeDefaults_1 = {\n  readonly \"tone\": \"quiet\";\n  readonly \"size\": \"md\";\n};\ntype RecipeRef_0 = ((selection?: RecipeSelection_0 | null) => StyleRef) & Readonly<{\n  recipeId: \"bare\";\n  axisOrder: readonly [];\n  variantKeys: readonly [];\n  variantMap: Readonly<Record<never, never>>;\n  defaultVariants: RecipeDefaults_0;\n  splitVariantProps(props?: Readonly<Record<string, unknown>>): readonly [RecipeSelection_0, Readonly<Record<string, unknown>>];\n  getVariantProps(selection?: RecipeSelection_0 | null): RecipeSelection_0;\n}>;\n\ntype RecipeRef_1 = ((selection?: RecipeSelection_1 | null) => StyleRef) & Readonly<{\n  recipeId: \"button\";\n  axisOrder: readonly [\"tone\", \"size\", \"flag\"];\n  variantKeys: readonly [\"tone\", \"size\", \"flag\"];\n  variantMap: {\n  readonly \"tone\": readonly [\"quiet\", \"loud\"];\n  readonly \"size\": readonly [\"sm\", \"md\"];\n  readonly \"flag\": readonly [\"true\", \"false\"];\n};\n  defaultVariants: RecipeDefaults_1;\n  splitVariantProps(props?: Readonly<Record<string, unknown>>): readonly [RecipeSelection_1, Readonly<Record<string, unknown>>];\n  getVariantProps(selection?: RecipeSelection_1 | null): RecipeSelection_1;\n}>;\ntype VariantDomainValue<Domain extends readonly string[]> = Exclude<Domain[number], 'true' | 'false'> extends never ? ('true' extends Domain[number] ? ('false' extends Domain[number] ? boolean : true) : false) : Domain[number];\nexport type PublicRecipeAxis<Id extends PublicRecipeId = PublicRecipeId> = Id extends PublicRecipeId ? Extract<keyof RecipeAxes[Id], string> : never;\nexport type PublicRecipeAxisValue<Id extends PublicRecipeId = PublicRecipeId> = Id extends PublicRecipeId ? { [Axis in keyof RecipeAxes[Id]]: VariantDomainValue<RecipeAxes[Id][Axis]> }[keyof RecipeAxes[Id]] : never;\nexport type RecipeAxisName = \"tone\" | \"size\" | \"flag\";\nexport type RecipeAxisValue = \"quiet\" | \"loud\" | \"sm\" | \"md\" | boolean;\ntype PropertyCategories = {\n  readonly \"color\": \"colors\";\n  readonly \"backgroundColor\": \"colors\";\n  readonly \"borderColor\": \"colors\";\n  readonly \"borderTopColor\": \"colors\";\n  readonly \"borderRightColor\": \"colors\";\n  readonly \"borderBottomColor\": \"colors\";\n  readonly \"borderLeftColor\": \"colors\";\n  readonly \"borderInlineColor\": \"colors\";\n  readonly \"borderBlockColor\": \"colors\";\n  readonly \"outlineColor\": \"colors\";\n  readonly \"textDecorationColor\": \"colors\";\n  readonly \"caretColor\": \"colors\";\n  readonly \"fill\": \"colors\";\n  readonly \"stroke\": \"colors\";\n  readonly \"padding\": \"spacing\";\n  readonly \"paddingTop\": \"spacing\";\n  readonly \"paddingRight\": \"spacing\";\n  readonly \"paddingBottom\": \"spacing\";\n  readonly \"paddingLeft\": \"spacing\";\n  readonly \"paddingInline\": \"spacing\";\n  readonly \"paddingInlineStart\": \"spacing\";\n  readonly \"paddingInlineEnd\": \"spacing\";\n  readonly \"paddingBlock\": \"spacing\";\n  readonly \"paddingBlockStart\": \"spacing\";\n  readonly \"paddingBlockEnd\": \"spacing\";\n  readonly \"margin\": \"spacing\";\n  readonly \"marginTop\": \"spacing\";\n  readonly \"marginRight\": \"spacing\";\n  readonly \"marginBottom\": \"spacing\";\n  readonly \"marginLeft\": \"spacing\";\n  readonly \"marginInlineStart\": \"spacing\";\n  readonly \"marginInlineEnd\": \"spacing\";\n  readonly \"marginBlock\": \"spacing\";\n  readonly \"marginBlockStart\": \"spacing\";\n  readonly \"marginBlockEnd\": \"spacing\";\n  readonly \"gap\": \"spacing\";\n  readonly \"rowGap\": \"spacing\";\n  readonly \"columnGap\": \"spacing\";\n  readonly \"borderRadius\": \"radii\";\n  readonly \"borderTopLeftRadius\": \"radii\";\n  readonly \"borderTopRightRadius\": \"radii\";\n  readonly \"borderBottomLeftRadius\": \"radii\";\n  readonly \"borderBottomRightRadius\": \"radii\";\n  readonly \"borderStartStartRadius\": \"radii\";\n  readonly \"borderStartEndRadius\": \"radii\";\n  readonly \"borderEndStartRadius\": \"radii\";\n  readonly \"borderEndEndRadius\": \"radii\";\n  readonly \"fontFamily\": \"fontFamilies\";\n  readonly \"fontSize\": \"fontSizes\";\n  readonly \"fontWeight\": \"fontWeights\";\n  readonly \"lineHeight\": \"lineHeights\";\n  readonly \"letterSpacing\": \"letterSpacings\";\n  readonly \"boxShadow\": \"shadows\";\n  readonly \"textShadow\": \"shadows\";\n  readonly \"transitionDuration\": \"durations\";\n  readonly \"transitionDelay\": \"durations\";\n  readonly \"transitionTimingFunction\": \"easings\";\n  readonly \"animationDuration\": \"durations\";\n  readonly \"animationDelay\": \"durations\";\n  readonly \"animationTimingFunction\": \"easings\";\n};\ntype StructuralPropertyValues = {\n  readonly \"display\": \"flex\" | \"inline-flex\" | \"block\" | \"inline-block\" | \"grid\" | \"none\";\n  readonly \"flexDirection\": \"row\" | \"row-reverse\" | \"column\" | \"column-reverse\";\n  readonly \"alignItems\": \"flex-start\" | \"flex-end\" | \"center\" | \"baseline\" | \"stretch\";\n  readonly \"justifyContent\": \"flex-start\" | \"flex-end\" | \"center\" | \"space-between\" | \"space-around\";\n  readonly \"boxSizing\": \"border-box\";\n  readonly \"width\": \"100%\";\n  readonly \"marginInline\": \"auto\";\n};\ntype StructuralNumberProperties = \"opacity\" | \"flex\" | \"flexGrow\" | \"flexShrink\";\ntype StyleProperty = keyof PropertyCategories | keyof StructuralPropertyValues | StructuralNumberProperties;\ntype CategoryValue<Property extends keyof PropertyCategories> = CoreTokenRef<PropertyCategories[Property], TokenPathByCategory<PropertyCategories[Property]>>;\ntype PropertyValue<Property extends StyleProperty> = Property extends keyof PropertyCategories ? CategoryValue<Property> : Property extends keyof StructuralPropertyValues ? StructuralPropertyValues[Property] : number;\ntype ConditionValue<Property extends StyleProperty> = Partial<Record<PmsConditionName | 'base' | 'default', PropertyValue<Property>>>;\nexport type PmsStyleRule = { [Property in StyleProperty]?: PropertyValue<Property> | ConditionValue<Property> };\nexport type PmsStyleSheet = Readonly<Record<string, PmsStyleRule>>;\nexport declare function token<Path extends PublicTokenPath>(path: Path): CoreTokenRef<TokenCategoryForPath<Path>, Path>;\nexport declare function create<Sheet extends PmsStyleSheet>(sheet: Sheet): Readonly<{ [Namespace in keyof Sheet]: StyleRef }>;\nexport type PmsCompositionInput = StyleRef | ThemeRef | readonly PmsCompositionInput[] | null | undefined | false;\nexport declare const props: (...inputs: readonly PmsCompositionInput[]) => Readonly<{ className: string }> | Readonly<Record<string, never>>;\nexport declare const recipes: {\n  readonly \"bare\": RecipeRef_0;\n  readonly \"button\": RecipeRef_1;\n};\nexport declare const themes: {\n  readonly \"base\": ThemeRef & Readonly<{ themeId: \"base\" }>;\n  readonly \"dark\": ThemeRef & Readonly<{ themeId: \"dark\" }>;\n  readonly \"light\": ThemeRef & Readonly<{ themeId: \"light\" }>;\n};\nexport declare const manifest: Readonly<{\n  schemaVersion: 1;\n  systemId: \"oracle-ui\";\n  registryDigest: \"62c1f84c2058efed\";\n  abiVersion: 1;\n  compilerContractVersion: 'pms-0.1';\n  manifestSchemaVersion: 1;\n  capabilities: Readonly<{ slots: false; compoundVariants: false; patterns: false; rawDynamicStyles: false }>;\n  tokens: {\n  readonly \"spacing.sm\": Readonly<{ readonly category: \"spacing\" }>;\n  readonly \"spacing.md\": Readonly<{ readonly category: \"spacing\" }>;\n  readonly \"spacing.lg\": Readonly<{ readonly category: \"spacing\" }>;\n  readonly \"colors.text\": Readonly<{ readonly category: \"colors\" }>;\n  readonly \"colors.surface\": Readonly<{ readonly category: \"colors\" }>;\n};\n  semanticTokens: {\n  readonly \"colors.text\": Readonly<{ readonly category: \"colors\"; readonly kind: 'alias'; }>;\n  readonly \"colors.surface\": Readonly<{ readonly category: \"colors\"; readonly kind: 'alias'; }>;\n};\n  tokenCategories: readonly [\"colors\", \"spacing\"];\n  conditions: readonly [Readonly<{ name: \"hover\"; definition: \":hover\"; kind: \"selector\" }>, Readonly<{ name: \"wide\"; definition: \"@media (min-width: 768px)\"; kind: \"at-rule\" }>, Readonly<{ name: \"focus\"; definition: \":focus\"; kind: \"selector\" }>];\n  themes: readonly [\"dark\", \"light\"];\n  recipes: {\n  readonly \"bare\": Readonly<{\n  readonly axisOrder: readonly [];\n  readonly axes: Readonly<Record<never, never>>;\n  readonly defaults: Readonly<Record<never, never>>;\n}>;\n  readonly \"button\": Readonly<{\n  readonly axisOrder: readonly [\"tone\", \"size\", \"flag\"];\n  readonly axes: {\n  readonly \"tone\": readonly [\"quiet\", \"loud\"];\n  readonly \"size\": readonly [\"sm\", \"md\"];\n  readonly \"flag\": readonly [\"true\", \"false\"];\n};\n  readonly defaults: {\n  readonly \"tone\": \"quiet\";\n  readonly \"size\": \"md\";\n};\n}>;\n};\n  supportedProperties: Readonly<{ categories: PropertyCategories; structuralSets: StructuralPropertyValues; structuralNumbers: {\n  readonly \"opacity\": Readonly<{ min: 0; max: number }>;\n  readonly \"flex\": Readonly<{ min: 0; max: number }>;\n  readonly \"flexGrow\": Readonly<{ min: 0; max: number }>;\n  readonly \"flexShrink\": Readonly<{ min: 0; max: number }>;\n}; compositeFormsRejected: readonly [\"background\", \"border\", \"font\", \"animation\", \"transition\"] }>;\n}>;\nexport declare const __pandamstyle: Readonly<{\n  abiVersion: 1;\n  compilerContractVersion: \"pms-0.1\";\n  designSystem: Readonly<{ systemId: \"oracle-ui\"; registryDigest: \"62c1f84c2058efed\" }>;\n  manifestSchemaVersion: 1;\n  capabilities: Readonly<{ slots: false; compoundVariants: false; patterns: false; rawDynamicStyles: false }>;\n}>;",
+          "design.pandamstyle.js": "/**\n * GENERATED BY PANDAMSTYLE - DO NOT EDIT.\n *\n * This file is the consumption surface of one design-system instance.\n * It holds finite, precompiled data only.\n */\n\nimport { assertAbi, defineRecipeSelector, props as __pmsProps, PmsSelectionError } from '@pandamstyle/core';\n\nassertAbi(1);\n\nexport const __pandamstyle = {\n  \"abiVersion\": 1,\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"designSystem\": {\n    \"systemId\": \"oracle-ui\",\n    \"registryDigest\": \"62c1f84c2058efed\"\n  },\n  \"manifestSchemaVersion\": 1,\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  }\n};\n\nexport const manifest = {\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"62c1f84c2058efed\",\n  \"abiVersion\": 1,\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"manifestSchemaVersion\": 1,\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"semanticTokens\": {\n    \"colors.text\": {\n      \"category\": \"colors\",\n      \"kind\": \"alias\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\",\n      \"kind\": \"alias\"\n    }\n  },\n  \"tokenCategories\": [\n    \"colors\",\n    \"spacing\"\n  ],\n  \"conditions\": [\n    {\n      \"name\": \"hover\",\n      \"definition\": \":hover\",\n      \"kind\": \"selector\"\n    },\n    {\n      \"name\": \"wide\",\n      \"definition\": \"@media (min-width: 768px)\",\n      \"kind\": \"at-rule\"\n    },\n    {\n      \"name\": \"focus\",\n      \"definition\": \":focus\",\n      \"kind\": \"selector\"\n    }\n  ],\n  \"themes\": [\n    \"dark\",\n    \"light\"\n  ],\n  \"recipes\": {\n    \"bare\": {\n      \"axisOrder\": [],\n      \"axes\": {},\n      \"defaults\": {}\n    },\n    \"button\": {\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  }\n};\n\nexport const props = __pmsProps;\n\nexport const themes = {\n  \"base\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"base\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"dark\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"dark\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x1jmeyti\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        \"x5jm8p5\"\n      ]\n    ]\n  },\n  \"light\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"light\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  }\n};\n\nconst __pmsRecipe_bare = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"bare\",\n  \"axisOrder\": [],\n  \"variantMap\": {},\n  \"defaultVariants\": {},\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x1lliihq\"\n      ]\n    ]\n  },\n  \"branches\": {}\n});\n\nconst __pmsRecipe_button = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"button\",\n  \"axisOrder\": [\n    \"tone\",\n    \"size\",\n    \"flag\"\n  ],\n  \"variantMap\": {\n    \"tone\": [\n      \"quiet\",\n      \"loud\"\n    ],\n    \"size\": [\n      \"sm\",\n      \"md\"\n    ],\n    \"flag\": [\n      \"true\",\n      \"false\"\n    ]\n  },\n  \"defaultVariants\": {\n    \"tone\": \"quiet\",\n    \"size\": \"md\"\n  },\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x3nfvp2\"\n      ],\n      [\n        \"kMwMTN\",\n        \"xmcn0qq\"\n      ]\n    ]\n  },\n  \"branches\": {\n    \"tone\": {\n      \"quiet\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"xbyyjgo\"\n          ]\n        ]\n      },\n      \"loud\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"x1hc1fzr\"\n          ]\n        ]\n      }\n    },\n    \"size\": {\n      \"sm\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"xr1eeyi\"\n          ]\n        ]\n      },\n      \"md\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"x1db5p44\"\n          ]\n        ]\n      }\n    },\n    \"flag\": {\n      \"true\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x78zum5\"\n          ]\n        ]\n      },\n      \"false\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x1lliihq\"\n          ]\n        ]\n      }\n    }\n  }\n});\n\nexport const recipes = { \"bare\": __pmsRecipe_bare, \"button\": __pmsRecipe_button };\n\n// Compile-time only: reaching either at runtime means the PandamStyle\n// compiler did not transform this file.\nexport const token = function token(path) {\n  throw new PmsSelectionError({ code: 'PMS_TOKEN_RUNTIME', message: 'token() is compile-time only.', rule: 'generated.token-runtime', context: { path } });\n};\n\nexport const create = function create() {\n  throw new PmsSelectionError({ code: 'PMS_UNCOMPILED_CREATE', message: 'create() must be transformed by the PandamStyle compiler.', rule: 'generated.create-runtime', context: {} });\n};\n",
+          "js/src/page.js": "import { props as __pmsProps } from \"@pandamstyle/core\";\nconst s = {\n  a: {\n    kind: \"pandamstyle-style-ref\",\n    abiVersion: 1,\n    systemId: \"oracle-ui\",\n    entries: [[\"kMwMTN\", \"xmcn0qq\"]]\n  }\n};\nexport const result = __pmsProps({\n  kind: \"pandamstyle-theme-ref\",\n  abiVersion: 1,\n  systemId: \"oracle-ui\",\n  themeId: \"dark\",\n  entries: [[\"x5jm8p5\", \"x1jmeyti\"], [\"x5jm8p5\\0pandamstyle-theme-class:1\", \"x5jm8p5\"]]\n}, s.a);",
+          "manifest.json": "{\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"62c1f84c2058efed\",\n  \"abiVersion\": 1,\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"manifestSchemaVersion\": 1,\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"semanticTokens\": {\n    \"colors.text\": {\n      \"category\": \"colors\",\n      \"kind\": \"alias\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\",\n      \"kind\": \"alias\"\n    }\n  },\n  \"tokenCategories\": [\n    \"colors\",\n    \"spacing\"\n  ],\n  \"conditions\": [\n    {\n      \"name\": \"hover\",\n      \"definition\": \":hover\",\n      \"kind\": \"selector\"\n    },\n    {\n      \"name\": \"wide\",\n      \"definition\": \"@media (min-width: 768px)\",\n      \"kind\": \"at-rule\"\n    },\n    {\n      \"name\": \"focus\",\n      \"definition\": \":focus\",\n      \"kind\": \"selector\"\n    }\n  ],\n  \"themes\": [\n    \"dark\",\n    \"light\"\n  ],\n  \"recipes\": {\n    \"bare\": {\n      \"axisOrder\": [],\n      \"axes\": {},\n      \"defaults\": {}\n    },\n    \"button\": {\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  }\n}\n",
+          "styles.css": "/* pandamstyle-design-system {\"systemId\":\"oracle-ui\",\"registryDigest\":\"62c1f84c2058efed\",\"abiVersion\":1,\"compilerContractVersion\":\"pms-0.1\",\"manifestSchemaVersion\":1} */\n:root, .x5jm8p5{--x806e8r:8px;--x1efyk35:16px;--x10bq9o0:24px;--x1a46r13:#112233;--x19wwu0b:#ffffff;--x19gs4d:#112233;--x1wcnge4:#ffffff;}\n.x1jmeyti.x1jmeyti, .x1jmeyti.x1jmeyti:root{--x1wcnge4:#112233;--x19gs4d:#ffffff;}\n.x1db5p44:not(#\\#){padding:var(--x1efyk35)}\n.xr1eeyi:not(#\\#){padding:var(--x806e8r)}\n.xmcn0qq:not(#\\#):not(#\\#){color:var(--x19gs4d)}\n.x1lliihq:not(#\\#):not(#\\#){display:block}\n.x78zum5:not(#\\#):not(#\\#){display:flex}\n.x3nfvp2:not(#\\#):not(#\\#){display:inline-flex}\n.xbyyjgo:not(#\\#):not(#\\#){opacity:.5}\n.x1hc1fzr:not(#\\#):not(#\\#){opacity:1}"
+        }
+      },
+      "incremental": {
+        "accepted": true,
+        "codes": [],
+        "diagnostics": [],
+        "rules": [
+          {
+            "selector": ":root, .base|light",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.ink)",
+                "#112233"
+              ],
+              [
+                "token(colors.paper)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.surface)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.text)",
+                "#112233"
+              ],
+              [
+                "token(spacing.lg)",
+                "24px"
+              ],
+              [
+                "token(spacing.md)",
+                "16px"
+              ],
+              [
+                "token(spacing.sm)",
+                "8px"
+              ]
+            ],
+            "themes": [
+              "base",
+              "light"
+            ]
+          },
+          {
+            "selector": ".dark.dark, .dark.dark:root",
+            "conditions": [],
+            "declarations": [
+              [
+                "token(colors.surface)",
+                "#112233"
+              ],
+              [
+                "token(colors.text)",
+                "#ffffff"
+              ]
+            ],
+            "themes": [
+              "dark"
+            ]
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.md)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "padding",
+                "token(spacing.sm)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "color",
+                "token(colors.text)"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "block"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "display",
+                "inline-flex"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "0.5"
+              ]
+            ],
+            "themes": []
+          },
+          {
+            "selector": "&:not(#\\#):not(#\\#)",
+            "conditions": [],
+            "declarations": [
+              [
+                "opacity",
+                "1"
+              ]
+            ],
+            "themes": []
+          }
+        ],
+        "manifest": {
+          "schemaVersion": 1,
+          "systemId": "oracle-ui",
+          "registryDigest": "62c1f84c2058efed",
+          "abiVersion": 1,
+          "compilerContractVersion": "pms-0.1",
+          "manifestSchemaVersion": 1,
+          "capabilities": {
+            "slots": false,
+            "compoundVariants": false,
+            "patterns": false,
+            "rawDynamicStyles": false
+          },
+          "tokens": {
+            "spacing.sm": {
+              "category": "spacing"
+            },
+            "spacing.md": {
+              "category": "spacing"
+            },
+            "spacing.lg": {
+              "category": "spacing"
+            },
+            "colors.text": {
+              "category": "colors"
+            },
+            "colors.surface": {
+              "category": "colors"
+            }
+          },
+          "semanticTokens": {
+            "colors.text": {
+              "category": "colors",
+              "kind": "alias"
+            },
+            "colors.surface": {
+              "category": "colors",
+              "kind": "alias"
+            }
+          },
+          "tokenCategories": [
+            "colors",
+            "spacing"
+          ],
+          "conditions": [
+            {
+              "name": "hover",
+              "definition": ":hover",
+              "kind": "selector"
+            },
+            {
+              "name": "wide",
+              "definition": "@media (min-width: 768px)",
+              "kind": "at-rule"
+            },
+            {
+              "name": "focus",
+              "definition": ":focus",
+              "kind": "selector"
+            }
+          ],
+          "themes": [
+            "dark",
+            "light"
+          ],
+          "recipes": {
+            "bare": {
+              "axisOrder": [],
+              "axes": {},
+              "defaults": {}
+            },
+            "button": {
+              "axisOrder": [
+                "tone",
+                "size",
+                "flag"
+              ],
+              "axes": {
+                "tone": [
+                  "quiet",
+                  "loud"
+                ],
+                "size": [
+                  "sm",
+                  "md"
+                ],
+                "flag": [
+                  "true",
+                  "false"
+                ]
+              },
+              "defaults": {
+                "tone": "quiet",
+                "size": "md"
+              }
+            }
+          },
+          "supportedProperties": {
+            "categories": {
+              "color": "colors",
+              "backgroundColor": "colors",
+              "borderColor": "colors",
+              "borderTopColor": "colors",
+              "borderRightColor": "colors",
+              "borderBottomColor": "colors",
+              "borderLeftColor": "colors",
+              "borderInlineColor": "colors",
+              "borderBlockColor": "colors",
+              "outlineColor": "colors",
+              "textDecorationColor": "colors",
+              "caretColor": "colors",
+              "fill": "colors",
+              "stroke": "colors",
+              "padding": "spacing",
+              "paddingTop": "spacing",
+              "paddingRight": "spacing",
+              "paddingBottom": "spacing",
+              "paddingLeft": "spacing",
+              "paddingInline": "spacing",
+              "paddingInlineStart": "spacing",
+              "paddingInlineEnd": "spacing",
+              "paddingBlock": "spacing",
+              "paddingBlockStart": "spacing",
+              "paddingBlockEnd": "spacing",
+              "margin": "spacing",
+              "marginTop": "spacing",
+              "marginRight": "spacing",
+              "marginBottom": "spacing",
+              "marginLeft": "spacing",
+              "marginInlineStart": "spacing",
+              "marginInlineEnd": "spacing",
+              "marginBlock": "spacing",
+              "marginBlockStart": "spacing",
+              "marginBlockEnd": "spacing",
+              "gap": "spacing",
+              "rowGap": "spacing",
+              "columnGap": "spacing",
+              "borderRadius": "radii",
+              "borderTopLeftRadius": "radii",
+              "borderTopRightRadius": "radii",
+              "borderBottomLeftRadius": "radii",
+              "borderBottomRightRadius": "radii",
+              "borderStartStartRadius": "radii",
+              "borderStartEndRadius": "radii",
+              "borderEndStartRadius": "radii",
+              "borderEndEndRadius": "radii",
+              "fontFamily": "fontFamilies",
+              "fontSize": "fontSizes",
+              "fontWeight": "fontWeights",
+              "lineHeight": "lineHeights",
+              "letterSpacing": "letterSpacings",
+              "boxShadow": "shadows",
+              "textShadow": "shadows",
+              "transitionDuration": "durations",
+              "transitionDelay": "durations",
+              "transitionTimingFunction": "easings",
+              "animationDuration": "durations",
+              "animationDelay": "durations",
+              "animationTimingFunction": "easings"
+            },
+            "structuralSets": {
+              "display": [
+                "flex",
+                "inline-flex",
+                "block",
+                "inline-block",
+                "grid",
+                "none"
+              ],
+              "flexDirection": [
+                "row",
+                "row-reverse",
+                "column",
+                "column-reverse"
+              ],
+              "alignItems": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "baseline",
+                "stretch"
+              ],
+              "justifyContent": [
+                "flex-start",
+                "flex-end",
+                "center",
+                "space-between",
+                "space-around"
+              ],
+              "boxSizing": [
+                "border-box"
+              ],
+              "width": [
+                "100%"
+              ],
+              "marginInline": [
+                "auto"
+              ]
+            },
+            "structuralNumbers": {
+              "opacity": {
+                "min": 0,
+                "max": 1
+              },
+              "flex": {
+                "min": 0,
+                "max": null
+              },
+              "flexGrow": {
+                "min": 0,
+                "max": null
+              },
+              "flexShrink": {
+                "min": 0,
+                "max": null
+              }
+            },
+            "compositeFormsRejected": [
+              "background",
+              "border",
+              "font",
+              "animation",
+              "transition"
+            ]
+          }
+        },
+        "revisionId": 1,
+        "current": {
+          "revisionId": 1,
+          "generationId": 1,
+          "registryDigest": "62c1f84c2058efed"
+        },
+        "publication": {
+          "exists": true,
+          "artifacts": [
+            "artifacts.json",
+            "build-report.json",
+            "design.pandamstyle.d.ts",
+            "design.pandamstyle.js",
+            "js/src/page.js",
+            "manifest.json",
+            "styles.css"
+          ]
+        },
+        "counters": {
+          "filesChanged": 0,
+          "filesAdded": 1,
+          "filesRemoved": 0,
+          "filesReparsed": 2,
+          "filesRecompiled": 1,
+          "filesCompiled": 1,
+          "filesReused": 0,
+          "coverageSummariesReused": 0,
+          "coverageSummariesRebuilt": 2,
+          "reverseDependentsInvalidated": 0,
+          "negativeResolutionsInvalidated": 0,
+          "fullFallback": 1,
+          "fullFallbackReason": "design-system-definition",
+          "newlyCoveredFiles": 1,
+          "coveredFileCount": 2,
+          "fileStateCount": 2,
+          "dirtyFilesDeclared": 0,
+          "dirtyFilesRead": 1,
+          "dirtyFilesHashed": 1,
+          "dirtyFilesUnchanged": 0
+        },
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "62c1f84c2058efed"
+          },
+          "abiVersion": 1,
+          "ok": true,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [],
+          "diagnosticsTotal": 0,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              }
+            ],
+            "total": 1,
+            "truncated": false
+          },
+          "generation": {
+            "published": true,
+            "generationId": 1,
+            "artifactRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            },
+            "artifactDigest": "41c4ffa5c95a0b96a8056267523f52dae747bc42821a5b92801c23a7ec394893",
+            "associationRevision": {
+              "projectId": "oracle-project",
+              "sessionId": "oracle-session",
+              "revisionId": 1
+            }
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": true,
+            "generationCommitted": true,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {
+          "artifacts.json": "2e57abadd327b24998dcc68c4cdf7b5d51c1d52d6c4dbd0e751c61075ffebb5d",
+          "build-report.json": "3746b27d54f3dc2fab5470818dd3988952210d6766e83f31f2d49373c379549e",
+          "design.pandamstyle.d.ts": "ce9bef1ce5a651a1c817cb4eb0ef7202584a9a3229c92cf6edce1bc1a0cd8fb3",
+          "design.pandamstyle.js": "5ffa5b421647fd03e7583da900526f4dbdd912dedc2165079a475eea0460b17f",
+          "js/src/page.js": "afad67415cf3f6a0c629e53b77f5e360c0e0a44dc64bb948a89dd9a04d7d9a13",
+          "manifest.json": "2f39fd01bd3715e0dbe3ba540c2e78c2e032fd2e6f97ad2b274166de8f796100",
+          "styles.css": "272bb561efc7b91fe8713fbfaaebf72c1cd056d566c559c8ca80966d23eefbbe"
+        },
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:import"
+          }
+        ],
+        "runtime": {
+          "result": {
+            "keys": [
+              "className"
+            ],
+            "rules": [
+              {
+                "selector": ":root, .base|light",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "token(colors.ink)",
+                    "#112233"
+                  ],
+                  [
+                    "token(colors.paper)",
+                    "#ffffff"
+                  ],
+                  [
+                    "token(colors.surface)",
+                    "#ffffff"
+                  ],
+                  [
+                    "token(colors.text)",
+                    "#112233"
+                  ],
+                  [
+                    "token(spacing.lg)",
+                    "24px"
+                  ],
+                  [
+                    "token(spacing.md)",
+                    "16px"
+                  ],
+                  [
+                    "token(spacing.sm)",
+                    "8px"
+                  ]
+                ],
+                "themes": [
+                  "base",
+                  "light"
+                ]
+              },
+              {
+                "selector": ".dark.dark, .dark.dark:root",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "token(colors.surface)",
+                    "#112233"
+                  ],
+                  [
+                    "token(colors.text)",
+                    "#ffffff"
+                  ]
+                ],
+                "themes": [
+                  "dark"
+                ]
+              },
+              {
+                "selector": "&:not(#\\#):not(#\\#)",
+                "conditions": [],
+                "declarations": [
+                  [
+                    "color",
+                    "token(colors.text)"
+                  ]
+                ],
+                "themes": []
+              }
+            ],
+            "classOrder": [
+              [
+                {
+                  "selector": ".dark.dark, .dark.dark:root",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "token(colors.surface)",
+                      "#112233"
+                    ],
+                    [
+                      "token(colors.text)",
+                      "#ffffff"
+                    ]
+                  ],
+                  "themes": [
+                    "dark"
+                  ]
+                }
+              ],
+              [
+                {
+                  "selector": ":root, .base|light",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "token(colors.ink)",
+                      "#112233"
+                    ],
+                    [
+                      "token(colors.paper)",
+                      "#ffffff"
+                    ],
+                    [
+                      "token(colors.surface)",
+                      "#ffffff"
+                    ],
+                    [
+                      "token(colors.text)",
+                      "#112233"
+                    ],
+                    [
+                      "token(spacing.lg)",
+                      "24px"
+                    ],
+                    [
+                      "token(spacing.md)",
+                      "16px"
+                    ],
+                    [
+                      "token(spacing.sm)",
+                      "8px"
+                    ]
+                  ],
+                  "themes": [
+                    "base",
+                    "light"
+                  ]
+                }
+              ],
+              [
+                {
+                  "selector": "&:not(#\\#):not(#\\#)",
+                  "conditions": [],
+                  "declarations": [
+                    [
+                      "color",
+                      "token(colors.text)"
+                    ]
+                  ],
+                  "themes": []
+                }
+              ]
+            ]
+          }
+        },
+        "artifactBytes": {
+          "artifacts.json": "{\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"62c1f84c2058efed\",\n  \"abiVersion\": 1,\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"manifestSchemaVersion\": 1,\n  \"artifactSetDigest\": \"b0bc04d3f1bea4bd177ca8e36513f35c1f21a4dc06e8b0d7745e82e8c8ce0611\",\n  \"artifacts\": {\n    \"designModule\": {\n      \"file\": \"design.pandamstyle.js\",\n      \"sha256\": \"5ffa5b421647fd03e7583da900526f4dbdd912dedc2165079a475eea0460b17f\",\n      \"bytes\": 9599\n    },\n    \"declarations\": {\n      \"file\": \"design.pandamstyle.d.ts\",\n      \"sha256\": \"ce9bef1ce5a651a1c817cb4eb0ef7202584a9a3229c92cf6edce1bc1a0cd8fb3\",\n      \"bytes\": 10722\n    },\n    \"manifest\": {\n      \"file\": \"manifest.json\",\n      \"sha256\": \"2f39fd01bd3715e0dbe3ba540c2e78c2e032fd2e6f97ad2b274166de8f796100\",\n      \"bytes\": 4942\n    },\n    \"css\": {\n      \"file\": \"styles.css\",\n      \"sha256\": \"272bb561efc7b91fe8713fbfaaebf72c1cd056d566c559c8ca80966d23eefbbe\",\n      \"bytes\": 736\n    }\n  }\n}\n",
+          "design.pandamstyle.d.ts": "/**\n * GENERATED BY PANDAMSTYLE - DO NOT EDIT.\n * Generated from the canonical design-system snapshot.\n */\nimport type { StyleRef, ThemeRef, TokenRef as CoreTokenRef } from '@pandamstyle/core';\nexport type PublicTokenPath = \"spacing.sm\" | \"spacing.md\" | \"spacing.lg\" | \"colors.text\" | \"colors.surface\";\nexport type PublicTokenCategory = \"colors\" | \"spacing\";\ntype TokenPathDomains = {\n  readonly \"colors\": \"colors.text\" | \"colors.surface\";\n  readonly \"spacing\": \"spacing.sm\" | \"spacing.md\" | \"spacing.lg\";\n};\nexport type TokenPathByCategory<Category extends PublicTokenCategory> = TokenPathDomains[Category];\nexport type ColorsTokenPath = TokenPathByCategory<\"colors\">;\nexport type SpacingTokenPath = TokenPathByCategory<\"spacing\">;\ntype TokenCategoryForPath<Path extends PublicTokenPath> = { [Category in PublicTokenCategory]: Path extends TokenPathByCategory<Category> ? Category : never }[PublicTokenCategory];\nexport type PandamStyleTokenRef<Category extends PublicTokenCategory, Path extends TokenPathByCategory<Category>> = CoreTokenRef<Category, Path>;\nexport type PmsConditionName = \"hover\" | \"wide\" | \"focus\";\nexport type ThemeName = \"base\" | \"dark\" | \"light\";\nexport type PublicRecipeId = \"bare\" | \"button\";\ntype RecipeAxes = {\n  readonly \"bare\": Readonly<Record<never, never>>;\n  readonly \"button\": {\n    readonly \"tone\": readonly [\"quiet\", \"loud\"];\n    readonly \"size\": readonly [\"sm\", \"md\"];\n    readonly \"flag\": readonly [\"true\", \"false\"];\n  };\n};\ntype RecipeSelection_0 = Readonly<{\n\n}>;\ntype RecipeDefaults_0 = Readonly<Record<never, never>>;\n\ntype RecipeSelection_1 = Readonly<{\n  readonly \"tone\"?: \"quiet\" | \"loud\";\n  readonly \"size\"?: \"sm\" | \"md\";\n  readonly \"flag\"?: boolean;\n}>;\ntype RecipeDefaults_1 = {\n  readonly \"tone\": \"quiet\";\n  readonly \"size\": \"md\";\n};\ntype RecipeRef_0 = ((selection?: RecipeSelection_0 | null) => StyleRef) & Readonly<{\n  recipeId: \"bare\";\n  axisOrder: readonly [];\n  variantKeys: readonly [];\n  variantMap: Readonly<Record<never, never>>;\n  defaultVariants: RecipeDefaults_0;\n  splitVariantProps(props?: Readonly<Record<string, unknown>>): readonly [RecipeSelection_0, Readonly<Record<string, unknown>>];\n  getVariantProps(selection?: RecipeSelection_0 | null): RecipeSelection_0;\n}>;\n\ntype RecipeRef_1 = ((selection?: RecipeSelection_1 | null) => StyleRef) & Readonly<{\n  recipeId: \"button\";\n  axisOrder: readonly [\"tone\", \"size\", \"flag\"];\n  variantKeys: readonly [\"tone\", \"size\", \"flag\"];\n  variantMap: {\n  readonly \"tone\": readonly [\"quiet\", \"loud\"];\n  readonly \"size\": readonly [\"sm\", \"md\"];\n  readonly \"flag\": readonly [\"true\", \"false\"];\n};\n  defaultVariants: RecipeDefaults_1;\n  splitVariantProps(props?: Readonly<Record<string, unknown>>): readonly [RecipeSelection_1, Readonly<Record<string, unknown>>];\n  getVariantProps(selection?: RecipeSelection_1 | null): RecipeSelection_1;\n}>;\ntype VariantDomainValue<Domain extends readonly string[]> = Exclude<Domain[number], 'true' | 'false'> extends never ? ('true' extends Domain[number] ? ('false' extends Domain[number] ? boolean : true) : false) : Domain[number];\nexport type PublicRecipeAxis<Id extends PublicRecipeId = PublicRecipeId> = Id extends PublicRecipeId ? Extract<keyof RecipeAxes[Id], string> : never;\nexport type PublicRecipeAxisValue<Id extends PublicRecipeId = PublicRecipeId> = Id extends PublicRecipeId ? { [Axis in keyof RecipeAxes[Id]]: VariantDomainValue<RecipeAxes[Id][Axis]> }[keyof RecipeAxes[Id]] : never;\nexport type RecipeAxisName = \"tone\" | \"size\" | \"flag\";\nexport type RecipeAxisValue = \"quiet\" | \"loud\" | \"sm\" | \"md\" | boolean;\ntype PropertyCategories = {\n  readonly \"color\": \"colors\";\n  readonly \"backgroundColor\": \"colors\";\n  readonly \"borderColor\": \"colors\";\n  readonly \"borderTopColor\": \"colors\";\n  readonly \"borderRightColor\": \"colors\";\n  readonly \"borderBottomColor\": \"colors\";\n  readonly \"borderLeftColor\": \"colors\";\n  readonly \"borderInlineColor\": \"colors\";\n  readonly \"borderBlockColor\": \"colors\";\n  readonly \"outlineColor\": \"colors\";\n  readonly \"textDecorationColor\": \"colors\";\n  readonly \"caretColor\": \"colors\";\n  readonly \"fill\": \"colors\";\n  readonly \"stroke\": \"colors\";\n  readonly \"padding\": \"spacing\";\n  readonly \"paddingTop\": \"spacing\";\n  readonly \"paddingRight\": \"spacing\";\n  readonly \"paddingBottom\": \"spacing\";\n  readonly \"paddingLeft\": \"spacing\";\n  readonly \"paddingInline\": \"spacing\";\n  readonly \"paddingInlineStart\": \"spacing\";\n  readonly \"paddingInlineEnd\": \"spacing\";\n  readonly \"paddingBlock\": \"spacing\";\n  readonly \"paddingBlockStart\": \"spacing\";\n  readonly \"paddingBlockEnd\": \"spacing\";\n  readonly \"margin\": \"spacing\";\n  readonly \"marginTop\": \"spacing\";\n  readonly \"marginRight\": \"spacing\";\n  readonly \"marginBottom\": \"spacing\";\n  readonly \"marginLeft\": \"spacing\";\n  readonly \"marginInlineStart\": \"spacing\";\n  readonly \"marginInlineEnd\": \"spacing\";\n  readonly \"marginBlock\": \"spacing\";\n  readonly \"marginBlockStart\": \"spacing\";\n  readonly \"marginBlockEnd\": \"spacing\";\n  readonly \"gap\": \"spacing\";\n  readonly \"rowGap\": \"spacing\";\n  readonly \"columnGap\": \"spacing\";\n  readonly \"borderRadius\": \"radii\";\n  readonly \"borderTopLeftRadius\": \"radii\";\n  readonly \"borderTopRightRadius\": \"radii\";\n  readonly \"borderBottomLeftRadius\": \"radii\";\n  readonly \"borderBottomRightRadius\": \"radii\";\n  readonly \"borderStartStartRadius\": \"radii\";\n  readonly \"borderStartEndRadius\": \"radii\";\n  readonly \"borderEndStartRadius\": \"radii\";\n  readonly \"borderEndEndRadius\": \"radii\";\n  readonly \"fontFamily\": \"fontFamilies\";\n  readonly \"fontSize\": \"fontSizes\";\n  readonly \"fontWeight\": \"fontWeights\";\n  readonly \"lineHeight\": \"lineHeights\";\n  readonly \"letterSpacing\": \"letterSpacings\";\n  readonly \"boxShadow\": \"shadows\";\n  readonly \"textShadow\": \"shadows\";\n  readonly \"transitionDuration\": \"durations\";\n  readonly \"transitionDelay\": \"durations\";\n  readonly \"transitionTimingFunction\": \"easings\";\n  readonly \"animationDuration\": \"durations\";\n  readonly \"animationDelay\": \"durations\";\n  readonly \"animationTimingFunction\": \"easings\";\n};\ntype StructuralPropertyValues = {\n  readonly \"display\": \"flex\" | \"inline-flex\" | \"block\" | \"inline-block\" | \"grid\" | \"none\";\n  readonly \"flexDirection\": \"row\" | \"row-reverse\" | \"column\" | \"column-reverse\";\n  readonly \"alignItems\": \"flex-start\" | \"flex-end\" | \"center\" | \"baseline\" | \"stretch\";\n  readonly \"justifyContent\": \"flex-start\" | \"flex-end\" | \"center\" | \"space-between\" | \"space-around\";\n  readonly \"boxSizing\": \"border-box\";\n  readonly \"width\": \"100%\";\n  readonly \"marginInline\": \"auto\";\n};\ntype StructuralNumberProperties = \"opacity\" | \"flex\" | \"flexGrow\" | \"flexShrink\";\ntype StyleProperty = keyof PropertyCategories | keyof StructuralPropertyValues | StructuralNumberProperties;\ntype CategoryValue<Property extends keyof PropertyCategories> = CoreTokenRef<PropertyCategories[Property], TokenPathByCategory<PropertyCategories[Property]>>;\ntype PropertyValue<Property extends StyleProperty> = Property extends keyof PropertyCategories ? CategoryValue<Property> : Property extends keyof StructuralPropertyValues ? StructuralPropertyValues[Property] : number;\ntype ConditionValue<Property extends StyleProperty> = Partial<Record<PmsConditionName | 'base' | 'default', PropertyValue<Property>>>;\nexport type PmsStyleRule = { [Property in StyleProperty]?: PropertyValue<Property> | ConditionValue<Property> };\nexport type PmsStyleSheet = Readonly<Record<string, PmsStyleRule>>;\nexport declare function token<Path extends PublicTokenPath>(path: Path): CoreTokenRef<TokenCategoryForPath<Path>, Path>;\nexport declare function create<Sheet extends PmsStyleSheet>(sheet: Sheet): Readonly<{ [Namespace in keyof Sheet]: StyleRef }>;\nexport type PmsCompositionInput = StyleRef | ThemeRef | readonly PmsCompositionInput[] | null | undefined | false;\nexport declare const props: (...inputs: readonly PmsCompositionInput[]) => Readonly<{ className: string }> | Readonly<Record<string, never>>;\nexport declare const recipes: {\n  readonly \"bare\": RecipeRef_0;\n  readonly \"button\": RecipeRef_1;\n};\nexport declare const themes: {\n  readonly \"base\": ThemeRef & Readonly<{ themeId: \"base\" }>;\n  readonly \"dark\": ThemeRef & Readonly<{ themeId: \"dark\" }>;\n  readonly \"light\": ThemeRef & Readonly<{ themeId: \"light\" }>;\n};\nexport declare const manifest: Readonly<{\n  schemaVersion: 1;\n  systemId: \"oracle-ui\";\n  registryDigest: \"62c1f84c2058efed\";\n  abiVersion: 1;\n  compilerContractVersion: 'pms-0.1';\n  manifestSchemaVersion: 1;\n  capabilities: Readonly<{ slots: false; compoundVariants: false; patterns: false; rawDynamicStyles: false }>;\n  tokens: {\n  readonly \"spacing.sm\": Readonly<{ readonly category: \"spacing\" }>;\n  readonly \"spacing.md\": Readonly<{ readonly category: \"spacing\" }>;\n  readonly \"spacing.lg\": Readonly<{ readonly category: \"spacing\" }>;\n  readonly \"colors.text\": Readonly<{ readonly category: \"colors\" }>;\n  readonly \"colors.surface\": Readonly<{ readonly category: \"colors\" }>;\n};\n  semanticTokens: {\n  readonly \"colors.text\": Readonly<{ readonly category: \"colors\"; readonly kind: 'alias'; }>;\n  readonly \"colors.surface\": Readonly<{ readonly category: \"colors\"; readonly kind: 'alias'; }>;\n};\n  tokenCategories: readonly [\"colors\", \"spacing\"];\n  conditions: readonly [Readonly<{ name: \"hover\"; definition: \":hover\"; kind: \"selector\" }>, Readonly<{ name: \"wide\"; definition: \"@media (min-width: 768px)\"; kind: \"at-rule\" }>, Readonly<{ name: \"focus\"; definition: \":focus\"; kind: \"selector\" }>];\n  themes: readonly [\"dark\", \"light\"];\n  recipes: {\n  readonly \"bare\": Readonly<{\n  readonly axisOrder: readonly [];\n  readonly axes: Readonly<Record<never, never>>;\n  readonly defaults: Readonly<Record<never, never>>;\n}>;\n  readonly \"button\": Readonly<{\n  readonly axisOrder: readonly [\"tone\", \"size\", \"flag\"];\n  readonly axes: {\n  readonly \"tone\": readonly [\"quiet\", \"loud\"];\n  readonly \"size\": readonly [\"sm\", \"md\"];\n  readonly \"flag\": readonly [\"true\", \"false\"];\n};\n  readonly defaults: {\n  readonly \"tone\": \"quiet\";\n  readonly \"size\": \"md\";\n};\n}>;\n};\n  supportedProperties: Readonly<{ categories: PropertyCategories; structuralSets: StructuralPropertyValues; structuralNumbers: {\n  readonly \"opacity\": Readonly<{ min: 0; max: number }>;\n  readonly \"flex\": Readonly<{ min: 0; max: number }>;\n  readonly \"flexGrow\": Readonly<{ min: 0; max: number }>;\n  readonly \"flexShrink\": Readonly<{ min: 0; max: number }>;\n}; compositeFormsRejected: readonly [\"background\", \"border\", \"font\", \"animation\", \"transition\"] }>;\n}>;\nexport declare const __pandamstyle: Readonly<{\n  abiVersion: 1;\n  compilerContractVersion: \"pms-0.1\";\n  designSystem: Readonly<{ systemId: \"oracle-ui\"; registryDigest: \"62c1f84c2058efed\" }>;\n  manifestSchemaVersion: 1;\n  capabilities: Readonly<{ slots: false; compoundVariants: false; patterns: false; rawDynamicStyles: false }>;\n}>;",
+          "design.pandamstyle.js": "/**\n * GENERATED BY PANDAMSTYLE - DO NOT EDIT.\n *\n * This file is the consumption surface of one design-system instance.\n * It holds finite, precompiled data only.\n */\n\nimport { assertAbi, defineRecipeSelector, props as __pmsProps, PmsSelectionError } from '@pandamstyle/core';\n\nassertAbi(1);\n\nexport const __pandamstyle = {\n  \"abiVersion\": 1,\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"designSystem\": {\n    \"systemId\": \"oracle-ui\",\n    \"registryDigest\": \"62c1f84c2058efed\"\n  },\n  \"manifestSchemaVersion\": 1,\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  }\n};\n\nexport const manifest = {\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"62c1f84c2058efed\",\n  \"abiVersion\": 1,\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"manifestSchemaVersion\": 1,\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"semanticTokens\": {\n    \"colors.text\": {\n      \"category\": \"colors\",\n      \"kind\": \"alias\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\",\n      \"kind\": \"alias\"\n    }\n  },\n  \"tokenCategories\": [\n    \"colors\",\n    \"spacing\"\n  ],\n  \"conditions\": [\n    {\n      \"name\": \"hover\",\n      \"definition\": \":hover\",\n      \"kind\": \"selector\"\n    },\n    {\n      \"name\": \"wide\",\n      \"definition\": \"@media (min-width: 768px)\",\n      \"kind\": \"at-rule\"\n    },\n    {\n      \"name\": \"focus\",\n      \"definition\": \":focus\",\n      \"kind\": \"selector\"\n    }\n  ],\n  \"themes\": [\n    \"dark\",\n    \"light\"\n  ],\n  \"recipes\": {\n    \"bare\": {\n      \"axisOrder\": [],\n      \"axes\": {},\n      \"defaults\": {}\n    },\n    \"button\": {\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  }\n};\n\nexport const props = __pmsProps;\n\nexport const themes = {\n  \"base\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"base\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  },\n  \"dark\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"dark\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x1jmeyti\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        \"x5jm8p5\"\n      ]\n    ]\n  },\n  \"light\": {\n    \"kind\": \"pandamstyle-theme-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"themeId\": \"light\",\n    \"entries\": [\n      [\n        \"x5jm8p5\",\n        \"x5jm8p5\"\n      ],\n      [\n        \"x5jm8p5\\u0000pandamstyle-theme-class:1\",\n        null\n      ]\n    ]\n  }\n};\n\nconst __pmsRecipe_bare = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"bare\",\n  \"axisOrder\": [],\n  \"variantMap\": {},\n  \"defaultVariants\": {},\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x1lliihq\"\n      ]\n    ]\n  },\n  \"branches\": {}\n});\n\nconst __pmsRecipe_button = defineRecipeSelector({\n  \"abiVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"recipeId\": \"button\",\n  \"axisOrder\": [\n    \"tone\",\n    \"size\",\n    \"flag\"\n  ],\n  \"variantMap\": {\n    \"tone\": [\n      \"quiet\",\n      \"loud\"\n    ],\n    \"size\": [\n      \"sm\",\n      \"md\"\n    ],\n    \"flag\": [\n      \"true\",\n      \"false\"\n    ]\n  },\n  \"defaultVariants\": {\n    \"tone\": \"quiet\",\n    \"size\": \"md\"\n  },\n  \"base\": {\n    \"kind\": \"pandamstyle-style-ref\",\n    \"abiVersion\": 1,\n    \"systemId\": \"oracle-ui\",\n    \"entries\": [\n      [\n        \"k1xSpc\",\n        \"x3nfvp2\"\n      ],\n      [\n        \"kMwMTN\",\n        \"xmcn0qq\"\n      ]\n    ]\n  },\n  \"branches\": {\n    \"tone\": {\n      \"quiet\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"xbyyjgo\"\n          ]\n        ]\n      },\n      \"loud\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kSiTet\",\n            \"x1hc1fzr\"\n          ]\n        ]\n      }\n    },\n    \"size\": {\n      \"sm\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"xr1eeyi\"\n          ]\n        ]\n      },\n      \"md\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"kmVPX3\",\n            \"x1db5p44\"\n          ]\n        ]\n      }\n    },\n    \"flag\": {\n      \"true\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x78zum5\"\n          ]\n        ]\n      },\n      \"false\": {\n        \"kind\": \"pandamstyle-style-ref\",\n        \"abiVersion\": 1,\n        \"systemId\": \"oracle-ui\",\n        \"entries\": [\n          [\n            \"k1xSpc\",\n            \"x1lliihq\"\n          ]\n        ]\n      }\n    }\n  }\n});\n\nexport const recipes = { \"bare\": __pmsRecipe_bare, \"button\": __pmsRecipe_button };\n\n// Compile-time only: reaching either at runtime means the PandamStyle\n// compiler did not transform this file.\nexport const token = function token(path) {\n  throw new PmsSelectionError({ code: 'PMS_TOKEN_RUNTIME', message: 'token() is compile-time only.', rule: 'generated.token-runtime', context: { path } });\n};\n\nexport const create = function create() {\n  throw new PmsSelectionError({ code: 'PMS_UNCOMPILED_CREATE', message: 'create() must be transformed by the PandamStyle compiler.', rule: 'generated.create-runtime', context: {} });\n};\n",
+          "js/src/page.js": "import { props as __pmsProps } from \"@pandamstyle/core\";\nconst s = {\n  a: {\n    kind: \"pandamstyle-style-ref\",\n    abiVersion: 1,\n    systemId: \"oracle-ui\",\n    entries: [[\"kMwMTN\", \"xmcn0qq\"]]\n  }\n};\nexport const result = __pmsProps({\n  kind: \"pandamstyle-theme-ref\",\n  abiVersion: 1,\n  systemId: \"oracle-ui\",\n  themeId: \"dark\",\n  entries: [[\"x5jm8p5\", \"x1jmeyti\"], [\"x5jm8p5\\0pandamstyle-theme-class:1\", \"x5jm8p5\"]]\n}, s.a);",
+          "manifest.json": "{\n  \"schemaVersion\": 1,\n  \"systemId\": \"oracle-ui\",\n  \"registryDigest\": \"62c1f84c2058efed\",\n  \"abiVersion\": 1,\n  \"compilerContractVersion\": \"pms-0.1\",\n  \"manifestSchemaVersion\": 1,\n  \"capabilities\": {\n    \"slots\": false,\n    \"compoundVariants\": false,\n    \"patterns\": false,\n    \"rawDynamicStyles\": false\n  },\n  \"tokens\": {\n    \"spacing.sm\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.md\": {\n      \"category\": \"spacing\"\n    },\n    \"spacing.lg\": {\n      \"category\": \"spacing\"\n    },\n    \"colors.text\": {\n      \"category\": \"colors\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\"\n    }\n  },\n  \"semanticTokens\": {\n    \"colors.text\": {\n      \"category\": \"colors\",\n      \"kind\": \"alias\"\n    },\n    \"colors.surface\": {\n      \"category\": \"colors\",\n      \"kind\": \"alias\"\n    }\n  },\n  \"tokenCategories\": [\n    \"colors\",\n    \"spacing\"\n  ],\n  \"conditions\": [\n    {\n      \"name\": \"hover\",\n      \"definition\": \":hover\",\n      \"kind\": \"selector\"\n    },\n    {\n      \"name\": \"wide\",\n      \"definition\": \"@media (min-width: 768px)\",\n      \"kind\": \"at-rule\"\n    },\n    {\n      \"name\": \"focus\",\n      \"definition\": \":focus\",\n      \"kind\": \"selector\"\n    }\n  ],\n  \"themes\": [\n    \"dark\",\n    \"light\"\n  ],\n  \"recipes\": {\n    \"bare\": {\n      \"axisOrder\": [],\n      \"axes\": {},\n      \"defaults\": {}\n    },\n    \"button\": {\n      \"axisOrder\": [\n        \"tone\",\n        \"size\",\n        \"flag\"\n      ],\n      \"axes\": {\n        \"tone\": [\n          \"quiet\",\n          \"loud\"\n        ],\n        \"size\": [\n          \"sm\",\n          \"md\"\n        ],\n        \"flag\": [\n          \"true\",\n          \"false\"\n        ]\n      },\n      \"defaults\": {\n        \"tone\": \"quiet\",\n        \"size\": \"md\"\n      }\n    }\n  },\n  \"supportedProperties\": {\n    \"categories\": {\n      \"color\": \"colors\",\n      \"backgroundColor\": \"colors\",\n      \"borderColor\": \"colors\",\n      \"borderTopColor\": \"colors\",\n      \"borderRightColor\": \"colors\",\n      \"borderBottomColor\": \"colors\",\n      \"borderLeftColor\": \"colors\",\n      \"borderInlineColor\": \"colors\",\n      \"borderBlockColor\": \"colors\",\n      \"outlineColor\": \"colors\",\n      \"textDecorationColor\": \"colors\",\n      \"caretColor\": \"colors\",\n      \"fill\": \"colors\",\n      \"stroke\": \"colors\",\n      \"padding\": \"spacing\",\n      \"paddingTop\": \"spacing\",\n      \"paddingRight\": \"spacing\",\n      \"paddingBottom\": \"spacing\",\n      \"paddingLeft\": \"spacing\",\n      \"paddingInline\": \"spacing\",\n      \"paddingInlineStart\": \"spacing\",\n      \"paddingInlineEnd\": \"spacing\",\n      \"paddingBlock\": \"spacing\",\n      \"paddingBlockStart\": \"spacing\",\n      \"paddingBlockEnd\": \"spacing\",\n      \"margin\": \"spacing\",\n      \"marginTop\": \"spacing\",\n      \"marginRight\": \"spacing\",\n      \"marginBottom\": \"spacing\",\n      \"marginLeft\": \"spacing\",\n      \"marginInlineStart\": \"spacing\",\n      \"marginInlineEnd\": \"spacing\",\n      \"marginBlock\": \"spacing\",\n      \"marginBlockStart\": \"spacing\",\n      \"marginBlockEnd\": \"spacing\",\n      \"gap\": \"spacing\",\n      \"rowGap\": \"spacing\",\n      \"columnGap\": \"spacing\",\n      \"borderRadius\": \"radii\",\n      \"borderTopLeftRadius\": \"radii\",\n      \"borderTopRightRadius\": \"radii\",\n      \"borderBottomLeftRadius\": \"radii\",\n      \"borderBottomRightRadius\": \"radii\",\n      \"borderStartStartRadius\": \"radii\",\n      \"borderStartEndRadius\": \"radii\",\n      \"borderEndStartRadius\": \"radii\",\n      \"borderEndEndRadius\": \"radii\",\n      \"fontFamily\": \"fontFamilies\",\n      \"fontSize\": \"fontSizes\",\n      \"fontWeight\": \"fontWeights\",\n      \"lineHeight\": \"lineHeights\",\n      \"letterSpacing\": \"letterSpacings\",\n      \"boxShadow\": \"shadows\",\n      \"textShadow\": \"shadows\",\n      \"transitionDuration\": \"durations\",\n      \"transitionDelay\": \"durations\",\n      \"transitionTimingFunction\": \"easings\",\n      \"animationDuration\": \"durations\",\n      \"animationDelay\": \"durations\",\n      \"animationTimingFunction\": \"easings\"\n    },\n    \"structuralSets\": {\n      \"display\": [\n        \"flex\",\n        \"inline-flex\",\n        \"block\",\n        \"inline-block\",\n        \"grid\",\n        \"none\"\n      ],\n      \"flexDirection\": [\n        \"row\",\n        \"row-reverse\",\n        \"column\",\n        \"column-reverse\"\n      ],\n      \"alignItems\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"baseline\",\n        \"stretch\"\n      ],\n      \"justifyContent\": [\n        \"flex-start\",\n        \"flex-end\",\n        \"center\",\n        \"space-between\",\n        \"space-around\"\n      ],\n      \"boxSizing\": [\n        \"border-box\"\n      ],\n      \"width\": [\n        \"100%\"\n      ],\n      \"marginInline\": [\n        \"auto\"\n      ]\n    },\n    \"structuralNumbers\": {\n      \"opacity\": {\n        \"min\": 0,\n        \"max\": 1\n      },\n      \"flex\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexGrow\": {\n        \"min\": 0,\n        \"max\": null\n      },\n      \"flexShrink\": {\n        \"min\": 0,\n        \"max\": null\n      }\n    },\n    \"compositeFormsRejected\": [\n      \"background\",\n      \"border\",\n      \"font\",\n      \"animation\",\n      \"transition\"\n    ]\n  }\n}\n",
+          "styles.css": "/* pandamstyle-design-system {\"systemId\":\"oracle-ui\",\"registryDigest\":\"62c1f84c2058efed\",\"abiVersion\":1,\"compilerContractVersion\":\"pms-0.1\",\"manifestSchemaVersion\":1} */\n:root, .x5jm8p5{--x806e8r:8px;--x1efyk35:16px;--x10bq9o0:24px;--x1a46r13:#112233;--x19wwu0b:#ffffff;--x19gs4d:#112233;--x1wcnge4:#ffffff;}\n.x1jmeyti.x1jmeyti, .x1jmeyti.x1jmeyti:root{--x1wcnge4:#112233;--x19gs4d:#ffffff;}\n.x1db5p44:not(#\\#){padding:var(--x1efyk35)}\n.xr1eeyi:not(#\\#){padding:var(--x806e8r)}\n.xmcn0qq:not(#\\#):not(#\\#){color:var(--x19gs4d)}\n.x1lliihq:not(#\\#):not(#\\#){display:block}\n.x78zum5:not(#\\#):not(#\\#){display:flex}\n.x3nfvp2:not(#\\#):not(#\\#){display:inline-flex}\n.xbyyjgo:not(#\\#):not(#\\#){opacity:.5}\n.x1hc1fzr:not(#\\#):not(#\\#){opacity:1}"
+        }
+      },
+      "freshChecks": [
+        {
+          "path": "accepted",
+          "value": true,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "themes": [
+              "base",
+              "light"
+            ],
+            "declarations": [
+              [
+                "token(colors.ink)",
+                "#112233"
+              ],
+              [
+                "token(colors.paper)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.surface)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.text)",
+                "#112233"
+              ],
+              [
+                "token(spacing.lg)",
+                "24px"
+              ],
+              [
+                "token(spacing.md)",
+                "16px"
+              ],
+              [
+                "token(spacing.sm)",
+                "8px"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "themes": [
+              "dark"
+            ],
+            "declarations": [
+              [
+                "token(colors.surface)",
+                "#112233"
+              ],
+              [
+                "token(colors.text)",
+                "#ffffff"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "conditions": [],
+            "declarations": [
+              [
+                "color",
+                "token(colors.text)"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": 3,
+          "op": "length",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/keys",
+          "value": [
+            "className"
+          ],
+          "op": "equal",
+          "matches": true
+        }
+      ],
+      "incrementalChecks": [
+        {
+          "path": "accepted",
+          "value": true,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "themes": [
+              "base",
+              "light"
+            ],
+            "declarations": [
+              [
+                "token(colors.ink)",
+                "#112233"
+              ],
+              [
+                "token(colors.paper)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.surface)",
+                "#ffffff"
+              ],
+              [
+                "token(colors.text)",
+                "#112233"
+              ],
+              [
+                "token(spacing.lg)",
+                "24px"
+              ],
+              [
+                "token(spacing.md)",
+                "16px"
+              ],
+              [
+                "token(spacing.sm)",
+                "8px"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "themes": [
+              "dark"
+            ],
+            "declarations": [
+              [
+                "token(colors.surface)",
+                "#112233"
+              ],
+              [
+                "token(colors.text)",
+                "#ffffff"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": {
+            "conditions": [],
+            "declarations": [
+              [
+                "color",
+                "token(colors.text)"
+              ]
+            ]
+          },
+          "op": "includes",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/rules",
+          "value": 3,
+          "op": "length",
+          "matches": true
+        },
+        {
+          "path": "runtime/result/keys",
+          "value": [
+            "className"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "revisionId",
+          "value": 1,
+          "matches": true
+        }
+      ],
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    }
+  ],
+  "contractReferences": [
+    "docs/architecture/public-api-v0.1.md",
+    "docs/architecture/generated-design-system-abi-v1.md"
+  ],
+  "classificationVerified": true
+}

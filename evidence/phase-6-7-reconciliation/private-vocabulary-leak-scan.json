@@ -1,0 +1,267 @@
+{
+  "documentKind": "pandamstyle-reconciliation-private-vocabulary-leak-scan",
+  "testedCommit": "c4c6b07a7124370b4d9de04bafc8101a7a497c7d",
+  "testedTree": "a1ec19d6f9d13fb37496c2f8b2df036342937bd9",
+  "sources": [
+    "performance/service-performance.json",
+    "performance/artifact-set.json",
+    "verify/phase-6-7-qualification.json",
+    "verify/pandamstyle.log"
+  ],
+  "corpusContentHash": "f1d6c857aa6ef311b8deeadf16ff740090f78eaac3ab2d0fa7481e89d46f78be",
+  "privateTokens": [
+    "spacing.lg",
+    "spacing.xs15",
+    "spacing.xl15",
+    "colors.primitive.muted",
+    "colors.primitive.primary17",
+    "colors.primitive.danger17",
+    "radii.lg",
+    "radii.xs15",
+    "radii.xl15",
+    "fontSizes.lg",
+    "fontSizes.xs15",
+    "fontSizes.xl15",
+    "fontWeights.lg",
+    "fontWeights.xs15",
+    "fontWeights.xl15",
+    "lineHeights.lg",
+    "lineHeights.xs15",
+    "lineHeights.xl15",
+    "fontFamilies.lg",
+    "fontFamilies.xs15",
+    "fontFamilies.xl15",
+    "shadows.lg",
+    "shadows.xs15",
+    "shadows.xl15",
+    "durations.lg",
+    "durations.xs15",
+    "durations.xl15",
+    "easings.lg",
+    "easings.xs15",
+    "easings.xl15"
+  ],
+  "privateRecipes": [],
+  "scannedMembers": [
+    "designModule",
+    "declarations",
+    "manifest",
+    "css",
+    "artifactMetadata",
+    "candidateTokens",
+    "repairTokens",
+    "repairRecipes",
+    "repairThemes",
+    "repairConditions"
+  ],
+  "matchRule": "Exact qualified token/recipe identifier with identifier boundaries; no arbitrary substring matching.",
+  "hits": [],
+  "lifecycleHits": [],
+  "fixtureCoverage": {
+    "privateIdentifiers": [
+      "secretSpace",
+      "privateInk",
+      "privateRecipe",
+      "hiddenAxis",
+      "hiddenValue"
+    ],
+    "fivePublishedMembersCheckedBy": "phase-6-7-reconciliation-test.js coherent()",
+    "observations": [
+      {
+        "scenario": "candidate-order-and-privacy",
+        "result": "passed",
+        "identity": {
+          "schemaVersion": 1,
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0",
+          "abiVersion": 1,
+          "compilerContractVersion": "pms-0.1",
+          "manifestSchemaVersion": 1,
+          "artifactSetDigest": "0c446b2feb4b64d8c768f988d93a407880e7ae696dbdf8beaca0c16a80c0546b",
+          "artifacts": {
+            "designModule": {
+              "file": "design.js",
+              "sha256": "6f937ae7acd95dd00a0d6f094a31fd7e9be6c7f73cbd28bffa3f045aad075550",
+              "bytes": 7139
+            },
+            "declarations": {
+              "file": "design.d.ts",
+              "sha256": "ff086de63865216b4d02f534ffdaea14b04667dc6f432a408542bdb8cb62b98f",
+              "bytes": 8920
+            },
+            "manifest": {
+              "file": "manifest.json",
+              "sha256": "efbd89e9fb570accd191577e415774525414781fdc890496a7012d61c23b5756",
+              "bytes": 4369
+            },
+            "css": {
+              "file": "styles.css",
+              "sha256": "cf863bab06becf965cd16332afa7de458e9589ffd2b27b79a644af9cf9a7d7a1",
+              "bytes": 541
+            }
+          }
+        },
+        "declarationBytes": 8920
+      },
+      {
+        "scenario": "multi-project-canonical-isolation",
+        "result": "passed",
+        "leftIdentity": {
+          "schemaVersion": 1,
+          "systemId": "shared-ui",
+          "registryDigest": "31e9420ccff8e9a0",
+          "abiVersion": 1,
+          "compilerContractVersion": "pms-0.1",
+          "manifestSchemaVersion": 1,
+          "artifactSetDigest": "0c446b2feb4b64d8c768f988d93a407880e7ae696dbdf8beaca0c16a80c0546b",
+          "artifacts": {
+            "designModule": {
+              "file": "design.js",
+              "sha256": "6f937ae7acd95dd00a0d6f094a31fd7e9be6c7f73cbd28bffa3f045aad075550",
+              "bytes": 7139
+            },
+            "declarations": {
+              "file": "design.d.ts",
+              "sha256": "ff086de63865216b4d02f534ffdaea14b04667dc6f432a408542bdb8cb62b98f",
+              "bytes": 8920
+            },
+            "manifest": {
+              "file": "manifest.json",
+              "sha256": "efbd89e9fb570accd191577e415774525414781fdc890496a7012d61c23b5756",
+              "bytes": 4369
+            },
+            "css": {
+              "file": "styles.css",
+              "sha256": "cf863bab06becf965cd16332afa7de458e9589ffd2b27b79a644af9cf9a7d7a1",
+              "bytes": 541
+            }
+          }
+        },
+        "rightIdentity": {
+          "schemaVersion": 1,
+          "systemId": "shared-ui",
+          "registryDigest": "4cea634166bd17eb",
+          "abiVersion": 1,
+          "compilerContractVersion": "pms-0.1",
+          "manifestSchemaVersion": 1,
+          "artifactSetDigest": "c65585f68117ecf3cb048302aa47add22cec4037684f75988687fd965b5ffe65",
+          "artifacts": {
+            "designModule": {
+              "file": "design.js",
+              "sha256": "4d6b5ab5d3727adc14557fe5dd0f8e5537196967f1ff25cac0119e467abdb541",
+              "bytes": 7143
+            },
+            "declarations": {
+              "file": "design.d.ts",
+              "sha256": "f585e703f1fc4e28f67b98d3aff3cd156a6011b70231bdbf0d2c8456b514222c",
+              "bytes": 8932
+            },
+            "manifest": {
+              "file": "manifest.json",
+              "sha256": "63ee70a532c3f91b9b0fb2b821baeb7c0b8dea71cd837b0246dc52cc3c266b68",
+              "bytes": 4373
+            },
+            "css": {
+              "file": "styles.css",
+              "sha256": "e1546b27a10c6b2fc745be21fa2928f50f59a4382db7d43287a1e3d4a6538c48",
+              "bytes": 541
+            }
+          }
+        },
+        "repair": {
+          "schemaVersion": 1,
+          "code": "PMS_FORBIDDEN_VALUE",
+          "severity": "error",
+          "phase": "policy",
+          "rule": "category-strict",
+          "message": "Valeur interdite pour padding : 17. Un token spacing est requis.",
+          "source": {
+            "file": "src/page.js",
+            "line": 1,
+            "column": 75,
+            "endLine": null,
+            "endColumn": null,
+            "label": null
+          },
+          "location": {
+            "file": "src/page.js",
+            "line": 1,
+            "column": 75,
+            "endLine": null,
+            "endColumn": null,
+            "label": null
+          },
+          "role": "page",
+          "context": {
+            "property": "padding",
+            "value": 17,
+            "systemId": "shared-ui",
+            "conditionPath": []
+          },
+          "expected": {
+            "category": "spacing",
+            "visibility": "public",
+            "static": true,
+            "domain": null
+          },
+          "candidates": [
+            {
+              "tokenId": "spacing.onlyB",
+              "category": "spacing"
+            },
+            {
+              "tokenId": "spacing.z",
+              "category": "spacing"
+            }
+          ],
+          "candidatesTotal": 2,
+          "candidatesTruncated": false,
+          "candidatesQuery": {
+            "method": "candidateTokens",
+            "category": "spacing",
+            "offset": 0,
+            "limit": 32,
+            "revision": {
+              "projectId": "/tmp/pms-reconciliation-cMJc2F",
+              "sessionId": "debc691c-0e6e-482c-b504-6911a98b6357",
+              "revisionId": 2
+            }
+          },
+          "repair": {
+            "kind": "replace-with-token",
+            "applicable": true,
+            "target": {
+              "property": "padding"
+            },
+            "expected": {
+              "category": "spacing"
+            },
+            "reason": null
+          },
+          "autofix": null,
+          "affectedRegion": {
+            "file": "src/page.js",
+            "namespace": null,
+            "property": "padding",
+            "conditionPath": []
+          },
+          "coverage": {
+            "analysed": true,
+            "origin": "root",
+            "failed": true
+          },
+          "revision": {
+            "projectId": "/tmp/pms-reconciliation-cMJc2F",
+            "sessionId": "debc691c-0e6e-482c-b504-6911a98b6357",
+            "revisionId": 2
+          }
+        }
+      }
+    ],
+    "publicAliasToPrivateTarget": "Retained Phase 6 projection assertions and canonical service fixture pass without leaking target identifier."
+  },
+  "limitations": [
+    "The 10k corpus has zero private recipes; private recipe/axis/value coverage comes from the newly executed reconciliation fixture."
+  ],
+  "result": "passed"
+}

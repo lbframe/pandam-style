@@ -1,0 +1,3282 @@
+{
+  "documentKind": "pandamstyle-reconciliation-donor-package-closure-report",
+  "testedCommit": "c4c6b07a7124370b4d9de04bafc8101a7a497c7d",
+  "testedTree": "a1ec19d6f9d13fb37496c2f8b2df036342937bd9",
+  "sources": [
+    "verify/donor-closure/report.json",
+    "verify/core-package-proof/proof.json"
+  ],
+  "productionDonorEngineEdges": 0,
+  "repositoryPaths": {
+    "checked": 13,
+    "absentCount": 13,
+    "present": [],
+    "paths": [
+      {
+        "path": "packages/@stylexjs",
+        "exists": false
+      },
+      {
+        "path": "packages/style-value-parser",
+        "exists": false
+      },
+      {
+        "path": "upstream/stylex",
+        "exists": false
+      },
+      {
+        "path": "upstream/panda",
+        "exists": false
+      },
+      {
+        "path": "legacy",
+        "exists": false
+      },
+      {
+        "path": "archive",
+        "exists": false
+      },
+      {
+        "path": "vendor",
+        "exists": false
+      },
+      {
+        "path": "old-stylex",
+        "exists": false
+      },
+      {
+        "path": "stylex-reference",
+        "exists": false
+      },
+      {
+        "path": "panda-reference",
+        "exists": false
+      },
+      {
+        "path": "reference-copy",
+        "exists": false
+      },
+      {
+        "path": "vendor-history",
+        "exists": false
+      },
+      {
+        "path": "donor-backup",
+        "exists": false
+      }
+    ]
+  },
+  "core": {
+    "manifest": {
+      "label": "core source manifest",
+      "path": "/home/kyle/work/pandam-style-phase-6-7-reconciliation-2026-10/packages/core/package.json",
+      "name": "@pandamstyle/core",
+      "dependencies": {},
+      "donorDependencies": []
+    },
+    "sources": {
+      "label": "core source",
+      "root": "/home/kyle/work/pandam-style-phase-6-7-reconciliation-2026-10/packages/core/src",
+      "fileCount": 7,
+      "imports": [
+        {
+          "file": "abi.js",
+          "specifier": "./selection-error.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "index.js",
+          "specifier": "./abi.js",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "index.js",
+          "specifier": "./props.js",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "index.js",
+          "specifier": "./recipe.js",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "index.js",
+          "specifier": "./selection-error.js",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "props.js",
+          "specifier": "./abi.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "props.js",
+          "specifier": "./selection-error.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "recipe-select.js",
+          "specifier": "./abi.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "recipe-select.js",
+          "specifier": "./selection-error.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "recipe.js",
+          "specifier": "./recipe-select.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        }
+      ],
+      "approvedDynamicImports": []
+    }
+  },
+  "compiler": {
+    "manifest": {
+      "label": "compiler source manifest",
+      "path": "/home/kyle/work/pandam-style-phase-6-7-reconciliation-2026-10/packages/compiler/package.json",
+      "name": "@pandamstyle/compiler",
+      "dependencies": {
+        "@babel/core": "^7.26.8",
+        "@babel/helper-module-imports": "^7.25.9",
+        "@babel/parser": "^7.28.5",
+        "@babel/preset-react": "^7.27.1",
+        "@babel/preset-typescript": "^7.26.0",
+        "@babel/traverse": "^7.26.8",
+        "@babel/types": "^7.26.8",
+        "@csstools/css-tokenizer": "^3.0.3",
+        "@pandamstyle/core": "0.1.0",
+        "postcss-value-parser": "^4.1.0"
+      },
+      "donorDependencies": []
+    },
+    "sources": {
+      "label": "compiler source",
+      "root": "/home/kyle/work/pandam-style-phase-6-7-reconciliation-2026-10/packages/compiler/src",
+      "fileCount": 83,
+      "imports": [
+        {
+          "file": "api/cli.js",
+          "specifier": "node:fs/promises",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "api/cli.js",
+          "specifier": "node:path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "api/cli.js",
+          "specifier": "node:url",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "api/cli.js",
+          "specifier": "./index.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "api/cli.js",
+          "specifier": null,
+          "kind": "dynamic-import",
+          "typeOnly": false,
+          "line": 29,
+          "column": 26
+        },
+        {
+          "file": "api/config.js",
+          "specifier": "../design-system/tokens/ref.js",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "api/index.js",
+          "specifier": "./project.js",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "api/index.js",
+          "specifier": "../protocol/diagnostics.js",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "api/index.js",
+          "specifier": "../protocol/diagnostics-result-v1.js",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "api/project.js",
+          "specifier": "node:fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "api/project.js",
+          "specifier": "node:path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "api/project.js",
+          "specifier": "../artifacts/publication/transaction.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "api/project.js",
+          "specifier": "../project/session/index.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "api/project.js",
+          "specifier": "../protocol/identities.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "api/project.js",
+          "specifier": "../protocol/diagnostics-result-v1.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 19,
+          "column": 0
+        },
+        {
+          "file": "api/project.js",
+          "specifier": "../protocol/diagnostics.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 20,
+          "column": 0
+        },
+        {
+          "file": "api/project.js",
+          "specifier": "../project/mutations/transaction.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 21,
+          "column": 0
+        },
+        {
+          "file": "api/project.js",
+          "specifier": "../observability/metrics.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 22,
+          "column": 0
+        },
+        {
+          "file": "artifacts/javascript/design-module.js",
+          "specifier": "../../project/graph/resolution",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 28,
+          "column": 0
+        },
+        {
+          "file": "artifacts/javascript/design-module.js",
+          "specifier": "../../design-system/registry/snapshot",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 29,
+          "column": 0
+        },
+        {
+          "file": "artifacts/javascript/design-module.js",
+          "specifier": "./refs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 30,
+          "column": 0
+        },
+        {
+          "file": "artifacts/metadata/artifact-set.js",
+          "specifier": "crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "artifacts/metadata/artifact-set.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "artifacts/publication/transaction.js",
+          "specifier": "crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 144,
+          "column": 0
+        },
+        {
+          "file": "artifacts/publication/transaction.js",
+          "specifier": "fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 145,
+          "column": 0
+        },
+        {
+          "file": "artifacts/publication/transaction.js",
+          "specifier": "../metadata/artifact-set",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 146,
+          "column": 0
+        },
+        {
+          "file": "artifacts/publication/transaction.js",
+          "specifier": "path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 147,
+          "column": 0
+        },
+        {
+          "file": "artifacts/publication/transaction.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 149,
+          "column": 0
+        },
+        {
+          "file": "artifacts/types/design-declarations.js",
+          "specifier": "../../design-system/registry/snapshot",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "design-system/recipes/compile.js",
+          "specifier": "@pandamstyle/core",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "design-system/recipes/compile.js",
+          "specifier": "../../artifacts/javascript/refs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "@pandamstyle/core",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "./index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "./snapshot",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "../../engine/lowering/styles",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "../recipes/compile",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 23,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "../../artifacts/javascript/refs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 24,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "../tokens/ref",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 25,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "../policy/properties",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 26,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 27,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/build-system.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 29,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/index.js",
+          "specifier": "crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "design-system/registry/index.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "design-system/themes/lowering.js",
+          "specifier": "../../engine/types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "design-system/themes/lowering.js",
+          "specifier": "../../engine/atomic/hash",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "design-system/themes/lowering.js",
+          "specifier": "../tokens/vars-utils",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "design-system/themes/lowering.js",
+          "specifier": "../tokens/types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "design-system/themes/lowering.js",
+          "specifier": "../../engine/ordering/defaults",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 19,
+          "column": 0
+        },
+        {
+          "file": "design-system/tokens/lowering.js",
+          "specifier": "../../engine/types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "design-system/tokens/lowering.js",
+          "specifier": "./vars-utils",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "design-system/tokens/lowering.js",
+          "specifier": "./types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "design-system/tokens/lowering.js",
+          "specifier": "../../engine/atomic/hash",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "design-system/tokens/lowering.js",
+          "specifier": "../../engine/atomic/utils/object-utils",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "design-system/tokens/lowering.js",
+          "specifier": "../../engine/ordering/defaults",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "design-system/tokens/lowering.js",
+          "specifier": "./vars-utils",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "design-system/tokens/vars-utils.js",
+          "specifier": "./types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/create-set.js",
+          "specifier": "../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/create-set.js",
+          "specifier": "./preprocess-rules/PreRule",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/create-set.js",
+          "specifier": "./hash",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/create-set.js",
+          "specifier": "../ordering/defaults",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 19,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/create-set.js",
+          "specifier": "./preprocess-rules/flatten-raw-style-obj",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 20,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/create-set.js",
+          "specifier": "./preprocess-rules/basic-validation",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 21,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/direction/generate-ltr.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/direction/generate-ltr.js",
+          "specifier": "../../ordering/defaults",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/direction/generate-rtl.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/direction/generate-rtl.js",
+          "specifier": "../../ordering/defaults",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/direction/generate-rtl.js",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/PreRule.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/PreRule.js",
+          "specifier": "../utils/convert-to-className",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/PreRule.js",
+          "specifier": "../utils/object-utils",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/PreRule.js",
+          "specifier": "../utils/rule-utils",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/application-order.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/basic-validation.js",
+          "specifier": "../messages",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/basic-validation.js",
+          "specifier": "../utils/object-utils",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/flatten-raw-style-obj.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/flatten-raw-style-obj.js",
+          "specifier": "./index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/flatten-raw-style-obj.js",
+          "specifier": "../../ordering/media-query/media-query-transform",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/flatten-raw-style-obj.js",
+          "specifier": "../messages",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/flatten-raw-style-obj.js",
+          "specifier": "./PreRule",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/index.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/index.js",
+          "specifier": "./application-order",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/index.js",
+          "specifier": "./legacy-expand-shorthands",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/index.js",
+          "specifier": "./property-specificity",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/legacy-expand-shorthands.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/legacy-expand-shorthands.js",
+          "specifier": "../utils/split-css-value",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/preprocess-rules/property-specificity.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/convert-to-className.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/convert-to-className.js",
+          "specifier": "../hash",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/convert-to-className.js",
+          "specifier": "./dashify",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/convert-to-className.js",
+          "specifier": "./transform-value",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/convert-to-className.js",
+          "specifier": "./generate-css-rule",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/convert-to-className.js",
+          "specifier": "../../ordering/defaults",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/convert-to-className.js",
+          "specifier": "../messages",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/convert-to-className.js",
+          "specifier": "./rule-utils",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/generate-css-rule.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/generate-css-rule.js",
+          "specifier": "../../ordering/defaults",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/generate-css-rule.js",
+          "specifier": "../direction/generate-ltr",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/generate-css-rule.js",
+          "specifier": "../direction/generate-rtl",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/generate-css-rule.js",
+          "specifier": "../../ordering/property-priorities",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "./normalizers/font-size-px-to-rem",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "./normalizers/leading-zero",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "./normalizers/quotes",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "./normalizers/timings",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "./normalizers/whitespace",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "./normalizers/zero-dimensions",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 19,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "./normalizers/detect-unclosed-fns",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 21,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "./normalizers/detect-unclosed-strings",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 22,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 23,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalize-value.js",
+          "specifier": "./normalizers/convert-camel-case-values",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 24,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalizers/convert-camel-case-values.js",
+          "specifier": "../dashify",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalizers/detect-unclosed-fns.js",
+          "specifier": "../../messages",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalizers/detect-unclosed-strings.js",
+          "specifier": "../../messages",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalizers/font-size-px-to-rem.js",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalizers/leading-zero.js",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalizers/timings.js",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/normalizers/zero-dimensions.js",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/object-utils.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/rule-utils.js",
+          "specifier": "./object-utils",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/split-css-value.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/split-css-value.js",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/transform-value.js",
+          "specifier": "../../types",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/transform-value.js",
+          "specifier": "./normalize-value",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/atomic/utils/transform-value.js",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "engine/index.js",
+          "specifier": "./ordering/defaults",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/index.js",
+          "specifier": "./atomic/create-set",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "engine/index.js",
+          "specifier": "../design-system/tokens/lowering",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "engine/index.js",
+          "specifier": "../design-system/themes/lowering",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "engine/index.js",
+          "specifier": "./ordering/rules",
+          "kind": "re-export",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "engine/lowering/styles.js",
+          "specifier": "../index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "engine/lowering/styles.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 22,
+          "column": 0
+        },
+        {
+          "file": "engine/lowering/styles.js",
+          "specifier": "../../design-system/tokens/ref",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 23,
+          "column": 0
+        },
+        {
+          "file": "engine/lowering/styles.js",
+          "specifier": "../../design-system/policy/properties",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 24,
+          "column": 0
+        },
+        {
+          "file": "engine/lowering/styles.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 31,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/css-types/calc-constant.js",
+          "specifier": "../token-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/css-types/calc.js",
+          "specifier": "./calc-constant",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/css-types/calc.js",
+          "specifier": "./common-types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/css-types/calc.js",
+          "specifier": "../token-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/css-types/calc.js",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 19,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/css-types/common-types.js",
+          "specifier": "../token-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/css-types/common-types.js",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/css-types/common-types.js",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/media-query-transform.js",
+          "specifier": "./media-query",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/media-query-transform.js",
+          "specifier": "./media-query.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/media-query.js",
+          "specifier": "./token-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/media-query.js",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/media-query.js",
+          "specifier": "./css-types/calc",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/media-query.js",
+          "specifier": "./messages",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/token-parser.js",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/token-parser.js",
+          "specifier": "./token-types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 41,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/token-parser.js",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 42,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/token-types.js",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/media-query/token-types.js",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/rules.js",
+          "specifier": "./media-query/media-query",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/rules.js",
+          "specifier": "./media-query/media-query",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "engine/ordering/rules.js",
+          "specifier": "../atomic/preprocess-rules/legacy-expand-shorthands",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/compile-file.js",
+          "specifier": "@babel/core",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/compile-file.js",
+          "specifier": "@babel/preset-typescript",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/compile-file.js",
+          "specifier": "@babel/preset-react",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/compile-file.js",
+          "specifier": "./plugin",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/compile-file.js",
+          "specifier": "../../engine/index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/compile-file.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/evaluate.js",
+          "specifier": "./static-evaluator",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 22,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/evaluate.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 23,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/evaluate.js",
+          "specifier": "../../design-system/tokens/ref",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 24,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/evaluate.js",
+          "specifier": "../../project/graph/resolution",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 25,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/plugin.js",
+          "specifier": "@babel/types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 24,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/plugin.js",
+          "specifier": "./pass-state",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 25,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/plugin.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 26,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/plugin.js",
+          "specifier": "./evaluate",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 27,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/plugin.js",
+          "specifier": "../../semantics/provenance/index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 34,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/plugin.js",
+          "specifier": "./transform",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 40,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/plugin.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 42,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/static-evaluator.js",
+          "specifier": "@babel/traverse",
+          "kind": "import",
+          "typeOnly": true,
+          "line": 27,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/static-evaluator.js",
+          "specifier": "@babel/types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 29,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/static-evaluator.js",
+          "specifier": "./static-evaluation-errors",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 30,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/transform.js",
+          "specifier": "@babel/types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/transform.js",
+          "specifier": "@pandamstyle/core",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 19,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/transform.js",
+          "specifier": "../../engine/lowering/styles",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 20,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/transform.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 21,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/transform.js",
+          "specifier": "../../artifacts/javascript/refs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 22,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/transform.js",
+          "specifier": "./evaluate",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 27,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/transform.js",
+          "specifier": "../../semantics/provenance/index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 36,
+          "column": 0
+        },
+        {
+          "file": "frontend/babel/transform.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 38,
+          "column": 0
+        },
+        {
+          "file": "hosts/watcher/index.js",
+          "specifier": "crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 66,
+          "column": 0
+        },
+        {
+          "file": "hosts/watcher/index.js",
+          "specifier": "fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 67,
+          "column": 0
+        },
+        {
+          "file": "hosts/watcher/index.js",
+          "specifier": "path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 68,
+          "column": 0
+        },
+        {
+          "file": "project/css-state/index.js",
+          "specifier": "../../engine/index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 72,
+          "column": 0
+        },
+        {
+          "file": "project/css-state/index.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 79,
+          "column": 0
+        },
+        {
+          "file": "project/graph/coverage.js",
+          "specifier": "path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 129,
+          "column": 0
+        },
+        {
+          "file": "project/graph/resolution.js",
+          "specifier": "fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 23,
+          "column": 0
+        },
+        {
+          "file": "project/graph/resolution.js",
+          "specifier": "path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 24,
+          "column": 0
+        },
+        {
+          "file": "project/graph/resolution.js",
+          "specifier": "node:async_hooks",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 25,
+          "column": 0
+        },
+        {
+          "file": "project/graph/resolution.js",
+          "specifier": "@babel/parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 26,
+          "column": 0
+        },
+        {
+          "file": "project/graph/resolution.js",
+          "specifier": "@babel/traverse",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 27,
+          "column": 0
+        },
+        {
+          "file": "project/graph/resolution.js",
+          "specifier": "@babel/types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 28,
+          "column": 0
+        },
+        {
+          "file": "project/graph/resolution.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 29,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 24,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 25,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../engine/index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 26,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 27,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../protocol/diagnostics-result",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 28,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../design-system/registry/build-system",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 36,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../artifacts/javascript/design-module",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 37,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../artifacts/types/design-declarations",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 38,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../artifacts/metadata/artifact-set",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 39,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../artifacts/publication/transaction",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 44,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../graph/resolution",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 45,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../frontend/babel/compile-file",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 55,
+          "column": 0
+        },
+        {
+          "file": "project/session/fresh.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 57,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 85,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 86,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 87,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../engine/index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 89,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../css-state/index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 90,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../mutations/transaction",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 91,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../hosts/watcher/index",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 97,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../design-system/registry/build-system",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 98,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../artifacts/javascript/design-module",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 99,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../artifacts/types/design-declarations",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 100,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../artifacts/metadata/artifact-set",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 101,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../design-system/registry/snapshot",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 106,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 110,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../protocol/diagnostics-result",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 111,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "./fresh",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 126,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../frontend/babel/compile-file",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 133,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../graph/resolution",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 134,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../graph/coverage",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 147,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../artifacts/publication/transaction",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 153,
+          "column": 0
+        },
+        {
+          "file": "project/session/index.js",
+          "specifier": "../../observability/metrics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 154,
+          "column": 0
+        },
+        {
+          "file": "protocol/diagnostics-result-v1.js",
+          "specifier": "node:path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "protocol/diagnostics-result-v1.js",
+          "specifier": "../design-system/policy/properties.js",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "protocol/diagnostics-result.js",
+          "specifier": "./diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 65,
+          "column": 0
+        },
+        {
+          "file": "protocol/identities.js",
+          "specifier": "node:crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "semantics/provenance/index.js",
+          "specifier": "../../protocol/diagnostics",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 43,
+          "column": 0
+        },
+        {
+          "file": "semantics/provenance/index.js",
+          "specifier": "../../frontend/babel/evaluate",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 44,
+          "column": 0
+        }
+      ],
+      "approvedDynamicImports": [
+        {
+          "file": "api/cli.js",
+          "count": 1,
+          "reason": "loads the consuming project build config passed to pms-build"
+        }
+      ]
+    },
+    "cliSources": {
+      "label": "compiler CLI source",
+      "root": "/home/kyle/work/pandam-style-phase-6-7-reconciliation-2026-10/packages/compiler/bin",
+      "fileCount": 1,
+      "imports": [
+        {
+          "file": "pms-build.js",
+          "specifier": "../lib/cli.mjs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        }
+      ],
+      "approvedDynamicImports": []
+    },
+    "rollupGraphs": [
+      {
+        "input": [
+          "./src/api/cli.js"
+        ],
+        "watchedFileCount": 80,
+        "donorSourceFiles": [],
+        "emittedImports": [
+          "node:fs/promises",
+          "node:path",
+          "node:url",
+          "node:fs",
+          "crypto",
+          "fs",
+          "path",
+          "postcss-value-parser",
+          "@csstools/css-tokenizer",
+          "@pandamstyle/core",
+          "node:async_hooks",
+          "@babel/parser",
+          "@babel/traverse",
+          "@babel/types",
+          "@babel/core",
+          "@babel/preset-typescript",
+          "@babel/preset-react",
+          "node:crypto"
+        ]
+      },
+      {
+        "input": [
+          "./src/api/index.js"
+        ],
+        "watchedFileCount": 79,
+        "donorSourceFiles": [],
+        "emittedImports": [
+          "node:fs",
+          "node:path",
+          "crypto",
+          "fs",
+          "path",
+          "postcss-value-parser",
+          "@csstools/css-tokenizer",
+          "@pandamstyle/core",
+          "node:async_hooks",
+          "@babel/parser",
+          "@babel/traverse",
+          "@babel/types",
+          "@babel/core",
+          "@babel/preset-typescript",
+          "@babel/preset-react",
+          "node:crypto"
+        ]
+      },
+      {
+        "input": [
+          "./src/api/config.js"
+        ],
+        "watchedFileCount": 2,
+        "donorSourceFiles": [],
+        "emittedImports": []
+      },
+      {
+        "input": [
+          "./src/api/host.js"
+        ],
+        "watchedFileCount": 1,
+        "donorSourceFiles": [],
+        "emittedImports": []
+      }
+    ],
+    "builtArtifacts": {
+      "fileCount": 4,
+      "imports": [
+        {
+          "file": "cli.mjs",
+          "specifier": "node:fs/promises",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 1,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "node:path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 2,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "node:url",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 3,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "node:fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 4,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 5,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 6,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 7,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "@pandamstyle/core",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "node:async_hooks",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "@babel/parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "@babel/traverse",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "@babel/types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "@babel/types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "@babel/core",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "@babel/preset-typescript",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "@babel/preset-react",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 19,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": "node:crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 20,
+          "column": 0
+        },
+        {
+          "file": "cli.mjs",
+          "specifier": null,
+          "kind": "dynamic-import",
+          "typeOnly": false,
+          "line": 14794,
+          "column": 26
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "node:fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 1,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "node:path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 2,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 3,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 4,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "fs",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 5,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "path",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 6,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "postcss-value-parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 7,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "@csstools/css-tokenizer",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 8,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "@pandamstyle/core",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 9,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "node:async_hooks",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 10,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "@babel/parser",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 11,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "@babel/traverse",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 12,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "@babel/types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 13,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "@babel/types",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 14,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "@babel/core",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 15,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "@babel/preset-typescript",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 16,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "@babel/preset-react",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 17,
+          "column": 0
+        },
+        {
+          "file": "index.mjs",
+          "specifier": "node:crypto",
+          "kind": "import",
+          "typeOnly": false,
+          "line": 18,
+          "column": 0
+        }
+      ],
+      "donorImports": []
+    }
+  },
+  "packed": {
+    "packages": [
+      {
+        "label": "packed @pandamstyle/compiler",
+        "path": "/tmp/pms-donor-closure-ksQH7M/@pandamstyle__compiler/package/package.json",
+        "name": "@pandamstyle/compiler",
+        "dependencies": {
+          "@babel/core": "^7.26.8",
+          "@babel/helper-module-imports": "^7.25.9",
+          "@babel/parser": "^7.28.5",
+          "@babel/preset-react": "^7.27.1",
+          "@babel/preset-typescript": "^7.26.0",
+          "@babel/traverse": "^7.26.8",
+          "@babel/types": "^7.26.8",
+          "@csstools/css-tokenizer": "^3.0.3",
+          "@pandamstyle/core": "0.1.0",
+          "postcss-value-parser": "^4.1.0"
+        },
+        "donorDependencies": [],
+        "tarball": "pandamstyle-compiler-0.1.0.tgz",
+        "fileCount": 8,
+        "imports": [
+          {
+            "file": "bin/pms-build.js",
+            "specifier": "../lib/cli.mjs",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 8,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "node:fs/promises",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 1,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "node:path",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 2,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "node:url",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 3,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "node:fs",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 4,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "crypto",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 5,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "crypto",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 6,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "fs",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 7,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "path",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 8,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "postcss-value-parser",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 9,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "@csstools/css-tokenizer",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 10,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "@pandamstyle/core",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 11,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "node:async_hooks",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 12,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "@babel/parser",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 13,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "@babel/traverse",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 14,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "@babel/types",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 15,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "@babel/types",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 16,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "@babel/core",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 17,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "@babel/preset-typescript",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 18,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "@babel/preset-react",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 19,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": "node:crypto",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 20,
+            "column": 0
+          },
+          {
+            "file": "lib/cli.mjs",
+            "specifier": null,
+            "kind": "dynamic-import",
+            "typeOnly": false,
+            "line": 14794,
+            "column": 26
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "node:fs",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 1,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "node:path",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 2,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "crypto",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 3,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "crypto",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 4,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "fs",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 5,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "path",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 6,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "postcss-value-parser",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 7,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "@csstools/css-tokenizer",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 8,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "@pandamstyle/core",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 9,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "node:async_hooks",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 10,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "@babel/parser",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 11,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "@babel/traverse",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 12,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "@babel/types",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 13,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "@babel/types",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 14,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "@babel/core",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 15,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "@babel/preset-typescript",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 16,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "@babel/preset-react",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 17,
+            "column": 0
+          },
+          {
+            "file": "lib/index.mjs",
+            "specifier": "node:crypto",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 18,
+            "column": 0
+          }
+        ]
+      },
+      {
+        "label": "packed @pandamstyle/core",
+        "path": "/tmp/pms-donor-closure-ksQH7M/@pandamstyle__core/package/package.json",
+        "name": "@pandamstyle/core",
+        "dependencies": {},
+        "donorDependencies": [],
+        "tarball": "pandamstyle-core-0.1.0.tgz",
+        "fileCount": 7,
+        "imports": [
+          {
+            "file": "src/abi.js",
+            "specifier": "./selection-error.js",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 8,
+            "column": 0
+          },
+          {
+            "file": "src/index.js",
+            "specifier": "./abi.js",
+            "kind": "re-export",
+            "typeOnly": false,
+            "line": 8,
+            "column": 0
+          },
+          {
+            "file": "src/index.js",
+            "specifier": "./props.js",
+            "kind": "re-export",
+            "typeOnly": false,
+            "line": 9,
+            "column": 0
+          },
+          {
+            "file": "src/index.js",
+            "specifier": "./recipe.js",
+            "kind": "re-export",
+            "typeOnly": false,
+            "line": 10,
+            "column": 0
+          },
+          {
+            "file": "src/index.js",
+            "specifier": "./selection-error.js",
+            "kind": "re-export",
+            "typeOnly": false,
+            "line": 11,
+            "column": 0
+          },
+          {
+            "file": "src/props.js",
+            "specifier": "./abi.js",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 8,
+            "column": 0
+          },
+          {
+            "file": "src/props.js",
+            "specifier": "./selection-error.js",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 9,
+            "column": 0
+          },
+          {
+            "file": "src/recipe-select.js",
+            "specifier": "./abi.js",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 8,
+            "column": 0
+          },
+          {
+            "file": "src/recipe-select.js",
+            "specifier": "./selection-error.js",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 9,
+            "column": 0
+          },
+          {
+            "file": "src/recipe.js",
+            "specifier": "./recipe-select.js",
+            "kind": "import",
+            "typeOnly": false,
+            "line": 8,
+            "column": 0
+          }
+        ]
+      }
+    ],
+    "installedGraph": {
+      "complete": true,
+      "packages": [
+        {
+          "name": "@pandamstyle/compiler",
+          "version": "0.1.0",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@pandamstyle/compiler"
+        },
+        {
+          "name": "@pandamstyle/core",
+          "version": "0.1.0",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@pandamstyle/core"
+        },
+        {
+          "name": "@babel/core",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/core"
+        },
+        {
+          "name": "@babel/helper-module-imports",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-module-imports"
+        },
+        {
+          "name": "@babel/parser",
+          "version": "7.29.9",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/parser"
+        },
+        {
+          "name": "@babel/preset-react",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/preset-react"
+        },
+        {
+          "name": "@babel/preset-typescript",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/preset-typescript"
+        },
+        {
+          "name": "@babel/traverse",
+          "version": "7.29.8",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/traverse"
+        },
+        {
+          "name": "@babel/types",
+          "version": "7.29.8",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/types"
+        },
+        {
+          "name": "@csstools/css-tokenizer",
+          "version": "3.0.4",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@csstools/css-tokenizer"
+        },
+        {
+          "name": "postcss-value-parser",
+          "version": "4.2.0",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/postcss-value-parser"
+        },
+        {
+          "name": "@babel/code-frame",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/code-frame"
+        },
+        {
+          "name": "@babel/generator",
+          "version": "7.29.8",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/generator"
+        },
+        {
+          "name": "@babel/helper-compilation-targets",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-compilation-targets"
+        },
+        {
+          "name": "@babel/helper-module-transforms",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-module-transforms"
+        },
+        {
+          "name": "@babel/helpers",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helpers"
+        },
+        {
+          "name": "@babel/template",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/template"
+        },
+        {
+          "name": "@jridgewell/remapping",
+          "version": "2.3.5",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@jridgewell/remapping"
+        },
+        {
+          "name": "convert-source-map",
+          "version": "2.0.0",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/convert-source-map"
+        },
+        {
+          "name": "debug",
+          "version": "4.4.3",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/debug"
+        },
+        {
+          "name": "gensync",
+          "version": "1.0.0-beta.2",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/gensync"
+        },
+        {
+          "name": "json5",
+          "version": "2.2.3",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/json5"
+        },
+        {
+          "name": "semver",
+          "version": "6.3.1",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/semver"
+        },
+        {
+          "name": "@babel/helper-plugin-utils",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-plugin-utils"
+        },
+        {
+          "name": "@babel/helper-validator-option",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-validator-option"
+        },
+        {
+          "name": "@babel/plugin-transform-react-display-name",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/plugin-transform-react-display-name"
+        },
+        {
+          "name": "@babel/plugin-transform-react-jsx",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/plugin-transform-react-jsx"
+        },
+        {
+          "name": "@babel/plugin-transform-react-jsx-development",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/plugin-transform-react-jsx-development"
+        },
+        {
+          "name": "@babel/plugin-transform-react-pure-annotations",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/plugin-transform-react-pure-annotations"
+        },
+        {
+          "name": "@babel/plugin-syntax-jsx",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/plugin-syntax-jsx"
+        },
+        {
+          "name": "@babel/plugin-transform-modules-commonjs",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/plugin-transform-modules-commonjs"
+        },
+        {
+          "name": "@babel/plugin-transform-typescript",
+          "version": "7.29.9",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/plugin-transform-typescript"
+        },
+        {
+          "name": "@babel/helper-globals",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-globals"
+        },
+        {
+          "name": "@babel/helper-string-parser",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-string-parser"
+        },
+        {
+          "name": "@babel/helper-validator-identifier",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-validator-identifier"
+        },
+        {
+          "name": "js-tokens",
+          "version": "4.0.0",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/js-tokens"
+        },
+        {
+          "name": "picocolors",
+          "version": "1.1.1",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/picocolors"
+        },
+        {
+          "name": "@jridgewell/gen-mapping",
+          "version": "0.3.13",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@jridgewell/gen-mapping"
+        },
+        {
+          "name": "@jridgewell/trace-mapping",
+          "version": "0.3.31",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@jridgewell/trace-mapping"
+        },
+        {
+          "name": "jsesc",
+          "version": "3.1.0",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/jsesc"
+        },
+        {
+          "name": "@babel/compat-data",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/compat-data"
+        },
+        {
+          "name": "browserslist",
+          "version": "4.29.3",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/browserslist"
+        },
+        {
+          "name": "lru-cache",
+          "version": "5.1.1",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/lru-cache"
+        },
+        {
+          "name": "ms",
+          "version": "2.1.3",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/ms"
+        },
+        {
+          "name": "@babel/helper-annotate-as-pure",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-annotate-as-pure"
+        },
+        {
+          "name": "@babel/helper-create-class-features-plugin",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-create-class-features-plugin"
+        },
+        {
+          "name": "@babel/helper-skip-transparent-expression-wrappers",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-skip-transparent-expression-wrappers"
+        },
+        {
+          "name": "@babel/plugin-syntax-typescript",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/plugin-syntax-typescript"
+        },
+        {
+          "name": "@jridgewell/sourcemap-codec",
+          "version": "1.6.0",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@jridgewell/sourcemap-codec"
+        },
+        {
+          "name": "@jridgewell/resolve-uri",
+          "version": "3.1.2",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@jridgewell/resolve-uri"
+        },
+        {
+          "name": "baseline-browser-mapping",
+          "version": "2.11.26",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/baseline-browser-mapping"
+        },
+        {
+          "name": "caniuse-lite",
+          "version": "1.0.30001814",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/caniuse-lite"
+        },
+        {
+          "name": "electron-to-chromium",
+          "version": "1.5.443",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/electron-to-chromium"
+        },
+        {
+          "name": "node-releases",
+          "version": "2.0.57",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/node-releases"
+        },
+        {
+          "name": "update-browserslist-db",
+          "version": "1.3.3",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/update-browserslist-db"
+        },
+        {
+          "name": "yallist",
+          "version": "3.1.1",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/yallist"
+        },
+        {
+          "name": "@babel/helper-member-expression-to-functions",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-member-expression-to-functions"
+        },
+        {
+          "name": "@babel/helper-optimise-call-expression",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-optimise-call-expression"
+        },
+        {
+          "name": "@babel/helper-replace-supers",
+          "version": "7.29.7",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/@babel/helper-replace-supers"
+        },
+        {
+          "name": "escalade",
+          "version": "3.2.0",
+          "path": "/tmp/pandamstyle-pilot-c4c6b07a7124370b4d9de04bafc8101a7a497c7d-575025/app/node_modules/escalade"
+        }
+      ],
+      "donorPackages": [],
+      "workspaceLeakage": false
+    }
+  },
+  "corePackageProof": {
+    "package": "@pandamstyle/core",
+    "version": "0.1.0",
+    "tarball": "evidence/phase-6-7-reconciliation/verify/core-package-proof/tarball/pandamstyle-core-0.1.0.tgz",
+    "tarballBytes": 5251,
+    "installedPath": "/tmp/pandamstyle-core-consumer-2pnzKx/node_modules/@pandamstyle/core/src/index.js",
+    "fixturePath": "/tmp/pandamstyle-core-consumer-2pnzKx",
+    "workspaceLeakage": false,
+    "exports": [
+      ".",
+      "./package.json"
+    ],
+    "runtimeDependencies": {},
+    "dependencyGraph": [
+      "@pandamstyle/core"
+    ],
+    "stylexDependencyCount": 0,
+    "pandacssDependencyCount": 0,
+    "nodeBuiltinImports": [],
+    "donorRuntimeImports": [],
+    "runtimeChecks": {
+      "composition": "passed",
+      "recipeSelection": "passed",
+      "malformedRefCode": "PMS_UNVERIFIED_PROPS_SOURCE",
+      "unsupportedAbiCode": "PMS_ABI_MISMATCH"
+    },
+    "benchmark": {
+      "singleStyleRef": {
+        "iterations": 10000,
+        "elapsedMs": 17.936
+      },
+      "multipleStyleRefs": {
+        "iterations": 10000,
+        "elapsedMs": 22.136
+      },
+      "recipeSelection": {
+        "iterations": 10000,
+        "elapsedMs": 17.711
+      },
+      "largeRepeatedComposition": {
+        "iterations": 1000,
+        "elapsedMs": 25.495
+      }
+    }
+  },
+  "result": "passed"
+}

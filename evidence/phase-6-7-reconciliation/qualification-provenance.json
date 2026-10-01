@@ -1,0 +1,15 @@
+{
+  "documentKind": "pandamstyle-combined-qualification-provenance",
+  "testedCommit": "c4c6b07a7124370b4d9de04bafc8101a7a497c7d",
+  "testedTree": "a1ec19d6f9d13fb37496c2f8b2df036342937bd9",
+  "workingTreeAtOfficialStart": "clean",
+  "sourceDiffAfterQualification": [],
+  "officialCommand": "PMS_OUT_DIR=/home/kyle/work/pandam-style-phase-6-7-reconciliation-2026-10/evidence/phase-6-7-reconciliation/verify PMS_BATCH_BASE_REF=7641b51b14881c7eb84f1772b879cc041868c2e0 ./verify-pms.sh",
+  "localDiagnosticCommand": "node benchmarks/pandamstyle/src/phase-d-profile.js --corpus .pms-bench/corpora/c10000-t1000-r100-s307-f8 --variants compact_agent_result --scenarios one_file_existing_atoms,import_change,reexport_change,unresolved_import_then_file_appears,no_change --iterations 3 --label reconciliation-local-diagnostics --out evidence/phase-6-7-reconciliation/performance/local-diagnostics.jsonl",
+  "localPublicationCommand": "node benchmarks/pandamstyle/src/phase-d-profile.js --corpus .pms-bench/corpora/c10000-t1000-r100-s307-f8 --variants compact_agent_result_plus_compact_publish_metadata --scenarios one_file_existing_atoms --iterations 3 --label reconciliation-local-publication --out evidence/phase-6-7-reconciliation/performance/local-publication.jsonl",
+  "publicServiceCommand": "node tools/pms/reconciliation-service-profile.cjs .pms-bench/corpora/c10000-t1000-r100-s307-f8 evidence/phase-6-7-reconciliation/performance",
+  "executedSequentially": true,
+  "rawCampaignExitCode": 0,
+  "corePackedPayloadPreserved": "verify/core-package-proof/tarball/pandamstyle-core-0.1.0.tgz",
+  "result": "passed"
+}

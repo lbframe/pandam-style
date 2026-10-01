@@ -1,0 +1,565 @@
+{
+  "id": "forward.partial",
+  "area": "forwarding",
+  "status": "MUST_PRESERVE",
+  "gapId": null,
+  "fresh": {
+    "applicable": true
+  },
+  "incremental": {
+    "applicable": true
+  },
+  "freshMatchesExpected": true,
+  "incrementalMatchesExpected": true,
+  "freshMatchesIncremental": true,
+  "revisions": [
+    {
+      "revision": 1,
+      "label": "initial",
+      "fresh": {
+        "accepted": false,
+        "codes": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_FORBIDDEN_IMPORT",
+            "severity": "error",
+            "phase": "imports",
+            "source": "src/page.js (page)",
+            "location": {
+              "file": "src/page.js",
+              "line": 1,
+              "column": 1,
+              "role": "page"
+            },
+            "rule": "module.forwarding",
+            "context": {
+              "source": "./relay",
+              "exported": "token",
+              "reason": "missing-or-ambiguous-export",
+              "forwardingIssues": [],
+              "repairShape": "Import an explicitly forwarded binding or repair the relay export."
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": null,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": null,
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "62c1f84c2058efed"
+          },
+          "abiVersion": 1,
+          "ok": false,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [
+            {
+              "schemaVersion": 1,
+              "code": "PMS_FORBIDDEN_IMPORT",
+              "severity": "error",
+              "phase": "imports",
+              "rule": "module.forwarding",
+              "message": "No unambiguous export \"token\" is forwarded by \"./relay\".",
+              "source": {
+                "file": "src/page.js",
+                "line": 1,
+                "column": 1,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "location": {
+                "file": "src/page.js",
+                "line": 1,
+                "column": 1,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "role": "page",
+              "context": {
+                "source": "./relay",
+                "exported": "token",
+                "reason": "missing-or-ambiguous-export",
+                "forwardingIssues": [],
+                "repairShape": "Import an explicitly forwarded binding or repair the relay export."
+              },
+              "expected": {
+                "category": null,
+                "visibility": null,
+                "static": null,
+                "domain": null
+              },
+              "candidates": [],
+              "candidatesTotal": 0,
+              "candidatesTruncated": false,
+              "candidatesQuery": {
+                "method": "candidateTokens",
+                "category": null,
+                "offset": 0,
+                "limit": 32,
+                "revision": {
+                  "projectId": "oracle-project",
+                  "sessionId": "oracle-session",
+                  "revisionId": 1
+                }
+              },
+              "repair": {
+                "kind": "remove-the-import",
+                "applicable": true,
+                "target": null,
+                "expected": {
+                  "forbidden": true
+                },
+                "reason": null
+              },
+              "autofix": null,
+              "affectedRegion": {
+                "file": "src/page.js",
+                "namespace": null,
+                "property": null,
+                "conditionPath": []
+              },
+              "coverage": {
+                "analysed": true,
+                "origin": "root",
+                "failed": true
+              },
+              "revision": {
+                "projectId": "oracle-project",
+                "sessionId": "oracle-session",
+                "revisionId": 1
+              }
+            }
+          ],
+          "diagnosticsTotal": 1,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              },
+              {
+                "file": "src/relay.js",
+                "role": "page"
+              }
+            ],
+            "total": 2,
+            "truncated": false
+          },
+          "generation": {
+            "published": false,
+            "generationId": null,
+            "artifactRevision": null,
+            "artifactDigest": null,
+            "associationRevision": null
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": false,
+            "generationCommitted": false,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "src/relay.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:export-named"
+          }
+        ],
+        "forwarding": [
+          {
+            "source": "./relay",
+            "bindings": [
+              {
+                "exported": "create",
+                "imported": "create",
+                "origin": "generated/design.pandamstyle.js",
+                "chain": [
+                  "src/relay.js",
+                  "generated/design.pandamstyle.js"
+                ],
+                "kind": "named"
+              }
+            ],
+            "issues": []
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "incremental": {
+        "accepted": false,
+        "codes": [
+          "PMS_FORBIDDEN_IMPORT"
+        ],
+        "diagnostics": [
+          {
+            "schemaVersion": 1,
+            "code": "PMS_FORBIDDEN_IMPORT",
+            "severity": "error",
+            "phase": "imports",
+            "source": "src/page.js (page)",
+            "location": {
+              "file": "src/page.js",
+              "line": 1,
+              "column": 1,
+              "role": "page"
+            },
+            "rule": "module.forwarding",
+            "context": {
+              "source": "./relay",
+              "exported": "token",
+              "reason": "missing-or-ambiguous-export",
+              "forwardingIssues": [],
+              "repairShape": "Import an explicitly forwarded binding or repair the relay export."
+            },
+            "autofix": null
+          }
+        ],
+        "rules": [],
+        "manifest": null,
+        "revisionId": 1,
+        "current": null,
+        "publication": {
+          "exists": false,
+          "artifacts": []
+        },
+        "counters": {
+          "filesChanged": 0,
+          "filesAdded": 2,
+          "filesRemoved": 0,
+          "filesReparsed": 3,
+          "filesRecompiled": 1,
+          "filesCompiled": 2,
+          "filesReused": 0,
+          "coverageSummariesReused": 0,
+          "coverageSummariesRebuilt": 3,
+          "reverseDependentsInvalidated": 0,
+          "negativeResolutionsInvalidated": 0,
+          "fullFallback": 1,
+          "fullFallbackReason": "design-system-definition",
+          "newlyCoveredFiles": 2,
+          "coveredFileCount": 3,
+          "fileStateCount": 3,
+          "dirtyFilesDeclared": 0,
+          "dirtyFilesRead": 2,
+          "dirtyFilesHashed": 2,
+          "dirtyFilesUnchanged": 0
+        },
+        "protocol": {
+          "documentKind": "pandamstyle-diagnostics-result",
+          "schemaVersion": 1,
+          "revision": {
+            "projectId": "oracle-project",
+            "sessionId": "oracle-session",
+            "revisionId": 1
+          },
+          "designSystem": {
+            "systemId": "oracle-ui",
+            "registryDigest": "62c1f84c2058efed"
+          },
+          "abiVersion": 1,
+          "ok": false,
+          "completeness": {
+            "status": "complete",
+            "scope": "declared-project",
+            "discovery": "full-discovery",
+            "evidence": "filesystem-scan",
+            "resyncRequired": false
+          },
+          "diagnostics": [
+            {
+              "schemaVersion": 1,
+              "code": "PMS_FORBIDDEN_IMPORT",
+              "severity": "error",
+              "phase": "imports",
+              "rule": "module.forwarding",
+              "message": "No unambiguous export \"token\" is forwarded by \"./relay\".",
+              "source": {
+                "file": "src/page.js",
+                "line": 1,
+                "column": 1,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "location": {
+                "file": "src/page.js",
+                "line": 1,
+                "column": 1,
+                "endLine": null,
+                "endColumn": null,
+                "label": null
+              },
+              "role": "page",
+              "context": {
+                "source": "./relay",
+                "exported": "token",
+                "reason": "missing-or-ambiguous-export",
+                "forwardingIssues": [],
+                "repairShape": "Import an explicitly forwarded binding or repair the relay export."
+              },
+              "expected": {
+                "category": null,
+                "visibility": null,
+                "static": null,
+                "domain": null
+              },
+              "candidates": [],
+              "candidatesTotal": 0,
+              "candidatesTruncated": false,
+              "candidatesQuery": {
+                "method": "candidateTokens",
+                "category": null,
+                "offset": 0,
+                "limit": 32,
+                "revision": {
+                  "projectId": "oracle-project",
+                  "sessionId": "oracle-session",
+                  "revisionId": 1
+                }
+              },
+              "repair": {
+                "kind": "remove-the-import",
+                "applicable": true,
+                "target": null,
+                "expected": {
+                  "forbidden": true
+                },
+                "reason": null
+              },
+              "autofix": null,
+              "affectedRegion": {
+                "file": "src/page.js",
+                "namespace": null,
+                "property": null,
+                "conditionPath": []
+              },
+              "coverage": {
+                "analysed": true,
+                "origin": "root",
+                "failed": true
+              },
+              "revision": {
+                "projectId": "oracle-project",
+                "sessionId": "oracle-session",
+                "revisionId": 1
+              }
+            }
+          ],
+          "diagnosticsTotal": 1,
+          "diagnosticsTruncated": false,
+          "affected": {
+            "entries": [
+              {
+                "file": "src/page.js",
+                "role": "page"
+              },
+              {
+                "file": "src/relay.js",
+                "role": "page"
+              }
+            ],
+            "total": 2,
+            "truncated": false
+          },
+          "generation": {
+            "published": false,
+            "generationId": null,
+            "artifactRevision": null,
+            "artifactDigest": null,
+            "associationRevision": null
+          },
+          "milestones": {
+            "diagnosticsReady": true,
+            "generationReady": false,
+            "generationCommitted": false,
+            "auditReportReady": false
+          },
+          "audit": {
+            "requested": false,
+            "materialized": false,
+            "document": null
+          },
+          "incremental": {
+            "fullFallback": false,
+            "reason": null
+          },
+          "revisionId": 1
+        },
+        "negativeResolutionCount": 0,
+        "publicationError": null,
+        "publicationDigests": {},
+        "coverage": [
+          {
+            "file": "src/page.js",
+            "origin": "root"
+          },
+          {
+            "file": "src/relay.js",
+            "origin": "root"
+          },
+          {
+            "file": "generated/design.pandamstyle.js",
+            "origin": "closure:export-named"
+          }
+        ],
+        "forwarding": [
+          {
+            "source": "./relay",
+            "bindings": [
+              {
+                "exported": "create",
+                "imported": "create",
+                "origin": "generated/design.pandamstyle.js",
+                "chain": [
+                  "src/relay.js",
+                  "generated/design.pandamstyle.js"
+                ],
+                "kind": "named"
+              }
+            ],
+            "issues": []
+          }
+        ],
+        "artifactBytes": {}
+      },
+      "freshChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_FORBIDDEN_IMPORT"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "forwarding",
+          "value": [
+            {
+              "source": "./relay",
+              "bindings": [
+                {
+                  "exported": "create",
+                  "imported": "create",
+                  "origin": "generated/design.pandamstyle.js",
+                  "chain": [
+                    "src/relay.js",
+                    "generated/design.pandamstyle.js"
+                  ],
+                  "kind": "named"
+                }
+              ],
+              "issues": []
+            }
+          ],
+          "op": "equal",
+          "matches": true
+        }
+      ],
+      "incrementalChecks": [
+        {
+          "path": "accepted",
+          "value": false,
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "codes",
+          "value": [
+            "PMS_FORBIDDEN_IMPORT"
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "forwarding",
+          "value": [
+            {
+              "source": "./relay",
+              "bindings": [
+                {
+                  "exported": "create",
+                  "imported": "create",
+                  "origin": "generated/design.pandamstyle.js",
+                  "chain": [
+                    "src/relay.js",
+                    "generated/design.pandamstyle.js"
+                  ],
+                  "kind": "named"
+                }
+              ],
+              "issues": []
+            }
+          ],
+          "op": "equal",
+          "matches": true
+        },
+        {
+          "path": "revisionId",
+          "value": 1,
+          "matches": true
+        }
+      ],
+      "freshMatchesExpected": true,
+      "incrementalMatchesExpected": true,
+      "freshMatchesIncremental": true
+    }
+  ],
+  "contractReferences": [
+    "docs/architecture/public-api-v0.1.md",
+    "docs/architecture/generated-design-system-abi-v1.md"
+  ],
+  "classificationVerified": true
+}

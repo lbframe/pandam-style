@@ -1,0 +1,3516 @@
+{
+  "schemaVersion": 1,
+  "systemId": "corpus-c10000-t1000-r100-s307-f8@0.1",
+  "registryDigest": "7b1708be320a834b",
+  "abiVersion": 1,
+  "compilerContractVersion": "pms-0.1",
+  "manifestSchemaVersion": 1,
+  "capabilities": {
+    "slots": false,
+    "compoundVariants": false,
+    "patterns": false,
+    "rawDynamicStyles": false
+  },
+  "tokens": {
+    "spacing.xs": {
+      "category": "spacing"
+    },
+    "spacing.sm": {
+      "category": "spacing"
+    },
+    "spacing.md": {
+      "category": "spacing"
+    },
+    "spacing.xl": {
+      "category": "spacing"
+    },
+    "spacing.2xl": {
+      "category": "spacing"
+    },
+    "spacing.3xl": {
+      "category": "spacing"
+    },
+    "spacing.sm15": {
+      "category": "spacing"
+    },
+    "spacing.md15": {
+      "category": "spacing"
+    },
+    "spacing.lg15": {
+      "category": "spacing"
+    },
+    "spacing.2xl15": {
+      "category": "spacing"
+    },
+    "spacing.3xl15": {
+      "category": "spacing"
+    },
+    "colors.primitive.base": {
+      "category": "colors"
+    },
+    "colors.text.base": {
+      "category": "colors"
+    },
+    "colors.surface.base": {
+      "category": "colors"
+    },
+    "colors.primitive.primary": {
+      "category": "colors"
+    },
+    "colors.text.primary": {
+      "category": "colors"
+    },
+    "colors.surface.primary": {
+      "category": "colors"
+    },
+    "colors.primitive.secondary": {
+      "category": "colors"
+    },
+    "colors.text.secondary": {
+      "category": "colors"
+    },
+    "colors.surface.secondary": {
+      "category": "colors"
+    },
+    "colors.text.muted": {
+      "category": "colors"
+    },
+    "colors.surface.muted": {
+      "category": "colors"
+    },
+    "colors.primitive.accent": {
+      "category": "colors"
+    },
+    "colors.text.accent": {
+      "category": "colors"
+    },
+    "colors.surface.accent": {
+      "category": "colors"
+    },
+    "colors.primitive.danger": {
+      "category": "colors"
+    },
+    "colors.text.danger": {
+      "category": "colors"
+    },
+    "colors.surface.danger": {
+      "category": "colors"
+    },
+    "colors.primitive.base17": {
+      "category": "colors"
+    },
+    "colors.text.base17": {
+      "category": "colors"
+    },
+    "colors.surface.base17": {
+      "category": "colors"
+    },
+    "colors.text.primary17": {
+      "category": "colors"
+    },
+    "colors.surface.primary17": {
+      "category": "colors"
+    },
+    "colors.primitive.secondary17": {
+      "category": "colors"
+    },
+    "colors.text.secondary17": {
+      "category": "colors"
+    },
+    "colors.surface.secondary17": {
+      "category": "colors"
+    },
+    "colors.primitive.muted17": {
+      "category": "colors"
+    },
+    "colors.text.muted17": {
+      "category": "colors"
+    },
+    "colors.surface.muted17": {
+      "category": "colors"
+    },
+    "colors.primitive.accent17": {
+      "category": "colors"
+    },
+    "colors.text.accent17": {
+      "category": "colors"
+    },
+    "colors.surface.accent17": {
+      "category": "colors"
+    },
+    "colors.text.danger17": {
+      "category": "colors"
+    },
+    "colors.surface.danger17": {
+      "category": "colors"
+    },
+    "radii.xs": {
+      "category": "radii"
+    },
+    "radii.sm": {
+      "category": "radii"
+    },
+    "radii.md": {
+      "category": "radii"
+    },
+    "radii.xl": {
+      "category": "radii"
+    },
+    "radii.2xl": {
+      "category": "radii"
+    },
+    "radii.3xl": {
+      "category": "radii"
+    },
+    "radii.sm15": {
+      "category": "radii"
+    },
+    "radii.md15": {
+      "category": "radii"
+    },
+    "radii.lg15": {
+      "category": "radii"
+    },
+    "radii.2xl15": {
+      "category": "radii"
+    },
+    "radii.3xl15": {
+      "category": "radii"
+    },
+    "fontSizes.xs": {
+      "category": "fontSizes"
+    },
+    "fontSizes.sm": {
+      "category": "fontSizes"
+    },
+    "fontSizes.md": {
+      "category": "fontSizes"
+    },
+    "fontSizes.xl": {
+      "category": "fontSizes"
+    },
+    "fontSizes.2xl": {
+      "category": "fontSizes"
+    },
+    "fontSizes.3xl": {
+      "category": "fontSizes"
+    },
+    "fontSizes.sm15": {
+      "category": "fontSizes"
+    },
+    "fontSizes.md15": {
+      "category": "fontSizes"
+    },
+    "fontSizes.lg15": {
+      "category": "fontSizes"
+    },
+    "fontSizes.2xl15": {
+      "category": "fontSizes"
+    },
+    "fontSizes.3xl15": {
+      "category": "fontSizes"
+    },
+    "fontWeights.xs": {
+      "category": "fontWeights"
+    },
+    "fontWeights.sm": {
+      "category": "fontWeights"
+    },
+    "fontWeights.md": {
+      "category": "fontWeights"
+    },
+    "fontWeights.xl": {
+      "category": "fontWeights"
+    },
+    "fontWeights.2xl": {
+      "category": "fontWeights"
+    },
+    "fontWeights.3xl": {
+      "category": "fontWeights"
+    },
+    "fontWeights.sm15": {
+      "category": "fontWeights"
+    },
+    "fontWeights.md15": {
+      "category": "fontWeights"
+    },
+    "fontWeights.lg15": {
+      "category": "fontWeights"
+    },
+    "fontWeights.2xl15": {
+      "category": "fontWeights"
+    },
+    "fontWeights.3xl15": {
+      "category": "fontWeights"
+    },
+    "lineHeights.xs": {
+      "category": "lineHeights"
+    },
+    "lineHeights.sm": {
+      "category": "lineHeights"
+    },
+    "lineHeights.md": {
+      "category": "lineHeights"
+    },
+    "lineHeights.xl": {
+      "category": "lineHeights"
+    },
+    "lineHeights.2xl": {
+      "category": "lineHeights"
+    },
+    "lineHeights.3xl": {
+      "category": "lineHeights"
+    },
+    "lineHeights.sm15": {
+      "category": "lineHeights"
+    },
+    "lineHeights.md15": {
+      "category": "lineHeights"
+    },
+    "lineHeights.lg15": {
+      "category": "lineHeights"
+    },
+    "lineHeights.2xl15": {
+      "category": "lineHeights"
+    },
+    "lineHeights.3xl15": {
+      "category": "lineHeights"
+    },
+    "fontFamilies.xs": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.sm": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.md": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.xl": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.2xl": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.3xl": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.sm15": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.md15": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.lg15": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.2xl15": {
+      "category": "fontFamilies"
+    },
+    "fontFamilies.3xl15": {
+      "category": "fontFamilies"
+    },
+    "shadows.xs": {
+      "category": "shadows"
+    },
+    "shadows.sm": {
+      "category": "shadows"
+    },
+    "shadows.md": {
+      "category": "shadows"
+    },
+    "shadows.xl": {
+      "category": "shadows"
+    },
+    "shadows.2xl": {
+      "category": "shadows"
+    },
+    "shadows.3xl": {
+      "category": "shadows"
+    },
+    "shadows.sm15": {
+      "category": "shadows"
+    },
+    "shadows.md15": {
+      "category": "shadows"
+    },
+    "shadows.lg15": {
+      "category": "shadows"
+    },
+    "shadows.2xl15": {
+      "category": "shadows"
+    },
+    "shadows.3xl15": {
+      "category": "shadows"
+    },
+    "durations.xs": {
+      "category": "durations"
+    },
+    "durations.sm": {
+      "category": "durations"
+    },
+    "durations.md": {
+      "category": "durations"
+    },
+    "durations.xl": {
+      "category": "durations"
+    },
+    "durations.2xl": {
+      "category": "durations"
+    },
+    "durations.3xl": {
+      "category": "durations"
+    },
+    "durations.sm15": {
+      "category": "durations"
+    },
+    "durations.md15": {
+      "category": "durations"
+    },
+    "durations.lg15": {
+      "category": "durations"
+    },
+    "durations.2xl15": {
+      "category": "durations"
+    },
+    "durations.3xl15": {
+      "category": "durations"
+    },
+    "easings.xs": {
+      "category": "easings"
+    },
+    "easings.sm": {
+      "category": "easings"
+    },
+    "easings.md": {
+      "category": "easings"
+    },
+    "easings.xl": {
+      "category": "easings"
+    },
+    "easings.2xl": {
+      "category": "easings"
+    },
+    "easings.3xl": {
+      "category": "easings"
+    },
+    "easings.sm15": {
+      "category": "easings"
+    },
+    "easings.md15": {
+      "category": "easings"
+    },
+    "easings.lg15": {
+      "category": "easings"
+    },
+    "easings.2xl15": {
+      "category": "easings"
+    },
+    "easings.3xl15": {
+      "category": "easings"
+    }
+  },
+  "semanticTokens": {
+    "colors.text.base": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.base"
+    },
+    "colors.surface.base": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.base"
+    },
+    "colors.text.primary": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.primary"
+    },
+    "colors.surface.primary": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.primary"
+    },
+    "colors.text.secondary": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.secondary"
+    },
+    "colors.surface.secondary": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.secondary"
+    },
+    "colors.text.muted": {
+      "category": "colors",
+      "kind": "alias"
+    },
+    "colors.surface.muted": {
+      "category": "colors",
+      "kind": "alias"
+    },
+    "colors.text.accent": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.accent"
+    },
+    "colors.surface.accent": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.accent"
+    },
+    "colors.text.danger": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.danger"
+    },
+    "colors.surface.danger": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.danger"
+    },
+    "colors.text.base17": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.base17"
+    },
+    "colors.surface.base17": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.base17"
+    },
+    "colors.text.primary17": {
+      "category": "colors",
+      "kind": "alias"
+    },
+    "colors.surface.primary17": {
+      "category": "colors",
+      "kind": "alias"
+    },
+    "colors.text.secondary17": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.secondary17"
+    },
+    "colors.surface.secondary17": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.secondary17"
+    },
+    "colors.text.muted17": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.muted17"
+    },
+    "colors.surface.muted17": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.muted17"
+    },
+    "colors.text.accent17": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.accent17"
+    },
+    "colors.surface.accent17": {
+      "category": "colors",
+      "kind": "alias",
+      "ref": "colors.primitive.accent17"
+    },
+    "colors.text.danger17": {
+      "category": "colors",
+      "kind": "alias"
+    },
+    "colors.surface.danger17": {
+      "category": "colors",
+      "kind": "alias"
+    }
+  },
+  "tokenCategories": [
+    "colors",
+    "durations",
+    "easings",
+    "fontFamilies",
+    "fontSizes",
+    "fontWeights",
+    "lineHeights",
+    "radii",
+    "shadows",
+    "spacing"
+  ],
+  "conditions": [
+    {
+      "name": "hover",
+      "definition": ":is(:hover, [data-hover])",
+      "kind": "selector"
+    },
+    {
+      "name": "focus",
+      "definition": "@media (min-width: 640px)",
+      "kind": "at-rule"
+    },
+    {
+      "name": "active",
+      "definition": "[data-active=\"true\"]",
+      "kind": "selector"
+    },
+    {
+      "name": "disabled",
+      "definition": ":is(:disabled, [data-disabled])",
+      "kind": "selector"
+    },
+    {
+      "name": "wide",
+      "definition": "@media (min-width: 760px)",
+      "kind": "at-rule"
+    },
+    {
+      "name": "tall",
+      "definition": "[data-tall=\"true\"]",
+      "kind": "selector"
+    },
+    {
+      "name": "compact",
+      "definition": ":is(:compact, [data-compact])",
+      "kind": "selector"
+    },
+    {
+      "name": "dark",
+      "definition": "@media (min-width: 880px)",
+      "kind": "at-rule"
+    }
+  ],
+  "themes": [
+    "dark",
+    "light"
+  ],
+  "recipes": {
+    "recipe000": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe001": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe002": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe003": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe004": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe005": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe006": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe007": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe008": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe009": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe010": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe011": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe012": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe013": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe014": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe015": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe016": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe017": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe018": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe019": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe020": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe021": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe022": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe023": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe024": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe025": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe026": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe027": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe028": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe029": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe030": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe031": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe032": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe033": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe034": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe035": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe036": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe037": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe038": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe039": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe040": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe041": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe042": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe043": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe044": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe045": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe046": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe047": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe048": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe049": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe050": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe051": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe052": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe053": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe054": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe055": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe056": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe057": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe058": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe059": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe060": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe061": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe062": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe063": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe064": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe065": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe066": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe067": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe068": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe069": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe070": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe071": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe072": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe073": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe074": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe075": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe076": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe077": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe078": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe079": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe080": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe081": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe082": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe083": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe084": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe085": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe086": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe087": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe088": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe089": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe090": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe091": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe092": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe093": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe094": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe095": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe096": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe097": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "secondary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe098": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "danger",
+        "size": "md",
+        "emphasis": "low"
+      }
+    },
+    "recipe099": {
+      "axisOrder": [
+        "tone",
+        "size",
+        "emphasis"
+      ],
+      "axes": {
+        "tone": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "emphasis": [
+          "low",
+          "high"
+        ]
+      },
+      "defaults": {
+        "tone": "primary",
+        "size": "md",
+        "emphasis": "low"
+      }
+    }
+  },
+  "supportedProperties": {
+    "categories": {
+      "color": "colors",
+      "backgroundColor": "colors",
+      "borderColor": "colors",
+      "borderTopColor": "colors",
+      "borderRightColor": "colors",
+      "borderBottomColor": "colors",
+      "borderLeftColor": "colors",
+      "borderInlineColor": "colors",
+      "borderBlockColor": "colors",
+      "outlineColor": "colors",
+      "textDecorationColor": "colors",
+      "caretColor": "colors",
+      "fill": "colors",
+      "stroke": "colors",
+      "padding": "spacing",
+      "paddingTop": "spacing",
+      "paddingRight": "spacing",
+      "paddingBottom": "spacing",
+      "paddingLeft": "spacing",
+      "paddingInline": "spacing",
+      "paddingInlineStart": "spacing",
+      "paddingInlineEnd": "spacing",
+      "paddingBlock": "spacing",
+      "paddingBlockStart": "spacing",
+      "paddingBlockEnd": "spacing",
+      "margin": "spacing",
+      "marginTop": "spacing",
+      "marginRight": "spacing",
+      "marginBottom": "spacing",
+      "marginLeft": "spacing",
+      "marginInlineStart": "spacing",
+      "marginInlineEnd": "spacing",
+      "marginBlock": "spacing",
+      "marginBlockStart": "spacing",
+      "marginBlockEnd": "spacing",
+      "gap": "spacing",
+      "rowGap": "spacing",
+      "columnGap": "spacing",
+      "borderRadius": "radii",
+      "borderTopLeftRadius": "radii",
+      "borderTopRightRadius": "radii",
+      "borderBottomLeftRadius": "radii",
+      "borderBottomRightRadius": "radii",
+      "borderStartStartRadius": "radii",
+      "borderStartEndRadius": "radii",
+      "borderEndStartRadius": "radii",
+      "borderEndEndRadius": "radii",
+      "fontFamily": "fontFamilies",
+      "fontSize": "fontSizes",
+      "fontWeight": "fontWeights",
+      "lineHeight": "lineHeights",
+      "letterSpacing": "letterSpacings",
+      "boxShadow": "shadows",
+      "textShadow": "shadows",
+      "transitionDuration": "durations",
+      "transitionDelay": "durations",
+      "transitionTimingFunction": "easings",
+      "animationDuration": "durations",
+      "animationDelay": "durations",
+      "animationTimingFunction": "easings"
+    },
+    "structuralSets": {
+      "display": [
+        "flex",
+        "inline-flex",
+        "block",
+        "inline-block",
+        "grid",
+        "none"
+      ],
+      "flexDirection": [
+        "row",
+        "row-reverse",
+        "column",
+        "column-reverse"
+      ],
+      "alignItems": [
+        "flex-start",
+        "flex-end",
+        "center",
+        "baseline",
+        "stretch"
+      ],
+      "justifyContent": [
+        "flex-start",
+        "flex-end",
+        "center",
+        "space-between",
+        "space-around"
+      ],
+      "boxSizing": [
+        "border-box"
+      ],
+      "width": [
+        "100%"
+      ],
+      "marginInline": [
+        "auto"
+      ]
+    },
+    "structuralNumbers": {
+      "opacity": {
+        "min": 0,
+        "max": 1
+      },
+      "flex": {
+        "min": 0,
+        "max": null
+      },
+      "flexGrow": {
+        "min": 0,
+        "max": null
+      },
+      "flexShrink": {
+        "min": 0,
+        "max": null
+      }
+    },
+    "compositeFormsRejected": [
+      "background",
+      "border",
+      "font",
+      "animation",
+      "transition"
+    ]
+  }
+}
