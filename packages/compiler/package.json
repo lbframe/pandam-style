@@ -4,7 +4,15 @@
   "private": false,
   "description": "PandamStyle compiler and revision-based project service.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lbframe/pandam-style.git",
+    "directory": "packages/compiler"
+  },
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "module": "./lib/index.mjs",
   "types": "./types/index.d.ts",
   "bin": {
@@ -26,9 +34,14 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "lib/*",
-    "bin/*",
-    "types/*"
+    "lib",
+    "bin",
+    "types",
+    "LICENSE",
+    "ATTRIBUTIONS.md",
+    "LICENSES",
+    "docs/architecture/phase-4-derived-source-provenance.md",
+    "docs/architecture/phase-4-engine-absorption-map.md"
   ],
   "scripts": {
     "build": "rollup --config ./rollup.config.mjs",
