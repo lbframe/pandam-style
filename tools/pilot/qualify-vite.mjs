@@ -1125,6 +1125,12 @@ async function runDevQualification() {
         ),
       { expectIdentityChange: false },
     );
+    await changeDefinition('recipe variant domain change', (source) =>
+      source.replace(
+        "md: { fontSize: token('fontSizes.md'), marginLeft: token('spacing.zero') },",
+        "md: { fontSize: token('fontSizes.md'), marginLeft: token('spacing.zero') },\n          lg: { fontSize: token('fontSizes.md'), padding: token('spacing.lg') },",
+      ),
+    );
 
     await fs.writeFile(definitionPath, definitionBefore, 'utf8');
     const restoreCursor = events.length;
