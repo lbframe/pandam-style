@@ -13,7 +13,7 @@ files.
 - License: MIT; the root [`LICENSE`](LICENSE) carries the Meta Platforms notice.
 - PandamStyle use: selected engine helpers were refactored into owned compiler
   modules. Their source headers and file-by-file mapping are preserved in the
-  compiler's [derived-source provenance map](packages/compiler/docs/architecture/phase-4-derived-source-provenance.md).
+  [derived-source provenance map](docs/architecture/phase-4-derived-source-provenance.md).
 
 ## Panda CSS reference source
 
