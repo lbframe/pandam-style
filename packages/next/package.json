@@ -1,0 +1,44 @@
+{
+  "name": "@pandamstyle/next",
+  "version": "0.1.0-alpha.1",
+  "private": false,
+  "description": "Next.js host integration over the PandamStyle Project Service.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lbframe/pandam-style.git",
+    "directory": "packages/next"
+  },
+  "type": "module",
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || ^26.0.0"
+  },
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./adapter": "./src/adapter.js",
+    "./loader": "./src/loader.cjs",
+    "./turbopack-loader": "./src/turbopack-loader.cjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "types",
+    "LICENSE",
+    "ATTRIBUTIONS.md",
+    "README.md"
+  ],
+  "bin": {
+    "pandamstyle-next": "./src/cli.js"
+  },
+  "dependencies": {
+    "@jridgewell/sourcemap-codec": "^1.5.5",
+    "@pandamstyle/compiler": "0.1.0-alpha.1"
+  },
+  "peerDependencies": {
+    "next": "16.3.8"
+  }
+}

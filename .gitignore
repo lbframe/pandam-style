@@ -1,0 +1,35 @@
+*.log*
+.DS_Store
+build
+coverage
+dist
+lib
+node_modules
+# PandamStyle: regenerable run output.
+# The committed part of a run (env.json, summary.json, REPORT.md, per-step logs,
+# artifact-digests.txt) stays tracked; the heavy artifacts and the pilot work
+# tree do not. The pattern is per-directory so every run directory is treated
+# the same way, including the ones that do not exist yet.
+out-pandamstyle/
+evidence/*/artifacts/
+evidence/*/pilot/
+# A verification run directory can be nested one level deeper than the patterns
+# above (evidence/performance/<batch>/verify/...), and the same rule applies to
+# it: the committed part of a run is env.json, summary.json, steps.tsv and the
+# per-step logs; the pilot work tree and the generated artifacts are not.
+evidence/**/artifacts/
+evidence/**/pilot/
+# Raw step logs are evidence and stay tracked, like the historical ones.
+!evidence/*/*.log
+examples/pilots/vite-react/.pandamstyle/
+examples/pilots/vite-react/dist/
+examples/pilots/vite-react/node_modules/
+packages/compiler/__tests__/pandamstyle/fixtures/*/generated/
+
+# PandamStyle benchmark scratch: generated corpora, per-job project copies and
+# the raw observation stream. Everything here is REGENERABLE from the committed
+# corpus manifests and the harness, and the corpora are benchmark INPUT whose
+# byte content is the identity of every number taken against it. The committed
+# evidence lives in evidence/performance/spike-1/.
+.pms-bench/
+.pms-test-support/

@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "suites": {
+    "tests/semantic/__tests__/tokens-test.js": {
+      "area": "tokens",
+      "caseIds": [
+        "token.public",
+        "token.semantic",
+        "token.alias-reference",
+        "token.private",
+        "token.unknown",
+        "token.category",
+        "token.raw-spacing",
+        "token.raw-color",
+        "token.binding-alias",
+        "token.local-function",
+        "token.forged",
+        "token.rename-removal"
+      ]
+    },
+    "tests/semantic/__tests__/themes-test.js": {
+      "area": "themes",
+      "caseIds": [
+        "theme.base",
+        "theme.alternate",
+        "theme.token-override",
+        "theme.semantic-multiple",
+        "theme.composition",
+        "theme.composition-reverse",
+        "theme.unknown",
+        "theme.mutation"
+      ]
+    },
+    "tests/semantic/__tests__/conditions-test.js": {
+      "area": "conditions",
+      "caseIds": [
+        "condition.pseudo",
+        "condition.media",
+        "condition.base-map",
+        "condition.default-alias",
+        "condition.multiple",
+        "condition.canonical-order",
+        "condition.unknown",
+        "condition.mutation"
+      ]
+    },
+    "tests/semantic/__tests__/create-test.js": {
+      "area": "create",
+      "caseIds": [
+        "create.simple",
+        "create.multiple-keys",
+        "create.constrained",
+        "create.nested-condition",
+        "create.forbidden-value",
+        "create.unsupported-property",
+        "create.forbidden-channel",
+        "create.static-computed",
+        "create.spread",
+        "create.local-shadow",
+        "create.dynamic"
+      ]
+    },
+    "tests/semantic/__tests__/props-test.js": {
+      "area": "props",
+      "caseIds": [
+        "props.single",
+        "props.multiple",
+        "props.compiled-null-cancellation",
+        "props.ordered",
+        "props.conflict-reverse",
+        "props.recipe-local",
+        "props.theme-style",
+        "props.invalid",
+        "props.forged",
+        "props.omissions",
+        "props.empty",
+        "props.nested-array",
+        "props.condition-conflict",
+        "props.runtime-malformed"
+      ]
+    },
+    "tests/semantic/__tests__/recipes-test.js": {
+      "area": "recipes",
+      "caseIds": [
+        "recipe.base",
+        "recipe.defaults",
+        "recipe.one-axis",
+        "recipe.multiple-axes",
+        "recipe.override-default",
+        "recipe.boolean-false",
+        "recipe.invalid-value",
+        "recipe.invalid-axis",
+        "recipe.determinism",
+        "recipe.result-composition",
+        "recipe.branch-css",
+        "recipe.null-selection",
+        "recipe.null-axis",
+        "recipe.scalar-coercion",
+        "recipe.private-visibility",
+        "recipe.slots",
+        "recipe.slot-label",
+        "recipe.slot-defaults",
+        "recipe.slot-unknown",
+        "recipe.slot-container",
+        "recipe.compounds",
+        "recipe.compound-revisions",
+        "recipe.compound-absent-axis"
+      ]
+    },
+    "tests/semantic/__tests__/forwarding-test.js": {
+      "area": "forwarding",
+      "caseIds": [
+        "forward.direct",
+        "forward.renamed-import",
+        "forward.namespace-import",
+        "forward.local-alias",
+        "forward.named-reexport",
+        "forward.renamed-reexport",
+        "forward.multi-hop",
+        "forward.star",
+        "forward.mixed-barrel",
+        "forward.partial",
+        "forward.source-remap",
+        "forward.non-pms-spelling",
+        "forward.ambiguous-star",
+        "forward.default-export"
+      ]
+    },
+    "tests/semantic/__tests__/provenance-test.js": {
+      "area": "provenance",
+      "caseIds": [
+        "forward.local-symbol",
+        "forward.incomplete-provenance",
+        "provenance.generated-authentication"
+      ]
+    },
+    "tests/semantic/__tests__/module-resolution-test.js": {
+      "area": "module-resolution",
+      "caseIds": [
+        "resolution.existing",
+        "resolution.deleted-restored",
+        "resolution.rename-import-repair"
+      ]
+    },
+    "tests/semantic/__tests__/negative-resolution-test.js": {
+      "area": "negative-resolution",
+      "caseIds": [
+        "resolution.missing-created",
+        "resolution.relay-added-removed"
+      ]
+    },
+    "tests/semantic/__tests__/coverage-test.js": {
+      "area": "coverage",
+      "caseIds": [
+        "resolution.coverage-change",
+        "coverage.root",
+        "coverage.closure-no-helper",
+        "coverage.enter-leave",
+        "coverage.design-dependency",
+        "coverage.rename-delete"
+      ]
+    },
+    "tests/semantic/__tests__/revisions-test.js": {
+      "area": "revisions",
+      "caseIds": [
+        "revision.no-change",
+        "revision.local-edit",
+        "revision.multi-file-transaction"
+      ]
+    },
+    "tests/semantic/__tests__/multi-revision-test.js": {
+      "area": "multi-revision",
+      "caseIds": ["revision.valid-invalid-repaired", "revision.a-b-a"]
+    },
+    "tests/semantic/__tests__/incremental-css-test.js": {
+      "area": "incremental-css",
+      "caseIds": [
+        "css.declaration-change",
+        "css.shared-owners",
+        "css.shared-introduced",
+        "css.conditioned-change",
+        "css.theme-token-change",
+        "css.no-op"
+      ]
+    },
+    "tests/semantic/__tests__/publication-test.js": {
+      "area": "publication",
+      "caseIds": [
+        "publication.valid",
+        "publication.invalid-first",
+        "publication.staged-failure",
+        "publication.superseded",
+        "publication.noop-generation"
+      ]
+    },
+    "tests/semantic/__tests__/diagnostics-test.js": {
+      "area": "diagnostics",
+      "caseIds": [
+        "diagnostics.protocol-v1",
+        "diagnostics.smaller-bound",
+        "diagnostics.category-repair",
+        "diagnostics.private-repair",
+        "diagnostics.truncation"
+      ]
+    },
+    "tests/semantic/__tests__/syntax-test.js": {
+      "area": "syntax",
+      "caseIds": ["syntax.incomplete-edit", "syntax.error-affected"]
+    },
+    "tests/semantic/__tests__/deferred-test.js": {
+      "area": "deferred",
+      "caseIds": ["deferred.patterns", "deferred.advanced-themes"]
+    },
+    "tests/semantic/__tests__/browser-test.js": {
+      "area": "browser",
+      "caseIds": [
+        "browser.shorthand-longhand",
+        "browser.token-values",
+        "browser.theme-scope",
+        "browser.conflict",
+        "browser.media-cascade",
+        "browser.ssr-hydration"
+      ]
+    },
+    "tests/semantic/__tests__/harness-integrity-test.js": {
+      "area": "harness-integrity",
+      "caseIds": [
+        "independence.fresh-only-bug",
+        "independence.both-same-bug",
+        "projection.cascade-order",
+        "projection.token-identity",
+        "projection.theme-identity",
+        "projection.location",
+        "assertions.unknown-op",
+        "inventory.catalog",
+        "expectations.output-protected",
+        "inventory.unknown-status",
+        "inventory.missing-case",
+        "inventory.discovery",
+        "inventory.zero-suite",
+        "inventory.test-unaccounted",
+        "inventory.suite-unaccounted",
+        "inventory.suite-load-failure",
+        "inventory.skipped-test",
+        "inventory.zero-test",
+        "gaps.phase-2-runtime-guard-promoted-with-target-intact"
+      ]
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@pandamstyle/core",
+  "version": "0.1.0-alpha.1",
+  "private": false,
+  "description": "PandamStyle compiled style reference runtime and composition ABI.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lbframe/pandam-style.git",
+    "directory": "packages/core"
+  },
+  "type": "module",
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || ^26.0.0"
+  },
+  "sideEffects": false,
+  "types": "./src/types.ts",
+  "exports": {
+    ".": {
+      "types": "./src/types.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "LICENSE",
+    "ATTRIBUTIONS.md",
+    "README.md"
+  ]
+}

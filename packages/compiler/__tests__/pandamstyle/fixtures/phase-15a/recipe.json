@@ -1,0 +1,14 @@
+{
+  "slots": ["root", "label"],
+  "base": { "root": { "display": "block" }, "label": { "position": "relative" } },
+  "variants": {
+    "tone": { "quiet": { "root": { "opacity": 0.5 }, "label": { "display": "block" } }, "loud": { "root": { "opacity": 1 }, "label": { "display": "flex" } } },
+    "size": { "sm": { "root": { "display": "flex" } }, "md": { "root": { "display": "inline-flex" } } },
+    "flag": { "true": {}, "false": {} }
+  },
+  "defaultVariants": { "tone": "quiet", "size": "md" },
+  "compoundVariants": [
+    { "tone": "quiet", "size": ["sm", "md"], "css": { "root": { "display": "inline-block" } } },
+    { "flag": false, "css": { "root": { "display": "grid" }, "label": { "display": "flex" } } }
+  ]
+}

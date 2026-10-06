@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "release": {
+    "name": "PandamStyle Alpha 1",
+    "version": "0.1.0-alpha.1",
+    "npmDistTag": "alpha"
+  },
+  "measurement": {
+    "kind": "qualified synthetic compiler benchmark",
+    "primaryMetric": "filesystem_to_diagnostics_ms",
+    "primaryMetricDescription": "elapsed wall time from filesystem edit to compiler diagnostics",
+    "cacheState": "process_warm_edit",
+    "workersPerCell": 7,
+    "summary": "median milliseconds",
+    "methodology": "Historical Phase 15 baseline samples and Phase 17B product samples use the qualified Phase 16A harness and comparable synthetic c10000 workloads on the same machine and method. They were collected in separate runs, not as contemporaneous interleaved controls. No new baseline was run for this release preparation.",
+    "environment": {
+      "os": "Ubuntu 24.04.4 LTS",
+      "kernelFamily": "Linux",
+      "architecture": "x64",
+      "cpu": "AMD Ryzen 7 5800X3D 8-Core Processor",
+      "logicalCores": 16,
+      "filesystem": "ext4",
+      "node": "22.22.0",
+      "yarn": "1.22.22"
+    }
+  },
+  "sources": {
+    "baseline": "Synthetic compiler baseline measurements; development logs and qualification artifacts are excluded.",
+    "alpha1": "Alpha 1 reference values are retained in this dataset; supporting historical qualification artifacts are omitted.",
+    "hostQualification": "docs/agent-install.md"
+  },
+  "corpora": {
+    "standard": "c10000-t1000-r100-s307",
+    "patterned": "c10000-t1000-r100-s307-patterns"
+  },
+  "edits": [
+    {
+      "id": "local-style",
+      "scenario": "one_file_existing_atoms",
+      "corpus": "c10000-t1000-r100-s307",
+      "baselinePhase": "Phase 15",
+      "baselineMedianMs": 2409.4,
+      "candidatePhase": "Phase 17B qualified product (Alpha 1 runtime base)",
+      "candidateMedianMs": 737.6
+    },
+    {
+      "id": "token",
+      "scenario": "token_value",
+      "corpus": "c10000-t1000-r100-s307",
+      "baselinePhase": "Phase 15",
+      "baselineMedianMs": 28675.5,
+      "candidatePhase": "Phase 17B qualified product (Alpha 1 runtime base)",
+      "candidateMedianMs": 814.5
+    },
+    {
+      "id": "theme",
+      "scenario": "theme_value",
+      "corpus": "c10000-t1000-r100-s307",
+      "baselinePhase": "Phase 15",
+      "baselineMedianMs": 28526.7,
+      "candidatePhase": "Phase 17B qualified product (Alpha 1 runtime base)",
+      "candidateMedianMs": 2487.4
+    },
+    {
+      "id": "recipe",
+      "scenario": "recipe_branch",
+      "corpus": "c10000-t1000-r100-s307",
+      "baselinePhase": "Phase 15",
+      "baselineMedianMs": 28528.1,
+      "candidatePhase": "Phase 17B qualified product (Alpha 1 runtime base)",
+      "candidateMedianMs": 916.7
+    },
+    {
+      "id": "patterned-token",
+      "scenario": "pattern_token_value",
+      "corpus": "c10000-t1000-r100-s307-patterns",
+      "baselinePhase": "Phase 15",
+      "baselineMedianMs": 30950.5,
+      "candidatePhase": "Phase 17B qualified product (Alpha 1 runtime base)",
+      "candidateMedianMs": 933.9
+    }
+  ],
+  "interpretationLimits": [
+    "These are synthetic compiler-workload measurements, not end-user application or host-visible latency measurements.",
+    "The table compares historical baseline and Alpha 1 reference medians; it does not isolate the effect of any single optimization.",
+    "The Alpha 1 candidate measurements describe the product represented by this reference dataset; release metadata changes do not alter compiler runtime behavior.",
+    "These reference values apply to the recorded workloads and should not be generalized to other corpora or projects."
+  ]
+}

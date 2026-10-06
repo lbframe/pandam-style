@@ -1,0 +1,33 @@
+build
+coverage
+dist
+lib
+node_modules
+# Third-party Flow declarations provide types, not repository source.
+flow-typed/
+**/__mocks__/snapshot*
+
+# PandamStyle regenerable run output is not source, so it is outside the format
+# surface. This is the same boundary as the ignorePatterns in .eslintrc.js, and
+# it is stated explicitly here instead of being left to the implicit .gitignore
+# coupling Prettier 3 applies by default. Only the rebuildable outputs are
+# listed: a run directory keeps its durable evidence (REPORT.md, env.json,
+# summary.json, manifest.json, artifact-digests.txt, steps.tsv and the per-step
+# logs), and only the heavy artifacts below it do not. The patterns are
+# per-directory, so a run that does not exist yet behaves like one that does.
+out-pandamstyle/
+evidence/*/artifacts/
+evidence/*/pilot/
+# A run directory can be nested deeper than `evidence/<batch>/`; same rule.
+evidence/**/artifacts/
+evidence/**/pilot/
+examples/pilots/vite-react/.pandamstyle/
+
+# Fixture projects stand in for consuming applications, so they keep their own
+# source formatting. This also ignores fixture build output (fixtures/*/generated/).
+packages/compiler/__tests__/pandamstyle/fixtures/
+
+# PandamStyle benchmark scratch root. The generated corpora are fixtures whose
+# byte content IS the benchmark input: reformatting them would change the
+# corpus content hash and invalidate every measurement taken against it.
+.pms-bench/

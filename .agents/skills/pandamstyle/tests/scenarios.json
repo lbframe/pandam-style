@@ -1,0 +1,95 @@
+{
+  "kind": "pandamstyle-agent-skill-protocol-scenarios",
+  "version": 1,
+  "status": "protocol fixtures for review; no agent runtime harness is present; not end-to-end agent execution",
+  "scenarios": [
+    {
+      "id": "build-with-existing-vocabulary",
+      "request": "Add an empty-state panel and action button to this PandamStyle app. Match the existing light and dark modes.",
+      "fixture": "packages/compiler/__tests__/pandamstyle/fixtures/valid and packages/compiler/__tests__/pandamstyle/fixtures/_shared/design.pms.config.mjs",
+      "route": ["docs/agent-use.md", "docs/reference/README.md"],
+      "expected": ["Inspect existing semantic tokens, button recipe, themes, and generated module.", "Compose from existing vocabulary, compile, and repair only compiler-reported violations."],
+      "must_not": ["Invent colors or spacing values.", "Add a second styling system or migrate unrelated components."]
+    },
+    {
+      "id": "install-vite-rolldown",
+      "request": "Install PandamStyle in this Vite 8 project without changing its current styles.",
+      "fixture": {"packageManager": "pnpm", "framework": "Vite 8.3.1 + React", "bundler": "Rolldown", "config": "vite.config.ts", "typescript": true, "existingStyling": ["CSS Modules"]},
+      "route": ["docs/agent-install.md"],
+      "expected": ["Detect the host and package manager, follow the qualified Vite path, configure integration, and run contract checks."],
+      "must_not": ["Migrate CSS Modules.", "Infer host support from dependency compatibility alone."]
+    },
+    {
+      "id": "install-next-webpack",
+      "request": "Install PandamStyle in this Next.js 16 app using webpack.",
+      "fixture": {"packageManager": "npm", "framework": "Next.js 16.3.8", "bundler": "webpack", "config": "next.config.mjs", "typescript": true, "existingStyling": ["Tailwind CSS"]},
+      "route": ["docs/agent-install.md"],
+      "expected": ["Confirm the detected Next/webpack path is qualified, install and configure only that integration, then verify development and production as specified."],
+      "must_not": ["Remove Tailwind CSS or migrate application styles.", "Treat Turbopack development qualification as proof for webpack or vice versa."]
+    },
+    {
+      "id": "install-next-turbopack-semantic-dev",
+      "request": "Add PandamStyle to this Next.js 16 project; our development server uses Turbopack.",
+      "fixture": {"packageManager": "yarn", "framework": "Next.js 16.3.8", "developmentBundler": "Turbopack", "productionBundler": "webpack", "config": "next.config.mjs", "existingStyling": ["CSS Modules"]},
+      "route": ["docs/agent-install.md"],
+      "expected": ["Apply only the separately documented Turbopack semantic-development behavior; resolve any requested build/production path from its own qualified contract."],
+      "must_not": ["Claim full Turbopack support beyond the documented semantic-development qualification or infer production support.", "Change existing style ownership."]
+    },
+    {
+      "id": "install-rsbuild-rspack",
+      "request": "Install PandamStyle in this Rsbuild app and keep its current CSS setup.",
+      "fixture": {"packageManager": "pnpm", "framework": "Rsbuild 2.2.11", "bundler": "Rspack", "config": "rsbuild.config.ts", "typescript": true, "existingStyling": ["CSS Modules"]},
+      "route": ["docs/agent-install.md"],
+      "expected": ["Check the exact qualified Rsbuild/Rspack path, integrate it, and run its required development/build checks."],
+      "must_not": ["Rewrite existing CSS Modules.", "Assume a different Rsbuild/Rspack version is qualified without contract evidence."]
+    },
+    {
+      "id": "audit-legacy-project",
+      "request": "Audit this dashboard for migration to PandamStyle. Do not change files.",
+      "fixture": {"framework": "Vite + React + TypeScript", "projectSize": "about 90 source modules", "styling": ["CSS Modules", "global CSS custom properties", "inline style in two charts"], "repeatedStructures": ["button", "filter bar", "card"], "themeEvidence": "light/dark custom properties", "PandamStyleInstalled": false},
+      "route": ["docs/agent-audit.md"],
+      "expected": ["Inspect files read-only and report host, styling/design-system state, repeat candidates, dynamic constructs, migration risk, and benchmark readiness."],
+      "must_not": ["Edit source, install dependencies, or claim a complete source-wide inventory from sampling."]
+    },
+    {
+      "id": "migration-plan",
+      "request": "Plan a PandamStyle migration from the completed audit. Wait before editing.",
+      "fixture": "Output of audit-legacy-project; includes shared button variants, CSS variable themes, and dynamically assembled chart styles.",
+      "route": ["docs/agent-migration.md", "docs/agent-use.md"],
+      "expected": ["Separate safe transformations from review-required dynamic styles, define a small first batch, baseline checks, rollback point, and completion criteria."],
+      "must_not": ["Modify files.", "Guess the intended mapping for dynamic chart styles or propose a whole-repository rewrite as the first batch."]
+    },
+    {
+      "id": "bounded-migration-execution",
+      "request": "Execute the approved first migration batch for the filter bar only and verify it.",
+      "fixture": {"approvedPlan": "Migrate FilterBar.tsx and its colocated style module only; preserve screenshot behavior; PandamStyle is installed and its generated design module has tokens and a slot recipe.", "otherFiles": "out of scope"},
+      "route": ["docs/agent-migration.md", "docs/agent-use.md", "docs/agent-repair.md"],
+      "expected": ["Change only the approved batch, compose with existing token/slot vocabulary, compile, repair locally, and run planned regression checks."],
+      "must_not": ["Redesign appearance.", "Edit unrelated files or move beyond the approved batch."]
+    },
+    {
+      "id": "repair-compiler-diagnostic",
+      "request": "Fix this PandamStyle compiler error: PMS_FORBIDDEN_VALUE on color: 17 in src/Badge.tsx.",
+      "fixture": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-value and packages/compiler/__tests__/pandamstyle/agent-result-test.js",
+      "route": ["docs/agent-repair.md", "docs/reference/README.md"],
+      "expected": ["Read structured code, source, expected category, and candidate/repair fields; select an existing design-approved color token if it matches intent; compile again."],
+      "must_not": ["Treat a candidate as an automatic fix.", "Choose a visually different color without evidence or broaden the component rewrite."]
+    },
+    {
+      "id": "benchmark-quick-estimate",
+      "request": "Give me a quick estimate of how PandamStyle might behave on this repository.",
+      "fixture": {"host": "Vite 8 / Rolldown", "sourceModules": 90, "styleFiles": 34, "PandamStyleEntities": 0, "measurementsRequested": false},
+      "route": ["docs/agent-benchmark.md"],
+      "expected": ["Collect cheap descriptors, compare only with a qualified matching reference corpus, state estimate and confidence, and say no workload ran."],
+      "must_not": ["Report milliseconds, CPU, or memory as measured.", "Invent a PandamStyle entity count or reference range."]
+    },
+    {
+      "id": "benchmark-deep-before-after",
+      "request": "Deep-benchmark this project before and after the approved PandamStyle migration and compare the results.",
+      "fixture": {"baselineRevision": "recorded commit", "pandamStyleRevision": "migration commit", "host": "qualified host", "environment": "same machine and runtime available", "availableMetrics": ["cold build", "local edit latency", "CPU", "peak RSS"]},
+      "route": ["docs/agent-benchmark.md"],
+      "expected": ["Choose real project workloads that exist in both states, capture the listed available metrics, identify missing semantic edits and environment differences, and label both sides and methodology."],
+      "must_not": ["Fabricate a workload or metric.", "Call an estimate a benchmark or make an unqualified performance claim."]
+    }
+  ]
+}

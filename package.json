@@ -1,0 +1,92 @@
+{
+  "private": true,
+  "name": "pandamstyle-workspace",
+  "packageManager": "yarn@1.22.22",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "prepare": "husky install tools/husky",
+    "build": "yarn workspace @pandamstyle/compiler run build",
+    "verify": "./verify-pms.sh",
+    "flow": "flow",
+    "prettier": "prettier --write \"**/*.{js,jsx,mjs,cjs,flow,tsx,mts,ts}\"",
+    "prettier:report": "prettier --check \"**/*.{js,jsx,mjs,cjs,flow,tsx,mts,ts}\"",
+    "lint": "npm run lint:report -- --fix",
+    "lint:report": "eslint . --ext .flow,.js,.jsx,.mjs,.cjs,.ts,.tsx,.mts",
+    "test": "./verify-pms.sh"
+  },
+  "workspaces": [
+    "packages/core",
+    "packages/compiler",
+    "packages/vite",
+    "packages/next",
+    "packages/rsbuild"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.26.8",
+    "@babel/preset-env": "^7.26.8",
+    "@babel/preset-flow": "^7.26.8",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@types/estree": "^1.0.6",
+    "@types/jest": "^30.0.0",
+    "babel-jest": "^30.2.0",
+    "babel-plugin-syntax-hermes-parser": "^0.36.1",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "eslint": "8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-ft-flow": "^3.0.11",
+    "esbuild": "0.27.7",
+    "eslint-plugin-headers": "~1.2.1",
+    "eslint-plugin-react": "^7.37.1",
+    "flow-bin": "^0.314.0",
+    "glob": "^10.5.0",
+    "hermes-parser": "^0.36.1",
+    "hermes-eslint": "^0.36.1",
+    "husky": "^8.0.0",
+    "jest": "^30.2.0",
+    "lint-staged": "^13.0.3",
+    "prettier": "3.5.3",
+    "prettier-plugin-hermes-parser": "^0.36.1",
+    "rollup": "^4.59.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "typescript": "^5.9.3",
+    "vite": "8.3.1"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 2,
+    "plugins": [
+      "prettier-plugin-hermes-parser"
+    ],
+    "proseWrap": "always",
+    "trailingComma": "all",
+    "overrides": [
+      {
+        "files": [
+          "*.js",
+          "*.jsx",
+          "*.mjs",
+          "*.cjs",
+          "*.flow"
+        ],
+        "options": {
+          "parser": "hermes"
+        }
+      }
+    ]
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,mjs,cjs,flow,ts,tsx,mts}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "resolutions": {
+    "baseline-browser-mapping": "^2.9.14"
+  }
+}
