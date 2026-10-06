@@ -240,6 +240,7 @@ function normalizeConfig(input) {
   return {
     definition: input.definition,
     rootDir: path.resolve(input.rootDir ?? process.cwd()),
+    rootDirBoundary: input.rootDirBoundary ?? input.rootDir != null,
     roots: (input.roots ?? []).map((r) => path.resolve(r)),
     outDir: path.resolve(input.outDir ?? '.pandamstyle'),
     designSystemFile: input.designSystemFile ?? 'design.pandamstyle.js',
@@ -802,12 +803,172 @@ export function createProjectSession(config) {
     return candidates;
   }
 
+  function isWithinProjectRoot(parent, target) {
+    const relative = path.relative(parent, target);
+    return (
+      relative === '' ||
+      (relative !== '..' &&
+        !relative.startsWith(`..${path.sep}`) &&
+        !path.isAbsolute(relative))
+    );
+  }
+
+  function realPathWithinProjectRoot(target) {
+    if (!state.config.rootDirBoundary) return true;
+    try {
+      const realRoot = fs.realpathSync.native(state.config.rootDir);
+      const realTarget = fs.realpathSync.native(target);
+      return isWithinProjectRoot(realRoot, realTarget);
+    } catch (error) {
+      if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') return null;
+      return false;
+    }
+  }
+
+  function openProjectSource(realRoot, realFile) {
+    if (process.platform !== 'linux') {
+      return fs.openSync(
+        realFile,
+        fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0),
+      );
+    }
+
+    const relative = path.relative(realRoot, realFile);
+    if (
+      relative === '' ||
+      relative === '..' ||
+      relative.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relative)
+    ) {
+      return null;
+    }
+    const parts = relative.split(path.sep);
+    const directoryFlags =
+      fs.constants.O_RDONLY |
+      fs.constants.O_DIRECTORY |
+      fs.constants.O_NOFOLLOW;
+    const fileFlags = fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW;
+    const directoryDescriptors = [];
+    try {
+      let parent = fs.openSync(realRoot, directoryFlags);
+      directoryDescriptors.push(parent);
+      for (const part of parts.slice(0, -1)) {
+        parent = fs.openSync(`/proc/self/fd/${parent}/${part}`, directoryFlags);
+        directoryDescriptors.push(parent);
+      }
+      return fs.openSync(
+        `/proc/self/fd/${parent}/${parts[parts.length - 1]}`,
+        fileFlags,
+      );
+    } finally {
+      for (const directoryFd of directoryDescriptors.reverse()) {
+        try {
+          fs.closeSync(directoryFd);
+        } catch {
+          // Closing a directory descriptor does not affect the opened source.
+        }
+      }
+    }
+  }
+
+  function readProjectSource(file) {
+    if (!state.config.rootDirBoundary) {
+      try {
+        return fs.readFileSync(file, 'utf8');
+      } catch {
+        return null;
+      }
+    }
+
+    let fd;
+    try {
+      const realRoot = fs.realpathSync.native(state.config.rootDir);
+      const realFile = fs.realpathSync.native(file);
+      if (!isWithinProjectRoot(realRoot, realFile)) return null;
+
+      // Read from the resolved in-root path. Linux opens each component from
+      // a held directory descriptor; other platforms use O_NOFOLLOW for the
+      // final component where supported, then verify the opened file identity.
+      fd = openProjectSource(realRoot, realFile);
+      if (fd == null) return null;
+      const opened = fs.fstatSync(fd, { bigint: true });
+      if (!opened.isFile()) return null;
+
+      if (process.platform === 'linux') {
+        const descriptorPath = fs.realpathSync.native(`/proc/self/fd/${fd}`);
+        if (!isWithinProjectRoot(realRoot, descriptorPath)) return null;
+      } else {
+        const currentRealFile = fs.realpathSync.native(file);
+        if (!isWithinProjectRoot(realRoot, currentRealFile)) return null;
+        const current = fs.statSync(currentRealFile, { bigint: true });
+        if (opened.dev !== current.dev || opened.ino !== current.ino)
+          return null;
+      }
+      return fs.readFileSync(fd, 'utf8');
+    } catch {
+      return null;
+    } finally {
+      if (fd != null) {
+        try {
+          fs.closeSync(fd);
+        } catch {
+          // Preserve the read result; close errors do not change file identity.
+        }
+      }
+    }
+  }
+
+  function isSafeResolutionCandidate(candidate) {
+    if (
+      candidate === state.generatedModulePath &&
+      state.overlay.has(candidate)
+    ) {
+      return true;
+    }
+    if (
+      state.config.rootDirBoundary &&
+      !isWithinProjectRoot(state.config.rootDir, candidate)
+    ) {
+      return false;
+    }
+    if (realPathWithinProjectRoot(path.dirname(candidate)) === false) {
+      return false;
+    }
+    if (state.overlay.has(candidate)) return true;
+    return realPathWithinProjectRoot(candidate) === true;
+  }
+
   function probeResolution(fromFile, request) {
     const base = path.resolve(path.dirname(fromFile), request);
     for (const candidate of candidatesOf(base)) {
-      if (state.overlay.has(candidate)) return candidate;
+      const generatedOverlay =
+        candidate === state.generatedModulePath && state.overlay.has(candidate);
+      if (
+        !generatedOverlay &&
+        state.config.rootDirBoundary &&
+        !isWithinProjectRoot(state.config.rootDir, candidate)
+      ) {
+        // Keep looking because a compiler-owned generated module can be an
+        // extension or index candidate in an output directory outside rootDir.
+        // No filesystem lookup is made for this out-of-root candidate.
+        continue;
+      }
+
+      // Do not enumerate an outside directory reached through a symlinked
+      // parent. The logical import and its physical target must both stay
+      // within the project boundary.
+      if (!generatedOverlay) {
+        const parentWithinRoot = realPathWithinProjectRoot(
+          path.dirname(candidate),
+        );
+        if (parentWithinRoot === false) return null;
+      }
+
+      if (state.overlay.has(candidate)) {
+        return isSafeResolutionCandidate(candidate) ? candidate : null;
+      }
       if (listingOf(path.dirname(candidate)).has(path.basename(candidate))) {
-        return candidate;
+        return isSafeResolutionCandidate(candidate) ? candidate : null;
       }
     }
     return null;
@@ -904,7 +1065,20 @@ export function createProjectSession(config) {
     if (!request.startsWith('.')) return null;
     const key = resolutionKeyOf(fromFile, request);
     const known = resolutionKeys.get(key);
-    if (known !== undefined) return known.resolved;
+    if (known !== undefined) {
+      // Resolution strings are cached, but symlink targets can change without
+      // changing the candidate path. Recheck the physical target before the
+      // cached answer can re-enter the coverage graph.
+      if (
+        known.resolved != null &&
+        !isSafeResolutionCandidate(known.resolved)
+      ) {
+        known.resolved = phase('session_resolve_ms', () =>
+          probeResolution(fromFile, request),
+        );
+      }
+      return known.resolved;
+    }
     const resolved = phase('session_resolve_ms', () =>
       probeResolution(fromFile, request),
     );
@@ -1097,14 +1271,18 @@ export function createProjectSession(config) {
     if (file === state.generatedModulePath) {
       return { text: state.designSystemSource, ok: true };
     }
+    if (
+      (state.config.rootDirBoundary &&
+        !isWithinProjectRoot(state.config.rootDir, file)) ||
+      realPathWithinProjectRoot(file) === false
+    ) {
+      return { text: null, ok: false };
+    }
     if (state.hostSourceOverlays.has(file)) {
       return { text: state.hostSourceOverlays.get(file), ok: true };
     }
-    try {
-      return { text: fs.readFileSync(file, 'utf8'), ok: true };
-    } catch {
-      return { text: null, ok: false };
-    }
+    const text = readProjectSource(file);
+    return { text, ok: text != null };
   }
 
   /**

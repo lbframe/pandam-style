@@ -81,6 +81,24 @@ describe('Phase 17B transaction backup and recovery', () => {
     compiler.beginGeneration(out, opts).rollback();
     compiler.beginGeneration(out, opts).rollback(); // cleanup/recovery is idempotent
   }
+  function writeUndoJournal(overrides = {}) {
+    const journal = {
+      transaction: {
+        version: 1,
+        id: 'forged-undo-journal',
+        strategy: 'undo',
+        phase: 'ready',
+        hadOutDir: true,
+        backupFiles: [],
+        newFiles: [],
+        newDirectories: [],
+        ...overrides,
+      },
+    };
+    const pending = path.join(root, '.out.pms-state.pending.json');
+    fs.writeFileSync(pending, JSON.stringify(journal));
+    return { journal, pending };
+  }
   function crash(point, files = next, extra = {}) {
     const result = spawnSync(
       process.execPath,
@@ -373,6 +391,106 @@ describe('Phase 17B transaction backup and recovery', () => {
     expect(() => recover()).toThrow();
     expect(tree()).toEqual(original);
     expect(fs.readFileSync(pending, 'utf8')).toBe('{broken');
+  });
+
+  test('a forged traversal member is rejected before it can delete outside output', () => {
+    const outside = path.join(root, 'outside.txt');
+    fs.writeFileSync(outside, 'keep this file');
+    const { journal, pending } = writeUndoJournal({
+      newFiles: ['../outside.txt'],
+    });
+
+    expect(() => recover()).toThrow(/invalid publication transaction journal/);
+    expect(fs.readFileSync(outside, 'utf8')).toBe('keep this file');
+    expect(tree()).toEqual(original);
+    expect(fs.readFileSync(pending, 'utf8')).toBe(JSON.stringify(journal));
+  });
+
+  test.each([
+    '.. /outside.txt',
+    '.. ./outside.txt',
+    '.. . ./outside.txt',
+    'C:/outside.txt',
+    'C:outside.txt',
+  ])('a Win32-normalized traversal member %s is rejected', (member) => {
+    const outside = path.join(root, 'outside.txt');
+    fs.writeFileSync(outside, 'keep this file');
+    const { journal, pending } = writeUndoJournal({ newFiles: [member] });
+
+    const platform = Object.getOwnPropertyDescriptor(process, 'platform');
+    try {
+      Object.defineProperty(process, 'platform', {
+        ...platform,
+        value: 'win32',
+      });
+      expect(() => recover()).toThrow(
+        /invalid publication transaction journal/,
+      );
+    } finally {
+      Object.defineProperty(process, 'platform', platform);
+    }
+    expect(fs.readFileSync(outside, 'utf8')).toBe('keep this file');
+    expect(tree()).toEqual(original);
+    expect(fs.readFileSync(pending, 'utf8')).toBe(JSON.stringify(journal));
+  });
+
+  test.each(['artifact.', 'artifact ', '.. . .', 'a:file', 'C:/path'])(
+    'first-publication recovery allows POSIX name %p',
+    (artifact) => {
+      fs.rmSync(out, { recursive: true, force: true });
+      const { pending } = writeUndoJournal({
+        hadOutDir: false,
+        newFiles: [artifact],
+      });
+
+      expect(() => recover()).not.toThrow();
+      expect(fs.existsSync(out)).toBe(false);
+      expect(fs.existsSync(pending)).toBe(false);
+    },
+  );
+
+  test('a forged undo path cannot traverse a symlinked output child', () => {
+    const external = path.join(root, 'external');
+    fs.mkdirSync(external);
+    fs.writeFileSync(path.join(external, 'keep.txt'), 'keep this file');
+    fs.symlinkSync(external, path.join(out, 'linked'), 'dir');
+    const { journal, pending } = writeUndoJournal({
+      newFiles: ['linked/keep.txt'],
+    });
+
+    expect(() => recover()).toThrow(/invalid publication transaction journal/);
+    expect(fs.readFileSync(path.join(external, 'keep.txt'), 'utf8')).toBe(
+      'keep this file',
+    );
+    expect(fs.readFileSync(pending, 'utf8')).toBe(JSON.stringify(journal));
+  });
+
+  test('an undo journal with missing backup bytes is rejected before live files change', () => {
+    const { journal, pending } = writeUndoJournal({
+      newFiles: ['js/remove.js'],
+      backupFiles: ['missing/old.js'],
+    });
+
+    expect(() => recover()).toThrow(/invalid publication transaction journal/);
+    expect(tree()).toEqual(original);
+    expect(fs.readFileSync(pending, 'utf8')).toBe(JSON.stringify(journal));
+  });
+
+  test('an undo journal cannot operate through a symlinked output root', () => {
+    const external = path.join(root, 'external-output');
+    fs.mkdirSync(external);
+    fs.writeFileSync(path.join(external, 'keep.txt'), 'keep this file');
+    fs.rmSync(out, { recursive: true, force: true });
+    fs.symlinkSync(external, out, 'dir');
+    const { journal, pending } = writeUndoJournal({
+      newFiles: ['keep.txt'],
+    });
+
+    expect(() => recover()).toThrow(/invalid publication transaction journal/);
+    expect(fs.readFileSync(path.join(external, 'keep.txt'), 'utf8')).toBe(
+      'keep this file',
+    );
+    expect(fs.readFileSync(pending, 'utf8')).toBe(JSON.stringify(journal));
   });
 
   test.each(['EXDEV', 'EPERM'])(

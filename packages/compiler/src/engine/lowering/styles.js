@@ -354,6 +354,15 @@ function checkValue({
   return varsByToken[tokenId];
 }
 
+function setOwnStyleValue(target, key, value) {
+  Object.defineProperty(target, key, {
+    configurable: true,
+    enumerable: true,
+    value,
+    writable: true,
+  });
+}
+
 /**
  * Compiles PandamStyle declaration namespaces.
  * signature : compileStyles({ registry, varsByToken, namespaces, role, source, options })
@@ -403,7 +412,10 @@ export function compileStyles({
           );
           continue;
         }
-        outNs[condDef] = outNs[condDef] ?? {};
+        if (!Object.prototype.hasOwnProperty.call(outNs, condDef)) {
+          setOwnStyleValue(outNs, condDef, {});
+        }
+        const conditionStyles = outNs[condDef];
         for (const prop of Object.keys(value)) {
           const lowered = checkValue({
             property: prop,
@@ -420,9 +432,9 @@ export function compileStyles({
             diagnostics,
           });
           if (lowered === null) {
-            delete outNs[condDef][prop];
+            delete conditionStyles[prop];
           } else {
-            outNs[condDef][prop] = lowered;
+            setOwnStyleValue(conditionStyles, prop, lowered);
           }
         }
         continue;
@@ -449,8 +461,10 @@ export function compileStyles({
             diagnostics,
           });
           if (lowered !== null) {
-            outNs[key] = outNs[key] ?? {};
-            outNs[key][prop] = lowered;
+            if (!Object.prototype.hasOwnProperty.call(outNs, key)) {
+              setOwnStyleValue(outNs, key, {});
+            }
+            setOwnStyleValue(outNs[key], prop, lowered);
           }
         }
         continue;
@@ -481,14 +495,16 @@ export function compileStyles({
         });
         if (lowered === null) continue;
         if (condDef == null) {
-          outNs[key] = lowered;
+          setOwnStyleValue(outNs, key, lowered);
         } else {
-          outNs[condDef] = outNs[condDef] ?? {};
-          outNs[condDef][key] = lowered;
+          if (!Object.prototype.hasOwnProperty.call(outNs, condDef)) {
+            setOwnStyleValue(outNs, condDef, {});
+          }
+          setOwnStyleValue(outNs[condDef], key, lowered);
         }
       }
     }
-    normalized[nsName] = outNs;
+    setOwnStyleValue(normalized, nsName, outNs);
   }
 
   if (diagnostics.length > 0) {

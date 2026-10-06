@@ -172,6 +172,26 @@ export function captureAcceptedSnapshot({
   cssSourceMap,
   outDir,
 }) {
+  if (
+    !Array.isArray(modules) ||
+    modules.some(
+      (module) =>
+        module == null ||
+        typeof module.source !== 'string' ||
+        module.source === '' ||
+        module.source.includes('\\') ||
+        path.posix.isAbsolute(module.source) ||
+        path.win32.isAbsolute(module.source) ||
+        module.source
+          .split('/')
+          .some((part) => part === '..' || part === '.' || part === ''),
+    )
+  ) {
+    throw snapshotError(
+      'corrupt-member',
+      'Accepted module names must be safe project-relative POSIX paths.',
+    );
+  }
   const ordered = orderedMembers(generated.files);
   const published = readPublishedGenerationMembers(
     outDir,

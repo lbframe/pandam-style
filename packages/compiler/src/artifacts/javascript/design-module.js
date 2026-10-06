@@ -63,12 +63,11 @@ export function generateDesignSystemModule({ designSystem }) {
   };
 
   const recipeEntries = [];
-  const consumerRecipeIds = runtime.recipes.map(([recipeId]) => recipeId);
-  for (const [recipeId, recipe] of runtime.recipes) {
+  for (const [index, [, recipe]] of runtime.recipes.entries()) {
     const spec = toRecipeSpec(recipe, systemId);
     recipeEntries.push(
       [
-        `const __pmsRecipe_${recipeId} = /*#__PURE__*/ defineRecipeSelector(${jsonLiteral(spec)});`,
+        `const __pmsRecipe_${index} = /*#__PURE__*/ defineRecipeSelector(${jsonLiteral(spec)});`,
         '',
       ].join('\n'),
     );
@@ -92,8 +91,8 @@ export function generateDesignSystemModule({ designSystem }) {
     )};`,
     '',
     ...recipeEntries,
-    `export const recipes = { ${consumerRecipeIds
-      .map((id) => JSON.stringify(id) + `: __pmsRecipe_${id}`)
+    `export const recipes = { ${runtime.recipes
+      .map(([id], index) => `[${JSON.stringify(id)}]: __pmsRecipe_${index}`)
       .join(', ')} };`,
     '',
     '// Compile-time only: reaching either at runtime means the PandamStyle',

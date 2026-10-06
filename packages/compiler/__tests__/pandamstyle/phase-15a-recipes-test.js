@@ -103,6 +103,38 @@ describe('Phase 15A: recipe compiler domains', () => {
     expect(ds.recipes.card().kind).toBe('pandamstyle-style-ref');
     expect(ds.renderCss()).toContain('display:flex');
   });
+
+  test('a condition definition named __proto__ cannot pollute Object.prototype', () => {
+    const existingDisplay = Object.getOwnPropertyDescriptor(
+      Object.prototype,
+      'display',
+    );
+    try {
+      expect(() =>
+        buildDesignSystem({
+          systemId: 'condition-prototype-safety',
+          conditions: { poison: '__proto__' },
+          recipes: {
+            card: {
+              visibility: 'public',
+              base: { _poison: { display: 'block' } },
+            },
+          },
+        }),
+      ).toThrow();
+
+      expect(Object.hasOwn(Object.prototype, 'display')).toBe(false);
+    } finally {
+      if (existingDisplay === undefined) {
+        // eslint-disable-next-line no-extend-native -- restore the global if this regression fails.
+        delete Object.prototype.display;
+      } else {
+        // eslint-disable-next-line no-extend-native -- restore the global if this regression fails.
+        Object.defineProperty(Object.prototype, 'display', existingDisplay);
+      }
+    }
+  });
+
   test('slot compounds preserve private token authority and independent condition conflicts', () => {
     const config = structuredClone(recipe);
     config.base.root.color = loadCompiler().token('colors.ink');

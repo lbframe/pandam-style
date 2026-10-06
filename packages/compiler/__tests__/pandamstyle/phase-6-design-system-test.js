@@ -13,8 +13,12 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
+const { parse } = require('@babel/parser');
+const babelTraverse = require('@babel/traverse');
 const { execFileSync, spawnSync } = require('child_process');
 const { loadCompiler } = require('./session-helpers');
+
+const traverse = babelTraverse.default ?? babelTraverse;
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
 
@@ -203,6 +207,52 @@ function sampleSet(systemId) {
 }
 
 describe('Phase 6 canonical design-system projections', () => {
+  test('recipe IDs stay inert string keys in generated JavaScript', () => {
+    const compiler = loadCompiler();
+    const maliciousId =
+      'x = (globalThis.__pmsRecipeCodegenProbe = true, 1), __pmsRecipe_y';
+    const input = definition();
+    input.recipes = {
+      [maliciousId]: {
+        visibility: 'public',
+        base: { display: 'block' },
+      },
+    };
+    const designSystem = compiler.buildDesignSystem(input);
+    const generated = compiler.generateDesignSystemModule({ designSystem });
+    const ast = parse(generated, { sourceType: 'module' });
+    const identifierNames = [];
+    let hostileIdIsAStringKey = false;
+    let hostileIdIsAComputedKey = false;
+
+    traverse(ast, {
+      Identifier(nodePath) {
+        identifierNames.push(nodePath.node.name);
+      },
+      StringLiteral(nodePath) {
+        if (nodePath.node.value === maliciousId) hostileIdIsAStringKey = true;
+      },
+      ObjectProperty(nodePath) {
+        const { computed, key } = nodePath.node;
+        if (
+          computed === true &&
+          key.type === 'StringLiteral' &&
+          key.value === maliciousId
+        ) {
+          hostileIdIsAComputedKey = true;
+        }
+      },
+    });
+
+    expect(hostileIdIsAStringKey).toBe(true);
+    expect(identifierNames).not.toContain('globalThis');
+    expect(identifierNames).not.toContain('__pmsRecipe_y');
+    expect(identifierNames.some((name) => /^__pmsRecipe_\d+$/.test(name))).toBe(
+      true,
+    );
+    expect(hostileIdIsAComputedKey).toBe(true);
+  });
+
   test('the immutable snapshot owns identity, public vocabulary, ordering and qualified Phase 15 capabilities', () => {
     const compiler = loadCompiler();
     const ds = compiler.buildDesignSystem(definition());

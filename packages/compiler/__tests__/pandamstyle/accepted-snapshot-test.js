@@ -8,6 +8,7 @@
 'use strict';
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { openProject } = require('./session-helpers');
@@ -144,6 +145,300 @@ function local(require) { return require('../generated/design'); }
     );
     expect(Object.isFrozen(ranges)).toBe(true);
     expect(ranges.every(Object.isFrozen)).toBe(true);
+  });
+});
+
+describe('accepted snapshot project-root confinement', () => {
+  test('relative import traversal outside root is rejected', async () => {
+    const fixture = openProject('valid');
+    const project = fixture.openPublicSession({
+      acceptedSnapshotRetention: {},
+      rootDirBoundary: false,
+    });
+    const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-outside-'));
+    const outsideFile = path.join(outsideDir, 'private-source.js');
+    const page = fixture.src('src', 'page.js');
+    try {
+      fs.writeFileSync(outsideFile, 'export const value = 2;\n', 'utf8');
+      const request = path
+        .relative(path.dirname(page), outsideFile)
+        .split(path.sep)
+        .join('/');
+      fs.appendFileSync(page, `\nimport ${JSON.stringify(request)};\n`);
+
+      const initial = await project.initialize();
+      const rejected = await project.validate(initial.revision);
+      expect(rejected.ok).toBe(false);
+      expect(rejected.diagnostics.map(({ code }) => code)).toContain(
+        'PMS_COVERAGE_GAP',
+      );
+      expect(fs.readFileSync(outsideFile, 'utf8')).toBe(
+        'export const value = 2;\n',
+      );
+    } finally {
+      jest.restoreAllMocks();
+      await project.close();
+      fs.rmSync(outsideDir, { recursive: true, force: true });
+    }
+  });
+
+  test('a cached in-root import cannot escape after its symlink is retargeted', async () => {
+    const fixture = openProject('valid');
+    const project = fixture.openPublicSession({
+      acceptedSnapshotRetention: {},
+    });
+    const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-outside-'));
+    const outsideFile = path.join(outsideDir, 'private-source.js');
+    const insideTarget = fixture.src('shared', 'inside-source.js');
+    const symlink = fixture.src('shared', 'linked-source.js');
+    const page = fixture.src('src', 'page.js');
+    try {
+      fs.mkdirSync(path.dirname(insideTarget), { recursive: true });
+      fs.writeFileSync(insideTarget, 'export const value = 1;\n', 'utf8');
+      fs.writeFileSync(outsideFile, 'export const value = 2;\n', 'utf8');
+      fs.symlinkSync(insideTarget, symlink, 'file');
+      fs.appendFileSync(page, "\nimport '../shared/linked-source.js';\n");
+
+      const initial = await project.initialize();
+      const valid = await project.validate(initial.revision);
+      expect(valid.ok).toBe(true);
+
+      fs.unlinkSync(symlink);
+      fs.symlinkSync(outsideFile, symlink, 'file');
+      const changed = await project.applyChanges({
+        ...mutation(valid.revision),
+        mode: 'full-discovery',
+      });
+      const rejected = await project.validate(changed.revision);
+      expect(rejected.ok).toBe(false);
+      expect(rejected.diagnostics.map(({ code }) => code)).toContain(
+        'PMS_COVERAGE_GAP',
+      );
+      expect(fs.readFileSync(outsideFile, 'utf8')).toBe(
+        'export const value = 2;\n',
+      );
+      await expect(
+        project.pinAcceptedSnapshot(changed.revision, {
+          owner: 'rejected-outside-source',
+        }),
+      ).rejects.toThrow();
+    } finally {
+      await project.close();
+      fs.rmSync(outsideDir, { recursive: true, force: true });
+    }
+  });
+
+  test('an import symlink changed during open still reads its checked in-root target', async () => {
+    const fixture = openProject('valid');
+    const project = fixture.openPublicSession({
+      acceptedSnapshotRetention: {},
+    });
+    const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-outside-'));
+    const outsideFile = path.join(outsideDir, 'private-source.js');
+    const insideTarget = fixture.src('shared', 'inside-source.js');
+    const symlink = fixture.src('shared', 'linked-source.js');
+    const page = fixture.src('src', 'page.js');
+    try {
+      fs.mkdirSync(path.dirname(insideTarget), { recursive: true });
+      fs.writeFileSync(insideTarget, 'export const value = 1;\n', 'utf8');
+      fs.writeFileSync(outsideFile, 'export const value = 2;\n', 'utf8');
+      fs.symlinkSync(insideTarget, symlink, 'file');
+      fs.appendFileSync(page, "\nimport '../shared/linked-source.js';\n");
+
+      const open = fs.openSync;
+      let swapped = false;
+      jest.spyOn(fs, 'openSync').mockImplementation((file, flags, mode) => {
+        if (
+          !swapped &&
+          String(file).startsWith('/proc/self/fd/') &&
+          path.basename(String(file)) === 'inside-source.js'
+        ) {
+          swapped = true;
+          fs.unlinkSync(symlink);
+          fs.symlinkSync(outsideFile, symlink, 'file');
+          try {
+            return open(file, flags, mode);
+          } finally {
+            fs.unlinkSync(symlink);
+            fs.symlinkSync(insideTarget, symlink, 'file');
+          }
+        }
+        return open(file, flags, mode);
+      });
+
+      const initial = await project.initialize();
+      const valid = await project.validate(initial.revision);
+      expect(swapped).toBe(true);
+      expect(valid.ok).toBe(true);
+      const generated = await project.readGeneratedArtifacts(valid.revision);
+      const receipt = await project.commitPrepared(
+        await project.preparePublication(valid.revision),
+      );
+      const pin = await project.pinAcceptedSnapshot(
+        receipt.associationRevision,
+        {
+          owner: 'resolved-in-root-source',
+        },
+      );
+      const imported = pin.snapshot.moduleArtifacts.find(
+        ({ source }) => source === 'shared/linked-source.js',
+      );
+      expect(imported.sourceDigest).toBe(sha256('export const value = 1;\n'));
+      expect(imported.sourceDigest).not.toBe(
+        sha256('export const value = 2;\n'),
+      );
+      expect(generated.files.length).toBeGreaterThan(0);
+      expect(fs.readFileSync(outsideFile, 'utf8')).toBe(
+        'export const value = 2;\n',
+      );
+    } finally {
+      jest.restoreAllMocks();
+      await project.close();
+      fs.rmSync(outsideDir, { recursive: true, force: true });
+    }
+  });
+
+  test('a resolved source replaced by an outside symlink during open is rejected', async () => {
+    const fixture = openProject('valid');
+    const project = fixture.openPublicSession({
+      acceptedSnapshotRetention: {},
+    });
+    const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-outside-'));
+    const outsideFile = path.join(outsideDir, 'private-source.js');
+    const insideTarget = fixture.src('shared', 'inside-source.js');
+    const savedTarget = fixture.src('shared', '.inside-source.saved');
+    const symlink = fixture.src('shared', 'linked-source.js');
+    const page = fixture.src('src', 'page.js');
+    try {
+      fs.mkdirSync(path.dirname(insideTarget), { recursive: true });
+      fs.writeFileSync(insideTarget, 'export const value = 1;\n', 'utf8');
+      fs.writeFileSync(outsideFile, 'export const value = 2;\n', 'utf8');
+      fs.symlinkSync(insideTarget, symlink, 'file');
+      fs.appendFileSync(page, "\nimport '../shared/linked-source.js';\n");
+
+      const open = fs.openSync;
+      let swapped = false;
+      jest.spyOn(fs, 'openSync').mockImplementation((file, flags, mode) => {
+        if (
+          !swapped &&
+          String(file).startsWith('/proc/self/fd/') &&
+          path.basename(String(file)) === 'inside-source.js'
+        ) {
+          swapped = true;
+          fs.renameSync(insideTarget, savedTarget);
+          fs.symlinkSync(outsideFile, insideTarget, 'file');
+          try {
+            return open(file, flags, mode);
+          } finally {
+            fs.unlinkSync(insideTarget);
+            fs.renameSync(savedTarget, insideTarget);
+          }
+        }
+        return open(file, flags, mode);
+      });
+
+      const initial = await project.initialize();
+      const rejected = await project.validate(initial.revision);
+      expect(swapped).toBe(true);
+      expect(rejected.ok).toBe(false);
+      expect(rejected.diagnostics.map(({ code }) => code)).toContain(
+        'PMS_COVERAGE_GAP',
+      );
+      await expect(
+        project.pinAcceptedSnapshot(initial.revision, {
+          owner: 'raced-outside-source',
+        }),
+      ).rejects.toThrow();
+    } finally {
+      if (fs.existsSync(savedTarget)) fs.renameSync(savedTarget, insideTarget);
+      jest.restoreAllMocks();
+      await project.close();
+      fs.rmSync(outsideDir, { recursive: true, force: true });
+    }
+  });
+
+  (process.platform === 'linux' ? test : test.skip)(
+    'a parent-directory symlink race cannot redirect an in-root open',
+    async () => {
+      const fixture = openProject('valid');
+      const project = fixture.openPublicSession({
+        acceptedSnapshotRetention: {},
+      });
+      const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-outside-'));
+      const outsideFile = path.join(outsideDir, 'private-source.js');
+      const shared = fixture.src('shared');
+      const savedShared = fixture.src('.shared-saved');
+      const page = fixture.src('src', 'page.js');
+      try {
+        fs.mkdirSync(path.dirname(fixture.src('shared', 'inside-source.js')), {
+          recursive: true,
+        });
+        fs.writeFileSync(outsideFile, 'export const value = 2;\n', 'utf8');
+        fs.writeFileSync(
+          fixture.src('shared', 'inside-source.js'),
+          'export const value = 1;\n',
+          'utf8',
+        );
+        fs.symlinkSync(
+          fixture.src('shared', 'inside-source.js'),
+          fixture.src('shared', 'linked-source.js'),
+          'file',
+        );
+        fs.appendFileSync(page, "\nimport '../shared/linked-source.js';\n");
+
+        const open = fs.openSync;
+        let swapped = false;
+        jest.spyOn(fs, 'openSync').mockImplementation((file, flags, mode) => {
+          if (
+            !swapped &&
+            String(file).startsWith('/proc/self/fd/') &&
+            path.basename(String(file)) === 'shared'
+          ) {
+            swapped = true;
+            fs.renameSync(shared, savedShared);
+            fs.symlinkSync(outsideDir, shared, 'dir');
+            try {
+              return open(file, flags, mode);
+            } finally {
+              fs.unlinkSync(shared);
+              fs.renameSync(savedShared, shared);
+            }
+          }
+          return open(file, flags, mode);
+        });
+
+        const initial = await project.initialize();
+        const rejected = await project.validate(initial.revision);
+        expect(swapped).toBe(true);
+        expect(rejected.ok).toBe(false);
+        expect(rejected.diagnostics.map(({ code }) => code)).toContain(
+          'PMS_COVERAGE_GAP',
+        );
+        await expect(
+          project.pinAcceptedSnapshot(initial.revision, {
+            owner: 'raced-parent-source',
+          }),
+        ).rejects.toThrow();
+        expect(fs.readFileSync(outsideFile, 'utf8')).toBe(
+          'export const value = 2;\n',
+        );
+      } finally {
+        if (fs.existsSync(savedShared)) fs.renameSync(savedShared, shared);
+        jest.restoreAllMocks();
+        await project.close();
+        fs.rmSync(outsideDir, { recursive: true, force: true });
+      }
+    },
+  );
+
+  test.each([
+    null,
+    { source: '../private-source.js' },
+    { source: 'C:\\private.js' },
+  ])('accepted snapshot capture rejects unsafe module source %p', (module) => {
+    expect(() => captureAcceptedSnapshot({ modules: [module] })).toThrow(
+      /safe project-relative POSIX paths/,
+    );
   });
 });
 

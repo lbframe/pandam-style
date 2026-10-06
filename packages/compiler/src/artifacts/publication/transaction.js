@@ -146,6 +146,140 @@ function isDir(target) {
   }
 }
 
+function safeRelativeTransactionPath(value) {
+  const isWindows = process.platform === 'win32';
+  if (
+    typeof value !== 'string' ||
+    value === '' ||
+    value.includes('\0') ||
+    path.isAbsolute(value) ||
+    (isWindows && path.win32.isAbsolute(value))
+  ) {
+    return false;
+  }
+  const parts = value.split(/[\\/]/);
+  return (
+    parts.length > 0 &&
+    parts.every((part) => {
+      // Win32 trims spaces and dots in special components. Check common
+      // trimming orders for traversal aliases without rejecting POSIX names.
+      const trimmedSpaces = part.replace(/ +$/g, '');
+      const trimmedDotsAndSpaces = part
+        .replace(/\.+$/g, '')
+        .replace(/ +$/g, '');
+      const win32TraversalAlias =
+        isWindows &&
+        (trimmedSpaces === '.' ||
+          trimmedSpaces === '..' ||
+          trimmedDotsAndSpaces === '.' ||
+          trimmedDotsAndSpaces === '..' ||
+          /^\.\.[. ]*$/.test(part));
+      return (
+        part !== '' &&
+        part !== '.' &&
+        part !== '..' &&
+        !win32TraversalAlias &&
+        (!isWindows || !/^[a-z]:/i.test(part))
+      );
+    })
+  );
+}
+
+function assertSafeTransactionPath(
+  root,
+  relative,
+  { includeLeaf = false, requireLeaf = false } = {},
+) {
+  const parts = relative.split(/[\\/]/);
+  let current = root;
+  const limit = includeLeaf ? parts.length : parts.length - 1;
+  for (let index = 0; index < limit; index += 1) {
+    current = path.join(current, parts[index]);
+    let stat;
+    try {
+      stat = fs.lstatSync(current);
+    } catch (error) {
+      if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') {
+        if (requireLeaf) {
+          throw new Error(
+            'pandamstyle: invalid publication transaction journal',
+          );
+        }
+        return;
+      }
+      throw error;
+    }
+    if (
+      stat.isSymbolicLink() ||
+      (index < parts.length - 1 && !stat.isDirectory()) ||
+      (includeLeaf && index === parts.length - 1 && !stat.isFile())
+    ) {
+      throw new Error('pandamstyle: invalid publication transaction journal');
+    }
+  }
+}
+
+function assertSafeUndoTransaction(absOut, paths, transaction) {
+  if (
+    typeof transaction.hadOutDir !== 'boolean' ||
+    !Array.isArray(transaction.newFiles) ||
+    !Array.isArray(transaction.newDirectories) ||
+    !Array.isArray(transaction.backupFiles) ||
+    [
+      ...transaction.newFiles,
+      ...transaction.newDirectories,
+      ...transaction.backupFiles,
+    ].some((relative) => !safeRelativeTransactionPath(relative))
+  ) {
+    throw new Error('pandamstyle: invalid publication transaction journal');
+  }
+
+  if (transaction.hadOutDir) {
+    let outputStat;
+    try {
+      outputStat = fs.lstatSync(absOut);
+    } catch (error) {
+      if (error?.code !== 'ENOENT' && error?.code !== 'ENOTDIR') throw error;
+    }
+    if (
+      outputStat == null ||
+      outputStat.isSymbolicLink() ||
+      !outputStat.isDirectory()
+    ) {
+      throw new Error('pandamstyle: invalid publication transaction journal');
+    }
+  }
+
+  for (const relative of transaction.newFiles) {
+    assertSafeTransactionPath(absOut, relative);
+  }
+  for (const relative of transaction.newDirectories) {
+    assertSafeTransactionPath(absOut, relative);
+  }
+
+  if (transaction.backupFiles.length > 0) {
+    let backupStat;
+    try {
+      backupStat = fs.lstatSync(paths.backupDir);
+    } catch (error) {
+      if (error?.code !== 'ENOENT' && error?.code !== 'ENOTDIR') throw error;
+    }
+    if (
+      backupStat != null &&
+      (backupStat.isSymbolicLink() || !backupStat.isDirectory())
+    ) {
+      throw new Error('pandamstyle: invalid publication transaction journal');
+    }
+  }
+  for (const relative of transaction.backupFiles) {
+    assertSafeTransactionPath(absOut, relative);
+    assertSafeTransactionPath(paths.backupDir, relative, {
+      includeLeaf: true,
+      requireLeaf: true,
+    });
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Reuse unchanged artifacts.
 //
@@ -215,6 +349,7 @@ function restoreFullTransaction(absOut, paths, transaction) {
     }
     return;
   }
+  assertSafeUndoTransaction(absOut, paths, transaction);
   if (!transaction.hadOutDir) {
     rmrf(absOut);
     return;

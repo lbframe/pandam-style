@@ -511,6 +511,9 @@ export function createProjectSession(config) {
       const recovered = recoverPublishedGeneration(normalized.outDir);
       implementation = createSynchronousSession({
         ...normalized,
+        // Snapshot retention is bounded by the public project's rootDir. A
+        // caller-supplied config field cannot disable that trust boundary.
+        rootDirBoundary: true,
         // The stable Project Service owns the publication strategy. Delta
         // publication persists generation identity and lets the publisher
         // reconcile output across cold session restarts.
@@ -676,6 +679,12 @@ export function createProjectSession(config) {
           }
           const modules = implementation.fileStates().flatMap((fileState) => {
             if (!coveredFiles.has(path.resolve(fileState.file))) return [];
+            if (!isWithin(normalized.rootDir, canonicalPath(fileState.file))) {
+              throw lifecycleError(
+                Codes.INVALID_REVISION,
+                'Accepted snapshots cannot retain sources outside rootDir.',
+              );
+            }
             const compiled = implementation._artifactFor(fileState.file);
             if (compiled == null) return [];
             return [
