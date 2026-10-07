@@ -66,6 +66,11 @@ edits and report the mismatch.
 4. Set `roots` to the existing app-local JavaScript/TypeScript directories that
    contain PandamStyle-authored modules. Keep the generated output outside those
    roots. Do not use a broad repository root without checking what it covers.
+   If the project has no PandamStyle-authored app code yet, create a dedicated
+   empty source directory for future modules (for example, `src/pandamstyle`)
+   and use only that directory as the root. Do not include the general app source
+   tree just to activate the adapter; keep existing CSS imports and styling code
+   outside the covered roots until those files intentionally adopt PandamStyle.
 5. Update only the script/config entry needed to launch the selected qualified
    host mode. Preserve existing script names and behavior where possible.
 
