@@ -76,6 +76,12 @@ npm install @pandamstyle/core@alpha
 npm install --save-dev @pandamstyle/compiler@alpha @pandamstyle/vite@alpha
 ```
 
+Keep `@alpha` on every direct PandamStyle package during Alpha 1, or pin all
+packages to the exact version `0.1.0-alpha.1`. Do not rely on bare package
+requests or treat npm's `latest` tag as the stable PandamStyle channel. The
+first stable PandamStyle release will make `latest` authoritative for stable
+installation.
+
 Replace `@pandamstyle/vite` with `@pandamstyle/next` or
 `@pandamstyle/rsbuild` for the detected host. Use the equivalent `pnpm add`,
 `yarn add`, or `bun add` operation while preserving the repository's package

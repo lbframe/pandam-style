@@ -28,6 +28,9 @@ support for other host versions or modes from dependency compatibility.
 
 The default setup path is to ask a coding agent to follow the canonical
 [installation contract](https://github.com/lbframe/pandam-style/blob/main/docs/agent-install.md).
+Install every Alpha package using the `@alpha` tag, as shown in the contract.
+Do not treat npm's `latest` tag as a stable PandamStyle channel; the first
+stable release will make `latest` authoritative for stable installation.
 Installation does not migrate existing styles. For an overview and all agent
 workflows, see the [PandamStyle README](https://github.com/lbframe/pandam-style/blob/main/README.md).
 
