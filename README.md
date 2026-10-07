@@ -1,3 +1,5 @@
+![PandamStyle Alpha 1](assets/pandamstyle-alpha1-banner.webp)
+
 # PandamStyle
 
 PandamStyle is a constrained styling language and compiler. It lets AI coding
