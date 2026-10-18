@@ -24,9 +24,9 @@ jobs:
   pandamstyle:
     runs-on: ubuntu-latest
     env:
-      # The runner restricts unprivileged user namespaces through AppArmor.
-      # Its Google Chrome build has the profile that keeps the Chromium
-      # sandbox usable; `/usr/bin/chromium` aborts in its zygote instead.
+      # On this runner, `chromium` aborts creating its sandbox under the
+      # AppArmor user-namespace restriction; its Google Chrome runs the same
+      # sandboxed launches.
       PMS_CHROMIUM: /opt/google/chrome/chrome
     steps:
       - uses: actions/checkout@v6
@@ -39,18 +39,6 @@ jobs:
           cache-dependency-path: yarn.lock
       - run: corepack prepare yarn@1.22.22 --activate
       - run: ./verify-pms.sh
-      # The per-step logs and reports are the only record of why a required
-      # step failed; keep them with the run instead of discarding the runner.
-      - if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: pandamstyle-evidence
-          path: |
-            evidence/native/**/*.log
-            evidence/native/**/*.json
-            evidence/native/steps.tsv
-          if-no-files-found: warn
-          retention-days: 30
 
   prettier:
     runs-on: ubuntu-latest
@@ -82,8 +70,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      # Pin the exact release: the floating `v1` tag is deprecated and its
-      # dictionary changes would move the oracle without a repository change.
+      # Pin the release that reported and verified the inherited findings;
+      # the floating `v1` tag is deprecated.
       - uses: crate-ci/typos@v1.50.2
         with:
           config: .github/workflows/typos.toml
