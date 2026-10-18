@@ -1,0 +1,338 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-classifier-calibration",
+  "task": "CE-00.2",
+  "fixtureSet": "CE-FX-CAP-45-calibrated-classifier-343-1559",
+  "status": "calibrated: the recovered original classifier and the parser-based reconstruction both reproduce every reported category exactly, on the exact recovered mockup input and on a pinned replacement candidate for the utilities input",
+  "consumer": {
+    "repository": "https://github.com/lbframe/wacando",
+    "visibility": "private",
+    "publication": "Only extracted CSS declarations (property, value, condition and state context), Alpha 1 categories, ordinal ids, pinned consumer commits, input digests and counts are published. Consumer source, selectors, file paths, source positions, unapproved identifiers, the original script and private values are not. Redaction placeholders use HMAC-SHA256 with a private key kept outside the repository, so removed values cannot be recovered by hashing guesses; each set publishes only the key fingerprint. The private key and the per-input position maps are held by the maintainer with the private inputs."
+  },
+  "reportedBaseline": {
+    "source": "consumer integration note, section 6 (Vocabulaire Alpha 1)",
+    "noteBlobs": [
+      {
+        "commit": "0ce8997eda1ecbffa6f66fdf2884542fe29ec98f",
+        "blob": "d51e9785e36afdb743f8f8b29cb008cbd0319b7d",
+        "role": "introduced the measurement table"
+      },
+      {
+        "commit": "f54dc1253bb753eb1a9a88e0a277adaf437e0834",
+        "blob": "4cc35013c417ac2d12ed3c378a0cf96ca5375e9e",
+        "role": "intermediate revision"
+      },
+      {
+        "commit": "777d9ae6b56b31de198766d27f8689ab950aa12b",
+        "blob": "4ed2e94b3f11c770db257f89ec52bc0d6610700e",
+        "role": "revision inspected by the CE research [W1]"
+      }
+    ],
+    "tableIdenticalInEveryBlob": true,
+    "rerunBeforeCe002": false
+  },
+  "originalClassifier": {
+    "status": "recovered",
+    "recoveredFrom": "An agent session transcript of the consumer integration work on the maintainer's machine. The script was written to a session scratch directory and never committed to the consumer repository or any other repository; the consumer Git history (all branches, pull refs and tags, 629 commits, 4,753 blobs) contains no classifier.",
+    "recordedWriteAt": "2026-10-18T01:10:41.799Z",
+    "contentSha256": "e26cfe34885ea90fe4cfb4ff5eebe0ad8075295a19d1e2a97c0022e1aea1bce8",
+    "gitBlob": "345dcaaf871857b2478a1d6e5bebe6c9fa429853",
+    "bytes": 1655,
+    "transcriptSha256AtRecovery": "187a0236839a7124a323dabea360cf9052f9c6b48de7751cf8c5d54d17c6f7d9",
+    "published": false,
+    "publicationReason": "It was written during the consumer's own work session, so it is treated as consumer material. It is identified by digest and described here; tools/coverage/ is the parser-based replacement that this repository runs.",
+    "algorithm": [
+      "Import propertyKind and structuralAllowed from the Alpha 1 policy module given as an argument.",
+      "Remove /* */ comments and @keyframes blocks with regular expressions.",
+      "Match every `name: value` followed by `;` or `}` with the expression ([a-z-]+)\\s*:\\s*([^;{}]+)[;}].",
+      "Skip names starting with `--` (custom properties). A second skip for names starting with `webkit` never matches, because vendor names start with `-`.",
+      "Remove `!important`, trim the value and convert the name with -([a-z]) to camelCase (so -webkit-user-select becomes WebkitUserSelect).",
+      "Tally category, composite-form and unsupported kinds by property. For structural kinds, tally structuralOk when structuralAllowed(name, value) or structuralAllowed(name, Number(value)) holds, otherwise structuralForbidden.",
+      "The utilities measurement first cut the `@layer utilities{...}` block out of the renderer stylesheet by brace matching."
+    ],
+    "policyModule": {
+      "path": "packages/compiler/src/design-system/policy/properties.js",
+      "pandamStyleCommit": "f3e880394d4352b133ff505dff7aef90bc6cdcca",
+      "gitBlob": "7c7a6cad5baf7d8e0c67f018fb8d7d2156a1afc0",
+      "sha256": "f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540",
+      "identicalAt": [
+        "415e05539fcb5d36a78226112b5cf488b200b1aa",
+        "943adf7fb37f275070e81b5154db64aa3ff76a1e"
+      ],
+      "consumerPackage": "@pandamstyle/compiler 0.1.0-alpha.1"
+    },
+    "bucketMapping": {
+      "expressible": ["category", "structural-ok"],
+      "compositeRewrite": ["composite"],
+      "gap": ["unsupported", "structural-forbidden"],
+      "absentProperty": ["unsupported"],
+      "outOfDomain": ["structural-forbidden"]
+    },
+    "recordedRuns": [
+      {
+        "inputId": "W-UTIL-343",
+        "resultAt": "2026-10-18T01:10:56.514Z",
+        "buckets": {
+          "category": 160,
+          "structural-ok": 52,
+          "structural-forbidden": 47,
+          "composite": 37,
+          "unsupported": 47
+        },
+        "total": 343
+      },
+      {
+        "inputId": "W-MOCKUP-1559",
+        "resultAt": "2026-10-18T01:11:08.716Z",
+        "buckets": {
+          "category": 811,
+          "structural-ok": 300,
+          "structural-forbidden": 212,
+          "composite": 124,
+          "unsupported": 112
+        },
+        "total": 1559
+      },
+      {
+        "inputId": null,
+        "note": "First run over the whole renderer stylesheet before the utilities block was cut out. It was not reported.",
+        "resultAt": "2026-10-18T01:10:45.250Z",
+        "buckets": {
+          "category": 195,
+          "structural-ok": 63,
+          "structural-forbidden": 54,
+          "composite": 45,
+          "unsupported": 81
+        },
+        "total": 438
+      }
+    ]
+  },
+  "reconstructedClassifier": {
+    "tool": "tools/coverage/cli.mjs",
+    "parser": {
+      "name": "postcss",
+      "version": "8.5.28",
+      "resolution": "yarn.lock, dependency of vite 8.3.1"
+    },
+    "policy": "the same pinned Alpha 1 policy module, loaded from its digested bytes",
+    "differencesFromOriginal": [
+      "Declarations come from a CSS parser instead of a regular expression; on both inputs the two extractions yield identical (property, value) multisets.",
+      "Excluded declarations (custom properties, @keyframes frames, layers outside the measured block) stay in the set with a reason instead of disappearing.",
+      "Each declaration is also bound to its CE-00.1 registry entry and proof fixture, annotated with boundary flags and, for composites, with the longhands a rewrite needs.",
+      "Declarations are identified by ordinal within their input only. Source positions stay in a private position map kept outside the repository with the private inputs; only its SHA-256 is published."
+    ]
+  },
+  "sets": [
+    {
+      "inputId": "W-UTIL-343",
+      "declarationSet": "tests/core-evolution/corpus/calibration/w-util-343.declarations.v1.json",
+      "profiles": ["desktop-renderer"],
+      "description": "PandaCSS @layer utilities block of the consumer desktop renderer stylesheet.",
+      "input": {
+        "sha256": "f706b14992356988e605226ce930d89bfc969fbbc67ae0befc8c7ffe1dda268b",
+        "bytes": 21318,
+        "role": "replacement-candidate",
+        "recovery": "Build output left in the consumer integration worktree (ignored by Git, never committed). Its modification time, 2026-10-18T01:34:05Z, is after the measurement, so it is a rebuild, pinned here as a replacement candidate for the measured file.",
+        "consumerCommitOfRebuild": "f54dc1253bb753eb1a9a88e0a277adaf437e0834",
+        "consumerCommitOfMeasuredSources": "0ce8997eda1ecbffa6f66fdf2884542fe29ec98f",
+        "evidence": [
+          "Between 0ce8997e and f54dc125 no renderer component, Panda configuration or token file changed; only build guards, a Vite plugin entry, scripts, tests and documentation did.",
+          "The utilities block span is 14,938 characters, the span the original session printed when it cut the block out.",
+          "All five recorded bucket counts are reproduced exactly."
+        ],
+        "utilitiesBlockSpan": 14938,
+        "utilitiesBlockSha256": "c5429335abe9758e8c14975943eec74263d556cca01de9eacb5934127259d8ec",
+        "byteIdentity": "unproven: the original session recorded no digest of the measured file; only its category counts and block span reconcile",
+        "positionMapSha256": "de324855078fc1862ec97eeb8f7ee85ab1cce0701ca2d5765c6592295d3ad96d"
+      },
+      "reported": {
+        "total": 343,
+        "expressible": 212,
+        "compositeRewrite": 37,
+        "gap": 94,
+        "absentProperty": 47,
+        "outOfDomain": 47
+      },
+      "reproduction": {
+        "recoveredClassifierOnRecoveredInput": "exact",
+        "reconstructedClassifierOnRecoveredInput": "exact",
+        "extractionParity": "identical (property, value) multisets"
+      }
+    },
+    {
+      "inputId": "W-MOCKUP-1559",
+      "declarationSet": "tests/core-evolution/corpus/calibration/w-mockup-1559.declarations.v1.json",
+      "profiles": ["desktop-renderer"],
+      "description": "Designer mockup stylesheet of the consumer desktop redesign.",
+      "input": {
+        "sha256": "ff85a7213c9e280f0925b6ebe09332ad4025702aa1b97057d4b7319ede1d4d90",
+        "bytes": 36690,
+        "role": "recovered-exact",
+        "recovery": "The designer package the original session read as data, still present in that session's scratch directory. The package is not part of the consumer repository; the integration note at 0ce8997e names it.",
+        "manifestSha256": "4340e1181ce7325ca4aa04905b0e6240419a0c37191a4cc9569ae708e08d3ce8",
+        "evidence": [
+          "The stylesheet digest equals its entry in the package's SHA-256 manifest."
+        ],
+        "positionMapSha256": "b34c15a92a69e986b9918abd5b98d0186814ae9befb63600bc313d36066733a4"
+      },
+      "reported": {
+        "total": 1559,
+        "expressible": 1111,
+        "compositeRewrite": 124,
+        "gap": 324,
+        "absentProperty": 112,
+        "outOfDomain": 212
+      },
+      "reproduction": {
+        "recoveredClassifierOnRecoveredInput": "exact",
+        "reconstructedClassifierOnRecoveredInput": "exact",
+        "extractionParity": "identical (property, value) multisets"
+      }
+    }
+  ],
+  "calibrationLimits": [
+    {
+      "id": "CAL-01",
+      "title": "Numeric coercion",
+      "statement": "The original retried each structural value as a JavaScript number. These declarations count as expressible only because a JavaScript number could be authored. The note's prose says string values such as \"0.6\" are refused; its counts include the coercion.",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "numeric-coercion"
+      },
+      "values": {
+        "W-UTIL-343": 5,
+        "W-MOCKUP-1559": 3
+      }
+    },
+    {
+      "id": "CAL-02",
+      "title": "Category-bound values are not checked",
+      "statement": "A category-bound property counts as expressible whatever its value. Raw values become expressible only through a token of that category; keywords, multi-value, negative or invalid values are not examined. Value grammar is not validated at all.",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "raw-value-needs-token"
+      },
+      "values": {
+        "W-UTIL-343": 125,
+        "W-MOCKUP-1559": 722
+      }
+    },
+    {
+      "id": "CAL-03",
+      "title": "Conditions are not checked",
+      "statement": "Declarations under media queries, pseudo-classes or state attributes are classified on property and value only. Alpha 1 needs each condition declared in the design system.",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "conditional-context-not-checked"
+      },
+      "values": {
+        "W-UTIL-343": 39,
+        "W-MOCKUP-1559": 332
+      }
+    },
+    {
+      "id": "CAL-04",
+      "title": "Pseudo-elements are not checked",
+      "statement": "Declarations on ::before, ::after or ::placeholder are counted on property and value although Alpha 1 has no pseudo-element authoring.",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "pseudo-element-not-checked"
+      },
+      "values": {
+        "W-UTIL-343": 0,
+        "W-MOCKUP-1559": 25
+      }
+    },
+    {
+      "id": "CAL-05",
+      "title": "Only five composite forms",
+      "statement": "Only background, border, font, animation and transition count as composite rewrites. A background whose value is one <color> (CSS Color 4 named or system colors, transparent, currentcolor, hex or a color function, or a custom property whose every declaration in the same stylesheet is such a color) rewrites to background-color, the other background longhands falling back to their initial values. Every other composite needs a full longhand reset that Alpha 1 does not admit; this includes background: none (background-image none, background-color transparent) and a reference to an undefined custom property. Other shorthands (border-top, outline, text-decoration, list-style, place-items, flex, inset, grid-column) count as gaps, not rewrites. The five reported buckets do not depend on this accounting.",
+      "measure": {
+        "counter": "compositeRewrites",
+        "key": "full-longhand-reset/some-longhands-not-admitted"
+      },
+      "values": {
+        "W-UTIL-343": 16,
+        "W-MOCKUP-1559": 25
+      }
+    },
+    {
+      "id": "CAL-06",
+      "title": "Font-face descriptors counted as declarations",
+      "statement": "@font-face descriptors are counted like properties: font-family and font-weight as expressible, src and font-display as gaps. font-display has no CE-00.1 registry entry.",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "font-face-descriptor"
+      },
+      "values": {
+        "W-UTIL-343": 0,
+        "W-MOCKUP-1559": 4
+      }
+    },
+    {
+      "id": "CAL-07",
+      "title": "Vendor-prefixed names counted as absent properties",
+      "statement": "Vendor-prefixed declarations are counted as absent properties; the CE-00.1 registry disposes of them separately.",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "vendor-prefixed"
+      },
+      "values": {
+        "W-UTIL-343": 1,
+        "W-MOCKUP-1559": 2
+      }
+    },
+    {
+      "id": "CAL-08",
+      "title": "!important ignored",
+      "statement": "The original removed !important before classifying; Alpha 1 has no !important authoring.",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "important-ignored"
+      },
+      "values": {
+        "W-UTIL-343": 0,
+        "W-MOCKUP-1559": 6
+      }
+    },
+    {
+      "id": "CAL-09",
+      "title": "Reported denominator is not the full stylesheet",
+      "statement": "The reported totals exclude custom properties, @keyframes frames and, for the utilities input, the reset, base and tokens layers. The sets keep those declarations with their reason; the full denominators are the set totals.",
+      "measure": {
+        "counter": "all",
+        "key": null
+      },
+      "values": {
+        "W-UTIL-343": 528,
+        "W-MOCKUP-1559": 1587
+      }
+    },
+    {
+      "id": "CAL-10",
+      "title": "Different kinds of denominator",
+      "statement": "The utilities block lists each atomic declaration once, however many components use it. The mockup lists every authored declaration, repeated ones included. The two totals are not comparable rates."
+    },
+    {
+      "id": "CAL-11",
+      "title": "Utilities input is a replacement candidate",
+      "statement": "The utilities input is a pinned replacement candidate rebuilt from unchanged sources. Its block span and all bucket counts reconcile with the original run, but its bytes cannot be proven identical to the measured file. Exact-input recovery is claimed for the mockup only."
+    },
+    {
+      "id": "CAL-12",
+      "title": "Policy-level evidence only",
+      "statement": "Expressible means the Alpha 1 policy module admits the property and value. It is not compiler acceptance (E2), emitted CSS (E3) or rendered behavior (E4). A declaration counted expressible can still fail to reproduce its rendering."
+    },
+    {
+      "id": "CAL-13",
+      "title": "Invalid values are counted",
+      "statement": "The original never validates value grammar. W-UTIL-343 contains direction: incoming and direction: outgoing, which are invalid CSS (scope finding SF-03); they count as absent-property gaps and imply neither validity nor fidelity."
+    }
+  ],
+  "separateGates": [
+    "The consumer's badge comparison script (blob 8a97a049f1a9a3117342532c66ca407d1a6ecfbd) compares computed badge styles and border boxes under CSP in Chromium. It is not this classifier, is not used here and stays a separate rendering check.",
+    "Rendered and behavioral fidelity is CE-FX-CAP-45-render-behavior-fidelity (E4), owned by CE-14. Calibration closes no rendering, state, accessibility or CSP claim.",
+    "The zero-unexpressible full-denominator proof is CE-FX-CAP-45-full-denominator-zero-unexpressible, owned by CE-14 against the canonical catalog, not the Alpha 1 policy."
+  ]
+}

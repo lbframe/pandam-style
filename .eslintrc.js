@@ -60,6 +60,8 @@ module.exports = {
     'evidence/*/pilot/',
     'build',
     'coverage',
+    // The CE-00.2 declaration classifier is source, not test-coverage output.
+    '!tools/coverage/',
     'dist',
     'lib',
     'node_modules',
