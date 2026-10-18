@@ -1038,6 +1038,30 @@
           "note": "The focused element and its outline move off screen."
         },
         {
+          "id": "FORMS-K12",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { clip-path: inset(50%) !important; border-width: 10px !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "clip-path hides the outline while a 10px focus border grows the input; suppressing the border must not move the neighbouring text into the count."
+        },
+        {
+          "id": "FORMS-K13",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { clip-path: inset(50%) !important; border-width: 4px !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "clip-path hides the outline while a 4px focus border grows the input; suppressing the border must not move the neighbouring text into the count."
+        },
+        {
           "id": "FORMS-A1",
           "oracle": "ORC-A11Y",
           "case": "positive",

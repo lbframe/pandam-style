@@ -347,10 +347,13 @@ const INDICATOR_LONGHANDS = [
 ];
 const SIDES = ['top', 'right', 'bottom', 'left'];
 
-// The indicator paint that focus added on one node, as the declarations that
-// put it back to its unfocused computed values: each outline or box-shadow
-// longhand and each border side that focus changed. With no outline or shadow
-// when unfocused, this is `outline-style: none; box-shadow: none`.
+// The indicator paint that focus added on one node, as declarations that
+// remove that paint without changing geometry: each outline or box-shadow
+// longhand that focus changed goes back to its unfocused computed value (with
+// no outline or shadow when unfocused, `outline-style: none; box-shadow:
+// none`). A border side that focus changed keeps its focused width and style
+// and only takes its unfocused color, or `transparent` when the unfocused side
+// has no border.
 export function indicatorResets(focused, unfocused) {
   const resets = INDICATOR_LONGHANDS.filter(
     ([key]) => focused[key] !== unfocused[key],
@@ -359,50 +362,101 @@ export function indicatorResets(focused, unfocused) {
     const f = focused.borders[k];
     const u = unfocused.borders[k];
     if (f.style !== u.style || f.width !== u.width || f.color !== u.color)
-      resets.push(
-        [`border-${side}-style`, u.style],
-        [`border-${side}-width`, u.width],
-        [`border-${side}-color`, u.color],
-      );
+      resets.push([
+        `border-${side}-color`,
+        ['none', 'hidden'].includes(u.style) ? 'transparent' : u.color,
+      ]);
   });
   return resets;
 }
 
-// Suppresses only the indicator paint on the candidates, through their inline
-// style with !important. Clip, masks, overlays, opacity, transforms and
-// position stay exactly as focused. Only the CSSOM is used: under the page CSP
-// a written style attribute is not applied.
-function suppressIndicator(resets) {
-  window.__ceSaved = window.__ceNodes.map((n, i) => ({
-    cssText: n.style.cssText,
-    values: resets[i].map(([property]) => [
-      property,
-      n.style.getPropertyValue(property),
-      n.style.getPropertyPriority(property),
-    ]),
+// Layout snapshot for the isolation guard: the window scroll position and the
+// viewport box of every element and every non-blank text node, in document
+// order, with the indicator candidates marked.
+export function geometrySnapshot() {
+  const rect = (r) => [r.left, r.top, r.right, r.bottom];
+  const boxes = [...document.querySelectorAll('*')].map((n) => ({
+    rect: rect(n.getBoundingClientRect()),
+    candidate: window.__ceNodes.includes(n),
   }));
-  window.__ceNodes.forEach((n, i) => {
-    for (const [property, value] of resets[i])
-      n.style.setProperty(property, value, 'important');
-  });
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+    if (!t.data.trim()) continue;
+    range.selectNodeContents(t);
+    boxes.push({ rect: rect(range.getBoundingClientRect()), candidate: false });
+  }
+  return { scroll: [window.scrollX, window.scrollY], boxes };
 }
 
-// Puts the candidates' inline declarations back; true when each inline style
-// is exactly as before the suppression.
-function restoreIndicator() {
-  return window.__ceNodes.every((n, i) => {
-    const { cssText, values } = window.__ceSaved[i];
-    for (const [property, value, priority] of values) {
-      if (value === '') n.style.removeProperty(property);
-      else n.style.setProperty(property, value, priority);
-    }
-    return n.style.cssText === cssText;
+// Isolation of the counterfactual: the scroll position and the box of each
+// candidate and of each element or text node whose box meets `region` (the
+// union of the indicator rings) in A or in B must agree within 0.5px.
+export function isolationOf(a, b, region) {
+  const meets = ([left, top, right, bottom]) =>
+    left <= region.right &&
+    right >= region.left &&
+    top <= region.bottom &&
+    bottom >= region.top;
+  const moved = (x, y) => x.some((v, i) => Math.abs(v - y[i]) > 0.5);
+  const compared =
+    a.boxes.length === b.boxes.length
+      ? a.boxes.filter(
+          (box, i) =>
+            box.candidate || meets(box.rect) || meets(b.boxes[i].rect),
+        ).length
+      : 0;
+  let reason = 'isolated';
+  if (moved(a.scroll, b.scroll)) reason = 'scroll-moved';
+  else if (
+    a.boxes.length !== b.boxes.length ||
+    a.boxes.some(
+      (box, i) =>
+        (box.candidate || meets(box.rect) || meets(b.boxes[i].rect)) &&
+        moved(box.rect, b.boxes[i].rect),
+    )
+  )
+    reason = 'box-moved';
+  return {
+    isolation: reason === 'isolated',
+    isolationBoxes: compared,
+    isolationReason: reason,
+  };
+}
+
+// Suppresses only the indicator paint on the candidates without touching the
+// DOM, so no page selector can react to it: an adopted constructed style sheet
+// holds the reset declarations as !important in a cascade layer, which wins
+// over every unlayered page declaration, for `:focus` (the focused element)
+// and `:focus + *` (its styled sibling when it is visually hidden). A page
+// declaration that still wins leaves the indicator in B, and the stop fails.
+function suppressIndicator(resets) {
+  const selectors = [':focus', ':focus + *'].slice(0, resets.length);
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(
+    `@layer ce-indicator-suppression { ${selectors.map((x) => `${x} {}`).join(' ')} }`,
+  );
+  resets.forEach((declarations, i) => {
+    const { style } = sheet.cssRules[0].cssRules[i];
+    for (const [property, value] of declarations)
+      style.setProperty(property, value, 'important');
   });
+  window.__ceSheet = sheet;
+  window.__ceAdopted = document.adoptedStyleSheets.length;
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+}
+
+// Removes the suppression sheet; true when the adopted sheets are as before.
+function restoreIndicator() {
+  document.adoptedStyleSheets = document.adoptedStyleSheets.filter(
+    (sheet) => sheet !== window.__ceSheet,
+  );
+  return document.adoptedStyleSheets.length === window.__ceAdopted;
 }
 
 // One keyboard stop: focused and unfocused styles, compositing, whether the
-// focused state was restored after the unfocused snapshot, and the
-// counterfactual indicator pixels.
+// focused state was restored after the unfocused snapshot, the isolation of
+// the counterfactual and the counterfactual indicator pixels.
 async function indicatorStop(page, stop, id) {
   await page.evaluate(SELECT_CANDIDATES);
   const focused = await page.evaluate(INDICATOR_SNAPSHOT);
@@ -447,18 +501,35 @@ async function indicatorStop(page, stop, id) {
   );
   const clip = { x: left, y: top, width: right - left, height: bottom - top };
   let pixels = 0;
-  // An indicator entirely outside the viewport paints nothing visible.
+  // An indicator entirely outside the viewport paints nothing visible, and
+  // its isolation cannot be established.
+  let isolation = {
+    isolation: false,
+    isolationBoxes: 0,
+    isolationReason: 'no-visible-ring',
+  };
   if (clip.width > 0 && clip.height > 0) {
     const options = { clip, animations: 'disabled', caret: 'hide' };
     const shotA = await page.screenshot(options);
+    const layoutA = await page.evaluate(geometrySnapshot);
     const resets = focused.map((f, i) =>
       indicatorResets(f.style, unfocused[i].style),
     );
     await page.evaluate(suppressIndicator, resets);
     const shotB = await page.screenshot(options);
+    const layoutB = await page.evaluate(geometrySnapshot);
     if (!(await page.evaluate(restoreIndicator)))
       throw new Error(`${id}: the suppressed indicator was not restored`);
-    pixels = counterfactualPixels(shotA, shotB, clip, rings);
+    const region = {
+      left: Math.min(...rings.map((r) => r.outer.left)),
+      top: Math.min(...rings.map((r) => r.outer.top)),
+      right: Math.max(...rings.map((r) => r.outer.right)),
+      bottom: Math.max(...rings.map((r) => r.outer.bottom)),
+    };
+    isolation = isolationOf(layoutA, layoutB, region);
+    // Pixels are attributed only when nothing but indicator paint changed.
+    if (isolation.isolation)
+      pixels = counterfactualPixels(shotA, shotB, clip, rings);
   }
   return {
     stop,
@@ -467,6 +538,7 @@ async function indicatorStop(page, stop, id) {
     unfocused: unfocused.map((n) => n.style),
     compositing: focused.map((n) => n.compositing),
     restored,
+    ...isolation,
     counterfactualPixels: pixels,
   };
 }

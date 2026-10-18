@@ -19,6 +19,15 @@ export const TOLERANCE = 0.5;
 // only the indicator paint suppressed.
 export const INDICATOR_MIN_PIXELS = 40;
 export const INDICATOR_PIXEL_DELTA = 24;
+// Why the counterfactual was or was not isolated: only indicator paint
+// changed; a compared box moved by more than 0.5px; the scroll position
+// moved; or no ring pixel is inside the viewport.
+export const ISOLATION_REASONS = Object.freeze([
+  'isolated',
+  'box-moved',
+  'scroll-moved',
+  'no-visible-ring',
+]);
 // Below this effective compositing visibility a node paints nothing visible.
 export const VISIBILITY_EPSILON = 0.05;
 
@@ -96,6 +105,9 @@ const stop = (v) =>
     'unfocused',
     'compositing',
     'restored',
+    'isolation',
+    'isolationBoxes',
+    'isolationReason',
     'counterfactualPixels',
   ]) &&
   int(v.stop) &&
@@ -111,6 +123,11 @@ const stop = (v) =>
   v.unfocused.every(style) &&
   v.compositing.every(compositing) &&
   bool(v.restored) &&
+  bool(v.isolation) &&
+  int(v.isolationBoxes) &&
+  ISOLATION_REASONS.includes(v.isolationReason) &&
+  v.isolation === (v.isolationReason === 'isolated') &&
+  (!v.isolation || v.isolationBoxes >= 1) &&
   int(v.counterfactualPixels);
 const valueMap = (v) =>
   v != null &&
@@ -339,13 +356,15 @@ export function effectiveVisibility(c) {
 
 // A stop proves a painted indicator when the focused state was restored for
 // the screenshots, a node that is visible after compositing carries a visible
-// indicator that focus added, and suppressing only that indicator paint
+// indicator that focus added, the counterfactual is isolated (no compared box
+// and no scroll position moved), and suppressing only that indicator paint
 // changes enough ring pixels. Clipping, masks, overlays, transforms and
 // positioning are identical in both screenshots, so whatever hides the
 // indicator cancels out of the counterfactual count.
 export function stopOk(s) {
   return (
     s.restored &&
+    s.isolation &&
     s.focused.some(
       (f, i) =>
         effectiveVisibility(s.compositing[i]) > VISIBILITY_EPSILON &&

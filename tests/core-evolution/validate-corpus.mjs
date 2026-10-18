@@ -2185,6 +2185,28 @@ const MUTATIONS = [
     },
   ],
   [
+    'a painted stop without its isolation record',
+    /FORMS-K1 paintedIndicator measurement does not have its strict shape/,
+    (d) => {
+      const r = d.referenceCheck.rows
+        .find((x) => x.id === 'FORMS-K1')
+        .results.find((x) => x.kind === 'paintedIndicator');
+      delete r.measured[1].isolation;
+      delete r.measured[1].isolationBoxes;
+      delete r.measured[1].isolationReason;
+    },
+  ],
+  [
+    'an isolation flag that contradicts its reason',
+    /FORMS-K1 paintedIndicator measurement does not have its strict shape/,
+    (d) => {
+      const r = d.referenceCheck.rows
+        .find((x) => x.id === 'FORMS-K1')
+        .results.find((x) => x.kind === 'paintedIndicator');
+      r.measured[1].isolation = false;
+    },
+  ],
+  [
     'a transparent outline kept as a painted indicator',
     /FORMS-K1 paintedIndicator verdict does not follow from its measurement/,
     (d) => {
@@ -2348,6 +2370,13 @@ const MUTATIONS = [
       },
     ],
     [
+      'a counterfactual that moved layout',
+      (stop) => {
+        stop.isolation = false;
+        stop.isolationReason = 'box-moved';
+      },
+    ],
+    [
       'an outline present without focus',
       (stop) => {
         stop.unfocused = structuredClone(stop.focused);
@@ -2372,6 +2401,8 @@ const MUTATIONS = [
     'FORMS-K9',
     'FORMS-K10',
     'FORMS-K11',
+    'FORMS-K12',
+    'FORMS-K13',
   ].map((id) => [
     `the ${id} control dropped`,
     new RegExp(`${id} is not a browser assertion of the corpus`),
