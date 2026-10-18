@@ -1,0 +1,104 @@
+apiVersion: agentdoc.dev/v1
+kind: Component
+metadata:
+  name: tooling
+  description: Contributor tooling coordinates PandamStyle repository verification, qualification harnesses and documentation maintenance.
+spec:
+  type: other
+  system: pandamstyle
+  requirements:
+    - id: constraints-provenance-and-qualification
+      key: requirement.constraints-provenance-and-qualification
+      value: implemented
+      source:
+        path: docs/CONSTRAINTS.md
+        section: provenance-and-qualification
+        sha256: 0fe4bc84144b844a728dd82e72c1893c53d1dc43629cb3f40c9218c59d0717c1
+    - id: adr0001-consequences-and-acceptance-evidence
+      key: requirement.adr0001-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0001-package-topology.md
+        section: consequences-and-acceptance-evidence
+        sha256: 969c3d83cfdded07b8b170b445b7075870c818698a0f6106b14ed3392be6f146
+    - id: adr0003-consequences-and-acceptance-evidence
+      key: requirement.adr0003-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0003-authoring-api.md
+        section: consequences-and-acceptance-evidence
+        sha256: 63f58e5956add8434ed403467ae1cee7d0e96d94e36caa15f3a3a7184591593e
+    - id: adr0005-consequences-and-acceptance-evidence
+      key: requirement.adr0005-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0005-runtime-compiler-boundary.md
+        section: consequences-and-acceptance-evidence
+        sha256: 2fa4ca4b584fd7992854766186bf54897e7015d724250348fb6eb67372d39861
+    - id: adr0007-decision
+      key: requirement.adr0007-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0007-donor-deletion-policy.md
+        section: decision
+        sha256: 3c96b78fcebd90a3ae3adb8948c275e5e7cd5fcbdd4245b79f30ea320ada1a35
+    - id: adr0007-consequences-and-acceptance-evidence
+      key: requirement.adr0007-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0007-donor-deletion-policy.md
+        section: consequences-and-acceptance-evidence
+        sha256: 9e0b2c5b6c622210cfa5e5f796ea073f39bc12a42fb4c188ba66ec53c64c4145
+    - id: adr0010-consequences-and-acceptance-evidence
+      key: requirement.adr0010-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0010-host-adapter-isolation.md
+        section: consequences-and-acceptance-evidence
+        sha256: e1960b62b4abaf733c51489230ccf12f2cae6e86905fb6f5f1e9f5da6eb6d022
+    - id: package-architecture-v1-attribution
+      key: requirement.package-architecture-v1-attribution
+      value: implemented
+      source:
+        path: docs/architecture/package-architecture-v1.md
+        section: attribution
+        sha256: b338bba443e427f93997e548e5ef22055b3d511f6a93a6d959d909e5ce7cc5fe
+    - id: phase-4-engine-absorption-map-vite-seam-and-proof-boundary
+      key: requirement.phase-4-engine-absorption-map-vite-seam-and-proof-boundary
+      value: implemented
+      source:
+        path: docs/architecture/phase-4-engine-absorption-map.md
+        section: vite-seam-and-proof-boundary
+        sha256: 09411bec102a4f15778a77567c6bc7b33509bbbaae861e3778be55973c488671
+    - id: semantic-oracle-v1-cases-and-expectations
+      key: requirement.semantic-oracle-v1-cases-and-expectations
+      value: implemented
+      source:
+        path: docs/architecture/semantic-oracle-v1.md
+        section: cases-and-expectations
+        sha256: 41ca563ee1a7a5562de7ca1a59910fc6d27ef403975ab44cd9f5e151ebbcbe2f
+    - id: semantic-oracle-v1-verification
+      key: requirement.semantic-oracle-v1-verification
+      value: implemented
+      source:
+        path: docs/architecture/semantic-oracle-v1.md
+        section: verification
+        sha256: 09a6e2bd967b891f98cca3d485b587de440890afa917c67207c5bfbf62f39e69
+  context:
+    docs:
+      - README.md
+      - AGENTS.md
+      - ATTRIBUTIONS.md
+      - LICENSES/PANDA-MIT-LICENSE.md
+      - .github/CONTRIBUTING.md
+      - .github/PULL_REQUEST_TEMPLATE.md
+      - .github/copilot-instructions.md
+      - tools/eslint/copyright-header.txt
+      - CHANGELOG.md
+      - PANDAMSTYLE.md
+    runbooks:
+      - docs/agentdoc.md
+      - tools/README.md
+      - tests/semantic/README.md
+      - agentdoc/observations/README.md
+      - docs/release/alpha1.md

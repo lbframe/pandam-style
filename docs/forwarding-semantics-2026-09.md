@@ -47,7 +47,8 @@ the three semantic comparisons has its own verdict.
 
 ## Generated API audit
 
-Source: `pandamstyle/codegen.js::generateDesignSystemModule`, not an assumed API.
+Source: [`generateDesignSystemModule`](../packages/compiler/src/artifacts/javascript/design-module.js),
+not an assumed API.
 The oracle uses that generator's real output; tests verify the complete export
 inventory separately.
 
@@ -57,6 +58,7 @@ inventory separately.
 | `token` | compiler-recognized API | static token references; runtime trap |
 | `props` | compiler-recognized API and runtime composition API | validated composition/provenance |
 | `recipes` | compiler-recognized API and finite runtime selectors | recipe selection/provenance |
+| `patterns` | compiler-recognized API | bounded static layout parameters; runtime traps |
 | `themes` | compiler-recognized API and runtime theme data | theme selection/provenance |
 | `manifest` | metadata export | none |
 | `__PMS_DESIGN_SYSTEM__` | internal/generated marker, not user-facing | module identification only; no helper authority |

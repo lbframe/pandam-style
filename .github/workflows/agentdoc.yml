@@ -1,0 +1,27 @@
+name: agentdoc
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  agentdoc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.22.0'
+      - name: Install pinned AgentDoc
+        run: npm install -g github:lbframe/agent-doc-system#9f9847848a5177e6a68b1f4d224eef2dcd41d32a
+      - name: Validate and compile catalog
+        run: |
+          agentdoc validate
+          agentdoc compile
+          agentdoc check --strict --require-clean
+      - name: Prove reproducible graph
+        run: |
+          cp .agentdoc/graph.json "$RUNNER_TEMP/agentdoc-graph.json"
+          agentdoc compile
+          agentdoc check --strict --require-clean
+          cmp "$RUNNER_TEMP/agentdoc-graph.json" .agentdoc/graph.json

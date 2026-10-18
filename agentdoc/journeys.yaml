@@ -1,0 +1,18 @@
+schemaVersion: agentdoc.dev/journeys/v1
+journeys:
+  - id: compile-compose-repair
+    description: An agent composes the pilot from generated vocabulary and repairs compiler diagnostics before consuming finite runtime references.
+    components:
+      - component:pandamstyle/vite-react-pilot
+      - component:pandamstyle/vite
+      - component:pandamstyle/compiler
+      - component:pandamstyle/core
+    notes: This describes the existing composition loop; it is not evidence that a workflow or product test was executed during catalog migration.
+  - id: preserve-publication-authority
+    description: Host lifecycle changes preserve one revision-bound compiler publication authority across integrations.
+    components:
+      - component:pandamstyle/compiler
+      - component:pandamstyle/vite
+      - component:pandamstyle/next
+      - component:pandamstyle/rsbuild
+    notes: Host adapters own bundler lifecycle while the public compiler service owns semantic and generated-artifact truth.

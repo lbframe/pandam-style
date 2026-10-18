@@ -1,0 +1,12 @@
+apiVersion: agentdoc.dev/v1
+kind: System
+metadata:
+  name: pandamstyle
+  description: PandamStyle constrains agent interface composition through a compiler, finite runtime and host integrations.
+spec:
+  placementRationale: The user-defined product and ADR 0001 establish one product with five package release boundaries; no organizational team or broader domain ownership is asserted.
+  context:
+    docs:
+      - docs/PRODUCT.md
+      - docs/ARCHITECTURE.md
+      - docs/CONSTRAINTS.md

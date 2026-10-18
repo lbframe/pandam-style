@@ -1,0 +1,13 @@
+apiVersion: agentdoc.dev/v1
+kind: Component
+metadata:
+  name: vite-react-pilot
+  description: The Vite React pilot demonstrates a project definition and consumer composition against generated PandamStyle vocabulary.
+spec:
+  type: web-app
+  system: pandamstyle
+  context:
+    docs:
+      - docs/agent-use.md
+      - docs/reference/design-system.md
+      - docs/reference/authoring.md

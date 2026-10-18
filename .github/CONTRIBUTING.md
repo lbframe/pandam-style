@@ -15,15 +15,32 @@ corepack prepare yarn@1.22.22 --activate
 yarn install --frozen-lockfile
 ```
 
-Run the repository verifier before submitting a change:
+For repository development, start with [AGENTS](../AGENTS.md), the
+[product contract](../docs/PRODUCT.md), and the relevant context from
+`agentdoc query <path>`. The product audience is exclusively AI/LLM agents;
+the consumer install/use contracts serve downstream projects.
+
+For documentation and catalog changes, follow the pinned
+[AgentDoc maintenance gate](../docs/agentdoc.md#maintenance-and-ci):
+
+```sh
+agentdoc validate
+agentdoc compile
+agentdoc check --strict
+```
+
+Choose focused checks for implementation changes using the affected component,
+existing CI and [tooling guide](../tools/README.md). Run the full verifier when
+the behavior or qualification scope requires its complete sequence:
 
 ```sh
 ./verify-pms.sh
 ```
 
-The `flow`, `prettier:report`, and `lint:report` scripts are available for
-focused checks. Update the relevant package documentation when changing a
-public API or supported host integration.
+The `flow`, `prettier:report`, and `lint:report` scripts are also available for
+focused checks. Update canonical documentation and catalog evidence when changing
+a public API, architecture boundary or supported host integration. Report any
+unrun checks explicitly.
 
 ## Pull requests
 

@@ -4,9 +4,11 @@
 
 **npm dist-tag:** `alpha`
 
-PandamStyle is a constrained styling language and compiler built primarily for
-AI coding agents. Agents compose interfaces from design-system vocabulary;
+PandamStyle is a constrained styling language and compiler exclusively for
+AI/LLM agents. Agents compose interfaces from design-system vocabulary;
 PandamStyle validates the result against compiler-enforced constraints.
+The [product contract](../PRODUCT.md) records that mandatory intent and the
+remaining Alpha 1 presentation deviations targeted by the accepted AG-13 plan.
 
 Alpha 1 supports tokens, styles, recipes, slot recipes, compound variants,
 layout patterns, themes, generated types, actionable diagnostics, and an

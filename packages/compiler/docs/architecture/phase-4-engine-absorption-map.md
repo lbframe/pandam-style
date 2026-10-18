@@ -34,15 +34,15 @@ provide additional source-level context.
 | `packages/@stylexjs/babel-plugin/src/shared/utils/dashify.js` | atomic CSS property serialization | Preserve property-name conversion under `engine/atomic/`. | MOVE | browser computed-style and output oracle cases; donor plugin 0.19.1, MIT |
 | `packages/@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js` | atomic CSS rule generation | Preserve selectors, at-rule wrapping, LTR/RTL pair shape, and priority inputs under `engine/atomic/`. | REFACTOR | browser, ordering, and incremental CSS cases; donor plugin 0.19.1, MIT |
 | `packages/@stylexjs/babel-plugin/src/shared/utils/normalize-value.js` | atomic value serialization | Preserve supported CSS value normalization under `engine/atomic/`. | REFACTOR | value-normalization and browser oracle cases; donor plugin 0.19.1, MIT |
-| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/convert-camel-case-values.js` | value normalization | Preserve supported value conversions under `engine/atomic/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
-| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-fns.js` | value normalization parser | Preserve malformed-function rejection under `engine/atomic/normalizers/`. | MOVE | negative value oracle cases; donor plugin 0.19.1, MIT |
-| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-strings.js` | value normalization parser | Preserve malformed-string rejection under `engine/atomic/normalizers/`. | MOVE | negative value oracle cases; donor plugin 0.19.1, MIT |
+| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/convert-camel-case-values.js` | value normalization | Preserve supported value conversions under `engine/atomic/utils/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
+| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-fns.js` | value normalization parser | Preserve malformed-function rejection under `engine/atomic/utils/normalizers/`. | MOVE | negative value oracle cases; donor plugin 0.19.1, MIT |
+| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/detect-unclosed-strings.js` | value normalization parser | Preserve malformed-string rejection under `engine/atomic/utils/normalizers/`. | MOVE | negative value oracle cases; donor plugin 0.19.1, MIT |
 | `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/font-size-px-to-rem.js` | optional font normalization | Keep only if the frozen supported configuration exercises it; otherwise remove from the absorbed closure. | REFACTOR | current compiler defaults disable this behavior; upstream normalization test is secondary; donor plugin 0.19.1, MIT |
-| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/leading-zero.js` | value normalization | Preserve supported numeric serialization under `engine/atomic/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
-| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/quotes.js` | value normalization | Preserve supported string quoting under `engine/atomic/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
-| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/timings.js` | value normalization | Preserve supported timing serialization under `engine/atomic/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
-| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/whitespace.js` | value normalization | Preserve supported whitespace normalization under `engine/atomic/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
-| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/zero-dimensions.js` | value normalization | Preserve supported zero-dimension normalization under `engine/atomic/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
+| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/leading-zero.js` | value normalization | Preserve supported numeric serialization under `engine/atomic/utils/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
+| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/quotes.js` | value normalization | Preserve supported string quoting under `engine/atomic/utils/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
+| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/timings.js` | value normalization | Preserve supported timing serialization under `engine/atomic/utils/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
+| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/whitespace.js` | value normalization | Preserve supported whitespace normalization under `engine/atomic/utils/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
+| `packages/@stylexjs/babel-plugin/src/shared/utils/normalizers/zero-dimensions.js` | value normalization | Preserve supported zero-dimension normalization under `engine/atomic/utils/normalizers/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
 | `packages/@stylexjs/babel-plugin/src/shared/utils/object-utils.js` | atomic and variable object traversal | Retain only object helpers used by supported lowering under `engine/atomic/` and `engine/lowering/`. | REFACTOR | token/theme and atomic oracle cases; donor plugin 0.19.1, MIT |
 | `packages/@stylexjs/babel-plugin/src/shared/utils/rule-utils.js` | rule generation/preprocessing | Retain the required rule operations under `engine/atomic/`. | REFACTOR | deduplication and ordering oracle cases; donor plugin 0.19.1, MIT |
 | `packages/@stylexjs/babel-plugin/src/shared/utils/split-css-value.js` | value normalization | Preserve supported CSS value splitting under `engine/atomic/`. | MOVE | value-normalization oracle cases; donor plugin 0.19.1, MIT |
@@ -92,7 +92,7 @@ packages/style-value-parser/src/css-types/angle.js
 packages/style-value-parser/src/css-types/alpha-value.js
 ```
 
-The `font-size-px-to-rem` module is reachable but the current PandamStyle-owned options disable it. Its final disposition is conditional on frozen oracle/config evidence; it is not retained merely because a donor default object names it.
+The `font-size-px-to-rem` module is retained in the transitive normalization closure because the existing internal option remains supported. The owned default disables that transform; retaining its source is not a new feature or qualification claim.
 
 ## Reachable but not required modules
 
@@ -148,7 +148,13 @@ packages/@stylexjs/stylex/src/types/VarTypes.js
 
 ## Vite seam and proof boundary
 
-Row 14, `packages/@stylexjs/babel-plugin/pandamstyle/vite.js`, is a qualification seam and is excluded from this engine source closure. It has been relocated to `tools/pilot/vite-seam.js` and remains outside compiler Rollup inputs and npm exports. The required `donor-closure` verifier scans source imports and built/packed application graphs structurally, while allowing historical docs, license text, test fixture text, and forbidden-import string matchers.
+The historical `packages/@stylexjs/babel-plugin/pandamstyle/vite.js` seam is
+excluded from this engine source closure. The current public integration lives
+in `packages/vite/src/index.js`; qualification harnesses live under `tools/pilot/`.
+There is no retained `tools/pilot/vite-seam.js` module. The required
+`tools/pms/donor-closure.js` verifier scans source imports and built/packed
+application graphs structurally, while allowing historical docs, license text,
+test fixture text, and forbidden-import string matchers.
 
 ## Provenance
 

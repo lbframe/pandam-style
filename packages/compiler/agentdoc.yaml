@@ -1,0 +1,480 @@
+apiVersion: agentdoc.dev/v1
+kind: Component
+metadata:
+  name: compiler
+  description: The compiler validates design-system authority and publishes revision-bound generated modules, declarations, diagnostics and extracted CSS.
+spec:
+  type: library
+  system: pandamstyle
+  requirements:
+    - id: constraints-semantic-authority
+      key: requirement.constraints-semantic-authority
+      value: implemented
+      source:
+        path: docs/CONSTRAINTS.md
+        section: semantic-authority
+        sha256: 3a52dcb77e20a85932a934a949b0f4f835f301d0ae2348d91e510c78415108a2
+    - id: constraints-generated-artifacts-and-execution
+      key: requirement.constraints-generated-artifacts-and-execution
+      value: implemented
+      source:
+        path: docs/CONSTRAINTS.md
+        section: generated-artifacts-and-execution
+        sha256: c20a5c5cbb08b9ea2df0a84bffee88928d71d00c3d6af4b571620aa6a0f28e7a
+    - id: constraints-publication-and-integrations
+      key: requirement.constraints-publication-and-integrations
+      value: implemented
+      source:
+        path: docs/CONSTRAINTS.md
+        section: publication-and-integrations
+        sha256: 9d7d3a29be34b74116aa6e1c4be8127bd70937a7afa2297e17a9ecc0c02fd012
+    - id: constraints-provenance-and-qualification
+      key: requirement.constraints-provenance-and-qualification
+      value: implemented
+      source:
+        path: docs/CONSTRAINTS.md
+        section: provenance-and-qualification
+        sha256: 0fe4bc84144b844a728dd82e72c1893c53d1dc43629cb3f40c9218c59d0717c1
+    - id: product-vocabulary-authority
+      key: requirement.product-vocabulary-authority
+      value: implemented
+      source:
+        path: docs/PRODUCT.md
+        section: vocabulary-authority
+        sha256: a18011e477cfc4da27d5954edf92be432bf0a1ccd0bda6872419b26d773c9070
+    - id: product-compilation-and-repair
+      key: requirement.product-compilation-and-repair
+      value: implemented
+      source:
+        path: docs/PRODUCT.md
+        section: compilation-and-repair
+        sha256: 5c084787261ef58a362c5cb03128bd7a9ad1e4e8815b39c6b137e6afe504008d
+    - id: agent-install-allowed-actions
+      key: requirement.agent-install-allowed-actions
+      value: implemented
+      source:
+        path: docs/agent-install.md
+        section: allowed-actions
+        sha256: bf9647e3d8baf88bf317929fa135a52019d4e9b762a1a3c974efb079f78afde2
+    - id: agent-repair-read-the-diagnostic
+      key: requirement.agent-repair-read-the-diagnostic
+      value: implemented
+      source:
+        path: docs/agent-repair.md
+        section: read-the-diagnostic
+        sha256: e73880ebc800a52881b77eec19591e10490048ea0f149316633aee8977c19c71
+    - id: agent-repair-common-categories-and-local-repair
+      key: requirement.agent-repair-common-categories-and-local-repair
+      value: implemented
+      source:
+        path: docs/agent-repair.md
+        section: common-categories-and-local-repair
+        sha256: 06bc442dd8b2c501b9a50b3eedc04854b76543ec4cfbd062419e6a22b0cae141
+    - id: agent-use-choose-a-primitive
+      key: requirement.agent-use-choose-a-primitive
+      value: implemented
+      source:
+        path: docs/agent-use.md
+        section: choose-a-primitive
+        sha256: e6dbc0673daf99d353fcc44dda0813f7a018b50ce6cd5ac111197c5a73f7bfce
+    - id: agent-use-composition-contract
+      key: requirement.agent-use-composition-contract
+      value: implemented
+      source:
+        path: docs/agent-use.md
+        section: composition-contract
+        sha256: 3322c049d3e679a64e4444b497b6adc12002757c8b4b82135e7c72d6b94344fc
+    - id: agent-use-responsive-behavior-and-finite-selection
+      key: requirement.agent-use-responsive-behavior-and-finite-selection
+      value: implemented
+      source:
+        path: docs/agent-use.md
+        section: responsive-behavior-and-finite-selection
+        sha256: 8b251a0b2bc043c7d3f48d13595cf653e510652e25662565885fadf519a45fe4
+    - id: agent-use-forbidden-patterns
+      key: requirement.agent-use-forbidden-patterns
+      value: implemented
+      source:
+        path: docs/agent-use.md
+        section: forbidden-patterns
+        sha256: 4d91a89370cfb411ea3832af33814032b15aa2ddeaf85e4c060397657e4a978f
+    - id: adr0001-decision
+      key: requirement.adr0001-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0001-package-topology.md
+        section: decision
+        sha256: df5374fbe090f56fb3e30748f86a1d2214124e35088e54c608aaebcb3c995cb4
+    - id: adr0001-consequences-and-acceptance-evidence
+      key: requirement.adr0001-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0001-package-topology.md
+        section: consequences-and-acceptance-evidence
+        sha256: 969c3d83cfdded07b8b170b445b7075870c818698a0f6106b14ed3392be6f146
+    - id: adr0002-decision
+      key: requirement.adr0002-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0002-runtime-package-name.md
+        section: decision
+        sha256: fda7088f5ecec44781207af7b1ec88dc72dfb5d8ef26ccd9300862b26fca0808
+    - id: adr0002-consequences-and-acceptance-evidence
+      key: requirement.adr0002-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0002-runtime-package-name.md
+        section: consequences-and-acceptance-evidence
+        sha256: a37462c98e66cd09a04c76b1a9d7466ff71bb5995175d93d0eba5bdf9b208460
+    - id: adr0003-decision
+      key: requirement.adr0003-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0003-authoring-api.md
+        section: decision
+        sha256: 39700977a54eee2c4e426392a5844762940b17e3f902eed3c632df724ad99332
+    - id: adr0003-consequences-and-acceptance-evidence
+      key: requirement.adr0003-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0003-authoring-api.md
+        section: consequences-and-acceptance-evidence
+        sha256: 63f58e5956add8434ed403467ae1cee7d0e96d94e36caa15f3a3a7184591593e
+    - id: adr0004-decision
+      key: requirement.adr0004-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0004-generated-import-model.md
+        section: decision
+        sha256: 25047d3bdc1362fc03f5b949dba09948344fd41d455b454153dbbe09ef3f7c0c
+    - id: adr0004-consequences-and-acceptance-evidence
+      key: requirement.adr0004-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0004-generated-import-model.md
+        section: consequences-and-acceptance-evidence
+        sha256: af906d56ec2ff8891966cf293e949dce545a7932b1f2c911a2ec34b000892dc4
+    - id: adr0005-decision
+      key: requirement.adr0005-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0005-runtime-compiler-boundary.md
+        section: decision
+        sha256: 6ab588e34eadfe01a7960ab80b4e414a8b397af11dbb2d143ff95173d4f40cbf
+    - id: adr0005-consequences-and-acceptance-evidence
+      key: requirement.adr0005-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0005-runtime-compiler-boundary.md
+        section: consequences-and-acceptance-evidence
+        sha256: 2fa4ca4b584fd7992854766186bf54897e7015d724250348fb6eb67372d39861
+    - id: adr0006-decision
+      key: requirement.adr0006-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0006-single-project-authority.md
+        section: decision
+        sha256: 8f5fa7962789fda3831348eaea476f96f38c4c745496f0fd6eb0904bdd51bf3a
+    - id: adr0006-consequences-and-acceptance-evidence
+      key: requirement.adr0006-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0006-single-project-authority.md
+        section: consequences-and-acceptance-evidence
+        sha256: 95dcc6bcff12c8a0ea9e74c02348975bf0db4c61571dbf8425c7a4f1df8c31d4
+    - id: adr0007-decision
+      key: requirement.adr0007-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0007-donor-deletion-policy.md
+        section: decision
+        sha256: 3c96b78fcebd90a3ae3adb8948c275e5e7cd5fcbdd4245b79f30ea320ada1a35
+    - id: adr0007-consequences-and-acceptance-evidence
+      key: requirement.adr0007-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0007-donor-deletion-policy.md
+        section: consequences-and-acceptance-evidence
+        sha256: 9e0b2c5b6c622210cfa5e5f796ea073f39bc12a42fb4c188ba66ec53c64c4145
+    - id: adr0008-decision
+      key: requirement.adr0008-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0008-diagnostics-protocol.md
+        section: decision
+        sha256: 86dfb8cd6e438197d632811ff4509f3a49373360c6e853a8a55b51e7f4794432
+    - id: adr0008-consequences-and-acceptance-evidence
+      key: requirement.adr0008-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0008-diagnostics-protocol.md
+        section: consequences-and-acceptance-evidence
+        sha256: aed07439e8a3a8fb62d0aa7cf6fa769dfdad7c72c9d4558c7b33d572cd6899e3
+    - id: adr0009-decision
+      key: requirement.adr0009-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0009-generated-types-ownership.md
+        section: decision
+        sha256: d7523c423932cce4af4cf5b86925a4b63a7b86fe9217864c5c5fd3e59a2ad881
+    - id: adr0009-consequences-and-acceptance-evidence
+      key: requirement.adr0009-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0009-generated-types-ownership.md
+        section: consequences-and-acceptance-evidence
+        sha256: 4f64725a97fd3ce6dc92d530f033a5d165f26e110ecfe8b945187c780e6437a7
+    - id: diagnostics-protocol-v1-normative-json-shape-arch-16
+      key: requirement.diagnostics-protocol-v1-normative-json-shape-arch-16
+      value: implemented
+      source:
+        path: docs/architecture/diagnostics-protocol-v1.md
+        section: normative-json-shape-arch-16
+        sha256: a9758c9a7bdd0b6a792f592b1b40b1793384ef04be2403484265e046b83d7138
+    - id: diagnostics-protocol-v1-field-semantics
+      key: requirement.diagnostics-protocol-v1-field-semantics
+      value: implemented
+      source:
+        path: docs/architecture/diagnostics-protocol-v1.md
+        section: field-semantics
+        sha256: 80e4ccc37ef21dca325947766156d364b401c005633aff1cb26d0e902e875f4b
+    - id: diagnostics-protocol-v1-stable-code-families-and-repairs
+      key: requirement.diagnostics-protocol-v1-stable-code-families-and-repairs
+      value: implemented
+      source:
+        path: docs/architecture/diagnostics-protocol-v1.md
+        section: stable-code-families-and-repairs
+        sha256: 9d4a7c1dcb202289f83f12f60032cf5849ca94fd2d84c6408691844c867c6135
+    - id: diagnostics-protocol-v1-audit-and-protocol-evolution
+      key: requirement.diagnostics-protocol-v1-audit-and-protocol-evolution
+      value: implemented
+      source:
+        path: docs/architecture/diagnostics-protocol-v1.md
+        section: audit-and-protocol-evolution
+        sha256: 2af92edfa6ec075c5fc56a11c6bcd239f8529a8c3e4068ef3dd2614c1c30cbda
+    - id: generated-design-system-abi-v1-generated-artifacts
+      key: requirement.generated-design-system-abi-v1-generated-artifacts
+      value: implemented
+      source:
+        path: docs/architecture/generated-design-system-abi-v1.md
+        section: generated-artifacts
+        sha256: 8c98a743ddea9d63e68752cc613e04f175d985ebf822ed512206cf4782ce77dd
+    - id: generated-design-system-abi-v1-runtime-references
+      key: requirement.generated-design-system-abi-v1-runtime-references
+      value: implemented
+      source:
+        path: docs/architecture/generated-design-system-abi-v1.md
+        section: runtime-references
+        sha256: d68b22ee20fb590c8536fac258e4de55fd8294673e5540956f0704f7b1dde3bc
+    - id: generated-design-system-abi-v1-identity-and-consistency
+      key: requirement.generated-design-system-abi-v1-identity-and-consistency
+      value: implemented
+      source:
+        path: docs/architecture/generated-design-system-abi-v1.md
+        section: identity-and-consistency
+        sha256: aaef7d353d6139111aca00898c59906b2f9f0c17bfdff3953853911466e31596
+    - id: package-architecture-v1-generated-output-and-publication
+      key: requirement.package-architecture-v1-generated-output-and-publication
+      value: implemented
+      source:
+        path: docs/architecture/package-architecture-v1.md
+        section: generated-output-and-publication
+        sha256: 7121d5a2d639f5cb4909f9d734cfbe65cc39c824f3b9fe5d11d4bb57f539e4b6
+    - id: package-architecture-v1-attribution
+      key: requirement.package-architecture-v1-attribution
+      value: implemented
+      source:
+        path: docs/architecture/package-architecture-v1.md
+        section: attribution
+        sha256: b338bba443e427f93997e548e5ef22055b3d511f6a93a6d959d909e5ce7cc5fe
+    - id: phase-4-derived-source-provenance-provenance-basis
+      key: requirement.phase-4-derived-source-provenance-provenance-basis
+      value: implemented
+      source:
+        path: docs/architecture/phase-4-derived-source-provenance.md
+        section: provenance-basis
+        sha256: d4d3268934d03ea0bb72da85571b4dcb16d8baac49e0e706c4ad257af71e5eef
+    - id: phase-4-derived-source-provenance-subsystem-mapping
+      key: requirement.phase-4-derived-source-provenance-subsystem-mapping
+      value: implemented
+      source:
+        path: docs/architecture/phase-4-derived-source-provenance.md
+        section: subsystem-mapping
+        sha256: 208270c8f3932a4222ee45810aa51ea0bacf0d5acf8ea96db4d2cd192c07e6f1
+    - id: phase-4-engine-absorption-map-required-behavior-and-source-modu
+      key: requirement.phase-4-engine-absorption-map-required-behavior-and-source-modu
+      value: implemented
+      source:
+        path: docs/architecture/phase-4-engine-absorption-map.md
+        section: required-behavior-and-source-module-decisions
+        sha256: daa15e75956cdd31f4f30e395c2d70fc1bf358165e728c88703759e0f4b74e92
+    - id: phase-4-engine-absorption-map-transitive-media-query-parser-clo
+      key: requirement.phase-4-engine-absorption-map-transitive-media-query-parser-clo
+      value: implemented
+      source:
+        path: docs/architecture/phase-4-engine-absorption-map.md
+        section: transitive-media-query-parser-closure
+        sha256: 53e80124052e080b81711c0288e7765ad512ecc63df3ff82ba94a5f13b3750e9
+    - id: phase-4-engine-absorption-map-provenance
+      key: requirement.phase-4-engine-absorption-map-provenance
+      value: implemented
+      source:
+        path: docs/architecture/phase-4-engine-absorption-map.md
+        section: provenance
+        sha256: 9c2944e0a63b302e022514829260dd7e029b692093b9880150414f217854bf98
+    - id: public-api-v0-1-application-authoring
+      key: requirement.public-api-v0-1-application-authoring
+      value: implemented
+      source:
+        path: docs/architecture/public-api-v0.1.md
+        section: application-authoring
+        sha256: 08b363564cc6ccd8e9f7dfbd28533fe711e7913db31ff2c5d0127dd10dfeedd8
+    - id: public-api-v0-1-package-apis
+      key: requirement.public-api-v0-1-package-apis
+      value: implemented
+      source:
+        path: docs/architecture/public-api-v0.1.md
+        section: package-apis
+        sha256: b32a0e2c361bd89f2261930b7e52bae1813af9b5a8f0659520aa56a13aa43fed
+    - id: public-api-v0-1-project-lifecycle
+      key: requirement.public-api-v0-1-project-lifecycle
+      value: implemented
+      source:
+        path: docs/architecture/public-api-v0.1.md
+        section: project-lifecycle
+        sha256: a23caf911a7973f72eef9a3278b4ae542b77c91d808af8b6118455dc743747fd
+    - id: forwarding-semantics-2026-09-generated-api-audit
+      key: requirement.forwarding-semantics-2026-09-generated-api-audit
+      value: implemented
+      source:
+        path: docs/forwarding-semantics-2026-09.md
+        section: generated-api-audit
+        sha256: e73527fab00a067228115c8f84ae62823ce692fbdbb8c21ef71a66c87126902a
+    - id: forwarding-semantics-2026-09-module-invariants
+      key: requirement.forwarding-semantics-2026-09-module-invariants
+      value: implemented
+      source:
+        path: docs/forwarding-semantics-2026-09.md
+        section: module-invariants
+        sha256: 773fa6f619f8697ff549080674e00c5cd7318f8488037753f571125ae08ee00f
+    - id: forwarding-semantics-2026-09-scope-and-limits
+      key: requirement.forwarding-semantics-2026-09-scope-and-limits
+      value: implemented
+      source:
+        path: docs/forwarding-semantics-2026-09.md
+        section: scope-and-limits
+        sha256: d16a43b52443e8206c617678a88588fbd0e6810451ebd9e9c3b0205dd15459a4
+    - id: authoring-styles-and-tokens
+      key: requirement.authoring-styles-and-tokens
+      value: implemented
+      source:
+        path: docs/reference/authoring.md
+        section: styles-and-tokens
+        sha256: 7566a42b0ff1b9fd7bea9d5705fcb128d59cd6900b4734b3b90dfd6ec9e2690a
+    - id: authoring-recipes-slots-and-compounds
+      key: requirement.authoring-recipes-slots-and-compounds
+      value: implemented
+      source:
+        path: docs/reference/authoring.md
+        section: recipes-slots-and-compounds
+        sha256: 8fa0dc87f90a65f3d9ffce54c4b3921a5d11e2db1d47a1950bae35e3ea969c8f
+    - id: authoring-layout-patterns
+      key: requirement.authoring-layout-patterns
+      value: implemented
+      source:
+        path: docs/reference/authoring.md
+        section: layout-patterns
+        sha256: 27bba845e618aff4b8e9cde262b0655668b16b517b27b2e8d8f0522e6cd7bf9f
+    - id: authoring-themes-and-generated-types
+      key: requirement.authoring-themes-and-generated-types
+      value: implemented
+      source:
+        path: docs/reference/authoring.md
+        section: themes-and-generated-types
+        sha256: 8111500ff2135612eeb3a7793be9a82ae2727bd88f0f77cbf7ad776a7cbebbc8
+    - id: compiler-api-public-package-exports
+      key: requirement.compiler-api-public-package-exports
+      value: implemented
+      source:
+        path: docs/reference/compiler-api.md
+        section: public-package-exports
+        sha256: e578854409a3b75e0c2718a52e610bc0304f3468dc7193a708b0e65172cfffd8
+    - id: compiler-api-compiler-project-service
+      key: requirement.compiler-api-compiler-project-service
+      value: implemented
+      source:
+        path: docs/reference/compiler-api.md
+        section: compiler-project-service
+        sha256: bfa325eacdaa669a5a3e544127a320e1f766606b9e54e8d0d31961f5069d7b5a
+    - id: compiler-api-diagnostics
+      key: requirement.compiler-api-diagnostics
+      value: implemented
+      source:
+        path: docs/reference/compiler-api.md
+        section: diagnostics
+        sha256: a53fee7b5dd63af3048c74cda1cf6e6d53003c46528a90e2b10514a42cfe172c
+    - id: compiler-api-generated-artifacts
+      key: requirement.compiler-api-generated-artifacts
+      value: implemented
+      source:
+        path: docs/reference/compiler-api.md
+        section: generated-artifacts
+        sha256: 1de2a61e62b697625a5ebd1cb9f426d94f4abbf339f65db1c72d1c0961096c51
+    - id: design-system-definition-shape
+      key: requirement.design-system-definition-shape
+      value: implemented
+      source:
+        path: docs/reference/design-system.md
+        section: definition-shape
+        sha256: 55a23a36e954738f6e89615d5c410b53cddf4d9912877461837da3a8211d9344
+    - id: design-system-conditions
+      key: requirement.design-system-conditions
+      value: implemented
+      source:
+        path: docs/reference/design-system.md
+        section: conditions
+        sha256: 45829a209f7a858a24dfac152e8b0c6dd52fa92f0592bda02c016aed9a18b827
+    - id: design-system-themes
+      key: requirement.design-system-themes
+      value: implemented
+      source:
+        path: docs/reference/design-system.md
+        section: themes
+        sha256: 6f378fb9e3568aea2f18c34eb31a45d310c489f3594d3e38d27a3ed1f9580b79
+    - id: design-system-recipe-definitions
+      key: requirement.design-system-recipe-definitions
+      value: implemented
+      source:
+        path: docs/reference/design-system.md
+        section: recipe-definitions
+        sha256: 34f30decb4e15dd8dd8185a2f8ef95908bf4507f64518da6fc8ffca45b55a845
+    - id: design-system-validation-boundary
+      key: requirement.design-system-validation-boundary
+      value: implemented
+      source:
+        path: docs/reference/design-system.md
+        section: validation-boundary
+        sha256: 5fd43352565ee5df52cbf8574e0a15e4d3f218da91e48006123fc13f70447d96
+  context:
+    docs:
+      - docs/reference/compiler-api.md
+      - docs/reference/design-system.md
+      - docs/architecture/public-api-v0.1.md
+      - docs/architecture/diagnostics-protocol-v1.md
+      - docs/architecture/adr/0003-authoring-api.md
+      - docs/architecture/adr/0004-generated-import-model.md
+      - docs/architecture/adr/0006-single-project-authority.md
+      - docs/architecture/adr/0008-diagnostics-protocol.md
+      - docs/architecture/adr/0009-generated-types-ownership.md
+      - docs/forwarding-semantics-2026-09.md
+      - docs/architecture/semantic-gap-register.md
+      - docs/architecture/semantic-oracle-v1.md
+    constraints:
+      - docs/architecture/adr/0007-donor-deletion-policy.md
+      - packages/compiler/ATTRIBUTIONS.md
+      - packages/compiler/LICENSES/PANDA-MIT-LICENSE.md
+    runbooks:
+      - docs/agent-repair.md
+      - docs/agent-audit.md
+      - docs/agent-migration.md
+      - docs/agent-benchmark.md

@@ -1,8 +1,10 @@
 # PandamStyle repository guide
 
-PandamStyle is a constrained styling language and compiler for design-system
-vocabulary. Start with the [README](README.md) for the product overview and
-supported host combinations.
+PandamStyle is a constrained styling language and compiler exclusively for
+AI/LLM agents. Start with the [README](README.md) for the product overview and
+supported host combinations. Agents developing PandamStyle itself use
+[AGENTS](AGENTS.md), the canonical [product contract](docs/PRODUCT.md), and
+[catalog maintenance](docs/agentdoc.md).
 
 For task-specific agent workflows, use the canonical contracts:
 

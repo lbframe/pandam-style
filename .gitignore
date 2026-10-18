@@ -33,3 +33,6 @@ packages/compiler/__tests__/pandamstyle/fixtures/*/generated/
 # evidence lives in evidence/performance/spike-1/.
 .pms-bench/
 .pms-test-support/
+
+# AgentDoc is generated locally and in CI with the exact documented CLI pin.
+.agentdoc/
