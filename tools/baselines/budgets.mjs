@@ -13,8 +13,8 @@
 //     --results <raw.json> [...] --candidate <epoch> [--reference alpha1]
 //
 // `freeze` applies the versioned threshold rule of a policy file to observed
-// baseline results; the validator re-derives committed budgets the same way,
-// so a budget cannot differ from its rule and data. `gate` compares a
+// baseline results; rerunning freeze on the same inputs reproduces the
+// committed budgets, so a budget cannot differ from its rule and data. `gate` compares a
 // candidate epoch with the unchanged alpha1 artifact measured in the same
 // interleaved run(s): timing, memory and runtime budgets are ratios of
 // contemporaneous medians and p95s, deterministic budgets are absolute

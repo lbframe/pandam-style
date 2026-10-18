@@ -4,8 +4,8 @@ CE-00.3 tooling for the frozen Alpha 1 baseline epoch and the core-evolution
 non-regression budgets. The records, methodology and policy are described in
 [`benchmarks/core-evolution`](../../benchmarks/core-evolution/README.md). This
 tooling changes no product behavior and is not part of the product test suites.
-It uses Node built-ins only. `derive-ce-corpus.mjs` and `validate.mjs` also
-import the CE-00.2 classifier, which needs the repository install.
+It uses Node built-ins only. `derive-ce-corpus.mjs` also imports the CE-00.2
+classifier, which needs the repository install.
 
 | File                   | Purpose                                                                                                                                                                 |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -17,7 +17,6 @@ import the CE-00.2 classifier, which needs the repository install.
 | `measure.mjs`          | Interleaved, load-recording batches with a quiet-machine gate; writes `raw.json` and `summary.json`                                                                     |
 | `summarize.mjs`        | Metric definitions and summaries; pools runs and compares epochs                                                                                                        |
 | `budgets.mjs`          | `freeze` (policy + baseline runs → budgets) and `gate` (candidate against `alpha1`, same run) with policy-chain checks                                                  |
-| `validate.mjs`         | Record validator with a mutation self-test                                                                                                                              |
 
 ## Commands
 
@@ -40,9 +39,6 @@ node tools/baselines/budgets.mjs freeze --policy <budget-policy.vN.json> \
   --results <raw.json> --results <raw.json> --out <budgets.vN.json>
 node tools/baselines/budgets.mjs gate --budgets <budgets.vN.json> \
   --results <raw.json> --candidate <name>
-
-# Records.
-node tools/baselines/validate.mjs --self-test
 ```
 
 `measure.mjs` exits with status 3 and writes `READY-TO-MEASURE.json` when the
@@ -54,50 +50,8 @@ as `benchmarks/core-evolution/epochs/alpha1/closure/package.json`, installed
 with `npm install --ignore-scripts`. Measure it in the same run as `alpha1`. The
 gate rejects results without both epochs.
 
-## Validator
-
-`validate.mjs` reads committed files and Git objects only. It checks:
-
-- **Manifest:**
-  - the baseline commit and tree;
-  - the five package identities against the registry integrity;
-  - a closure lockfile pinning exactly those tarballs, and its digest;
-  - reproducible source packs that differ from the registry only under
-    `package/docs/`;
-  - hosts matching the lockfile, and Chromium equal to the CE-00.2 reference
-    engine;
-  - every corpus and asset file digest recomputed from Git.
-- **Workloads:** each re-materializes to its frozen digest, every source edit
-  exists, and every plan names measurable workloads and kinds.
-- **Corpus derivation:** it re-derives from the pinned accounting and policy;
-  every candidate is included unchanged or excluded with a diagnostic code; the
-  totals agree.
-- **Results:**
-  - the unchanged `alpha1` tarballs and installed tree;
-  - harness digests equal to the files at the recorded commit, with no
-    uncommitted harness;
-  - load recorded before and after the batch, and a quiet start for final runs;
-  - the archived Node version;
-  - no failed sample, and the planned sample counts;
-  - `summary.json` re-derived.
-- **Budgets:**
-  - `budgets.v1.json` re-derives exactly from its policy and at least two quiet
-    final baseline runs;
-  - every budgeted metric has a budget;
-  - unknown metrics are explicit, owned and not budgeted;
-  - the policy chain is valid;
-  - the unchanged artifact (`alpha1-replay`) passes its own budgets in every
-    baseline run.
-- **Frozen files:** each committed frozen file equals the version from the
-  commit that added it.
-
-`--self-test` applies record mutations, each of which must be rejected for its
-stated reason, plus gate-behavior cases:
-
-- a slower compile, larger CSS, a grown selection domain, slower runtime
-  selection or a canonical mismatch fails;
-- an unrun budget is `incomplete`, not `pass`;
-- a failed sample, an altered reference artifact or a missing candidate fails;
-- unknown metrics stay `unknown`.
-
-A pass proves record consistency and gate behavior. It is not a new measurement.
+Rerunning `budgets.mjs freeze` with the committed policy and the committed
+baseline results must reproduce `budgets.v1.json` byte for byte. `gate` fails
+when the budgets file differs from the version of the commit that added it, or
+when a later version breaks the policy chain (see the
+[benchmark README](../../benchmarks/core-evolution/README.md#budgets)).

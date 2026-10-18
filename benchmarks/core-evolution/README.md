@@ -163,8 +163,8 @@ and `alpha1-replay`.
 [`budget-policy.v1.json`](budget-policy.v1.json) is the versioned threshold
 rule. It lists the budgeted metrics, the metrics that stay `unknown` and the
 change policy. [`budgets.v1.json`](budgets.v1.json) is generated from the policy
-and the baseline runs by `budgets.mjs freeze`, never by hand. The validator
-re-derives it.
+and the baseline runs by `budgets.mjs freeze`, never by hand. Rerunning the
+same freeze command must reproduce it byte for byte.
 
 - **Timing, memory and runtime:** the limit is a ratio of the candidate's median
   (and p95) to the `alpha1` median measured in the same interleaved run. It is
@@ -196,21 +196,10 @@ node tools/baselines/budgets.mjs gate --budgets benchmarks/core-evolution/budget
 **No retrospective weakening.**
 
 - Committed policy, budget, workload, derivation, manifest, closure and result
-  files are frozen. The validator and the gate compare each with the version of
-  the commit that added it.
+  files are frozen. The gate compares the budgets file with the version of the
+  commit that added it and fails on any difference.
 - A new budgets version needs:
   - a `budget-policy.vN.json` with a justification;
   - the exact predecessor, by path and SHA-256;
   - a new comparable baseline run, because reused result files are rejected;
   - a justified relaxation entry for every loosened or removed budget.
-
-## Validate
-
-```sh
-node tools/baselines/validate.mjs --self-test
-```
-
-The validator reads committed files and Git objects only. It checks the
-manifest, workloads, corpus derivation, result runs and budgets as described in
-[`tools/baselines`](../../tools/baselines/README.md). The self-test then applies
-mutations in memory, each of which must be rejected.
