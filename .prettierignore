@@ -31,3 +31,10 @@ packages/compiler/__tests__/pandamstyle/fixtures/
 # byte content IS the benchmark input: reformatting them would change the
 # corpus content hash and invalidate every measurement taken against it.
 .pms-bench/
+
+# Agentic evaluation inputs (fixture projects, task overlays, oracle fixtures,
+# held-out staging). Their exact bytes are corpus content digested into
+# benchmarks/agentic/corpus.lock.json; reformatting would change the corpus.
+benchmarks/agentic/fixtures/
+benchmarks/agentic/tasks/
+benchmarks/agentic/heldout/

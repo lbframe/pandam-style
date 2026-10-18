@@ -59,6 +59,21 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn lint:report
 
+  agentic-corpus:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.x'
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+      - run: corepack prepare yarn@1.22.22 --activate
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn bench:agentic:validate
+      - run: yarn bench:agentic:test
+
   spelling:
     runs-on: ubuntu-latest
     steps:
