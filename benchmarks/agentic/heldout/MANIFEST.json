@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "corpusVersion": "1.0.0",
+  "corpusVersion": "1.1.0",
   "digestAlgorithm": "pms-tree-sha256/v1",
   "encryption": {
     "tool": "gpg",
@@ -9,8 +9,8 @@
     "archive": "heldout.tar.gpg"
   },
   "sealed": {
-    "archiveSha256": "b751ad3d78370b5a121aa30c95f174da944dac50a0baa292c0a286155751ff5e",
-    "plaintextSetDigest": "4210960d7a6c813f6ecba228c0ad62bcfba7fd5d03674aaa6080dc01a7f9aef0"
+    "archiveSha256": "04ab0d1f6f7f1fa74ce08a12fde47179457e67c163275c9331a2d49ec842c8b7",
+    "plaintextSetDigest": "58a3f56b7b181899cd038dc6de8a84a86f7dec5d5a04057951d63c82fcdbdcab"
   },
   "tasks": [
     {
@@ -26,7 +26,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "a384657afc718c2bd726a2363829500304330ec19bcb9cdec5fe063fc1d1e013"
+      "sha256": "fccfbbd222196e71c0321dc9cb7b00d597faee982b7f7c278ca9fbea73b4b789"
     },
     {
       "id": "heldout-composition-exact-hex",
@@ -42,7 +42,7 @@
       "classification": {
         "alpha1": "missing-project-vocabulary"
       },
-      "sha256": "00a24b85f056c819c7e7ccde7bf6aa92942c8919e87ab77110d85dfb9146410c"
+      "sha256": "be57997e9727c8b253dcaac00fef8b6701ce05ce778b2a73457edb835fd383c2"
     },
     {
       "id": "heldout-composition-page-header",
@@ -56,7 +56,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "3e3a32ef91aae5487416c127a4c8fd772332a04bb9aa51839509bb1b466c6889"
+      "sha256": "009f582c36cde440c4d433a52e414851d9ad826a446e3e6d579d97d0d1003e99"
     },
     {
       "id": "heldout-concurrent-new-file",
@@ -70,7 +70,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "0177125ec4ebf5b8e131f2130023c3e10cbe8fd11ba263d8fe3f8f3733efbb5c"
+      "sha256": "966e9f0707bc4a7303317205e36ad14bd54292e954a12791f1ceae9431222c8d"
     },
     {
       "id": "heldout-discovery-condition-kinds",
@@ -85,7 +85,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "5b824ec14a03f016ced23282b102b073f669f0f7d974dd1876b9b82220b26b97"
+      "sha256": "ee1124545a45b790877996d8b85f45cbb3c2ad1fef3f733e9f2bb84634d58bc9"
     },
     {
       "id": "heldout-dsx-wide-spacing",
@@ -100,7 +100,7 @@
       "classification": {
         "alpha1": "missing-project-vocabulary"
       },
-      "sha256": "cd17f9a3cf6a409c27b4e54d3d0e9aec7560989ae57b0052e65b82737229022e"
+      "sha256": "a2d22b88b2c940019b6e366fdb297a59d6614c6cd7ba86f92a754b0b90c7df58"
     },
     {
       "id": "heldout-installation-strict-turbopack-dev",
@@ -130,7 +130,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "5fe9732452fcc714e86a85ac745ce9a0c646af2971affcc346458ba11440c84d"
+      "sha256": "296a1b4d3b3395db8cc7f6724937b419d92278de3a46c8281cb654f8baba54f9"
     },
     {
       "id": "heldout-migration-rating",
@@ -144,7 +144,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "d51229c317538341216af370b4e74c35fee52e4da5005cf69ffe2d5b8e3b3739"
+      "sha256": "48d531f41c2b4e5ca23f984a6d97aa09b8fee460ec35563ce0a9801555ec23c6"
     },
     {
       "id": "heldout-recovery-stale-generated",
@@ -158,7 +158,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "9708a633e9eb884d166ff17476a419c90f2064471befe7552bb7b59e27ecc812"
+      "sha256": "2c24279c9dc828c848a2e26632b44ad8dd49d8b07974415f28cd335d18166aaf"
     },
     {
       "id": "heldout-repair-missing-secondary-tone",
@@ -173,7 +173,7 @@
       "classification": {
         "alpha1": "missing-project-vocabulary"
       },
-      "sha256": "88db2eee9d4eb488bd9d444ed34c31a5bc079e794236f69c2e5de57be30515ea"
+      "sha256": "9769bf157710d31ff971ae9db6dd83c69fe3d461b827f70893bff266b74b6f03"
     },
     {
       "id": "heldout-repair-weaken-coverage",
@@ -189,7 +189,7 @@
       "classification": {
         "alpha1": "missing-product-capability"
       },
-      "sha256": "e6d33202886cae129d879671be477f4de64d41f76c2b83ec80698210a184f1c4"
+      "sha256": "8365e40963ebfa8024c544f60a5a7808c78bbe33b69ced4157e4c32baaa7fdba"
     },
     {
       "id": "heldout-slots-collapsed-link-size",
@@ -203,7 +203,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "26a58a8471eb408644a92b1a76ae924c9bf7d64f3e63f75ce12c2a38f8fae724"
+      "sha256": "d700f36f35ad03c874d2e3e6fd9eb84770710a86c83112302ab00437d85f4d0a"
     },
     {
       "id": "heldout-states-focus-ring-missing-condition",
@@ -218,7 +218,7 @@
       "classification": {
         "alpha1": "missing-project-vocabulary"
       },
-      "sha256": "dd20da43c1d823668f559373a95f24b2ab9df8d4e5bdcf33c1e31879a15774f1"
+      "sha256": "984551e229022132833d5272be5c7a304c775451456731f257c4ff5ba5975677"
     },
     {
       "id": "heldout-themes-operator-layout",
@@ -232,7 +232,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "f439cdf8445fd44cd721f642ecfa411d858602ccae3a24aba153d1eafcf8ee2b"
+      "sha256": "58bcc56a5f073524e6789d292f3d0bc429e9a3fae10c196da7933994ca1846c0"
     },
     {
       "id": "heldout-variants-preorder-badge",
@@ -246,7 +246,7 @@
       "classification": {
         "alpha1": "expressible"
       },
-      "sha256": "df51b6c06ac5a9bfaf94107dcb03d21bd9608abb3f86bba647ec5679c0b7fdaf"
+      "sha256": "545c7bb27f9d37d615e5577efa3dda18e3b3c3d943f0df5440c3daeaaec90835"
     }
   ]
 }

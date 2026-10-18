@@ -379,3 +379,26 @@ test('the guard fails when held-out plaintext is tracked or not ignored', () => 
   assert.match(problems, /is not gitignored/);
   fs.rmSync(root, { recursive: true, force: true });
 });
+
+test('no corpus input on disk is excluded by an ignore rule', () => {
+  const files = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const abs = path.join(dir, entry.name);
+      if (abs.startsWith(path.join(CORPUS_ROOT, 'heldout', '.'))) continue;
+      if (entry.isDirectory()) walk(abs);
+      else files.push(path.relative(CORPUS_ROOT, abs));
+    }
+  };
+  walk(CORPUS_ROOT);
+  const r = spawnSync('git', ['check-ignore', '--no-index', '--stdin'], {
+    cwd: CORPUS_ROOT,
+    input: files.join('\n'),
+    encoding: 'utf8',
+  });
+  assert.deepEqual(
+    r.stdout.split('\n').filter(Boolean),
+    [],
+    'ignored corpus inputs would be missing from a clean checkout',
+  );
+});

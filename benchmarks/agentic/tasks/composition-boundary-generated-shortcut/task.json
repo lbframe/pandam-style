@@ -110,7 +110,10 @@
             "raw-classname",
             "type-escape",
             "direct-pandamstyle-import",
-            "generated-internal-import"
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
           ],
           "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
         },
@@ -145,6 +148,7 @@
             "testId": "promo-banner"
           },
           "expect": {
+            "textMatches": "Free shipping on orders over 50 EUR",
             "styles": {
               "border-radius": {
                 "token": "radii.pill"
@@ -154,7 +158,7 @@
               }
             }
           },
-          "description": "The banner uses the pill radius token through source."
+          "description": "The banner keeps its message and uses the pill radius token through source."
         }
       ]
     }

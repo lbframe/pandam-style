@@ -119,6 +119,14 @@
             "\\bnext\\s+(build|dev)\\b"
           ],
           "description": "No build, dev or install command ran."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
         }
       ]
     }

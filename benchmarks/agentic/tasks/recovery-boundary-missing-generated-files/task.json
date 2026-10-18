@@ -124,7 +124,10 @@
             "raw-classname",
             "type-escape",
             "direct-pandamstyle-import",
-            "generated-internal-import"
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
           ],
           "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
         },
@@ -141,6 +144,7 @@
             "testId": "notes-app"
           },
           "expect": {
+            "textMatches": "Groceries[\\s\\S]*Ideas",
             "styles": {
               "background-color": {
                 "token": "colors.surface.base"

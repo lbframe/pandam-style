@@ -109,7 +109,10 @@
             "raw-classname",
             "type-escape",
             "direct-pandamstyle-import",
-            "generated-internal-import"
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
           ],
           "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
         },
@@ -171,6 +174,7 @@
             }
           },
           "expect": {
+            "text": "Free shipping on orders over 50 EUR.",
             "styles": {
               "font-size": {
                 "token": "fontSizes.md"

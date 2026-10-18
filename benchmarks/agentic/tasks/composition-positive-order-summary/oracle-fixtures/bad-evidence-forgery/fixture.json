@@ -1,0 +1,10 @@
+{
+  "description": "Review probe: application code imports node:fs to rewrite the harness result file; the sandbox denies it and the wrong title is observed.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-title": "fail",
+    "summary-card": "fail"
+  }
+}

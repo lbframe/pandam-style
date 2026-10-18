@@ -9,7 +9,7 @@
 // Findings are compared with the baseline file so that only constructs the
 // evaluated agent introduced are attributed to it.
 
-import { createRequire } from 'node:module';
+import { createRequire, isBuiltin } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const { parse } = require('@babel/parser');
@@ -29,7 +29,55 @@ export const STATIC_RULES = [
   'type-escape',
   'direct-pandamstyle-import',
   'generated-internal-import',
+  'dom-global-access',
+  'dynamic-code',
+  'privileged-import',
 ];
+
+// Members whose use reads or writes inline styles, style sheets or raw markup.
+const STYLE_MEMBERS = new Set([
+  'style',
+  'cssText',
+  'adoptedStyleSheets',
+  'styleSheets',
+  'sheet',
+  'cssRules',
+  'insertRule',
+  'deleteRule',
+  'addRule',
+  'replaceSync',
+  'setProperty',
+  'removeProperty',
+  'attributeStyleMap',
+  'innerHTML',
+  'outerHTML',
+  'insertAdjacentHTML',
+  'animate',
+]);
+const STYLE_GLOBALS = new Set([
+  'CSSStyleSheet',
+  'CSS',
+  'StyleSheet',
+  'CSSStyleDeclaration',
+  'CSSStyleRule',
+  'FontFace',
+]);
+// Ambient objects through which any DOM or runtime mutation is reachable.
+// Static analysis cannot prove a use harmless, so use fails closed.
+const DOM_GLOBALS = new Set([
+  'document',
+  'window',
+  'globalThis',
+  'self',
+  'top',
+  'frames',
+]);
+const MUTATORS = new Set([
+  'assign',
+  'defineProperty',
+  'defineProperties',
+  'setPrototypeOf',
+]);
 
 function parseSource(code, file) {
   return parse(code, {
@@ -70,7 +118,109 @@ function memberName(node) {
   return null;
 }
 
-/** Returns `[{ rule, line, detail }]` for one file. */
+// Folds a computed member key to a string when it is a constant expression.
+function constantKey(node) {
+  if (node == null) return null;
+  if (node.type === 'StringLiteral') return node.value;
+  if (node.type === 'TemplateLiteral' && node.expressions.length === 0)
+    return node.quasis.map((q) => q.value.cooked).join('');
+  if (node.type === 'BinaryExpression' && node.operator === '+') {
+    const l = constantKey(node.left);
+    const r = constantKey(node.right);
+    return l != null && r != null ? l + r : null;
+  }
+  return null;
+}
+
+function propertyName(node) {
+  if (
+    node?.type !== 'MemberExpression' &&
+    node?.type !== 'OptionalMemberExpression'
+  )
+    return null;
+  if (!node.computed)
+    return node.property.type === 'Identifier' ? node.property.name : null;
+  return constantKey(node.property);
+}
+
+function isLiteralObject(node) {
+  return node?.type === 'ObjectExpression' || node?.type === 'ArrayExpression';
+}
+
+function isReference(node, parent, key) {
+  if (parent == null) return true;
+  if (
+    (parent.type === 'MemberExpression' ||
+      parent.type === 'OptionalMemberExpression') &&
+    key === 'property' &&
+    !parent.computed
+  )
+    return false;
+  if (
+    (parent.type === 'ObjectProperty' ||
+      parent.type === 'ObjectMethod' ||
+      parent.type === 'ClassProperty' ||
+      parent.type === 'ClassMethod') &&
+    key === 'key' &&
+    !parent.computed
+  )
+    return false;
+  if (parent.type === 'VariableDeclarator' && key === 'id') return false;
+  if (
+    (parent.type === 'FunctionDeclaration' ||
+      parent.type === 'FunctionExpression' ||
+      parent.type === 'ArrowFunctionExpression') &&
+    key !== 'body'
+  )
+    return false;
+  if (parent.type.startsWith('Import') || parent.type === 'ExportSpecifier')
+    return false;
+  if (parent.type.startsWith('JSX')) return false;
+  if (parent.type.startsWith('TS') || parent.type.endsWith('TypeAnnotation'))
+    return false;
+  if (
+    parent.type === 'LabeledStatement' ||
+    parent.type === 'BreakStatement' ||
+    parent.type === 'ContinueStatement'
+  )
+    return false;
+  return true;
+}
+
+function walkWithParent(node, visit, parent = null, key = null) {
+  if (node == null || typeof node !== 'object') return;
+  if (Array.isArray(node)) {
+    for (const child of node) walkWithParent(child, visit, parent, key);
+    return;
+  }
+  if (typeof node.type === 'string') visit(node, parent, key);
+  for (const [k, value] of Object.entries(node)) {
+    if (
+      k === 'loc' ||
+      k === 'start' ||
+      k === 'end' ||
+      k === 'extra' ||
+      k === 'leadingComments' ||
+      k === 'trailingComments' ||
+      k === 'innerComments'
+    )
+      continue;
+    if (value != null && typeof value === 'object')
+      walkWithParent(
+        value,
+        visit,
+        typeof node.type === 'string' ? node : parent,
+        k,
+      );
+  }
+}
+
+/**
+ * Returns `[{ rule, line, detail }]` for one file. Rules fail closed: a
+ * construct that could mutate styles and cannot be proven harmless statically
+ * is reported (`dom-global-access`, `dynamic-code`, non-literal mutation
+ * targets), never assumed safe.
+ */
 export function findConstructs(code, file, { isDefinition = false } = {}) {
   let ast;
   try {
@@ -94,7 +244,23 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
       add('type-escape', comment, comment.value.trim().slice(0, 60));
     }
   }
-  walk(ast.program, (node) => {
+  const checkModule = (node, source) => {
+    if (typeof source !== 'string') {
+      add('dynamic-code', node, 'non-literal module specifier');
+      return;
+    }
+    if (CSS_IN_JS.test(source)) add('css-in-js-import', node, source);
+    if (STYLESHEET.test(source)) add('stylesheet-import', node, source);
+    if (!isDefinition && PMS_DIRECT.test(source))
+      add('direct-pandamstyle-import', node, source);
+    if (
+      /\.pandamstyle\/(js|css)\//.test(source) ||
+      /manifest\.json$/.test(source)
+    )
+      add('generated-internal-import', node, source);
+    if (isBuiltin(source)) add('privileged-import', node, source);
+  };
+  walkWithParent(ast.program, (node, parent, key) => {
     switch (node.type) {
       case 'JSXAttribute': {
         const name = node.name?.name;
@@ -111,90 +277,185 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
         }
         break;
       }
+      case 'JSXSpreadAttribute':
+        if (node.argument?.type === 'ObjectExpression') {
+          for (const p of node.argument.properties) {
+            const k = p.key?.name ?? p.key?.value;
+            if (k === 'style')
+              add('jsx-style-prop', node, 'style in spread attributes');
+            if (k === 'className' || k === 'class')
+              add('raw-classname', node, 'className in spread attributes');
+            if (k === 'dangerouslySetInnerHTML')
+              add(
+                'runtime-style-injection',
+                node,
+                'dangerouslySetInnerHTML in spread',
+              );
+          }
+        }
+        break;
+      case 'JSXOpeningElement': {
+        const tag = node.name?.type === 'JSXIdentifier' ? node.name.name : null;
+        if (tag === 'style' || tag === 'link')
+          add('runtime-style-injection', node, `<${tag}> element`);
+        break;
+      }
       case 'ImportDeclaration':
       case 'ExportNamedDeclaration':
-      case 'ExportAllDeclaration': {
-        const source = node.source?.value;
-        if (typeof source !== 'string') break;
-        if (CSS_IN_JS.test(source)) add('css-in-js-import', node, source);
-        if (STYLESHEET.test(source)) add('stylesheet-import', node, source);
-        if (!isDefinition && PMS_DIRECT.test(source))
-          add('direct-pandamstyle-import', node, source);
-        if (
-          /\.pandamstyle\/(js|css)\//.test(source) ||
-          /manifest\.json$/.test(source)
-        ) {
-          add('generated-internal-import', node, source);
-        }
+      case 'ExportAllDeclaration':
+        if (node.source != null) checkModule(node, node.source.value);
         break;
-      }
-      case 'CallExpression': {
-        const callee = memberName(node.callee) ?? node.callee?.name;
+      case 'ImportExpression':
+        checkModule(node, constantKey(node.source));
+        break;
+      case 'CallExpression':
+      case 'OptionalCallExpression':
+      case 'NewExpression': {
+        const callee = node.callee;
+        const name = propertyName(callee) ?? callee?.name;
         const arg = node.arguments?.[0];
-        if (
-          callee === 'createElement' &&
-          arg?.type === 'StringLiteral' &&
-          arg.value === 'style'
-        ) {
-          add('runtime-style-injection', node, "createElement('style')");
+        const argKey = constantKey(arg);
+        if (callee?.type === 'Import') checkModule(node, argKey);
+        if (name === 'require') checkModule(node, argKey);
+        if (name === 'createElement' || name === 'createElementNS') {
+          const tag = node.arguments?.[name === 'createElementNS' ? 1 : 0];
+          const tagKey = constantKey(tag);
+          if (
+            tagKey == null &&
+            tag?.type !== 'Identifier' &&
+            tag?.type !== 'MemberExpression'
+          )
+            add(
+              'runtime-style-injection',
+              node,
+              `${name} with non-constant tag`,
+            );
+          if (tagKey === 'style' || tagKey === 'link')
+            add('runtime-style-injection', node, `${name}('${tagKey}')`);
         }
         if (
-          [
-            'insertRule',
-            'replaceSync',
-            'setProperty',
-            'insertAdjacentHTML',
-          ].includes(callee)
+          ['setAttribute', 'setAttributeNS', 'toggleAttribute'].includes(name)
         ) {
-          add('runtime-style-injection', node, callee);
+          const attr = constantKey(
+            node.arguments?.[name === 'setAttributeNS' ? 1 : 0],
+          );
+          if (attr == null)
+            add(
+              'runtime-style-injection',
+              node,
+              `${name} with non-constant attribute`,
+            );
+          else if (attr === 'style')
+            add('runtime-style-injection', node, `${name}('style')`);
+          else if (attr === 'class')
+            add('raw-classname', node, `${name}('class')`);
         }
-        if (callee === 'require' && arg?.type === 'StringLiteral') {
-          if (CSS_IN_JS.test(arg.value))
-            add('css-in-js-import', node, arg.value);
-          if (STYLESHEET.test(arg.value))
-            add('stylesheet-import', node, arg.value);
+        if (['write', 'writeln'].includes(name) && propertyName(callee) != null)
+          add('runtime-style-injection', node, `document.${name}`);
+        const objectName = callee?.object?.name;
+        if (
+          (objectName === 'Object' && MUTATORS.has(name)) ||
+          objectName === 'Reflect'
+        ) {
+          if (objectName === 'Reflect' || !isLiteralObject(arg))
+            add(
+              'runtime-style-injection',
+              node,
+              `${objectName}.${name} on a non-literal target`,
+            );
         }
+        if (
+          (callee?.name === 'eval' || callee?.name === 'Function') &&
+          node.type !== 'NewExpression'
+        )
+          add('dynamic-code', node, callee.name);
+        if (node.type === 'NewExpression' && callee?.name === 'Function')
+          add('dynamic-code', node, 'new Function');
+        if (
+          (callee?.name === 'setTimeout' || callee?.name === 'setInterval') &&
+          arg != null &&
+          arg.type !== 'ArrowFunctionExpression' &&
+          arg.type !== 'FunctionExpression' &&
+          arg.type !== 'Identifier'
+        ) {
+          add(
+            'dynamic-code',
+            node,
+            `${callee.name} with a non-function argument`,
+          );
+        }
+        if (node.type === 'NewExpression' && STYLE_GLOBALS.has(callee?.name))
+          add('runtime-style-injection', node, `new ${callee.name}`);
         break;
       }
-      case 'NewExpression':
-        if (node.callee?.name === 'CSSStyleSheet')
-          add('runtime-style-injection', node, 'new CSSStyleSheet');
-        break;
-      case 'MemberExpression': {
-        const name = memberName(node);
+      case 'MemberExpression':
+      case 'OptionalMemberExpression': {
+        const name = propertyName(node);
+        if (name != null && STYLE_MEMBERS.has(name))
+          add('runtime-style-injection', node, `.${name}`);
+        if (name === 'classList') add('raw-classname', node, '.classList');
         if (
-          name === 'adoptedStyleSheets' ||
-          name === 'cssText' ||
-          name === 'styleSheets'
+          node.computed &&
+          name == null &&
+          constantKey(node.property) == null
         ) {
-          add('runtime-style-injection', node, name);
+          // A computed key on an object reached from a DOM global or a style
+          // object cannot be checked against the style members above.
+          let root = node.object;
+          while (
+            root?.type === 'MemberExpression' ||
+            root?.type === 'OptionalMemberExpression'
+          )
+            root = root.object;
+          if (root?.type === 'Identifier' && DOM_GLOBALS.has(root.name))
+            add('dom-global-access', node, `${root.name}[computed]`);
+        }
+        if (
+          node.object?.type === 'Identifier' &&
+          node.object.name === 'process' &&
+          propertyName(node) !== 'env'
+        ) {
+          add(
+            'privileged-import',
+            node,
+            `process.${propertyName(node) ?? '[computed]'}`,
+          );
         }
         break;
       }
       case 'AssignmentExpression': {
         const target = node.left;
-        if (
-          (target.type === 'MemberExpression' &&
-            memberName(target.object) === 'style') ||
-          memberName(target) === 'innerHTML'
-        ) {
-          add('runtime-style-injection', node, 'style/innerHTML assignment');
-        }
+        if (propertyName(target) === 'className')
+          add('raw-classname', node, 'className assignment');
         break;
       }
+      case 'ObjectPattern':
+        for (const p of node.properties) {
+          const k = p.key?.name ?? p.key?.value;
+          if (k != null && STYLE_MEMBERS.has(k))
+            add('runtime-style-injection', node, `destructured ${k}`);
+        }
+        break;
+      case 'Identifier':
+        if (isReference(node, parent, key)) {
+          if (DOM_GLOBALS.has(node.name))
+            add('dom-global-access', node, node.name);
+          if (STYLE_GLOBALS.has(node.name))
+            add('runtime-style-injection', node, node.name);
+        }
+        break;
       case 'TSAsExpression':
       case 'TSTypeAssertion':
         if (node.typeAnnotation?.type === 'TSAnyKeyword')
           add('type-escape', node, 'as any');
         break;
       case 'TypeCastExpression':
-        if (node.typeAnnotation?.typeAnnotation?.type === 'AnyTypeAnnotation') {
+        if (node.typeAnnotation?.typeAnnotation?.type === 'AnyTypeAnnotation')
           add('type-escape', node, 'any cast');
-        }
         break;
       case 'TaggedTemplateExpression': {
         const tag = node.tag;
-        const name = tag?.name ?? memberName(tag) ?? tag?.callee?.name;
+        const name = tag?.name ?? propertyName(tag) ?? tag?.callee?.name;
         if (
           [
             'css',
@@ -203,9 +464,8 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
             'createGlobalStyle',
             'keyframes',
           ].includes(name)
-        ) {
+        )
           add('css-in-js-import', node, `tagged template ${name}`);
-        }
         break;
       }
       default:

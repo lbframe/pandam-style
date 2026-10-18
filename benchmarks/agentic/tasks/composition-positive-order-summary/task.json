@@ -106,7 +106,10 @@
             "raw-classname",
             "type-escape",
             "direct-pandamstyle-import",
-            "generated-internal-import"
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
           ],
           "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
         },
@@ -235,9 +238,13 @@
             "testId": "order-summary-item"
           },
           "expect": {
-            "count": 2
+            "count": 2,
+            "texts": [
+              "\\b1\\b.*\\bMug\\b|\\bMug\\b.*\\b1\\b",
+              "\\b2\\b.*\\bTote\\b|\\bTote\\b.*\\b2\\b"
+            ]
           },
-          "description": "One line per item."
+          "description": "One visible line per item showing its quantity and name."
         },
         {
           "id": "checkout-button",
@@ -291,10 +298,18 @@
             "export": "ProductPage"
           },
           "select": {
-            "testId": "order-summary"
+            "testId": "order-summary-item",
+            "within": {
+              "testId": "order-summary"
+            }
           },
-          "expect": {},
-          "description": "The summary is rendered on the product page."
+          "expect": {
+            "count": 1,
+            "texts": [
+              "\\b2\\b.*Canvas tote|Canvas tote.*\\b2\\b"
+            ]
+          },
+          "description": "The product page shows the summary with the requested item data (2 x Canvas tote)."
         },
         {
           "id": "visual-fidelity",

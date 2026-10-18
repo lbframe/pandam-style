@@ -8,9 +8,11 @@ wrong one. Check IDs refer to `expectations.alpha1.checks` in each
 `pms-agentic oracle-fixtures` and matched its expected verdict and statuses.
 
 Every task also has a required `scope.diff` (byte diff against writable and
-protected globs). Application tasks also have `compile`, `no-bypass`
-(`static.forbidden`) and `generated-untouched` (`generated.consistent`). These
-are not repeated below unless they are the discriminating evidence.
+protected globs), and every task with a PandamStyle project has
+`generated-untouched` (full generated inventory). Application tasks also have
+`compile` and `no-bypass` (`static.forbidden`), and at least one render check
+asserting rendered content. Every rendered match must be presented. These are
+not repeated below unless they are the discriminating evidence.
 
 ## discovery: `discovery-positive-card-vocabulary`
 
@@ -33,8 +35,10 @@ are not repeated below unless they are the discriminating evidence.
 - **Evidence:**
   - `rendered`: `summary-card` (box-shadow `shadows.raised`, background
     `colors.surface.page`, radius `radii.md`); `summary-title` (`fontSizes.lg`,
-    `fontWeights.bold`, text); `summary-items` (count 2); `checkout-button`
-    (`colors.action.primary`, width `100%`); `mounted-on-page`.
+    `fontWeights.bold`, text); `summary-items` (two visible lines whose text
+    shows each quantity and name); `checkout-button`
+    (`colors.action.primary`, width `100%`); `mounted-on-page` (the product
+    page shows the requested `2 x Canvas tote` line inside the summary).
   - `visual`: `visual-fidelity` is `unmeasured` and not required.
 - **Discrimination:**
   - `bad-compiles-wrong-vocabulary` compiles (`compile` pass) but uses the flat
@@ -44,6 +48,21 @@ are not repeated below unless they are the discriminating evidence.
     and its renders are `blocked`.
   - `bad-out-of-scope` edits the design system: `scope` and
     `vocabulary-unchanged` fail.
+  - Independent-review probes, all rejected:
+    - `bad-empty-items` (content), `bad-hidden-root` and `bad-template-mount`
+      (presentation).
+    - `bad-runtime-style` (`Object.assign` on `document.body.style`) and
+      `bad-spread-style` (static rules).
+    - `bad-evidence-forgery`: application code imports `node:fs` to rewrite the
+      harness result. The sandbox denies the import, and no trusted output is
+      reachable.
+    - `bad-patched-generated-js` (a compiled module under `.pandamstyle/js/`).
+    - `bad-renamed-data`, `bad-deleted-page` and `bad-protected-symlink`
+      (scope).
+  - The same class for behavior is covered by
+    `variants-positive-remove-button`. `remove-click` dispatches a click and
+    requires exactly one `onRemove` call; `bad-no-click-handler` and
+    `bad-calls-during-render` fail.
 
 ## states: `states-boundary-aria-disabled`
 

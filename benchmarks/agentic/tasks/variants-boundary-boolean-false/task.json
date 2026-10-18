@@ -106,7 +106,10 @@
             "raw-classname",
             "type-escape",
             "direct-pandamstyle-import",
-            "generated-internal-import"
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
           ],
           "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
         },
@@ -149,6 +152,7 @@
             "testId": "service-health"
           },
           "expect": {
+            "text": "Failing",
             "styles": {
               "opacity": {
                 "absent": true
@@ -181,6 +185,7 @@
             "testId": "service-health"
           },
           "expect": {
+            "text": "Healthy",
             "styles": {
               "opacity": {
                 "value": "0.6"

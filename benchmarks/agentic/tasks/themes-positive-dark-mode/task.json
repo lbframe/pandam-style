@@ -104,7 +104,10 @@
             "raw-classname",
             "type-escape",
             "direct-pandamstyle-import",
-            "generated-internal-import"
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
           ],
           "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
         },
@@ -142,6 +145,7 @@
             "testId": "app-shell"
           },
           "expect": {
+            "textMatches": "Featured products",
             "styles": {
               "background-color": {
                 "value": "#0b1220"
@@ -177,7 +181,12 @@
               "color": {
                 "value": "#ffffff"
               }
-            }
+            },
+            "texts": [
+              "Canvas tote",
+              "Enamel mug",
+              "Linen notebook"
+            ]
           },
           "description": "Nested cards inherit the dark mapping.",
           "index": 0

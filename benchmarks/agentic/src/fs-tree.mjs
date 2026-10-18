@@ -112,7 +112,7 @@ function listDirs(root, exclude) {
 export function copyTree(
   src,
   dest,
-  { exclude = [], includeEmptyDirs = false } = {},
+  { exclude = [], includeEmptyDirs = false, skipSymlinks = false } = {},
 ) {
   if (includeEmptyDirs) {
     for (const rel of listDirs(src, exclude))
@@ -121,8 +121,10 @@ export function copyTree(
   for (const rel of listFiles(src, { exclude })) {
     const from = path.join(src, rel);
     const to = path.join(dest, rel);
-    fs.mkdirSync(path.dirname(to), { recursive: true });
     const stat = fs.lstatSync(from);
+    // Oracle scratch copies never follow agent-created links out of the tree.
+    if (stat.isSymbolicLink() && skipSymlinks) continue;
+    fs.mkdirSync(path.dirname(to), { recursive: true });
     if (stat.isSymbolicLink()) {
       fs.symlinkSync(fs.readlinkSync(from), to);
     } else {

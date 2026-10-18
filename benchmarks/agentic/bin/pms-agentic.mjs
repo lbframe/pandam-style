@@ -16,7 +16,8 @@
 //   prepare <task> <dest>             prepare steps + baseline commit (after install)
 //   event <task> <eventId> <dest>     apply a concurrent-edit event (exit 3: not applied)
 //   evaluate <task> --baseline d --workspace d [--response f] [--transcript f]
-//            [--observations f] [--epoch e] [--host-commands] [--out f]
+//            [--observations f] [--epoch e] [--host-commands]
+//            [--trusted-node-modules d] [--out f]
 //   oracle-fixtures [--task id] [--scratch d] [--verbose]  prove oracles discriminate
 //   heldout manifest|seal|unseal|verify|guard [--dest d]
 //
@@ -197,7 +198,12 @@ async function main() {
           ? JSON.parse(fs.readFileSync(flags.observations, 'utf8'))
           : null,
         scratchRoot: flags.scratch ? path.resolve(flags.scratch) : undefined,
-        options: { hostCommands: flags['host-commands'] === true },
+        options: {
+          hostCommands: flags['host-commands'] === true,
+          trustedNodeModules: flags['trusted-node-modules']
+            ? path.resolve(flags['trusted-node-modules'])
+            : null,
+        },
       });
       const out = `${JSON.stringify(res, null, 2)}\n`;
       if (flags.out) fs.writeFileSync(flags.out, out);

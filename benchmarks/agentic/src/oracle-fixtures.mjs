@@ -74,6 +74,15 @@ export async function runOracleFixture({
   for (const rel of fixture.spec.delete ?? [])
     fs.rmSync(path.join(workspaceDir, rel), { recursive: true, force: true });
   const project = taskEntry.task.project ?? meta.meta.project;
+  for (const link of fixture.spec.symlinks ?? []) {
+    const target = link.target.startsWith('baseline:')
+      ? path.join(baselineDir, link.target.slice('baseline:'.length))
+      : link.target;
+    fs.rmSync(path.join(workspaceDir, link.path), { force: true });
+    fs.symlinkSync(target, path.join(workspaceDir, link.path));
+  }
+  if (fixture.spec.regenerate === 'before-steps')
+    compileInPlace({ dir: workspaceDir, project });
   if (fixture.spec.steps != null) {
     const r = applySteps({
       taskEntry,
@@ -83,7 +92,8 @@ export async function runOracleFixture({
     });
     if (!r.applied) throw new Error(`fixture step did not apply: ${r.reason}`);
   }
-  if (fixture.spec.regenerate) compileInPlace({ dir: workspaceDir, project });
+  if (fixture.spec.regenerate === true)
+    compileInPlace({ dir: workspaceDir, project });
   const responsePath = path.join(fixture.dir, 'response.md');
   const result = await evaluateTask({
     task: taskEntry.task,

@@ -1,0 +1,12 @@
+{
+  "description": "Review probe: deletes the product page.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "fail",
+    "mounted-on-page": "blocked"
+  },
+  "delete": [
+    "src/pages/ProductPage.jsx"
+  ]
+}

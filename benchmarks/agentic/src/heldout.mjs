@@ -23,6 +23,9 @@ import { sha256 } from './fs-tree.mjs';
 export const UNSEAL_PURPOSES = [
   'ag-12.2-final-qualification',
   'seal-verification',
+  // One-time author revision before any consumption; refused once AG-00.3
+  // freezes thresholds (corpus.json freeze.thresholdsFrozen).
+  'pre-freeze-revision',
 ];
 
 function passphraseFile() {
@@ -189,6 +192,16 @@ export function unseal(
     throw new Error(
       `unseal requires PMS_HELDOUT_PURPOSE in ${UNSEAL_PURPOSES.join('|')} (see heldout/ACCESS-POLICY.md)`,
     );
+  }
+  if (purpose === 'pre-freeze-revision') {
+    const corpus = JSON.parse(
+      fs.readFileSync(path.join(root, 'corpus.json'), 'utf8'),
+    );
+    if (corpus.freeze?.thresholdsFrozen !== false) {
+      throw new Error(
+        'pre-freeze-revision is refused: AG-00.3 thresholds are frozen (corpus.json freeze.thresholdsFrozen)',
+      );
+    }
   }
   const hp = heldoutPaths(root);
   const target = path.resolve(dest ?? hp.unsealed);

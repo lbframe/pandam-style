@@ -12,7 +12,8 @@
     "workflows",
     "caseTypes",
     "requiredTags",
-    "splits"
+    "splits",
+    "freeze"
   ],
   "properties": {
     "schemaVersion": {
@@ -116,6 +117,22 @@
     },
     "description": {
       "type": "string"
+    },
+    "freeze": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "thresholdsFrozen"
+      ],
+      "properties": {
+        "thresholdsFrozen": {
+          "type": "boolean",
+          "description": "Set to true by AG-00.3 when baseline thresholds are frozen; from then on the held-out set may only be unsealed for AG-12.2 or seal verification."
+        },
+        "note": {
+          "type": "string"
+        }
+      }
     }
   }
 }

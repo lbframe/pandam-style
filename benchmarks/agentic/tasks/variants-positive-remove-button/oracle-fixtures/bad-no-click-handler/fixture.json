@@ -1,0 +1,10 @@
+{
+  "description": "Review probe: the onClick handler is removed; styles still match.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "remove-default": "pass",
+    "remove-hover": "pass",
+    "remove-click": "fail"
+  }
+}

@@ -975,7 +975,10 @@
                     "raw-classname",
                     "type-escape",
                     "direct-pandamstyle-import",
-                    "generated-internal-import"
+                    "generated-internal-import",
+                    "dom-global-access",
+                    "dynamic-code",
+                    "privileged-import"
                   ]
                 }
               }
@@ -1200,6 +1203,32 @@
               },
               "expect": {
                 "$ref": "#/$defs/renderExpect"
+              },
+              "interactions": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "testId",
+                    "event"
+                  ],
+                  "properties": {
+                    "testId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "event": {
+                      "enum": [
+                        "click",
+                        "change",
+                        "submit",
+                        "input"
+                      ]
+                    }
+                  }
+                }
               }
             },
             "additionalProperties": false,
@@ -1584,6 +1613,36 @@
               }
             }
           }
+        },
+        "texts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "One case-insensitive regular expression per matched element, in document order."
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Default true: every match must be presented (not hidden, inert, template content, display:none, visibility:hidden or opacity:0)."
+        },
+        "callbacks": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "calls"
+            ],
+            "properties": {
+              "calls": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "description": "Spy callbacks (render props written {\"$pmsSpy\": name}) and how many times the interactions must call them; calls outside the interactions always fail."
         }
       }
     },

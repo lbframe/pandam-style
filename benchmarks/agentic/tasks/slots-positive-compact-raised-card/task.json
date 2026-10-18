@@ -104,7 +104,10 @@
             "raw-classname",
             "type-escape",
             "direct-pandamstyle-import",
-            "generated-internal-import"
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
           ],
           "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
         },
@@ -214,6 +217,7 @@
             "testId": "save-for-later"
           },
           "expect": {
+            "text": "Save for later",
             "styles": {
               "background-color": {
                 "token": "colors.surface.raised"
@@ -252,7 +256,11 @@
             "count": 2,
             "attributes": {
               "data-testid": "save-for-later"
-            }
+            },
+            "texts": [
+              "^Save for later$",
+              "^Add to cart$"
+            ]
           },
           "description": "Save for later precedes Add to cart.",
           "index": 0

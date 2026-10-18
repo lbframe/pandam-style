@@ -194,6 +194,18 @@ function checkTask(entry, { corpus, fixtures, schemas, split, errors }) {
     if (new Set(ids).size !== ids.length) e('duplicate check ids');
     const req = checks.filter((c) => c.required);
     const has = (pred) => req.some(pred);
+    if (
+      project != null &&
+      (task.permissions?.harnessIgnored ?? []).some((g) =>
+        g.startsWith(project.outDir.replace(/^\.\//, '')),
+      )
+    ) {
+      if (!has((c) => c.kind === 'generated.consistent')) {
+        e(
+          'the generated output directory is harness-ignored by the scope diff, so a required generated.consistent check must cover it',
+        );
+      }
+    }
     if (!has((c) => c.kind === 'scope.diff'))
       e(
         'a required scope.diff check is mandatory (restrictions must be checkable independently)',
@@ -226,6 +238,27 @@ function checkTask(entry, { corpus, fixtures, schemas, split, errors }) {
         e(
           `${c.id}: ${c.kind} needs a project (fixture.project or task.project)`,
         );
+      }
+      if (c.kind === 'render.styles') {
+        const count = c.expect?.count ?? 1;
+        if (count > 1 && (c.expect?.texts ?? []).length !== count) {
+          e(
+            `${c.id}: a render check matching ${count} elements must assert each element's content (texts)`,
+          );
+        }
+        const spies = [];
+        JSON.stringify(c.render.props ?? {}, (k, v) => {
+          if (k === '$pmsSpy') spies.push(v);
+          return v;
+        });
+        for (const spy of spies) {
+          if (c.expect?.callbacks?.[spy] == null)
+            e(`${c.id}: spy ${spy} has no callbacks expectation`);
+        }
+        if (c.expect?.callbacks != null && (c.interactions ?? []).length === 0)
+          e(`${c.id}: callbacks need interactions that invoke them`);
+        if ((c.interactions ?? []).length > 0 && c.class !== 'behavioral')
+          e(`${c.id}: interaction checks are behavioral`);
       }
       if (c.kind === 'render.styles' && c.class === 'behavioral') {
         const ctx = c.context ?? {};
@@ -265,6 +298,19 @@ function checkTask(entry, { corpus, fixtures, schemas, split, errors }) {
       }
       if (!has((c) => c.kind === 'compile.project' && c.expect === 'ok'))
         e('application-success needs a required compile.project ok check');
+      if (
+        !has(
+          (c) =>
+            c.kind === 'render.styles' &&
+            (c.expect?.text != null ||
+              c.expect?.textMatches != null ||
+              c.expect?.texts != null),
+        )
+      ) {
+        e(
+          'application-success needs a required render check asserting rendered content (text, textMatches or texts), not only structure',
+        );
+      }
       if (!has((c) => c.kind === 'static.forbidden'))
         e('application-success needs a required static.forbidden check');
     }

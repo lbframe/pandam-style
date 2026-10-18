@@ -5,17 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-// Child process that observes a project through the public compiler SDK.
+// Trusted child process that observes a project through the public compiler
+// SDK.
 //
 // Usage: node project-worker.mjs <request.json> <response.json>
 //
-// It runs in its own process so that definition modules, compiled
-// application modules and React state never leak between evaluations, and so
-// a crashing or hanging application module cannot take the harness down.
+// It never imports code written by the evaluated agent. The design-system
+// definition arrives as data produced by the sandbox (sandbox.mjs); token
+// references are re-minted with the trusted compiler's own `token()`.
+// Application modules are only compiled here, never executed: rendering
+// happens in the sandbox. The only modules it executes are compiler output
+// (the generated design module) and the harness's own vocabulary probe.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire, register } from 'node:module';
+import { register } from 'node:module';
 import { pathToFileURL } from 'node:url';
 
 const SOURCE = /\.(jsx?|tsx?|mjs)$/;
@@ -48,20 +52,29 @@ async function loadCompiler(workspaceDir) {
   const manifestPath = findPackage(workspaceDir, '@pandamstyle/compiler');
   if (manifestPath == null) {
     throw new Error(
-      'PMS_ORACLE_NO_COMPILER: @pandamstyle/compiler is not resolvable from the workspace',
+      'PMS_ORACLE_NO_COMPILER: @pandamstyle/compiler is not resolvable from the trusted dependency tree',
     );
   }
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const dir = path.dirname(manifestPath);
   const entry = manifest.exports?.['.']?.import ?? manifest.module;
-  const compiler = await import(
-    pathToFileURL(path.join(path.dirname(manifestPath), entry)).href
-  );
-  return { compiler, version: manifest.version };
+  const configEntry = manifest.exports?.['./config']?.import;
+  const compiler = await import(pathToFileURL(path.join(dir, entry)).href);
+  const config = await import(pathToFileURL(path.join(dir, configEntry)).href);
+  return { compiler, config, version: manifest.version };
 }
 
-async function importDefault(file) {
-  const ns = await import(pathToFileURL(file).href);
-  return Object.hasOwn(ns, 'default') ? ns.default : ns;
+// Rebuilds a definition from sandbox data with trusted token references.
+function reviveDefinition(data, token) {
+  if (Array.isArray(data)) return data.map((v) => reviveDefinition(v, token));
+  if (data != null && typeof data === 'object') {
+    if (typeof data.$pmsTokenRef === 'string') return token(data.$pmsTokenRef);
+    const out = {};
+    for (const [key, value] of Object.entries(data))
+      out[key] = reviveDefinition(value, token);
+    return out;
+  }
+  return data;
 }
 
 function listSources(root) {
@@ -99,9 +112,8 @@ function normalizeDiagnostic(d) {
 
 async function compileProject(
   compiler,
-  { rootDir, definitionPath, roots, outDir },
+  { rootDir, definition, roots, outDir },
 ) {
-  const definition = await importDefault(definitionPath);
   const session = compiler.createProjectSession({
     projectId: rootDir,
     rootDir,
@@ -136,51 +148,7 @@ async function compileProject(
   }
 }
 
-function flattenDefinition(definition) {
-  const out = {};
-  const json = (v) => JSON.stringify(v);
-  function tokens(node, prefix) {
-    for (const [key, value] of Object.entries(node ?? {})) {
-      const p = prefix ? `${prefix}.${key}` : key;
-      if (
-        value != null &&
-        typeof value === 'object' &&
-        ('value' in value || 'ref' in value)
-      ) {
-        out[`token:${p}`] = json(value);
-      } else if (value != null && typeof value === 'object') {
-        tokens(value, p);
-      }
-    }
-  }
-  out['system:id'] = json(definition?.systemId ?? null);
-  tokens(definition?.tokens, '');
-  for (const [name, value] of Object.entries(definition?.conditions ?? {})) {
-    out[`condition:${name}`] = json(value);
-  }
-  for (const [name, value] of Object.entries(definition?.themes ?? {})) {
-    out[`theme:${name}`] = json(value);
-  }
-  for (const [id, recipe] of Object.entries(definition?.recipes ?? {})) {
-    out[`recipe:${id}`] = json(recipe?.base ?? null);
-    for (const slot of recipe?.slots ?? [])
-      out[`slot:${id}.${slot}`] = json(true);
-    for (const [axis, branches] of Object.entries(recipe?.variants ?? {})) {
-      for (const [value, branch] of Object.entries(branches ?? {})) {
-        out[`variant:${id}.${axis}.${value}`] = json(branch);
-      }
-    }
-    for (const [axis, value] of Object.entries(recipe?.defaultVariants ?? {})) {
-      out[`default:${id}.${axis}`] = json(value);
-    }
-    (recipe?.compoundVariants ?? []).forEach((compound, i) => {
-      out[`compound:${id}#${i}`] = json(compound);
-    });
-  }
-  return out;
-}
-
-async function probeVocabulary(compiler, request, tokens, themes) {
+async function probeVocabulary(compiler, request, definition, tokens, themes) {
   const probeRoot = path.join(request.workspaceDir, '.pms-oracle-probe');
   const probeOut = path.join(request.workspaceDir, '.pms-oracle-probe-out');
   fs.rmSync(probeRoot, { recursive: true, force: true });
@@ -218,10 +186,7 @@ async function probeVocabulary(compiler, request, tokens, themes) {
     write(list);
     const result = await compileProject(compiler, {
       rootDir: request.workspaceDir,
-      definitionPath: path.join(
-        request.workspaceDir,
-        request.project.definition,
-      ),
+      definition,
       roots: [probeRoot],
       outDir: probeOut,
     });
@@ -268,168 +233,108 @@ async function main() {
   const request = JSON.parse(fs.readFileSync(requestPath, 'utf8'));
   const response = {
     compile: null,
-    vocabulary: {},
-    renders: {},
     tokenVars: {},
     themeClasses: {},
+    overrides: {},
   };
   const ws = request.workspaceDir;
-
-  for (const [label, file] of Object.entries(request.definitionFiles ?? {})) {
-    try {
-      response.vocabulary[label] = flattenDefinition(await importDefault(file));
-    } catch (error) {
-      response.vocabulary[label] = { error: String(error?.message ?? error) };
-    }
+  const { compiler, config, version } = await loadCompiler(ws);
+  response.compilerVersion = version;
+  const roots = request.project.roots.map((r) => path.resolve(ws, r));
+  const outDir = path.resolve(ws, request.project.outDir);
+  if (request.definitionError != null) {
+    response.compile = {
+      ok: false,
+      diagnostics: [
+        {
+          code: 'PMS_ORACLE_DEFINITION_UNLOADABLE',
+          message: request.definitionError,
+        },
+      ],
+    };
+    fs.writeFileSync(responsePath, JSON.stringify(response));
+    return;
   }
-
-  if (request.compile) {
-    const { compiler, version } = await loadCompiler(ws);
-    response.compilerVersion = version;
-    const roots = request.project.roots.map((r) => path.resolve(ws, r));
-    const outDir = path.resolve(ws, request.project.outDir);
-    const definitionPath = path.resolve(ws, request.project.definition);
-    if (!fs.existsSync(definitionPath)) {
-      response.compile = {
-        ok: false,
-        diagnostics: [
-          {
-            code: 'PMS_ORACLE_DEFINITION_MISSING',
-            message: request.project.definition,
-          },
-        ],
-      };
-    } else {
-      const result = await compileProject(compiler, {
-        rootDir: ws,
-        definitionPath,
-        roots,
-        outDir,
-      });
-      response.compile = { ok: result.ok, diagnostics: result.diagnostics };
-      if (result.ok) {
-        const generated = await result.session.readGeneratedArtifacts(
+  const definition = reviveDefinition(request.definitionData, config.token);
+  const result = await compileProject(compiler, {
+    rootDir: ws,
+    definition,
+    roots,
+    outDir,
+  });
+  response.compile = { ok: result.ok, diagnostics: result.diagnostics };
+  if (!result.ok) {
+    await result.session.close();
+    fs.writeFileSync(responsePath, JSON.stringify(response));
+    return;
+  }
+  const generated = await result.session.readGeneratedArtifacts(
+    result.revision,
+  );
+  response.compile.generatedFiles = generated.files.map(
+    (f) => f.path ?? f.file ?? f.name,
+  );
+  response.css = fs.readFileSync(path.join(outDir, 'styles.css'), 'utf8');
+  const uncovered = [];
+  for (const root of roots) {
+    for (const abs of listSources(root)) {
+      const rel = path.relative(ws, abs).split(path.sep).join('/');
+      try {
+        const artifact = await result.session.readArtifact(
           result.revision,
+          rel,
         );
-        response.compile.generatedFiles = generated.files.map(
-          (f) => f.path ?? f.file ?? f.name,
-        );
-        response.css = fs.readFileSync(path.join(outDir, 'styles.css'), 'utf8');
-        const overrides = {};
-        const uncovered = [];
-        for (const root of roots) {
-          for (const abs of listSources(root)) {
-            const rel = path.relative(ws, abs).split(path.sep).join('/');
-            try {
-              const artifact = await result.session.readArtifact(
-                result.revision,
-                rel,
-              );
-              overrides[pathToFileURL(abs).href] = artifact.javascript;
-            } catch (error) {
-              uncovered.push({
-                file: rel,
-                reason: String(error?.message ?? error),
-              });
-            }
-          }
-        }
-        response.compile.coveredModules = Object.keys(overrides).length;
-        response.compile.uncovered = uncovered;
-        await result.session.close();
-
-        if (request.probe === false) {
-          fs.writeFileSync(responsePath, JSON.stringify(response));
-          return;
-        }
-        const manifest = JSON.parse(
-          fs.readFileSync(path.join(outDir, 'manifest.json'), 'utf8'),
-        );
-        const themes = manifest.themes ?? [];
-        const probe = await probeVocabulary(
-          compiler,
-          request,
-          request.tokenProbes ?? [],
-          themes,
-        );
-        if (probe.probeUrl != null) overrides[probe.probeUrl] = probe.probeJs;
-        register(new URL('./loader-hooks.mjs', import.meta.url), {
-          data: { overrides, workspaceUrl: pathToFileURL(ws + path.sep).href },
-        });
-        if (probe.probeUrl != null) {
-          const mod = await import(probe.probeUrl);
-          response.themeClasses = mod.themeClasses;
-          const { parseCss } = await import('../css-cascade.mjs');
-          const rules = parseCss(probe.probeCss);
-          probe.accepted.forEach((t, i) => {
-            const classes = mod.tokenClasses[`t${i}`].split(/\s+/);
-            let variable = null;
-            for (const rule of rules) {
-              for (const selector of rule.selectors) {
-                const cls = selector.parts?.find(
-                  (p) => p.type === 'class',
-                )?.name;
-                if (cls != null && classes.includes(cls)) {
-                  const m = /^var\((--[\w-]+)\)$/.exec(
-                    rule.declarations[0]?.value ?? '',
-                  );
-                  if (m) variable = m[1];
-                }
-              }
-            }
-            response.tokenVars[t] = variable;
-          });
-        }
-        for (const t of probe.rejected ?? []) response.tokenVars[t] = null;
-
-        const requireFromWs = createRequire(path.join(ws, 'package.json'));
-        let React;
-        let server;
-        try {
-          React = requireFromWs('react');
-          server = requireFromWs('react-dom/server');
-        } catch (error) {
-          for (const r of request.renders ?? []) {
-            response.renders[r.id] = {
-              error: `PMS_ORACLE_NO_REACT: ${error.message}`,
-            };
-          }
-        }
-        for (const r of React != null ? (request.renders ?? []) : []) {
-          try {
-            const url = pathToFileURL(path.resolve(ws, r.module)).href;
-            if (!Object.hasOwn(overrides, url)) {
-              throw new Error(`PMS_ORACLE_UNCOVERED_MODULE: ${r.module}`);
-            }
-            const mod = await import(url);
-            const Component = mod[r.export ?? 'default'];
-            if (typeof Component !== 'function') {
-              throw new Error(
-                `PMS_ORACLE_MISSING_EXPORT: ${r.module}#${r.export ?? 'default'}`,
-              );
-            }
-            let element = React.createElement(Component, r.props ?? {});
-            if (r.theme != null) {
-              const className = response.themeClasses[r.theme];
-              if (className == null)
-                throw new Error(`PMS_ORACLE_UNKNOWN_THEME: ${r.theme}`);
-              element = React.createElement(
-                'div',
-                { className, 'data-pms-oracle-theme': r.theme },
-                element,
-              );
-            }
-            response.renders[r.id] = {
-              html: server.renderToStaticMarkup(element),
-            };
-          } catch (error) {
-            response.renders[r.id] = { error: String(error?.message ?? error) };
-          }
-        }
-      } else {
-        await result.session.close();
+        response.overrides[pathToFileURL(abs).href] = artifact.javascript;
+      } catch (error) {
+        uncovered.push({ file: rel, reason: String(error?.message ?? error) });
       }
     }
+  }
+  response.compile.coveredModules = Object.keys(response.overrides).length;
+  response.compile.uncovered = uncovered;
+  await result.session.close();
+  if (request.probe !== false) {
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(outDir, 'manifest.json'), 'utf8'),
+    );
+    const probe = await probeVocabulary(
+      compiler,
+      request,
+      definition,
+      request.tokenProbes ?? [],
+      manifest.themes ?? [],
+    );
+    if (probe.probeUrl != null) {
+      // Only the harness probe (compiled by the trusted compiler) and the
+      // generated design module it imports are executed here.
+      register(new URL('./loader-hooks.mjs', import.meta.url), {
+        data: {
+          overrides: { [probe.probeUrl]: probe.probeJs },
+          workspaceUrl: pathToFileURL(ws + path.sep).href,
+        },
+      });
+      const mod = await import(probe.probeUrl);
+      response.themeClasses = { ...mod.themeClasses };
+      const { parseCss } = await import('../css-cascade.mjs');
+      const rules = parseCss(probe.probeCss);
+      probe.accepted.forEach((t, i) => {
+        const classes = mod.tokenClasses[`t${i}`].split(/\s+/);
+        let variable = null;
+        for (const rule of rules) {
+          for (const selector of rule.selectors) {
+            const cls = selector.parts?.find((p) => p.type === 'class')?.name;
+            if (cls != null && classes.includes(cls)) {
+              const v = /^var\((--[\w-]+)\)$/.exec(
+                rule.declarations[0]?.value ?? '',
+              );
+              if (v) variable = v[1];
+            }
+          }
+        }
+        response.tokenVars[t] = variable;
+      });
+    }
+    for (const t of probe.rejected ?? []) response.tokenVars[t] = null;
   }
   fs.writeFileSync(responsePath, JSON.stringify(response));
 }

@@ -1,0 +1,9 @@
+{
+  "description": "Adds the vocabulary but also repoints the existing danger badge branch to the new token (a token-reference change inside a recipe).",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "vocabulary-diff": "fail",
+    "warning-badge": "pass"
+  }
+}

@@ -113,6 +113,14 @@
               "equals": "colors.text.muted"
             }
           }
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
         }
       ]
     }

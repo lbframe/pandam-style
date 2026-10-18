@@ -104,7 +104,10 @@
             "raw-classname",
             "type-escape",
             "direct-pandamstyle-import",
-            "generated-internal-import"
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
           ],
           "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
         },
@@ -154,6 +157,39 @@
             }
           },
           "description": "Danger tone, small size."
+        },
+        {
+          "id": "remove-click",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/RemoveFromCartButton.jsx",
+            "export": "RemoveFromCartButton",
+            "props": {
+              "onRemove": {
+                "$pmsSpy": "onRemove"
+              }
+            }
+          },
+          "select": {
+            "testId": "remove-from-cart"
+          },
+          "expect": {
+            "text": "Remove",
+            "callbacks": {
+              "onRemove": {
+                "calls": 1
+              }
+            }
+          },
+          "description": "Clicking the button calls onRemove exactly once, and never during render.",
+          "interactions": [
+            {
+              "testId": "remove-from-cart",
+              "event": "click"
+            }
+          ]
         },
         {
           "id": "remove-hover",

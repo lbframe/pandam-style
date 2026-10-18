@@ -8,9 +8,13 @@
 // Independent task oracles.
 //
 // `evaluateTask` observes a finished workspace and never trusts the evaluated
-// agent: scope is a byte diff against the materialized baseline, compilation
-// and rendering run in a scratch copy through the public compiler SDK, and the
-// agent's report only counts for what the agent claims to have diagnosed.
+// agent: scope is a byte diff against the materialized baseline; compilation
+// runs in a scratch copy through the public compiler SDK in a trusted process
+// that never executes agent code; agent code (definitions, application
+// modules) runs only in the permission-restricted sandbox, whose output is
+// treated as untrusted data; and the agent's report only counts for what the
+// agent claims to have diagnosed. Dependencies come from a trusted tree
+// (`options.trustedNodeModules`), never from the agent-writable workspace.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -28,6 +32,8 @@ import { compileGlobs, matchesAny } from '../glob.mjs';
 import { computeStyle, parseCss } from '../css-cascade.mjs';
 import { classList, parseHtml, select, textContent } from '../html.mjs';
 import { checkReport, extractReport } from './report.mjs';
+import { loadDefinitionData, parseCalls, runSandbox } from './run-sandbox.mjs';
+import { flattenDefinition } from './vocabulary.mjs';
 import {
   countByRule,
   findConstructs,
@@ -38,12 +44,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ALWAYS_IGNORED = ['node_modules/**', '**/node_modules/**', '.git/**'];
 const SCRATCH_EXCLUDE = [...ALWAYS_IGNORED, 'dist/**', 'build/**', '.next/**'];
 const SOURCE_GLOB = '**/*.{js,jsx,ts,tsx,mjs,cjs}';
-const GENERATED_COMPARED = [
-  'design.pandamstyle.js',
-  'design.pandamstyle.d.ts',
-  'manifest.json',
-  'styles.css',
-];
+// Compiler-owned files whose bytes depend on the workspace path or session;
+// they are verified against the generation's own digest list instead.
+const PATH_DEPENDENT_GENERATED = new Set(['build-report.json']);
 
 export const CHECK_CLASSES = [
   'scope',
@@ -72,16 +75,37 @@ function readText(file) {
   }
 }
 
-function prepareScratch(src, dest, extraExclude = []) {
+// The workspace's own node_modules is agent-writable and never used. Packages
+// resolve from `trustedNodeModules` (a pristine install kept by the runner) or,
+// when it is absent, from the scratch location's ancestors.
+function prepareScratch(
+  src,
+  dest,
+  extraExclude = [],
+  trustedNodeModules = null,
+) {
   fs.rmSync(dest, { recursive: true, force: true });
   fs.mkdirSync(dest, { recursive: true });
   copyTree(src, dest, {
     exclude: [...SCRATCH_EXCLUDE, ...extraExclude],
     includeEmptyDirs: true,
+    skipSymlinks: true,
   });
-  const nm = path.join(src, 'node_modules');
-  if (fs.existsSync(nm))
-    fs.symlinkSync(nm, path.join(dest, 'node_modules'), 'dir');
+  if (trustedNodeModules != null) {
+    fs.symlinkSync(
+      path.resolve(trustedNodeModules),
+      path.join(dest, 'node_modules'),
+      'dir',
+    );
+  }
+}
+
+export function stateFileFor(outDir) {
+  const parent = path.dirname(outDir);
+  return path.join(
+    parent === '.' ? '' : parent,
+    `.${path.basename(outDir)}.pms-state.json`,
+  );
 }
 
 function runWorker(request, scratchRoot, timeoutMs) {
@@ -108,12 +132,14 @@ function runWorker(request, scratchRoot, timeoutMs) {
   return JSON.parse(fs.readFileSync(responsePath, 'utf8'));
 }
 
-function renderKey(render) {
+function renderKey(check) {
+  const render = check.render;
   return JSON.stringify([
     render.module,
     render.export ?? 'default',
     render.props ?? {},
     render.theme ?? null,
+    check.interactions ?? [],
   ]);
 }
 
@@ -220,6 +246,77 @@ function evaluateStyleExpectation(property, exp, computed, tokenVars) {
   return { status: 'pass' };
 }
 
+// Whether an element would be presented. Structural reasons (template
+// content, hidden, inert, closed details/dialog) are decided from markup;
+// display, visibility and opacity from the static cascade. Anything the
+// cascade cannot decide makes visibility unmeasured, never assumed.
+function visibilityOf(target, observed, context) {
+  for (
+    let node = target;
+    node != null && node.tag !== '#root';
+    node = node.parent
+  ) {
+    if (node.tag === 'template')
+      return { visible: false, reason: 'inside <template> content' };
+    if (Object.hasOwn(node.attributes, 'hidden'))
+      return { visible: false, reason: `hidden attribute on <${node.tag}>` };
+    if (Object.hasOwn(node.attributes, 'inert'))
+      return { visible: false, reason: `inert attribute on <${node.tag}>` };
+    if (node.tag === 'dialog' && !Object.hasOwn(node.attributes, 'open'))
+      return { visible: false, reason: 'inside a closed <dialog>' };
+    if (
+      node.tag === 'details' &&
+      !Object.hasOwn(node.attributes, 'open') &&
+      node !== target
+    ) {
+      let child = target;
+      while (child.parent !== node) child = child.parent;
+      if (child.tag !== 'summary')
+        return { visible: false, reason: 'inside a closed <details>' };
+    }
+  }
+  let visibilityDecided = false;
+  for (
+    let node = target;
+    node != null && node.tag !== '#root';
+    node = node.parent
+  ) {
+    const computed = computeStyle(
+      observed.cssRules,
+      elementChain(node),
+      context,
+    );
+    for (const property of [
+      'display',
+      'opacity',
+      ...(visibilityDecided ? [] : ['visibility']),
+    ]) {
+      if (Object.hasOwn(computed.unmeasuredProperties, property)) {
+        return {
+          visible: null,
+          reason: `${property} on <${node.tag}> is not statically decidable`,
+        };
+      }
+    }
+    const display = computed.properties.display?.resolved;
+    if (display != null && normalizeCssValue(display) === 'none')
+      return { visible: false, reason: `display:none on <${node.tag}>` };
+    const opacity = computed.properties.opacity?.resolved;
+    if (opacity != null && Number(opacity) === 0)
+      return { visible: false, reason: `opacity:0 on <${node.tag}>` };
+    const visibility = computed.properties.visibility?.resolved;
+    if (!visibilityDecided && visibility != null) {
+      visibilityDecided = true;
+      if (['hidden', 'collapse'].includes(normalizeCssValue(visibility)))
+        return {
+          visible: false,
+          reason: `visibility:${visibility} on <${node.tag}>`,
+        };
+    }
+  }
+  return { visible: true };
+}
+
 function evaluateRender(check, observed) {
   const rendered = observed.renders?.[check.renderId];
   if (rendered == null) return result('error', 'render was not requested');
@@ -229,7 +326,10 @@ function evaluateRender(check, observed) {
   try {
     tree = parseHtml(rendered.html);
   } catch (error) {
-    return result('error', `rendered markup not parseable: ${error.message}`);
+    return result(
+      'fail',
+      `rendered markup is not well formed: ${error.message}`,
+    );
   }
   const matches = select(tree, check.select);
   const expect = check.expect ?? {};
@@ -242,9 +342,57 @@ function evaluateRender(check, observed) {
       `selector ${JSON.stringify(check.select)} matched ${matches.length}, expected ${expectedCount}`,
     );
   }
-  if (expectedCount === 0) return result('pass', null, { matched: 0 });
+  const context = check.context ?? {};
+  if (expect.visible !== false) {
+    for (const match of matches) {
+      const v = visibilityOf(match, observed, context);
+      if (v.visible === false) failures.push(`not presented: ${v.reason}`);
+      if (v.visible === null)
+        unmeasured.push(`visibility unknown: ${v.reason}`);
+    }
+  }
+  if (expect.texts != null) {
+    if (expect.texts.length !== matches.length)
+      failures.push(
+        `texts lists ${expect.texts.length} patterns for ${matches.length} matches`,
+      );
+    matches.forEach((match, i) => {
+      const t = textContent(match).replace(/\s+/g, ' ').trim();
+      if (
+        expect.texts[i] != null &&
+        !new RegExp(expect.texts[i], 'i').test(t)
+      ) {
+        failures.push(
+          `match ${i} text ${JSON.stringify(t)} does not match /${expect.texts[i]}/i`,
+        );
+      }
+    });
+  }
+  const calls = parseCalls(rendered.calls);
+  for (const outcome of calls.interactions) {
+    if (outcome.outcome !== 'dispatched')
+      failures.push(
+        `${outcome.event} on ${outcome.testId}: ${outcome.outcome}`,
+      );
+  }
+  for (const [name, exp] of Object.entries(expect.callbacks ?? {})) {
+    const got = calls.spies[name] ?? { inDispatch: 0, outside: 0 };
+    if (got.inDispatch !== exp.calls)
+      failures.push(
+        `callback ${name} called ${got.inDispatch} time(s) by the interaction, expected ${exp.calls}`,
+      );
+    if (got.outside !== 0)
+      failures.push(
+        `callback ${name} called ${got.outside} time(s) outside the interaction (during render)`,
+      );
+  }
+  if (expectedCount === 0) {
+    return failures.length > 0
+      ? result('fail', failures.join('; '))
+      : result('pass', null, { matched: 0 });
+  }
   const target = matches[check.index ?? 0];
-  const text = textContent(target).trim();
+  const text = textContent(target).replace(/\s+/g, ' ').trim();
   if (expect.text != null && text !== expect.text)
     failures.push(`text is ${JSON.stringify(text)}`);
   if (
@@ -269,11 +417,7 @@ function evaluateRender(check, observed) {
   }
   let computed = null;
   if (expect.styles != null) {
-    computed = computeStyle(
-      observed.cssRules,
-      elementChain(target),
-      check.context ?? {},
-    );
+    computed = computeStyle(observed.cssRules, elementChain(target), context);
     for (const [property, exp] of Object.entries(expect.styles)) {
       const r = evaluateStyleExpectation(
         property,
@@ -287,6 +431,8 @@ function evaluateRender(check, observed) {
   }
   const evidence = {
     classes: classList(target),
+    text: text.slice(0, 200),
+    callbacks: Object.keys(calls.spies).length > 0 ? calls.spies : undefined,
     styles:
       computed == null
         ? undefined
@@ -516,21 +662,44 @@ function evaluatePackageJson(check, ctx) {
     : result('pass');
 }
 
+function inventory(dir) {
+  const out = {};
+  if (!fs.existsSync(dir)) return out;
+  for (const rel of listFiles(dir)) out[rel] = fileDigest(path.join(dir, rel));
+  return out;
+}
+
+function readJsonOrNull(file) {
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+// Every compiler-owned file is compared: the whole output directory
+// (including js/**) and the generation state file next to it. Additions,
+// modifications and deletions are all evidence.
+//   must-match:    the workspace holds exactly the fresh compiler output.
+//   no-hand-edits: each file equals fresh output or its untouched baseline
+//                  version; absence is allowed (not regenerated yet).
 function evaluateGenerated(check, ctx, observed) {
-  const outDir = ctx.project.outDir;
-  if (!observed.compile?.ok) {
-    // Without fresh output, only "untouched since the baseline" is provable.
+  const outDir = ctx.project.outDir.replace(/^\.\//, '').replace(/\/$/, '');
+  const ws = inventory(path.join(ctx.workspaceDir, outDir));
+  const base = inventory(path.join(ctx.baselineDir, outDir));
+  const fresh = observed.compile?.ok
+    ? inventory(path.join(ctx.scratchWorkspace, outDir))
+    : null;
+  const statePath = stateFileFor(outDir);
+  const wsState = readJsonOrNull(path.join(ctx.workspaceDir, statePath));
+  const problems = [];
+  if (fresh == null) {
     if (check.mode === 'must-match')
       return result(
         'blocked',
         'fresh compilation failed; generated output cannot be compared',
       );
-    const touched = GENERATED_COMPARED.filter((name) => {
-      const wsFile = path.join(ctx.workspaceDir, outDir, name);
-      const base = path.join(ctx.baselineDir, outDir, name);
-      if (!fs.existsSync(wsFile)) return false;
-      return !fs.existsSync(base) || fileDigest(base) !== fileDigest(wsFile);
-    });
+    const touched = Object.keys(ws).filter((rel) => ws[rel] !== base[rel]);
     return touched.length === 0
       ? result('pass', null, {
           note: 'fresh compilation failed; generated output is untouched since the baseline',
@@ -540,27 +709,53 @@ function evaluateGenerated(check, ctx, observed) {
           `fresh compilation failed and generated files changed: ${touched.join(', ')}`,
         );
   }
-  const mismatches = [];
-  for (const name of GENERATED_COMPARED) {
-    const wsFile = path.join(ctx.workspaceDir, outDir, name);
-    if (!fs.existsSync(wsFile)) {
-      if (check.mode === 'must-match') mismatches.push(`${name} missing`);
+  for (const [rel, digest] of Object.entries(ws)) {
+    if (PATH_DEPENDENT_GENERATED.has(rel)) {
+      if (digest === base[rel]) continue;
+      const listed = wsState?.files?.[rel]?.digest;
+      const doc = readJsonOrNull(path.join(ctx.workspaceDir, outDir, rel));
+      if (
+        listed !== digest ||
+        doc?.documentKind !== 'pandamstyle-build-report'
+      ) {
+        problems.push(
+          `${rel} is not the report of the generation recorded in ${statePath}`,
+        );
+      }
       continue;
     }
-    const fresh = path.join(ctx.scratchWorkspace, outDir, name);
-    const base = path.join(ctx.baselineDir, outDir, name);
-    const wsDigest = fileDigest(wsFile);
-    const matchesFresh = fs.existsSync(fresh) && fileDigest(fresh) === wsDigest;
-    const untouched = fs.existsSync(base) && fileDigest(base) === wsDigest;
-    if (!matchesFresh && !(check.mode !== 'must-match' && untouched))
-      mismatches.push(name);
+    const matchesFresh = fresh[rel] === digest;
+    const untouched = base[rel] === digest;
+    if (matchesFresh || (check.mode !== 'must-match' && untouched)) continue;
+    if (fresh[rel] == null && base[rel] == null)
+      problems.push(`unexpected file ${rel}`);
+    else problems.push(`modified ${rel}`);
   }
-  return mismatches.length > 0
+  if (check.mode === 'must-match') {
+    for (const rel of Object.keys(fresh)) {
+      if (!PATH_DEPENDENT_GENERATED.has(rel) && ws[rel] == null)
+        problems.push(`missing ${rel}`);
+    }
+    if (wsState == null) problems.push(`missing ${statePath}`);
+  }
+  if (wsState != null) {
+    for (const [rel, entry] of Object.entries(wsState.files ?? {})) {
+      if (
+        ws[rel] != null &&
+        entry?.digest !== ws[rel] &&
+        !(check.mode !== 'must-match' && base[rel] === ws[rel])
+      ) {
+        problems.push(`${statePath} disagrees with ${rel}`);
+      }
+    }
+  }
+  return problems.length > 0
     ? result(
         'fail',
-        `generated output differs from compiler output: ${mismatches.join(', ')}`,
+        `generated output is not compiler output: ${problems.slice(0, 8).join('; ')}`,
+        problems,
       )
-    : result('pass');
+    : result('pass', null, { files: Object.keys(ws).length });
 }
 
 function evaluateTranscript(check, transcript) {
@@ -614,7 +809,11 @@ function scopeContext(ctx) {
   ];
   const before = snapshotTree(ctx.baselineDir, { exclude: ignored });
   const after = snapshotTree(ctx.workspaceDir, { exclude: ignored });
-  return diffSnapshots(before, after);
+  const diff = diffSnapshots(before, after);
+  diff.symlinks = [...diff.added, ...diff.modified].filter((rel) =>
+    after[rel].startsWith('symlink:'),
+  );
+  return diff;
 }
 
 function evaluateScopeDiff(check, ctx) {
@@ -622,6 +821,8 @@ function evaluateScopeDiff(check, ctx) {
   const writable = compileGlobs(ctx.permissions.writable ?? []);
   const protectedGlobs = compileGlobs(ctx.permissions.protected ?? []);
   const violations = [];
+  for (const rel of diff.symlinks ?? [])
+    violations.push(`symbolic link written: ${rel}`);
   for (const rel of [...diff.added, ...diff.modified]) {
     if (protectedGlobs.match(rel) != null)
       violations.push(`protected path written: ${rel}`);
@@ -684,6 +885,77 @@ function aggregate(statuses) {
   if (statuses.includes('blocked')) return 'blocked';
   if (statuses.includes('unmeasured')) return 'unmeasured';
   return 'pass';
+}
+
+function observeProject({
+  ctx,
+  project,
+  checks,
+  renders,
+  needsCompile,
+  needsDefinition,
+  scratch,
+  options,
+}) {
+  const trusted = options.trustedNodeModules ?? null;
+  const outExclude = project.outDir
+    ? [`${project.outDir.replace(/^\.\//, '').replace(/\/$/, '')}/**`]
+    : [];
+  prepareScratch(ctx.workspaceDir, ctx.scratchWorkspace, outExclude, trusted);
+  const observed = { renders: {} };
+  const loadDefinition = (dir) =>
+    fs.existsSync(path.join(dir, project.definition))
+      ? loadDefinitionData(dir, project.definition)
+      : { error: `PMS_ORACLE_DEFINITION_MISSING: ${project.definition}` };
+  const after = loadDefinition(ctx.scratchWorkspace);
+  if (needsDefinition) {
+    const baselineScratch = path.join(scratch, 'baseline');
+    prepareScratch(ctx.baselineDir, baselineScratch, outExclude, trusted);
+    const before = loadDefinition(baselineScratch);
+    observed.vocabulary = {
+      before:
+        before.error != null
+          ? { error: before.error }
+          : flattenDefinition(before.data),
+      after:
+        after.error != null
+          ? { error: after.error }
+          : flattenDefinition(after.data),
+    };
+  }
+  if (!needsCompile) return observed;
+  const worker = runWorker(
+    {
+      workspaceDir: ctx.scratchWorkspace,
+      project,
+      definitionData: after.data ?? null,
+      definitionError: after.error ?? null,
+      tokenProbes: collectTokenExpectations(checks),
+    },
+    scratch,
+    (options.workerTimeoutSeconds ?? 180) * 1000,
+  );
+  if (worker.error != null) return { ...observed, error: worker.error };
+  Object.assign(observed, worker);
+  if (!worker.compile?.ok) return observed;
+  for (const r of renders.values()) {
+    const out = runSandbox(
+      {
+        mode: 'render',
+        workspaceDir: ctx.scratchWorkspace,
+        overrides: worker.overrides,
+        themeClasses: worker.themeClasses,
+        render: r.render,
+        interactions: r.interactions,
+      },
+      { timeoutMs: (options.renderTimeoutSeconds ?? 60) * 1000 },
+    );
+    observed.renders[r.id] = out.ok
+      ? { html: out.payload, calls: out.calls }
+      : { error: out.error };
+  }
+  delete observed.overrides;
+  return observed;
 }
 
 /**
@@ -752,57 +1024,29 @@ export async function evaluateTask({
   const needsDefinition = checks.some((c) => c.kind === 'definition.diff');
   const renders = new Map();
   for (const c of checks.filter((c) => c.kind === 'render.styles')) {
-    const key = renderKey(c.render);
-    if (!renders.has(key))
-      renders.set(key, { id: `r${renders.size}`, ...c.render });
+    const key = renderKey(c);
+    if (!renders.has(key)) {
+      renders.set(key, {
+        id: `r${renders.size}`,
+        render: c.render,
+        interactions: c.interactions ?? [],
+      });
+    }
     c.renderId = renders.get(key).id;
   }
   let observed = {};
   if ((needsCompile || needsDefinition) && project != null) {
-    const outExclude = project.outDir
-      ? [`${project.outDir.replace(/^\.\//, '')}/**`]
-      : [];
-    prepareScratch(workspaceDir, ctx.scratchWorkspace, outExclude);
-    let baselineScratch = null;
-    if (needsDefinition) {
-      baselineScratch = path.join(scratch, 'baseline');
-      prepareScratch(baselineDir, baselineScratch, outExclude);
-      if (
-        !fs.existsSync(path.join(baselineScratch, 'node_modules')) &&
-        fs.existsSync(path.join(workspaceDir, 'node_modules'))
-      ) {
-        fs.symlinkSync(
-          path.join(workspaceDir, 'node_modules'),
-          path.join(baselineScratch, 'node_modules'),
-          'dir',
-        );
-      }
-    }
-    const definitionFiles = needsDefinition
-      ? {
-          before: path.join(baselineScratch, project.definition),
-          after: path.join(ctx.scratchWorkspace, project.definition),
-        }
-      : {};
-    observed = runWorker(
-      {
-        workspaceDir: ctx.scratchWorkspace,
-        compile: needsCompile,
-        project,
-        tokenProbes: collectTokenExpectations(checks),
-        renders: [...renders.values()],
-        definitionFiles,
-      },
+    observed = observeProject({
+      ctx,
+      project,
+      checks,
+      renders,
+      needsCompile,
+      needsDefinition,
       scratch,
-      (options.workerTimeoutSeconds ?? 180) * 1000,
-    );
+      options,
+    });
     if (observed.css != null) observed.cssRules = parseCss(observed.css);
-  }
-  if (
-    checks.some((c) => c.kind === 'host.build') &&
-    options.hostCommands === true
-  ) {
-    prepareScratch(workspaceDir, ctx.hostScratch);
   }
   const reportExtraction = extractReport(responseText);
 
@@ -887,7 +1131,8 @@ export async function evaluateTask({
             r = evaluatePackageJson(check, ctx);
             break;
           case 'host.build':
-            r = runHostBuild(check, ctx, options);
+            // Runs last (below): it executes agent-controlled scripts.
+            r = null;
             break;
           case 'report.final':
             if (reportExtraction.report == null)
@@ -945,6 +1190,25 @@ export async function evaluateTask({
       required: check.required,
       ...r,
     });
+  }
+  // Host builds execute agent-controlled scripts, so they run after every
+  // other observation, in their own copy, and can only decide their own check.
+  for (const entry of evaluated.filter((e) => e.kind === 'host.build')) {
+    const check = checks.find((c) => c.id === entry.id);
+    let r;
+    try {
+      if (options.hostCommands === true)
+        prepareScratch(
+          workspaceDir,
+          ctx.hostScratch,
+          [],
+          options.trustedNodeModules ?? null,
+        );
+      r = runHostBuild(check, ctx, options);
+    } catch (error) {
+      r = result('error', String(error?.stack ?? error).slice(0, 1500));
+    }
+    Object.assign(entry, r);
   }
 
   const outcomes = {};

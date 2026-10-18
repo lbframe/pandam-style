@@ -21,10 +21,12 @@
 // the evaluated agent.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { copyTree } from './fs-tree.mjs';
+import { loadDefinitionData } from './oracles/run-sandbox.mjs';
 
 const GIT_ENV = {
   GIT_AUTHOR_NAME: 'pms-harness',
@@ -72,21 +74,27 @@ export function materializeFiles({ taskEntry, fixture, dest }) {
 }
 
 /** Regenerates compiler output in place through the public SDK (worker). */
+/**
+ * Regenerates compiler output in place through the public SDK. The definition
+ * is evaluated in the sandbox; the trusted worker only compiles.
+ */
 export function compileInPlace({ dir, project }) {
   const worker = path.join(
     path.dirname(fileURLToPath(import.meta.url)),
     'oracles/project-worker.mjs',
   );
-  const request = path.join(dir, '.pms-prepare-request.json');
-  const response = `${request}.out`;
+  const definition = loadDefinitionData(dir, project.definition);
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-prepare-'));
+  const request = path.join(tmp, 'request.json');
+  const response = path.join(tmp, 'response.json');
   fs.writeFileSync(
     request,
     JSON.stringify({
       workspaceDir: dir,
-      compile: true,
       probe: false,
       project,
-      renders: [],
+      definitionData: definition.data ?? null,
+      definitionError: definition.error ?? null,
       tokenProbes: [],
     }),
   );
@@ -96,7 +104,7 @@ export function compileInPlace({ dir, project }) {
   const out = fs.existsSync(response)
     ? JSON.parse(fs.readFileSync(response, 'utf8'))
     : null;
-  for (const f of [request, response]) fs.rmSync(f, { force: true });
+  fs.rmSync(tmp, { recursive: true, force: true });
   if (r.status !== 0 || out?.compile?.ok !== true) {
     throw new Error(
       `compile step failed: ${r.stderr || JSON.stringify(out?.compile?.diagnostics)}`,

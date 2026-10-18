@@ -33,8 +33,20 @@ the 16 tasks listed in [`MANIFEST.json`](MANIFEST.json).
 - **Seal verification.** Right after sealing, the operator who sealed may
   unseal once with `PMS_HELDOUT_PURPOSE=seal-verification` to confirm the
   archive round-trips to the manifest digests. Then delete the unsealed copy.
+- **Pre-freeze revision.** The author may unseal with
+  `PMS_HELDOUT_PURPOSE=pre-freeze-revision` to revise the held-out set before
+  it has ever been consumed. That means no baseline run and no feature work,
+  and only while `corpus.json` has `freeze.thresholdsFrozen: false`. AG-00.3
+  sets that flag to `true` when it freezes the thresholds, and the tool refuses
+  this purpose from then on. Each use is recorded below.
 - Agents implementing AG-01 to AG-13 must not read, decrypt or derive work from
   the held-out set. Development uses only `tasks/`.
+
+## Revision record
+
+| Date | Purpose | Reason | Result |
+| --- | --- | --- | --- |
+| 2026-10-18 | `pre-freeze-revision` | Independent review of AG-00.1 (PR #88) found oracle classes that asserted structure but not content or behavior, a too-narrow generated-integrity check and missing static bypass rules. The held-out set had not been consumed (no baseline, no feature work), so its author applied the same fixes. | Corpus 1.1.0: content assertions, the extended static rule set and generated-integrity checks were added to the affected held-out tasks. The set was re-sealed and verified by a seal-verification round trip, and the plaintext was deleted. |
 
 ## Rotation and changes
 

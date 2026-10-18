@@ -110,7 +110,10 @@
             "raw-classname",
             "type-escape",
             "direct-pandamstyle-import",
-            "generated-internal-import"
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
           ],
           "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
         },
@@ -152,6 +155,7 @@
             "testId": "account-balance"
           },
           "expect": {
+            "text": "-12.00",
             "styles": {
               "font-weight": {
                 "token": "fontWeights.semibold"
@@ -183,6 +187,7 @@
             "testId": "account-balance"
           },
           "expect": {
+            "text": "12.00",
             "styles": {
               "font-weight": {
                 "absent": true
