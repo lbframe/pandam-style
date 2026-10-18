@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interaction states reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <main class="matrix" data-testid="matrix">
+      <button class="control" type="button" data-testid="control-rest">Rest</button>
+      <button class="control" type="button" data-testid="control-pointer">Pointer</button>
+      <button class="control" type="button" data-testid="control-keyboard">Keyboard</button>
+      <button class="control" type="button" aria-invalid="true" aria-describedby="error-text" data-testid="control-error">Error</button>
+      <button class="control" type="button" aria-busy="true" aria-disabled="true" data-testid="control-loading">
+        <span class="busy-indicator" aria-hidden="true" data-testid="busy-indicator"></span>
+        Loading
+      </button>
+      <button class="control" type="button" disabled data-testid="control-disabled">Disabled</button>
+      <p class="error-text" id="error-text" data-testid="error-text">The value is required.</p>
+      <div class="menu" role="menu" aria-label="Actions" data-testid="menu">
+        <button class="menu-item" role="menuitem" type="button" tabindex="0" data-testid="menu-item-1">Open</button>
+        <button class="menu-item" role="menuitem" type="button" tabindex="-1" data-testid="menu-item-2">Rename</button>
+        <button class="menu-item" role="menuitem" type="button" tabindex="-1" data-testid="menu-item-3">Delete</button>
+      </div>
+      <label class="switch" data-testid="switch">
+        <input class="switch-input" type="checkbox" role="switch" data-testid="switch-input" />
+        <span class="switch-track" aria-hidden="true" data-testid="switch-track"></span>
+        Notifications
+      </label>
+      <p class="selectable" data-testid="selectable">Selectable text for copy and paste.</p>
+    </main>
+  </body>
+</html>

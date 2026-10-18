@@ -1,0 +1,202 @@
+/* Interaction state matrix reference outcome. Authored for CE-00.2; not compiler output. */
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1f2421;
+  user-select: none;
+}
+
+.matrix {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 24px;
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  min-height: 36px;
+  padding-inline: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #b9c0b3;
+  border-radius: 6px;
+  color: #1f2421;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition-property: background-color;
+  transition-duration: 120ms;
+}
+
+.control:hover {
+  background-color: #edf2e8;
+}
+
+.control:active {
+  transform: translateY(1px);
+}
+
+.control:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 2px;
+}
+
+.control[aria-invalid='true'] {
+  border-color: #a83c37;
+  color: #a83c37;
+}
+
+.control[aria-busy='true'] {
+  cursor: progress;
+}
+
+.control:disabled,
+.control[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.control:disabled:active {
+  transform: none;
+}
+
+.busy-indicator {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation-name: spin;
+  animation-duration: 800ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.error-text {
+  margin: 0;
+  color: #a83c37;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  padding: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #d6dbd0;
+  border-radius: 8px;
+}
+
+.menu-item {
+  padding: 6px 8px;
+  border-style: none;
+  border-radius: 4px;
+  text-align: start;
+  background-color: transparent;
+  cursor: default;
+}
+
+.menu-item:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: -2px;
+  background-color: #edf2e8;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.switch-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.switch-track {
+  width: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background-color: #b9c0b3;
+}
+
+.switch-input:checked + .switch-track {
+  background-color: #3e563f;
+}
+
+.switch-input:focus-visible + .switch-track {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 2px;
+}
+
+.selectable {
+  margin: 0;
+  user-select: text;
+  cursor: text;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .control {
+    min-height: 44px;
+  }
+  .control:hover {
+    background-color: #ffffff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .control {
+    transition-duration: 0s;
+  }
+  .busy-indicator {
+    animation-duration: 2400ms;
+  }
+}
+
+@media (forced-colors: active) {
+  .control:focus-visible,
+  .menu-item:focus-visible {
+    outline-color: Highlight;
+  }
+  .control:disabled,
+  .control[aria-disabled='true'] {
+    color: GrayText;
+    border-color: GrayText;
+  }
+  .switch-input:checked + .switch-track {
+    background-color: Highlight;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .control {
+    border-color: #1f2421;
+  }
+}

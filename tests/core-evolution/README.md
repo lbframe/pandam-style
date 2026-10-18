@@ -1,26 +1,33 @@
-# Core evolution inventory and profile specifications
+# Core evolution inventory, profiles and proof corpus
 
 These files implement the CE-00.1 scope contract described in
-[the registry document](../../docs/research/core-evolution-registry.md). They
-contain specifications and record tooling only. They change no product behavior
-and are not part of the product test suites.
+[the registry document](../../docs/research/core-evolution-registry.md) and the
+CE-00.2 proof corpus and classifier calibration described
+[below](#proof-corpus-and-classifier-calibration-ce-002). They contain
+specifications, fixtures and record tooling only. They change no product
+behavior and are not part of the product test suites.
 
 ## Files
 
 | Path                                                               | Kind      | Content                                                                                                                                            |
 | ------------------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Path                                                               | Kind      | Content                                                                                                                                            |
-| ---                                                                | ---       | ---                                                                                                                                                |
 | `classification-rules.v1.json`                                     | authored  | Disposition definitions, ordered procedure, curated records, alias audits, families and overlay requirements                                       |
 | `profiles.v1.json`                                                 | authored  | The nine accepted project profiles and their required capability families                                                                          |
 | `capabilities.v1.json`                                             | authored  | CAP-01–CAP-48 dispositions, owners, planned proof records, limitations, request cases and lot issues                                               |
 | `scope-decisions.v1.json`                                          | authored  | Source-format decisions (D-SF-01..10, closing in CE-13) and browser-profile decisions (D-BP-01..11 and D-BP-13 closing in CE-01, D-BP-12 in CE-13) |
-| `schema/*.schema.json`                                             | authored  | JSON Schemas for the six validated records                                                                                                         |
+| `schema/*.schema.json`                                             | authored  | JSON Schemas for the six CE-00.1 records and the five CE-00.2 records                                                                              |
 | `validate.mjs`                                                     | tool      | Dependency-free validator and drift self-test                                                                                                      |
 | `tools/derive-registry.mjs`                                        | tool      | Pure derivation of the registry from authored inputs and recorded facts, shared by builder and validator                                           |
 | `tools/*.mjs`, `tools/regenerate.sh`                               | tool      | Key extraction, emission probes, registry observation and registry build                                                                           |
 | `../../docs/research/core-evolution-registry.v1.json`              | generated | The registry; rebuild it, never edit it                                                                                                            |
 | `../../docs/research/core-evolution-upstream-observations.v1.json` | generated | Timestamped comparator refresh; regenerate it, never edit it                                                                                       |
+| `corpus/corpus.v1.json`                                            | authored  | CE-00.2 positive fixtures, success criteria, assertions and negative fixtures                                                                      |
+| `corpus/oracles.v1.json`                                           | authored  | CE-00.2 oracle definitions, outcome classes and interaction states                                                                                 |
+| `corpus/fixtures/*/`                                               | authored  | Reference pages, stylesheets and assets pinned by the corpus manifest                                                                              |
+| `corpus/calibration/baseline.v1.json`                              | authored  | Reported consumer baseline, recovered classifier provenance, inputs, reproduction and calibration limits                                           |
+| `corpus/calibration/*.declarations.v1.json`                        | generated | Redacted consumer declaration sets; extract them with `tools/coverage`, never edit them                                                            |
+| `corpus/accounting.v1.json`                                        | generated | Accounting of every corpus declaration; regenerate with `node tools/coverage/cli.mjs corpus`                                                       |
+| `validate-corpus.mjs`                                              | tool      | CE-00.2 validator and mutation self-test                                                                                                           |
 
 Changing an authored record requires regenerating the registry. Each registry
 entry keeps its recorded upstream facts (`sources`, `bcd`, `bcdRelations`,
@@ -140,3 +147,67 @@ The extraction and both emission probes are deterministic, and the observation
 record names their digests. Each run refreshes the npm observation, so its
 timestamps and response digests change. A newer `latest` tag is recorded as
 `newer-latest-requires-delta-review`; it never replaces the pinned comparator.
+
+## Proof corpus and classifier calibration (CE-00.2)
+
+The corpus binds reproducible outcomes to the CE-00.1 profiles and capability
+fixture sets. Its parts are kept apart: compiler acceptance, vocabulary gaps,
+unsupported behavior and rendered fidelity are separate outcome classes. Nothing
+here has been rendered or compiled yet. The oracles define their inputs and
+negative controls, and the lots named in each oracle execute them.
+
+- **Positive fixtures.** Ten authored reference pages: application shell, forms,
+  notices and empty states, dense data grid, content, RTL and vertical text, SVG
+  and media, SSR with a lazy route, component library, and an interaction-state
+  matrix. Every profile's fixture classes are covered. Each fixture states
+  accepted vocabulary, expected CSS, geometry, text wrapping, state behavior,
+  keyboard, accessibility and CSP criteria as assertions of the oracles. Each
+  assertion is a positive, boundary or negative case. Expected values are
+  authored numbers and computed values chosen not to depend on fonts.
+- **States.** Pointer, touch, keyboard, error, loading, disabled, forced colors
+  and increased contrast are all exercised, plus reduced motion, print, RTL,
+  scrolled and hydrated states.
+- **Negative fixtures.** Sixteen consumer sources against the existing
+  `tests/fixtures/design-systems/conformance.js` definition. They cover wrong
+  categories, private tokens and unowned URLs, raw and unknown selectors, inline
+  styles, raw values and composites, runtime values, inline custom-property
+  transport, mixed design systems and a desktop-only platform extension. Each
+  records the Alpha 1 diagnostic and rule found by source inspection (E1, not
+  executed) and the rejection that every later lot must keep.
+- **Accounting.** `accounting.v1.json` classifies every declaration of every
+  reference stylesheet (835, of which 829 are in the Alpha 1 denominator)
+  against the pinned Alpha 1 policy. Each declaration is bound to its registry
+  entry and `CE-FX-PROP-*` fixture, and composites carry the longhands their
+  rewrite needs.
+- **Calibration.** The consumer's reported 343 = 212 + 37 + 94 and 1,559 =
+  1,111 + 124 + 324 reconcile exactly. The original classifier and both inputs
+  were recovered; [`tools/coverage`](../../tools/coverage/README.md) describes
+  their provenance and the parser-based reconstruction.
+  `calibration/baseline.v1.json` records the evidence and the twelve calibration
+  limits. It supersedes the CE-00.1 evidence lock's
+  `originalClassifierRecovered: false` and `classificationResultsRerun: false`.
+  That frozen record is left unchanged.
+
+```sh
+node tests/core-evolution/validate-corpus.mjs --self-test
+node tools/coverage/cli.mjs calibrate
+```
+
+The corpus validator needs the repository install for postcss. It checks:
+
+- the five schemas and every input, source and definition digest;
+- profile, capability fixture set, oracle, viewport, state and target bindings;
+- the selectors and properties named by each mutation;
+- coverage: a positive fixture, a boundary assertion and a negative fixture for
+  every profile; positive, boundary and negative cases for every oracle; every
+  required interaction state and negative category;
+- every success criterion of each positive fixture;
+- re-derivation of the accounting and of both consumer sets, the reported counts
+  and each calibration limit;
+- regular-expression parity of the parser on every corpus stylesheet;
+- the publication rules for consumer data.
+
+`--self-test` applies 24 mutations, and each must fail for its stated reason.
+
+Changing a fixture input, expectation or negative fixture is a corpus change and
+needs a reviewed reason. Regenerate the accounting rather than editing it.

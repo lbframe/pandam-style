@@ -1,0 +1,218 @@
+/* Forms and validation reference outcome. Authored for CE-00.2; not compiler output. */
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1f2421;
+  background-color: #ffffff;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 46ch;
+  padding: 24px;
+}
+
+.form-title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border-style: none;
+  min-inline-size: 0;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.input {
+  min-height: 36px;
+  padding-inline: 8px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #b9c0b3;
+  border-radius: 6px;
+  font: inherit;
+  color: inherit;
+  background-color: #ffffff;
+  caret-color: #3e563f;
+  accent-color: #3e563f;
+}
+
+.input::placeholder {
+  color: #697067;
+  opacity: 1;
+}
+
+.input:hover {
+  border-color: #8a9284;
+}
+
+.input:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 2px;
+}
+
+.input[aria-invalid='true'] {
+  border-color: #a83c37;
+}
+
+.input:read-only {
+  background-color: #f4f6f0;
+  user-select: all;
+}
+
+.input-code {
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.04em;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  color: #697067;
+  background-color: #f4f6f0;
+}
+
+.textarea {
+  min-height: 72px;
+  padding-block: 8px;
+  resize: vertical;
+}
+
+.field-error {
+  margin: 0;
+  color: #a83c37;
+  overflow-wrap: anywhere;
+}
+
+.file::file-selector-button {
+  margin-inline-end: 8px;
+  padding: 4px 8px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #b9c0b3;
+  border-radius: 6px;
+  background-color: #f4f6f0;
+  cursor: pointer;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.check-box {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #3e563f;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding-inline: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  border-radius: 6px;
+  color: #ffffff;
+  background-color: #3e563f;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.button:hover {
+  background-color: #304431;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 2px;
+}
+
+.button:disabled,
+.button[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation-name: spin;
+  animation-duration: 800ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (pointer: coarse) {
+  .input,
+  .button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2400ms;
+  }
+}
+
+@media (forced-colors: active) {
+  .input[aria-invalid='true'] {
+    border-color: Mark;
+  }
+  .button:disabled,
+  .button[aria-disabled='true'] {
+    color: GrayText;
+    border-color: GrayText;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .input {
+    border-color: #1f2421;
+  }
+}

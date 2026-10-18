@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dense data grid reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <div class="grid-scroll" tabindex="0" role="region" aria-labelledby="grid-caption" data-testid="grid-scroll">
+      <table class="grid" role="grid" aria-rowcount="7" data-testid="grid">
+        <caption class="grid-caption" id="grid-caption">Deployments</caption>
+        <thead>
+          <tr>
+            <th class="cell cell-head cell-sticky" scope="col" data-testid="head-name">Name</th>
+            <th class="cell cell-head" scope="col">Region</th>
+            <th class="cell cell-head cell-num" scope="col">Requests</th>
+            <th class="cell cell-head cell-num" scope="col">Errors</th>
+            <th class="cell cell-head" scope="col">Owner</th>
+            <th class="cell cell-head" scope="col">Description</th>
+            <th class="cell cell-head" scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row" aria-selected="true" data-testid="row-1">
+            <th class="cell cell-sticky" scope="row" data-testid="cell-1-name">api-gateway-production-eu-west-primary</th>
+            <td class="cell">eu-west</td>
+            <td class="cell cell-num" data-testid="cell-1-requests">1,204,551</td>
+            <td class="cell cell-num">12</td>
+            <td class="cell">platform</td>
+            <td class="cell cell-truncate" data-testid="cell-1-description">Handles every public request and forwards it to the regional services behind the load balancer</td>
+            <td class="cell"><span class="status status-ok">Healthy</span></td>
+          </tr>
+          <tr class="row" tabindex="-1" data-testid="row-2">
+            <th class="cell cell-sticky" scope="row">billing</th>
+            <td class="cell">us-east</td>
+            <td class="cell cell-num">88,019</td>
+            <td class="cell cell-num">0</td>
+            <td class="cell">finance</td>
+            <td class="cell cell-truncate">Invoices</td>
+            <td class="cell"><span class="status status-warn">Degraded</span></td>
+          </tr>
+          <tr class="row" tabindex="-1" data-testid="row-3">
+            <th class="cell cell-sticky" scope="row">search</th>
+            <td class="cell">ap-south</td>
+            <td class="cell cell-num">431,700</td>
+            <td class="cell cell-num">1,045</td>
+            <td class="cell">discovery</td>
+            <td class="cell cell-truncate">Full-text index</td>
+            <td class="cell"><span class="status status-error">Failing</span></td>
+          </tr>
+          <tr class="row" tabindex="-1"><th class="cell cell-sticky" scope="row">mail</th><td class="cell">eu-west</td><td class="cell cell-num">9,330</td><td class="cell cell-num">2</td><td class="cell">platform</td><td class="cell cell-truncate">Outbound mail</td><td class="cell"><span class="status status-ok">Healthy</span></td></tr>
+          <tr class="row" tabindex="-1"><th class="cell cell-sticky" scope="row">media</th><td class="cell">us-west</td><td class="cell cell-num">77,412</td><td class="cell cell-num">7</td><td class="cell">content</td><td class="cell cell-truncate">Transcoding</td><td class="cell"><span class="status status-ok">Healthy</span></td></tr>
+          <tr class="row" tabindex="-1"><th class="cell cell-sticky" scope="row">reports</th><td class="cell">eu-central</td><td class="cell cell-num">1,018</td><td class="cell cell-num">0</td><td class="cell">finance</td><td class="cell cell-truncate">Nightly exports</td><td class="cell"><span class="status status-ok">Healthy</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

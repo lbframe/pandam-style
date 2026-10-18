@@ -1,0 +1,142 @@
+/* Dense data grid reference outcome. Authored for CE-00.2; not compiler output. */
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #1f2421;
+}
+
+.grid-scroll {
+  max-width: 640px;
+  max-height: 240px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #d6dbd0;
+}
+
+.grid-scroll:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: -2px;
+}
+
+.grid {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: max-content;
+}
+
+.grid-caption {
+  padding: 8px;
+  text-align: start;
+  caption-side: top;
+  font-weight: 600;
+}
+
+.cell {
+  width: 120px;
+  height: 28px;
+  padding-inline: 8px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #e8ebe3;
+  white-space: nowrap;
+  vertical-align: middle;
+  text-align: start;
+  background-color: #ffffff;
+}
+
+.cell-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  font-weight: 600;
+  background-color: #f4f6f0;
+}
+
+.cell-sticky {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 160px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.cell-head.cell-sticky {
+  z-index: 3;
+}
+
+.cell-num {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-truncate {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row:hover .cell {
+  background-color: #f4f6f0;
+}
+
+.row[aria-selected='true'] .cell {
+  background-color: #e3ebdc;
+}
+
+.row:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: -2px;
+}
+
+.status {
+  display: inline-block;
+  padding-inline: 6px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.status-ok {
+  color: #1f5132;
+  background-color: #dcefe2;
+}
+
+.status-warn {
+  color: #6b4c12;
+  background-color: #faf3e6;
+}
+
+.status-error {
+  color: #7d2a26;
+  background-color: #fbefed;
+}
+
+@media (forced-colors: active) {
+  .row[aria-selected='true'] .cell {
+    color: HighlightText;
+    background-color: Highlight;
+  }
+}
+
+@media print {
+  .grid-scroll {
+    max-height: none;
+    overflow: visible;
+  }
+  .cell-head,
+  .cell-sticky {
+    position: static;
+  }
+}
