@@ -1,0 +1,11 @@
+{
+  "description": "Review probe: every covered root of the build report is replaced, keeping their count, with the generation state's digest and size of build-report.json updated.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "generationEdits": [{ "op": "json-map", "rel": "build-report.json", "pointer": "/coveredRoots", "value": "/forged/source" }],
+  "regenerate": true
+}

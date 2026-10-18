@@ -97,6 +97,22 @@ not repeated below unless they are the discriminating evidence.
       them.
     - `broken-select-on-section`: calling `select()` on a `<section>` throws,
       as in a browser, so the render fails.
+  - Fourth-review probes:
+    - `bad-portal-raw-style`, `bad-event-raw-style` and
+      `bad-event-raw-inline-style`: raw markup (`dangerouslySetInnerHTML`)
+      carrying a style sheet or inline style, through a portal into the body
+      or after a checkout click; the whole document is scanned after every
+      phase.
+    - `bad-font-color-item-text` and `bad-bgcolor-table`: legacy
+      presentational HTML is a style channel.
+    - `bad-second-summary-item-text`: a closed `<details>` presents only its
+      first `<summary>`.
+    - `bad-report-coverage-document`, `-coverage-replaced`, `-covered-roots`
+      and `-relay-edges`: the build report is compared in full against the
+      fresh one.
+    - Good controls: `good-portal-owned-container` (portal into a `<ul>` the
+      component renders), `good-object-assign-accumulator` and
+      `good-roving-focus-refs`.
   - Good controls: `good-idiomatic-indexing` (array indexing and lookup maps),
     `good-handler-map` (`handlers[e.key]?.()`), `good-focus-ref`,
     `good-memo-hooks` and `good-regenerated` (complete fresh generation).
@@ -108,12 +124,14 @@ not repeated below unless they are the discriminating evidence.
       `bad-disabled-button`, `bad-clone-remove-handler` (`cloneElement`
       removes `onClick`), `bad-clone-forge-marker` (props copied from an
       unused element), `bad-bound-native-listener` (a bound DOM method
-      registered as a listener) and `bad-template-decoy-handler` (a handler
-      on a decoy inside a `<template>`).
+      registered as a listener), `bad-template-decoy-handler` (a handler
+      on a decoy inside a `<template>`) and `bad-span-remove-button` (a
+      clicked target must be a native control).
     - Unmeasured: `bad-popover-button` (a closed popover's presentation is not
       measurable).
     - Pass: `good-arrow-handler`, `good-bubbling-handler`,
-      `good-clone-add-handler`, `good-primary-button-check`
+      `good-clone-add-handler`, `good-memo-export`, `good-forward-ref-export`,
+      `good-primary-button-check`
       (`e.button === 0`) and `good-target-equality`
       (`e.target === e.currentTarget`).
 

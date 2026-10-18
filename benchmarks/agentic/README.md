@@ -9,10 +9,10 @@ no product behavior depends on it.
 
 Status:
 
-- **Present:** corpus `1.3.0`, reference epoch `alpha1`. It has 47 development
+- **Present:** corpus `1.4.0`, reference epoch `alpha1`. It has 47 development
   tasks and 16 held-out tasks (encrypted in the repository; see
   [held-out policy](heldout/ACCESS-POLICY.md)), 8 project shapes on 5 hosts, the
-  oracles, and 165 development oracle fixtures (known-good and known-bad
+  oracles, and 181 development oracle fixtures (known-good and known-bad
   solutions, including the independent reviews' probes).
 - **Not present:** the runner, the provider adapters, the frozen baseline and the
   thresholds. Those are AG-00.2 (#6) and AG-00.3 (#7). No LLM run has been
@@ -184,7 +184,8 @@ structure:
   `<template>` serializes its content rather than its children).
 - Text assertions use presented text: descendants under `hidden`, `inert`,
   elements the user agent never renders (`<template>`, `<script>`,
-  `<noscript>`, `<style>`, `<rp>`, ...), a closed `<dialog>`/`<details>`,
+  `<noscript>`, `<style>`, `<rp>`, ...), a closed `<dialog>`, a closed
+  `<details>` (except its first `<summary>` child),
   `display:none`, `visibility:hidden`, `opacity:0`, `font-size:0`,
   `content-visibility:hidden` or a text color equal to its background
   contribute nothing. `aria-hidden` is not concealment: the text is still
@@ -209,16 +210,36 @@ structure:
   one with the committed tree's elements carrying the test id. The target
   must be the single presented,
   enabled (not `disabled`, not under `pointer-events:none`) committed element
-  with the test id. A render prop written `{"$pmsSpy": "onRemove"}` becomes a
+  with the test id. A clicked target must be a native control (`<button>`, an
+  `<input>` button, checkbox or radio, `<a href>`, or a `<details>`' first
+  `<summary>`): only those are keyboard operable by the platform (Enter and
+  Space activation), which jsdom does not emulate, so custom `role="button"`
+  widgets are not accepted. A render prop written `{"$pmsSpy": "onRemove"}` becomes a
   spy; `expect.callbacks` counts the calls made by that dispatch, and calls
   during render always fail.
+- Style channels outside PandamStyle fail render checks and `no-bypass`,
+  wherever they appear in the document, after rendering, each interaction and
+  the sweep: `<style>`/`<link>` elements, `style` attributes, raw markup
+  (`dangerouslySetInnerHTML`, also reported statically) and legacy
+  presentational HTML. The presentational list is in
+  `src/oracles/style-channels.mjs`: the elements `basefont`, `big`, `blink`,
+  `center`, `font`, `marquee`, `nobr`, `spacer`, `strike` and `tt`; the
+  attributes `align`, `alink`, `background`, `bgcolor`, `border`,
+  `cellpadding`, `cellspacing`, `clear`, `color`, `face`, `frame`, `hspace`,
+  `link`, `marginheight`, `marginwidth`, `noshade`, `nowrap`, `rules`, `text`,
+  `valign`, `vlink` and `vspace`; `size` on `<hr>`; and `width`/`height` on
+  anything but `canvas`, `embed`, `iframe`, `img`, `input`, `object`,
+  `source`, `svg` and `video`. Attributes inside SVG are SVG's own.
 - Generated integrity takes its references only from places the agent cannot
   edit: the harness's baseline snapshot and a fresh trusted recompilation of
   the final sources. The workspace's generation state is never trusted as an
   inventory. Full path inventories (the output directory and the state file)
-  are compared exactly, deterministic files byte for byte, and the build
-  report and state file in a normal form that keeps every path-independent
-  field. The generation must be the fresh compiler generation (`must-match`),
+  are compared exactly, deterministic files byte for byte, and the state file
+  on every path-independent field. The build report is compared in full
+  against the fresh one after normalising only path and session differences:
+  project paths (covered roots, relay edges) are reduced to the part that
+  names a file of the project, and the session record (`incremental`, the
+  coverage report's `revisionId` and `materializedAt`) is dropped. The generation must be the fresh compiler generation (`must-match`),
   or either that or the byte-identical baseline generation (`no-hand-edits`).
   "Never generated" applies only when the baseline had no generation either;
   deleting a baseline generation fails. A task whose generated directory is
@@ -293,8 +314,9 @@ sandbox for hostile native code.
    - **Committed-tree consistency:** after rendering, after each interaction
      and after the sweep, the DOM must be exactly what React's committed fiber
      tree says: the same nodes in the same order, the same text, and the
-     attributes React's own serializer derives from the committed props; the
-     rest of the document is unchanged apart from React-placed nodes, and no
+     attributes React's own serializer derives from the committed props
+     (portal nodes inside a node React renders count among that node's
+     children); the rest of the document is unchanged apart from React-placed nodes, and no
      own property or replaced prototype shadows a DOM interface member. This catches writes with no
      agent stack frame, such as a bound DOM method handed to React as a ref or
      handler.
@@ -312,9 +334,15 @@ sandbox for hostile native code.
      `.target`, DOM queries and their aliases).
    - Computed reads, writes and calls on ordinary values (array indexing,
      lookup maps such as `handlers[e.key]?.()`, accumulators, ref containers
-     like `refs.current[i] = el`) stay inside the subset and are left to the
+     created with `useRef([])` or `useRef({})`, like `refs.current[i] = el`
+     and `refs.current[(i + 1) % n]?.focus()`) stay inside the subset and are left to the
      dynamic trace, which observes their effect on the DOM. The
-     `good-idiomatic-indexing` and `good-handler-map` fixtures prove it.
+     `good-idiomatic-indexing`, `good-handler-map` and `good-roving-focus-refs`
+     fixtures prove it. `Object.assign` and the other `Object` mutators are
+     accepted on provably plain data only: a literal, a local bound to one, or
+     a `reduce` accumulator seeded with one (`good-object-assign-accumulator`).
+   - Legacy presentational JSX (elements and attributes listed above) and
+     raw markup in props objects are reported.
    - Computed access on a value that may be a DOM node fails closed rather
      than being `unmeasured`: it is the one form the dynamic trace cannot
      observe on paths the sweep does not reach, and no honest solution needs
@@ -445,6 +473,10 @@ development/held-out split is part of the versioned data: each task's `split`
 field, the committed held-out manifest and its digest in the lock.
 
 ## Known limitations
+
+- Click targets must be native controls; an accessible custom widget
+  (`role="button"` with its own key handling) fails, because jsdom cannot
+  verify keyboard activation.
 
 - No runner, provider adapter or real LLM run exists yet (AG-00.2).
 - Host builds, dev servers, services and browser behavior require the runner.

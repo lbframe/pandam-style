@@ -1,0 +1,9 @@
+{
+  "description": "Review probe: a portal into the document body renders raw markup (dangerouslySetInnerHTML) holding a <style> element.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-card": "fail"
+  }
+}

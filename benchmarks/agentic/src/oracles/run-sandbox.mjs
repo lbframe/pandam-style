@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { STYLE_CHANNELS } from './style-channels.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SANDBOX = path.join(HERE, 'sandbox.mjs');
@@ -99,7 +100,7 @@ export function runSandbox(request, { timeoutMs = 60000 } = {}) {
     SANDBOX,
   ];
   const child = spawnSync(process.execPath, args, {
-    input: JSON.stringify({ ...request, nonce }),
+    input: JSON.stringify({ ...request, styleChannels: STYLE_CHANNELS, nonce }),
     encoding: 'utf8',
     timeout: timeoutMs,
     maxBuffer: 64 * 1024 * 1024,

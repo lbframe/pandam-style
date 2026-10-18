@@ -105,12 +105,28 @@ export async function runOracleFixture({
       continue;
     }
     const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-    if (edit.op === 'rewrite') {
-      fs.writeFileSync(path.join(outDir, edit.rel), edit.content);
+    let content = edit.content;
+    // A JSON document edited in place: `set` replaces the value at `pointer`,
+    // `map` replaces every element of the array there, keeping its length.
+    if (edit.op === 'json-set' || edit.op === 'json-map') {
+      const doc = JSON.parse(
+        fs.readFileSync(path.join(outDir, edit.rel), 'utf8'),
+      );
+      const keys = edit.pointer.split('/').slice(1);
+      const last = keys.pop();
+      const owner = keys.reduce((o, k) => o[k], doc);
+      owner[last] =
+        edit.op === 'json-set'
+          ? edit.value
+          : owner[last].map(() => structuredClone(edit.value));
+      content = JSON.stringify(doc);
+    }
+    if (content != null) {
+      fs.writeFileSync(path.join(outDir, edit.rel), content);
       state.files[edit.rel] = {
         ...state.files[edit.rel],
-        digest: sha256(edit.content),
-        size: Buffer.byteLength(edit.content),
+        digest: sha256(content),
+        size: Buffer.byteLength(content),
       };
     } else if (edit.op === 'delete-entry') {
       fs.rmSync(path.join(outDir, edit.rel), { force: true });

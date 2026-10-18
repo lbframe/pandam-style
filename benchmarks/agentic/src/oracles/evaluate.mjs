@@ -38,6 +38,7 @@ import {
   runSandbox,
 } from './run-sandbox.mjs';
 import { flattenDefinition } from './vocabulary.mjs';
+import { presentationalChannel } from './style-channels.mjs';
 import {
   countByRule,
   findConstructs,
@@ -539,11 +540,12 @@ function structuralConcealment(node, child) {
     return `inert attribute on <${node.tag}>`;
   if (node.tag === 'dialog' && !Object.hasOwn(node.attributes, 'open'))
     return 'inside a closed <dialog>';
+  // A closed <details> presents only its first <summary> child.
   if (
     node.tag === 'details' &&
     !Object.hasOwn(node.attributes, 'open') &&
     child != null &&
-    child.tag !== 'summary'
+    child !== (node.children ?? []).find((c) => c.tag === 'summary')
   ) {
     return 'inside a closed <details>';
   }
@@ -657,6 +659,7 @@ function presentedText(
   let lenient = '';
   for (const child of node.children ?? []) {
     if (child.tag === '#text') {
+      if (structuralConcealment(node, child) != null) continue;
       const visibility = inherited(
         chain,
         'visibility',
@@ -697,6 +700,32 @@ function presentedText(
     lenient += ` ${inner.lenient} `;
   }
   return { strict, lenient };
+}
+
+const NATIVE_INPUT_CONTROLS = new Set([
+  'button',
+  'submit',
+  'reset',
+  'checkbox',
+  'radio',
+  'image',
+]);
+
+function nonNativeControl(node) {
+  if (node.tag === 'button') return null;
+  if (
+    node.tag === 'input' &&
+    NATIVE_INPUT_CONTROLS.has((node.attributes.type ?? '').toLowerCase())
+  )
+    return null;
+  if (node.tag === 'a' && Object.hasOwn(node.attributes, 'href')) return null;
+  if (
+    node.tag === 'summary' &&
+    node.parent?.tag === 'details' &&
+    node.parent.children.find((c) => c.tag === 'summary') === node
+  )
+    return null;
+  return `target <${node.tag}> is not a native control (button, input button, link or summary), so keyboard operation is not guaranteed`;
 }
 
 function disabledReason(node) {
@@ -855,6 +884,16 @@ function evaluateRender(check, observed) {
         `${wanted.event} on ${wanted.testId}: ${eligible.length} eligible rendered targets (${nodes.length} rendered${reasons.length ? `; ${reasons.join(', ')}` : ''})`,
       );
       continue;
+    }
+    // A clicked target must be a native control: only those are keyboard
+    // operable by the platform (Enter/Space activation), which jsdom does not
+    // emulate. Custom role="button" widgets are not accepted.
+    if (wanted.event === 'click') {
+      const why = nonNativeControl(eligible[0]);
+      if (why != null) {
+        failures.push(`click on ${wanted.testId}: ${why}`);
+        continue;
+      }
     }
     const outcome = byIndex.get(nodes.indexOf(eligible[0]));
     if (outcome == null) {
@@ -1194,34 +1233,49 @@ function readJsonOrNull(file) {
 //   - Path inventories (output directory files plus the state file) are
 //     compared exactly: missing, added and renamed files all count.
 //   - Deterministic files must be byte-identical. The build report and the
-//     state file embed paths and session identities, so they are compared in
-//     a normal form that keeps every path-independent field.
+//     state file embed paths and session identities: the report is compared
+//     in full after only those are normalised (`reportForm`), the state file
+//     on every path-independent field.
 //   - must-match: the workspace generation is the fresh generation.
 //   - no-hand-edits: it is byte-identical to the baseline generation (never
 //     touched), or the fresh generation, or absent when the baseline had none.
 //     Deleting a baseline generation is never "never generated".
-const REPORT_FIELDS = [
-  'documentKind',
-  'schemaVersion',
-  'contractVersion',
-  'systemId',
-  'registryDigest',
-  'coveredFileCount',
-  'analysedFileCount',
-  'designSystemRuleCount',
-  'consumerRuleCount',
-  'ruleCount',
-  'cssBytes',
-  'coverageSummary',
-  'coverageConsistency',
-  'externalRequests',
-];
+// Session identities of a build report: they legitimately differ between the
+// agent's builds and the fresh recompilation. Everything else is compared.
+const REPORT_SESSION_FIELDS = ['incremental'];
+const COVERAGE_REPORT_SESSION_FIELDS = ['revisionId', 'materializedAt'];
+
+// A path in a build report names a file of the project it was built from,
+// absolute or relative to the build's working directory. Normalised to the
+// shortest suffix that exists under the project root; a path naming nothing
+// in the project is kept as is (and then differs).
+function projectPath(p, root) {
+  if (typeof p !== 'string') return p;
+  const parts = p.split(/[\\/]+/).filter(Boolean);
+  for (let i = 0; i < parts.length; i += 1) {
+    const rest = parts.slice(i).join('/');
+    if (fs.existsSync(path.join(root, rest))) return rest;
+  }
+  return p;
+}
+
+// Canonical JSON (sorted keys) so key order alone never differs.
+function canonical(value) {
+  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
+  if (value != null && typeof value === 'object')
+    return `{${Object.keys(value)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${canonical(value[k])}`)
+      .join(',')}}`;
+  return JSON.stringify(value);
+}
 
 function readGeneration(root, outDir, statePath) {
   const files = inventory(path.join(root, outDir));
   const stateFile = path.join(root, statePath);
   const stateExists = fs.existsSync(stateFile);
   return {
+    root,
     files,
     stateExists,
     stateDigest: stateExists ? fileDigest(stateFile) : null,
@@ -1234,20 +1288,27 @@ function readGeneration(root, outDir, statePath) {
   };
 }
 
-function reportForm(report) {
-  if (report == null || typeof report !== 'object') return null;
-  const out = {};
-  for (const key of REPORT_FIELDS) {
-    if (!Object.hasOwn(report, key)) return null;
-    out[key] = report[key];
-  }
-  out.coveredRoots = Array.isArray(report.coveredRoots)
-    ? report.coveredRoots.length
-    : null;
-  out.relayEdges = Array.isArray(report.relayEdges)
-    ? report.relayEdges.length
-    : null;
-  return JSON.stringify(out);
+function reportForm(report, root) {
+  if (report == null || typeof report !== 'object' || Array.isArray(report))
+    return null;
+  const out = structuredClone(report);
+  for (const key of REPORT_SESSION_FIELDS) delete out[key];
+  if (out.coverageReport != null && typeof out.coverageReport === 'object')
+    for (const key of COVERAGE_REPORT_SESSION_FIELDS)
+      delete out.coverageReport[key];
+  if (Array.isArray(out.coveredRoots))
+    out.coveredRoots = out.coveredRoots.map((p) => projectPath(p, root));
+  if (Array.isArray(out.relayEdges))
+    out.relayEdges = out.relayEdges.map((edge) =>
+      edge != null && typeof edge === 'object' && !Array.isArray(edge)
+        ? {
+            ...edge,
+            from: projectPath(edge.from, root),
+            to: projectPath(edge.to, root),
+          }
+        : edge,
+    );
+  return canonical(out);
 }
 
 function stateForm(state) {
@@ -1283,8 +1344,8 @@ function sameAsFresh(ws, fresh) {
     fresh.files['build-report.json'] != null &&
     ws.files['build-report.json'] != null
   ) {
-    const form = reportForm(ws.report);
-    if (form == null || form !== reportForm(fresh.report))
+    const form = reportForm(ws.report, ws.root);
+    if (form == null || form !== reportForm(fresh.report, fresh.root))
       problems.push('build-report.json differs from the fresh build report');
   }
   if (ws.stateExists !== fresh.stateExists)
@@ -1538,11 +1599,25 @@ function committedDomViolations(snapshot, knownClasses) {
     return [`committed DOM is not readable: ${error.message}`];
   }
   const out = [];
+  const inSvg = (el) => {
+    for (let n = el; n != null; n = n.parent) if (n.tag === 'svg') return true;
+    return false;
+  };
   for (const el of elements(tree)) {
     if (Object.hasOwn(el.attributes, 'style'))
       out.push(`committed <${el.tag}> carries a style attribute`);
     if (el.tag === 'style' || el.tag === 'link')
       out.push(`committed <${el.tag}> element`);
+    // Legacy presentational HTML is a style channel outside PandamStyle.
+    if (!inSvg(el)) {
+      for (const channel of [
+        presentationalChannel(el.tag),
+        ...Object.keys(el.attributes).map((a) =>
+          presentationalChannel(el.tag, a),
+        ),
+      ])
+        if (channel != null) out.push(`committed ${channel}`);
+    }
     for (const cls of classList(el)) {
       if (!knownClasses.has(cls))
         out.push(`committed class "${cls}" was not emitted by the compiler`);

@@ -1181,6 +1181,12 @@ function snapshotTree(read, node, depth = 0) {
 
 // React's FiberRoot for a container, captured right after createRoot and
 // before any agent render code runs; its `current` is the committed tree.
+const COMPONENT_WRAPPERS = new Set([
+  Symbol.for('react.memo'),
+  Symbol.for('react.forward_ref'),
+  Symbol.for('react.lazy'),
+]);
+
 function fiberRootOf(container) {
   for (const key of Object.getOwnPropertyNames(container)) {
     if (key.startsWith('__reactContainer$'))
@@ -1228,9 +1234,38 @@ function checkTree(read, container, fiberRoot, phase) {
   const problems = [];
   const unmeasured = [];
   const known = new Set([container]);
+  const channels = [];
   const root = fiberRoot?.current ?? null;
   if (root == null)
-    return { problems: ['no committed React root'], unmeasured, known };
+    return {
+      problems: ['no committed React root'],
+      unmeasured,
+      known,
+      channels,
+    };
+  // Portals into a node React itself renders (or the root container): their
+  // nodes are expected among that node's children, next to its own.
+  const owned = new Set([container]);
+  const portalsInto = new Map();
+  const collect = (fiber) => {
+    for (let c = fiber.child; c != null; c = c.sibling) {
+      if (c.tag === HOST_COMPONENT || c.tag === HOST_TEXT)
+        owned.add(c.stateNode);
+      if (c.tag === HOST_PORTAL) {
+        const target = c.stateNode.containerInfo;
+        const groups = portalsInto.get(target) ?? [];
+        groups.push(hostChildren(c).nodes.map((f) => f.stateNode));
+        portalsInto.set(target, groups);
+      }
+      collect(c);
+    }
+  };
+  collect(root);
+  const inOrder = (actual, group) => {
+    let at = 0;
+    for (const n of actual) if (n === group[at]) at += 1;
+    return at === group.length;
+  };
   const checkChildren = (parent, acc, exact) => {
     if (acc.hidden) {
       unmeasured.push(
@@ -1240,7 +1275,21 @@ function checkTree(read, container, fiberRoot, phase) {
     }
     const expected = acc.nodes.map((f) => f.stateNode);
     const actual = read.children(parent);
-    if (exact) {
+    const portals = exact ? (portalsInto.get(parent) ?? []) : [];
+    if (portals.length > 0) {
+      // Exactly the node's own children and the portals' nodes, each group
+      // in its own order.
+      const groups = [expected, ...portals];
+      const all = new Set(groups.flat());
+      const same =
+        actual.length === all.size &&
+        actual.every((n) => all.has(n)) &&
+        groups.every((g) => inOrder(actual, g));
+      if (!same)
+        problems.push(
+          `children of ${read.describe(parent)} differ from React's committed tree`,
+        );
+    } else if (exact) {
       const same =
         expected.length === actual.length &&
         expected.every((n, i) => n === actual[i]);
@@ -1251,9 +1300,7 @@ function checkTree(read, container, fiberRoot, phase) {
     } else {
       // Portal containers may hold other content; React's nodes must still be
       // there, in order.
-      let at = 0;
-      for (const n of actual) if (n === expected[at]) at += 1;
-      if (at !== expected.length)
+      if (!inOrder(actual, expected))
         problems.push(`portal content in ${read.describe(parent)} was altered`);
     }
   };
@@ -1298,6 +1345,9 @@ function checkTree(read, container, fiberRoot, phase) {
     compareAttributes(fiber, node, tag);
     const acc = hostChildren(fiber);
     const children = props.children;
+    // Raw markup is a channel around the design system, like inline styles.
+    if (props.dangerouslySetInnerHTML != null)
+      channels.push(`raw markup (dangerouslySetInnerHTML) on <${tag}>`);
     if (
       props.dangerouslySetInnerHTML != null ||
       tag === 'textarea' ||
@@ -1334,14 +1384,51 @@ function checkTree(read, container, fiberRoot, phase) {
     }
     for (const portal of acc.portals) {
       const inner = hostChildren(portal);
-      checkChildren(portal.stateNode.containerInfo, inner, false);
+      const target = portal.stateNode.containerInfo;
+      // A React-owned target is checked with its owner's children.
+      if (!owned.has(target)) checkChildren(target, inner, false);
       descend(inner);
     }
   };
   const top = hostChildren(root);
   checkChildren(container, top, true);
   descend(top);
-  return { problems, unmeasured, known };
+  return { problems, unmeasured, known, channels };
+}
+
+// Style channels anywhere in the document, whoever made them: style sheet
+// elements, `style` attributes and legacy presentational HTML (the lists
+// come from the parent, `style-channels.mjs`).
+const STYLE_CHANNELS = request.styleChannels ?? {
+  elements: [],
+  attributes: [],
+  dimensioned: [],
+};
+
+function documentStyleChannels(read, doc) {
+  const out = [];
+  const visit = (el, inSvg) => {
+    const tag = read.tag(el);
+    const svg = inSvg || tag === 'svg';
+    if (tag === 'style' || tag === 'link') out.push(`<${tag}> element`);
+    if (!svg && STYLE_CHANNELS.elements.includes(tag))
+      out.push(`presentational <${tag}> element`);
+    for (const name of read.attributes(el).keys()) {
+      if (name === 'style') out.push(`style attribute on <${tag}>`);
+      else if (
+        !svg &&
+        (STYLE_CHANNELS.attributes.includes(name) ||
+          (name === 'size' && tag === 'hr') ||
+          ((name === 'width' || name === 'height') &&
+            !STYLE_CHANNELS.dimensioned.includes(tag)))
+      )
+        out.push(`presentational ${name} attribute on <${tag}>`);
+    }
+    for (const child of read.children(el))
+      if (read.type(child) === 1) visit(child, svg);
+  };
+  visit(read.root(doc), false);
+  return out;
 }
 
 // Outside the container the document must stay as the harness created it,
@@ -1487,6 +1574,9 @@ async function renderScenario(spec, index) {
     ];
     for (const p of problems.slice(0, 10))
       violation(`committed DOM diverges from React (${phase}): ${p}`);
+    const channels = [...tree.channels, ...documentStyleChannels(read, doc)];
+    for (const c of channels.slice(0, 10))
+      violation(`style channel in the document (${phase}): ${c}`);
     for (const u of tree.unmeasured)
       if (!scenario.unmeasured.includes(u)) scenario.unmeasured.push(u);
   };
@@ -1539,7 +1629,13 @@ async function renderScenario(spec, index) {
       throw new Error(`PMS_ORACLE_UNCOVERED_MODULE: ${r.module}`);
     const mod = await import(`${url}?pms-scenario=${index}`);
     const Component = mod[r.export ?? 'default'];
-    if (typeof Component !== 'function')
+    // Function components and React's component wrappers (memo, forwardRef,
+    // lazy); React validates the rest.
+    const wrapper =
+      Component != null &&
+      typeof Component === 'object' &&
+      COMPONENT_WRAPPERS.has(Component.$$typeof);
+    if (typeof Component !== 'function' && !wrapper)
       throw new Error(
         `PMS_ORACLE_MISSING_EXPORT: ${r.module}#${r.export ?? 'default'}`,
       );

@@ -10,6 +10,7 @@
 // evaluated agent introduced are attributed to it.
 
 import { createRequire, isBuiltin } from 'node:module';
+import { presentationalChannel } from './style-channels.mjs';
 
 const require = createRequire(import.meta.url);
 const { parse } = require('@babel/parser');
@@ -389,7 +390,58 @@ function collectBindings(program) {
         for (const name of namesIn(d.id)) tainted.add(name);
     }
   }
-  return { plain, isTainted };
+  // Ref containers: `const refs = useRef([])` (or `{}`) holds a collection;
+  // `refs.current` is plain data even though its elements may be nodes.
+  const refContainers = new Set();
+  // Accumulators of `reduce(fn, <plain literal>)`: the callback's first
+  // parameter, by name and callback source range.
+  const accumulators = [];
+  for (const d of declarators) {
+    const init = d.init;
+    if (
+      d.id.type === 'Identifier' &&
+      init?.type === 'CallExpression' &&
+      (init.callee?.name === 'useRef' ||
+        propertyName(init.callee) === 'useRef') &&
+      ['ArrayExpression', 'ObjectExpression'].includes(
+        init.arguments?.[0]?.type,
+      )
+    )
+      refContainers.add(d.id.name);
+  }
+  walkWithParent(program, (node) => {
+    if (
+      node.type === 'CallExpression' &&
+      ['reduce', 'reduceRight'].includes(propertyName(node.callee)) &&
+      isPlainDataInit(node.arguments?.[1])
+    ) {
+      const fn = node.arguments[0];
+      if (
+        (fn?.type === 'ArrowFunctionExpression' ||
+          fn?.type === 'FunctionExpression') &&
+        fn.params[0]?.type === 'Identifier'
+      )
+        accumulators.push({
+          name: fn.params[0].name,
+          start: fn.start,
+          end: fn.end,
+        });
+    }
+  });
+  // Provably plain data as a mutation target: a literal, a local bound to a
+  // literal, or a reduce accumulator seeded with one.
+  const isPlainTarget = (expr, at) =>
+    isLiteralObject(expr) ||
+    (expr?.type === 'Identifier' &&
+      (plain.has(expr.name) ||
+        accumulators.some(
+          (a) => a.name === expr.name && at.start >= a.start && at.end <= a.end,
+        )));
+  const isRefContainer = (expr) =>
+    propertyName(expr) === 'current' &&
+    expr.object?.type === 'Identifier' &&
+    refContainers.has(expr.object.name);
+  return { plain, isTainted, isPlainTarget, isRefContainer };
 }
 
 function isNonConstantComputed(node) {
@@ -448,6 +500,24 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
     if (isBuiltin(source)) add('privileged-import', node, source);
   };
   const bindings = collectBindings(ast.program);
+  // JSX elements inside <svg> carry SVG's own attributes.
+  const insideSvg = new Set();
+  walk(ast.program, (node) => {
+    if (node.type === 'JSXElement' && node.openingElement?.name?.name === 'svg')
+      walk(node.children, (inner) => {
+        if (inner.type === 'JSXOpeningElement') insideSvg.add(inner);
+      });
+  });
+  const presentational = (node, tag, attributes) => {
+    if (typeof tag !== 'string' || !/^[a-z]/.test(tag)) return;
+    if (tag === 'svg' || insideSvg.has(node)) return;
+    const element = presentationalChannel(tag);
+    if (element != null) add('jsx-style-prop', node, element);
+    for (const name of attributes) {
+      const channel = presentationalChannel(tag, name);
+      if (channel != null) add('jsx-style-prop', node, channel);
+    }
+  };
   const writeTarget = (target, node, how) => {
     if (
       target?.type === 'MemberExpression' ||
@@ -465,9 +535,7 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
       // are undecidable here. A ref container (`refs.current[i] = el`) is
       // ordinary data.
       const owner = target.object;
-      const refContainer =
-        propertyName(owner) === 'current' &&
-        owner?.object?.type === 'Identifier';
+      const refContainer = bindings.isRefContainer(owner);
       if (
         isNonConstantComputed(target) &&
         !refContainer &&
@@ -513,7 +581,13 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
       const name = propertyName(node);
       if (name === 'constructor' || name === '__proto__')
         add('dynamic-code', node, `.${name} access`);
-      if (isNonConstantComputed(node) && bindings.isTainted(node.object))
+      // Indexing a ref container (`refs.current[i]`) reads plain data; the
+      // element it yields stays a possible DOM node for later uses.
+      if (
+        isNonConstantComputed(node) &&
+        bindings.isTainted(node.object) &&
+        !bindings.isRefContainer(node.object)
+      )
         add(
           'dynamic-code',
           node,
@@ -544,12 +618,6 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
               add('jsx-style-prop', node, 'style in spread attributes');
             if (k === 'className' || k === 'class')
               add('raw-classname', node, 'className in spread attributes');
-            if (k === 'dangerouslySetInnerHTML')
-              add(
-                'runtime-style-injection',
-                node,
-                'dangerouslySetInnerHTML in spread',
-              );
           }
         }
         break;
@@ -557,6 +625,23 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
         const tag = node.name?.type === 'JSXIdentifier' ? node.name.name : null;
         if (tag === 'style' || tag === 'link')
           add('runtime-style-injection', node, `<${tag}> element`);
+        presentational(
+          node,
+          tag,
+          (node.attributes ?? [])
+            .filter((a) => a.type === 'JSXAttribute')
+            .map((a) => a.name?.name)
+            .filter((n) => typeof n === 'string'),
+        );
+        break;
+      }
+      case 'ObjectProperty': {
+        // Raw markup through props objects (createElement, spreads, jsx()).
+        const k = node.computed
+          ? constantKey(node.key)
+          : (node.key?.name ?? node.key?.value);
+        if (k === 'dangerouslySetInnerHTML')
+          add('runtime-style-injection', node, 'dangerouslySetInnerHTML');
         break;
       }
       case 'ImportDeclaration':
@@ -591,6 +676,17 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
             );
           if (tagKey === 'style' || tagKey === 'link')
             add('runtime-style-injection', node, `${name}('${tagKey}')`);
+          const props = node.arguments?.[name === 'createElementNS' ? 2 : 1];
+          if (name === 'createElement' && tagKey != null)
+            presentational(
+              node,
+              tagKey,
+              props?.type === 'ObjectExpression'
+                ? props.properties
+                    .map((p) => p.key?.name ?? p.key?.value)
+                    .filter((n) => typeof n === 'string')
+                : [],
+            );
         }
         if (
           ['setAttribute', 'setAttributeNS', 'toggleAttribute'].includes(name)
@@ -616,7 +712,7 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
           (objectName === 'Object' && MUTATORS.has(name)) ||
           objectName === 'Reflect'
         ) {
-          if (objectName === 'Reflect' || !isLiteralObject(arg))
+          if (objectName === 'Reflect' || !bindings.isPlainTarget(arg, node))
             add(
               'runtime-style-injection',
               node,

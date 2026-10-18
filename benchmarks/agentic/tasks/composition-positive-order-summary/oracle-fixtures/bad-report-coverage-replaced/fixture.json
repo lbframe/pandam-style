@@ -1,0 +1,11 @@
+{
+  "description": "Review probe: the build report's coverageReport is replaced by {\"forged\":true}, with the generation state's digest and size of build-report.json updated.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "generationEdits": [{ "op": "json-set", "rel": "build-report.json", "pointer": "/coverageReport", "value": { "forged": true } }],
+  "regenerate": true
+}

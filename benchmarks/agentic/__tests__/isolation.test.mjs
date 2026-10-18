@@ -411,6 +411,12 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
     'export const A = () => <div ref={(el) => { if (el) { const k = ["st", "yle"].join(""); el[k].backgroundColor = "red"; } }} />;':
       ['dynamic-code'],
     'const make = Function; make("x")();': ['dynamic-code'],
+    "export const A = () => createElement('div', { dangerouslySetInnerHTML: { __html: '' } });":
+      ['runtime-style-injection'],
+    "export const A = () => <table bgColor='white'><tbody><tr><td><font color='white'>x</font></td></tr></tbody></table>;":
+      ['jsx-style-prop'],
+    'export function A({ k }) { const r = useRef(null); useEffect(() => { r.current[k] = 1; }); return <div ref={r} />; }':
+      ['dynamic-code'],
     '(() => {}).constructor("x")();': ['dynamic-code'],
     "String.prototype.trim = () => '';": ['dynamic-code'],
     'export function A() { const r = useRef(null); useEffect(() => { const n = r.current; n[key] = 1; }); return <div ref={r} />; }':
@@ -433,6 +439,9 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
     'export function L({ items }) { const refs = useRef([]); return items.map((x, i) => <li key={x} ref={(el) => { refs.current[i] = el; }} />); }',
     'export const add = (a) => (b) => a + b;\nexport const three = add(1)(2);',
     'export function f(obj, k) { obj[k] = 1; }',
+    'export const byId = (items) => items.reduce((acc, item) => Object.assign(acc, { [item.id]: item }), {});',
+    "export function L({ items }) { const refs = useRef([]); return items.map((it, i) => <li key={it.id} tabIndex={-1} ref={(el) => { refs.current[i] = el; }} onKeyDown={(e) => { if (e.key === 'Enter') refs.current[(i + 1) % items.length]?.focus(); }}>{it.name}</li>); }",
+    'export const Icon = () => <svg width={16} height={16} color="red"><rect width={2} height={2} /></svg>;',
   ];
   for (const code of idiomatic)
     assert.deepEqual(findConstructs(code, 'x.jsx'), [], code);

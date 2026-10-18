@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: a <span> with the compiled button classes and a click handler; a clicked target must be a native control (keyboard operable).",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "remove-click": "fail"
+  }
+}

@@ -61,6 +61,15 @@ Other custody events:
   task schema is unchanged, so no held-out task needed to change. Only the
   manifest's `corpusVersion` was updated; the archive, its digest and every
   task digest are unchanged.
+- 2026-10-18, corpus 1.4.0 (fourth independent review, targeted): no unseal
+  and no revision. The fixes are in the oracles and static rules (raw markup
+  and presentational HTML as style channels, whole-document style-channel
+  scan, native-control click targets, first-summary presentation, full
+  build-report comparison, plain-data and ref-container analysis). The task
+  schema and every task's content are unchanged; the native-control rule is
+  oracle-wide, so no held-out task needed to change. Only the manifest's
+  `corpusVersion` was updated; the archive, its digest and every task digest
+  are unchanged.
 
 ## Rotation and changes
 
