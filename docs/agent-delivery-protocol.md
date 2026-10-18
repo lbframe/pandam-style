@@ -67,8 +67,9 @@ class, and the absence of a severity and exit contract.
    derived from a private or sealed source is scanned locally before its first
    push. Pushing a branch to this public repository publishes its commits;
    deleting the branch afterwards does not make them unreachable by SHA.
-   Existing guards include the AG held-out guard and the CE-00.2 publication
-   gate (`tools/coverage/publication.mjs`).
+   Existing guards include the CE-00.2 publication gate
+   (`tools/coverage/publication.mjs`). The AG held-out guard
+   (`pms-agentic heldout guard`) lands with AG-00.1 (PR #88).
 
 ## Reviewer briefs
 
