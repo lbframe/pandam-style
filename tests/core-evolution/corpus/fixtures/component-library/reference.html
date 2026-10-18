@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Component library reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <main class="gallery" data-testid="gallery">
+      <section class="row" aria-label="Buttons">
+        <button class="btn btn-primary btn-md" type="button" data-testid="btn-primary-md">Primary</button>
+        <button class="btn btn-secondary btn-md" type="button" data-testid="btn-secondary-md">Secondary</button>
+        <button class="btn btn-primary btn-sm" type="button" data-testid="btn-primary-sm">Small</button>
+        <button class="btn btn-danger btn-md" type="button" data-testid="btn-danger-md">Remove</button>
+      </section>
+      <section class="row" aria-label="Badges">
+        <span class="badge badge-neutral" data-testid="badge-neutral">Draft</span>
+        <span class="badge badge-success" data-testid="badge-success">Live</span>
+        <span class="badge badge-warning" data-testid="badge-warning">Expiring</span>
+      </section>
+      <article class="card" data-testid="card">
+        <header class="card-header" data-testid="card-header">
+          <h2 class="card-title">Usage</h2>
+          <span class="badge badge-neutral">Monthly</span>
+        </header>
+        <div class="card-body" data-testid="card-body">The card recipe has header, body and footer slots.</div>
+        <footer class="card-footer">
+          <button class="btn btn-secondary btn-sm" type="button">Details</button>
+        </footer>
+      </article>
+      <section class="theme-dark" data-testid="theme-dark">
+        <button class="btn btn-primary btn-md" type="button" data-testid="btn-primary-dark">Primary on dark</button>
+      </section>
+    </main>
+  </body>
+</html>

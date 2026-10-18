@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-profiles.v1.schema.json",
+  "title": "Core evolution project profiles v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-project-profiles"
+    },
+    "task": {
+      "const": "CE-00.1"
+    },
+    "status": {
+      "type": "string"
+    },
+    "policy": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidenceClasses": {
+      "type": "object",
+      "required": ["E1", "E2", "E3", "E4", "E5"],
+      "additionalProperties": false,
+      "properties": {
+        "E1": {
+          "type": "string"
+        },
+        "E2": {
+          "type": "string"
+        },
+        "E3": {
+          "type": "string"
+        },
+        "E4": {
+          "type": "string"
+        },
+        "E5": {
+          "type": "string"
+        }
+      }
+    },
+    "corpusFixtureClasses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "enum": [
+              "web",
+              "desktop-renderer",
+              "content",
+              "forms",
+              "data",
+              "rtl",
+              "svg-media",
+              "ssr",
+              "reusable-package"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": ["application", "overlay", "delivery", "distribution"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "inheritsPropertiesFrom": {
+            "type": "string"
+          },
+          "corpusFixtureClasses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "browserTargetDecision": {
+            "type": "string",
+            "pattern": "^(D-BP-\\d\\d|inherits-application-profile)$"
+          },
+          "additionalBrowserDecisions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^D-BP-\\d\\d$"
+            }
+          },
+          "sourceFormatDecisions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^D-SF-\\d\\d$"
+            }
+          },
+          "hosts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "consumerEvidence": {
+            "type": "string"
+          },
+          "requiredCapabilities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^CAP-(0[1-9]|[1-3]\\d|4[0-8])$"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "qualificationOwners": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^CE-(0\\d|1[0-5])$"
+            },
+            "minItems": 1
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "description",
+          "corpusFixtureClasses",
+          "browserTargetDecision",
+          "additionalBrowserDecisions",
+          "sourceFormatDecisions",
+          "hosts",
+          "requiredCapabilities",
+          "qualificationOwners",
+          "issues"
+        ]
+      },
+      "minItems": 9,
+      "maxItems": 9
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "task",
+    "status",
+    "policy",
+    "evidenceClasses",
+    "corpusFixtureClasses",
+    "profiles"
+  ]
+}

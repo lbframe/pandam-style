@@ -1,0 +1,147 @@
+/* Notices, empty and loading states reference outcome. Authored for CE-00.2; not compiler output. */
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1f2421;
+}
+
+.page {
+  display: grid;
+  gap: 16px;
+  max-width: 62ch;
+  padding: 24px;
+}
+
+.notice {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  padding: 12px;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 6px;
+}
+
+.notice-info {
+  border-color: #c9d6c2;
+  background-color: #edf2e8;
+}
+
+.notice-danger {
+  border-color: #e3b6b2;
+  color: #7d2a26;
+  background-color: #fbefed;
+}
+
+.notice-icon {
+  width: 16px;
+  height: 16px;
+  margin-block-start: 2px;
+  fill: currentColor;
+}
+
+.notice-text {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: break-word;
+}
+
+.notice-dismiss {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-style: none;
+  border-radius: 6px;
+  color: inherit;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.notice-dismiss:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: currentColor;
+  outline-offset: 1px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  border-width: 1px;
+  border-style: dashed;
+  border-color: #c4cabe;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 18px;
+  height: 18px;
+  fill: #697067;
+}
+
+.empty-title {
+  margin: 0;
+  font-size: 16px;
+  text-wrap: balance;
+}
+
+.empty-text {
+  margin: 0;
+  max-width: 46ch;
+  color: #697067;
+  text-wrap: pretty;
+}
+
+.empty-action {
+  cursor: pointer;
+}
+
+.skeleton-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.skeleton-row {
+  height: 16px;
+  border-radius: 4px;
+  background-color: #e8ebe3;
+  animation-name: shimmer;
+  animation-duration: 1.2s;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+}
+
+@keyframes shimmer {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-row {
+    animation-name: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .notice {
+    border-color: CanvasText;
+  }
+  .skeleton-row {
+    background-color: GrayText;
+  }
+}

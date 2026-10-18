@@ -21,3 +21,6 @@ PandamStyle in consumer projects; it is not this repository's contributor guide.
   workflow without a reason. Documentation changes use the AgentDoc gate.
 - Update affected contracts and catalog evidence with the change; report files,
   commands, results and remaining gaps. Never describe unrun checks as passing.
+- Delegated implementation and independent review follow the
+  [agent delivery protocol](docs/agent-delivery-protocol.md): no scope added in
+  fix rounds, executed evidence, class-level fixes and a bounded review contract.

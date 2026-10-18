@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-scope-decisions",
+  "task": "CE-00.1",
+  "status": "open-decisions-handed-to-owning-lots",
+  "policy": [
+    "Each decision is open until its closing lot records the decision, rationale and executable evidence. No decision here is a support claim.",
+    "An unsupported source format or browser target must be recorded before a project that needs it is accepted; it cannot silently leave a profile.",
+    "Evidence references identify inspected source (evidence class E1) unless stated otherwise."
+  ],
+  "decisions": [
+    {
+      "id": "D-SF-01",
+      "kind": "source-format",
+      "question": "Which JavaScript/TypeScript module extensions are accepted source formats, and do all hosts agree?",
+      "alpha1": "Project session SOURCE_RE accepts .js/.jsx/.ts/.tsx/.mjs/.cjs; the Rsbuild adapter accepts .js/.mjs/.cjs/.jsx/.ts/.tsx; the Next adapter rule tests /\\.[cm]?[jt]sx?$/ and therefore also matches .mts/.cts/.mjsx/.cjsx. The host filters disagree on .mts/.cts.",
+      "alpha1Sources": [
+        "packages/compiler/src/project/session/fresh.js",
+        "packages/rsbuild/src/index.js",
+        "packages/next/src/index.js"
+      ],
+      "upstreamEvidence": [
+        "StyleX 0.19.1 unplugin core.js JS_LIKE_RE /\\.[cm]?[jt]sx?(\\?|$)/",
+        "Panda 2.2.0 pandacss_sfc js.rs"
+      ],
+      "closingLot": "CE-13",
+      "issues": [80],
+      "affects": {
+        "profiles": ["web", "desktop-renderer", "content", "forms", "data"],
+        "capabilities": ["CAP-42"]
+      }
+    },
+    {
+      "id": "D-SF-02",
+      "kind": "source-format",
+      "question": "Is Vue single-file-component source accepted, with a dedicated source identity adapter, or recorded as unsupported?",
+      "alpha1": "The Vite adapter throws UNSUPPORTED_FEATURE for .vue modules: SFC submodules need a dedicated source identity adapter.",
+      "alpha1Sources": ["packages/vite/src/index.js"],
+      "upstreamEvidence": [
+        "Panda 2.2.0 extracts Vue SFC templates and scripts (crates/pandacss_sfc/src/vue.rs)",
+        "StyleX 0.19.1 unplugin transforms JS-like and Svelte ids only"
+      ],
+      "closingLot": "CE-13",
+      "issues": [80],
+      "affects": { "profiles": ["web"], "capabilities": ["CAP-42"] }
+    },
+    {
+      "id": "D-SF-03",
+      "kind": "source-format",
+      "question": "Is Svelte component source accepted?",
+      "alpha1": "No Svelte adapter.",
+      "alpha1Sources": [],
+      "upstreamEvidence": [
+        "Panda 2.2.0 crates/pandacss_sfc/src/svelte.rs",
+        "StyleX 0.19.1 unplugin core.js SVELTE_LIKE_RE /\\.svelte(\\?|$)/"
+      ],
+      "closingLot": "CE-13",
+      "issues": [80],
+      "affects": { "profiles": ["web"], "capabilities": ["CAP-42"] }
+    },
+    {
+      "id": "D-SF-04",
+      "kind": "source-format",
+      "question": "Is Astro component source accepted?",
+      "alpha1": "No Astro adapter.",
+      "alpha1Sources": [],
+      "upstreamEvidence": ["Panda 2.2.0 crates/pandacss_sfc/src/astro/"],
+      "closingLot": "CE-13",
+      "issues": [80],
+      "affects": { "profiles": ["web", "content"], "capabilities": ["CAP-42"] }
+    },
+    {
+      "id": "D-SF-05",
+      "kind": "source-format",
+      "question": "Is MDX content source accepted?",
+      "alpha1": "No MDX adapter.",
+      "alpha1Sources": [],
+      "upstreamEvidence": ["Panda 2.2.0 crates/pandacss_sfc/src/mdx/"],
+      "closingLot": "CE-13",
+      "issues": [80],
+      "affects": { "profiles": ["content"], "capabilities": ["CAP-42"] }
+    },
+    {
+      "id": "D-SF-06",
+      "kind": "source-format",
+      "question": "Which JSX runtimes are accepted (React only, or also Solid, Preact or Vue JSX), given that Alpha 1 lowers JSX with the React automatic runtime?",
+      "alpha1": "Babel pass 2 applies @babel/preset-react with runtime automatic to every accepted module.",
+      "alpha1Sources": ["packages/compiler/src/frontend/babel/compile-file.js"],
+      "upstreamEvidence": [
+        "Panda 2.2.0 JsxFramework 'react' | 'solid' | 'preact' | 'vue' (packages/types/src/config.ts jsxFramework)"
+      ],
+      "closingLot": "CE-13",
+      "issues": [80],
+      "affects": { "profiles": ["web"], "capabilities": ["CAP-42"] }
+    },
+    {
+      "id": "D-SF-07",
+      "kind": "source-format",
+      "question": "Are static HTML/markup templates an accepted source, or is content authored only through accepted component formats?",
+      "alpha1": "No markup adapter.",
+      "alpha1Sources": [],
+      "upstreamEvidence": [
+        "Panda 2.2.0 crates/pandacss_sfc/src/markup.rs and template.rs"
+      ],
+      "closingLot": "CE-13",
+      "issues": [80],
+      "affects": { "profiles": ["content"], "capabilities": ["CAP-42"] }
+    },
+    {
+      "id": "D-SF-08",
+      "kind": "source-format",
+      "question": "How is one source identity kept across client, SSR and RSC compiler environments and lazy chunks?",
+      "alpha1": "Next and Vite adapters exist; multi-environment identity has no qualified matrix.",
+      "alpha1Sources": [
+        "packages/next/src/state.js",
+        "packages/vite/src/index.js"
+      ],
+      "upstreamEvidence": [
+        "StyleX 0.19.1 unplugin shares one rule store across Vite client/ssr/rsc environments (core.js getSharedStore)"
+      ],
+      "closingLot": "CE-13",
+      "issues": [78],
+      "affects": { "profiles": ["ssr"], "capabilities": ["CAP-42", "CAP-44"] }
+    },
+    {
+      "id": "D-SF-09",
+      "kind": "source-format",
+      "question": "Do reusable packages ship prebuilt PandamStyle artifacts or source to extract, and how are node_modules sources and external definitions admitted?",
+      "alpha1": "The Vite adapter skips node_modules modules; cross-system references are rejected.",
+      "alpha1Sources": ["packages/vite/src/index.js"],
+      "upstreamEvidence": [
+        "StyleX 0.19.1 unplugin externalPackages option",
+        "Panda 2.2.0 NodeDriver.writeDesignSystemLib design-system library manifests"
+      ],
+      "closingLot": "CE-13",
+      "issues": [80, 70],
+      "affects": {
+        "profiles": ["reusable-package"],
+        "capabilities": ["CAP-35", "CAP-42"]
+      }
+    },
+    {
+      "id": "D-SF-10",
+      "kind": "source-format",
+      "question": "Which Vitest 4.1.11 on Vite 8.3.1 transform, watch and isolation paths are accepted for component tests?",
+      "alpha1": "No qualified Vitest path; the consumer manifest declares the versions.",
+      "alpha1Sources": [],
+      "upstreamEvidence": [
+        "Wacando desktop manifest blob ab0711f9fd433c146d33a49f2ae4f712507cb25e (declared versions only)"
+      ],
+      "closingLot": "CE-13",
+      "issues": [79],
+      "affects": {
+        "profiles": ["desktop-renderer"],
+        "capabilities": ["CAP-43"]
+      }
+    },
+    {
+      "id": "D-BP-01",
+      "kind": "browser-profile",
+      "question": "What exact default evergreen target floor (Chrome, Edge, Firefox, Safari) does the web/content/forms/data profile use, and from which Browserslist/data versions?",
+      "alpha1": "No qualified cross-browser target contract.",
+      "upstreamEvidence": [
+        "Panda 2.2.0 FAQ baseline Chrome/Edge 99+, Firefox 97+, Safari/iOS 15.4+, Android 115+, Opera 73+ (published claim, not to be copied)",
+        "StyleX 0.19.1 unplugin applies Lightning CSS with project Browserslist targets"
+      ],
+      "closingLot": "CE-01",
+      "issues": [44],
+      "affects": {
+        "profiles": ["web", "content", "forms", "data"],
+        "capabilities": ["CAP-41"]
+      }
+    },
+    {
+      "id": "D-BP-02",
+      "kind": "browser-profile",
+      "question": "Which iOS Safari/WebKit versions are announced, and which real devices or engines prove them? Desktop Safari data and Playwright WebKit do not substitute.",
+      "alpha1": "None.",
+      "upstreamEvidence": [
+        "BCD 8.1.6 safari_ios statements recorded per registry entry"
+      ],
+      "closingLot": "CE-01",
+      "issues": [44, 81],
+      "affects": {
+        "profiles": ["web", "content", "forms"],
+        "capabilities": ["CAP-41"]
+      }
+    },
+    {
+      "id": "D-BP-03",
+      "kind": "browser-profile",
+      "question": "Which exact Electron/Chromium versions does the desktop-renderer profile target, and which platform extensions does it admit?",
+      "alpha1": "Chromium pilot only; no Electron qualification.",
+      "upstreamEvidence": [
+        "Consumer manifest declares Electron 44.7.2; its Chromium version must be resolved from Electron release data",
+        "Registry scoped-platform-extension entries -webkit-app-region and -webkit-user-drag"
+      ],
+      "closingLot": "CE-01",
+      "issues": [44, 81],
+      "affects": {
+        "profiles": ["desktop-renderer"],
+        "capabilities": ["CAP-11", "CAP-41", "CAP-42"]
+      }
+    },
+    {
+      "id": "D-BP-04",
+      "kind": "browser-profile",
+      "question": "Is Android WebView an announced target, and with which minimum version?",
+      "alpha1": "None.",
+      "upstreamEvidence": [
+        "BCD 8.1.6 webview_android statements recorded per registry entry"
+      ],
+      "closingLot": "CE-01",
+      "issues": [44],
+      "affects": { "profiles": ["web"], "capabilities": ["CAP-41"] }
+    },
+    {
+      "id": "D-BP-05",
+      "kind": "browser-profile",
+      "question": "Record the explicit incompatibility of Internet Explorer, legacy EdgeHTML, Presto Opera and KHTML engines and their prefixed property entries.",
+      "alpha1": "No explicit disposition.",
+      "upstreamEvidence": [
+        "Registry obsolete-engine-prefix entries (-ms-, -o-, -khtml-)"
+      ],
+      "closingLot": "CE-01",
+      "issues": [44],
+      "affects": {
+        "profiles": ["web", "desktop-renderer", "content", "forms", "data"],
+        "capabilities": ["CAP-41"]
+      }
+    },
+    {
+      "id": "D-BP-06",
+      "kind": "browser-profile",
+      "question": "For each required property whose BCD 8.1.6 base support lacks an unprefixed release in Chrome, Firefox or Safari, decide native, transformed-with-proof, equivalent fallback or incompatible per target.",
+      "alpha1": "None.",
+      "upstreamEvidence": [
+        "Registry entries with targetDecision D-BP-06 and their missingEngines list"
+      ],
+      "closingLot": "CE-01",
+      "issues": [44],
+      "affects": {
+        "profiles": [
+          "web",
+          "desktop-renderer",
+          "content",
+          "forms",
+          "data",
+          "rtl",
+          "svg-media"
+        ],
+        "capabilities": ["CAP-01", "CAP-41"]
+      }
+    },
+    {
+      "id": "D-BP-07",
+      "kind": "browser-profile",
+      "question": "Which prefixed-only or prefix-dependent features (for example line-clamp, masks, backdrop-filter, text-size-adjust) does the compiler-owned transformation emit, and how is that emission bound to artifact identity?",
+      "alpha1": "No compiler-owned transform stage.",
+      "upstreamEvidence": [
+        "Panda 2.2.0 probe emits -webkit- companions for appearance, backdrop-filter, background-clip, mask-*, user-select, hyphens and the line-clamp bundle",
+        "StyleX 0.19.1 Babel output emits no prefixes; its unplugin delegates lowering to Lightning CSS"
+      ],
+      "closingLot": "CE-01",
+      "issues": [45],
+      "affects": {
+        "profiles": ["web", "content", "svg-media"],
+        "capabilities": ["CAP-41"]
+      }
+    },
+    {
+      "id": "D-BP-08",
+      "kind": "browser-profile",
+      "question": "Which value keywords and functions need their own target records (text-wrap balance/pretty, multi-keyword display, light-dark(), color-mix(), modern color spaces, intrinsic sizes)?",
+      "alpha1": "None.",
+      "upstreamEvidence": [
+        "BCD 8.1.6 keyword subfeatures; core-evolution-upstreams.md selected native thresholds"
+      ],
+      "closingLot": "CE-01",
+      "issues": [44],
+      "affects": {
+        "profiles": ["web", "content", "rtl"],
+        "capabilities": ["CAP-02", "CAP-12", "CAP-41"]
+      }
+    },
+    {
+      "id": "D-BP-09",
+      "kind": "browser-profile",
+      "question": "Which CSS transformation engine, Browserslist data pin and identity stage does the compiler own?",
+      "alpha1": "None.",
+      "upstreamEvidence": [
+        "StyleX 0.19.1 unplugin Lightning CSS lowering and documented light-dark()/color-scheme hazard",
+        "Panda 2.2.0 removed root lightningcss/browserslist options in v2"
+      ],
+      "closingLot": "CE-01",
+      "issues": [45],
+      "affects": {
+        "profiles": ["web", "desktop-renderer", "content", "forms", "data"],
+        "capabilities": ["CAP-41"]
+      }
+    },
+    {
+      "id": "D-BP-10",
+      "kind": "browser-profile",
+      "question": "What is the cascade-layer target policy: native layers only, or a proven equivalent lowering for older targets?",
+      "alpha1": "Atomic ordering without a target layer policy.",
+      "upstreamEvidence": [
+        "Panda 2.2.0 emit-time layer polyfill (crates/pandacss_stylesheet/src/polyfill.rs)",
+        "BCD 8.1.6 css.at-rules.layer Chrome 99, Firefox 97, Safari 15.4"
+      ],
+      "closingLot": "CE-01",
+      "issues": [44, 45],
+      "affects": { "profiles": ["web"], "capabilities": ["CAP-28", "CAP-41"] }
+    },
+    {
+      "id": "D-BP-11",
+      "kind": "browser-profile",
+      "question": "Which reduced-motion, forced-colors, contrast and pointer/hover media features are required per target?",
+      "alpha1": "Named conditions only.",
+      "upstreamEvidence": ["Panda 2.2.0 preset-base conditions.ts"],
+      "closingLot": "CE-01",
+      "issues": [44],
+      "affects": {
+        "profiles": ["web", "desktop-renderer", "content", "forms", "data"],
+        "capabilities": ["CAP-10", "CAP-25"]
+      }
+    },
+    {
+      "id": "D-BP-12",
+      "kind": "browser-profile",
+      "question": "The ssr profile inherits the browser targets of the application it delivers; which first-paint, hydration and asset-load proofs bind it to those targets?",
+      "alpha1": "Existing integration infrastructure without the expanded matrix.",
+      "upstreamEvidence": [],
+      "closingLot": "CE-13",
+      "issues": [78],
+      "affects": { "profiles": ["ssr"], "capabilities": ["CAP-44"] }
+    },
+    {
+      "id": "D-BP-13",
+      "kind": "browser-profile",
+      "question": "How does a reusable package declare its minimum target range so the consuming application resolves targets once?",
+      "alpha1": "No package target metadata.",
+      "upstreamEvidence": [],
+      "closingLot": "CE-01",
+      "issues": [44, 70],
+      "affects": {
+        "profiles": ["reusable-package"],
+        "capabilities": ["CAP-35", "CAP-41"]
+      }
+    }
+  ]
+}

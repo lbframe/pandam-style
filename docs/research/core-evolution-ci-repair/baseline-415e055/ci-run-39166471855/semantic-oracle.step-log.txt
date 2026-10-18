@@ -1,0 +1,333 @@
+PASS tests/semantic/__tests__/harness-integrity-test.js
+PASS tests/semantic/__tests__/negative-resolution-test.js
+PASS tests/semantic/__tests__/module-resolution-test.js
+PASS tests/semantic/__tests__/incremental-css-test.js (7.591 s)
+PASS tests/semantic/__tests__/multi-revision-test.js
+PASS tests/semantic/__tests__/publication-test.js
+PASS tests/semantic/__tests__/diagnostics-test.js
+PASS tests/semantic/__tests__/provenance-test.js
+PASS tests/semantic/__tests__/forwarding-test.js (13.45 s)
+PASS tests/semantic/__tests__/conditions-test.js (7.241 s)
+PASS tests/semantic/__tests__/revisions-test.js
+PASS tests/semantic/__tests__/deferred-test.js
+PASS tests/semantic/__tests__/coverage-test.js (5.739 s)
+PASS tests/semantic/__tests__/recipes-test.js (21.383 s)
+FAIL tests/semantic/__tests__/browser-test.js (16.114 s)
+  ● Semantic oracle: browser › browser.shorthand-longhand — A longhand override cancels only its component of an earlier shorthand
+
+    assert.strictEqual(received, expected)
+
+    Expected value to strictly be equal to:
+      0
+    Received:
+      1
+
+    Message:
+      browser.shorthand-longhand/fresh failed to execute:
+    Error: Semantic browser execution failed: gsignal
+    #6 0x7f88d58288ff abort
+    #7 0x5626d05cc965 base::debug::BreakDebuggerAsyncSafe()
+    #8 0x5626d0511643 base::RepeatingCallback<>::Run()
+    #9 0x5626d0511505 logging::LogMessage::HandleFatal()
+    #10 0x5626d05110f7 logging::LogMessage::Flush()
+    #11 0x5626d0511699 logging::LogMessageFatal::~LogMessageFatal()
+    #12 0x5626cd34b9e2 content::ZygoteHostImpl::Init()
+    #13 0x5626cf578ca9 content::ContentMainRunnerImpl::Initialize()
+    #14 0x5626cf57634c content::RunContentProcess()
+    #15 0x5626cf576797 content::ContentMain()
+    #16 0x5626c956a37d ChromeMain
+    #17 0x7f88d582a1ca (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9)
+    #18 0x7f88d582a28b __libc_start_main
+    #19 0x5626c956a02a _start
+      r8: 00003ec800074a63  r9: 00000000000004c3 r10: 0000000000000008 r11: 0000000000000246
+     r12: 0000000000000006 r13: 0000000000000726 r14: 0000000000000016 r15: 00007fff960ef370
+      di: 0000000000001a91  si: 0000000000001a91  bp: 00007fff960ef220  bx: 0000000000001a91
+      dx: 0000000000000006  ax: 0000000000000000  cx: 00007f88d589ec0c  sp: 00007fff960ef1e0
+      ip: 00007f88d589ec0c efl: 0000000000000246 cgf: 002b000000000033 erf: 0000000000000000
+     trp: 0000000000000000 msk: 0000000000000000 cr2: 0000000000000000
+    [end of stack trace]
+
+    [0m [90m 76 |[39m   fs[33m.[39mrmSync(scratch[33m,[39m { recursive[33m:[39m [36mtrue[39m[33m,[39m force[33m:[39m [36mtrue[39m })[33m;[39m
+     [90m 77 |[39m   [36mif[39m (child[33m.[39mstatus [33m!==[39m [35m0[39m)
+    [31m[1m>[22m[39m[90m 78 |[39m     [36mthrow[39m [36mnew[39m [33mError[39m(
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 79 |[39m       [32m'Semantic browser execution failed: '[39m [33m+[39m child[33m.[39mstderr[33m.[39mslice([33m-[39m[35m1200[39m)[33m,[39m
+     [90m 80 |[39m     )[33m;[39m
+     [90m 81 |[39m   [36mconst[39m encoded [33m=[39m child[33m.[39mstdout[33m.[39mmatch([0m
+
+      at Object.observeBrowser (tests/semantic/harness/browser-adapter.js:78:11)
+      at observe (tests/semantic/harness/implementation-adapter.js:251:53)
+      at run (tests/semantic/harness/implementation-adapter.js:438:24)
+      at async /home/runner/work/pandam-style/pandam-style/tests/semantic/harness/worker.js:16:19
+      1 !== 0
+      at execute (tests/semantic/harness/run-case.js:25:10)
+      at runCase (tests/semantic/harness/run-case.js:60:19)
+      at Object.<anonymous> (tests/semantic/harness/suite.js:14:9)
+
+  ● Semantic oracle: browser › browser.token-values — Browser computed spacing and semantic color come from the authored token values
+
+    assert.strictEqual(received, expected)
+
+    Expected value to strictly be equal to:
+      0
+    Received:
+      1
+
+    Message:
+      browser.token-values/fresh failed to execute:
+    Error: Semantic browser execution failed: gsignal
+    #6 0x7f2bbe0288ff abort
+    #7 0x561f509a9965 base::debug::BreakDebuggerAsyncSafe()
+    #8 0x561f508ee643 base::RepeatingCallback<>::Run()
+    #9 0x561f508ee505 logging::LogMessage::HandleFatal()
+    #10 0x561f508ee0f7 logging::LogMessage::Flush()
+    #11 0x561f508ee699 logging::LogMessageFatal::~LogMessageFatal()
+    #12 0x561f4d7289e2 content::ZygoteHostImpl::Init()
+    #13 0x561f4f955ca9 content::ContentMainRunnerImpl::Initialize()
+    #14 0x561f4f95334c content::RunContentProcess()
+    #15 0x561f4f953797 content::ContentMain()
+    #16 0x561f4994737d ChromeMain
+    #17 0x7f2bbe02a1ca (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9)
+    #18 0x7f2bbe02a28b __libc_start_main
+    #19 0x561f4994702a _start
+      r8: 00002cf800074a63  r9: 00000000000004c3 r10: 0000000000000008 r11: 0000000000000246
+     r12: 0000000000000006 r13: 0000000000000726 r14: 0000000000000016 r15: 00007ffd4a5fcf80
+      di: 0000000000001ac3  si: 0000000000001ac3  bp: 00007ffd4a5fce30  bx: 0000000000001ac3
+      dx: 0000000000000006  ax: 0000000000000000  cx: 00007f2bbe09ec0c  sp: 00007ffd4a5fcdf0
+      ip: 00007f2bbe09ec0c efl: 0000000000000246 cgf: 002b000000000033 erf: 0000000000000000
+     trp: 0000000000000000 msk: 0000000000000000 cr2: 0000000000000000
+    [end of stack trace]
+
+    [0m [90m 76 |[39m   fs[33m.[39mrmSync(scratch[33m,[39m { recursive[33m:[39m [36mtrue[39m[33m,[39m force[33m:[39m [36mtrue[39m })[33m;[39m
+     [90m 77 |[39m   [36mif[39m (child[33m.[39mstatus [33m!==[39m [35m0[39m)
+    [31m[1m>[22m[39m[90m 78 |[39m     [36mthrow[39m [36mnew[39m [33mError[39m(
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 79 |[39m       [32m'Semantic browser execution failed: '[39m [33m+[39m child[33m.[39mstderr[33m.[39mslice([33m-[39m[35m1200[39m)[33m,[39m
+     [90m 80 |[39m     )[33m;[39m
+     [90m 81 |[39m   [36mconst[39m encoded [33m=[39m child[33m.[39mstdout[33m.[39mmatch([0m
+
+      at Object.observeBrowser (tests/semantic/harness/browser-adapter.js:78:11)
+      at observe (tests/semantic/harness/implementation-adapter.js:251:53)
+      at run (tests/semantic/harness/implementation-adapter.js:438:24)
+      at async /home/runner/work/pandam-style/pandam-style/tests/semantic/harness/worker.js:16:19
+      1 !== 0
+      at execute (tests/semantic/harness/run-case.js:25:10)
+      at runCase (tests/semantic/harness/run-case.js:60:19)
+      at Object.<anonymous> (tests/semantic/harness/suite.js:14:9)
+
+  ● Semantic oracle: browser › browser.theme-scope — A composed dark theme changes the browser semantic color
+
+    assert.strictEqual(received, expected)
+
+    Expected value to strictly be equal to:
+      0
+    Received:
+      1
+
+    Message:
+      browser.theme-scope/fresh failed to execute:
+    Error: Semantic browser execution failed: gsignal
+    #6 0x7f3e24c288ff abort
+    #7 0x55d4076cd965 base::debug::BreakDebuggerAsyncSafe()
+    #8 0x55d407612643 base::RepeatingCallback<>::Run()
+    #9 0x55d407612505 logging::LogMessage::HandleFatal()
+    #10 0x55d4076120f7 logging::LogMessage::Flush()
+    #11 0x55d407612699 logging::LogMessageFatal::~LogMessageFatal()
+    #12 0x55d40444c9e2 content::ZygoteHostImpl::Init()
+    #13 0x55d406679ca9 content::ContentMainRunnerImpl::Initialize()
+    #14 0x55d40667734c content::RunContentProcess()
+    #15 0x55d406677797 content::ContentMain()
+    #16 0x55d40066b37d ChromeMain
+    #17 0x7f3e24c2a1ca (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9)
+    #18 0x7f3e24c2a28b __libc_start_main
+    #19 0x55d40066b02a _start
+      r8: 0000035800074a63  r9: 00000000000004c3 r10: 0000000000000008 r11: 0000000000000246
+     r12: 0000000000000006 r13: 0000000000000726 r14: 0000000000000016 r15: 00007ffdba462d10
+      di: 0000000000001adf  si: 0000000000001adf  bp: 00007ffdba462bc0  bx: 0000000000001adf
+      dx: 0000000000000006  ax: 0000000000000000  cx: 00007f3e24c9ec0c  sp: 00007ffdba462b80
+      ip: 00007f3e24c9ec0c efl: 0000000000000246 cgf: 002b000000000033 erf: 0000000000000000
+     trp: 0000000000000000 msk: 0000000000000000 cr2: 0000000000000000
+    [end of stack trace]
+
+    [0m [90m 76 |[39m   fs[33m.[39mrmSync(scratch[33m,[39m { recursive[33m:[39m [36mtrue[39m[33m,[39m force[33m:[39m [36mtrue[39m })[33m;[39m
+     [90m 77 |[39m   [36mif[39m (child[33m.[39mstatus [33m!==[39m [35m0[39m)
+    [31m[1m>[22m[39m[90m 78 |[39m     [36mthrow[39m [36mnew[39m [33mError[39m(
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 79 |[39m       [32m'Semantic browser execution failed: '[39m [33m+[39m child[33m.[39mstderr[33m.[39mslice([33m-[39m[35m1200[39m)[33m,[39m
+     [90m 80 |[39m     )[33m;[39m
+     [90m 81 |[39m   [36mconst[39m encoded [33m=[39m child[33m.[39mstdout[33m.[39mmatch([0m
+
+      at Object.observeBrowser (tests/semantic/harness/browser-adapter.js:78:11)
+      at observe (tests/semantic/harness/implementation-adapter.js:251:53)
+      at run (tests/semantic/harness/implementation-adapter.js:438:24)
+      at async /home/runner/work/pandam-style/pandam-style/tests/semantic/harness/worker.js:16:19
+      1 !== 0
+      at execute (tests/semantic/harness/run-case.js:25:10)
+      at runCase (tests/semantic/harness/run-case.js:60:19)
+      at Object.<anonymous> (tests/semantic/harness/suite.js:14:9)
+
+  ● Semantic oracle: browser › browser.conflict — Ordered composition produces the expected browser property winner
+
+    assert.strictEqual(received, expected)
+
+    Expected value to strictly be equal to:
+      0
+    Received:
+      1
+
+    Message:
+      browser.conflict/fresh failed to execute:
+    Error: Semantic browser execution failed: gsignal
+    #6 0x7f95654288ff abort
+    #7 0x55766c8fc965 base::debug::BreakDebuggerAsyncSafe()
+    #8 0x55766c841643 base::RepeatingCallback<>::Run()
+    #9 0x55766c841505 logging::LogMessage::HandleFatal()
+    #10 0x55766c8410f7 logging::LogMessage::Flush()
+    #11 0x55766c841699 logging::LogMessageFatal::~LogMessageFatal()
+    #12 0x55766967b9e2 content::ZygoteHostImpl::Init()
+    #13 0x55766b8a8ca9 content::ContentMainRunnerImpl::Initialize()
+    #14 0x55766b8a634c content::RunContentProcess()
+    #15 0x55766b8a6797 content::ContentMain()
+    #16 0x55766589a37d ChromeMain
+    #17 0x7f956542a1ca (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9)
+    #18 0x7f956542a28b __libc_start_main
+    #19 0x55766589a02a _start
+      r8: 000033b800074a63  r9: 00000000000004c3 r10: 0000000000000008 r11: 0000000000000246
+     r12: 0000000000000006 r13: 0000000000000726 r14: 0000000000000016 r15: 00007ffdd236dc70
+      di: 0000000000001b00  si: 0000000000001b00  bp: 00007ffdd236db20  bx: 0000000000001b00
+      dx: 0000000000000006  ax: 0000000000000000  cx: 00007f956549ec0c  sp: 00007ffdd236dae0
+      ip: 00007f956549ec0c efl: 0000000000000246 cgf: 002b000000000033 erf: 0000000000000000
+     trp: 0000000000000000 msk: 0000000000000000 cr2: 0000000000000000
+    [end of stack trace]
+
+    [0m [90m 76 |[39m   fs[33m.[39mrmSync(scratch[33m,[39m { recursive[33m:[39m [36mtrue[39m[33m,[39m force[33m:[39m [36mtrue[39m })[33m;[39m
+     [90m 77 |[39m   [36mif[39m (child[33m.[39mstatus [33m!==[39m [35m0[39m)
+    [31m[1m>[22m[39m[90m 78 |[39m     [36mthrow[39m [36mnew[39m [33mError[39m(
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 79 |[39m       [32m'Semantic browser execution failed: '[39m [33m+[39m child[33m.[39mstderr[33m.[39mslice([33m-[39m[35m1200[39m)[33m,[39m
+     [90m 80 |[39m     )[33m;[39m
+     [90m 81 |[39m   [36mconst[39m encoded [33m=[39m child[33m.[39mstdout[33m.[39mmatch([0m
+
+      at Object.observeBrowser (tests/semantic/harness/browser-adapter.js:78:11)
+      at observe (tests/semantic/harness/implementation-adapter.js:251:53)
+      at run (tests/semantic/harness/implementation-adapter.js:438:24)
+      at async /home/runner/work/pandam-style/pandam-style/tests/semantic/harness/worker.js:16:19
+      1 !== 0
+      at execute (tests/semantic/harness/run-case.js:25:10)
+      at runCase (tests/semantic/harness/run-case.js:60:19)
+      at Object.<anonymous> (tests/semantic/harness/suite.js:14:9)
+
+  ● Semantic oracle: browser › browser.media-cascade — The applicable wide condition wins over the base spacing declaration
+
+    assert.strictEqual(received, expected)
+
+    Expected value to strictly be equal to:
+      0
+    Received:
+      1
+
+    Message:
+      browser.media-cascade/fresh failed to execute:
+    Error: Semantic browser execution failed: gsignal
+    #6 0x7fa7724288ff abort
+    #7 0x55e003453965 base::debug::BreakDebuggerAsyncSafe()
+    #8 0x55e003398643 base::RepeatingCallback<>::Run()
+    #9 0x55e003398505 logging::LogMessage::HandleFatal()
+    #10 0x55e0033980f7 logging::LogMessage::Flush()
+    #11 0x55e003398699 logging::LogMessageFatal::~LogMessageFatal()
+    #12 0x55e0001d29e2 content::ZygoteHostImpl::Init()
+    #13 0x55e0023ffca9 content::ContentMainRunnerImpl::Initialize()
+    #14 0x55e0023fd34c content::RunContentProcess()
+    #15 0x55e0023fd797 content::ContentMain()
+    #16 0x55dffc3f137d ChromeMain
+    #17 0x7fa77242a1ca (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9)
+    #18 0x7fa77242a28b __libc_start_main
+    #19 0x55dffc3f102a _start
+      r8: 0000143000074a63  r9: 00000000000004c3 r10: 0000000000000008 r11: 0000000000000246
+     r12: 0000000000000006 r13: 0000000000000726 r14: 0000000000000016 r15: 00007fff01ee1cc0
+      di: 0000000000001b1c  si: 0000000000001b1c  bp: 00007fff01ee1b70  bx: 0000000000001b1c
+      dx: 0000000000000006  ax: 0000000000000000  cx: 00007fa77249ec0c  sp: 00007fff01ee1b30
+      ip: 00007fa77249ec0c efl: 0000000000000246 cgf: 002b000000000033 erf: 0000000000000000
+     trp: 0000000000000000 msk: 0000000000000000 cr2: 0000000000000000
+    [end of stack trace]
+
+    [0m [90m 76 |[39m   fs[33m.[39mrmSync(scratch[33m,[39m { recursive[33m:[39m [36mtrue[39m[33m,[39m force[33m:[39m [36mtrue[39m })[33m;[39m
+     [90m 77 |[39m   [36mif[39m (child[33m.[39mstatus [33m!==[39m [35m0[39m)
+    [31m[1m>[22m[39m[90m 78 |[39m     [36mthrow[39m [36mnew[39m [33mError[39m(
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 79 |[39m       [32m'Semantic browser execution failed: '[39m [33m+[39m child[33m.[39mstderr[33m.[39mslice([33m-[39m[35m1200[39m)[33m,[39m
+     [90m 80 |[39m     )[33m;[39m
+     [90m 81 |[39m   [36mconst[39m encoded [33m=[39m child[33m.[39mstdout[33m.[39mmatch([0m
+
+      at Object.observeBrowser (tests/semantic/harness/browser-adapter.js:78:11)
+      at observe (tests/semantic/harness/implementation-adapter.js:251:53)
+      at run (tests/semantic/harness/implementation-adapter.js:438:24)
+      at async /home/runner/work/pandam-style/pandam-style/tests/semantic/harness/worker.js:16:19
+      1 !== 0
+      at execute (tests/semantic/harness/run-case.js:25:10)
+      at runCase (tests/semantic/harness/run-case.js:60:19)
+      at Object.<anonymous> (tests/semantic/harness/suite.js:14:9)
+
+  ● Semantic oracle: browser › browser.ssr-hydration — Server rendering and browser hydration preserve compiled composition without recovery errors
+
+    assert.strictEqual(received, expected)
+
+    Expected value to strictly be equal to:
+      0
+    Received:
+      1
+
+    Message:
+      browser.ssr-hydration/fresh failed to execute:
+    Error: Semantic browser execution failed: gsignal
+    #6 0x7f810e4288ff abort
+    #7 0x5601692c6965 base::debug::BreakDebuggerAsyncSafe()
+    #8 0x56016920b643 base::RepeatingCallback<>::Run()
+    #9 0x56016920b505 logging::LogMessage::HandleFatal()
+    #10 0x56016920b0f7 logging::LogMessage::Flush()
+    #11 0x56016920b699 logging::LogMessageFatal::~LogMessageFatal()
+    #12 0x5601660459e2 content::ZygoteHostImpl::Init()
+    #13 0x560168272ca9 content::ContentMainRunnerImpl::Initialize()
+    #14 0x56016827034c content::RunContentProcess()
+    #15 0x560168270797 content::ContentMain()
+    #16 0x56016226437d ChromeMain
+    #17 0x7f810e42a1ca (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9)
+    #18 0x7f810e42a28b __libc_start_main
+    #19 0x56016226402a _start
+      r8: 00000bc000074a63  r9: 00000000000004c3 r10: 0000000000000008 r11: 0000000000000246
+     r12: 0000000000000006 r13: 0000000000000726 r14: 0000000000000016 r15: 00007ffdf1198b00
+      di: 0000000000001b41  si: 0000000000001b41  bp: 00007ffdf11989b0  bx: 0000000000001b41
+      dx: 0000000000000006  ax: 0000000000000000  cx: 00007f810e49ec0c  sp: 00007ffdf1198970
+      ip: 00007f810e49ec0c efl: 0000000000000246 cgf: 002b000000000033 erf: 0000000000000000
+     trp: 0000000000000000 msk: 0000000000000000 cr2: 0000000000000000
+    [end of stack trace]
+
+    [0m [90m 76 |[39m   fs[33m.[39mrmSync(scratch[33m,[39m { recursive[33m:[39m [36mtrue[39m[33m,[39m force[33m:[39m [36mtrue[39m })[33m;[39m
+     [90m 77 |[39m   [36mif[39m (child[33m.[39mstatus [33m!==[39m [35m0[39m)
+    [31m[1m>[22m[39m[90m 78 |[39m     [36mthrow[39m [36mnew[39m [33mError[39m(
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 79 |[39m       [32m'Semantic browser execution failed: '[39m [33m+[39m child[33m.[39mstderr[33m.[39mslice([33m-[39m[35m1200[39m)[33m,[39m
+     [90m 80 |[39m     )[33m;[39m
+     [90m 81 |[39m   [36mconst[39m encoded [33m=[39m child[33m.[39mstdout[33m.[39mmatch([0m
+
+      at Object.observeBrowser (tests/semantic/harness/browser-adapter.js:78:11)
+      at observe (tests/semantic/harness/implementation-adapter.js:251:53)
+      at run (tests/semantic/harness/implementation-adapter.js:438:24)
+      at async /home/runner/work/pandam-style/pandam-style/tests/semantic/harness/worker.js:16:19
+      1 !== 0
+      at execute (tests/semantic/harness/run-case.js:25:10)
+      at runCase (tests/semantic/harness/run-case.js:60:19)
+      at Object.<anonymous> (tests/semantic/harness/suite.js:14:9)
+
+PASS tests/semantic/__tests__/tokens-test.js (9.059 s)
+PASS tests/semantic/__tests__/themes-test.js (7.005 s)
+PASS tests/semantic/__tests__/syntax-test.js
+PASS tests/semantic/__tests__/create-test.js (8.556 s)
+PASS tests/semantic/__tests__/props-test.js (11.981 s)
+
+Test Suites: 1 failed, 19 passed, 20 total
+Tests:       6 failed, 148 passed, 154 total
+Snapshots:   0 total
+Time:        128.385 s
+Ran all test suites.
+Test results written to: evidence/native/semantic-oracle/semantic-jest-results.json

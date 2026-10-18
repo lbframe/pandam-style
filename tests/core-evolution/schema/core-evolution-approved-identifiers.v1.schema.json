@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-approved-identifiers.v1.schema.json",
+  "title": "CE-00.2 approved consumer identifiers (closed surface)",
+  "x-closed-surface": true,
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-approved-identifiers"
+    },
+    "task": {
+      "const": "CE-00.2"
+    },
+    "identifiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "pattern": "^-{0,2}[A-Za-z][A-Za-z0-9-]*$",
+            "maxLength": 64
+          },
+          "kind": {
+            "enum": [
+              "custom-property",
+              "font-family",
+              "animation-name",
+              "layer",
+              "invalid-value"
+            ]
+          },
+          "reason": {
+            "enum": [
+              "platform-defined",
+              "css-generic-token-name",
+              "public-font-family",
+              "generic-animation-name",
+              "invalid-value-generic-word"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": ["identifier", "kind", "reason"]
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "task", "identifiers"]
+}

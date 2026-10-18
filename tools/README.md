@@ -9,6 +9,9 @@ The tools in this directory support PandamStyle development and qualification.
   qualification app outside the workspace.
 - `tools/husky/` contains the local commit hooks.
 - `tools/eslint/` contains lint support used by the repository.
+- `tools/coverage/` contains the CE-00.2 declaration classifier, calibrated
+  against the reported consumer baseline. It measures policy coverage only, not
+  rendering; see its [README](coverage/README.md).
 
 Run the full required qualification from the repository root with
 `./verify-pms.sh`. Package publication is handled only after the later release

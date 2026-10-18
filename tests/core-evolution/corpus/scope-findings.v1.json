@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-scope-findings",
+  "task": "CE-00.2",
+  "findings": [
+    {
+      "id": "SF-01",
+      "kind": "registry-scope",
+      "owner": "CE-09.1",
+      "issue": 65,
+      "subject": {
+        "inputId": "W-MOCKUP-1559",
+        "property": "font-display"
+      }
+    },
+    {
+      "id": "SF-02",
+      "kind": "compiler-defect",
+      "owner": "CE-07.1",
+      "issue": 54,
+      "subject": {
+        "negativeFixture": "CE-NEG-UNKNOWN-SELECTOR-03"
+      },
+      "profileImpact": ["rtl"]
+    },
+    {
+      "id": "SF-03",
+      "kind": "measurement-data",
+      "owner": "CE-14.1",
+      "issue": 82,
+      "subject": {
+        "inputId": "W-UTIL-343",
+        "property": "direction",
+        "values": ["incoming", "outgoing"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RTL and vertical text reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <section class="card" data-testid="card-rtl">
+      <span class="badge" data-testid="badge-rtl">جديد</span>
+      <h1 class="card-title" data-testid="title-rtl">الإعدادات العامة</h1>
+      <p class="card-text" data-testid="text-rtl">
+        اسم الملف: <bdi class="isolate" data-testid="bdi">report-2026.pdf</bdi> — تم التحميل.
+      </p>
+      <a class="card-link" href="#next" data-testid="link-rtl">التالي</a>
+    </section>
+    <section class="card" dir="ltr" lang="en" data-testid="card-ltr">
+      <span class="badge" data-testid="badge-ltr">New</span>
+      <h1 class="card-title">General settings</h1>
+      <p class="card-text">File name: <bdi class="isolate">تقرير.pdf</bdi> uploaded.</p>
+      <a class="card-link" href="#next" data-testid="link-ltr">Next</a>
+    </section>
+    <section class="vertical" lang="ja" dir="ltr" data-testid="vertical">
+      <h2 class="vertical-title" data-testid="vertical-title">縦書きの見出し</h2>
+      <p class="vertical-text" data-testid="vertical-text">
+        <ruby>漢字<rp>(</rp><rt>かんじ</rt><rp>)</rp></ruby>を含む本文は右から左へ行が進みます。数字<span class="tcy" data-testid="tcy">12</span>は縦中横です。
+      </p>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Application shell reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <div class="shell" data-testid="shell">
+      <header class="titlebar" data-testid="titlebar">
+        <span class="titlebar-name" data-testid="titlebar-name">Workspace</span>
+        <button class="titlebar-action" type="button" data-testid="titlebar-action">
+          Settings
+        </button>
+      </header>
+      <nav class="sidebar" aria-label="Primary" data-testid="sidebar">
+        <a class="nav-item" href="#inbox" aria-current="page" data-testid="nav-inbox">
+          <svg class="nav-icon" viewBox="0 0 16 16" aria-hidden="true" data-testid="nav-icon">
+            <path d="M2 4h12v8H2z" />
+          </svg>
+          <span class="nav-label">Inbox</span>
+          <span class="nav-count" data-testid="nav-count">12</span>
+        </a>
+        <a class="nav-item" href="#projects" data-testid="nav-projects">
+          <svg class="nav-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 3h5l1 2h6v8H2z" />
+          </svg>
+          <span class="nav-label" data-testid="nav-label-long">Projects with a deliberately long navigation label</span>
+        </a>
+        <a class="nav-item" href="#archive" data-testid="nav-archive">
+          <svg class="nav-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 3h12v3H2zM3 6h10v7H3z" />
+          </svg>
+          <span class="nav-label">Archive</span>
+        </a>
+        <span class="presence" data-testid="presence">
+          <span class="presence-dot" data-testid="presence-dot"></span>
+          Online
+        </span>
+      </nav>
+      <main class="content" data-testid="content" tabindex="-1">
+        <div class="toolbar" data-testid="toolbar">
+          <h1 class="page-title">Inbox</h1>
+          <button class="primary-action" type="button" data-testid="primary-action">
+            New item
+          </button>
+        </div>
+        <ol class="feed" data-testid="feed">
+          <li class="feed-item">First item</li>
+          <li class="feed-item">Second item</li>
+          <li class="feed-item">Third item</li>
+          <li class="feed-item">Fourth item</li>
+          <li class="feed-item">Fifth item</li>
+          <li class="feed-item">Sixth item</li>
+          <li class="feed-item">Seventh item</li>
+          <li class="feed-item">Eighth item</li>
+          <li class="feed-item">Ninth item</li>
+          <li class="feed-item">Tenth item</li>
+          <li class="feed-item">Eleventh item</li>
+          <li class="feed-item">Twelfth item</li>
+        </ol>
+      </main>
+      <div class="toast-region" role="status" aria-live="polite" data-testid="toast-region">
+        <p class="toast" data-testid="toast">Saved</p>
+      </div>
+    </div>
+  </body>
+</html>

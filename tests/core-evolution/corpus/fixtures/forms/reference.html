@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Forms reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <form class="form" aria-labelledby="form-title" novalidate data-testid="form">
+      <h1 class="form-title" id="form-title">Account details</h1>
+      <div class="field" data-testid="field-name">
+        <label class="label" for="name">Display name</label>
+        <input class="input" id="name" name="name" placeholder="Your name" data-testid="input-name" />
+      </div>
+      <div class="field" data-testid="field-email">
+        <label class="label" for="email">Email address</label>
+        <input
+          class="input"
+          id="email"
+          name="email"
+          type="email"
+          aria-invalid="true"
+          aria-describedby="email-error"
+          value="not-an-address"
+          data-testid="input-email"
+        />
+        <p class="field-error" id="email-error" data-testid="email-error">
+          Enter an address in the form name@domain.
+        </p>
+      </div>
+      <div class="field" data-testid="field-code">
+        <label class="label" for="code">Recovery code</label>
+        <input class="input input-code" id="code" name="code" readonly value="7Q4M-2KX9-LP3D" data-testid="input-code" />
+      </div>
+      <div class="field" data-testid="field-notes">
+        <label class="label" for="notes">Notes</label>
+        <textarea class="input textarea" id="notes" name="notes" rows="3" data-testid="input-notes"></textarea>
+      </div>
+      <div class="field" data-testid="field-file">
+        <label class="label" for="avatar">Avatar</label>
+        <input class="file" id="avatar" name="avatar" type="file" data-testid="input-file" />
+      </div>
+      <label class="check" data-testid="check">
+        <input class="check-box" type="checkbox" name="terms" data-testid="input-check" />
+        I accept the terms
+      </label>
+      <fieldset class="field" disabled data-testid="fieldset-disabled">
+        <legend class="label">Plan</legend>
+        <select class="input" name="plan" data-testid="select-plan">
+          <option>Standard</option>
+        </select>
+      </fieldset>
+      <div class="actions">
+        <button class="button" type="submit" data-testid="submit">Save</button>
+        <button class="button button-busy" type="button" aria-busy="true" aria-disabled="true" data-testid="busy">
+          <span class="spinner" aria-hidden="true" data-testid="spinner"></span>
+          Saving
+        </button>
+        <button class="button" type="button" disabled data-testid="disabled">Delete</button>
+      </div>
+    </form>
+  </body>
+</html>

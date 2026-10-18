@@ -1,0 +1,638 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-corpus-accounting.v1.schema.json",
+  "title": "CE-00.2 corpus declaration accounting (closed surface)",
+  "x-closed-surface": true,
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-corpus-accounting"
+    },
+    "task": {
+      "const": "CE-00.2"
+    },
+    "generatedBy": {
+      "enum": ["node tools/coverage/cli.mjs corpus"]
+    },
+    "registryVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "maxLength": 16
+    },
+    "totals": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "baseline": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "byOutcome": {
+          "type": "object",
+          "propertyNames": {
+            "enum": ["expressible", "composite-rewrite", "gap"]
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "byGapKind": {
+          "type": "object",
+          "propertyNames": {
+            "enum": ["absent-property", "out-of-domain"]
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "byBucket": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "category",
+              "structural-ok",
+              "structural-forbidden",
+              "composite",
+              "unsupported"
+            ]
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "excluded": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "custom-property",
+              "keyframes-frame",
+              "layer-outside-measured-input"
+            ]
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "baselineFlags": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "numeric-coercion",
+              "font-face-descriptor",
+              "vendor-prefixed",
+              "important-ignored",
+              "conditional-context-not-checked",
+              "pseudo-element-not-checked",
+              "raw-value-needs-token"
+            ]
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "compositeRewrites": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^(background-color-only|full-longhand-reset)/(all-longhands-admitted|some-longhands-not-admitted)$",
+            "maxLength": 64
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "registryRequirement": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^(carried-by-capability|disposition-only|required-gap|required-requalification-and-expansion|unregistered:(not-in-research-inventory|font-face-descriptor-not-in-inventory))$",
+            "maxLength": 80
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "registryEntries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "redactions": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "url",
+              "string",
+              "email",
+              "uri",
+              "opaque",
+              "non-ascii-text",
+              "identifier",
+              "at-rule",
+              "at-rule-params",
+              "params",
+              "property",
+              "token"
+            ]
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "registryEntriesExercised": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "x-closed": "registry-name",
+            "maxLength": 64
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "capabilitiesExercised": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^CAP-\\d{2}$",
+            "maxLength": 6
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "all",
+        "baseline",
+        "byOutcome",
+        "byGapKind",
+        "byBucket",
+        "excluded",
+        "baselineFlags",
+        "compositeRewrites",
+        "registryRequirement",
+        "registryEntries",
+        "redactions",
+        "registryEntriesExercised",
+        "capabilitiesExercised"
+      ]
+    },
+    "stylesheets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "fixtureId": {
+            "type": "string",
+            "pattern": "^CE-CORPUS-[A-Z-]+-[0-9]{2}$",
+            "maxLength": 48
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^tests/core-evolution/corpus/fixtures/[a-z-]+/[a-z-]+\\.css$",
+            "maxLength": 96
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "maxLength": 64
+          },
+          "counts": {
+            "type": "object",
+            "properties": {
+              "all": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "baseline": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "byOutcome": {
+                "type": "object",
+                "propertyNames": {
+                  "enum": ["expressible", "composite-rewrite", "gap"]
+                },
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "byGapKind": {
+                "type": "object",
+                "propertyNames": {
+                  "enum": ["absent-property", "out-of-domain"]
+                },
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "byBucket": {
+                "type": "object",
+                "propertyNames": {
+                  "enum": [
+                    "category",
+                    "structural-ok",
+                    "structural-forbidden",
+                    "composite",
+                    "unsupported"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "excluded": {
+                "type": "object",
+                "propertyNames": {
+                  "enum": [
+                    "custom-property",
+                    "keyframes-frame",
+                    "layer-outside-measured-input"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "baselineFlags": {
+                "type": "object",
+                "propertyNames": {
+                  "enum": [
+                    "numeric-coercion",
+                    "font-face-descriptor",
+                    "vendor-prefixed",
+                    "important-ignored",
+                    "conditional-context-not-checked",
+                    "pseudo-element-not-checked",
+                    "raw-value-needs-token"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "compositeRewrites": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "pattern": "^(background-color-only|full-longhand-reset)/(all-longhands-admitted|some-longhands-not-admitted)$",
+                  "maxLength": 64
+                },
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "registryRequirement": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "pattern": "^(carried-by-capability|disposition-only|required-gap|required-requalification-and-expansion|unregistered:(not-in-research-inventory|font-face-descriptor-not-in-inventory))$",
+                  "maxLength": 80
+                },
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "registryEntries": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "redactions": {
+                "type": "object",
+                "propertyNames": {
+                  "enum": [
+                    "url",
+                    "string",
+                    "email",
+                    "uri",
+                    "opaque",
+                    "non-ascii-text",
+                    "identifier",
+                    "at-rule",
+                    "at-rule-params",
+                    "params",
+                    "property",
+                    "token"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "all",
+              "baseline",
+              "byOutcome",
+              "byGapKind",
+              "byBucket",
+              "excluded",
+              "baselineFlags",
+              "compositeRewrites",
+              "registryRequirement",
+              "registryEntries",
+              "redactions"
+            ]
+          },
+          "declarations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^CE-CORPUS-[A-Z-]+-[0-9]{2}:[a-z-]+#[0-9]{3}$",
+                  "maxLength": 64
+                },
+                "property": {
+                  "type": "string",
+                  "x-closed": "authored-css-property",
+                  "maxLength": 1024
+                },
+                "value": {
+                  "type": "string",
+                  "x-closed": "authored-css-value",
+                  "maxLength": 1024
+                },
+                "important": {
+                  "const": true
+                },
+                "context": {
+                  "type": "object",
+                  "properties": {
+                    "layer": {
+                      "type": "string",
+                      "x-closed": "authored-css-layer",
+                      "maxLength": 1024
+                    },
+                    "atRules": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "x-closed": "authored-css-at-rule",
+                        "maxLength": 1024
+                      }
+                    },
+                    "keyframes": {
+                      "const": true
+                    },
+                    "descriptor": {
+                      "enum": ["font-face"]
+                    },
+                    "state": {
+                      "type": "object",
+                      "properties": {
+                        "pseudoClasses": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "x-closed": "pseudo-class",
+                            "maxLength": 64
+                          }
+                        },
+                        "pseudoElements": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "x-closed": "pseudo-element",
+                            "maxLength": 64
+                          }
+                        },
+                        "attributes": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "x-closed": "state-attribute",
+                            "maxLength": 64
+                          }
+                        },
+                        "redactedAttributes": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "redactedSelectorParts": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": []
+                    },
+                    "nestedRules": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": []
+                },
+                "denominator": {
+                  "enum": ["alpha1-baseline", "outside-alpha1-baseline"]
+                },
+                "excludedReason": {
+                  "enum": [
+                    "custom-property",
+                    "keyframes-frame",
+                    "layer-outside-measured-input"
+                  ]
+                },
+                "redactions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "url",
+                          "string",
+                          "email",
+                          "uri",
+                          "opaque",
+                          "non-ascii-text",
+                          "identifier",
+                          "at-rule",
+                          "at-rule-params",
+                          "params",
+                          "property",
+                          "token"
+                        ]
+                      },
+                      "digest": {
+                        "type": "string",
+                        "pattern": "^(hmac-)?sha256:[0-9a-f]{64}$",
+                        "maxLength": 76
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": ["kind", "digest"]
+                  },
+                  "minItems": 1
+                },
+                "alpha1": {
+                  "type": "object",
+                  "properties": {
+                    "bucket": {
+                      "enum": [
+                        "category",
+                        "structural-ok",
+                        "structural-forbidden",
+                        "composite",
+                        "unsupported"
+                      ]
+                    },
+                    "outcome": {
+                      "enum": ["expressible", "composite-rewrite", "gap"]
+                    },
+                    "gapKind": {
+                      "enum": ["absent-property", "out-of-domain"]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": ["bucket", "outcome"]
+                },
+                "composite": {
+                  "type": "object",
+                  "properties": {
+                    "rewrite": {
+                      "enum": ["background-color-only", "full-longhand-reset"]
+                    },
+                    "basis": {
+                      "enum": [
+                        "color",
+                        "custom-property-color",
+                        "unresolved-custom-property",
+                        "none-keyword",
+                        "other"
+                      ]
+                    },
+                    "longhands": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "x-closed": "composite-longhand",
+                        "maxLength": 64
+                      }
+                    },
+                    "longhandsNotAdmitted": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "x-closed": "composite-longhand",
+                        "maxLength": 64
+                      }
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "rewrite",
+                    "basis",
+                    "longhands",
+                    "longhandsNotAdmitted"
+                  ]
+                },
+                "registry": {
+                  "type": "object",
+                  "properties": {
+                    "entry": {
+                      "type": ["string", "null"],
+                      "x-closed": "registry-name",
+                      "maxLength": 64
+                    },
+                    "requirement": {
+                      "enum": [
+                        "carried-by-capability",
+                        "disposition-only",
+                        "required-gap",
+                        "required-requalification-and-expansion"
+                      ]
+                    },
+                    "fixtureId": {
+                      "type": "string",
+                      "pattern": "^CE-FX-PROP-[a-z0-9-]+$",
+                      "maxLength": 80
+                    },
+                    "descriptorOf": {
+                      "enum": ["font-face"]
+                    },
+                    "unregisteredReason": {
+                      "enum": [
+                        "not-in-research-inventory",
+                        "font-face-descriptor-not-in-inventory"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": ["entry"]
+                },
+                "flags": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "numeric-coercion",
+                      "font-face-descriptor",
+                      "vendor-prefixed",
+                      "important-ignored",
+                      "conditional-context-not-checked",
+                      "pseudo-element-not-checked",
+                      "raw-value-needs-token"
+                    ]
+                  },
+                  "minItems": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "property",
+                "value",
+                "context",
+                "denominator",
+                "registry"
+              ]
+            },
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["fixtureId", "path", "sha256", "counts", "declarations"]
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "task",
+    "generatedBy",
+    "registryVersion",
+    "totals",
+    "stylesheets"
+  ]
+}
