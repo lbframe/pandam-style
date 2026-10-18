@@ -70,6 +70,12 @@ Other custody events:
   oracle-wide, so no held-out task needed to change. Only the manifest's
   `corpusVersion` was updated; the archive, its digest and every task digest
   are unchanged.
+- 2026-10-18, corpus 1.4.1 (regressions of 1.4.0): no unseal and no
+  revision. Three false rejects introduced by 1.4.0's static and style-channel
+  rules were corrected in the oracles (SVG attributes outside source nesting,
+  custom-element attributes, ref-container aliases and constructed arrays).
+  Only the manifest's `corpusVersion` was updated; the archive, its digest and
+  every task digest are unchanged.
 
 ## Rotation and changes
 

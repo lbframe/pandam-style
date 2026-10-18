@@ -11,6 +11,8 @@
 // DOM (evaluator) and anywhere in the document (sandbox).
 //
 // Inside SVG, attributes are SVG's own; SVG content is not measured.
+// Custom elements (names with a hyphen) define their own attributes; their
+// attributes are not compared (`unmeasured`), never presentational.
 
 export const PRESENTATIONAL_ELEMENTS = [
   'basefont',
@@ -64,9 +66,29 @@ export const DIMENSIONED_ELEMENTS = [
   'video',
 ];
 
+// Element names that are provably HTML wherever they appear in source. Names
+// SVG shares (`a`, `script`, `style`, `title`) and every SVG name (`path`,
+// `g`, `text`, ...) are not in it: a JSX element rendered by a child component
+// may land inside an <svg>, so static rules check attributes only on these;
+// the committed-DOM checks know the namespace.
+export const HTML_ELEMENTS = new Set(
+  (
+    'abbr address area article aside audio b bdi bdo blockquote body br ' +
+    'button canvas caption cite code col colgroup data datalist dd del ' +
+    'details dfn dialog div dl dt em embed fieldset figcaption figure footer ' +
+    'form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins ' +
+    'kbd label legend li main map mark menu meter nav noscript object ol ' +
+    'optgroup option output p picture pre progress q rp rt ruby s samp ' +
+    'search section select slot small source span strong sub summary sup ' +
+    'table tbody td template textarea tfoot th thead time tr track u ul var ' +
+    'video wbr basefont big blink center font marquee nobr spacer strike tt'
+  ).split(' '),
+);
+
 /** The presentational channel an HTML element or attribute is, or null. */
 export function presentationalChannel(tag, attribute = null) {
   const t = tag.toLowerCase();
+  if (t.includes('-')) return null;
   if (attribute == null)
     return PRESENTATIONAL_ELEMENTS.includes(t)
       ? `presentational <${t}> element`

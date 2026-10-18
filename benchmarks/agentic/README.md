@@ -9,10 +9,10 @@ no product behavior depends on it.
 
 Status:
 
-- **Present:** corpus `1.4.0`, reference epoch `alpha1`. It has 47 development
+- **Present:** corpus `1.4.1`, reference epoch `alpha1`. It has 47 development
   tasks and 16 held-out tasks (encrypted in the repository; see
   [held-out policy](heldout/ACCESS-POLICY.md)), 8 project shapes on 5 hosts, the
-  oracles, and 181 development oracle fixtures (known-good and known-bad
+  oracles, and 186 development oracle fixtures (known-good and known-bad
   solutions, including the independent reviews' probes).
 - **Not present:** the runner, the provider adapters, the frozen baseline and the
   thresholds. Those are AG-00.2 (#6) and AG-00.3 (#7). No LLM run has been
@@ -229,7 +229,12 @@ structure:
   `link`, `marginheight`, `marginwidth`, `noshade`, `nowrap`, `rules`, `text`,
   `valign`, `vlink` and `vspace`; `size` on `<hr>`; and `width`/`height` on
   anything but `canvas`, `embed`, `iframe`, `img`, `input`, `object`,
-  `source`, `svg` and `video`. Attributes inside SVG are SVG's own.
+  `source`, `svg` and `video`. Attributes inside SVG are SVG's own, and custom
+  elements (names with a hyphen) define their own attributes (not compared,
+  so `unmeasured`). The DOM checks know each element's namespace; the static
+  rules check attributes only on element names that are provably HTML
+  (`HTML_ELEMENTS`), since a child component's JSX may render inside an
+  `<svg>`.
 - Generated integrity takes its references only from places the agent cannot
   edit: the harness's baseline snapshot and a fresh trusted recompilation of
   the final sources. The workspace's generation state is never trusted as an
@@ -334,7 +339,9 @@ sandbox for hostile native code.
      `.target`, DOM queries and their aliases).
    - Computed reads, writes and calls on ordinary values (array indexing,
      lookup maps such as `handlers[e.key]?.()`, accumulators, ref containers
-     created with `useRef([])` or `useRef({})`, like `refs.current[i] = el`
+     created with React's `useRef` (also imported under another name, or as
+     `React.useRef`) from provably plain data (`[]`, `{}`, `new Array(n)`,
+     `Array.from(...)`, or a local bound to one), like `refs.current[i] = el`
      and `refs.current[(i + 1) % n]?.focus()`) stay inside the subset and are left to the
      dynamic trace, which observes their effect on the DOM. The
      `good-idiomatic-indexing`, `good-handler-map` and `good-roving-focus-refs`

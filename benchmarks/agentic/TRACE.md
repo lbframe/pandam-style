@@ -113,6 +113,11 @@ not repeated below unless they are the discriminating evidence.
     - Good controls: `good-portal-owned-container` (portal into a `<ul>` the
       component renders), `good-object-assign-accumulator` and
       `good-roving-focus-refs`.
+    - Regression controls (1.4.1): `good-svg-child-component-color` and
+      `good-svg-create-element` (SVG attributes outside source nesting),
+      `unmeasured-custom-element-attrs` (custom-element attributes stay
+      `unmeasured`), `good-ref-container-alias` and
+      `good-ref-container-new-array`.
   - Good controls: `good-idiomatic-indexing` (array indexing and lookup maps),
     `good-handler-map` (`handlers[e.key]?.()`), `good-focus-ref`,
     `good-memo-hooks` and `good-regenerated` (complete fresh generation).

@@ -417,6 +417,10 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
       ['jsx-style-prop'],
     'export function A({ k }) { const r = useRef(null); useEffect(() => { r.current[k] = 1; }); return <div ref={r} />; }':
       ['dynamic-code'],
+    "import { useRef as useR } from 'react';\nexport function A({ k }) { const r = useR(null); useEffect(() => { r.current[k] = 1; }); return <div ref={r} />; }":
+      ['dynamic-code'],
+    'export const T = () => <table><tbody><tr><td align="left">a</td></tr></tbody></table>;':
+      ['jsx-style-prop'],
     '(() => {}).constructor("x")();': ['dynamic-code'],
     "String.prototype.trim = () => '';": ['dynamic-code'],
     'export function A() { const r = useRef(null); useEffect(() => { const n = r.current; n[key] = 1; }); return <div ref={r} />; }':
@@ -442,6 +446,9 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
     'export const byId = (items) => items.reduce((acc, item) => Object.assign(acc, { [item.id]: item }), {});',
     "export function L({ items }) { const refs = useRef([]); return items.map((it, i) => <li key={it.id} tabIndex={-1} ref={(el) => { refs.current[i] = el; }} onKeyDown={(e) => { if (e.key === 'Enter') refs.current[(i + 1) % items.length]?.focus(); }}>{it.name}</li>); }",
     'export const Icon = () => <svg width={16} height={16} color="red"><rect width={2} height={2} /></svg>;',
+    'function IconPath() { return <path color="currentColor" d="M0 0" />; }\nexport const Icon = () => <svg><IconPath /></svg>;',
+    'export const Meta = () => <product-meta text="sku-123" color="blue" width={3} />;',
+    "import { useRef as useNodeRefs } from 'react';\nexport function L({ items }) { const refs = useNodeRefs(new Array(items.length)); return items.map((it, i) => <li key={it.id} ref={(el) => { refs.current[i] = el; }} onKeyDown={() => refs.current[(i + 1) % items.length]?.focus()} />); }",
   ];
   for (const code of idiomatic)
     assert.deepEqual(findConstructs(code, 'x.jsx'), [], code);

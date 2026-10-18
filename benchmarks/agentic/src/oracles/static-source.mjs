@@ -10,7 +10,7 @@
 // evaluated agent introduced are attributed to it.
 
 import { createRequire, isBuiltin } from 'node:module';
-import { presentationalChannel } from './style-channels.mjs';
+import { HTML_ELEMENTS, presentationalChannel } from './style-channels.mjs';
 
 const require = createRequire(import.meta.url);
 const { parse } = require('@babel/parser');
@@ -390,9 +390,26 @@ function collectBindings(program) {
         for (const name of namesIn(d.id)) tainted.add(name);
     }
   }
-  // Ref containers: `const refs = useRef([])` (or `{}`) holds a collection;
+  // Ref containers: `const refs = useRef([])` (or `{}`, `new Array(n)`, ...)
+  // holds a collection;
   // `refs.current` is plain data even though its elements may be nodes.
   const refContainers = new Set();
+  // Local names of React's useRef (`import { useRef as useR } from 'react'`);
+  // `React.useRef` is matched by member name.
+  const useRefNames = new Set(['useRef']);
+  walk(program, (node) => {
+    if (node.type === 'ImportDeclaration' && node.source?.value === 'react')
+      for (const spec of node.specifiers ?? [])
+        if (
+          spec.type === 'ImportSpecifier' &&
+          (spec.imported?.name ?? spec.imported?.value) === 'useRef'
+        )
+          useRefNames.add(spec.local.name);
+  });
+  // A provably plain initial value: a literal, `new Array(n)`, `Array.from`,
+  // ... or a local bound to one.
+  const plainInitial = (arg) =>
+    isPlainDataInit(arg) || (arg?.type === 'Identifier' && plain.has(arg.name));
   // Accumulators of `reduce(fn, <plain literal>)`: the callback's first
   // parameter, by name and callback source range.
   const accumulators = [];
@@ -401,11 +418,9 @@ function collectBindings(program) {
     if (
       d.id.type === 'Identifier' &&
       init?.type === 'CallExpression' &&
-      (init.callee?.name === 'useRef' ||
+      (useRefNames.has(init.callee?.name) ||
         propertyName(init.callee) === 'useRef') &&
-      ['ArrayExpression', 'ObjectExpression'].includes(
-        init.arguments?.[0]?.type,
-      )
+      plainInitial(init.arguments?.[0])
     )
       refContainers.add(d.id.name);
   }
@@ -513,6 +528,9 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
     if (tag === 'svg' || insideSvg.has(node)) return;
     const element = presentationalChannel(tag);
     if (element != null) add('jsx-style-prop', node, element);
+    // Attributes only on provably HTML elements; the committed-DOM checks
+    // cover the rest with the real namespace.
+    if (!HTML_ELEMENTS.has(tag)) return;
     for (const name of attributes) {
       const channel = presentationalChannel(tag, name);
       if (channel != null) add('jsx-style-prop', node, channel);

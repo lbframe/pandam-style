@@ -1417,6 +1417,8 @@ function documentStyleChannels(read, doc) {
       if (name === 'style') out.push(`style attribute on <${tag}>`);
       else if (
         !svg &&
+        // Custom elements define their own attributes.
+        !tag.includes('-') &&
         (STYLE_CHANNELS.attributes.includes(name) ||
           (name === 'size' && tag === 'hr') ||
           ((name === 'width' || name === 'height') &&
