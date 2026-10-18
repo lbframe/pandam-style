@@ -8,7 +8,10 @@
     "mode": "symmetric",
     "archive": "heldout.tar.gpg"
   },
-  "sealed": null,
+  "sealed": {
+    "archiveSha256": "b751ad3d78370b5a121aa30c95f174da944dac50a0baa292c0a286155751ff5e",
+    "plaintextSetDigest": "4210960d7a6c813f6ecba228c0ad62bcfba7fd5d03674aaa6080dc01a7f9aef0"
+  },
   "tasks": [
     {
       "id": "heldout-audit-partial-migration",
