@@ -39,10 +39,22 @@ const GIT_ENV = {
   GIT_CONFIG_GLOBAL: '/dev/null',
 };
 
+// No detached auto-maintenance or gc: they write and remove lock files in
+// .git after the command returns, racing with workspace snapshots.
 function git(cwd, args) {
   const r = spawnSync(
     'git',
-    ['-c', 'commit.gpgsign=false', '-c', 'core.hooksPath=/dev/null', ...args],
+    [
+      '-c',
+      'commit.gpgsign=false',
+      '-c',
+      'core.hooksPath=/dev/null',
+      '-c',
+      'maintenance.auto=false',
+      '-c',
+      'gc.auto=0',
+      ...args,
+    ],
     {
       cwd,
       encoding: 'utf8',
