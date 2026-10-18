@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-capabilities.v1.schema.json",
+  "title": "Core evolution capability dispositions v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-capability-dispositions"
+    },
+    "task": {
+      "const": "CE-00.1"
+    },
+    "status": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "dispositionDefinitions": {
+      "type": "object",
+      "required": ["required-implementation", "existing-requalification"]
+    },
+    "lotIssues": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "minItems": 1
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CAP-(0[1-9]|[1-3]\\d|4[0-8])$"
+          },
+          "disposition": {
+            "enum": ["required-implementation", "existing-requalification"]
+          },
+          "primaryOwner": {
+            "type": "string",
+            "pattern": "^CE-(0\\d|1[0-5])$"
+          },
+          "closingLot": {
+            "type": "string",
+            "pattern": "^CE-(0\\d|1[0-5])$"
+          },
+          "proofRecord": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^CE-PROOF-CAP-\\d\\d$"
+              },
+              "plannedPath": {
+                "type": "string",
+                "pattern": "^tests/core-evolution/proofs/CAP-\\d\\d\\.json$"
+              },
+              "status": {
+                "const": "planned"
+              },
+              "evidenceClasses": {
+                "type": "array",
+                "items": {
+                  "enum": ["E1", "E2", "E3", "E4", "E5"]
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "fixtureSets": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^CE-FX-CAP-\\d\\d-"
+                },
+                "minItems": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "plannedPath",
+              "status",
+              "evidenceClasses",
+              "fixtureSets"
+            ]
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^LIM-\\d\\d$"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "disposition",
+          "primaryOwner",
+          "closingLot",
+          "proofRecord",
+          "limitations"
+        ]
+      },
+      "minItems": 48,
+      "maxItems": 48
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^LIM-\\d\\d$"
+          },
+          "kind": {
+            "enum": [
+              "architectural-exclusion",
+              "application-responsibility",
+              "unsupported-platform",
+              "target-limited",
+              "upstream-limitation-disclosed"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string"
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^CAP-(0[1-9]|[1-3]\\d|4[0-8])$"
+            },
+            "minItems": 1
+          },
+          "evidence": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "statement",
+          "capabilities",
+          "evidence"
+        ]
+      },
+      "minItems": 1
+    },
+    "requestCases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^REQ-\\d\\d$"
+          },
+          "request": {
+            "type": "string"
+          },
+          "lots": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^CE-(0\\d|1[0-5])$"
+            },
+            "minItems": 1
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^CAP-(0[1-9]|[1-3]\\d|4[0-8])$"
+            },
+            "minItems": 1
+          },
+          "acceptance": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["id", "request", "lots", "capabilities"]
+      },
+      "minItems": 16,
+      "maxItems": 16
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "task",
+    "status",
+    "source",
+    "dispositionDefinitions",
+    "lotIssues",
+    "capabilities",
+    "limitations",
+    "requestCases"
+  ]
+}
