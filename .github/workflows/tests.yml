@@ -23,11 +23,18 @@ jobs:
 
   pandamstyle:
     runs-on: ubuntu-latest
+    env:
+      # The runner restricts unprivileged user namespaces through AppArmor.
+      # Its Google Chrome build has the profile that keeps the Chromium
+      # sandbox usable; `/usr/bin/chromium` aborts in its zygote instead.
+      PMS_CHROMIUM: /opt/google/chrome/chrome
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: '22.x'
+          # The package and Next qualifications assert this exact host
+          # runtime beside their pinned 22.12.0 and 24.21.0 consumer lanes.
+          node-version: '22.22.0'
           cache: 'yarn'
           cache-dependency-path: yarn.lock
       - run: corepack prepare yarn@1.22.22 --activate
@@ -45,17 +52,19 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-  # TEMPORARY (CE-00.4 diagnosis, removed before review): reproduce the
-  # inherited failures on the immutable Alpha 1 baseline with retained logs.
+  # TEMPORARY (CE-00.4 diagnosis, removed before review): run the immutable
+  # Alpha 1 baseline under the repaired CI environment with retained logs.
   baseline-415e055:
     runs-on: ubuntu-latest
+    env:
+      PMS_CHROMIUM: /opt/google/chrome/chrome
     steps:
       - uses: actions/checkout@v6
         with:
           ref: 415e05539fcb5d36a78226112b5cf488b200b1aa
       - uses: actions/setup-node@v6
         with:
-          node-version: '22.x'
+          node-version: '22.22.0'
           cache: 'yarn'
           cache-dependency-path: yarn.lock
       - run: corepack prepare yarn@1.22.22 --activate
