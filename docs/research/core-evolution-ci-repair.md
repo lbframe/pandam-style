@@ -52,7 +52,7 @@ verbatim.
   - **4 × the Stylus `.styl` extension.** These are in the stylesheet rejection
     lists of `frontend/babel/evaluate.js` and `project/graph/resolution.js`.
   - **1 × the second half of "ANDed".** A probe containing "separate axes are
-    ANDed." reports the `Ded` token under the old configuration and passes
+    ANDed." reports its split second half under the old configuration and passes
     under the new one. The word is in the "Responsive behavior and finite
     selection" section of `docs/agent-use.md`, line 125.
   - **3 French words.** Two are in a demonstrator comment in
@@ -178,7 +178,7 @@ All results in this section are **[executed]**.
 
 [Run 39167443930](https://github.com/lbframe/pandam-style/actions/runs/39167443930)
 ran the verifier under the repaired settings twice:
-- on the unchanged baseline (temporary job 117793243713; tree `26928afe…`);
+- on the unchanged baseline (temporary job 117793243713; tree `26928afeac8822d4789141d7094ccfaf601942ed`);
 - on the branch merge tree (`pandamstyle`, job 117793243769).
 
 Both report `verification verdict: verified`, 12 of 12 steps passed with
