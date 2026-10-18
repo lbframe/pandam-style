@@ -2615,6 +2615,30 @@ reviewedOverrides:
       - path: tools/semantic-oracle/integrity.js
         sha256: 1a0b82ef471cbbbf582017736d2819a7e1acfc01a527ab031c957c2adad83847
 normativeCoverage:
+  - path: docs/agent-delivery-protocol.md
+    section: implementation
+    sha256: ab51a3bfeeb216ae9c88a1f8b03c38d1b88c195377ff3c1ec64d62d612e1b401
+    disposition: no-implementation-obligation
+    reason: "Contribution process for delegated implementation work (scope, design notes, executed evidence, self-review); it places no obligation on a product component."
+    reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."
+  - path: docs/agent-delivery-protocol.md
+    section: publication
+    sha256: 693f010be5ab1bb034e169388b9ff52f85d76caae61da2d70a29cc01f59f019b
+    disposition: no-implementation-obligation
+    reason: "Contribution process requiring a local leak scan before pushing private- or sealed-derived data; existing guards are cited as examples, not new product guarantees."
+    reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."
+  - path: docs/agent-delivery-protocol.md
+    section: review
+    sha256: 343e24bb8553a4431429e9b87aa631387fa8beb930cc336f084db4b900329d10
+    disposition: no-implementation-obligation
+    reason: "Contribution process for independent review severity, round limits and residual-risk authority; it places no obligation on a product component."
+    reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."
+  - path: docs/agent-delivery-protocol.md
+    section: reviewer-briefs
+    sha256: 328164ea0be9f5301d38f72b48a5823303d9ae52758fd05586d75194076a47f2
+    disposition: no-implementation-obligation
+    reason: "Wording guidance for reviewer briefs; it places no obligation on a product component."
+    reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."
   - path: docs/CONSTRAINTS.md
     section: product-audience
     sha256: 6b6057d0306bdf125b296a2564d1cedc096e1bd288b21140602092a8121f1d8a
