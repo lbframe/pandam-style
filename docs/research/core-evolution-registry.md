@@ -54,10 +54,11 @@ closes with its evidence classes:
 3. **Classification.** A documented, ordered procedure assigns exactly one
    disposition: curated records first, then obsolete-engine prefixes, BCD
    status, BCD prefix/alternative-name statements, vendor-base derivation. An
-   unclassified name or an entry without a family fails the build. A BCD prefix
-   or alternative name becomes a normalized alias only when its relating
-   statements carry no caveat, or when a curated audit finds a behavior caveat
-   with the same grammar (see [Alias audit](#alias-audit)).
+   unclassified name or an entry without a family fails the build. The absence
+   of a BCD note is never treated as equivalence: vendor-prefixed names are
+   never normalized aliases, and an unprefixed name stays an alias only with a
+   curated positive equivalence statement and sources (see
+   [Alias audit](#alias-audit)).
 4. **Requirement.** Families name the profiles that require their stable
    canonical properties. Overlay rules add the `rtl` and `svg-media` overlays to
    direction-sensitive or media-related entries. Alpha 1 status then separates
@@ -79,35 +80,37 @@ closes with its evidence classes:
 
 ## Inventory dispositions
 
-| Disposition                        | Entries  |
-| ---------------------------------- | -------- |
-| `canonical-property`               | 471      |
-| `deprecated-or-experimental`       | 375      |
-| `incompatible-runtime-requirement` | 2        |
-| `non-css-syntax`                   | 24       |
-| `normalized-alias`                 | 173      |
-| `scoped-platform-extension`        | 7        |
-| `system-resource`                  | 56       |
-| **Total**                          | **1108** |
+| Disposition                        | `68557ea` | `0fe86d6` | Current  |
+| ---------------------------------- | --------- | --------- | -------- |
+| `canonical-property`               | 471       | 471       | 471      |
+| `deprecated-or-experimental`       | 361       | 375       | 536      |
+| `incompatible-runtime-requirement` | 2         | 2         | 2        |
+| `non-css-syntax`                   | 24        | 24        | 25       |
+| `normalized-alias`                 | 187       | 173       | 11       |
+| `scoped-platform-extension`        | 7         | 7         | 7        |
+| `system-resource`                  | 56        | 56        | 56       |
+| **Total**                          | **1108**  | **1108**  | **1108** |
 
 | Subkind of `deprecated-or-experimental` | Entries |
 | --------------------------------------- | ------- |
 | `abandoned-draft`                       | 5       |
 | `deprecated`                            | 52      |
-| `divergent-legacy-variant`              | 14      |
+| `divergent-legacy-variant`              | 17      |
 | `experimental`                          | 134     |
-| `nonstandard`                           | 52      |
+| `nonstandard`                           | 53      |
 | `obsolete-engine-prefix`                | 101     |
+| `superseded-name`                       | 13      |
 | `unimplemented-specification`           | 17      |
+| `vendor-legacy-variant`                 | 144     |
 
 | Owner lot | Entries |
 | --------- | ------- |
 | CE-01     | 101     |
-| CE-02     | 325     |
+| CE-02     | 324     |
 | CE-03     | 38      |
 | CE-04     | 152     |
 | CE-05     | 178     |
-| CE-06     | 104     |
+| CE-06     | 105     |
 | CE-07     | 2       |
 | CE-08     | 41      |
 | CE-09     | 2       |
@@ -116,8 +119,8 @@ closes with its evidence classes:
 
 | Requirement status                       | Entries |
 | ---------------------------------------- | ------- |
-| `carried-by-capability`                  | 79      |
-| `disposition-only`                       | 565     |
+| `carried-by-capability`                  | 80      |
+| `disposition-only`                       | 564     |
 | `required-gap`                           | 362     |
 | `required-requalification-and-expansion` | 102     |
 
@@ -129,44 +132,69 @@ diagnostic.
 
 ## Alias audit
 
-Every automatic alias rests on BCD 8.1.6 prefix or alternative-name statements,
-now recorded per entry in `bcdRelations` with their notes,
-partial-implementation and flag caveats. All 180 automatic aliases were audited
-against those statements; 28 carry caveats, none carries flags, and each of the
-28 has a curated `aliasAudit` verdict in the classification rules. The build
-fails on a missing or stale verdict, and a behavior-only verdict on notes that
-mention syntax or values needs an explicit reviewed reason.
+Agents author canonical properties. Emitting a vendor prefix for a target is a
+compiler transformation owned by CAP-41/CE-01 (D-BP-07), not an authoring alias,
+so the registry makes no equivalence claim for prefixed names. The absence of a
+BCD note is not evidence of equivalence.
 
-**Grammar-divergent (14), reclassified from `normalized-alias` to
-`deprecated-or-experimental/divergent-legacy-variant`:** `-moz-background-clip`
-→ `background-clip`, `-moz-background-origin` → `background-origin`,
-`-moz-border-image` → `border-image`, `-moz-column-rule` → `column-rule`,
-`-moz-font-feature-settings` → `font-feature-settings`,
-`-webkit-background-clip` → `background-clip`, `-webkit-background-origin` →
-`background-origin`, `-webkit-background-size` → `background-size`,
-`-webkit-initial-letter` → `initial-letter`, `-webkit-mask` → `mask`,
-`-webkit-mask-image` → `mask-image`, `-webkit-perspective` → `perspective`,
-`-webkit-ruby-position` → `ruby-position`, `-webkit-scroll-snap-type` →
-`scroll-snap-type`. They are diagnosed toward their target instead of
-normalized. 12 still ship in some engine; for those, any prefixed emission is a
-D-BP-07 transformation decision with emitted-CSS proof (E3) restricted to the
-shared value subset. `-moz-background-clip` and `-moz-background-origin` no
-longer ship.
+- **Vendor-prefixed names** related by BCD to a canonical target are
+  `deprecated-or-experimental/vendor-legacy-variant` (144), or
+  `divergent-legacy-variant` (17) when a curated audit cites a documented
+  grammar or value difference. They are diagnosed toward their target. 137 of
+  them still ship in some engine and carry `emissionDecision: D-BP-07` with
+  emitted-CSS proof (E3) restricted to the value subset shared with the target.
+  No Alpha 1 admitted name is vendor-prefixed, so no accepted input is dropped.
+- **Unprefixed names** stay `normalized-alias` only with a curated positive
+  equivalence statement and pinned sources. Unprefixed BCD alternative names
+  without such evidence are `deprecated-or-experimental/superseded-name` (13):
+  `inset-area` → `position-area`, `motion` → `offset`, `motion-distance` →
+  `offset-distance`, `motion-path` → `offset-path`, `motion-rotation` →
+  `offset-rotate`, `offset-block` → `inset-block`, `offset-block-end` →
+  `inset-block-end`, `offset-block-start` → `inset-block-start`, `offset-inline`
+  → `inset-inline`, `offset-inline-end` → `inset-inline-end`,
+  `offset-inline-start` → `inset-inline-start`, `offset-rotation` →
+  `offset-rotate`, `position-try-options` → `position-try-fallbacks`.
+- Every alias audit carries sources: a BCD statement, a pinned engine source
+  (WebKit `CSSProperties.json` at `77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1`,
+  sha256 `f56793c6…`), a dated W3C specification or a pinned upstream source.
+  Missing, stale or source-less verdicts fail the build, and an equivalent or
+  behavior-only verdict on BCD notes that mention syntax or values needs an
+  explicit reviewed reason.
 
-**Behavior caveat only (14), kept as aliases with the audit recorded:**
-`-moz-box-sizing`, `-moz-column-count`, `-moz-column-width`, `-moz-columns`,
-`-webkit-animation`, `-webkit-box-decoration-break`,
-`-webkit-font-feature-settings`, `-webkit-print-color-adjust`,
-`-webkit-transform`, `scroll-snap-margin`, `scroll-snap-margin-bottom`,
-`scroll-snap-margin-left`, `scroll-snap-margin-right`, `scroll-snap-margin-top`.
-Their notes describe engine bugs or partial behavior with the same grammar, such
-as old Firefox `getComputedStyle` sizing, `display: table-caption` columns,
-inline-only `box-decoration-break` and Safari's fragment-scroll margin.
+**Divergent legacy variants (17):** `-moz-background-clip` → `background-clip`
+(bcd), `-moz-background-origin` → `background-origin` (bcd), `-moz-border-image`
+→ `border-image` (bcd), `-moz-column-rule` → `column-rule` (bcd),
+`-moz-font-feature-settings` → `font-feature-settings` (bcd),
+`-webkit-background-clip` → `background-clip` (bcd), `-webkit-background-origin`
+→ `background-origin` (bcd), `-webkit-background-size` → `background-size`
+(bcd), `-webkit-border-image` → `border-image` (engine-source),
+`-webkit-border-radius` → `border-radius` (engine-source),
+`-webkit-initial-letter` → `initial-letter` (bcd), `-webkit-line-clamp` →
+`line-clamp` (specification), `-webkit-mask` → `mask` (bcd),
+`-webkit-mask-image` → `mask-image` (bcd), `-webkit-perspective` → `perspective`
+(bcd), `-webkit-ruby-position` → `ruby-position` (bcd),
+`-webkit-scroll-snap-type` → `scroll-snap-type` (bcd).
 
-The remaining 152 automatic aliases have BCD statements without notes, partial
-implementation or flags. That some prefixed forms were later removed from
-engines is recorded as `prefixedFormShips: false`; removal does not change
-grammar equivalence.
+**Remaining normalized aliases (11), all audited:**
+
+| Alias                       | Canonical              | Equivalence                                                                                                                                                                                                    | Sources                                                                                                                                                                                                                                            |
+| --------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `end`                       | `inset-inline-end`     | StyleX authoring key that its compiler rewrites to inset-inline-end with the same value; the StyleX 0.19.1 and Panda 2.2.0 emission probes both emit inset-inline-end.                                         | [upstream-source](https://github.com/facebook/stylex/blob/1fcb9a51cbecad2c82255e0f4b45cc072fa1a95a/packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/property-specificity.js#L220-L221)                                                  |
+| `grid-column-gap`           | `column-gap`           | Specified legacy name alias: grid-column-gap parses and computes exactly as column-gap.                                                                                                                        | [specification](https://www.w3.org/TR/2025/WD-css-align-3-20250311/#gap-legacy); [engine-source](https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L10536)                      |
+| `grid-gap`                  | `gap`                  | Specified legacy name alias: grid-gap parses and computes exactly as gap.                                                                                                                                      | [specification](https://www.w3.org/TR/2025/WD-css-align-3-20250311/#gap-legacy); [engine-source](https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L10573)                      |
+| `grid-row-gap`              | `row-gap`              | Specified legacy name alias: grid-row-gap parses and computes exactly as row-gap.                                                                                                                              | [specification](https://www.w3.org/TR/2025/WD-css-align-3-20250311/#gap-legacy); [engine-source](https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L10555)                      |
+| `scroll-snap-margin`        | `scroll-margin`        | WebKit, the only engine that shipped scroll-snap-margin, implements it as an alias of scroll-margin; the BCD partial-implementation note on older Safari applies to scroll-margin itself.                      | [engine-source](https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13137); bcd: @mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin support statements        |
+| `scroll-snap-margin-bottom` | `scroll-margin-bottom` | WebKit, the only engine that shipped scroll-snap-margin-bottom, implements it as an alias of scroll-margin-bottom; the BCD partial-implementation note on older Safari applies to scroll-margin-bottom itself. | [engine-source](https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13157); bcd: @mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin-bottom support statements |
+| `scroll-snap-margin-left`   | `scroll-margin-left`   | WebKit, the only engine that shipped scroll-snap-margin-left, implements it as an alias of scroll-margin-left; the BCD partial-implementation note on older Safari applies to scroll-margin-left itself.       | [engine-source](https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13180); bcd: @mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin-left support statements   |
+| `scroll-snap-margin-right`  | `scroll-margin-right`  | WebKit, the only engine that shipped scroll-snap-margin-right, implements it as an alias of scroll-margin-right; the BCD partial-implementation note on older Safari applies to scroll-margin-right itself.    | [engine-source](https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13203); bcd: @mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin-right support statements  |
+| `scroll-snap-margin-top`    | `scroll-margin-top`    | WebKit, the only engine that shipped scroll-snap-margin-top, implements it as an alias of scroll-margin-top; the BCD partial-implementation note on older Safari applies to scroll-margin-top itself.          | [engine-source](https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13226); bcd: @mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin-top support statements    |
+| `start`                     | `inset-inline-start`   | StyleX authoring key that its compiler rewrites to inset-inline-start with the same value; the StyleX 0.19.1 and Panda 2.2.0 emission probes both emit inset-inline-start.                                     | [upstream-source](https://github.com/facebook/stylex/blob/1fcb9a51cbecad2c82255e0f4b45cc072fa1a95a/packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/property-specificity.js#L220-L221)                                                  |
+| `word-wrap`                 | `overflow-wrap`        | Specified legacy name alias: word-wrap parses and computes exactly as overflow-wrap.                                                                                                                           | [specification](https://www.w3.org/TR/2026/CRD-css-text-3-20260814/#overflow-wrap-property); [engine-source](https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L7778)           |
+
+`text-fill-color` is now `deprecated-or-experimental/nonstandard`: StyleX emits
+it verbatim and no engine implements it. `font-smoothing` is now
+`non-css-syntax`: Panda maps the value `subpixel-antialiased` to `auto`, so it
+is a value-mapping helper rather than an alias.
 
 ## Upstream emission findings
 
@@ -349,6 +377,17 @@ digests match.
 | `@pandacss/types`          | 2.2.0  | 2.2.0                   | `latest-equals-pinned` | True                     |
 | `@mdn/browser-compat-data` | 8.1.6  | 8.1.6                   | `latest-equals-pinned` | True                     |
 | `@pandacss/core`           | 1.12.1 | 1.12.1                  | `latest-equals-pinned` | not locked (v1 internal) |
+
+## Changing authored scope
+
+Re-derivation proves that the generated registry follows the authored
+specifications; it cannot judge whether an authored change is right. Any change
+to `classification-rules`, `profiles`, `capabilities` or `scope-decisions` is a
+scope change that needs independent review. A diff that reduces required
+entries, profile requirements, capability requirements or proof classes must be
+called out explicitly in its pull request. The validator prints required-entry,
+requirement and proof-class totals on every pass so such reductions are visible
+in review output.
 
 ## Limits of this task
 
