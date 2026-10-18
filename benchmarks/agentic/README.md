@@ -288,7 +288,7 @@ sandbox for hostile native code.
      tree says: the same nodes in the same order, the same text, and the
      attributes React's own serializer derives from the committed props; the
      rest of the document is unchanged apart from React-placed nodes, and no
-     own property shadows a DOM interface member. This catches writes with no
+     own property or replaced prototype shadows a DOM interface member. This catches writes with no
      agent stack frame, such as a bound DOM method handed to React as a ref or
      handler.
    - **Sweep:** after the requested interactions, common events are dispatched
@@ -335,7 +335,9 @@ the oracle internals, and another layer still applies:
 - **Tampering with React's internal fiber objects** (reachable only through
   randomized expando keys on DOM nodes) to make the consistency check expect
   the tampered DOM.
-  - Mitigation: reaching them needs computed access on a DOM node, which is
+  - Mitigation: the fiber root is captured right after `createRoot`, before
+    any agent render code, so added or replaced root keys are ignored.
+    Reaching fiber objects needs computed access on a DOM node, which is
     reported statically. The committed markup is still the evidence: hidden,
     inert, unknown classes, style attributes and style elements in it fail
     regardless.

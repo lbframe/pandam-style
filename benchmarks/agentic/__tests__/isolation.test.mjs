@@ -283,6 +283,12 @@ test('the committed DOM must be what React committed, read through frozen interf
     /own property childNodes shadows the DOM on <div>/,
   );
   assert.match(
+    violations(
+      "export function C() { return jsx('div', { ref: (el) => { if (el) Object.setPrototypeOf(el, Object.create(Object.getPrototypeOf(el))); }, children: 'x' }); }",
+    ),
+    /\[\[Prototype\]\] shadows the DOM on <div>/,
+  );
+  assert.match(
     failure(
       render(
         dir,

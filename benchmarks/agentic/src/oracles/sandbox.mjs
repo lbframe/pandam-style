@@ -559,12 +559,17 @@ function newWindow() {
   });
   // Every DOM and CSSOM interface is then frozen, and so are the window's
   // bindings to them: agent code cannot patch what the harness and React use.
+  const prototypes = new Set();
+  harnessDom.get(win).prototypes = prototypes;
   for (const name of Object.getOwnPropertyNames(win)) {
     if (!/^[A-Z]/.test(name)) continue;
     const d = Object.getOwnPropertyDescriptor(win, name);
     const ctor = d?.value;
     if (typeof ctor !== 'function' || ctor === globalThis[name]) continue;
-    if (ctor.prototype != null) Object.freeze(ctor.prototype);
+    if (ctor.prototype != null) {
+      Object.freeze(ctor.prototype);
+      prototypes.add(ctor.prototype);
+    }
     Object.freeze(ctor);
     if (d.configurable)
       Object.defineProperty(win, name, {
@@ -1164,10 +1169,12 @@ function snapshotTree(read, node, depth = 0) {
   return children;
 }
 
-function committedRoot(container) {
+// React's FiberRoot for a container, captured right after createRoot and
+// before any agent render code runs; its `current` is the committed tree.
+function fiberRootOf(container) {
   for (const key of Object.getOwnPropertyNames(container)) {
     if (key.startsWith('__reactContainer$'))
-      return container[key]?.stateNode?.current ?? null;
+      return container[key]?.stateNode ?? null;
   }
   return null;
 }
@@ -1207,11 +1214,11 @@ const parserAttributes = (el) => {
   return out;
 };
 
-function checkTree(read, container, phase) {
+function checkTree(read, container, fiberRoot, phase) {
   const problems = [];
   const unmeasured = [];
   const known = new Set([container]);
-  const root = committedRoot(container);
+  const root = fiberRoot?.current ?? null;
   if (root == null)
     return { problems: ['no committed React root'], unmeasured, known };
   const checkChildren = (parent, acc, exact) => {
@@ -1382,8 +1389,10 @@ const WELL_KNOWN_SYMBOLS = new Set(
     .filter((v) => typeof v === 'symbol'),
 );
 
-function shadowingProperties(read, node) {
+function shadowingProperties(read, node, prototypes) {
   const out = [];
+  // A replaced prototype swaps the node's whole interface.
+  if (!prototypes.has(Object.getPrototypeOf(node))) out.push('[[Prototype]]');
   const isElement = read.type(node) === 1;
   const tag = isElement ? read.tag(node) : '#node';
   const legacy = tag === 'form' || tag === 'select';
@@ -1398,10 +1407,10 @@ function shadowingProperties(read, node) {
   return out;
 }
 
-function checkOwnProperties(read, doc, container) {
+function checkOwnProperties(read, doc, container, prototypes) {
   const problems = [];
   const visit = (node) => {
-    const extra = shadowingProperties(read, node);
+    const extra = shadowingProperties(read, node, prototypes);
     if (extra.length > 0)
       problems.push(
         `own property ${extra[0]} shadows the DOM on ${read.describe(node)}`,
@@ -1410,7 +1419,7 @@ function checkOwnProperties(read, doc, container) {
       for (const child of read.children(node)) visit(child);
   };
   for (const node of [doc, read.root(doc), read.head(doc), read.body(doc)]) {
-    const extra = shadowingProperties(read, node);
+    const extra = shadowingProperties(read, node, prototypes);
     if (extra.length > 0)
       problems.push(`own property ${extra[0]} shadows the DOM on the document`);
   }
@@ -1458,10 +1467,11 @@ async function renderScenario(spec, index) {
   const read = dom.read;
   const documentBefore = snapshotDocument(read, doc);
   // Run after every settled phase: the DOM must be what React committed.
+  let fiberRoot = null;
   const verify = (phase) => {
-    const tree = checkTree(read, container, phase);
+    const tree = checkTree(read, container, fiberRoot, phase);
     const problems = [
-      ...checkOwnProperties(read, doc, container),
+      ...checkOwnProperties(read, doc, container, dom.prototypes),
       ...tree.problems,
       ...checkDocument(read, doc, documentBefore, tree.known),
     ];
@@ -1539,6 +1549,7 @@ async function renderScenario(spec, index) {
       onCaughtError: onUncaught,
       onRecoverableError: NOOP,
     });
+    fiberRoot = fiberRootOf(container);
     flushSync(() => root.render(element));
     await settle();
     drain('render');
