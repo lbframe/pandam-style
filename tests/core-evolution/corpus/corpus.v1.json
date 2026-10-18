@@ -942,6 +942,42 @@
           "note": "A transparent outline has width but paints nothing; the visible-indicator check must fail."
         },
         {
+          "id": "FORMS-K4",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { opacity: 0 !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "The focused element becomes invisible; its disappearance changes ring pixels but paints no indicator."
+        },
+        {
+          "id": "FORMS-K5",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { filter: opacity(0) !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "filter: opacity(0) hides the focused element and its outline."
+        },
+        {
+          "id": "FORMS-K6",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"field-email\"]:focus-within { opacity: 0 !important; } [data-testid=\"input-email\"]:focus-visible { outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "An ancestor with opacity 0 hides the focused element and its outline."
+        },
+        {
           "id": "FORMS-A1",
           "oracle": "ORC-A11Y",
           "case": "positive",

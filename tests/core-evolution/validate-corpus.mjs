@@ -903,7 +903,13 @@ export function validateDocs(docs, env) {
       a.case === 'negative'
         ? fixture.assertions.find((x) => x.id === a.mustFail)
         : a;
-    const problems = rowProblems(row, a, target);
+    const pages = fixture.inputs
+      .filter((i) => i.role === 'reference-page')
+      .map((i) => ({
+        name: path.basename(i.path),
+        text: fileText(i.path, docs),
+      }));
+    const problems = rowProblems(row, a, target, pages);
     check(problems.length === 0, `${at} ${problems.join('; ')}`);
   }
   for (const id of expectedRows.keys())
@@ -2175,6 +2181,7 @@ const MUTATIONS = [
       r.measured = r.measured.map((stop) => ({
         ...stop,
         changedRingPixels: 0,
+        indicatorColorPixels: 0,
       }));
     },
   ],
@@ -2222,6 +2229,137 @@ const MUTATIONS = [
       f.assertions = f.assertions.filter((a) => a.id !== 'FORMS-K3');
     },
   ],
+  // Round-4: every multi-element measurement covers exactly its subjects.
+  ...[
+    ['FORMS-K1', 'focusVisible'],
+    ['FORMS-K1', 'paintedIndicator'],
+    ['FORMS-K1', 'focusOrder'],
+    ['GRID-S1', 'computed'],
+    ['NOTICES-S2', 'animationNone'],
+  ].flatMap(([row, kind]) =>
+    [
+      ['truncated', (list) => list.slice(0, -1)],
+      ['truncated to one', (list) => list.slice(0, 1)],
+      ['duplicated', (list) => [list[0], ...list.slice(0, -1)]],
+      ['reordered', (list) => [...list].reverse()],
+      ['extended', (list) => [...list, list[list.length - 1]]],
+    ].map(([how, change]) => [
+      `${kind} of ${row} ${how}`,
+      new RegExp(
+        `${row} ${kind} (verdict does not follow from its measurement|measurement does not have its strict shape)`,
+      ),
+      (d) => {
+        const r = d.referenceCheck.rows
+          .find((x) => x.id === row)
+          .results.find((x) => x.kind === kind);
+        r.measured = change(r.measured);
+      },
+    ]),
+  ),
+  ...[
+    ['truncated', (list) => list.slice(0, -1)],
+    ['duplicated', (list) => [list[0], ...list.slice(0, -1)]],
+    ['reordered', (list) => [...list].reverse()],
+  ].map(([how, change]) => [
+    `author breaks of NOTICES-T1 ${how}`,
+    /NOTICES-T1 preservesBreaks verdict does not follow from its measurement/,
+    (d) => {
+      const r = d.referenceCheck.rows
+        .find((x) => x.id === 'NOTICES-T1')
+        .results.find((x) => x.kind === 'preservesBreaks');
+      r.measured.authorBreaks = change(r.measured.authorBreaks);
+    },
+  ]),
+  [
+    'an extra private field in a computed measurement',
+    /GRID-S1 computed verdict does not follow from its measurement/,
+    (d) => {
+      const r = d.referenceCheck.rows
+        .find((x) => x.id === 'GRID-S1')
+        .results.find((x) => x.kind === 'computed');
+      r.measured[0].values.PrivateCustomerName = 'red';
+    },
+  ],
+  [
+    'an extra field in an activation measurement',
+    /STATES-K2 activates verdict does not follow from its measurement/,
+    (d) => {
+      const r = d.referenceCheck.rows
+        .find((x) => x.id === 'STATES-K2')
+        .results.find((x) => x.kind === 'activates');
+      r.measured.computed.color = 'red';
+    },
+  ],
+  [
+    'an extra private field on a report row',
+    /SHELL-L1 row has unexpected field PrivateCustomerName/,
+    (d) => {
+      d.referenceCheck.rows.find(
+        (x) => x.id === 'SHELL-L1',
+      ).PrivateCustomerName = 'red';
+    },
+  ],
+  [
+    'a report row naming another page',
+    /SSR-L2 page is not the page holding the assertion/,
+    (d) => {
+      d.referenceCheck.rows.find((x) => x.id === 'SSR-L2').page =
+        'reference.html';
+    },
+  ],
+  [
+    'violation samples truncated below their count',
+    /SHELL-P1 violations measurement does not have its strict shape/,
+    (d) => {
+      const r = d.referenceCheck.rows
+        .find((x) => x.id === 'SHELL-P1')
+        .results.find((x) => x.kind === 'violations');
+      r.measured = { count: 2, samples: [] };
+    },
+  ],
+  ...[
+    [
+      'an invisible focused element',
+      (stop) => {
+        stop.compositing[0].opacity = 0;
+      },
+    ],
+    [
+      'a filtered-out focused element',
+      (stop) => {
+        stop.compositing[0].filterOpacity = 0;
+      },
+    ],
+    [
+      'a hidden focused element',
+      (stop) => {
+        stop.compositing[0].visibilityHidden = true;
+      },
+    ],
+    [
+      'too few indicator-colored pixels',
+      (stop) => {
+        stop.indicatorColorPixels = 39;
+      },
+    ],
+  ].map(([name, change]) => [
+    `${name} kept as a painted indicator`,
+    /FORMS-K1 paintedIndicator verdict does not follow from its measurement/,
+    (d) => {
+      const r = d.referenceCheck.rows
+        .find((x) => x.id === 'FORMS-K1')
+        .results.find((x) => x.kind === 'paintedIndicator');
+      change(r.measured[1]);
+    },
+  ]),
+  ...['FORMS-K4', 'FORMS-K5', 'FORMS-K6'].map((id) => [
+    `the ${id} control dropped`,
+    new RegExp(`${id} is not a browser assertion of the corpus`),
+    (d) => {
+      const f = d.corpus.fixtures.find((x) => x.id === 'CE-CORPUS-FORMS-01');
+      f.assertions = f.assertions.filter((a) => a.id !== id);
+    },
+  ]),
   // Negative baselines and their findings.
   [
     'an accepted negative without a defect finding',

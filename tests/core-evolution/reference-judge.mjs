@@ -15,6 +15,8 @@ export const TOLERANCE = 0.5;
 // A focus indicator must change at least this many pixels in the indicator
 // ring around the focused element (a text caret alone changes fewer).
 export const INDICATOR_MIN_PIXELS = 40;
+// Below this effective compositing visibility a node paints nothing visible.
+export const VISIBILITY_EPSILON = 0.05;
 
 // Result kinds that the reference page cannot evaluate, with their reason.
 export const NOT_EVALUATED_KINDS = Object.freeze({
@@ -68,25 +70,55 @@ const style = (v) =>
       str(b.width) &&
       str(b.color),
   );
+const COMPOSITING_KEYS = [
+  'opacity',
+  'filterOpacity',
+  'visibilityHidden',
+  'displayNone',
+  'contentVisibilityHidden',
+];
+const compositing = (v) =>
+  obj(v, COMPOSITING_KEYS) &&
+  num(v.opacity) &&
+  num(v.filterOpacity) &&
+  bool(v.visibilityHidden) &&
+  bool(v.displayNone) &&
+  bool(v.contentVisibilityHidden);
 const stop = (v) =>
-  obj(v, ['focused', 'unfocused', 'changedRingPixels']) &&
+  obj(v, [
+    'stop',
+    'id',
+    'focused',
+    'unfocused',
+    'compositing',
+    'changedRingPixels',
+    'indicatorColorPixels',
+  ]) &&
+  int(v.stop) &&
+  str(v.id, 64) &&
   Array.isArray(v.focused) &&
   v.focused.length >= 1 &&
   v.focused.length <= 2 &&
   Array.isArray(v.unfocused) &&
   v.unfocused.length === v.focused.length &&
+  Array.isArray(v.compositing) &&
+  v.compositing.length === v.focused.length &&
   v.focused.every(style) &&
   v.unfocused.every(style) &&
-  int(v.changedRingPixels);
-const computedValues = (v) =>
+  v.compositing.every(compositing) &&
+  int(v.changedRingPixels) &&
+  int(v.indicatorColorPixels);
+const valueMap = (v) =>
+  v != null &&
+  typeof v === 'object' &&
+  !Array.isArray(v) &&
+  Object.values(v).every((x) => str(x));
+const subjectValues = (v) =>
   Array.isArray(v) &&
   v.length >= 1 &&
   v.every(
     (e) =>
-      e != null &&
-      typeof e === 'object' &&
-      !Array.isArray(e) &&
-      Object.values(e).every((x) => str(x)),
+      obj(e, ['subject', 'values']) && str(e.subject, 64) && valueMap(e.values),
   );
 
 /** Strict measurement shape per result kind. */
@@ -109,10 +141,12 @@ export const MEASUREMENT_SHAPES = Object.freeze({
   edgeOffset: num,
   lineCount: int,
   preservesBreaks: (v) =>
-    obj(v, ['lines', 'authorBreaksHonored']) &&
+    obj(v, ['lines', 'authorBreaks']) &&
     int(v.lines) &&
-    Array.isArray(v.authorBreaksHonored) &&
-    v.authorBreaksHonored.every(bool),
+    Array.isArray(v.authorBreaks) &&
+    v.authorBreaks.every(
+      (b) => obj(b, ['break', 'honored']) && int(b.break) && bool(b.honored),
+    ),
   balancedLines: (v) =>
     obj(v, ['lines', 'ratio']) && int(v.lines) && num(v.ratio),
   truncated: (v) =>
@@ -127,17 +161,31 @@ export const MEASUREMENT_SHAPES = Object.freeze({
     num(v.right),
   writingMode: (v) => str(v, 32),
   direction: (v) => str(v, 8),
-  computed: computedValues,
+  computed: subjectValues,
   animationNone: (v) =>
-    Array.isArray(v) && v.length >= 1 && v.every((x) => str(x, 64)),
+    Array.isArray(v) &&
+    v.length >= 1 &&
+    v.every(
+      (e) =>
+        obj(e, ['subject', 'animationName']) &&
+        str(e.subject, 64) &&
+        str(e.animationName, 64),
+    ),
   focusOrder: (v) =>
     Array.isArray(v) && v.length >= 1 && v.every((x) => str(x, 64)),
-  focusVisible: (v) => Array.isArray(v) && v.length >= 1 && v.every(bool),
+  focusVisible: (v) =>
+    Array.isArray(v) &&
+    v.length >= 1 &&
+    v.every(
+      (e) =>
+        obj(e, ['stop', 'id', 'matches']) &&
+        int(e.stop) &&
+        str(e.id, 64) &&
+        bool(e.matches),
+    ),
   paintedIndicator: (v) => Array.isArray(v) && v.length >= 1 && v.every(stop),
   activates: (v) =>
-    obj(v, ['checked', 'computed']) &&
-    bool(v.checked) &&
-    computedValues([v.computed]),
+    obj(v, ['checked', 'computed']) && bool(v.checked) && valueMap(v.computed),
   scrollsWithKeys: (v) =>
     obj(v, ['focused', 'before', 'after']) &&
     (v.focused === null || str(v.focused, 64)) &&
@@ -161,7 +209,12 @@ export const MEASUREMENT_SHAPES = Object.freeze({
     num(v.width) &&
     num(v.height) &&
     bool(v.ignored),
-  violations: (v) => Array.isArray(v) && v.every((x) => str(x, 256)),
+  violations: (v) =>
+    obj(v, ['count', 'samples']) &&
+    int(v.count) &&
+    Array.isArray(v.samples) &&
+    v.samples.length === Math.min(v.count, 3) &&
+    v.samples.every((x) => str(x, 256)),
   styleElements: int,
   styleAttributes: int,
   runtimeStyleInsertions: int,
@@ -269,15 +322,140 @@ export function visibleIndicator(focused, unfocused) {
   return outline || shadow || border;
 }
 
+/** Effective compositing visibility of a node, from its recorded factors. */
+export function effectiveVisibility(c) {
+  if (c.visibilityHidden || c.displayNone || c.contentVisibilityHidden)
+    return 0;
+  return c.opacity * c.filterOpacity;
+}
+
+// A stop proves a painted indicator when a node that is visible after
+// compositing carries a visible indicator style, and enough changed ring
+// pixels take the indicator color (blended by its alpha) rather than what
+// shows through when the element changes or disappears.
 export function stopOk(s) {
   return (
-    s.focused.some((f, i) => visibleIndicator(f, s.unfocused[i])) &&
-    s.changedRingPixels >= INDICATOR_MIN_PIXELS
+    s.focused.some(
+      (f, i) =>
+        effectiveVisibility(s.compositing[i]) > VISIBILITY_EPSILON &&
+        visibleIndicator(f, s.unfocused[i]),
+    ) && s.indicatorColorPixels >= INDICATOR_MIN_PIXELS
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Expected subjects of multi-element measurements, derived from the pinned
+// reference HTML and the assertion, never from the report.
+
+/** Outer and inner HTML of the element carrying data-testid `id`. */
+export function elementHtml(html, id) {
+  const at = html.indexOf(`data-testid="${id}"`);
+  if (at < 0) return null;
+  const start = html.lastIndexOf('<', at);
+  const tag = /^<([a-zA-Z][a-zA-Z0-9-]*)/.exec(html.slice(start))[1];
+  const open = new RegExp(`<${tag}[\\s>]|</${tag}>`, 'g');
+  open.lastIndex = start;
+  let depth = 0;
+  for (let m = open.exec(html); m; m = open.exec(html)) {
+    depth += m[0].startsWith('</') ? -1 : 1;
+    if (depth === 0) {
+      const outer = html.slice(start, m.index + m[0].length);
+      const innerStart = html.indexOf('>', start) + 1;
+      return { outer, inner: html.slice(innerStart, m.index) };
+    }
+  }
+  return null;
+}
+
+// Author line breaks: a newline with non-space text before and after it in
+// the same text run (the rule the checker applies to DOM text nodes).
+export function authorBreakCount(inner) {
+  let count = 0;
+  for (const run of inner.split(/<[^>]*>/)) {
+    for (let i = run.indexOf('\n'); i >= 0; i = run.indexOf('\n', i + 1)) {
+      if (/\S/.test(run.slice(0, i)) && /\S/.test(run.slice(i + 1))) count += 1;
+    }
+  }
+  return count;
+}
+
+/** The reference page that holds an assertion's subjects. */
+export function pageFor(pages, assertion) {
+  const ids = [
+    assertion.target,
+    ...Object.values(assertion.expect ?? {}).flatMap((v) =>
+      Array.isArray(v) ? v : typeof v === 'object' && v ? Object.values(v) : [],
+    ),
+  ].filter((x) => typeof x === 'string');
+  return (
+    pages.find((p) =>
+      ids.some((id) => p.text.includes(`data-testid="${id}"`)),
+    ) ?? pages[0]
+  );
+}
+
+/**
+ * Expected subjects of a result: focus stops for keyboard kinds, cells or
+ * descendants for computed and animation results, author breaks for text.
+ * `html` is the pinned reference page that holds the assertion.
+ */
+export function expectedSubjects(kind, assertion, html) {
+  const expect = assertion.expect ?? {};
+  const element = assertion.target ? elementHtml(html, assertion.target) : null;
+  switch (kind) {
+    case 'focusVisible':
+    case 'paintedIndicator':
+      return expect.focusOrder.map((id, stop) => `${stop}:${id}`);
+    case 'computed':
+      if (expect.on === 'cells') {
+        const n = (element?.inner.match(/<t[dh][\s>]/g) ?? []).length;
+        return [...Array(n).keys()].map((i) => `cell:${i}`);
+      }
+      return [assertion.target];
+    case 'animationNone':
+      if (expect.animationNone === 'descendants') {
+        const n = (element?.inner.match(/<[a-zA-Z][a-zA-Z0-9-]*[\s/>]/g) ?? [])
+          .length;
+        return [...Array(n).keys()].map((i) => `descendant:${i}`);
+      }
+      return [assertion.target];
+    case 'preservesBreaks': {
+      const n = authorBreakCount(element?.inner ?? '');
+      return [...Array(n).keys()].map((i) => `break:${i}`);
+    }
+    default:
+      return null;
+  }
+}
+
+// Recorded subjects of a measurement, in order.
+function recordedSubjects(kind, measured) {
+  switch (kind) {
+    case 'focusVisible':
+    case 'paintedIndicator':
+      return measured.map((e) => `${e.stop}:${e.id}`);
+    case 'computed':
+    case 'animationNone':
+      return measured.map((e) => e.subject);
+    case 'preservesBreaks':
+      return measured.authorBreaks.map((b) => `break:${b.break}`);
+    default:
+      return null;
+  }
+}
+
+/** True when the measurement covers exactly the expected subjects, in order. */
+export function coversSubjects(kind, measured, subjects) {
+  if (subjects == null) return true;
+  return (
+    JSON.stringify(recordedSubjects(kind, measured)) ===
+    JSON.stringify(subjects)
   );
 }
 
 /** Verdict of one result from its measurement and the expectation. */
-export function judge(kind, want, measured) {
+export function judge(kind, want, measured, subjects = null) {
+  if (!coversSubjects(kind, measured, subjects)) return false;
   switch (kind) {
     case 'box':
       return Object.entries(want).every(([d, v]) => near(measured[d], v));
@@ -314,8 +492,8 @@ export function judge(kind, want, measured) {
     case 'preservesBreaks':
       return (
         measured.lines >= want.minLines &&
-        measured.authorBreaksHonored.length > 0 &&
-        measured.authorBreaksHonored.every(Boolean)
+        measured.authorBreaks.length > 0 &&
+        measured.authorBreaks.every((b) => b.honored)
       );
     case 'balancedLines':
       return measured.lines > 1 && measured.ratio >= 0.6;
@@ -330,20 +508,25 @@ export function judge(kind, want, measured) {
     case 'direction':
       return measured === want;
     case 'computed':
-      return measured.every((values) =>
-        Object.entries(want).every(([p, v]) => values[p] === v),
+      return measured.every(
+        ({ values }) =>
+          JSON.stringify(Object.keys(values).sort()) ===
+            JSON.stringify(Object.keys(want).sort()) &&
+          Object.entries(want).every(([p, v]) => values[p] === v),
       );
     case 'animationNone':
-      return measured.every((n) => n === 'none');
+      return measured.every((e) => e.animationName === 'none');
     case 'focusOrder':
       return JSON.stringify(measured) === JSON.stringify(want);
     case 'focusVisible':
-      return measured.every(Boolean);
+      return measured.every((e) => e.matches);
     case 'paintedIndicator':
       return measured.length === want && measured.every(stopOk);
     case 'activates':
       return (
         measured.checked === want.then.checked &&
+        JSON.stringify(Object.keys(measured.computed).sort()) ===
+          JSON.stringify(Object.keys(want.then.computed).sort()) &&
         Object.entries(want.then.computed).every(
           ([p, v]) => measured.computed[p] === v,
         )
@@ -368,7 +551,7 @@ export function judge(kind, want, measured) {
     case 'visuallyHiddenButExposed':
       return measured.width <= 1 && measured.height <= 1 && !measured.ignored;
     case 'violations':
-      return measured.length === want;
+      return measured.count === want;
     case 'styleElements':
     case 'styleAttributes':
     case 'runtimeStyleInsertions':
@@ -415,8 +598,29 @@ export function rowStatus(assertionCase, results) {
  * shapes, verdicts recomputed from measurements, the fixed not-evaluated
  * list and a status derived from the results.
  */
-export function rowProblems(row, assertion, target) {
+const ROW_KEYS = [
+  'id',
+  'fixture',
+  'oracle',
+  'case',
+  'page',
+  'state',
+  'viewport',
+  'assertionSha256',
+  'status',
+  'mutation',
+  'mustFail',
+  'results',
+];
+
+export function rowProblems(row, assertion, target, pages) {
   const problems = [];
+  for (const key of Object.keys(row))
+    if (!ROW_KEYS.includes(key))
+      problems.push(`row has unexpected field ${key}`);
+  const page = pageFor(pages, target);
+  if (row.page !== page.name)
+    problems.push('page is not the page holding the assertion');
   const results = Array.isArray(row.results) ? row.results : [];
   if (results.length === 0) return ['has no result evidence'];
   const required = requiredResults(target.expect);
@@ -447,7 +651,10 @@ export function rowProblems(row, assertion, target) {
       continue;
     }
     if (want === undefined) continue;
-    if (judge(r.kind, want, r.measured) !== r.ok)
+    const subjects = expectedSubjects(r.kind, target, page.text);
+    if (subjects != null && subjects.length === 0)
+      problems.push(`${r.kind} has no expected subjects in the pinned page`);
+    if (judge(r.kind, want, r.measured, subjects) !== r.ok)
       problems.push(`${r.kind} verdict does not follow from its measurement`);
   }
   if (

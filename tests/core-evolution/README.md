@@ -179,8 +179,16 @@ with the references) belongs to the lots named in each oracle.
   - Keyboard stops need a painted indicator, not only `:focus-visible`. That
     means a visible outline, shadow or border change (non-zero width and alpha),
     and at least 40 changed pixels inside the indicator ring against the
-    unfocused state. FORMS-K2 (indicators removed) and FORMS-K3 (transparent
-    outline) are negative controls that must fail.
+    unfocused state that match an indicator color composited over the unfocused
+    pixel. The node must also stay visible after compositing (opacity, filter,
+    visibility, display and content-visibility of the element and its
+    ancestors). FORMS-K2 (indicators removed), FORMS-K3 (transparent outline),
+    FORMS-K4 (`opacity: 0`), FORMS-K5 (`filter: opacity(0)`) and FORMS-K6
+    (ancestor at opacity 0) are negative controls that must fail.
+  - Every multi-element measurement records its subjects (stop index and id,
+    cell, descendant or author-break index). The validator derives the expected
+    subjects from the pinned reference HTML and the assertion; missing, extra,
+    duplicated or reordered subjects fail.
   - The result is `corpus/reference-check.v1.json`. It is bound by digest to
     every row's assertion, viewports, states, CSP and inputs, to the browser
     oracle definitions, to the checker source and to the engine identity.
@@ -259,7 +267,7 @@ The corpus validator needs the repository install for postcss. It checks:
   publication-review pin, on every published field of the consumer sets, the
   calibration record and the accounting.
 
-`--self-test` applies 106 mutations, and each must fail for its stated reason.
+`--self-test` applies 146 mutations, and each must fail for its stated reason.
 They include every publication bypass found in review.
 
 Changing a fixture input, expectation or negative fixture is a corpus change and

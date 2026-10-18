@@ -28,8 +28,12 @@ import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
 import {
   NOT_EVALUATED_KINDS,
+  VISIBILITY_EPSILON,
+  effectiveVisibility,
+  expectedSubjects,
   indicatorExtent,
   judge,
+  pageFor,
   requiredResults,
   rowStatus,
 } from './reference-judge.mjs';
@@ -246,11 +250,67 @@ export function decodePng(buffer) {
 // Counts changed pixels inside the indicator ring of the candidates: within
 // each node's border box expanded by its indicator extent plus 8px, and
 // outside its content box. `clip` is the screenshot area in viewport pixels.
-export function changedRingPixels(before, after, clip, rings) {
-  const a = decodePng(before);
-  const b = decodePng(after);
-  if (a.width !== b.width || a.height !== b.height) return 0;
+// Parses a computed rgb()/rgba() color into [r, g, b, alpha].
+function rgba(color) {
+  const m = /^rgba?\(([^)]*)\)$/.exec(color.trim());
+  if (m == null) return null;
+  const parts = m[1]
+    .split(/[\s,/]+/)
+    .filter(Boolean)
+    .map(Number);
+  return parts.length >= 3
+    ? [parts[0], parts[1], parts[2], parts[3] ?? 1]
+    : null;
+}
+
+// Colors a visible indicator may paint: a non-none outline, focus-added box
+// shadows and changed border sides. Each alpha includes the node's effective
+// compositing opacity, since the indicator is painted with the element.
+export function indicatorColors(focused, unfocused, compositing) {
+  const colors = [];
+  focused.forEach((f, i) => {
+    const u = unfocused[i];
+    const start = colors.length;
+    if (
+      !['none', 'hidden'].includes(f.outlineStyle) &&
+      parseFloat(f.outlineWidth) > 0
+    )
+      colors.push(f.outlineColor);
+    if (f.boxShadow !== 'none' && f.boxShadow !== u.boxShadow)
+      for (const m of f.boxShadow.matchAll(/rgba?\([^)]*\)/g))
+        colors.push(m[0]);
+    f.borders.forEach((b, side) => {
+      const ub = u.borders[side];
+      if (b.style !== ub.style || b.width !== ub.width || b.color !== ub.color)
+        colors.push(b.color);
+    });
+    const visibility = effectiveVisibility(compositing[i]);
+    for (let k = start; k < colors.length; k++)
+      colors[k] = [colors[k], visibility];
+  });
+  return colors
+    .map(([color, visibility]) => {
+      const c = rgba(color);
+      return c == null ? null : [c[0], c[1], c[2], c[3] * visibility];
+    })
+    .filter((c) => c != null && c[3] > VISIBILITY_EPSILON);
+}
+
+/**
+ * Ring pixels of a stop: `changed` counts pixels inside the indicator ring
+ * (border box grown by the indicator extent plus 8px, minus the content box)
+ * that differ between the focused and unfocused screenshots; `indicator`
+ * counts those whose focused color is an indicator color composited over the
+ * unfocused pixel, so a disappearing element (background showing through)
+ * does not count.
+ */
+export function ringPixels(focusedShot, unfocusedShot, clip, rings, colors) {
+  const a = decodePng(focusedShot);
+  const b = decodePng(unfocusedShot);
+  if (a.width !== b.width || a.height !== b.height)
+    return { changed: 0, indicator: 0 };
   let changed = 0;
+  let indicator = 0;
   for (let y = 0; y < a.height; y++) {
     for (let x = 0; x < a.width; x++) {
       const px = clip.x + x + 0.5;
@@ -270,19 +330,19 @@ export function changedRingPixels(before, after, clip, rings) {
       );
       if (!inRing) continue;
       const i = y * a.width + x;
-      for (let k = 0; k < 3; k++) {
-        if (
-          Math.abs(
-            a.pixels[i * a.channels + k] - b.pixels[i * b.channels + k],
-          ) > 24
-        ) {
-          changed += 1;
-          break;
-        }
-      }
+      const f = [0, 1, 2].map((k) => a.pixels[i * a.channels + k]);
+      const u = [0, 1, 2].map((k) => b.pixels[i * b.channels + k]);
+      if (!f.some((v, k) => Math.abs(v - u[k]) > 24)) continue;
+      changed += 1;
+      const painted = colors.some(([r, g, bl, alpha]) =>
+        [r, g, bl].every(
+          (c, k) => Math.abs(f[k] - (alpha * c + (1 - alpha) * u[k])) <= 48,
+        ),
+      );
+      if (painted) indicator += 1;
     }
   }
-  return changed;
+  return { changed, indicator };
 }
 
 // Computed indicator styles and boxes of the focused element and, when it is
@@ -300,7 +360,20 @@ const INDICATOR_SNAPSHOT = `(() => {
     const inset = {
       top: px(s.borderTopWidth) + px(s.paddingTop), right: px(s.borderRightWidth) + px(s.paddingRight),
       bottom: px(s.borderBottomWidth) + px(s.paddingBottom), left: px(s.borderLeftWidth) + px(s.paddingLeft) };
+    const compositing = { opacity: 1, filterOpacity: 1, visibilityHidden: s.visibility !== 'visible',
+      displayNone: false, contentVisibilityHidden: false };
+    for (let e = n; e; e = e.parentElement) {
+      const es = getComputedStyle(e);
+      compositing.opacity *= parseFloat(es.opacity);
+      for (const m of es.filter.matchAll(/opacity\\(([^)]*)\\)/g)) {
+        const v = m[1].trim();
+        compositing.filterOpacity *= v.endsWith('%') ? parseFloat(v) / 100 : parseFloat(v);
+      }
+      if (es.display === 'none') compositing.displayNone = true;
+      if (e !== n && es.contentVisibility === 'hidden') compositing.contentVisibilityHidden = true;
+    }
     return {
+      compositing,
       style: {
         outlineStyle: s.outlineStyle, outlineWidth: s.outlineWidth, outlineOffset: s.outlineOffset,
         outlineColor: s.outlineColor, boxShadow: s.boxShadow,
@@ -315,7 +388,7 @@ const INDICATOR_SNAPSHOT = `(() => {
 
 // One keyboard stop: styles focused and unfocused, and the changed pixels of
 // the indicator ring between the two states.
-async function indicatorStop(page) {
+async function indicatorStop(page, stop, id) {
   await page.evaluate(() => {
     window.__ceFocused = document.activeElement;
   });
@@ -359,15 +432,27 @@ async function indicatorStop(page) {
   const unfocused = await page.evaluate(INDICATOR_SNAPSHOT);
   const shotUnfocused = await page.screenshot(options);
   await page.evaluate(() => window.__ceFocused.focus());
-  return {
-    focused: focused.map((n) => n.style),
-    unfocused: unfocused.map((n) => n.style),
-    changedRingPixels: changedRingPixels(
-      shotFocused,
-      shotUnfocused,
-      clip,
-      rings,
+  const focusedStyles = focused.map((n) => n.style);
+  const unfocusedStyles = unfocused.map((n) => n.style);
+  const pixels = ringPixels(
+    shotFocused,
+    shotUnfocused,
+    clip,
+    rings,
+    indicatorColors(
+      focusedStyles,
+      unfocusedStyles,
+      focused.map((n) => n.compositing),
     ),
+  );
+  return {
+    stop,
+    id,
+    focused: focusedStyles,
+    unfocused: unfocusedStyles,
+    compositing: focused.map((n) => n.compositing),
+    changedRingPixels: pixels.changed,
+    indicatorColorPixels: pixels.indicator,
   };
 }
 
@@ -462,7 +547,9 @@ async function measure(ctx, a, kind, want) {
     case 'preservesBreaks':
       return {
         lines: (await el((id) => __ce.lines(id), a.target)).length,
-        authorBreaksHonored: await el((id) => __ce.breaks(id), a.target),
+        authorBreaks: (await el((id) => __ce.breaks(id), a.target)).map(
+          (honored, i) => ({ break: i, honored }),
+        ),
       };
     case 'balancedLines': {
       const lines = await el((id) => __ce.lines(id), a.target);
@@ -505,14 +592,15 @@ async function measure(ctx, a, kind, want) {
         ({ id, props, on, pseudo }) => {
           const t = __ce.el(id);
           const els = on === 'cells' ? [...t.querySelectorAll('td, th')] : [t];
-          return els.map((e) =>
-            Object.fromEntries(
+          return els.map((e, i) => ({
+            subject: on === 'cells' ? `cell:${i}` : id,
+            values: Object.fromEntries(
               props.map((p) => [
                 p,
                 getComputedStyle(e, pseudo || null).getPropertyValue(p),
               ]),
             ),
-          );
+          }));
         },
         {
           id: a.target,
@@ -525,9 +613,10 @@ async function measure(ctx, a, kind, want) {
       return el(
         ({ id, desc }) => {
           const t = __ce.el(id);
-          return (desc ? [...t.querySelectorAll('*')] : [t]).map(
-            (e) => getComputedStyle(e).animationName,
-          );
+          return (desc ? [...t.querySelectorAll('*')] : [t]).map((e, i) => ({
+            subject: desc ? `descendant:${i}` : id,
+            animationName: getComputedStyle(e).animationName,
+          }));
         },
         { id: a.target, desc: want === 'descendants' },
       );
@@ -594,7 +683,10 @@ async function measure(ctx, a, kind, want) {
       return { width: r.width, height: r.height, ignored: ax.ignored };
     }
     case 'violations':
-      return ctx.violations.slice(0, 3);
+      return {
+        count: ctx.violations.length,
+        samples: ctx.violations.slice(0, 3),
+      };
     case 'styleElements':
     case 'styleAttributes':
     case 'runtimeStyleInsertions':
@@ -644,9 +736,9 @@ async function measureKeyboard(ctx, want, withIndicator) {
       fv: document.activeElement?.matches(':focus-visible') ?? false,
     }));
     order.push(m.id);
-    visible.push(m.fv);
+    visible.push({ stop: i, id: m.id, matches: m.fv });
     if (withIndicator && m.id !== 'BODY')
-      painted.push(await indicatorStop(page));
+      painted.push(await indicatorStop(page, i, m.id));
   }
   return { order, visible, painted };
 }
@@ -676,7 +768,8 @@ export async function evaluateAssertion(ctx, a) {
     } else {
       measured = await measure(ctx, a, kind, want);
     }
-    results.push({ kind, ok: judge(kind, want, measured), measured });
+    const subjects = expectedSubjects(kind, a, ctx.pageText);
+    results.push({ kind, ok: judge(kind, want, measured, subjects), measured });
   }
   return results;
 }
@@ -751,21 +844,9 @@ export async function openState(browser, origin, fixture, a, page) {
   await p.waitForTimeout(
     state === 'pointer-hover' || state === 'touch' ? 250 : 50,
   );
-  return { context, page: p, cdp, violations };
-}
-
-function pageFor(fixture, a, pages) {
-  const ids = [
-    a.target,
-    ...Object.values(a.expect ?? {}).flatMap((v) =>
-      Array.isArray(v) ? v : typeof v === 'object' && v ? Object.values(v) : [],
-    ),
-  ].filter((x) => typeof x === 'string');
-  return (
-    pages.find((p) =>
-      ids.some((id) => p.text.includes(`data-testid="${id}"`)),
-    ) ?? pages[0]
-  ).name;
+  const input = fixture.inputs.find((i) => path.basename(i.path) === page);
+  const pageText = fs.readFileSync(path.join(repo, input.path), 'utf8');
+  return { context, page: p, cdp, violations, pageText };
 }
 
 export { rowStatus };
@@ -876,7 +957,7 @@ async function checkFixture(browser, postcss, fixture) {
         throw new Error(`${a.id}: mutation ${a.mutation.kind} needs a build`);
     }
     const { server, origin } = await serve(dir, fixture.csp, overrides);
-    const page = pageFor(fixture, target, pages);
+    const page = pageFor(pages, target).name;
     const session = await openState(browser, origin, fixture, target, page);
     let results;
     try {
