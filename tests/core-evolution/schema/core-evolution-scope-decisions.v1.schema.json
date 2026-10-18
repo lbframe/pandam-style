@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-scope-decisions.v1.schema.json",
+  "title": "Core evolution scope decisions v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-scope-decisions"
+    },
+    "task": {
+      "const": "CE-00.1"
+    },
+    "status": {
+      "type": "string"
+    },
+    "policy": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^D-(SF|BP)-\\d\\d$"
+          },
+          "kind": {
+            "enum": ["source-format", "browser-profile"]
+          },
+          "question": {
+            "type": "string"
+          },
+          "alpha1": {
+            "type": "string"
+          },
+          "alpha1Sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "upstreamEvidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "closingLot": {
+            "type": "string",
+            "pattern": "^CE-(0\\d|1[0-5])$"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "minItems": 1
+          },
+          "affects": {
+            "type": "object",
+            "properties": {
+              "profiles": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "web",
+                    "desktop-renderer",
+                    "content",
+                    "forms",
+                    "data",
+                    "rtl",
+                    "svg-media",
+                    "ssr",
+                    "reusable-package"
+                  ]
+                },
+                "minItems": 1
+              },
+              "capabilities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^CAP-(0[1-9]|[1-3]\\d|4[0-8])$"
+                },
+                "minItems": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": ["profiles", "capabilities"]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "question",
+          "alpha1",
+          "upstreamEvidence",
+          "closingLot",
+          "issues",
+          "affects"
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "task", "status", "policy", "decisions"]
+}

@@ -1,0 +1,841 @@
+{
+  "schemaVersion": 1,
+  "kind": "upstream-qualification-observation",
+  "task": "CE-00.1",
+  "observedAt": "2026-10-18T15:50:28.107Z",
+  "comparator": {
+    "stylex": "0.19.1",
+    "panda": "2.2.0",
+    "bcd": "8.1.6",
+    "policy": "The pinned comparator is retained. A newer latest tag is recorded as a delta requiring review; it never silently replaces the comparator."
+  },
+  "previousObservations": [
+    {
+      "file": "core-evolution-evidence.json",
+      "digest": "sha256:ef6fa57627bba9f301e223fcaf6ee867d594dbb4a78e1b2a1ad405d0f836ba7a",
+      "retrievedAt": "2026-10-18T12:56:26.948406+00:00"
+    }
+  ],
+  "registry": [
+    {
+      "package": "@stylexjs/stylex",
+      "metadataEndpoint": "https://registry.npmjs.org/@stylexjs%2fstylex",
+      "requestedAt": "2026-10-18T15:50:28.107Z",
+      "respondedAt": "2026-10-18T15:50:28.258Z",
+      "responseSha256": "sha256:6b30f1c5960b2a9292c7b6e48d0bc61a73c4573814dc158c9f485b67f5d62509",
+      "registryModifiedAt": "2026-09-15T21:19:27.570Z",
+      "distTags": {
+        "alpha": "0.5.0-alpha.4",
+        "beta": "0.10.0-beta.2",
+        "latest": "0.19.1"
+      },
+      "latestVersion": "0.19.1",
+      "latestPublishedAt": "2026-09-15T21:19:27.336Z",
+      "pinnedVersion": "0.19.1",
+      "pinnedPublishedAt": "2026-09-15T21:19:27.336Z",
+      "pinnedIntegrity": "sha512-JwNFm0MOYPqi+M4Ax5Un4ZxfZp4HEAX2sAWetZ88KALFcv1eEiHNJs75oO3V3U7RVWnzfkiM8i9eBowC3hqgUw==",
+      "pinnedTarball": "https://registry.npmjs.org/@stylexjs/stylex/-/stylex-0.19.1.tgz",
+      "newerStableVersions": [],
+      "delta": "latest-equals-pinned",
+      "evidenceLockIntegrity": "sha512-JwNFm0MOYPqi+M4Ax5Un4ZxfZp4HEAX2sAWetZ88KALFcv1eEiHNJs75oO3V3U7RVWnzfkiM8i9eBowC3hqgUw==",
+      "integrityMatchesEvidenceLock": true,
+      "role": "pinned-comparator"
+    },
+    {
+      "package": "@stylexjs/babel-plugin",
+      "metadataEndpoint": "https://registry.npmjs.org/@stylexjs%2fbabel-plugin",
+      "requestedAt": "2026-10-18T15:50:28.258Z",
+      "respondedAt": "2026-10-18T15:50:28.339Z",
+      "responseSha256": "sha256:b4c64e2341a84bf57f963276f9e2cef00e6c34e994f06b63e4a7e4730da88133",
+      "registryModifiedAt": "2026-09-15T21:19:50.110Z",
+      "distTags": {
+        "alpha": "0.5.0-alpha.4",
+        "beta": "0.10.0-beta.2",
+        "canary": "0.0.0-6e16619c",
+        "latest": "0.19.1"
+      },
+      "latestVersion": "0.19.1",
+      "latestPublishedAt": "2026-09-15T21:19:49.940Z",
+      "pinnedVersion": "0.19.1",
+      "pinnedPublishedAt": "2026-09-15T21:19:49.940Z",
+      "pinnedIntegrity": "sha512-Ig3crX6MuGWDEAx+f89aLxTQUWVeEc2Aco2moIdcObyvo7hZJgU26rxJN3k7geFjhi+5dfna6TNR8iTRK0PQGA==",
+      "pinnedTarball": "https://registry.npmjs.org/@stylexjs/babel-plugin/-/babel-plugin-0.19.1.tgz",
+      "newerStableVersions": [],
+      "delta": "latest-equals-pinned",
+      "evidenceLockIntegrity": "sha512-Ig3crX6MuGWDEAx+f89aLxTQUWVeEc2Aco2moIdcObyvo7hZJgU26rxJN3k7geFjhi+5dfna6TNR8iTRK0PQGA==",
+      "integrityMatchesEvidenceLock": true,
+      "role": "pinned-comparator"
+    },
+    {
+      "package": "@stylexjs/unplugin",
+      "metadataEndpoint": "https://registry.npmjs.org/@stylexjs%2funplugin",
+      "requestedAt": "2026-10-18T15:50:28.339Z",
+      "respondedAt": "2026-10-18T15:50:28.410Z",
+      "responseSha256": "sha256:a5d28e20dc4f9a66f9c4d37b4c1826e831c6b6dbd31bb27da57f2102f17edb62",
+      "registryModifiedAt": "2026-09-15T21:19:31.754Z",
+      "distTags": { "latest": "0.19.1" },
+      "latestVersion": "0.19.1",
+      "latestPublishedAt": "2026-09-15T21:19:31.522Z",
+      "pinnedVersion": "0.19.1",
+      "pinnedPublishedAt": "2026-09-15T21:19:31.522Z",
+      "pinnedIntegrity": "sha512-MJz/IPrFe3hSHbZtjbxaYd3kLgS718/NFBEY/Mf+njteJKLdY7bHHfVka3051LCYy9fKfyZapGCmUpibraHqmQ==",
+      "pinnedTarball": "https://registry.npmjs.org/@stylexjs/unplugin/-/unplugin-0.19.1.tgz",
+      "newerStableVersions": [],
+      "delta": "latest-equals-pinned",
+      "evidenceLockIntegrity": "sha512-MJz/IPrFe3hSHbZtjbxaYd3kLgS718/NFBEY/Mf+njteJKLdY7bHHfVka3051LCYy9fKfyZapGCmUpibraHqmQ==",
+      "integrityMatchesEvidenceLock": true,
+      "role": "pinned-comparator"
+    },
+    {
+      "package": "@pandacss/dev",
+      "metadataEndpoint": "https://registry.npmjs.org/@pandacss%2fdev",
+      "requestedAt": "2026-10-18T15:50:28.410Z",
+      "respondedAt": "2026-10-18T15:50:28.874Z",
+      "responseSha256": "sha256:fd9736f59f8bd71fe7f2dae7a3f6bb534077f3b75f48ecf1072a3dde8a1ef6f5",
+      "registryModifiedAt": "2026-10-09T20:42:13.776Z",
+      "distTags": {
+        "dev": "0.0.0-dev-20250612175103",
+        "beta": "2.0.0-beta.20",
+        "latest": "2.2.0"
+      },
+      "latestVersion": "2.2.0",
+      "latestPublishedAt": "2026-10-09T20:42:13.344Z",
+      "pinnedVersion": "2.2.0",
+      "pinnedPublishedAt": "2026-10-09T20:42:13.344Z",
+      "pinnedIntegrity": "sha512-tflRs0WLaESwmHptVls+SrkJpjepf9M29LJwjeh2H3BxH9BA1+/2riWFGweXoW7vmylkG98ns6BDqLBkqEVUJg==",
+      "pinnedTarball": "https://registry.npmjs.org/@pandacss/dev/-/dev-2.2.0.tgz",
+      "newerStableVersions": [],
+      "delta": "latest-equals-pinned",
+      "evidenceLockIntegrity": "sha512-tflRs0WLaESwmHptVls+SrkJpjepf9M29LJwjeh2H3BxH9BA1+/2riWFGweXoW7vmylkG98ns6BDqLBkqEVUJg==",
+      "integrityMatchesEvidenceLock": true,
+      "role": "pinned-comparator"
+    },
+    {
+      "package": "@pandacss/compiler",
+      "metadataEndpoint": "https://registry.npmjs.org/@pandacss%2fcompiler",
+      "requestedAt": "2026-10-18T15:50:28.875Z",
+      "respondedAt": "2026-10-18T15:50:28.946Z",
+      "responseSha256": "sha256:2795d63bbcdb800c92216f07291e8a0a351f8b8a8bbfc11762b6bb7f6e6e13d0",
+      "registryModifiedAt": "2026-10-09T20:43:44.145Z",
+      "distTags": { "beta": "2.0.0-beta.20", "latest": "2.2.0" },
+      "latestVersion": "2.2.0",
+      "latestPublishedAt": "2026-10-09T20:43:43.949Z",
+      "pinnedVersion": "2.2.0",
+      "pinnedPublishedAt": "2026-10-09T20:43:43.949Z",
+      "pinnedIntegrity": "sha512-wuaOhKNwUoF+18qBA9RtcQeTbbRKgDGOX8ynCPkobsT6I3tsXX4NSbeD/G25qF/262DYwcdbEldMgollOJ5zfQ==",
+      "pinnedTarball": "https://registry.npmjs.org/@pandacss/compiler/-/compiler-2.2.0.tgz",
+      "newerStableVersions": [],
+      "delta": "latest-equals-pinned",
+      "evidenceLockIntegrity": "sha512-wuaOhKNwUoF+18qBA9RtcQeTbbRKgDGOX8ynCPkobsT6I3tsXX4NSbeD/G25qF/262DYwcdbEldMgollOJ5zfQ==",
+      "integrityMatchesEvidenceLock": true,
+      "role": "pinned-comparator"
+    },
+    {
+      "package": "@pandacss/preset-base",
+      "metadataEndpoint": "https://registry.npmjs.org/@pandacss%2fpreset-base",
+      "requestedAt": "2026-10-18T15:50:28.946Z",
+      "respondedAt": "2026-10-18T15:50:29.055Z",
+      "responseSha256": "sha256:c73ab692b2672ba56fe877431bfefde31d955faa95d2f9b9007d2710dbf2c39e",
+      "registryModifiedAt": "2026-10-09T20:41:53.930Z",
+      "distTags": {
+        "dev": "0.0.0-dev-20250612175103",
+        "beta": "2.0.0-beta.20",
+        "latest": "2.2.0"
+      },
+      "latestVersion": "2.2.0",
+      "latestPublishedAt": "2026-10-09T20:41:53.486Z",
+      "pinnedVersion": "2.2.0",
+      "pinnedPublishedAt": "2026-10-09T20:41:53.486Z",
+      "pinnedIntegrity": "sha512-Cu3A/5ElXI3o5CuVLn/Y9/+CppaMzE/2pXCS5z2bb3k09Ucq3QVA7CQN4VoizIH1Fw8ibc99jOwqR8qZRRkqbQ==",
+      "pinnedTarball": "https://registry.npmjs.org/@pandacss/preset-base/-/preset-base-2.2.0.tgz",
+      "newerStableVersions": [],
+      "delta": "latest-equals-pinned",
+      "evidenceLockIntegrity": "sha512-Cu3A/5ElXI3o5CuVLn/Y9/+CppaMzE/2pXCS5z2bb3k09Ucq3QVA7CQN4VoizIH1Fw8ibc99jOwqR8qZRRkqbQ==",
+      "integrityMatchesEvidenceLock": true,
+      "role": "pinned-comparator"
+    },
+    {
+      "package": "@pandacss/types",
+      "metadataEndpoint": "https://registry.npmjs.org/@pandacss%2ftypes",
+      "requestedAt": "2026-10-18T15:50:29.056Z",
+      "respondedAt": "2026-10-18T15:50:29.252Z",
+      "responseSha256": "sha256:4dd1ed5b30178bb29c129a4264079823b2deb0b0fc9c9c7688975bfc43d1f329",
+      "registryModifiedAt": "2026-10-09T20:44:58.228Z",
+      "distTags": {
+        "dev": "0.0.0-dev-20250612175103",
+        "beta": "2.0.0-beta.20",
+        "latest": "2.2.0"
+      },
+      "latestVersion": "2.2.0",
+      "latestPublishedAt": "2026-10-09T20:44:57.878Z",
+      "pinnedVersion": "2.2.0",
+      "pinnedPublishedAt": "2026-10-09T20:44:57.878Z",
+      "pinnedIntegrity": "sha512-XeUt/mWUkghn4oyKqcFMz6whTr4SHxmiKksNVNX3EAB1ceyrvQ68tHrYWNK59NtBrRPeJxSOibHhZWVRqHcuvQ==",
+      "pinnedTarball": "https://registry.npmjs.org/@pandacss/types/-/types-2.2.0.tgz",
+      "newerStableVersions": [],
+      "delta": "latest-equals-pinned",
+      "evidenceLockIntegrity": "sha512-XeUt/mWUkghn4oyKqcFMz6whTr4SHxmiKksNVNX3EAB1ceyrvQ68tHrYWNK59NtBrRPeJxSOibHhZWVRqHcuvQ==",
+      "integrityMatchesEvidenceLock": true,
+      "role": "pinned-comparator"
+    },
+    {
+      "package": "@mdn/browser-compat-data",
+      "metadataEndpoint": "https://registry.npmjs.org/@mdn%2fbrowser-compat-data",
+      "requestedAt": "2026-10-18T15:50:29.253Z",
+      "respondedAt": "2026-10-18T15:50:29.355Z",
+      "responseSha256": "sha256:9ee0cad2598a8bf32c63dd5aafa77b427405dab853e3cdd6c86860e5ec8c46a0",
+      "registryModifiedAt": "2026-10-15T13:36:47.761Z",
+      "distTags": { "latest": "8.1.6" },
+      "latestVersion": "8.1.6",
+      "latestPublishedAt": "2026-10-15T13:36:46.918Z",
+      "pinnedVersion": "8.1.6",
+      "pinnedPublishedAt": "2026-10-15T13:36:46.918Z",
+      "pinnedIntegrity": "sha512-bTP5c58cBsgMOokwa/ECLcAxTkIwBe9csIts92Nq2wviediIJadh9iHI4Ezn2q6RiZhy7b54SNRn/tZpPKtTsA==",
+      "pinnedTarball": "https://registry.npmjs.org/@mdn/browser-compat-data/-/browser-compat-data-8.1.6.tgz",
+      "newerStableVersions": [],
+      "delta": "latest-equals-pinned",
+      "evidenceLockIntegrity": "sha512-bTP5c58cBsgMOokwa/ECLcAxTkIwBe9csIts92Nq2wviediIJadh9iHI4Ezn2q6RiZhy7b54SNRn/tZpPKtTsA==",
+      "integrityMatchesEvidenceLock": true,
+      "role": "pinned-comparator"
+    },
+    {
+      "package": "@pandacss/core",
+      "metadataEndpoint": "https://registry.npmjs.org/@pandacss%2fcore",
+      "requestedAt": "2026-10-18T15:50:29.356Z",
+      "respondedAt": "2026-10-18T15:50:29.558Z",
+      "responseSha256": "sha256:6c669f52a878337d02a632e1ecb70a1d71bafdf9fb5894e8b9f3b5b16a7f6741",
+      "registryModifiedAt": "2026-09-04T07:09:40.006Z",
+      "distTags": { "dev": "0.0.0-dev-20250612175103", "latest": "1.12.1" },
+      "latestVersion": "1.12.1",
+      "latestPublishedAt": "2026-09-04T07:09:39.607Z",
+      "pinnedVersion": "1.12.1",
+      "pinnedPublishedAt": "2026-09-04T07:09:39.607Z",
+      "pinnedIntegrity": "sha512-8TKYLAC07vj3RNLcKJjujS1in87uCwixEsIUF8/ezwrx0H6BGPTuyK1aVPICvdmWzluyhQwDhj7lWj7GkBuPYw==",
+      "pinnedTarball": "https://registry.npmjs.org/@pandacss/core/-/core-1.12.1.tgz",
+      "newerStableVersions": [],
+      "delta": "latest-equals-pinned",
+      "evidenceLockIntegrity": null,
+      "integrityMatchesEvidenceLock": null,
+      "role": "obsolete-v1-internal-not-the-comparator"
+    }
+  ],
+  "tarballs": [
+    {
+      "package": "@stylexjs/stylex",
+      "version": "0.19.1",
+      "tarball": "stylexjs-stylex-0.19.1.tgz",
+      "bytes": 56175,
+      "sha256": "sha256:2adbdf8af8b8822232fdc5506cc7e44dc67e5f8f43d54f69ba9d986ee325ffff",
+      "integrity": "sha512-JwNFm0MOYPqi+M4Ax5Un4ZxfZp4HEAX2sAWetZ88KALFcv1eEiHNJs75oO3V3U7RVWnzfkiM8i9eBowC3hqgUw==",
+      "matchesEvidenceLock": true
+    },
+    {
+      "package": "@stylexjs/babel-plugin",
+      "version": "0.19.1",
+      "tarball": "stylexjs-babel-plugin-0.19.1.tgz",
+      "bytes": 200868,
+      "sha256": "sha256:ea6a3415cde03d828144906fd3039300b5d5ab7c786f22e7338e6d2161e232c5",
+      "integrity": "sha512-Ig3crX6MuGWDEAx+f89aLxTQUWVeEc2Aco2moIdcObyvo7hZJgU26rxJN3k7geFjhi+5dfna6TNR8iTRK0PQGA==",
+      "matchesEvidenceLock": true
+    },
+    {
+      "package": "@stylexjs/unplugin",
+      "version": "0.19.1",
+      "tarball": "stylexjs-unplugin-0.19.1.tgz",
+      "bytes": 21526,
+      "sha256": "sha256:c03bfe8108345130b64abc593d8fc6a2a123f2635ecd6e5b8b523d36b5380b91",
+      "integrity": "sha512-MJz/IPrFe3hSHbZtjbxaYd3kLgS718/NFBEY/Mf+njteJKLdY7bHHfVka3051LCYy9fKfyZapGCmUpibraHqmQ==",
+      "matchesEvidenceLock": true
+    },
+    {
+      "package": "@pandacss/dev",
+      "version": "2.2.0",
+      "tarball": "pandacss-dev-2.2.0.tgz",
+      "bytes": 5312,
+      "sha256": "sha256:67519c17f1fbbaef2ef3255561684f15c67d36bd772d458541d8b327ae92f619",
+      "integrity": "sha512-tflRs0WLaESwmHptVls+SrkJpjepf9M29LJwjeh2H3BxH9BA1+/2riWFGweXoW7vmylkG98ns6BDqLBkqEVUJg==",
+      "matchesEvidenceLock": true
+    },
+    {
+      "package": "@pandacss/compiler",
+      "version": "2.2.0",
+      "tarball": "pandacss-compiler-2.2.0.tgz",
+      "bytes": 29359,
+      "sha256": "sha256:49c54cd06de05964f1645c97788eddfbcab601768a28b4033d3f4c344efd1436",
+      "integrity": "sha512-wuaOhKNwUoF+18qBA9RtcQeTbbRKgDGOX8ynCPkobsT6I3tsXX4NSbeD/G25qF/262DYwcdbEldMgollOJ5zfQ==",
+      "matchesEvidenceLock": true
+    },
+    {
+      "package": "@pandacss/preset-base",
+      "version": "2.2.0",
+      "tarball": "pandacss-preset-base-2.2.0.tgz",
+      "bytes": 18649,
+      "sha256": "sha256:d9c14bd01a4802c755176351dacecb4d291147a962df7ff05546c73852144932",
+      "integrity": "sha512-Cu3A/5ElXI3o5CuVLn/Y9/+CppaMzE/2pXCS5z2bb3k09Ucq3QVA7CQN4VoizIH1Fw8ibc99jOwqR8qZRRkqbQ==",
+      "matchesEvidenceLock": true
+    },
+    {
+      "package": "@pandacss/types",
+      "version": "2.2.0",
+      "tarball": "pandacss-types-2.2.0.tgz",
+      "bytes": 100316,
+      "sha256": "sha256:d9bb9e140df82f2cb302ef726dbcf98f3c819b76819c4f179f1129951afba0e7",
+      "integrity": "sha512-XeUt/mWUkghn4oyKqcFMz6whTr4SHxmiKksNVNX3EAB1ceyrvQ68tHrYWNK59NtBrRPeJxSOibHhZWVRqHcuvQ==",
+      "matchesEvidenceLock": true
+    },
+    {
+      "package": "@mdn/browser-compat-data",
+      "version": "8.1.6",
+      "tarball": "mdn-browser-compat-data-8.1.6.tgz",
+      "bytes": 954292,
+      "sha256": "sha256:5562473c7f1b3c2a80e31d426b55b3f2413a7c7f582c6fde34348293e3c2b0eb",
+      "integrity": "sha512-bTP5c58cBsgMOokwa/ECLcAxTkIwBe9csIts92Nq2wviediIJadh9iHI4Ezn2q6RiZhy7b54SNRn/tZpPKtTsA==",
+      "matchesEvidenceLock": true
+    }
+  ],
+  "sourceArchives": [
+    {
+      "source": "bcd",
+      "archive": "bcd-3e56658.tar.gz",
+      "sha256": "sha256:ee844c47381b5862d42d8336587e2df5147669f98dd0d98fc400b4871e2208b0"
+    },
+    {
+      "source": "panda",
+      "archive": "panda-d149285.tar.gz",
+      "sha256": "sha256:783c19dbd9a347d5cc18ff830838bf837318708518d906504095ab8d03191c19"
+    },
+    {
+      "source": "stylex",
+      "archive": "stylex-1fcb9a5.tar.gz",
+      "sha256": "sha256:b3705bad76e5b0a1511546bc7067e501a3616522624861bb281290c20feb4ee3"
+    }
+  ],
+  "sourceDigestChecks": [
+    {
+      "pin": "stylex",
+      "group": "inspectedFileDigests",
+      "file": "packages/@stylexjs/stylex/src/types/StyleXCSSTypes.js",
+      "expected": "sha256:f6eb8a1966af83db3202f118669216f80ccd16f1f8dc476877c012b07161545d",
+      "actual": "sha256:f6eb8a1966af83db3202f118669216f80ccd16f1f8dc476877c012b07161545d",
+      "match": true
+    },
+    {
+      "pin": "stylex",
+      "group": "inspectedFileDigests",
+      "file": "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js",
+      "expected": "sha256:6397a156b31196338df76a9bc64e86c02f11d3be032bbc6d7a82a8e8701fe261",
+      "actual": "sha256:6397a156b31196338df76a9bc64e86c02f11d3be032bbc6d7a82a8e8701fe261",
+      "match": true
+    },
+    {
+      "pin": "stylex",
+      "group": "inspectedFileDigests",
+      "file": "packages/@stylexjs/unplugin/README.md",
+      "expected": "sha256:198575a2bf834698c548eeeb8e1c95f4f0e4caa9fd22e98c56648884c5e43e16",
+      "actual": "sha256:198575a2bf834698c548eeeb8e1c95f4f0e4caa9fd22e98c56648884c5e43e16",
+      "match": true
+    },
+    {
+      "pin": "stylex",
+      "group": "inspectedFileDigests",
+      "file": "packages/docs/content/docs/api/javascript/when.mdx",
+      "expected": "sha256:ff4877f33c1bb21c6f77fa6b647eb9dac32b2226358dc583d296f5875b46e5e3",
+      "actual": "sha256:ff4877f33c1bb21c6f77fa6b647eb9dac32b2226358dc583d296f5875b46e5e3",
+      "match": true
+    },
+    {
+      "pin": "stylex",
+      "group": "inspectedFileDigests",
+      "file": "packages/docs/content/docs/api/javascript/positionTry.mdx",
+      "expected": "sha256:79eaa0f9a360786d11797dd8741de515d7523a283a48edf3a0b863ca461803b7",
+      "actual": "sha256:79eaa0f9a360786d11797dd8741de515d7523a283a48edf3a0b863ca461803b7",
+      "match": true
+    },
+    {
+      "pin": "stylex",
+      "group": "inspectedFileDigests",
+      "file": "packages/docs/content/docs/api/javascript/viewTransitionClass.mdx",
+      "expected": "sha256:feeb6a533042434ebcac79a19107c808de794d313efd106acfa836b0d280f885",
+      "actual": "sha256:feeb6a533042434ebcac79a19107c808de794d313efd106acfa836b0d280f885",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "inspectedFileDigests",
+      "file": "packages/types/src/csstype.d.ts",
+      "expected": "sha256:ac51dd7d31333793807a6abaa5ae168512b6131bd41d9c5b98477fc3b7800f9f",
+      "actual": "sha256:ac51dd7d31333793807a6abaa5ae168512b6131bd41d9c5b98477fc3b7800f9f",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "inspectedFileDigests",
+      "file": "packages/types/src/system-types.ts",
+      "expected": "sha256:68b6fc69b5609f457c1e2d282f6dc42ef1e616369ebae8734ccc5850a2fab1e0",
+      "actual": "sha256:68b6fc69b5609f457c1e2d282f6dc42ef1e616369ebae8734ccc5850a2fab1e0",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "inspectedFileDigests",
+      "file": "packages/types/src/config.ts",
+      "expected": "sha256:4ca750ca08b71e599ec665a9bdea09b5c0db56d082bef4ac51b597cc5a73cd9e",
+      "actual": "sha256:4ca750ca08b71e599ec665a9bdea09b5c0db56d082bef4ac51b597cc5a73cd9e",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "inspectedFileDigests",
+      "file": "packages/preset-base/src/patterns.ts",
+      "expected": "sha256:9d2b44790df1f58cee6b4c3998ee24b98357a7331a21053f7812c2e9c10b49ef",
+      "actual": "sha256:9d2b44790df1f58cee6b4c3998ee24b98357a7331a21053f7812c2e9c10b49ef",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "inspectedFileDigests",
+      "file": "packages/preset-base/src/conditions.ts",
+      "expected": "sha256:3c6f9f572d9ddcfe208d48a1587c5c8404ea3624edac779b47317c88420a0af6",
+      "actual": "sha256:3c6f9f572d9ddcfe208d48a1587c5c8404ea3624edac779b47317c88420a0af6",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "inspectedFileDigests",
+      "file": "website/content/docs/get-started/upgrading-to-v2.mdx",
+      "expected": "sha256:8b1b9be990d39aceb55d34310804fc064c7384555df7f1faa9438c376345adc1",
+      "actual": "sha256:8b1b9be990d39aceb55d34310804fc064c7384555df7f1faa9438c376345adc1",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "inspectedFileDigests",
+      "file": "website/content/docs/get-started/faq.mdx",
+      "expected": "sha256:d14a73faebba59c60d1c66319e83f2e0c6beaace8bd85a5ee74fdd19e01303e1",
+      "actual": "sha256:d14a73faebba59c60d1c66319e83f2e0c6beaace8bd85a5ee74fdd19e01303e1",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "inspectedFileDigests",
+      "file": "website/content/docs/recipes/responsive-variants.mdx",
+      "expected": "sha256:a614dc49250eff0795066e9361147135a9fd7250e00e17b313ab9a272e62ab07",
+      "actual": "sha256:a614dc49250eff0795066e9361147135a9fd7250e00e17b313ab9a272e62ab07",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "inspectedFileDigests",
+      "file": "crates/pandacss_stylesheet/src/polyfill.rs",
+      "expected": "sha256:d8a345cba4a7e9e397ea31cfbf76bbffccaa847a8a65a2a4b04dd919210cdd39",
+      "actual": "sha256:d8a345cba4a7e9e397ea31cfbf76bbffccaa847a8a65a2a4b04dd919210cdd39",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/background.ts",
+      "expected": "sha256:aad10823acd4ebb9001f4f13062a9ad40c757f673c7aaab60a6e8e56515b92fb",
+      "actual": "sha256:aad10823acd4ebb9001f4f13062a9ad40c757f673c7aaab60a6e8e56515b92fb",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/border.ts",
+      "expected": "sha256:ce4243e5b36e0364e16083815d4b896266bfc486a02684e753c157a2642d316d",
+      "actual": "sha256:ce4243e5b36e0364e16083815d4b896266bfc486a02684e753c157a2642d316d",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/container.ts",
+      "expected": "sha256:85dfd69296fee77042bd1ddb6b2f68ce12f4a0c58e9df19190820c1ea2a51767",
+      "actual": "sha256:85dfd69296fee77042bd1ddb6b2f68ce12f4a0c58e9df19190820c1ea2a51767",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/cursor.ts",
+      "expected": "sha256:b69d6d1d1fd03c341099ab6125241dd8a560a02b818494e627c6ad9eac69248d",
+      "actual": "sha256:b69d6d1d1fd03c341099ab6125241dd8a560a02b818494e627c6ad9eac69248d",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/display.ts",
+      "expected": "sha256:67870ccaefe1ab3df6715b91da7ed1f51aa6eabb6bbee21ca905edaede793420",
+      "actual": "sha256:67870ccaefe1ab3df6715b91da7ed1f51aa6eabb6bbee21ca905edaede793420",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/divide.ts",
+      "expected": "sha256:db4758a296ea22887c69a9429c68ce0c0ded58910536483b2c8ba0193f96506a",
+      "actual": "sha256:db4758a296ea22887c69a9429c68ce0c0ded58910536483b2c8ba0193f96506a",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/effects.ts",
+      "expected": "sha256:91d2ba1e4f322e34353164b304490a8494bdb45a0d019f601b6c74b7de11a724",
+      "actual": "sha256:91d2ba1e4f322e34353164b304490a8494bdb45a0d019f601b6c74b7de11a724",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/flex-and-grid.ts",
+      "expected": "sha256:25620062b076c9ad892abe9fa99f674092382ce11ddbba1f902f7a667f637ee7",
+      "actual": "sha256:25620062b076c9ad892abe9fa99f674092382ce11ddbba1f902f7a667f637ee7",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/focus-ring.ts",
+      "expected": "sha256:c118a4176caca32f45469b32099cc5711b444b7169cfbc10ce16601088a3fe37",
+      "actual": "sha256:c118a4176caca32f45469b32099cc5711b444b7169cfbc10ce16601088a3fe37",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/gradient.ts",
+      "expected": "sha256:ebca77d460fb702f5187350a293c03464011a68e4256b320d134d47a4604fc1d",
+      "actual": "sha256:ebca77d460fb702f5187350a293c03464011a68e4256b320d134d47a4604fc1d",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/helpers.ts",
+      "expected": "sha256:502999cf0ed5751a4de4051bb1c60790ebe0e2a9ed7f7e45734acdeb9cccbe9f",
+      "actual": "sha256:502999cf0ed5751a4de4051bb1c60790ebe0e2a9ed7f7e45734acdeb9cccbe9f",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/interactivity.ts",
+      "expected": "sha256:f5456f4b695b3fd38ed94ae913ed7a5ce66aedc2a6ec9ea865be65a6bed3b9fb",
+      "actual": "sha256:f5456f4b695b3fd38ed94ae913ed7a5ce66aedc2a6ec9ea865be65a6bed3b9fb",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/layout.ts",
+      "expected": "sha256:de41c9ad7cbe2f3153a84eaa3faf65e1e25e911176a578bce3a34556201752b7",
+      "actual": "sha256:de41c9ad7cbe2f3153a84eaa3faf65e1e25e911176a578bce3a34556201752b7",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/list.ts",
+      "expected": "sha256:d4689900f2326142cf8507c672f940268a7199b2f5e2ff1a168b5094ba601a98",
+      "actual": "sha256:d4689900f2326142cf8507c672f940268a7199b2f5e2ff1a168b5094ba601a98",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/mask.ts",
+      "expected": "sha256:971746fac816f2dc48410c2ec39060ec19dff9b56c611a807e6a2b4294582354",
+      "actual": "sha256:971746fac816f2dc48410c2ec39060ec19dff9b56c611a807e6a2b4294582354",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/outline.ts",
+      "expected": "sha256:e53bc09fe346ce72d344d1c6cc22ba4d765edb7a14567a2c37a73f2e43c348a5",
+      "actual": "sha256:e53bc09fe346ce72d344d1c6cc22ba4d765edb7a14567a2c37a73f2e43c348a5",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/polyfill.ts",
+      "expected": "sha256:91a78adab807c9617d084e87f4e769cf42b548f8448b7ca9dc281b4034f8f8f6",
+      "actual": "sha256:91a78adab807c9617d084e87f4e769cf42b548f8448b7ca9dc281b4034f8f8f6",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/sizing.ts",
+      "expected": "sha256:8b6916c9bb8e1c6c5ab4bbba866a94e7fb800709ef9683a880b09ffde5e6a7c0",
+      "actual": "sha256:8b6916c9bb8e1c6c5ab4bbba866a94e7fb800709ef9683a880b09ffde5e6a7c0",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/spacing.ts",
+      "expected": "sha256:5f5e823bccc8a390a115c4f26a08aaa26d4ea7930f8af9019b9ffb0dbd1c2871",
+      "actual": "sha256:5f5e823bccc8a390a115c4f26a08aaa26d4ea7930f8af9019b9ffb0dbd1c2871",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/svg.ts",
+      "expected": "sha256:7f33618acc60d483195407ab55182c7b402126625be9a65fd63a439c8f38b410",
+      "actual": "sha256:7f33618acc60d483195407ab55182c7b402126625be9a65fd63a439c8f38b410",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/tables.ts",
+      "expected": "sha256:89147c420657e38337bde13486421a006161d63b5355ab23abd9388e0ae1091b",
+      "actual": "sha256:89147c420657e38337bde13486421a006161d63b5355ab23abd9388e0ae1091b",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/transforms.ts",
+      "expected": "sha256:536cecda45e9312848355dbab5b377fde8ee1b62c72c9ea95568510bd9f89ca4",
+      "actual": "sha256:536cecda45e9312848355dbab5b377fde8ee1b62c72c9ea95568510bd9f89ca4",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/transitions.ts",
+      "expected": "sha256:9e767805ec2633ea18a931d92c5fdd063bc5628780968e53126c4fab9e28a6dc",
+      "actual": "sha256:9e767805ec2633ea18a931d92c5fdd063bc5628780968e53126c4fab9e28a6dc",
+      "match": true
+    },
+    {
+      "pin": "panda",
+      "group": "baseUtilityFileDigests",
+      "file": "packages/preset-base/src/utilities/typography.ts",
+      "expected": "sha256:e2fbd4c4e5d42beb3d481230865533ed50a97b36ba6af585f43631173c6af2da",
+      "actual": "sha256:e2fbd4c4e5d42beb3d481230865533ed50a97b36ba6af585f43631173c6af2da",
+      "match": true
+    },
+    {
+      "pin": "bcd",
+      "group": "publishedDataDigest",
+      "file": "@mdn/browser-compat-data@8.1.6/data.json",
+      "expected": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71",
+      "actual": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71",
+      "match": true
+    }
+  ],
+  "baselineDigestChecks": [
+    {
+      "file": "packages/compiler/src/design-system/policy/properties.js",
+      "expected": "sha256:f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540",
+      "actual": "sha256:f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540",
+      "match": true
+    },
+    {
+      "file": "packages/compiler/src/design-system/registry/index.js",
+      "expected": "sha256:a5ecb1065008e02e06642cce29641d3724b181c33380822fc43d97a5a0a415f1",
+      "actual": "sha256:a5ecb1065008e02e06642cce29641d3724b181c33380822fc43d97a5a0a415f1",
+      "match": true
+    },
+    {
+      "file": "packages/compiler/src/engine/lowering/styles.js",
+      "expected": "sha256:a582e48ef5531f2aed05a102367e8d407254952f99f478fa0498445a64d78b2a",
+      "actual": "sha256:a582e48ef5531f2aed05a102367e8d407254952f99f478fa0498445a64d78b2a",
+      "match": true
+    },
+    {
+      "file": "packages/compiler/src/artifacts/types/design-declarations.js",
+      "expected": "sha256:b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5",
+      "actual": "sha256:b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5",
+      "match": true
+    },
+    {
+      "file": "packages/compiler/src/frontend/babel/plugin.js",
+      "expected": "sha256:1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f",
+      "actual": "sha256:1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f",
+      "match": true
+    },
+    {
+      "file": "packages/compiler/src/design-system/patterns/compile.js",
+      "expected": "sha256:573fd2160a85a277f180eb3fceb17ada746c75fd7a447771a086d73a1345ba7b",
+      "actual": "sha256:573fd2160a85a277f180eb3fceb17ada746c75fd7a447771a086d73a1345ba7b",
+      "match": true
+    },
+    {
+      "file": "packages/core/src/props.js",
+      "expected": "sha256:b06b1192d16e673dc0dfe991064d70e0de89573960a8cf20073d5484e463acaf",
+      "actual": "sha256:b06b1192d16e673dc0dfe991064d70e0de89573960a8cf20073d5484e463acaf",
+      "match": true
+    }
+  ],
+  "extraction": {
+    "digest": "sha256:ed80390ff89fafaaf06b4c94285ce4f48f0c8b89c2b06e65e26ade4e30a57018",
+    "method": "StyleX: hermes-parser ObjectTypeProperty keys of the CSSProperties alias. Panda types: TypeScript optional identifier property signatures of top-level csstype.d.ts interfaces plus ModernCssProperties members. Panda utilities: top-level keys of exported object literals in preset-base/src/utilities/*.ts except index.ts. BCD: css.properties keys of published data.json.",
+    "counts": {
+      "stylexTypeNames": 522,
+      "pandaTypeNames": 863,
+      "pandaBaseUtilityKeys": 372,
+      "bcdPropertyKeys": 652
+    },
+    "bcdMeta": { "version": "8.1.6", "timestamp": "2026-10-15T13:35:41.362Z" }
+  },
+  "emissionProbes": {
+    "stylex": {
+      "kind": "stylex-emission-probe",
+      "comparator": "StyleX 0.19.1",
+      "versions": {
+        "@babel/core": "7.28.5",
+        "@stylexjs/babel-plugin": "0.19.1",
+        "@stylexjs/stylex": "0.19.1",
+        "@stylexjs/shared": "0.19.1"
+      },
+      "entries": 1108,
+      "emissionKinds": {
+        "no-emission": 14,
+        "passthrough": 1069,
+        "renamed": 25
+      },
+      "digest": "sha256:206a51dce9e7be226b5de839722826f1a0ec3ed8843075206edebdc1ff7b581f",
+      "resolvedPackages": [
+        {
+          "package": "@babel/core",
+          "version": "7.28.5",
+          "integrity": "sha512-e7jT4DxYvIDLk1ZHmU/m/mB19rex9sv0c2ftBtjSBv+kVM/902eh0fINUzD7UwLLNR+jU585GxUJ8/EBfAM5fw=="
+        },
+        {
+          "package": "@stylexjs/babel-plugin",
+          "version": "0.19.1",
+          "integrity": "sha512-Ig3crX6MuGWDEAx+f89aLxTQUWVeEc2Aco2moIdcObyvo7hZJgU26rxJN3k7geFjhi+5dfna6TNR8iTRK0PQGA=="
+        },
+        {
+          "package": "@stylexjs/shared",
+          "version": "0.19.1",
+          "integrity": "sha512-oFBtW0NPNLJOT1gLweWRNKrIJHjJMwOmSV7fgd6ewok4fwb/Nh95PEaYGKu+ZONk0nNghjLFfOwiIsxJdvh3TQ=="
+        },
+        {
+          "package": "@stylexjs/stylex",
+          "version": "0.19.1",
+          "integrity": "sha512-JwNFm0MOYPqi+M4Ax5Un4ZxfZp4HEAX2sAWetZ88KALFcv1eEiHNJs75oO3V3U7RVWnzfkiM8i9eBowC3hqgUw=="
+        }
+      ]
+    },
+    "panda": {
+      "kind": "panda-emission-probe",
+      "comparator": "PandaCSS 2.2.0",
+      "versions": {
+        "@pandacss/compiler": "2.2.0",
+        "@pandacss/compiler-shared": "2.2.0",
+        "@pandacss/config": "2.2.0",
+        "@pandacss/preset-base": "2.2.0",
+        "@pandacss/types": "2.2.0",
+        "@pandacss/dev": "2.2.0"
+      },
+      "entries": 1108,
+      "emissionKinds": {
+        "conditional-helper": 2,
+        "custom-property-composition": 55,
+        "expanded": 27,
+        "passthrough": 1007,
+        "renamed": 5,
+        "selector-helper": 12
+      },
+      "digest": "sha256:d1222d304613b21e57041b6aadfc907f60b9452e7392ad1ea1f715d35af56d24",
+      "resolvedPackages": [
+        {
+          "package": "@pandacss/cli",
+          "version": "2.2.0",
+          "integrity": "sha512-bDPfyD39jfFYtVg4IsTFamgGOK3r774dq16Qz8va3FWNSOPAatclkQXmvNqCqIKVliRVHWzcLMHBeTKlL2n7/A=="
+        },
+        {
+          "package": "@pandacss/compiler",
+          "version": "2.2.0",
+          "integrity": "sha512-wuaOhKNwUoF+18qBA9RtcQeTbbRKgDGOX8ynCPkobsT6I3tsXX4NSbeD/G25qF/262DYwcdbEldMgollOJ5zfQ=="
+        },
+        {
+          "package": "@pandacss/compiler-darwin-arm64",
+          "version": "2.2.0",
+          "integrity": "sha512-TIG6KTyD2tB2Yh3XkcFrJ2fZbmlF0Sfvr2hHTAAftYRMSnhKA2v1kI3JTxLHFQsr1Qr0cbYkrVfiGBTdiOu2hg=="
+        },
+        {
+          "package": "@pandacss/compiler-darwin-x64",
+          "version": "2.2.0",
+          "integrity": "sha512-XIxbBZBLtQdE6Z9u2ruGNrneJu18UrOZw9vTNp6do+hmGlPyjed042uJxMsoIhG+Bq0RwlC2SOX7U92GLZyApg=="
+        },
+        {
+          "package": "@pandacss/compiler-linux-arm64-gnu",
+          "version": "2.2.0",
+          "integrity": "sha512-NddWzvWjp/8aBB4AB/7HSNIi3hLHYqD8W/Wd/QHJ+TZtKBhXByK7YStrKBQpcXpXKgtwVShA2V+Y//tK9Q+CDA=="
+        },
+        {
+          "package": "@pandacss/compiler-linux-arm64-musl",
+          "version": "2.2.0",
+          "integrity": "sha512-YE9gxrz8sLv2QWeYp7l/8GTAcXHDQZq248ACIEMSi766MMAXxKeIYraSPTA6V27npbGNq4PTSLdcxwKl/cDWFw=="
+        },
+        {
+          "package": "@pandacss/compiler-linux-x64-gnu",
+          "version": "2.2.0",
+          "integrity": "sha512-y482diqp5o/aijmW6q263htgkEx/h0bS9At8GErlvmMxZFYfqZ8bL1v11CHWrruve06q82dqc4rP00NemyEYyA=="
+        },
+        {
+          "package": "@pandacss/compiler-linux-x64-musl",
+          "version": "2.2.0",
+          "integrity": "sha512-l06NSwKK2Qbfn/CHbvZE5JnoLUgWVayMBHkgsM1EIQsQMD2wTP3R0tfNmCroaEZPebDxPGaWomlGHHWkGPVFWg=="
+        },
+        {
+          "package": "@pandacss/compiler-shared",
+          "version": "2.2.0",
+          "integrity": "sha512-4UTc4MM31p/AHtMy9gI8o9LsIya17nlOfz+2iR59fvGe2pFkFNyqFZG42yb8HOh6TAmeE/9LGifCmuyg9r1qAQ=="
+        },
+        {
+          "package": "@pandacss/compiler-win32-arm64-msvc",
+          "version": "2.2.0",
+          "integrity": "sha512-pvSF+B4S6LScWuFJRMK/3nSCQRYv/tYm1QRGoaoSPlMANn5WCayqJ9qM1Jq8PDwl/9wqHpORwNr0UFJCkSwTww=="
+        },
+        {
+          "package": "@pandacss/compiler-win32-x64-msvc",
+          "version": "2.2.0",
+          "integrity": "sha512-puk51iU0eWQf5wLQr0u2rX9hQTDQFvtDsPaVSSj37Q63p/LYi7+JnKO/pK8bLwbJqQCVG7QD7M/KdhRP3aWNhQ=="
+        },
+        {
+          "package": "@pandacss/config",
+          "version": "2.2.0",
+          "integrity": "sha512-iPNLaTo+CmF94eu9s+KiooDXhV2hJ28fjgX/1RPm57lUhzMKsYs9gBb4RruQXF+UBQaFiagLeESUJrD96cwdvA=="
+        },
+        {
+          "package": "@pandacss/dev",
+          "version": "2.2.0",
+          "integrity": "sha512-tflRs0WLaESwmHptVls+SrkJpjepf9M29LJwjeh2H3BxH9BA1+/2riWFGweXoW7vmylkG98ns6BDqLBkqEVUJg=="
+        },
+        {
+          "package": "@pandacss/postcss",
+          "version": "2.2.0",
+          "integrity": "sha512-n4y0YJ4oLtr29MFn+5lFv/S3vju4/Wc0DDDf7QnI1EN9SfsunRSaNpxuMrze8HxPo/7K4J6loLRzl7bKuB05aA=="
+        },
+        {
+          "package": "@pandacss/preset-base",
+          "version": "2.2.0",
+          "integrity": "sha512-Cu3A/5ElXI3o5CuVLn/Y9/+CppaMzE/2pXCS5z2bb3k09Ucq3QVA7CQN4VoizIH1Fw8ibc99jOwqR8qZRRkqbQ=="
+        },
+        {
+          "package": "@pandacss/types",
+          "version": "2.2.0",
+          "integrity": "sha512-XeUt/mWUkghn4oyKqcFMz6whTr4SHxmiKksNVNX3EAB1ceyrvQ68tHrYWNK59NtBrRPeJxSOibHhZWVRqHcuvQ=="
+        }
+      ]
+    }
+  },
+  "environment": { "node": "v22.22.0", "platform": "linux-x64" },
+  "limits": [
+    "Registry metadata and tarball integrity identify packages; they do not qualify compiler or browser behavior.",
+    "Emission probes record upstream extraction/emission for one CSS-wide keyword per entry; they do not establish value-domain, cascade or browser behavior.",
+    "GitHub source archives are identified by commit; their archive digests are observations of this download, not upstream-signed artifacts."
+  ]
+}

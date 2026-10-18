@@ -1,0 +1,1054 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-capability-dispositions",
+  "task": "CE-00.1",
+  "status": "authored-scope-input",
+  "source": "docs/architecture/core-evolution-coverage.md (capability rows, Work column and initial request traceability are read from it and cross-checked by the builder)",
+  "dispositionDefinitions": {
+    "required-implementation": "Partial or absent in Alpha 1 source. Stable in-profile behavior is required work; its proof record must close with the listed evidence classes.",
+    "existing-requalification": "Existing in Alpha 1 source. Non-regression and requalification for the expanded language are still required work with the listed evidence classes."
+  },
+  "lotIssues": {
+    "CE-00": [40, 41, 42, 43],
+    "CE-01": [44, 45],
+    "CE-02": [46, 47, 48],
+    "CE-03": [49, 50, 55],
+    "CE-04": [51, 52, 56],
+    "CE-05": [53, 59, 60, 61],
+    "CE-06": [57, 66],
+    "CE-07": [54, 58, 62],
+    "CE-08": [63, 64],
+    "CE-09": [65, 67],
+    "CE-10": [68, 69, 70],
+    "CE-11": [71, 72, 73],
+    "CE-12": [74, 75, 76],
+    "CE-13": [78, 79, 80, 81],
+    "CE-14": [82, 83, 84],
+    "CE-15": [77, 85, 86]
+  },
+  "capabilities": [
+    {
+      "id": "CAP-01",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-02",
+      "closingLot": "CE-02",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-01",
+        "plannedPath": "tests/core-evolution/proofs/CAP-01.json",
+        "status": "planned",
+        "evidenceClasses": ["E1", "E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-01-registry-disposition-per-entry",
+          "CE-FX-CAP-01-descriptor-catalog-admission",
+          "CE-FX-CAP-01-unknown-and-vendor-property-diagnostics"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-02",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-02",
+      "closingLot": "CE-07",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-02",
+        "plannedPath": "tests/core-evolution/proofs/CAP-02.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-02-css-wide-keyword-per-property",
+          "CE-FX-CAP-02-finite-keyword-domain-negative",
+          "CE-FX-CAP-02-revert-layer-semantics"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-03",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-03",
+      "closingLot": "CE-04",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-03",
+        "plannedPath": "tests/core-evolution/proofs/CAP-03.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-03-size-token-and-keyword-mixed-domain",
+          "CE-FX-CAP-03-logical-physical-min-max",
+          "CE-FX-CAP-03-unit-aware-validation"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-04",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-04",
+      "closingLot": "CE-04",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-04",
+        "plannedPath": "tests/core-evolution/proofs/CAP-04.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-04-flex-none-normalization",
+          "CE-FX-CAP-04-approved-flex-tuple-1-1-0",
+          "CE-FX-CAP-04-per-property-alignment-domain-writing-direction"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-05",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-04",
+      "closingLot": "CE-04",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-05",
+        "plannedPath": "tests/core-evolution/proofs/CAP-05.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-05-track-resource-232px-minmax-0-1fr",
+          "CE-FX-CAP-05-placement-span-areas",
+          "CE-FX-CAP-05-subgrid-target"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-06",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-04",
+      "closingLot": "CE-04",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-06",
+        "plannedPath": "tests/core-evolution/proofs/CAP-06.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-06-sticky-fixed-containing-block",
+          "CE-FX-CAP-06-logical-insets-rtl",
+          "CE-FX-CAP-06-z-index-tokens-isolation"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-07",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-04",
+      "closingLot": "CE-05",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-07",
+        "plannedPath": "tests/core-evolution/proofs/CAP-07.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-07-overflow-axis-computed-interaction",
+          "CE-FX-CAP-07-scroll-snap-overscroll-gutter",
+          "CE-FX-CAP-07-clipping-containment"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-08",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-04",
+      "closingLot": "CE-04",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-08",
+        "plannedPath": "tests/core-evolution/proofs/CAP-08.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-08-logical-physical-spacing",
+          "CE-FX-CAP-08-auto-negative-margin-applicability",
+          "CE-FX-CAP-08-negative-padding-rejection"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-09",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-05",
+      "closingLot": "CE-05",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-09",
+        "plannedPath": "tests/core-evolution/proofs/CAP-09.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-09-side-width-style-color",
+          "CE-FX-CAP-09-outline-width-style-color-offset",
+          "CE-FX-CAP-09-collapsed-tables",
+          "CE-FX-CAP-09-border-image-resource"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-10",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-05",
+      "closingLot": "CE-07",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-10",
+        "plannedPath": "tests/core-evolution/proofs/CAP-10.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-10-focus-visible-ring-forced-colors",
+          "CE-FX-CAP-10-appearance-accent-system-colors",
+          "CE-FX-CAP-10-reduced-motion-contrast-modes"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-11",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-05",
+      "closingLot": "CE-05",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-11",
+        "plannedPath": "tests/core-evolution/proofs/CAP-11.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-11-cursor-pointer-default-not-allowed-text",
+          "CE-FX-CAP-11-user-select-text-touch-action",
+          "CE-FX-CAP-11-electron-app-region-drag-no-drag"
+        ]
+      },
+      "limitations": ["LIM-07"]
+    },
+    {
+      "id": "CAP-12",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-06",
+      "closingLot": "CE-06",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-12",
+        "plannedPath": "tests/core-evolution/proofs/CAP-12.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-12-text-align-center-right-end",
+          "CE-FX-CAP-12-white-space-pre-pre-wrap-pre-line",
+          "CE-FX-CAP-12-ellipsis-overflow-wrap-word-break",
+          "CE-FX-CAP-12-text-wrap-keyword-targets"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-13",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-06",
+      "closingLot": "CE-09",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-13",
+        "plannedPath": "tests/core-evolution/proofs/CAP-13.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-13-font-features-variations",
+          "CE-FX-CAP-13-text-decoration-longhands",
+          "CE-FX-CAP-13-line-clamp-bundle",
+          "CE-FX-CAP-13-list-counter-resources",
+          "CE-FX-CAP-13-rtl-vertical-writing"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-14",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-03",
+      "closingLot": "CE-09",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-14",
+        "plannedPath": "tests/core-evolution/proofs/CAP-14.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-14-layered-backgrounds",
+          "CE-FX-CAP-14-gradient-resources",
+          "CE-FX-CAP-14-mask-resources-blend"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-15",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-03",
+      "closingLot": "CE-05",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-15",
+        "plannedPath": "tests/core-evolution/proofs/CAP-15.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-15-multi-shadow-tokens",
+          "CE-FX-CAP-15-filter-composition-resources",
+          "CE-FX-CAP-15-backdrop-filter-target-fallback"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-16",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-05",
+      "closingLot": "CE-05",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-16",
+        "plannedPath": "tests/core-evolution/proofs/CAP-16.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-16-object-fit-position",
+          "CE-FX-CAP-16-aspect-ratio-sizes",
+          "CE-FX-CAP-16-responsive-media-without-inline-css"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-17",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-05",
+      "closingLot": "CE-06",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-17",
+        "plannedPath": "tests/core-evolution/proofs/CAP-17.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-17-svg-paint-geometry",
+          "CE-FX-CAP-17-dash-width-vector-effect",
+          "CE-FX-CAP-17-svg-text-presentation"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-18",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-03",
+      "closingLot": "CE-08",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-18",
+        "plannedPath": "tests/core-evolution/proofs/CAP-18.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-18-transform-functions-individual-transforms",
+          "CE-FX-CAP-18-animation-transition-longhands",
+          "CE-FX-CAP-18-transform-none-disabled-reduced-motion"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-19",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-08",
+      "closingLot": "CE-08",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-19",
+        "plannedPath": "tests/core-evolution/proofs/CAP-19.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-19-keyframe-registry-typed-reference",
+          "CE-FX-CAP-19-dangling-animation-name-rejection",
+          "CE-FX-CAP-19-keyframe-dedup-cleanup"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-20",
+      "disposition": "existing-requalification",
+      "primaryOwner": "CE-03",
+      "closingLot": "CE-03",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-20",
+        "plannedPath": "tests/core-evolution/proofs/CAP-20.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3"],
+        "fixtureSets": [
+          "CE-FX-CAP-20-category-grammar-compositional-references",
+          "CE-FX-CAP-20-missing-category-cycle-diagnostics"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-21",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-03",
+      "closingLot": "CE-07",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-21",
+        "plannedPath": "tests/core-evolution/proofs/CAP-21.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-21-conditional-token-base-precedence",
+          "CE-FX-CAP-21-cross-theme-resolution"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-22",
+      "disposition": "existing-requalification",
+      "primaryOwner": "CE-03",
+      "closingLot": "CE-07",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-22",
+        "plannedPath": "tests/core-evolution/proofs/CAP-22.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-22-nested-theme-override-reset",
+          "CE-FX-CAP-22-stable-identity-after-extension"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-23",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-07",
+      "closingLot": "CE-07",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-23",
+        "plannedPath": "tests/core-evolution/proofs/CAP-23.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-23-named-pseudo-aria-data-state-conditions",
+          "CE-FX-CAP-23-placeholder-file-backdrop-selection-content"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-24",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-07",
+      "closingLot": "CE-07",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-24",
+        "plannedPath": "tests/core-evolution/proofs/CAP-24.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-24-owned-selector-grammar",
+          "CE-FX-CAP-24-group-peer-marker-relations",
+          "CE-FX-CAP-24-raw-condition-bypass-negative"
+        ]
+      },
+      "limitations": ["LIM-03"]
+    },
+    {
+      "id": "CAP-25",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-07",
+      "closingLot": "CE-07",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-25",
+        "plannedPath": "tests/core-evolution/proofs/CAP-25.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-25-recursive-media-supports-container",
+          "CE-FX-CAP-25-print-and-input-capability-queries",
+          "CE-FX-CAP-25-condition-ordering-intersections"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-26",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-04",
+      "closingLot": "CE-11",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-26",
+        "plannedPath": "tests/core-evolution/proofs/CAP-26.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-26-named-containers",
+          "CE-FX-CAP-26-size-style-scroll-state-distinction",
+          "CE-FX-CAP-26-container-units-tokens"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-27",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-02",
+      "closingLot": "CE-07",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-27",
+        "plannedPath": "tests/core-evolution/proofs/CAP-27.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-27-system-owned-ordered-fallbacks",
+          "CE-FX-CAP-27-arbitrary-consumer-array-negative"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-28",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-02",
+      "closingLot": "CE-07",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-28",
+        "plannedPath": "tests/core-evolution/proofs/CAP-28.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-28-shorthand-reset-logical-physical-conflicts",
+          "CE-FX-CAP-28-condition-layer-precedence",
+          "CE-FX-CAP-28-important-policy"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-29",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-09",
+      "closingLot": "CE-09",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-29",
+        "plannedPath": "tests/core-evolution/proofs/CAP-29.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-29-reset-preflight-policy",
+          "CE-FX-CAP-29-scoped-global-resources",
+          "CE-FX-CAP-29-external-css-layer-interop"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-30",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-09",
+      "closingLot": "CE-13",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-30",
+        "plannedPath": "tests/core-evolution/proofs/CAP-30.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4", "E5"],
+        "fixtureSets": [
+          "CE-FX-CAP-30-self-hosted-font-face",
+          "CE-FX-CAP-30-asset-url-base-path-hash",
+          "CE-FX-CAP-30-asset-csp-facts"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-31",
+      "disposition": "existing-requalification",
+      "primaryOwner": "CE-10",
+      "closingLot": "CE-10",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-31",
+        "plannedPath": "tests/core-evolution/proofs/CAP-31.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-31-expanded-domain-in-recipes-slots-compounds",
+          "CE-FX-CAP-31-default-slot-conflict-stability"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-32",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-10",
+      "closingLot": "CE-10",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-32",
+        "plannedPath": "tests/core-evolution/proofs/CAP-32.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-32-responsive-variant-finite-selection",
+          "CE-FX-CAP-32-compound-responsive-interaction",
+          "CE-FX-CAP-32-bounded-expansion-failure"
+        ]
+      },
+      "limitations": ["LIM-08"]
+    },
+    {
+      "id": "CAP-33",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-10",
+      "closingLot": "CE-10",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-33",
+        "plannedPath": "tests/core-evolution/proofs/CAP-33.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-33-twenty-panda-pattern-equivalents",
+          "CE-FX-CAP-33-finite-pattern-parameter-schemas"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-34",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-03",
+      "closingLot": "CE-10",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-34",
+        "plannedPath": "tests/core-evolution/proofs/CAP-34.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3"],
+        "fixtureSets": ["CE-FX-CAP-34-text-layer-animation-declaration-bundles"]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-35",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-10",
+      "closingLot": "CE-13",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-35",
+        "plannedPath": "tests/core-evolution/proofs/CAP-35.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E5"],
+        "fixtureSets": [
+          "CE-FX-CAP-35-versioned-definition-imports-namespaces",
+          "CE-FX-CAP-35-cross-system-runtime-reference-negative",
+          "CE-FX-CAP-35-package-provenance"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-36",
+      "disposition": "existing-requalification",
+      "primaryOwner": "CE-12",
+      "closingLot": "CE-13",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-36",
+        "plannedPath": "tests/core-evolution/proofs/CAP-36.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4", "E5"],
+        "fixtureSets": [
+          "CE-FX-CAP-36-no-runtime-css-compilation-or-injection",
+          "CE-FX-CAP-36-no-free-css-value-transport",
+          "CE-FX-CAP-36-finite-runtime-selection"
+        ]
+      },
+      "limitations": ["LIM-01", "LIM-02"]
+    },
+    {
+      "id": "CAP-37",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-03",
+      "closingLot": "CE-11",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-37",
+        "plannedPath": "tests/core-evolution/proofs/CAP-37.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-37-typed-variables-defaults-inheritance",
+          "CE-FX-CAP-37-conditional-declarations",
+          "CE-FX-CAP-37-old-engine-behavior"
+        ]
+      },
+      "limitations": ["LIM-01"]
+    },
+    {
+      "id": "CAP-38",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-11",
+      "closingLot": "CE-11",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-38",
+        "plannedPath": "tests/core-evolution/proofs/CAP-38.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-38-anchor-position-try-resources",
+          "CE-FX-CAP-38-anchor-target-gating"
+        ]
+      },
+      "limitations": ["LIM-06"]
+    },
+    {
+      "id": "CAP-39",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-11",
+      "closingLot": "CE-11",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-39",
+        "plannedPath": "tests/core-evolution/proofs/CAP-39.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-39-view-transition-class-name-resources",
+          "CE-FX-CAP-39-native-api-availability-facts"
+        ]
+      },
+      "limitations": ["LIM-04", "LIM-06"]
+    },
+    {
+      "id": "CAP-40",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-07",
+      "closingLot": "CE-11",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-40",
+        "plannedPath": "tests/core-evolution/proofs/CAP-40.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-40-starting-style-resources",
+          "CE-FX-CAP-40-scroll-view-timelines",
+          "CE-FX-CAP-40-scope-rules-target-status"
+        ]
+      },
+      "limitations": ["LIM-04", "LIM-06"]
+    },
+    {
+      "id": "CAP-41",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-01",
+      "closingLot": "CE-13",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-41",
+        "plannedPath": "tests/core-evolution/proofs/CAP-41.json",
+        "status": "planned",
+        "evidenceClasses": ["E1", "E3", "E4", "E5"],
+        "fixtureSets": [
+          "CE-FX-CAP-41-single-target-transform-before-identity",
+          "CE-FX-CAP-41-prefix-policy",
+          "CE-FX-CAP-41-obsolete-engine-incompatibility"
+        ]
+      },
+      "limitations": ["LIM-05"]
+    },
+    {
+      "id": "CAP-42",
+      "disposition": "existing-requalification",
+      "primaryOwner": "CE-00",
+      "closingLot": "CE-13",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-42",
+        "plannedPath": "tests/core-evolution/proofs/CAP-42.json",
+        "status": "planned",
+        "evidenceClasses": ["E1", "E5"],
+        "fixtureSets": [
+          "CE-FX-CAP-42-existing-host-mode-requalification",
+          "CE-FX-CAP-42-accepted-source-format-matrix",
+          "CE-FX-CAP-42-unsupported-format-diagnostics"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-43",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-13",
+      "closingLot": "CE-13",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-43",
+        "plannedPath": "tests/core-evolution/proofs/CAP-43.json",
+        "status": "planned",
+        "evidenceClasses": ["E5"],
+        "fixtureSets": [
+          "CE-FX-CAP-43-vitest-4.1.11-vite-8.3.1-one-shot-watch",
+          "CE-FX-CAP-43-react-testing-library-isolation"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-44",
+      "disposition": "existing-requalification",
+      "primaryOwner": "CE-12",
+      "closingLot": "CE-13",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-44",
+        "plannedPath": "tests/core-evolution/proofs/CAP-44.json",
+        "status": "planned",
+        "evidenceClasses": ["E3", "E4", "E5"],
+        "fixtureSets": [
+          "CE-FX-CAP-44-ssr-first-paint-hydration",
+          "CE-FX-CAP-44-lazy-route-hmr-stale-rules"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-45",
+      "disposition": "required-implementation",
+      "primaryOwner": "CE-00",
+      "closingLot": "CE-14",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-45",
+        "plannedPath": "tests/core-evolution/proofs/CAP-45.json",
+        "status": "planned",
+        "evidenceClasses": ["E1", "E2", "E3", "E4"],
+        "fixtureSets": [
+          "CE-FX-CAP-45-calibrated-classifier-343-1559",
+          "CE-FX-CAP-45-full-denominator-zero-unexpressible",
+          "CE-FX-CAP-45-render-behavior-fidelity"
+        ]
+      },
+      "limitations": ["LIM-01"]
+    },
+    {
+      "id": "CAP-46",
+      "disposition": "existing-requalification",
+      "primaryOwner": "CE-12",
+      "closingLot": "CE-12",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-46",
+        "plannedPath": "tests/core-evolution/proofs/CAP-46.json",
+        "status": "planned",
+        "evidenceClasses": ["E2", "E3"],
+        "fixtureSets": [
+          "CE-FX-CAP-46-mixed-domain-resource-target-projections",
+          "CE-FX-CAP-46-no-permissive-type-escape"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-47",
+      "disposition": "existing-requalification",
+      "primaryOwner": "CE-00",
+      "closingLot": "CE-14",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-47",
+        "plannedPath": "tests/core-evolution/proofs/CAP-47.json",
+        "status": "planned",
+        "evidenceClasses": ["E1", "E3", "E5"],
+        "fixtureSets": [
+          "CE-FX-CAP-47-frozen-budgets",
+          "CE-FX-CAP-47-compile-incremental-runtime-css-size-measurements"
+        ]
+      },
+      "limitations": []
+    },
+    {
+      "id": "CAP-48",
+      "disposition": "existing-requalification",
+      "primaryOwner": "CE-15",
+      "closingLot": "CE-15",
+      "proofRecord": {
+        "id": "CE-PROOF-CAP-48",
+        "plannedPath": "tests/core-evolution/proofs/CAP-48.json",
+        "status": "planned",
+        "evidenceClasses": ["E5"],
+        "fixtureSets": [
+          "CE-FX-CAP-48-exact-consistent-archive-versions",
+          "CE-FX-CAP-48-migration-and-changelog",
+          "CE-FX-CAP-48-published-archive-verification"
+        ]
+      },
+      "limitations": []
+    }
+  ],
+  "limitations": [
+    {
+      "id": "LIM-01",
+      "kind": "architectural-exclusion",
+      "title": "Unbounded runtime CSS values",
+      "statement": "StyleX dynamic function styles and Panda runtime values need an inline custom-property or value channel. PandamStyle admits only finite authenticated selections; behavior that truly needs unrestricted runtime values is a product limitation, never approximated by bucketing and labeled equivalent.",
+      "capabilities": ["CAP-36", "CAP-37", "CAP-45"],
+      "evidence": "core-evolution-coverage.md Explicit architecture dispositions; core-evolution-upstreams.md StyleX dynamic values and Panda dynamic selection rows"
+    },
+    {
+      "id": "LIM-02",
+      "kind": "architectural-exclusion",
+      "title": "Runtime style injection",
+      "statement": "Runtime stylesheet injection, including development helpers, is excluded. Stylesheets and HMR must work under restrictive CSP; AG-13 owns removal of inherited display surfaces.",
+      "capabilities": ["CAP-36", "CAP-44"],
+      "evidence": "core-evolution-coverage.md; StyleX 0.19.1 unplugin devMode 'full' injects runtime and HTML in development"
+    },
+    {
+      "id": "LIM-03",
+      "kind": "architectural-exclusion",
+      "title": "Arbitrary consumer selectors, tokens or policy overrides",
+      "statement": "Replaced with declared project vocabulary. Upstream arbitrary-selector equivalence is not claimed; unauthorized selectors fail validation in every authoring context.",
+      "capabilities": ["CAP-23", "CAP-24"],
+      "evidence": "core-evolution-coverage.md Explicit architecture dispositions"
+    },
+    {
+      "id": "LIM-04",
+      "kind": "application-responsibility",
+      "title": "Runtime DOM and native API behavior",
+      "statement": "Opening dialogs, starting a native view transition or driving scroll position is application behavior. The styling contract, attributes and native API dependency are qualified together; CSS alone does not implement them.",
+      "capabilities": ["CAP-39", "CAP-40"],
+      "evidence": "core-evolution-coverage.md Explicit architecture dispositions"
+    },
+    {
+      "id": "LIM-05",
+      "kind": "unsupported-platform",
+      "title": "Obsolete engines",
+      "statement": "Internet Explorer, legacy EdgeHTML, Presto and KHTML are unsupported platforms. Their prefixed entries remain in the registry denominator as obsolete-engine-prefix dispositions; CE-01 records the incompatibility.",
+      "capabilities": ["CAP-41"],
+      "evidence": "Registry obsolete-engine-prefix entries; D-BP-05"
+    },
+    {
+      "id": "LIM-06",
+      "kind": "target-limited",
+      "title": "Unshipped or partially shipped browser features",
+      "statement": "A feature without stable support in a profile target is native-only progressive enhancement or needs an approved equivalent; it never receives a general support label. Required in-profile capabilities without an equivalent block that profile.",
+      "capabilities": ["CAP-38", "CAP-39", "CAP-40"],
+      "evidence": "BCD 8.1.6 statements in registry entries; D-BP-06"
+    },
+    {
+      "id": "LIM-07",
+      "kind": "unsupported-platform",
+      "title": "Platform-scoped desktop and vendor extensions",
+      "statement": "Electron and vendor extensions such as -webkit-app-region are scoped to their exact Chromium/Electron profile and are not portable browser CSS.",
+      "capabilities": ["CAP-11"],
+      "evidence": "Registry scoped-platform-extension entries; D-BP-03"
+    },
+    {
+      "id": "LIM-08",
+      "kind": "upstream-limitation-disclosed",
+      "title": "Panda responsive variants with compound variants",
+      "statement": "Panda 2.2.0 rejects responsive variant values on recipes with compound variants. PandamStyle must define and prove its finite condition-state semantics if the accepted corpus needs the combination; the upstream restriction is disclosed, not inherited silently.",
+      "capabilities": ["CAP-32"],
+      "evidence": "core-evolution-upstreams.md P7"
+    },
+    {
+      "id": "LIM-09",
+      "kind": "architectural-exclusion",
+      "title": "Script-binding CSS properties",
+      "statement": "behavior (IE HTML Components) and -moz-binding (XBL) attach script behavior through CSS. They are incompatible runtime requirements with no static equivalent.",
+      "capabilities": ["CAP-01"],
+      "evidence": "Registry incompatible-runtime-requirement entries"
+    }
+  ],
+  "requestCases": [
+    {
+      "id": "REQ-01",
+      "request": "Cursor pointer/default/not-allowed/text",
+      "lots": ["CE-05"],
+      "capabilities": ["CAP-11"]
+    },
+    {
+      "id": "REQ-02",
+      "request": "Overflow and X/Y auto/hidden/visible",
+      "lots": ["CE-04"],
+      "capabilities": ["CAP-07"]
+    },
+    {
+      "id": "REQ-03",
+      "request": "Position fixed/sticky; display inline-grid",
+      "lots": ["CE-04"],
+      "capabilities": ["CAP-05", "CAP-06"]
+    },
+    {
+      "id": "REQ-04",
+      "request": "Align items/self/content, justify items/self, place items: start/end/center/stretch",
+      "lots": ["CE-04"],
+      "capabilities": ["CAP-04"]
+    },
+    {
+      "id": "REQ-05",
+      "request": "Text align center/right/end; whitespace pre-wrap/pre-line",
+      "lots": ["CE-06"],
+      "capabilities": ["CAP-12"]
+    },
+    {
+      "id": "REQ-06",
+      "request": "Border dashed/none; user-select text; disabled transform none",
+      "lots": ["CE-05", "CE-08"],
+      "capabilities": ["CAP-09", "CAP-11", "CAP-18"]
+    },
+    {
+      "id": "REQ-07",
+      "request": "Flex none / longhands / approved 1 1 0% equivalent",
+      "lots": ["CE-04"],
+      "capabilities": ["CAP-04", "CAP-28"]
+    },
+    {
+      "id": "REQ-08",
+      "request": "flexWrap, overflowWrap, wordBreak, ellipsis, verticalAlign, objectFit, aspectRatio, textWrap",
+      "lots": ["CE-04", "CE-05", "CE-06"],
+      "capabilities": ["CAP-04", "CAP-12", "CAP-16"]
+    },
+    {
+      "id": "REQ-09",
+      "request": "Sizes: 12–18px icons, 220px QR, 46ch/62ch widths",
+      "lots": ["CE-03", "CE-04"],
+      "capabilities": ["CAP-03"]
+    },
+    {
+      "id": "REQ-10",
+      "request": "zIndices and opacities; conditional opacity variants",
+      "lots": ["CE-03", "CE-10"],
+      "capabilities": ["CAP-06", "CAP-15", "CAP-31"]
+    },
+    {
+      "id": "REQ-11",
+      "request": "Border Top/Right/Bottom/Left Width/Style/Color",
+      "lots": ["CE-05"],
+      "capabilities": ["CAP-09"]
+    },
+    {
+      "id": "REQ-12",
+      "request": "outlineWidth/Style/Color/Offset",
+      "lots": ["CE-05"],
+      "capabilities": ["CAP-09", "CAP-10"]
+    },
+    {
+      "id": "REQ-13",
+      "request": "Grid columns/rows 232px minmax(0,1fr), gridColumn",
+      "lots": ["CE-04"],
+      "capabilities": ["CAP-05"]
+    },
+    {
+      "id": "REQ-14",
+      "request": "Vitest 4.1 + Vite 8.3.1",
+      "lots": ["CE-13"],
+      "capabilities": ["CAP-43"]
+    },
+    {
+      "id": "REQ-15",
+      "request": "Static CSS, CSP style-src self, exact Alpha 2 versions and migration",
+      "lots": ["CE-13", "CE-15"],
+      "capabilities": ["CAP-36", "CAP-48"]
+    },
+    {
+      "id": "REQ-16",
+      "request": "Rerun declaration measurement",
+      "lots": ["CE-00", "CE-14"],
+      "capabilities": ["CAP-45"]
+    }
+  ]
+}

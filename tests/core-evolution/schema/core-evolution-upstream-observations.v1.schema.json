@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-upstream-observations.v1.schema.json",
+  "title": "Core evolution upstream qualification observation v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "upstream-qualification-observation"
+    },
+    "task": {
+      "const": "CE-00.1"
+    },
+    "observedAt": {
+      "type": "string"
+    },
+    "comparator": {
+      "type": "object"
+    },
+    "previousObservations": {
+      "type": "array",
+      "minItems": 1
+    },
+    "registry": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "package": {
+            "type": "string"
+          },
+          "metadataEndpoint": {
+            "type": "string"
+          },
+          "requestedAt": {
+            "type": "string"
+          },
+          "respondedAt": {
+            "type": "string"
+          },
+          "responseSha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "registryModifiedAt": {
+            "type": ["string", "null"]
+          },
+          "distTags": {
+            "type": "object"
+          },
+          "latestVersion": {
+            "type": ["string", "null"]
+          },
+          "latestPublishedAt": {
+            "type": ["string", "null"]
+          },
+          "pinnedVersion": {
+            "type": "string"
+          },
+          "pinnedPublishedAt": {
+            "type": ["string", "null"]
+          },
+          "pinnedIntegrity": {
+            "type": ["string", "null"]
+          },
+          "pinnedTarball": {
+            "type": ["string", "null"]
+          },
+          "newerStableVersions": {
+            "type": "array"
+          },
+          "delta": {
+            "enum": [
+              "latest-equals-pinned",
+              "newer-latest-requires-delta-review",
+              "latest-older-than-pinned",
+              "unknown"
+            ]
+          },
+          "evidenceLockIntegrity": {
+            "type": ["string", "null"]
+          },
+          "integrityMatchesEvidenceLock": {
+            "type": ["boolean", "null"]
+          },
+          "role": {
+            "enum": [
+              "pinned-comparator",
+              "obsolete-v1-internal-not-the-comparator"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "package",
+          "metadataEndpoint",
+          "requestedAt",
+          "respondedAt",
+          "responseSha256",
+          "registryModifiedAt",
+          "distTags",
+          "latestVersion",
+          "latestPublishedAt",
+          "pinnedVersion",
+          "pinnedPublishedAt",
+          "pinnedIntegrity",
+          "pinnedTarball",
+          "newerStableVersions",
+          "delta",
+          "evidenceLockIntegrity",
+          "integrityMatchesEvidenceLock",
+          "role"
+        ]
+      },
+      "minItems": 9
+    },
+    "tarballs": {
+      "type": "array",
+      "minItems": 8
+    },
+    "sourceArchives": {
+      "type": "array",
+      "minItems": 3
+    },
+    "sourceDigestChecks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pin": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "expected": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "actual": {
+            "type": ["string", "null"]
+          },
+          "match": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["pin", "group", "file", "expected", "actual", "match"]
+      },
+      "minItems": 1
+    },
+    "baselineDigestChecks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "expected": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "actual": {
+            "type": ["string", "null"]
+          },
+          "match": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["file", "expected", "actual", "match"]
+      },
+      "minItems": 1
+    },
+    "extraction": {
+      "type": "object"
+    },
+    "emissionProbes": {
+      "type": "object",
+      "properties": {
+        "stylex": {
+          "type": "object"
+        },
+        "panda": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["stylex", "panda"]
+    },
+    "environment": {
+      "type": "object"
+    },
+    "limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "task",
+    "observedAt",
+    "comparator",
+    "previousObservations",
+    "registry",
+    "tarballs",
+    "sourceArchives",
+    "sourceDigestChecks",
+    "baselineDigestChecks",
+    "extraction",
+    "emissionProbes",
+    "environment",
+    "limits"
+  ]
+}
