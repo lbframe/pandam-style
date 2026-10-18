@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-proof-oracles",
+  "task": "CE-00.2",
+  "status": "defined: inputs, assertion vocabularies and negative controls are frozen here; no oracle was executed in CE-00.2",
+  "policy": [
+    "Each oracle answers one question from its own inputs. Expected values are authored in the corpus manifest from the reference outcome; they are never generated from, regenerated against or blessed from compiler output.",
+    "An oracle reads the rendered page through the browser, never compiler internals, generated declarations or the design-system definition. The implementation under test is reached only through an adapter, as in the semantic migration oracle (docs/architecture/semantic-oracle-v1.md).",
+    "Results stay separate per outcome class. A fixture can be compiler-accepted and still fail fidelity, or fail acceptance because of a vocabulary gap while the behavior itself is unsupported. No combined score or percentage is derived.",
+    "Every oracle has a negative control: a mutation of the reference that must make the oracle fail. An oracle whose negative control passes is broken, and its positive results are void.",
+    "Engines, viewports, fonts and host identities come from the CE-01 browser-profile decisions and the CE-13 host qualification. A result without the exact engine identity is not evidence."
+  ],
+  "outcomeClasses": {
+    "compiler-accepted": "E2: the compiler admits the fixture's authored vocabulary without diagnostics.",
+    "compiler-rejected": "E2: the compiler rejects the source with the expected structured diagnostic. Expected for negative fixtures.",
+    "vocabulary-gap": "The catalog or design system cannot yet express a declaration of the reference. Required work, not a failure of the reference; measured by the classifier against a named policy or catalog.",
+    "unsupported-behavior": "The behavior is outside what a static, finite system or the target engine supports (registry limitations, target decisions). Reported as a limitation, never approximated and labeled equivalent.",
+    "fidelity-pass": "E3/E4: the emitted CSS and the rendered page satisfy every assertion of the oracle.",
+    "fidelity-failure": "E3/E4: at least one assertion fails on an accepted build."
+  },
+  "states": {
+    "rest": "Initial render, no interaction.",
+    "pointer-hover": "A mouse pointer rests over the target (real pointer move, not a forced pseudo-class).",
+    "pointer-active": "The primary mouse button is held down on the target.",
+    "touch": "Emulated coarse pointer without hover (pointer: coarse, hover: none) and touch input events.",
+    "keyboard-focus": "The target received focus from Tab or Shift+Tab, so :focus-visible matches.",
+    "keyboard-navigation": "Arrow, Home, End, Enter or Space keys move focus or activate inside a composite widget.",
+    "error": "The control carries aria-invalid=\"true\" and an associated error message.",
+    "loading": "The control or region carries aria-busy=\"true\".",
+    "disabled": "The control is disabled natively or with aria-disabled=\"true\".",
+    "high-contrast": "Forced colors are active (forced-colors: active).",
+    "increased-contrast": "The user prefers more contrast (prefers-contrast: more).",
+    "reduced-motion": "The user prefers reduced motion (prefers-reduced-motion: reduce).",
+    "scrolled": "A scroll container was scrolled by a stated offset.",
+    "print": "Print media emulation.",
+    "rtl": "Right-to-left direction from the document or an ancestor dir attribute.",
+    "hydrated": "After client hydration or a client-side route change of a server-rendered page."
+  },
+  "requiredInteractionStates": {
+    "pointer": ["pointer-hover", "pointer-active"],
+    "touch": ["touch"],
+    "keyboard": ["keyboard-focus", "keyboard-navigation"],
+    "error": ["error"],
+    "loading": ["loading"],
+    "disabled": ["disabled"],
+    "high-contrast": ["high-contrast", "increased-contrast"]
+  },
+  "oracles": [
+    {
+      "id": "ORC-VOCAB",
+      "class": "accepted-vocabulary",
+      "evidenceClass": "E2",
+      "question": "Does the compiler admit the fixture when the design system authorizes exactly the listed vocabulary, and reject it with the expected diagnostic when one item is withdrawn?",
+      "inputs": [
+        "fixture acceptedVocabulary (tokens, conditions, resources)",
+        "fixture source written against the canonical authoring API of the owning lot",
+        "compiler package identity and design-system definition digest"
+      ],
+      "procedure": [
+        "Compile the fixture source with a definition that declares exactly the listed vocabulary; require zero diagnostics.",
+        "For each listed item, compile again with that item withdrawn; require a structured rejection naming the missing item."
+      ],
+      "assertionKinds": ["accepted", "rejectedWithout"],
+      "independence": "The vocabulary list is authored from the reference outcome, not read from a definition the compiler produced.",
+      "negativeControl": "Withdraw one authorized token or condition; a run that still reports zero diagnostics fails the oracle.",
+      "executionOwners": ["CE-02", "CE-03", "CE-07", "CE-10", "CE-14"]
+    },
+    {
+      "id": "ORC-CSS",
+      "class": "expected-css",
+      "evidenceClass": "E3",
+      "question": "Is every declaration of the reference stylesheet emitted, under an equivalent condition, after the single target transform?",
+      "inputs": [
+        "reference stylesheet(s) and their accounting in accounting.v1.json",
+        "emitted and target-transformed CSS of the build",
+        "browser target decision of the bound profile"
+      ],
+      "procedure": [
+        "Canonicalize both stylesheets with the same parser: expand shorthands to longhands, normalize colors and lengths, map conditions to their media or selector meaning.",
+        "Require each reference longhand under each reference condition to have exactly one emitted counterpart with an equal canonical value.",
+        "Require that the emitted CSS adds no declaration whose computed effect differs on the fixture's elements."
+      ],
+      "assertionKinds": ["declarationsEquivalent", "noExtraEffect"],
+      "independence": "Reference declarations come from the authored stylesheet; emitted CSS is only compared, never used to update the reference.",
+      "negativeControl": "Delete one reference declaration from the emitted CSS; the oracle must report the missing longhand and condition.",
+      "executionOwners": ["CE-01", "CE-12", "CE-14"]
+    },
+    {
+      "id": "ORC-LAYOUT",
+      "class": "layout",
+      "evidenceClass": "E4",
+      "question": "Do the targets have the expected border boxes, positions, scroll and stacking behavior at each viewport and state?",
+      "inputs": [
+        "built page and the reference page, each served with the fixture CSP",
+        "viewports and states of the assertion",
+        "exact engine identity"
+      ],
+      "procedure": [
+        "Render at the viewport, drive the state with real input, wait for fonts and two animation frames.",
+        "Read getBoundingClientRect, scroll extents and elementFromPoint for each target; compare with the expectation within the tolerance."
+      ],
+      "assertionKinds": [
+        "box",
+        "minBox",
+        "maxBox",
+        "noHorizontalOverflow",
+        "scrollable",
+        "stuckAfterScroll",
+        "fixedToViewport",
+        "topmostAt",
+        "columns",
+        "edgeOffset",
+        "sameBoxAsReference"
+      ],
+      "comparator": "Pixel values compare within tolerancePx (default 0.5). Expected numbers are authored from fixed sizes, so they do not depend on fonts.",
+      "independence": "Expectations are authored numbers or the rendered reference page; the oracle never reads class names, generated CSS or definitions.",
+      "negativeControl": "Remove the reference's grid-template-columns (or the target's width) declaration; the box assertion must fail.",
+      "executionOwners": ["CE-04", "CE-05", "CE-14"]
+    },
+    {
+      "id": "ORC-TEXT",
+      "class": "text",
+      "evidenceClass": "E4",
+      "question": "Does text wrap, truncate, preserve breaks, isolate direction and flow vertically as specified?",
+      "inputs": [
+        "built page and reference page",
+        "viewports and states of the assertion",
+        "exact engine identity and, for font-dependent metrics, a pinned font resource"
+      ],
+      "procedure": [
+        "Measure line boxes with Range.getClientRects per target, compare scrollWidth with clientWidth, read computed direction and writing mode.",
+        "Font-dependent assertions require the pinned font of the executing lot; assertions in this corpus are font-independent by construction (single line versus several lines, truncation, preserved author breaks, overflow)."
+      ],
+      "assertionKinds": [
+        "lineCount",
+        "truncated",
+        "noOverflow",
+        "preservesBreaks",
+        "writingMode",
+        "direction",
+        "inlineStartEdge",
+        "balancedLines"
+      ],
+      "comparator": "Integer line counts compare exactly or against a stated minimum. Edge positions compare within tolerancePx.",
+      "independence": "Expected line behavior comes from the authored text and sizes, not from a rendering of the build.",
+      "negativeControl": "Replace white-space: pre-line by normal (or remove text-overflow: ellipsis); the line or truncation assertion must fail.",
+      "executionOwners": ["CE-06", "CE-14"]
+    },
+    {
+      "id": "ORC-STATE",
+      "class": "state",
+      "evidenceClass": "E4",
+      "question": "Does each state produce the expected computed styles, and only in that state?",
+      "inputs": [
+        "built page and reference page",
+        "states driven by real input or by the documented ARIA attributes",
+        "media emulation for touch, reduced motion, forced colors, contrast and print"
+      ],
+      "procedure": [
+        "Read computed styles of the target at rest, enter the state with real input or media emulation, read again.",
+        "Require the expected values in the state and the rest values outside it."
+      ],
+      "assertionKinds": [
+        "computed",
+        "computedUnchanged",
+        "animationNone",
+        "transitionNone"
+      ],
+      "comparator": "Computed values compare after the browser's own serialization; colors as resolved sRGB or system color keywords.",
+      "independence": "States are entered with real pointer, keyboard and media emulation; forcing pseudo-classes through developer protocol is not accepted.",
+      "negativeControl": "Delete the reference's :focus-visible outline rule; the focus state assertion must fail.",
+      "executionOwners": ["CE-05", "CE-07", "CE-08", "CE-14"]
+    },
+    {
+      "id": "ORC-KEYBOARD",
+      "class": "keyboard",
+      "evidenceClass": "E4",
+      "question": "Can the page be operated by keyboard alone, with a visible focus indicator at every step?",
+      "inputs": [
+        "built page and reference page",
+        "key sequence of the assertion"
+      ],
+      "procedure": [
+        "Start from the document, press the keys of the sequence through the browser input pipeline.",
+        "After each step record document.activeElement, whether :focus-visible matches and the focus indicator's painted outline or box-shadow area."
+      ],
+      "assertionKinds": [
+        "focusOrder",
+        "focusVisible",
+        "activates",
+        "scrollsWithKeys"
+      ],
+      "comparator": "The first Tab stops, starting from the document, must equal the listed targets in order; later stops are not constrained. A visible indicator needs a non-zero painted area outside or inside the border box.",
+      "independence": "Sequences are authored from the reference markup; the oracle never relies on generated class names.",
+      "negativeControl": "Swap the tabindex of two targets or remove the focus-visible outline; the order or indicator assertion must fail.",
+      "executionOwners": ["CE-05", "CE-07", "CE-14"]
+    },
+    {
+      "id": "ORC-A11Y",
+      "class": "accessibility",
+      "evidenceClass": "E4",
+      "question": "Do styling outcomes preserve roles, names, contrast, target size and forced-colors visibility?",
+      "inputs": [
+        "built page and reference page",
+        "browser accessibility tree snapshot",
+        "states including high-contrast and increased-contrast"
+      ],
+      "procedure": [
+        "Read the accessibility tree for role and name of each target.",
+        "Compute contrast from computed colors against the effective background; measure target sizes; in forced colors require visible boundaries."
+      ],
+      "assertionKinds": [
+        "role",
+        "name",
+        "contrastMin",
+        "targetSizeMin",
+        "forcedColorsVisible",
+        "notHiddenFromAssistiveTech",
+        "visuallyHiddenButExposed"
+      ],
+      "comparator": "Contrast uses the WCAG 2.2 relative luminance formula; sizes in CSS pixels.",
+      "independence": "Roles and names come from authored markup; contrast and size thresholds are WCAG 2.2 values.",
+      "negativeControl": "Set the error text color to the background color, or hide the label with display: none; the contrast or name assertion must fail.",
+      "executionOwners": ["CE-05", "CE-06", "CE-14"]
+    },
+    {
+      "id": "ORC-CSP",
+      "class": "csp",
+      "evidenceClass": "E4",
+      "question": "Does the page render completely under a restrictive CSP without inline styles, injected style elements or runtime style transport?",
+      "inputs": [
+        "built page served with the fixture policy as an HTTP header",
+        "securitypolicyviolation events, DOM snapshot after interaction",
+        "host identity (CE-13) for E5 qualification"
+      ],
+      "procedure": [
+        "Load every route of the fixture, run each assertion's states, then collect violations.",
+        "Count <style> elements, [style] attributes, CSSOM insertions made at runtime and custom properties set on elements by script."
+      ],
+      "assertionKinds": [
+        "violations",
+        "styleElements",
+        "styleAttributes",
+        "runtimeStyleInsertions",
+        "inlineCustomProperties",
+        "completeFirstPaint"
+      ],
+      "comparator": "All counters compare exactly with zero unless the assertion states otherwise.",
+      "independence": "The policy text is authored in the manifest; the oracle observes the browser, not the build output.",
+      "negativeControl": "Add one style attribute or one injected <style> element to the page; the violation or counter assertion must fail.",
+      "executionOwners": ["CE-12", "CE-13", "CE-14"]
+    }
+  ]
+}

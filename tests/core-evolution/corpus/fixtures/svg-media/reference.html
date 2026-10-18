@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVG and media reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <div class="icons" data-testid="icons">
+      <button class="icon-button" type="button" aria-label="Refresh" data-testid="icon-button">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" data-testid="icon">
+          <path class="icon-stroke" d="M4 12a8 8 0 0 1 14-5l2-2v6h-6l2-2a5 5 0 1 0 1 6" />
+        </svg>
+      </button>
+      <svg class="chart" viewBox="0 0 120 40" role="img" aria-label="Requests over time" data-testid="chart">
+        <polyline class="chart-line" points="0,30 20,22 40,26 60,12 80,18 100,6 120,10" />
+        <line class="chart-guide" x1="0" y1="20" x2="120" y2="20" />
+        <text class="chart-label" x="2" y="38">0</text>
+      </svg>
+    </div>
+    <figure class="media" data-testid="media">
+      <img class="media-img" src="media.svg" alt="Abstract landscape" width="640" height="480" data-testid="media-img" />
+      <figcaption class="media-caption" data-testid="media-caption">Cover-fitted media in a 16:9 frame.</figcaption>
+    </figure>
+    <div class="qr" data-testid="qr">
+      <img class="qr-img" src="media.svg" alt="Pairing code" data-testid="qr-img" />
+    </div>
+    <div class="masked" data-testid="masked"></div>
+  </body>
+</html>

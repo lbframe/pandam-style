@@ -1,0 +1,97 @@
+/* RTL and vertical writing reference outcome. Authored for CE-00.2; not compiler output. */
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #1f2421;
+}
+
+.card {
+  position: relative;
+  max-width: 360px;
+  margin-block-end: 16px;
+  padding-block: 16px;
+  padding-inline-start: 24px;
+  padding-inline-end: 64px;
+  border-inline-start-width: 4px;
+  border-inline-start-style: solid;
+  border-inline-start-color: #3e563f;
+  border-start-end-radius: 12px;
+  border-end-end-radius: 12px;
+  background-color: #f4f6f0;
+}
+
+.badge {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-end: 12px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #ffffff;
+  background-color: #3e563f;
+}
+
+.card-title {
+  margin-block: 0 8px;
+  font-size: 18px;
+  text-align: start;
+}
+
+.card-text {
+  margin: 0;
+  text-align: justify;
+}
+
+.isolate {
+  unicode-bidi: isolate;
+  font-family: ui-monospace, monospace;
+}
+
+.card-link {
+  display: inline-block;
+  margin-block-start: 8px;
+  color: #2f5b3a;
+}
+
+.card-link:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 2px;
+}
+
+.card-link::after {
+  content: '\2192';
+  margin-inline-start: 4px;
+}
+
+.card:dir(rtl) .card-link::after {
+  content: '\2190';
+}
+
+.vertical {
+  height: 280px;
+  padding: 16px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  background-color: #faf3e6;
+}
+
+.vertical-title {
+  margin-block: 0 16px;
+  font-size: 18px;
+}
+
+.vertical-text {
+  margin: 0;
+  line-break: strict;
+  ruby-position: over;
+}
+
+.tcy {
+  text-combine-upright: all;
+}

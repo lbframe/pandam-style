@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Content and marketing reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <header class="hero" data-testid="hero">
+      <p class="eyebrow">Release notes</p>
+      <h1 class="hero-title" data-testid="hero-title">Static styles that an agent can reason about</h1>
+      <p class="hero-lede" data-testid="hero-lede">
+        Every value comes from a finite vocabulary, so the stylesheet that ships is the stylesheet that was reviewed.
+      </p>
+      <a class="cta" href="#start" data-testid="cta">Get started</a>
+    </header>
+    <article class="article" data-testid="article">
+      <h2 class="article-heading">What changed</h2>
+      <p class="article-body" data-testid="article-body">
+        Compilation now records every design value it emits. Reviewers compare the record with the design system definition instead of reading generated files, and the comparison fails when a value has no authorized source.
+      </p>
+      <ol class="steps" data-testid="steps">
+        <li class="step">Declare the vocabulary.</li>
+        <li class="step">Compose it in components.</li>
+        <li class="step">Ship the static stylesheet.</li>
+      </ol>
+      <blockquote class="quote" data-testid="quote">
+        <p>Constraints are cheaper to review than conventions.</p>
+      </blockquote>
+      <p class="columns" data-testid="columns">
+        Multi-column text keeps long reference material readable on wide screens. It flows from one column to the next without manual breaks, and collapses to a single column when the viewport becomes narrow. Hyphenation and balanced line breaks keep the right edge even.
+      </p>
+      <pre class="code" data-testid="code">create({
+  card: { padding: token('spacing.md') },
+})</pre>
+      <a class="inline-link" href="#more" data-testid="inline-link">Read the full migration guide</a>
+    </article>
+    <footer class="footer"><small>Example content for layout tests.</small></footer>
+  </body>
+</html>

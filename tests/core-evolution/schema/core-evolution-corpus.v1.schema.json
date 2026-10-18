@@ -1,0 +1,661 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-corpus.v1.schema.json",
+  "title": "CE-00.2 proof corpus manifest",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-proof-corpus"
+    },
+    "task": {
+      "const": "CE-00.2"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "references": {
+      "type": "object",
+      "properties": {
+        "oracles": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accounting": {
+          "type": "string",
+          "minLength": 1
+        },
+        "calibration": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profiles": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilities": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceCheck": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scopeFindings": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "oracles",
+        "accounting",
+        "calibration",
+        "profiles",
+        "capabilities",
+        "referenceCheck",
+        "scopeFindings"
+      ]
+    },
+    "fixtures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CE-CORPUS-[A-Z-]+-[0-9]{2}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fixtureClass": {
+            "enum": [
+              "application-shell",
+              "forms-and-validation",
+              "notices-and-empty-states",
+              "dense-data-grid",
+              "content-and-marketing",
+              "rtl-and-vertical-text",
+              "svg-and-media",
+              "ssr-application",
+              "component-library",
+              "interaction-states"
+            ]
+          },
+          "profiles": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "capabilityFixtureSets": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^CE-FX-CAP-[0-9]{2}-"
+            },
+            "uniqueItems": true
+          },
+          "inputs": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "role": {
+                  "enum": ["reference-page", "reference-stylesheet", "asset"]
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["path", "role", "sha256"]
+            }
+          },
+          "viewports": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": ["id", "width", "height"]
+            }
+          },
+          "states": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "acceptedVocabulary": {
+            "type": "object",
+            "properties": {
+              "tokens": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "value": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": ["category", "name", "value"]
+                }
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "meaning": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": ["name", "meaning"]
+                }
+              },
+              "resources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["kind", "name"]
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": ["tokens", "conditions", "resources"]
+          },
+          "expectedCss": {
+            "type": "object",
+            "properties": {
+              "oracle": {
+                "const": "ORC-CSS"
+              },
+              "stylesheets": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": ["oracle", "stylesheets"]
+          },
+          "knownLimitations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "subject": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "outcome": {
+                  "enum": ["unsupported-behavior", "vocabulary-gap"]
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": ["subject", "outcome", "statement"]
+            }
+          },
+          "assertions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[A-Z]+-[A-Z][0-9]+$"
+                },
+                "oracle": {
+                  "type": "string",
+                  "pattern": "^ORC-"
+                },
+                "case": {
+                  "enum": ["positive", "boundary", "negative"]
+                },
+                "profiles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                },
+                "viewport": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expect": {
+                  "type": "object"
+                },
+                "mutation": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "withdraw-vocabulary",
+                        "remove-declaration",
+                        "replace-value",
+                        "remove-rule",
+                        "remove-emitted-declaration",
+                        "inject-style-element",
+                        "set-attribute"
+                      ]
+                    },
+                    "file": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "selector": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "property": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "value": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "item": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "target": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "attribute": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": ["kind"]
+                },
+                "mustFail": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "note": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": ["id", "oracle", "case"]
+            }
+          },
+          "csp": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "fixtureClass",
+          "profiles",
+          "capabilityFixtureSets",
+          "inputs",
+          "viewports",
+          "states",
+          "acceptedVocabulary",
+          "expectedCss",
+          "knownLimitations",
+          "assertions",
+          "csp"
+        ]
+      }
+    },
+    "negativeFixtures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CE-NEG-[A-Z-]+-[0-9]{2}$"
+          },
+          "category": {
+            "enum": [
+              "wrong-category",
+              "private-resource",
+              "unknown-selector",
+              "raw-style",
+              "runtime-value",
+              "mixed-design-system",
+              "unknown-property"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "profiles": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "capabilityFixtureSets": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^CE-FX-CAP-[0-9]{2}-"
+            }
+          },
+          "definition": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "additionalProperties": false,
+            "required": ["path", "sha256"]
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourceSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "sourceExtension": {
+            "enum": ["js", "jsx"]
+          },
+          "secondSystem": {
+            "type": "object",
+            "properties": {
+              "definition": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "additionalProperties": false,
+                "required": ["path", "sha256"]
+              },
+              "projectDir": {
+                "type": "string",
+                "pattern": "^[a-z-]+$"
+              },
+              "designSystemFile": {
+                "type": "string",
+                "pattern": "^[a-z-]+\\.pandamstyle\\.js$"
+              }
+            },
+            "additionalProperties": false,
+            "required": ["definition", "projectDir", "designSystemFile"]
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "intended": {
+                "type": "object",
+                "properties": {
+                  "outcome": {
+                    "enum": ["compiler-rejected", "runtime-rejected"]
+                  },
+                  "afterEveryLot": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sourceInspection": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "pattern": "^PMS_[A-Z_]+$"
+                      },
+                      "rule": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "site": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "superseded": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": ["code", "rule", "site"]
+                  }
+                },
+                "additionalProperties": false,
+                "required": ["outcome", "afterEveryLot", "sourceInspection"]
+              },
+              "observedAlpha1": {
+                "type": "object",
+                "properties": {
+                  "outcome": {
+                    "enum": [
+                      "compiler-rejected",
+                      "compiler-accepted",
+                      "runtime-rejected"
+                    ]
+                  },
+                  "phase": {
+                    "type": ["string", "null"]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^PMS_[A-Z_]+$"
+                    }
+                  },
+                  "rule": {
+                    "type": ["string", "null"]
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "pattern": "^E2: "
+                  },
+                  "emittedCssContains": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "defect": {
+                    "type": "object",
+                    "properties": {
+                      "scopeFinding": {
+                        "type": "string",
+                        "pattern": "^SF-[0-9]{2}$"
+                      },
+                      "owner": {
+                        "type": "string",
+                        "pattern": "^CE-[0-9]{2}\\.[0-9]$"
+                      },
+                      "issue": {
+                        "type": "integer"
+                      },
+                      "statement": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": ["scopeFinding", "owner", "issue", "statement"]
+                  },
+                  "runtimeProbe": {
+                    "type": "object",
+                    "properties": {
+                      "outcome": {
+                        "enum": ["runtime-rejected", "runtime-accepted"]
+                      },
+                      "code": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "rule": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "phase": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "procedure": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "outcome",
+                      "code",
+                      "rule",
+                      "phase",
+                      "procedure"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": ["outcome", "phase", "codes", "rule", "evidence"]
+              }
+            },
+            "additionalProperties": false,
+            "required": ["intended", "observedAlpha1"]
+          },
+          "boundary": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "category",
+          "title",
+          "profiles",
+          "capabilityFixtureSets",
+          "definition",
+          "source",
+          "sourceSha256",
+          "sourceExtension",
+          "expected"
+        ]
+      }
+    },
+    "calibrationSets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "task",
+    "status",
+    "policy",
+    "references",
+    "fixtures",
+    "negativeFixtures",
+    "calibrationSets"
+  ]
+}

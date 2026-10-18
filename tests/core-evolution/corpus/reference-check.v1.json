@@ -1,0 +1,3529 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-reference-check",
+  "task": "CE-00.2",
+  "statement": "Reference pages only: the authored outcomes rendered in Chromium. Not compiler, build or product qualification.",
+  "engine": {
+    "browser": "chromium",
+    "version": "148.0.7778.96",
+    "playwrightCore": "1.60.0"
+  },
+  "inputs": {
+    "tests/core-evolution/corpus/fixtures/app-shell/reference.html": "8595956a713d1252cec74863a8dff1aaad7accd2fd163e90727174dbe0a4fe36",
+    "tests/core-evolution/corpus/fixtures/app-shell/reference.css": "49b3ef9339b6be682a74eb13d719f9286556073d601da33cb24ecb17628ed4e2",
+    "tests/core-evolution/corpus/fixtures/forms/reference.html": "da196ff885606c2252955a529eb846ef8e08a9b36086d45b0d44c11d33176e84",
+    "tests/core-evolution/corpus/fixtures/forms/reference.css": "971753a50b3120ad67f5dca472f7b0e1c842838ac33248e541860d3dceeec9d3",
+    "tests/core-evolution/corpus/fixtures/notices/reference.html": "6da2325581b2727b39c1a8770dd98e628d62c01d15aae766bdede55e467256be",
+    "tests/core-evolution/corpus/fixtures/notices/reference.css": "313e942cb93efc57615cf7eb823ef836fe9318ed96a236b22f03fde9233583e0",
+    "tests/core-evolution/corpus/fixtures/data-grid/reference.html": "acd705cca3540fea05efab07c1ec2807a0cf58ffc1c01b515276f24a647b1276",
+    "tests/core-evolution/corpus/fixtures/data-grid/reference.css": "93936bdbd975624b7a233d3d5609457e33eb3863a9c25067096b825418459238",
+    "tests/core-evolution/corpus/fixtures/content/reference.html": "22ef62e8923d76cf3158c8abf111622b0998913bc236d09ef4e48a2cfc45e33c",
+    "tests/core-evolution/corpus/fixtures/content/reference.css": "b95615c9f609894ffa3868922b4ae8e0e92df819c17d6a7cda16c7f191ba81b3",
+    "tests/core-evolution/corpus/fixtures/rtl-vertical/reference.html": "e245eb463e541bbf0c6932c0a159f2f22d3ffe72ae9ab0024f527825a5306e27",
+    "tests/core-evolution/corpus/fixtures/rtl-vertical/reference.css": "692a2c7122cfda7ffa0a80326de9f3d93fa806616c1dc9396bc7d8e2eb4ab624",
+    "tests/core-evolution/corpus/fixtures/svg-media/reference.html": "a34bae99c76f775cbd73b0d7bc18ed8efc5365b8f34f333a9e6b5002a90d415c",
+    "tests/core-evolution/corpus/fixtures/svg-media/reference.css": "0a0d13729ae505ab14c9481915500951b9d468733b3b1d845f581f1b0b08f7f6",
+    "tests/core-evolution/corpus/fixtures/svg-media/media.svg": "7afd018d9e8419be2899213867c560b93ed2349211d18042c24962e0e52dfc50",
+    "tests/core-evolution/corpus/fixtures/ssr/reference.html": "997f83f5bf1d416951cb0904ee71374438e63a43c6c095e336ec9b2d2a44e760",
+    "tests/core-evolution/corpus/fixtures/ssr/reference.css": "4af52d1413ac4f9a5fd42b85e8a60755be92b491db6e9309f02e2a3af59c174c",
+    "tests/core-evolution/corpus/fixtures/ssr/route.html": "aad15933a1a9377c06468b0c974e7517bb6ca58b6f2b5b2c10e686ff32a4d747",
+    "tests/core-evolution/corpus/fixtures/ssr/route.css": "1228ffad62c4bffeb9a865204c35a4df0e32eef0bc84cb9f10055b980e12998a",
+    "tests/core-evolution/corpus/fixtures/component-library/reference.html": "0fbe22ce67f9e658db2a329e9fa23d1d70cf1b59c8ac3a56cbafc6d5bda86f55",
+    "tests/core-evolution/corpus/fixtures/component-library/reference.css": "aa04d2536e8df46b0851e07351191466a9067c7d359902bcd1748bbe7eefa0b3",
+    "tests/core-evolution/corpus/fixtures/interaction-states/reference.html": "fb283b411fea7c3226b6d5682892e33d88dc022190c8cdd41471a0c3ad0ba755",
+    "tests/core-evolution/corpus/fixtures/interaction-states/reference.css": "d8c696727aa30cd09dbff537eb622df82c125a56200fc3afcc0544857eeb7db1"
+  },
+  "tally": {
+    "pass": 141,
+    "not-evaluated": 9
+  },
+  "rows": [
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 232,
+            "height": 740
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-L2",
+      "oracle": "ORC-LAYOUT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "at-900",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 76,
+            "height": 660
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-L3",
+      "oracle": "ORC-LAYOUT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "at-901",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 232,
+            "height": 660
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-L4",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "scrolled",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "stuckAfterScroll",
+          "ok": true,
+          "measured": {
+            "scrolled": 107,
+            "offset": 0
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-L5",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "fixedToViewport",
+          "ok": true,
+          "measured": {
+            "right": 16,
+            "bottom": 16
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-L6",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 6,
+            "height": 6
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-L7",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 14,
+            "height": 14
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-L8",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "narrow",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "noHorizontalOverflow",
+          "ok": true,
+          "measured": {
+            "scrollWidth": 769,
+            "clientWidth": 769
+          }
+        },
+        {
+          "kind": "scrollable",
+          "ok": true,
+          "measured": {
+            "x": false,
+            "y": true
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-L9",
+      "oracle": "ORC-LAYOUT",
+      "case": "negative",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "mutation": "remove-declaration",
+      "mustFail": "SHELL-L1",
+      "results": [
+        {
+          "kind": "box",
+          "ok": false,
+          "measured": {
+            "width": 1120,
+            "height": 16
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-T1",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "lineCount",
+          "ok": true,
+          "measured": 1
+        },
+        {
+          "kind": "truncated",
+          "ok": true,
+          "measured": {
+            "overflow": true,
+            "textOverflow": "ellipsis"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "pointer-hover",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "background-color": "rgb(227, 232, 220)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-S2",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "pointer-active",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "transform": "matrix(1, 0, 0, 1, 0, 1)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-S3",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "touch",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "min-height": "44px"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-S4",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "reduced-motion",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "animationNone",
+          "ok": true,
+          "measured": [
+            "none"
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-S5",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "outline-style": "solid",
+            "outline-width": "2px",
+            "outline-offset": "2px"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-S6",
+      "oracle": "ORC-STATE",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "-webkit-app-region": "no-drag"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "titlebar-action",
+            "nav-inbox",
+            "nav-projects",
+            "nav-archive",
+            "primary-action"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-A1",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "navigation"
+        },
+        {
+          "kind": "name",
+          "ok": true,
+          "measured": "Primary"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-A2",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "status"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-A3",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "touch",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "targetSizeMin",
+          "ok": true,
+          "measured": {
+            "width": 215,
+            "height": 44
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-A4",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "high-contrast",
+      "viewport": "wide",
+      "status": "not-evaluated",
+      "results": [
+        {
+          "kind": "forcedColorsVisible",
+          "ok": null,
+          "measured": null,
+          "note": "not evaluated: needs a pixel comparison of the forced-colors rendering"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-APP-SHELL-01",
+      "id": "SHELL-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "minBox",
+          "ok": true,
+          "measured": {
+            "width": 409.71875,
+            "height": 40
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-L2",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "touch",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "minBox",
+          "ok": true,
+          "measured": {
+            "width": 409.71875,
+            "height": 48
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-L3",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 16,
+            "height": 16
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-T1",
+      "oracle": "ORC-TEXT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "tight",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "noOverflow",
+          "ok": true,
+          "measured": {
+            "scrollWidth": 192,
+            "clientWidth": 192,
+            "textRight": 187.578125,
+            "right": 216
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "border-top-color": "rgb(168, 60, 55)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-S2",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "outline-style": "solid",
+            "outline-width": "2px",
+            "outline-offset": "2px",
+            "outline-color": "rgb(62, 86, 63)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-S3",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "disabled",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "cursor": "not-allowed",
+            "opacity": "0.6"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-S4",
+      "oracle": "ORC-STATE",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "pointer-active",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "transform": "none"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-S5",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "loading",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "cursor": "not-allowed",
+            "opacity": "0.6"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-S6",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "reduced-motion",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "animation-duration": "2.4s"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-S7",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "increased-contrast",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "border-top-color": "rgb(31, 36, 33)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-S8",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "pointer-hover",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "background-color": "rgb(48, 68, 49)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-S9",
+      "oracle": "ORC-STATE",
+      "case": "negative",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "mutation": "remove-rule",
+      "mustFail": "FORMS-S2",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": false,
+          "measured": {
+            "outline-style": "auto",
+            "outline-width": "1px",
+            "outline-offset": "0px",
+            "outline-color": "rgb(16, 16, 16)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "input-name",
+            "input-email",
+            "input-code",
+            "input-notes",
+            "input-file",
+            "input-check",
+            "submit",
+            "busy"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-A1",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "textbox"
+        },
+        {
+          "kind": "name",
+          "ok": true,
+          "measured": "Email address"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-A2",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": true,
+          "measured": {
+            "ratio": 6.24,
+            "fg": [
+              168,
+              60,
+              55
+            ],
+            "bg": [
+              255,
+              255,
+              255
+            ],
+            "image": false
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-A3",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "high-contrast",
+      "viewport": "wide",
+      "status": "not-evaluated",
+      "results": [
+        {
+          "kind": "forcedColorsVisible",
+          "ok": null,
+          "measured": null,
+          "note": "not evaluated: needs a pixel comparison of the forced-colors rendering"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-A4",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "targetSizeMin",
+          "ok": true,
+          "measured": {
+            "width": 409.71875,
+            "height": 24
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-A5",
+      "oracle": "ORC-A11Y",
+      "case": "negative",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "mutation": "replace-value",
+      "mustFail": "FORMS-A2",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": false,
+          "measured": {
+            "ratio": 1,
+            "fg": [
+              255,
+              255,
+              255
+            ],
+            "bg": [
+              255,
+              255,
+              255
+            ],
+            "image": false
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-FORMS-01",
+      "id": "FORMS-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 24,
+            "height": 24
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-L2",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 18,
+            "height": 18
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-T1",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "preservesBreaks",
+          "ok": true,
+          "measured": {
+            "lines": 4,
+            "authorBreaksHonored": [
+              true,
+              true
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-T2",
+      "oracle": "ORC-TEXT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "narrow",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "preservesBreaks",
+          "ok": true,
+          "measured": {
+            "lines": 5,
+            "authorBreaksHonored": [
+              true,
+              true
+            ]
+          }
+        },
+        {
+          "kind": "noOverflow",
+          "ok": true,
+          "measured": {
+            "scrollWidth": 270,
+            "clientWidth": 270,
+            "textRight": 275,
+            "right": 296
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-T3",
+      "oracle": "ORC-TEXT",
+      "case": "negative",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "mutation": "replace-value",
+      "mustFail": "NOTICES-T1",
+      "results": [
+        {
+          "kind": "preservesBreaks",
+          "ok": false,
+          "measured": {
+            "lines": 3,
+            "authorBreaksHonored": [
+              false,
+              false
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "loading",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "display": "grid"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-S2",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "reduced-motion",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "animationNone",
+          "ok": true,
+          "measured": [
+            "none",
+            "none",
+            "none"
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-S3",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "text-align": "center",
+            "border-top-style": "dashed"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "notice-dismiss",
+            "empty-action"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-A1",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "alert"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-A2",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "button"
+        },
+        {
+          "kind": "name",
+          "ok": true,
+          "measured": "Dismiss"
+        },
+        {
+          "kind": "targetSizeMin",
+          "ok": true,
+          "measured": {
+            "width": 24,
+            "height": 24
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-A3",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": true,
+          "measured": {
+            "ratio": 5.1,
+            "fg": [
+              105,
+              112,
+              103
+            ],
+            "bg": [
+              255,
+              255,
+              255
+            ],
+            "image": false
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-A4",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "high-contrast",
+      "viewport": "wide",
+      "status": "not-evaluated",
+      "results": [
+        {
+          "kind": "forcedColorsVisible",
+          "ok": null,
+          "measured": null,
+          "note": "not evaluated: needs a pixel comparison of the forced-colors rendering"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-NOTICES-01",
+      "id": "NOTICES-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "scrollable",
+          "ok": true,
+          "measured": {
+            "x": true,
+            "y": true
+          }
+        },
+        {
+          "kind": "maxBox",
+          "ok": true,
+          "measured": {
+            "width": 640,
+            "height": 240
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-L2",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "scrolled",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "stuckAfterScroll",
+          "ok": true,
+          "measured": {
+            "scrolled": 242,
+            "offset": 0
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-L3",
+      "oracle": "ORC-LAYOUT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "scrolled",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "topmostAt",
+          "ok": true,
+          "measured": {
+            "hit": true,
+            "scrolled": [
+              242,
+              120
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-L4",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 160,
+            "height": 28
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-T1",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "lineCount",
+          "ok": true,
+          "measured": 1
+        },
+        {
+          "kind": "truncated",
+          "ok": true,
+          "measured": {
+            "overflow": true,
+            "textOverflow": "ellipsis"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-T2",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "lineCount",
+          "ok": true,
+          "measured": 1
+        },
+        {
+          "kind": "truncated",
+          "ok": true,
+          "measured": {
+            "overflow": true,
+            "textOverflow": "ellipsis"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "pointer-hover",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "background-color": "rgb(244, 246, 240)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-S2",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "text-align": "end",
+            "font-variant-numeric": "tabular-nums"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-S3",
+      "oracle": "ORC-STATE",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "print",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "overflow-x": "visible",
+            "overflow-y": "visible"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-navigation",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "grid-scroll"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true
+          ]
+        },
+        {
+          "kind": "scrollsWithKeys",
+          "ok": true,
+          "measured": {
+            "focused": "grid-scroll",
+            "before": [
+              0,
+              0
+            ],
+            "after": [
+              40,
+              40
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-A1",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "region"
+        },
+        {
+          "kind": "name",
+          "ok": true,
+          "measured": "Deployments"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-A2",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "grid"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-A3",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "high-contrast",
+      "viewport": "wide",
+      "status": "not-evaluated",
+      "results": [
+        {
+          "kind": "forcedColorsVisible",
+          "ok": null,
+          "measured": null,
+          "note": "not evaluated: needs a pixel comparison of the forced-colors rendering"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-DATA-GRID-01",
+      "id": "GRID-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "columns",
+          "ok": true,
+          "measured": 2
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-L2",
+      "oracle": "ORC-LAYOUT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "at-650",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "columns",
+          "ok": true,
+          "measured": 1
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-L3",
+      "oracle": "ORC-LAYOUT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "at-651",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "columns",
+          "ok": true,
+          "measured": 2
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-T1",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "preservesBreaks",
+          "ok": true,
+          "measured": {
+            "lines": 3,
+            "authorBreaksHonored": [
+              true,
+              true
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-T2",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "at-650",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "lineCount",
+          "ok": true,
+          "measured": 2
+        },
+        {
+          "kind": "balancedLines",
+          "ok": true,
+          "measured": {
+            "lines": 2,
+            "ratio": 0.844
+          },
+          "note": "balanced: the shortest line is at least 60% of the longest"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "pointer-hover",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "background-color": "rgb(48, 68, 49)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-S2",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "print",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "display": "none"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-S3",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "text-decoration-line": "underline",
+            "text-underline-offset": "3px"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "cta",
+            "inline-link"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-A1",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "heading"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-A2",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": true,
+          "measured": {
+            "ratio": 7.84,
+            "fg": [
+              47,
+              91,
+              58
+            ],
+            "bg": [
+              255,
+              255,
+              255
+            ],
+            "image": false
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-A3",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "list"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-CONTENT-01",
+      "id": "CONTENT-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rtl",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "edgeOffset",
+          "ok": true,
+          "measured": 12
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-L2",
+      "oracle": "ORC-LAYOUT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "edgeOffset",
+          "ok": true,
+          "measured": 12
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-T1",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rtl",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "direction",
+          "ok": true,
+          "measured": "rtl"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-T2",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "writingMode",
+          "ok": true,
+          "measured": "vertical-rl"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-T3",
+      "oracle": "ORC-TEXT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "rtl",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "direction",
+          "ok": true,
+          "measured": "ltr"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rtl",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "content": "\"←\""
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-S2",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "text-combine-upright": "all"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "link-rtl",
+            "link-ltr"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-A1",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rtl",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "heading"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-A2",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rtl",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": true,
+          "measured": {
+            "ratio": 8.05,
+            "fg": [
+              255,
+              255,
+              255
+            ],
+            "bg": [
+              62,
+              86,
+              63
+            ],
+            "image": false
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-RTL-VERTICAL-01",
+      "id": "RTL-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 320,
+            "height": 180
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-L2",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 220,
+            "height": 220
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-L3",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 18,
+            "height": 18
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-L4",
+      "oracle": "ORC-LAYOUT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "not-evaluated",
+      "results": [
+        {
+          "kind": "sameBoxAsReference",
+          "ok": null,
+          "measured": null,
+          "note": "not applicable to the reference page itself: it compares a build with this reference"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-T1",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "noOverflow",
+          "ok": true,
+          "measured": {
+            "scrollWidth": 320,
+            "clientWidth": 320,
+            "textRight": 253.40625,
+            "right": 344
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "pointer-hover",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "background-color": "rgb(237, 242, 232)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-S2",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "object-fit": "cover",
+            "object-position": "50% 30%"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-S3",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "stroke-width": "2px",
+            "stroke-linecap": "round",
+            "fill": "none"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "icon-button"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-A1",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "image"
+        },
+        {
+          "kind": "name",
+          "ok": true,
+          "measured": "Requests over time"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-A2",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "button"
+        },
+        {
+          "kind": "name",
+          "ok": true,
+          "measured": "Refresh"
+        },
+        {
+          "kind": "targetSizeMin",
+          "ok": true,
+          "measured": {
+            "width": 32,
+            "height": 32
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-A3",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "high-contrast",
+      "viewport": "wide",
+      "status": "not-evaluated",
+      "results": [
+        {
+          "kind": "forcedColorsVisible",
+          "ok": null,
+          "measured": null,
+          "note": "not evaluated: needs a pixel comparison of the forced-colors rendering"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SVG-MEDIA-01",
+      "id": "MEDIA-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 1024,
+            "height": 56
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-L2",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "route.html",
+      "state": "hydrated",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "maxBox",
+          "ok": true,
+          "measured": {
+            "width": 420,
+            "height": 131
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-L3",
+      "oracle": "ORC-LAYOUT",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "hydrated",
+      "viewport": "phone",
+      "status": "not-evaluated",
+      "results": [
+        {
+          "kind": "sameBoxAsReference",
+          "ok": null,
+          "measured": null,
+          "note": "not applicable to the reference page itself: it compares a build with this reference"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-T1",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "route.html",
+      "state": "hydrated",
+      "viewport": "phone",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "noOverflow",
+          "ok": true,
+          "measured": {
+            "scrollWidth": 264,
+            "clientWidth": 264,
+            "textRight": 280.3125,
+            "right": 312
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "hydrated",
+      "viewport": "wide",
+      "status": "not-evaluated",
+      "results": [
+        {
+          "kind": "computedUnchanged",
+          "ok": null,
+          "measured": null,
+          "note": "not applicable to the reference page itself: it compares a build with this reference"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "brand",
+            "tab-home",
+            "tab-settings"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-A1",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "link"
+        },
+        {
+          "kind": "name",
+          "ok": true,
+          "measured": "Home"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "completeFirstPaint",
+          "ok": true,
+          "measured": {
+            "links": 1,
+            "loaded": 1,
+            "scripts": 0
+          },
+          "note": "the reference page has no scripts; every linked stylesheet is applied"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-P2",
+      "oracle": "ORC-CSP",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "hydrated",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-SSR-01",
+      "id": "SSR-P3",
+      "oracle": "ORC-CSP",
+      "case": "negative",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "mutation": "inject-style-element",
+      "mustFail": "SSR-P1",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": false,
+          "measured": [
+            "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-XeYlw2NVzOfB1UCIJqCyGr+0n7bA4fFslFpvKu84IAw='), o",
+            "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-XeYlw2NVzOfB1UCIJqCyGr+0n7bA4fFslFpvKu84IAw='), o"
+          ]
+        },
+        {
+          "kind": "styleElements",
+          "ok": false,
+          "measured": 1
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "completeFirstPaint",
+          "ok": true,
+          "measured": {
+            "links": 1,
+            "loaded": 1,
+            "scripts": 0
+          },
+          "note": "the reference page has no scripts; every linked stylesheet is applied"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "minBox",
+          "ok": true,
+          "measured": {
+            "width": 86.15625,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-L2",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "minBox",
+          "ok": true,
+          "measured": {
+            "width": 54.015625,
+            "height": 28
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-L3",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "box",
+          "ok": true,
+          "measured": {
+            "width": 43.734375,
+            "height": 20
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-L4",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "maxBox",
+          "ok": true,
+          "measured": {
+            "width": 320,
+            "height": 177
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-T1",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "lineCount",
+          "ok": true,
+          "measured": 1
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "pointer-hover",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "background-color": "rgb(48, 68, 49)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-S2",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "background-color": "rgb(156, 197, 159)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-S3",
+      "oracle": "ORC-STATE",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "outline-color": "rgb(156, 197, 159)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "btn-primary-md",
+            "btn-secondary-md",
+            "btn-primary-sm",
+            "btn-danger-md"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-A1",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": true,
+          "measured": {
+            "ratio": 6.24,
+            "fg": [
+              255,
+              255,
+              255
+            ],
+            "bg": [
+              168,
+              60,
+              55
+            ],
+            "image": false
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-A2",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": true,
+          "measured": {
+            "ratio": 7.13,
+            "fg": [
+              107,
+              76,
+              18
+            ],
+            "bg": [
+              250,
+              243,
+              230
+            ],
+            "image": false
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "id": "LIB-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-L1",
+      "oracle": "ORC-LAYOUT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "touch",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "minBox",
+          "ok": true,
+          "measured": {
+            "width": 120,
+            "height": 44
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-T1",
+      "oracle": "ORC-TEXT",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "lineCount",
+          "ok": true,
+          "measured": 1
+        },
+        {
+          "kind": "noOverflow",
+          "ok": true,
+          "measured": {
+            "scrollWidth": 152,
+            "clientWidth": 152,
+            "textRight": 175.921875,
+            "right": 175.921875
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S1",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "pointer-hover",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "background-color": "rgb(237, 242, 232)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S2",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "pointer-active",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "transform": "matrix(1, 0, 0, 1, 0, 1)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S3",
+      "oracle": "ORC-STATE",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "pointer-active",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "transform": "none"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S4",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "outline-style": "solid",
+            "outline-width": "2px",
+            "outline-offset": "2px"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S5",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "border-top-color": "rgb(168, 60, 55)",
+            "color": "rgb(168, 60, 55)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S6",
+      "oracle": "ORC-STATE",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "loading",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "cursor": "not-allowed",
+            "opacity": "0.6"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S7",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "disabled",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "cursor": "not-allowed",
+            "opacity": "0.6"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S8",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "touch",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "background-color": "rgb(255, 255, 255)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S9",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "reduced-motion",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "transition-duration": "0s"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S10",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "increased-contrast",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "border-top-color": "rgb(31, 36, 33)"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-S11",
+      "oracle": "ORC-STATE",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "computed",
+          "ok": true,
+          "measured": {
+            "user-select": "text",
+            "cursor": "text"
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-K1",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": true,
+          "measured": [
+            "control-rest",
+            "control-pointer",
+            "control-keyboard",
+            "control-error",
+            "control-loading",
+            "menu-item-1",
+            "switch-input"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": true,
+          "measured": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-K2",
+      "oracle": "ORC-KEYBOARD",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "keyboard-navigation",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "activates",
+          "ok": true,
+          "measured": {
+            "checked": true,
+            "computed": {
+              "background-color": "rgb(62, 86, 63)"
+            }
+          },
+          "note": "focus is moved with element.focus(); the key press itself goes through the keyboard pipeline"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-K3",
+      "oracle": "ORC-KEYBOARD",
+      "case": "negative",
+      "page": "reference.html",
+      "state": "keyboard-focus",
+      "viewport": "wide",
+      "status": "pass",
+      "mutation": "set-attribute",
+      "mustFail": "STATES-K1",
+      "results": [
+        {
+          "kind": "focusOrder",
+          "ok": false,
+          "measured": [
+            "control-rest",
+            "control-pointer",
+            "control-error",
+            "control-loading",
+            "menu-item-1",
+            "switch-input",
+            "BODY"
+          ]
+        },
+        {
+          "kind": "focusVisible",
+          "ok": false,
+          "measured": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-A1",
+      "oracle": "ORC-A11Y",
+      "case": "boundary",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "switch"
+        },
+        {
+          "kind": "name",
+          "ok": true,
+          "measured": "Notifications"
+        },
+        {
+          "kind": "visuallyHiddenButExposed",
+          "ok": true,
+          "measured": {
+            "width": 1,
+            "height": 1,
+            "ignored": false
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-A2",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": true,
+          "measured": {
+            "ratio": 6.24,
+            "fg": [
+              168,
+              60,
+              55
+            ],
+            "bg": [
+              255,
+              255,
+              255
+            ],
+            "image": false
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-A3",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "high-contrast",
+      "viewport": "wide",
+      "status": "not-evaluated",
+      "results": [
+        {
+          "kind": "forcedColorsVisible",
+          "ok": null,
+          "measured": null,
+          "note": "not evaluated: needs a pixel comparison of the forced-colors rendering"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-A4",
+      "oracle": "ORC-A11Y",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "role",
+          "ok": true,
+          "measured": "menu"
+        },
+        {
+          "kind": "name",
+          "ok": true,
+          "measured": "Actions"
+        }
+      ]
+    },
+    {
+      "fixture": "CE-CORPUS-INTERACTION-STATES-01",
+      "id": "STATES-P1",
+      "oracle": "ORC-CSP",
+      "case": "positive",
+      "page": "reference.html",
+      "state": "rest",
+      "viewport": "wide",
+      "status": "pass",
+      "results": [
+        {
+          "kind": "violations",
+          "ok": true,
+          "measured": []
+        },
+        {
+          "kind": "styleElements",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "styleAttributes",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "runtimeStyleInsertions",
+          "ok": true,
+          "measured": 0
+        },
+        {
+          "kind": "inlineCustomProperties",
+          "ok": true,
+          "measured": 0
+        }
+      ]
+    }
+  ]
+}

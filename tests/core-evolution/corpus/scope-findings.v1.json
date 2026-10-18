@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-scope-findings",
+  "task": "CE-00.2",
+  "policy": "Findings that CE-00.2 hands to an owning lot. The frozen CE-00.1 records are not edited here; each owner decides the scope change with review.",
+  "findings": [
+    {
+      "id": "SF-01",
+      "title": "font-display has no registry entry",
+      "kind": "registry-scope",
+      "owner": "CE-09.1",
+      "issue": 65,
+      "evidence": "W-MOCKUP-1559 has one @font-face font-display declaration; its accounting is registry entry null with reason font-face-descriptor-not-in-inventory. The registry carries src and unicode-range but no other font-face descriptor.",
+      "handoff": "CE-09.1 defines the font-face resource schema. It decides whether font-face descriptors (font-display and the descriptor forms of font-family, font-weight and font-style) join the registry as system-resource entries, through a reviewed CE-00.1 scope change."
+    },
+    {
+      "id": "SF-02",
+      "title": "Alpha 1 emits a raw selector key",
+      "kind": "compiler-defect",
+      "owner": "CE-07.1",
+      "issue": 54,
+      "evidence": "CE-NEG-UNKNOWN-SELECTOR-03 compiles without diagnostics under the built Alpha 1 compiler and the emitted stylesheet contains `[dir=rtl] &` verbatim (tests/core-evolution/run-negatives.mjs).",
+      "handoff": "CE-07.1 closes raw-selector authority gaps: a consumer key that is not a declared condition must be rejected. Until then the rtl profile has no negative fixture that Alpha 1 actually rejects; the rejection stays intended and is not counted as met.",
+      "profileImpact": ["rtl"]
+    },
+    {
+      "id": "SF-03",
+      "title": "Invalid CSS values in measured consumer data",
+      "kind": "measurement-data",
+      "owner": "CE-14.1",
+      "issue": 82,
+      "evidence": "W-UTIL-343 contains `direction: incoming` and `direction: outgoing`, which are not valid direction values (a variant property emitted as CSS). The Alpha 1 measurement counts them as absent-property gaps because it never checks value grammar (CAL-02).",
+      "handoff": "Kept as measured data. They imply neither validity nor fidelity and need no vocabulary. The CE-14 migration accounts for them as consumer defects, not as required coverage."
+    }
+  ]
+}

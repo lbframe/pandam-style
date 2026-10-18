@@ -1,0 +1,69 @@
+/* SSR entry stylesheet: complete first paint for the server-rendered route. Authored for CE-00.2; not compiler output. */
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #1f2421;
+  background-color: #f6f7f3;
+}
+
+.masthead {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 56px;
+  padding-inline: 24px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 0 #e3e6de;
+}
+
+.brand {
+  font-weight: 700;
+  color: inherit;
+  text-decoration-line: none;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab {
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: inherit;
+  text-decoration-line: none;
+}
+
+.tab[aria-current='page'] {
+  background-color: #edf2e8;
+  font-weight: 600;
+}
+
+.tab:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 2px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 24px;
+  list-style-type: none;
+}
+
+.card {
+  min-height: 120px;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}

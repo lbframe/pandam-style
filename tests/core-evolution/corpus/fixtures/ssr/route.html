@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SSR lazy route reference</title>
+    <link rel="stylesheet" href="reference.css" />
+    <link rel="stylesheet" href="route.css" />
+  </head>
+  <body>
+    <div id="root" data-testid="root">
+      <header class="masthead">
+        <a class="brand" href="/">Catalog</a>
+        <nav class="tabs" aria-label="Sections">
+          <a class="tab" href="/">Home</a>
+          <a class="tab" href="/settings" aria-current="page">Settings</a>
+        </nav>
+      </header>
+      <main class="settings" data-testid="settings">
+        <section class="settings-panel" data-testid="settings-panel">
+          <h1 class="settings-title">Settings</h1>
+          <p class="settings-hint" data-testid="settings-hint">Changes apply to every device signed in to this account.</p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
