@@ -29,6 +29,7 @@ import zlib from 'node:zlib';
 import {
   INDICATOR_PIXEL_DELTA,
   NOT_EVALUATED_KINDS,
+  compositeContrast,
   expectedSubjects,
   indicatorExtent,
   judge,
@@ -543,6 +544,39 @@ async function indicatorStop(page, stop, id) {
   };
 }
 
+const RGBA =
+  /^rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\s*\)$/;
+
+// The canvas color behind a root without an opaque background: the Canvas
+// system color for the root's color-scheme under the page's emulated media,
+// resolved in a blank page of the same browser context so the reference page
+// is not touched. Null when it cannot be resolved as an rgb()/rgba() color.
+async function canvasColor(page) {
+  const env = await page.evaluate(() => ({
+    scheme: getComputedStyle(document.documentElement).colorScheme,
+    dark: matchMedia('(prefers-color-scheme: dark)').matches,
+    forced: matchMedia('(forced-colors: active)').matches,
+  }));
+  if (!/^[a-z ]+$/.test(env.scheme)) return null;
+  const probe = await page.context().newPage();
+  try {
+    await probe.emulateMedia({
+      colorScheme: env.dark ? 'dark' : 'light',
+      forcedColors: env.forced ? 'active' : 'none',
+    });
+    await probe.setContent(
+      `<!doctype html><html style="color-scheme: ${env.scheme}; background-color: Canvas"></html>`,
+    );
+    const color = await probe.evaluate(
+      () => getComputedStyle(document.documentElement).backgroundColor,
+    );
+    const m = RGBA.exec(color.trim());
+    return m ? [+m[1], +m[2], +m[3], m[4] == null ? 1 : +m[4]] : null;
+  } finally {
+    await probe.close();
+  }
+}
+
 // Measures one result kind; the verdict comes from judge().
 async function measure(ctx, a, kind, want) {
   const { page, cdp } = ctx;
@@ -748,22 +782,53 @@ async function measure(ctx, a, kind, want) {
       return (await axNode(cdp, a.target)).role;
     case 'name':
       return (await axNode(cdp, a.target)).name;
-    case 'contrastMin':
-      return el((id) => {
-        const parse = (c) => (c.match(/[\d.]+/g) || []).map(Number);
+    case 'contrastMin': {
+      // The painted text color (-webkit-text-fill-color) with its alpha, and
+      // from the element up to the root each node's background color with
+      // its alpha, its group opacity (opacity times filter opacity()), a
+      // background image and an effect the compositing cannot model. Colors
+      // outside rgb()/rgba() are recorded as null rather than converted.
+      const measured = await el((id) => {
+        const rgba = (c) => {
+          const m =
+            /^rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\s*\)$/.exec(
+              c.trim(),
+            );
+          if (c.trim() === 'transparent') return [0, 0, 0, 0];
+          return m ? [+m[1], +m[2], +m[3], m[4] == null ? 1 : +m[4]] : null;
+        };
         const e = __ce.el(id);
-        const fg = parse(getComputedStyle(e).color).slice(0, 3);
-        let bg = null;
-        let image = false;
-        for (let n = e; n && !bg; n = n.parentElement) {
+        const own = getComputedStyle(e);
+        let rendered = own.visibility === 'visible';
+        const chain = [];
+        for (let n = e; n; n = n.parentElement) {
           const s = getComputedStyle(n);
-          if (s.backgroundImage !== 'none') image = true;
-          const c = parse(s.backgroundColor);
-          if (c.length === 3 || (c.length === 4 && c[3] > 0))
-            bg = c.slice(0, 3);
+          if (s.display === 'none') rendered = false;
+          if (n !== e && s.contentVisibility === 'hidden') rendered = false;
+          let opacity = parseFloat(s.opacity);
+          for (const f of s.filter.matchAll(/opacity\(([^)]*)\)/g)) {
+            const v = f[1].trim();
+            opacity *= v.endsWith('%') ? parseFloat(v) / 100 : parseFloat(v);
+          }
+          const filters =
+            s.filter === 'none'
+              ? []
+              : s.filter.match(/[a-z-]+\(/g) || [s.filter];
+          chain.push({
+            background: rgba(s.backgroundColor),
+            opacity: Math.min(1, Math.max(0, opacity)),
+            image: s.backgroundImage !== 'none',
+            unsupportedEffect:
+              filters.some((f) => f !== 'opacity(') ||
+              s.backdropFilter !== 'none' ||
+              s.mixBlendMode !== 'normal',
+          });
         }
-        return { fg, bg: bg || [255, 255, 255], image };
+        return { fg: rgba(own.webkitTextFillColor), rendered, chain };
       }, a.target);
+      measured.canvas = await canvasColor(page);
+      return { ...measured, ...compositeContrast(measured) };
+    }
     case 'visuallyHiddenButExposed': {
       const r = await el((id) => __ce.rect(id), a.target);
       const ax = await axNode(cdp, a.target);

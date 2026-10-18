@@ -53,6 +53,24 @@ export const NOT_EVALUATED_ASSERTIONS = Object.freeze([
 const num = (v) => typeof v === 'number' && Number.isFinite(v);
 const int = (v) => Number.isInteger(v) && v >= 0;
 const bool = (v) => typeof v === 'boolean';
+const rgbaColor = (v) =>
+  Array.isArray(v) &&
+  v.length === 4 &&
+  v.every((c) => typeof c === 'number' && Number.isFinite(c)) &&
+  v.slice(0, 3).every((c) => c >= 0 && c <= 255) &&
+  v[3] >= 0 &&
+  v[3] <= 1;
+const contrastNode = (v) =>
+  v != null &&
+  typeof v === 'object' &&
+  Object.keys(v).sort().join() ===
+    'background,image,opacity,unsupportedEffect' &&
+  (v.background === null || rgbaColor(v.background)) &&
+  typeof v.opacity === 'number' &&
+  v.opacity >= 0 &&
+  v.opacity <= 1 &&
+  bool(v.image) &&
+  bool(v.unsupportedEffect);
 const str = (v, max = 512) => typeof v === 'string' && v.length <= max;
 const obj = (v, keys) =>
   v != null &&
@@ -215,14 +233,17 @@ export const MEASUREMENT_SHAPES = Object.freeze({
   role: (v) => str(v, 64),
   name: (v) => str(v, 256),
   contrastMin: (v) =>
-    obj(v, ['fg', 'bg', 'image']) &&
-    Array.isArray(v.fg) &&
-    v.fg.length === 3 &&
-    v.fg.every(num) &&
-    Array.isArray(v.bg) &&
-    v.bg.length === 3 &&
-    v.bg.every(num) &&
-    bool(v.image),
+    obj(v, ['fg', 'rendered', 'chain', 'canvas', 'ratio', 'reason']) &&
+    (v.fg === null || rgbaColor(v.fg)) &&
+    (v.canvas === null || rgbaColor(v.canvas)) &&
+    bool(v.rendered) &&
+    Array.isArray(v.chain) &&
+    v.chain.length >= 1 &&
+    v.chain.length <= 64 &&
+    v.chain.every(contrastNode) &&
+    CONTRAST_REASONS.includes(v.reason) &&
+    (v.ratio === null || num(v.ratio)) &&
+    sameContrast(v, compositeContrast(v)),
   targetSizeMin: (v) =>
     obj(v, ['width', 'height']) && num(v.width) && num(v.height),
   visuallyHiddenButExposed: (v) =>
@@ -246,6 +267,68 @@ export const MEASUREMENT_SHAPES = Object.freeze({
     int(v.loaded) &&
     int(v.scripts),
 });
+
+// Why a contrast ratio was or was not established: composited over an opaque
+// background; an unknown background image shows through; the background is
+// not opaque, even with the measured canvas color; a filter, backdrop filter or blend
+// mode the compositing does not model; a color outside rgb()/rgba(); or text
+// that is not rendered.
+export const CONTRAST_REASONS = Object.freeze([
+  'composited',
+  'background-image',
+  'background-not-opaque',
+  'unsupported-effect',
+  'unsupported-color',
+  'not-rendered',
+]);
+
+/**
+ * Contrast of a text pixel against its background pixel, both composited
+ * through the recorded chain (element first, root last), then over the
+ * measured canvas color when the chain is not opaque. Each node paints its
+ * background color, then its content; the node is a group whose opacity
+ * blends the result over its backdrop. Colors are composited in sRGB with
+ * their alpha, which is exact for flat colors.
+ */
+export function compositeContrast(m) {
+  if (!m.rendered) return { ratio: null, reason: 'not-rendered' };
+  if (m.fg == null || m.chain.some((n) => n.background == null))
+    return { ratio: null, reason: 'unsupported-color' };
+  if (m.chain.some((n) => n.unsupportedEffect))
+    return { ratio: null, reason: 'unsupported-effect' };
+  // Each layer is linear in its backdrop: color = P + T * backdrop.
+  const [r, g, b, alpha] = m.fg;
+  let text = { P: [r * alpha, g * alpha, b * alpha], T: 1 - alpha };
+  let back = { P: [0, 0, 0], T: 1 };
+  for (const node of m.chain) {
+    if (node.image && back.T > 0)
+      return { ratio: null, reason: 'background-image' };
+    const [br, bg, bb, ba] = node.background;
+    const group = ({ P, T }) => {
+      const premultiplied = [br, bg, bb].map((c, k) => P[k] + T * ba * c);
+      const coverage = 1 - T + T * ba;
+      return {
+        P: premultiplied.map((c) => node.opacity * c),
+        T: 1 - node.opacity * coverage,
+      };
+    };
+    text = group(text);
+    back = group(back);
+  }
+  // What shows through the root is the canvas, when it is an opaque color.
+  if (back.T > 1e-9 || text.T > 1e-9) {
+    if (m.canvas == null || m.canvas[3] !== 1)
+      return { ratio: null, reason: 'background-not-opaque' };
+    const over = ({ P, T }) => P.map((c, k) => c + T * m.canvas[k]);
+    return {
+      ratio: contrastRatio(over(text), over(back)),
+      reason: 'composited',
+    };
+  }
+  return { ratio: contrastRatio(text.P, back.P), reason: 'composited' };
+}
+
+const sameContrast = (v, c) => v.ratio === c.ratio && v.reason === c.reason;
 
 function luminance(rgb) {
   const [r, g, b] = rgb.map((v) => {
@@ -573,7 +656,7 @@ export function judge(kind, want, measured, subjects = null) {
     case 'name':
       return measured === want;
     case 'contrastMin':
-      return !measured.image && contrastRatio(measured.fg, measured.bg) >= want;
+      return measured.reason === 'composited' && measured.ratio >= want;
     case 'targetSizeMin':
       return (
         measured.width >= want - TOLERANCE &&

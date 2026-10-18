@@ -203,6 +203,22 @@ with the references) belongs to the lots named in each oracle.
     of the same color, a size or padding change) is not attributed and fails; it
     needs a different oracle in CE-05.1 (#59). A layout and paint change is
     credited for its paint only. No reference stop relies on either.
+  - Documented limitation, not fixed: the keyboard oracle can credit removal of
+    a contrasting unfocused indicator as a visible focused indicator when
+    screenshot B restores the unfocused paint. It is handed to CE-05.1 (#59)
+    below.
+  - Contrast composites, it does not read RGB alone. The painted text color
+    (`-webkit-text-fill-color`) keeps its alpha. Each node from the element to
+    the root records its background color with alpha, its group opacity
+    (`opacity` times `filter: opacity()`), a background image, and any other
+    filter, backdrop filter or blend mode. The text and background pixels are
+    composited through those groups, then over the measured canvas color when
+    the chain is not opaque. A background image showing through, a non-opaque
+    result, an unmodelled effect, a color outside `rgb()`/`rgba()` or text that
+    is not rendered fails with that reason. The validator recomputes the
+    recorded ratio and reason. FORMS-A5 (white text), FORMS-A6 (alpha 0),
+    FORMS-A7 (alpha 0.01) and FORMS-A8 (ancestor at opacity 0.1) are negative
+    controls that must fail.
   - FORMS-K2 (indicators removed), FORMS-K3 (transparent outline), FORMS-K4
     (`opacity: 0`), FORMS-K5 (`filter: opacity(0)`), FORMS-K6 (ancestor at
     opacity 0), FORMS-K7 (`clip-path: inset(50%)` with a white outline),
@@ -238,6 +254,12 @@ with the references) belongs to the lots named in each oracle.
   - SF-01: `font-display` has no registry entry (CE-09.1);
   - SF-02: the raw-selector defect (CE-07.1);
   - SF-03: invalid `direction` values in the consumer data (CE-14.1).
+- **Keyboard oracle handoff to CE-05.1 (#59).** The scope-findings schema has no
+  oracle subject, so these limitations are handed over here:
+  - The keyboard oracle can credit removal of a contrasting unfocused indicator
+    as a visible focused indicator when screenshot B restores the unfocused
+    paint.
+  - An indicator whose focus change is layout only is not attributed and fails.
 - **Accounting.** `accounting.v1.json` classifies every declaration of every
   reference stylesheet (840, of which 834 are in the Alpha 1 denominator)
   against the pinned Alpha 1 policy. Each declaration is bound to its registry
@@ -292,7 +314,7 @@ The corpus validator needs the repository install for postcss. It checks:
   publication-review pin, on every published field of the consumer sets, the
   calibration record and the accounting.
 
-`--self-test` applies 158 mutations, and each must fail for its stated reason.
+`--self-test` applies 167 mutations, and each must fail for its stated reason.
 They include every publication bypass found in review.
 
 Changing a fixture input, expectation or negative fixture is a corpus change and

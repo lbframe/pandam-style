@@ -10,7 +10,7 @@
   "binding": {
     "fixtures": {
       "CE-CORPUS-APP-SHELL-01": "72583e6e45bd73d1613a756bc050c07b1ae526408e4b51ca58e135a5891b0031",
-      "CE-CORPUS-FORMS-01": "0f2ff1d3f8c44b98bd5b4c052624391ea724d6b6d6868fa602451993a5f07b4c",
+      "CE-CORPUS-FORMS-01": "b3d03c84c742e22f9b1de26b2e215873682614fc2af5f6b964bfc3e4ba18c125",
       "CE-CORPUS-NOTICES-01": "400acfa43e6b93e987b79933c9729f86559b59d0bffdbf91c6117546149adcb5",
       "CE-CORPUS-DATA-GRID-01": "511d3dbde19b162ad030d636326af1c3739527957c206b40a76cbf36102b15af",
       "CE-CORPUS-CONTENT-01": "e619cd46621256a7abd7cca26c5dc1a1b1e421bf6a9082322173a1d51cf1e130",
@@ -20,14 +20,14 @@
       "CE-CORPUS-COMPONENT-LIBRARY-01": "e64f473e723049946a7b21b755843cb25ea0fa644a049a93c97bfa99fbdd1f08",
       "CE-CORPUS-INTERACTION-STATES-01": "712c4c8e322661bd22383adb6bb5be215166a87f2f21cd99bde30654a17aca44"
     },
-    "oracles": "35187a231297bb19dea4fa44ae8f50dd3ed972ca698b99651b57731b5a5030f0",
-    "checker": "d103cbdc7e6f4329dcbda4cf11645bb17ea5eedc2b181103c7caccb98394e248",
+    "oracles": "3ae5fc6dd323e5fb0cc9437ec2f3e3325ed9b033f72ccd44a02b444281c09cb1",
+    "checker": "4fba66753c163b734d522aa86e53b857850a62da75df924f3b37f0a99e210c2c",
     "engine": {
       "browser": "chromium",
       "version": "148.0.7778.96",
       "playwrightCore": "1.60.0"
     },
-    "verificationSha256": "3766935cb07e1b44029445e43dc30764d8b3d0891b664463788b2e7105fee209"
+    "verificationSha256": "4c0c53e3d681b899f173e24a208b9ccbc3eaa99395b8a4e203b981e6a5be485c"
   },
   "inputs": {
     "tests/core-evolution/corpus/fixtures/app-shell/reference.html": "8595956a713d1252cec74863a8dff1aaad7accd2fd163e90727174dbe0a4fe36",
@@ -55,7 +55,7 @@
     "tests/core-evolution/corpus/fixtures/interaction-states/reference.css": "d8c696727aa30cd09dbff537eb622df82c125a56200fc3afcc0544857eeb7db1"
   },
   "tally": {
-    "pass": 153,
+    "pass": 156,
     "not-evaluated": 9
   },
   "rows": [
@@ -10814,14 +10814,75 @@
             "fg": [
               168,
               60,
-              55
+              55,
+              1
             ],
-            "bg": [
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  255,
+                  255,
+                  255,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
+            ],
+            "canvas": [
               255,
               255,
-              255
+              255,
+              1
             ],
-            "image": false
+            "ratio": 6.237975641934834,
+            "reason": "composited"
           }
         }
       ]
@@ -10885,14 +10946,354 @@
             "fg": [
               255,
               255,
-              255
+              255,
+              1
             ],
-            "bg": [
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  255,
+                  255,
+                  255,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
+            ],
+            "canvas": [
               255,
               255,
-              255
+              255,
+              1
             ],
-            "image": false
+            "ratio": 1,
+            "reason": "composited"
+          }
+        }
+      ]
+    },
+    {
+      "id": "FORMS-A6",
+      "fixture": "CE-CORPUS-FORMS-01",
+      "oracle": "ORC-A11Y",
+      "case": "negative",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "assertionSha256": "f7a7cf84c35d4332256fea4cb6c1f357116ee079865f597086809a71aba81c2b",
+      "status": "pass",
+      "mutation": "append-css",
+      "mustFail": "FORMS-A2",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": false,
+          "measured": {
+            "fg": [
+              168,
+              60,
+              55,
+              0
+            ],
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  255,
+                  255,
+                  255,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
+            ],
+            "canvas": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "ratio": 1,
+            "reason": "composited"
+          }
+        }
+      ]
+    },
+    {
+      "id": "FORMS-A7",
+      "fixture": "CE-CORPUS-FORMS-01",
+      "oracle": "ORC-A11Y",
+      "case": "negative",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "assertionSha256": "2b090d4124c193cc0ff3dc331353f6ef0e4d2783de1c743b01c157fd4a6a2c8e",
+      "status": "pass",
+      "mutation": "append-css",
+      "mustFail": "FORMS-A2",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": false,
+          "measured": {
+            "fg": [
+              168,
+              60,
+              55,
+              0.01
+            ],
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  255,
+                  255,
+                  255,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
+            ],
+            "canvas": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "ratio": 1.0147932731696205,
+            "reason": "composited"
+          }
+        }
+      ]
+    },
+    {
+      "id": "FORMS-A8",
+      "fixture": "CE-CORPUS-FORMS-01",
+      "oracle": "ORC-A11Y",
+      "case": "negative",
+      "page": "reference.html",
+      "state": "error",
+      "viewport": "wide",
+      "assertionSha256": "962726260936afb9cff69ad3f45397a38bcfcc9b89835ce93b163b269f502b77",
+      "status": "pass",
+      "mutation": "append-css",
+      "mustFail": "FORMS-A2",
+      "results": [
+        {
+          "kind": "contrastMin",
+          "ok": false,
+          "measured": {
+            "fg": [
+              168,
+              60,
+              55,
+              1
+            ],
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 0.1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  255,
+                  255,
+                  255,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
+            ],
+            "canvas": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "ratio": 1.1621643751731308,
+            "reason": "composited"
           }
         }
       ]
@@ -11434,14 +11835,75 @@
             "fg": [
               105,
               112,
-              103
+              103,
+              1
             ],
-            "bg": [
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
+            ],
+            "canvas": [
               255,
               255,
-              255
+              255,
+              1
             ],
-            "image": false
+            "ratio": 5.104304976025307,
+            "reason": "composited"
           }
         }
       ]
@@ -12422,14 +12884,64 @@
             "fg": [
               47,
               91,
-              58
+              58,
+              1
             ],
-            "bg": [
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  255,
+                  255,
+                  255,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
+            ],
+            "canvas": [
               255,
               255,
-              255
+              255,
+              1
             ],
-            "image": false
+            "ratio": 7.840503591389664,
+            "reason": "composited"
           }
         }
       ]
@@ -12872,14 +13384,64 @@
             "fg": [
               255,
               255,
-              255
+              255,
+              1
             ],
-            "bg": [
-              62,
-              86,
-              63
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  62,
+                  86,
+                  63,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  244,
+                  246,
+                  240,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
             ],
-            "image": false
+            "canvas": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "ratio": 8.053017130457555,
+            "reason": "composited"
           }
         }
       ]
@@ -14451,14 +15013,75 @@
             "fg": [
               255,
               255,
-              255
+              255,
+              1
             ],
-            "bg": [
-              168,
-              60,
-              55
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  168,
+                  60,
+                  55,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
             ],
-            "image": false
+            "canvas": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "ratio": 6.237975641934834,
+            "reason": "composited"
           }
         }
       ]
@@ -14481,14 +15104,75 @@
             "fg": [
               107,
               76,
-              18
+              18,
+              1
             ],
-            "bg": [
-              250,
-              243,
-              230
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  250,
+                  243,
+                  230,
+                  1
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
             ],
-            "image": false
+            "canvas": [
+              255,
+              255,
+              255,
+              1
+            ],
+            "ratio": 7.132689797436388,
+            "reason": "composited"
           }
         }
       ]
@@ -16255,14 +16939,64 @@
             "fg": [
               168,
               60,
-              55
+              55,
+              1
             ],
-            "bg": [
+            "rendered": true,
+            "chain": [
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              },
+              {
+                "background": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "opacity": 1,
+                "image": false,
+                "unsupportedEffect": false
+              }
+            ],
+            "canvas": [
               255,
               255,
-              255
+              255,
+              1
             ],
-            "image": false
+            "ratio": 6.237975641934834,
+            "reason": "composited"
           }
         }
       ]

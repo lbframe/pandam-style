@@ -2184,6 +2184,54 @@ const MUTATIONS = [
       }));
     },
   ],
+  ...[
+    [
+      'contrast foreground alpha dropped',
+      (m) => {
+        m.fg = m.fg.slice(0, 3);
+      },
+    ],
+    [
+      'contrast background alpha dropped',
+      (m) => {
+        m.chain[0].background = m.chain[0].background.slice(0, 3);
+      },
+    ],
+    [
+      'a forged contrast ratio',
+      (m) => {
+        m.ratio = 21;
+      },
+    ],
+    [
+      'a transparent foreground keeping its ratio',
+      (m) => {
+        m.fg[3] = 0;
+      },
+    ],
+    [
+      'an ancestor opacity dropped from the chain',
+      (m) => {
+        m.chain.at(-1).opacity = 0.1;
+      },
+    ],
+    [
+      'a contrast measurement without its chain',
+      (m) => {
+        delete m.chain;
+      },
+    ],
+  ].map(([name, change]) => [
+    name,
+    /FORMS-A2 contrastMin measurement does not have its strict shape/,
+    (d) => {
+      change(
+        d.referenceCheck.rows
+          .find((x) => x.id === 'FORMS-A2')
+          .results.find((x) => x.kind === 'contrastMin').measured,
+      );
+    },
+  ]),
   [
     'a painted stop without its isolation record',
     /FORMS-K1 paintedIndicator measurement does not have its strict shape/,
@@ -2403,6 +2451,9 @@ const MUTATIONS = [
     'FORMS-K11',
     'FORMS-K12',
     'FORMS-K13',
+    'FORMS-A6',
+    'FORMS-A7',
+    'FORMS-A8',
   ].map((id) => [
     `the ${id} control dropped`,
     new RegExp(`${id} is not a browser assertion of the corpus`),

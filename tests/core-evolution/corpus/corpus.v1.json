@@ -1120,6 +1120,42 @@
           "mustFail": "FORMS-A2"
         },
         {
+          "id": "FORMS-A6",
+          "oracle": "ORC-A11Y",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"email-error\"] { color: rgba(168, 60, 55, 0) !important; }"
+          },
+          "mustFail": "FORMS-A2",
+          "note": "Fully transparent error text keeps its RGB color but paints nothing."
+        },
+        {
+          "id": "FORMS-A7",
+          "oracle": "ORC-A11Y",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"email-error\"] { color: rgba(168, 60, 55, 0.01) !important; }"
+          },
+          "mustFail": "FORMS-A2",
+          "note": "Near-transparent error text is composited almost to the background."
+        },
+        {
+          "id": "FORMS-A8",
+          "oracle": "ORC-A11Y",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"field-email\"] { opacity: 0.1 !important; }"
+          },
+          "mustFail": "FORMS-A2",
+          "note": "An ancestor at opacity 0.1 fades the error text into the page."
+        },
+        {
           "id": "FORMS-P1",
           "oracle": "ORC-CSP",
           "case": "positive",
