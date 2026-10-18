@@ -27,9 +27,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
 import {
+  INDICATOR_PIXEL_DELTA,
   NOT_EVALUATED_KINDS,
-  VISIBILITY_EPSILON,
-  effectiveVisibility,
   expectedSubjects,
   indicatorExtent,
   judge,
@@ -247,70 +246,16 @@ export function decodePng(buffer) {
   return { width: header.width, height: header.height, channels, pixels };
 }
 
-// Counts changed pixels inside the indicator ring of the candidates: within
-// each node's border box expanded by its indicator extent plus 8px, and
-// outside its content box. `clip` is the screenshot area in viewport pixels.
-// Parses a computed rgb()/rgba() color into [r, g, b, alpha].
-function rgba(color) {
-  const m = /^rgba?\(([^)]*)\)$/.exec(color.trim());
-  if (m == null) return null;
-  const parts = m[1]
-    .split(/[\s,/]+/)
-    .filter(Boolean)
-    .map(Number);
-  return parts.length >= 3
-    ? [parts[0], parts[1], parts[2], parts[3] ?? 1]
-    : null;
-}
-
-// Colors a visible indicator may paint: a non-none outline, focus-added box
-// shadows and changed border sides. Each alpha includes the node's effective
-// compositing opacity, since the indicator is painted with the element.
-export function indicatorColors(focused, unfocused, compositing) {
-  const colors = [];
-  focused.forEach((f, i) => {
-    const u = unfocused[i];
-    const start = colors.length;
-    if (
-      !['none', 'hidden'].includes(f.outlineStyle) &&
-      parseFloat(f.outlineWidth) > 0
-    )
-      colors.push(f.outlineColor);
-    if (f.boxShadow !== 'none' && f.boxShadow !== u.boxShadow)
-      for (const m of f.boxShadow.matchAll(/rgba?\([^)]*\)/g))
-        colors.push(m[0]);
-    f.borders.forEach((b, side) => {
-      const ub = u.borders[side];
-      if (b.style !== ub.style || b.width !== ub.width || b.color !== ub.color)
-        colors.push(b.color);
-    });
-    const visibility = effectiveVisibility(compositing[i]);
-    for (let k = start; k < colors.length; k++)
-      colors[k] = [colors[k], visibility];
-  });
-  return colors
-    .map(([color, visibility]) => {
-      const c = rgba(color);
-      return c == null ? null : [c[0], c[1], c[2], c[3] * visibility];
-    })
-    .filter((c) => c != null && c[3] > VISIBILITY_EPSILON);
-}
-
-/**
- * Ring pixels of a stop: `changed` counts pixels inside the indicator ring
- * (border box grown by the indicator extent plus 8px, minus the content box)
- * that differ between the focused and unfocused screenshots; `indicator`
- * counts those whose focused color is an indicator color composited over the
- * unfocused pixel, so a disappearing element (background showing through)
- * does not count.
- */
-export function ringPixels(focusedShot, unfocusedShot, clip, rings, colors) {
-  const a = decodePng(focusedShot);
-  const b = decodePng(unfocusedShot);
-  if (a.width !== b.width || a.height !== b.height)
-    return { changed: 0, indicator: 0 };
-  let changed = 0;
-  let indicator = 0;
+// Counterfactual indicator pixels: pixels inside the indicator ring (the
+// border box grown by the indicator extent plus 8px, minus the content box)
+// that differ between screenshot A (the focused page) and screenshot B (the
+// same focused page with only the indicator paint suppressed). Anything that
+// hides or covers the indicator is present in both and cancels out.
+export function counterfactualPixels(shotA, shotB, clip, rings) {
+  const a = decodePng(shotA);
+  const b = decodePng(shotB);
+  if (a.width !== b.width || a.height !== b.height) return 0;
+  let count = 0;
   for (let y = 0; y < a.height; y++) {
     for (let x = 0; x < a.width; x++) {
       const px = clip.x + x + 0.5;
@@ -330,30 +275,35 @@ export function ringPixels(focusedShot, unfocusedShot, clip, rings, colors) {
       );
       if (!inRing) continue;
       const i = y * a.width + x;
-      const f = [0, 1, 2].map((k) => a.pixels[i * a.channels + k]);
-      const u = [0, 1, 2].map((k) => b.pixels[i * b.channels + k]);
-      if (!f.some((v, k) => Math.abs(v - u[k]) > 24)) continue;
-      changed += 1;
-      const painted = colors.some(([r, g, bl, alpha]) =>
-        [r, g, bl].every(
-          (c, k) => Math.abs(f[k] - (alpha * c + (1 - alpha) * u[k])) <= 48,
-        ),
-      );
-      if (painted) indicator += 1;
+      for (let k = 0; k < 3; k++) {
+        if (
+          Math.abs(
+            a.pixels[i * a.channels + k] - b.pixels[i * b.channels + k],
+          ) > INDICATOR_PIXEL_DELTA
+        ) {
+          count += 1;
+          break;
+        }
+      }
     }
   }
-  return { changed, indicator };
+  return count;
 }
 
-// Computed indicator styles and boxes of the focused element and, when it is
-// visually hidden (a styled sibling carries its indicator), of its next
-// sibling.
-const INDICATOR_SNAPSHOT = `(() => {
-  const el = window.__ceFocused;
+// Chooses the indicator candidates once, in the focused state: the focused
+// element and, when it is visually hidden (a styled sibling carries its
+// indicator), its next sibling.
+const SELECT_CANDIDATES = `(() => {
+  const el = document.activeElement;
   const r = el.getBoundingClientRect();
   const hidden = r.width <= 1 && r.height <= 1;
-  const nodes = [el, ...(hidden && el.nextElementSibling ? [el.nextElementSibling] : [])];
-  return nodes.map((n) => {
+  window.__ceFocused = el;
+  window.__ceNodes = [el, ...(hidden && el.nextElementSibling ? [el.nextElementSibling] : [])];
+})()`;
+
+// Computed indicator styles, boxes and compositing of the candidates.
+const INDICATOR_SNAPSHOT = `(() => {
+  return window.__ceNodes.map((n) => {
     const s = getComputedStyle(n);
     const b = n.getBoundingClientRect();
     const px = (v) => parseFloat(v) || 0;
@@ -374,6 +324,7 @@ const INDICATOR_SNAPSHOT = `(() => {
     }
     return {
       compositing,
+      focusVisible: window.__ceFocused.matches(':focus-visible'),
       style: {
         outlineStyle: s.outlineStyle, outlineWidth: s.outlineWidth, outlineOffset: s.outlineOffset,
         outlineColor: s.outlineColor, boxShadow: s.boxShadow,
@@ -386,13 +337,69 @@ const INDICATOR_SNAPSHOT = `(() => {
   });
 })()`;
 
-// One keyboard stop: styles focused and unfocused, and the changed pixels of
-// the indicator ring between the two states.
-async function indicatorStop(page, stop, id) {
-  await page.evaluate(() => {
-    window.__ceFocused = document.activeElement;
+// Indicator longhands: the computed style key and the CSS property it maps to.
+const INDICATOR_LONGHANDS = [
+  ['outlineStyle', 'outline-style'],
+  ['outlineWidth', 'outline-width'],
+  ['outlineColor', 'outline-color'],
+  ['outlineOffset', 'outline-offset'],
+  ['boxShadow', 'box-shadow'],
+];
+const SIDES = ['top', 'right', 'bottom', 'left'];
+
+// The indicator paint that focus added on one node, as the declarations that
+// put it back to its unfocused computed values: each outline or box-shadow
+// longhand and each border side that focus changed. With no outline or shadow
+// when unfocused, this is `outline-style: none; box-shadow: none`.
+export function indicatorResets(focused, unfocused) {
+  const resets = INDICATOR_LONGHANDS.filter(
+    ([key]) => focused[key] !== unfocused[key],
+  ).map(([key, property]) => [property, unfocused[key]]);
+  SIDES.forEach((side, k) => {
+    const f = focused.borders[k];
+    const u = unfocused.borders[k];
+    if (f.style !== u.style || f.width !== u.width || f.color !== u.color)
+      resets.push(
+        [`border-${side}-style`, u.style],
+        [`border-${side}-width`, u.width],
+        [`border-${side}-color`, u.color],
+      );
   });
+  return resets;
+}
+
+// Suppresses only the indicator paint on the candidates, through their inline
+// style with !important. Clip, masks, overlays, opacity, transforms and
+// position stay exactly as focused.
+function suppressIndicator(resets) {
+  window.__ceSaved = window.__ceNodes.map((n) => n.getAttribute('style'));
+  window.__ceNodes.forEach((n, i) => {
+    for (const [property, value] of resets[i])
+      n.style.setProperty(property, value, 'important');
+  });
+}
+
+function restoreIndicator() {
+  window.__ceNodes.forEach((n, i) => {
+    const saved = window.__ceSaved[i];
+    if (saved == null) n.removeAttribute('style');
+    else n.setAttribute('style', saved);
+  });
+}
+
+// One keyboard stop: focused and unfocused styles, compositing, whether the
+// focused state was restored after the unfocused snapshot, and the
+// counterfactual indicator pixels.
+async function indicatorStop(page, stop, id) {
+  await page.evaluate(SELECT_CANDIDATES);
   const focused = await page.evaluate(INDICATOR_SNAPSHOT);
+  await page.evaluate(() => window.__ceFocused.blur());
+  const unfocused = await page.evaluate(INDICATOR_SNAPSHOT);
+  await page.evaluate(() => window.__ceFocused.focus());
+  const refocused = await page.evaluate(INDICATOR_SNAPSHOT);
+  const restored =
+    JSON.stringify(refocused.map((n) => [n.style, n.box, n.focusVisible])) ===
+    JSON.stringify(focused.map((n) => [n.style, n.box, n.focusVisible]));
   const rings = focused.map(({ style, box, content }) => {
     const grow = indicatorExtent(style) + 8;
     return {
@@ -426,33 +433,27 @@ async function indicatorStop(page, stop, id) {
     Math.ceil(Math.max(...rings.map((r) => r.outer.bottom))),
   );
   const clip = { x: left, y: top, width: right - left, height: bottom - top };
-  const options = { clip, animations: 'disabled', caret: 'hide' };
-  const shotFocused = await page.screenshot(options);
-  await page.evaluate(() => window.__ceFocused.blur());
-  const unfocused = await page.evaluate(INDICATOR_SNAPSHOT);
-  const shotUnfocused = await page.screenshot(options);
-  await page.evaluate(() => window.__ceFocused.focus());
-  const focusedStyles = focused.map((n) => n.style);
-  const unfocusedStyles = unfocused.map((n) => n.style);
-  const pixels = ringPixels(
-    shotFocused,
-    shotUnfocused,
-    clip,
-    rings,
-    indicatorColors(
-      focusedStyles,
-      unfocusedStyles,
-      focused.map((n) => n.compositing),
-    ),
-  );
+  let pixels = 0;
+  // An indicator entirely outside the viewport paints nothing visible.
+  if (clip.width > 0 && clip.height > 0) {
+    const options = { clip, animations: 'disabled', caret: 'hide' };
+    const shotA = await page.screenshot(options);
+    const resets = focused.map((f, i) =>
+      indicatorResets(f.style, unfocused[i].style),
+    );
+    await page.evaluate(suppressIndicator, resets);
+    const shotB = await page.screenshot(options);
+    await page.evaluate(restoreIndicator);
+    pixels = counterfactualPixels(shotA, shotB, clip, rings);
+  }
   return {
     stop,
     id,
-    focused: focusedStyles,
-    unfocused: unfocusedStyles,
+    focused: focused.map((n) => n.style),
+    unfocused: unfocused.map((n) => n.style),
     compositing: focused.map((n) => n.compositing),
-    changedRingPixels: pixels.changed,
-    indicatorColorPixels: pixels.indicator,
+    restored,
+    counterfactualPixels: pixels,
   };
 }
 

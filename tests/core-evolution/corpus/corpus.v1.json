@@ -978,6 +978,66 @@
           "note": "An ancestor with opacity 0 hides the focused element and its outline."
         },
         {
+          "id": "FORMS-K7",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { clip-path: inset(50%) !important; outline: 3px solid white !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "clip-path clips the focused element and its white outline; the clipped area changes ring pixels but no indicator paint shows."
+        },
+        {
+          "id": "FORMS-K8",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { mask-image: linear-gradient(transparent, transparent) !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "A transparent mask hides the focused element and its outline."
+        },
+        {
+          "id": "FORMS-K9",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"field-email\"]:focus-within { position: relative !important; } [data-testid=\"field-email\"]:focus-within::after { content: \"\"; position: absolute; inset: -24px; background: white; z-index: 10; } [data-testid=\"input-email\"]:focus-visible { outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "A white overlay covers the focused element and its outline."
+        },
+        {
+          "id": "FORMS-K10",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { transform: scale(0) !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "transform: scale(0) collapses the focused element and its outline."
+        },
+        {
+          "id": "FORMS-K11",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { position: relative !important; left: -10000px !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "The focused element and its outline move off screen."
+        },
+        {
           "id": "FORMS-A1",
           "oracle": "ORC-A11Y",
           "case": "positive",

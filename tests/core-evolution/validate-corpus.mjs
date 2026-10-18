@@ -2180,8 +2180,7 @@ const MUTATIONS = [
         .results.find((x) => x.kind === 'paintedIndicator');
       r.measured = r.measured.map((stop) => ({
         ...stop,
-        changedRingPixels: 0,
-        indicatorColorPixels: 0,
+        counterfactualPixels: 0,
       }));
     },
   ],
@@ -2337,9 +2336,21 @@ const MUTATIONS = [
       },
     ],
     [
-      'too few indicator-colored pixels',
+      'too few counterfactual pixels',
       (stop) => {
-        stop.indicatorColorPixels = 39;
+        stop.counterfactualPixels = 39;
+      },
+    ],
+    [
+      'an unrestored focus state',
+      (stop) => {
+        stop.restored = false;
+      },
+    ],
+    [
+      'an outline present without focus',
+      (stop) => {
+        stop.unfocused = structuredClone(stop.focused);
       },
     ],
   ].map(([name, change]) => [
@@ -2352,7 +2363,16 @@ const MUTATIONS = [
       change(r.measured[1]);
     },
   ]),
-  ...['FORMS-K4', 'FORMS-K5', 'FORMS-K6'].map((id) => [
+  ...[
+    'FORMS-K4',
+    'FORMS-K5',
+    'FORMS-K6',
+    'FORMS-K7',
+    'FORMS-K8',
+    'FORMS-K9',
+    'FORMS-K10',
+    'FORMS-K11',
+  ].map((id) => [
     `the ${id} control dropped`,
     new RegExp(`${id} is not a browser assertion of the corpus`),
     (d) => {

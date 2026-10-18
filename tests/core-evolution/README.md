@@ -177,14 +177,27 @@ with the references) belongs to the lots named in each oracle.
   every layout, text, state, keyboard, accessibility and CSP assertion and every
   negative control that applies to a page.
   - Keyboard stops need a painted indicator, not only `:focus-visible`. That
-    means a visible outline, shadow or border change (non-zero width and alpha),
-    and at least 40 changed pixels inside the indicator ring against the
-    unfocused state that match an indicator color composited over the unfocused
-    pixel. The node must also stay visible after compositing (opacity, filter,
-    visibility, display and content-visibility of the element and its
-    ancestors). FORMS-K2 (indicators removed), FORMS-K3 (transparent outline),
-    FORMS-K4 (`opacity: 0`), FORMS-K5 (`filter: opacity(0)`) and FORMS-K6
-    (ancestor at opacity 0) are negative controls that must fail.
+    means a visible outline, shadow or border that focus added or changed
+    (non-zero width and alpha), on a node that stays visible after compositing
+    (opacity, filter, visibility, display and content-visibility of the element
+    and its ancestors).
+  - The pixel evidence is counterfactual. With the element focused, screenshot A
+    is the page as is. Screenshot B is the same focused page with only the
+    indicator paint suppressed: inline `!important` declarations put each
+    focus-changed outline, box-shadow and border-side longhand back to its
+    unfocused value. At least 40 pixels of the indicator ring must differ
+    between A and B by more than 24 in some RGB channel. Clipping, masks,
+    overlays, transforms and positioning are the same in A and B, so an
+    indicator they hide cancels out.
+  - Residual limitation: a background-color, pseudo-element or text change is
+    not attributed as an indicator, so a stop whose only focus change is of such
+    a kind fails. No reference stop relies on one.
+  - FORMS-K2 (indicators removed), FORMS-K3 (transparent outline), FORMS-K4
+    (`opacity: 0`), FORMS-K5 (`filter: opacity(0)`), FORMS-K6 (ancestor at
+    opacity 0), FORMS-K7 (`clip-path: inset(50%)` with a white outline),
+    FORMS-K8 (transparent `mask-image`), FORMS-K9 (covering white overlay),
+    FORMS-K10 (`transform: scale(0)`) and FORMS-K11 (off screen) are negative
+    controls that must fail.
   - Every multi-element measurement records its subjects (stop index and id,
     cell, descendant or author-break index). The validator derives the expected
     subjects from the pinned reference HTML and the assertion; missing, extra,
@@ -267,7 +280,7 @@ The corpus validator needs the repository install for postcss. It checks:
   publication-review pin, on every published field of the consumer sets, the
   calibration record and the accounting.
 
-`--self-test` applies 146 mutations, and each must fail for its stated reason.
+`--self-test` applies 153 mutations, and each must fail for its stated reason.
 They include every publication bypass found in review.
 
 Changing a fixture input, expectation or negative fixture is a corpus change and

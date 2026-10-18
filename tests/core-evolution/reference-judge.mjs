@@ -12,9 +12,13 @@
 // never read from the report.
 
 export const TOLERANCE = 0.5;
-// A focus indicator must change at least this many pixels in the indicator
-// ring around the focused element (a text caret alone changes fewer).
+// A focus indicator must paint at least this many counterfactual pixels in
+// the indicator ring around the focused element (a text caret alone changes
+// fewer). A counterfactual pixel differs by more than INDICATOR_PIXEL_DELTA
+// in some RGB channel between the focused page and the same focused page with
+// only the indicator paint suppressed.
 export const INDICATOR_MIN_PIXELS = 40;
+export const INDICATOR_PIXEL_DELTA = 24;
 // Below this effective compositing visibility a node paints nothing visible.
 export const VISIBILITY_EPSILON = 0.05;
 
@@ -91,8 +95,8 @@ const stop = (v) =>
     'focused',
     'unfocused',
     'compositing',
-    'changedRingPixels',
-    'indicatorColorPixels',
+    'restored',
+    'counterfactualPixels',
   ]) &&
   int(v.stop) &&
   str(v.id, 64) &&
@@ -106,8 +110,8 @@ const stop = (v) =>
   v.focused.every(style) &&
   v.unfocused.every(style) &&
   v.compositing.every(compositing) &&
-  int(v.changedRingPixels) &&
-  int(v.indicatorColorPixels);
+  bool(v.restored) &&
+  int(v.counterfactualPixels);
 const valueMap = (v) =>
   v != null &&
   typeof v === 'object' &&
@@ -295,11 +299,15 @@ export function indicatorExtent(s) {
   return Math.max(0, outline, shadow);
 }
 
-// A visible indicator on one node: a non-transparent outline of non-zero
-// width, a visible box shadow that focus added or changed, or a changed
-// non-transparent border side of non-zero width.
+// A visible indicator on one node, added or changed by focus: a
+// non-transparent outline of non-zero width, a visible box shadow, or a
+// non-transparent border side of non-zero width. A focus change of any other
+// kind (background color, pseudo-element, text) is not an indicator here.
 export function visibleIndicator(focused, unfocused) {
   const outline =
+    ['outlineStyle', 'outlineWidth', 'outlineColor', 'outlineOffset'].some(
+      (key) => focused[key] !== unfocused[key],
+    ) &&
     !['none', 'hidden'].includes(focused.outlineStyle) &&
     parseFloat(focused.outlineWidth) > 0 &&
     (colorAlpha(focused.outlineColor) ?? 0) > 0;
@@ -329,17 +337,21 @@ export function effectiveVisibility(c) {
   return c.opacity * c.filterOpacity;
 }
 
-// A stop proves a painted indicator when a node that is visible after
-// compositing carries a visible indicator style, and enough changed ring
-// pixels take the indicator color (blended by its alpha) rather than what
-// shows through when the element changes or disappears.
+// A stop proves a painted indicator when the focused state was restored for
+// the screenshots, a node that is visible after compositing carries a visible
+// indicator that focus added, and suppressing only that indicator paint
+// changes enough ring pixels. Clipping, masks, overlays, transforms and
+// positioning are identical in both screenshots, so whatever hides the
+// indicator cancels out of the counterfactual count.
 export function stopOk(s) {
   return (
+    s.restored &&
     s.focused.some(
       (f, i) =>
         effectiveVisibility(s.compositing[i]) > VISIBILITY_EPSILON &&
         visibleIndicator(f, s.unfocused[i]),
-    ) && s.indicatorColorPixels >= INDICATOR_MIN_PIXELS
+    ) &&
+    s.counterfactualPixels >= INDICATOR_MIN_PIXELS
   );
 }
 
