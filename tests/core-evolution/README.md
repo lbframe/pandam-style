@@ -34,6 +34,8 @@ behavior and are not part of the product test suites.
 | `corpus/reference-check.v1.json`                                   | generated | Reference-page results in Chromium; rerun `check-references.mjs`, never edit                                                                       |
 | `validate-corpus.mjs`                                              | tool      | CE-00.2 validator and mutation self-test                                                                                                           |
 | `run-negatives.mjs`, `check-references.mjs`                        | tool      | Negative fixtures against the Alpha 1 build; reference pages in Chromium                                                                           |
+| `closed-surface.mjs`, `reference-judge.mjs`                        | tool      | Closed-type checks and walker; shared reference verdicts                                                                                           |
+| `corpus/calibration/README.md`                                     | authored  | Prose for every id the closed calibration records use                                                                                              |
 
 Changing an authored record requires regenerating the registry. Each registry
 entry keeps its recorded upstream facts (`sources`, `bcd`, `bcdRelations`,
@@ -174,9 +176,11 @@ with the references) belongs to the lots named in each oracle.
   Chromium 148.0.7778.96 (playwright-core 1.60.0) under its CSP. It evaluates
   every layout, text, state, keyboard, accessibility and CSP assertion and every
   negative control that applies to a page.
-  - Keyboard stops need a painted indicator, not only `:focus-visible`: a
-    computed outline, shadow or border change, and at least 40 changed pixels
-    against the unfocused state.
+  - Keyboard stops need a painted indicator, not only `:focus-visible`. That
+    means a visible outline, shadow or border change (non-zero width and alpha),
+    and at least 40 changed pixels inside the indicator ring against the
+    unfocused state. FORMS-K2 (indicators removed) and FORMS-K3 (transparent
+    outline) are negative controls that must fail.
   - The result is `corpus/reference-check.v1.json`. It is bound by digest to
     every row's assertion, viewports, states, CSP and inputs, to the browser
     oracle definitions, to the checker source and to the engine identity.
@@ -241,16 +245,21 @@ The corpus validator needs the repository install for postcss. It checks:
   finding for every accepted negative;
 - the scope findings' lots and issues;
 - the recorded reference check: its binding, one row per browser assertion,
-  statuses recomputed from per-row result evidence, the tally, and no failing
-  assertion;
+  exactly the expected result kinds per row, strict measurement shapes, verdicts
+  and statuses recomputed from the measurements (`reference-judge.mjs`),
+  not-evaluated only for the nine documented assertions with their fixed reason,
+  the tally, and no failing assertion;
 - re-derivation of the accounting and of both consumer sets, the reported counts
   and each calibration limit;
 - regular-expression parity of the parser on every corpus stylesheet;
+- the closed surface: every string leaf and key of every record derived from or
+  describing the consumer sits at a closed schema type, and every string-capable
+  node of those schemas is closed (`closed-surface.mjs`);
 - the token allow-list publication rules, canonical set headers and the
   publication-review pin, on every published field of the consumer sets, the
   calibration record and the accounting.
 
-`--self-test` applies 80 mutations, and each must fail for its stated reason.
+`--self-test` applies 106 mutations, and each must fail for its stated reason.
 They include every publication bypass found in review.
 
 Changing a fixture input, expectation or negative fixture is a corpus change and

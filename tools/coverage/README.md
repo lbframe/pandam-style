@@ -123,30 +123,51 @@ Nothing is skipped by prefix:
 - a hash token that is a 3, 4, 6 or 8 digit hex color;
 - an identifier listed with a reason in
   [`approved-identifiers.v1.json`](../../tests/core-evolution/corpus/calibration/approved-identifiers.v1.json);
-- a keyed redaction placeholder;
+- a keyed redaction placeholder of a listed kind (`PLACEHOLDER_KINDS` in
+  `digest.mjs`); a placeholder of any other kind is not a placeholder;
 - whitespace, a comma, slash or colon separator, a `calc()` operator or a
   parenthesized group.
 
 At extraction, any other token becomes a placeholder: an unknown identifier, a
 non-hex `#name` hash, a number with an unknown unit, an unknown function, a
-comment or a quoted string. URLs, e-mail addresses, URIs, long opaque tokens and
-non-ASCII text are replaced first, and so is a condition that holds a disallowed
-token. Further rules:
+comment, a quoted string or a `url()` that holds anything but one placeholder.
+URLs, e-mail addresses, URIs, long opaque tokens and non-ASCII text are replaced
+first, and so is a condition that holds a disallowed token. Further rules:
 
-- **Custom-property and layer names** must be approved.
-- **Other properties** must be CE-00.1 registry names or `font-display`.
+- **Custom-property and layer names** must be approved; otherwise they are
+  redacted.
+- **Other properties** must be CE-00.1 registry names or `font-display`;
+  otherwise they are redacted.
+- **At-rules** are `@media` and `@supports` with clean conditions, `@font-face`
+  or `@keyframes`; any other at-rule becomes one placeholder.
 - **Pseudo-classes and pseudo-elements** must be on their allow-lists (others
   are only counted).
 - **State attributes** come from an explicit list: every WAI-ARIA 1.2 state and
   property, the HTML state attributes and the listed `data-` state names.
 - **Ids** are ordinals of their input.
 
-Set headers carry no free text of their own. Their description and role equal
-the calibration record's, and their extraction block must equal the canonical
-header that `extractionHeader()` produces. The authored text of
-`baseline.v1.json` and `approved-identifiers.v1.json` is pinned by
-`publication-review.v1.json`: any wording or identifier change fails until it is
-reviewed and the pin is updated in the same diff.
+Every record derived from or describing the consumer has a closed surface. That
+covers the declaration sets, `baseline.v1.json`, `accounting.v1.json`,
+`scope-findings.v1.json`, `approved-identifiers.v1.json` and
+`publication-review.v1.json`. Each string field is one of the following:
+
+- an enum;
+- an anchored pattern with a maximum length (digests, commits, ordinal ids,
+  timestamps);
+- an `x-closed` type checked in code (CSS strings through the allow-list,
+  registry names, allow-listed pseudo-classes, state attributes and composite
+  longhands).
+
+Object keys are declared properties or closed `propertyNames`. The records
+contain no free text: provenance, calibration limits, rule ids, approval reasons
+and scope findings are explained by hand in
+[`tests/core-evolution/corpus/calibration/README.md`](../../tests/core-evolution/corpus/calibration/README.md),
+and the records refer to them by fixed id.
+
+Each set header has a canonical shape: `extractionHeader()` rebuilds its
+extraction block from the baseline layer that the calibration record fixes for
+the input (`utilities` or null). The calibration record, the approved
+identifiers and the scope findings are pinned by `publication-review.v1.json`.
 
 Extraction fails if a redaction would change a classification or a composite
 accounting. The corpus validator applies these rules to every published field

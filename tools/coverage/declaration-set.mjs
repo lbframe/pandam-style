@@ -173,7 +173,7 @@ export function extractSet({
     const redacted = { ...base, value, redactions };
     return approved == null
       ? redacted
-      : policeRecord(redacted, approved, digester);
+      : policeRecord(redacted, approved, digester, registry.byName);
   });
   const derive = (records) =>
     deriveSet({}, records, policy, registry).declarations.map((d) =>
@@ -205,26 +205,35 @@ export function extractSet({
   return { set, positions };
 }
 
+// Closed vocabularies of the set header. Their meaning is documented in
+// tests/core-evolution/corpus/calibration/README.md, never in the records.
+export const BASELINE_LAYERS = Object.freeze([null, 'utilities']);
+export const EXTRACTION_RULES = Object.freeze({
+  denominator: { null: 'CE-DEN-01', utilities: 'CE-DEN-02' },
+  selectors: 'CE-SEL-01',
+  redaction: 'CE-RED-01',
+});
+
 /** The extraction header of a set; the validator recomputes and compares it. */
 export function extractionHeader(baselineLayer, digester) {
+  if (!BASELINE_LAYERS.includes(baselineLayer))
+    throw new Error(
+      `baseline layer must be one of ${BASELINE_LAYERS.join(', ')}`,
+    );
   return {
     parser: { ...PARSER },
-    command: 'node tools/coverage/cli.mjs extract',
     baselineLayer,
-    denominatorRule:
-      'Alpha 1 baseline: every declaration except custom properties and declarations inside @keyframes' +
-      (baselineLayer ? `, restricted to @layer ${baselineLayer}` : '') +
-      '. Excluded declarations stay in the set with their reason.',
-    selectorPolicy:
-      'Selectors are not published; only allow-listed pseudo-classes, pseudo-elements and state attribute names are kept. Declarations are identified by ordinal only.',
+    rules: {
+      denominator: EXTRACTION_RULES.denominator[String(baselineLayer)],
+      selectors: EXTRACTION_RULES.selectors,
+      redaction: EXTRACTION_RULES.redaction,
+    },
     redactionDigest: {
       scheme: digester.scheme,
       ...(digester.keyFingerprint
         ? { keyFingerprint: digester.keyFingerprint }
         : {}),
     },
-    redactionPolicy:
-      'Every value and condition token that is not CSS vocabulary, a number with a CSS unit, a hex color, an approved identifier or punctuation is replaced by a placeholder carrying a keyed HMAC-SHA256 digest of the removed text, as are url(), quoted strings, e-mail addresses, URIs, opaque tokens, non-ASCII text, unapproved custom-property and layer names and unclean query parameters.',
   };
 }
 

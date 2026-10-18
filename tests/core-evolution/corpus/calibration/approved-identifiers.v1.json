@@ -2,602 +2,601 @@
   "schemaVersion": 1,
   "kind": "core-evolution-approved-identifiers",
   "task": "CE-00.2",
-  "policy": "Consumer-controlled identifiers (custom-property names, animation names, font family names, layer names and other non-CSS words) may appear in a published declaration set only when listed here with a reason. Extraction replaces every other one with a digest placeholder; the corpus validator rejects any that remains. CSS language vocabulary is listed in tools/coverage/publication.mjs.",
   "identifiers": [
     {
       "identifier": "--font-fallback",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--placeholder-fallback",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--font-mono-fallback",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--made-with-panda",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--blur",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--brightness",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--contrast",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--grayscale",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--hue-rotate",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--invert",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--saturate",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--sepia",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--drop-shadow",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--backdrop-blur",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--backdrop-brightness",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--backdrop-contrast",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--backdrop-grayscale",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--backdrop-hue-rotate",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--backdrop-invert",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--backdrop-opacity",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--backdrop-saturate",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--backdrop-sepia",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--gradient-from-position",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--gradient-to-position",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--gradient-via-position",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--scroll-snap-strictness",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--border-spacing-x",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--border-spacing-y",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--translate-x",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--translate-y",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--rotate",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--rotate-x",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--rotate-y",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--skew-x",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--skew-y",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--scale-x",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--scale-y",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--global-color-border",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--global-color-placeholder",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--global-color-selection",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--global-font-body",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--global-font-mono",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--breakpoints-sm",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--breakpoints-md",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--breakpoints-lg",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--breakpoints-xl",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--breakpoints-2xl",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--sizes-breakpoint-sm",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--sizes-breakpoint-md",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--sizes-breakpoint-lg",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--sizes-breakpoint-xl",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--sizes-breakpoint-2xl",
       "kind": "custom-property",
-      "reason": "PandaCSS preset or preflight variable: a library name, not a consumer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "--colors-bg",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-surface",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-sidebar",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-surface-hover",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-fg",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-muted",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-subtle",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-border",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-border-strong",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-accent",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-on-accent",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-accent-hover",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-accent-surface",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-control-border",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-focus",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-danger",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-danger-hover",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-danger-surface",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-on-danger",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-success",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-success-surface",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-warn",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-warn-surface",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-peer",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--colors-own",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--fonts-display",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--fonts-body",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--fonts-mono",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--ground",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--paper",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--ink",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--muted",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--faint",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--line",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--green",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--green-dark",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--sage",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--pale",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--own",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--red",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--red-pale",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--amber",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--amber-pale",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--font",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--ease",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "--surface",
       "kind": "custom-property",
-      "reason": "Generic design-token name (color, font, easing or surface word); reviewed as carrying no product, customer or internal name."
+      "reason": "css-generic-token-name"
     },
     {
       "identifier": "Instrument",
       "kind": "font-family",
-      "reason": "Public font family name: an OFL web font or a platform system font."
+      "reason": "public-font-family"
     },
     {
       "identifier": "Arial",
       "kind": "font-family",
-      "reason": "Public platform font family name in a font fallback list."
+      "reason": "public-font-family"
     },
     {
       "identifier": "Helvetica",
       "kind": "font-family",
-      "reason": "Public platform font family name in a font fallback list."
+      "reason": "public-font-family"
     },
     {
       "identifier": "Roboto",
       "kind": "font-family",
-      "reason": "Public platform font family name in a font fallback list."
+      "reason": "public-font-family"
     },
     {
       "identifier": "Menlo",
       "kind": "font-family",
-      "reason": "Public platform font family name in a font fallback list."
+      "reason": "public-font-family"
     },
     {
       "identifier": "Monaco",
       "kind": "font-family",
-      "reason": "Public platform font family name in a font fallback list."
+      "reason": "public-font-family"
     },
     {
       "identifier": "Consolas",
       "kind": "font-family",
-      "reason": "Public platform font family name in a font fallback list."
+      "reason": "public-font-family"
     },
     {
       "identifier": "SFMono-Regular",
       "kind": "font-family",
-      "reason": "Public platform font family name in a font fallback list."
+      "reason": "public-font-family"
     },
     {
       "identifier": "BlinkMacSystemFont",
       "kind": "font-family",
-      "reason": "Public platform font family name in a font fallback list."
+      "reason": "public-font-family"
     },
     {
       "identifier": "pulse",
       "kind": "animation-name",
-      "reason": "PandaCSS preset keyframes name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "spin",
       "kind": "animation-name",
-      "reason": "PandaCSS preset keyframes name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "modal-in",
       "kind": "animation-name",
-      "reason": "Generic animation name, approved in the CE-00.2 review."
+      "reason": "generic-animation-name"
     },
     {
       "identifier": "toast-in",
       "kind": "animation-name",
-      "reason": "Generic animation name, approved in the CE-00.2 review."
+      "reason": "generic-animation-name"
     },
     {
       "identifier": "veil-in",
       "kind": "animation-name",
-      "reason": "Generic animation name, approved in the CE-00.2 review."
+      "reason": "generic-animation-name"
     },
     {
       "identifier": "settle",
       "kind": "animation-name",
-      "reason": "Generic animation name, approved in the CE-00.2 review."
+      "reason": "generic-animation-name"
     },
     {
       "identifier": "reset",
       "kind": "layer",
-      "reason": "PandaCSS cascade layer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "base",
       "kind": "layer",
-      "reason": "PandaCSS cascade layer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "tokens",
       "kind": "layer",
-      "reason": "PandaCSS cascade layer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "utilities",
       "kind": "layer",
-      "reason": "PandaCSS cascade layer name."
+      "reason": "platform-defined"
     },
     {
       "identifier": "incoming",
       "kind": "invalid-value",
-      "reason": "Generic word emitted as an invalid direction value (see SF-03); kept as measured data, implying neither validity nor fidelity."
+      "reason": "invalid-value-generic-word"
     },
     {
       "identifier": "outgoing",
       "kind": "invalid-value",
-      "reason": "Generic word emitted as an invalid direction value (see SF-03); kept as measured data, implying neither validity nor fidelity."
+      "reason": "invalid-value-generic-word"
     }
   ]
 }

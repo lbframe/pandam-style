@@ -44,24 +44,29 @@ import {
   selectorState,
 } from '../../tools/coverage/declarations.mjs';
 import { extractionHeader } from '../../tools/coverage/declaration-set.mjs';
+import {
+  schemaOpenLocations,
+  validateSchema,
+  walkClosedSurface,
+} from './closed-surface.mjs';
 import { makeDigester } from '../../tools/coverage/digest.mjs';
 import { privateFile } from '../../tools/coverage/private-paths.mjs';
 import {
+  AUTHORED_IDENTIFIERS,
   STATE_ATTRIBUTES,
   checkPublishedDeclaration,
   loadApproved,
   policeRecord,
   policeTokens,
-  textProblems,
   wordsOf,
 } from '../../tools/coverage/publication.mjs';
 import {
-  CHECKER,
+  CHECKER_FILES,
   assertionDigest,
   canonical,
   computeBinding,
-  rowStatus,
 } from './check-references.mjs';
+import { rowProblems } from './reference-judge.mjs';
 
 const require = createRequire(import.meta.url);
 const postcss = require('postcss');
@@ -106,17 +111,17 @@ const PINNED_ENGINE = {
   playwrightCore: '1.60.0',
 };
 
-// Digest of every string leaf of a reviewed document, with its JSON path.
-export function reviewedTextDigest(doc) {
-  const leaves = [];
-  const walk = (value, at) => {
-    if (typeof value === 'string') leaves.push([at, value]);
-    else if (value && typeof value === 'object')
-      for (const [k, v] of Object.entries(value)) walk(v, `${at}.${k}`);
-  };
-  walk(doc, '$');
-  return sha256(canonical(leaves));
-}
+// Digest of a reviewed document: its canonical JSON.
+export const reviewedDigest = (doc) => sha256(canonical(doc));
+
+// Records derived from or describing the private consumer: closed surface.
+export const CLOSED_DOCUMENTS = [
+  'baseline',
+  'accounting',
+  'findings',
+  'approved',
+  'review',
+];
 const BROWSER_ORACLES = new Set([
   'ORC-LAYOUT',
   'ORC-TEXT',
@@ -125,22 +130,6 @@ const BROWSER_ORACLES = new Set([
   'ORC-A11Y',
   'ORC-CSP',
 ]);
-// Free text in the calibration record may name these and nothing else.
-const BASELINE_ALLOWED = {
-  urls: ['https://github.com/lbframe/wacando'],
-  paths: [
-    'tests/core-evolution/corpus/calibration/w-util-343.declarations.v1.json',
-    'tests/core-evolution/corpus/calibration/w-mockup-1559.declarations.v1.json',
-    'packages/compiler/src/design-system/policy/properties.js',
-    'tools/coverage/cli.mjs',
-    'tools/coverage/',
-  ],
-};
-// Declaration-set headers may name the extraction tool and the calibration
-// record, nothing else.
-const SET_HEADER_ALLOWED = {
-  paths: ['tools/coverage/cli.mjs', 'baseline.v1.json'],
-};
 const SET_SCHEMA = 'core-evolution-declaration-set.v1';
 
 const NEGATIVE_CATEGORIES = [
@@ -164,90 +153,6 @@ const SUCCESS_ORACLES = [
 const EXPECT_MODIFIERS = new Set(['on', 'pseudoElement']);
 
 // ---------------------------------------------------------------------------
-// Minimal JSON Schema subset, matching the shipped schemas.
-
-function typeOf(value) {
-  if (value === null) return 'null';
-  if (Array.isArray(value)) return 'array';
-  if (Number.isInteger(value)) return 'integer';
-  return typeof value;
-}
-function validateSchema(schema, value, where, out) {
-  if (out.length > 40) return;
-  if (
-    schema.const !== undefined &&
-    JSON.stringify(schema.const) !== JSON.stringify(value)
-  ) {
-    out.push(`${where}: expected ${JSON.stringify(schema.const)}`);
-    return;
-  }
-  if (
-    schema.enum &&
-    !schema.enum.some((v) => JSON.stringify(v) === JSON.stringify(value))
-  ) {
-    out.push(`${where}: ${JSON.stringify(value)} not in enum`);
-    return;
-  }
-  if (schema.type) {
-    const types = [schema.type].flat();
-    const actual = typeOf(value);
-    if (
-      !types.includes(actual) &&
-      !(actual === 'integer' && types.includes('number'))
-    ) {
-      out.push(`${where}: expected ${types.join('|')}, got ${actual}`);
-      return;
-    }
-  }
-  if (typeof value === 'string') {
-    if (schema.minLength != null && value.length < schema.minLength)
-      out.push(`${where}: too short`);
-    if (schema.pattern && !new RegExp(schema.pattern).test(value))
-      out.push(`${where}: ${value} does not match ${schema.pattern}`);
-  }
-  if (
-    typeof value === 'number' &&
-    schema.minimum != null &&
-    value < schema.minimum
-  )
-    out.push(`${where}: below minimum`);
-  if (Array.isArray(value)) {
-    if (schema.minItems != null && value.length < schema.minItems)
-      out.push(`${where}: fewer than ${schema.minItems} items`);
-    if (
-      schema.uniqueItems &&
-      new Set(value.map((v) => JSON.stringify(v))).size !== value.length
-    )
-      out.push(`${where}: duplicate items`);
-    if (schema.items)
-      value.forEach((item, i) =>
-        validateSchema(schema.items, item, `${where}[${i}]`, out),
-      );
-  }
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    for (const key of schema.required ?? [])
-      if (!(key in value)) out.push(`${where}: missing ${key}`);
-    for (const [key, item] of Object.entries(value)) {
-      if (schema.properties?.[key]) {
-        validateSchema(schema.properties[key], item, `${where}.${key}`, out);
-      } else if (schema.additionalProperties === false) {
-        out.push(`${where}: unexpected property ${key}`);
-      } else if (
-        schema.additionalProperties &&
-        typeof schema.additionalProperties === 'object'
-      ) {
-        validateSchema(
-          schema.additionalProperties,
-          item,
-          `${where}.${key}`,
-          out,
-        );
-      }
-    }
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Loading.
 
 export function loadDocs() {
@@ -258,7 +163,9 @@ export function loadDocs() {
     docs.baseline.sets.map((s) => [s.inputId, json(s.declarationSet)]),
   );
   docs.referenceCheck = json(REFERENCE_CHECK);
-  docs.checkerSource = read(CHECKER).toString('utf8');
+  docs.checkerSource = CHECKER_FILES.map((f) => read(f).toString('utf8')).join(
+    '\n',
+  );
   docs.profiles = json('tests/core-evolution/profiles.v1.json');
   docs.capabilities = json('tests/core-evolution/capabilities.v1.json');
   return docs;
@@ -323,16 +230,43 @@ export function validateDocs(docs, env) {
     if (!condition) failures.push(message);
   };
 
-  // Schemas.
+  // Schemas, with the closed types checked in code.
+  const approvedConsumer = loadApproved(docs.approved);
+  const closedContext = {
+    approved: approvedConsumer,
+    approvedAuthored: new Map([...approvedConsumer, ...AUTHORED_IDENTIFIERS]),
+    registryNames: env.registry.byName,
+  };
   for (const [name, [file, schema]] of Object.entries(FILES)) {
     const out = [];
-    validateSchema(SCHEMAS[schema], docs[name], file, out);
+    validateSchema(SCHEMAS[schema], docs[name], file, out, closedContext);
     check(out.length === 0, `schema: ${out.slice(0, 5).join('; ')}`);
   }
   for (const [id, set] of Object.entries(docs.sets)) {
     const out = [];
-    validateSchema(SCHEMAS[SET_SCHEMA], set, id, out);
+    validateSchema(SCHEMAS[SET_SCHEMA], set, id, out, closedContext);
     check(out.length === 0, `schema: ${out.slice(0, 5).join('; ')}`);
+  }
+  // Closed surface: every string leaf and key of every record derived from or
+  // describing the consumer sits at a closed schema type, and every
+  // string-capable node of those schemas is closed.
+  for (const [name, doc, schemaName] of [
+    ...CLOSED_DOCUMENTS.map((n) => [n, docs[n], FILES[n][1]]),
+    ...Object.entries(docs.sets).map(([id, set]) => [id, set, SET_SCHEMA]),
+  ]) {
+    const schema = SCHEMAS[schemaName];
+    check(
+      schema['x-closed-surface'] === true,
+      `closed surface: ${schemaName} is not marked closed`,
+    );
+    for (const at of schemaOpenLocations(schema))
+      check(
+        false,
+        `closed surface: ${schemaName} admits an open string at ${at}`,
+      );
+    const walk = walkClosedSurface(schema, doc);
+    for (const at of walk.open.slice(0, 5))
+      check(false, `closed surface: ${name} ${at}`);
   }
 
   const { corpus, oracles, profiles, capabilities } = docs;
@@ -654,11 +588,30 @@ export function validateDocs(docs, env) {
       `${f.id}: issue ${f.issue} is not an issue of ${lot}`,
     );
   }
+  // Each finding's subject exists in the data it is about.
+  const sf01 = findingById.get('SF-01');
   check(
-    docs.sets['W-MOCKUP-1559']?.declarations.some(
-      (d) => d.property === 'font-display' && d.registry.entry == null,
-    ) && findingById.get('SF-01')?.owner === 'CE-09.1',
+    sf01?.owner === 'CE-09.1' &&
+      docs.sets[sf01.subject.inputId]?.declarations.some(
+        (d) => d.property === sf01.subject.property && d.registry.entry == null,
+      ),
     'SF-01: the unregistered font-display descriptor needs its CE-09.1 handoff',
+  );
+  const sf02 = findingById.get('SF-02');
+  check(
+    corpus.negativeFixtures.find((n) => n.id === sf02?.subject.negativeFixture)
+      ?.expected.observedAlpha1.outcome === 'compiler-accepted',
+    'SF-02: its subject must be an accepted negative fixture',
+  );
+  const sf03 = findingById.get('SF-03');
+  check(
+    (sf03?.subject.values ?? []).length > 0 &&
+      sf03.subject.values.every((v) =>
+        docs.sets[sf03.subject.inputId]?.declarations.some(
+          (d) => d.property === sf03.subject.property && d.value === v,
+        ),
+      ),
+    'SF-03: its subject values must be measured declarations',
   );
   for (const c of NEGATIVE_CATEGORIES)
     check(
@@ -745,6 +698,16 @@ export function validateDocs(docs, env) {
         r.absentProperty + r.outOfDomain === r.gap,
       `calibration: ${entry.inputId} reported categories do not add up`,
     );
+    check(
+      baseline.originalClassifier.recordedRuns.every(
+        (r) => r.reported === (r.inputId != null),
+      ),
+      'calibration: only runs of a calibration input are reported',
+    );
+    check(
+      entry.baselineLayer === set.extraction?.baselineLayer,
+      `calibration: ${entry.inputId} baseline layer differs from its set`,
+    );
     const run = baseline.originalClassifier.recordedRuns.find(
       (x) => x.inputId === entry.inputId,
     );
@@ -809,12 +772,12 @@ export function validateDocs(docs, env) {
   const used = new Set();
   const fingerprints = new Set();
   for (const [id, set] of Object.entries(sets)) {
-    // Set headers carry no free text of their own: the description and role
-    // come from the calibration record, the extraction block is canonical.
+    // Set headers are closed and bound to the calibration record: the role
+    // and the baseline layer come from it, the extraction block is canonical.
     const entry = baseline.sets.find((x) => x.inputId === id);
     check(
-      set.description === entry?.description,
-      `privacy: ${id} header description is not the calibration record's`,
+      set.inputId === id && entry != null,
+      `privacy: ${id} header input id is not a calibration set`,
     );
     check(
       set.input?.role === entry?.input.role,
@@ -826,7 +789,7 @@ export function validateDocs(docs, env) {
       /^[0-9a-f]{64}$/.test(fingerprint ?? '') &&
         canonical(set.extraction) ===
           canonical(
-            extractionHeader(set.extraction.baselineLayer, {
+            extractionHeader(entry?.baselineLayer ?? null, {
               scheme: 'hmac-sha256',
               keyFingerprint: fingerprint,
             }),
@@ -837,11 +800,6 @@ export function validateDocs(docs, env) {
       set.registryVersion === env.registry.version,
       `privacy: ${id} registry version differs`,
     );
-    for (const problem of textProblems(
-      JSON.stringify({ ...set, declarations: [] }),
-      SET_HEADER_ALLOWED,
-    ))
-      check(false, `privacy: ${id} header carries ${problem}`);
     for (const d of set.declarations) {
       const problems = checkPublishedDeclaration(
         d,
@@ -861,49 +819,29 @@ export function validateDocs(docs, env) {
     fingerprints.size === 1,
     'privacy: the sets use different redaction keys',
   );
-  // Authored publication text is pinned to its review.
+  // The calibration records are pinned to their publication review.
   const review = docs.review;
-  check(
-    reviewedTextDigest(baseline) === review.reviewed.baseline,
-    'privacy: baseline.v1.json text differs from its publication review (review it, then update publication-review.v1.json)',
-  );
-  check(
-    reviewedTextDigest(docs.approved) === review.reviewed.approvedIdentifiers,
-    'privacy: approved-identifiers.v1.json differs from its publication review (review it, then update publication-review.v1.json)',
-  );
+  for (const [key, doc, file] of [
+    ['baseline', baseline, 'baseline.v1.json'],
+    ['approvedIdentifiers', docs.approved, 'approved-identifiers.v1.json'],
+    ['scopeFindings', docs.findings, 'scope-findings.v1.json'],
+  ])
+    check(
+      reviewedDigest(doc) === review.reviewed[key],
+      `privacy: ${file} differs from its publication review (review it, then update publication-review.v1.json)`,
+    );
   for (const identifier of approved.keys())
     check(
       used.has(identifier),
       `privacy: approved identifier ${identifier} is never published`,
     );
-  const walk = (value, at, visit) => {
-    if (typeof value === 'string') visit(value, at);
-    else if (value && typeof value === 'object')
-      for (const [k, v] of Object.entries(value)) walk(v, `${at}.${k}`, visit);
-  };
-  walk(baseline, 'baseline', (text, at) => {
-    for (const problem of textProblems(text, BASELINE_ALLOWED))
-      check(false, `privacy: ${at} carries ${problem}`);
-  });
   for (const s of docs.accounting.stylesheets) {
-    check(
-      /^tests\/core-evolution\/corpus\/fixtures\/[a-z-]+\/[a-z-]+\.css$/.test(
-        s.path,
-      ),
-      `privacy: accounting path ${s.path} is not a corpus stylesheet`,
-    );
     const inputId = `${s.fixtureId}:${path.basename(s.path, '.css')}`;
-    for (const d of s.declarations) {
+    for (const d of s.declarations)
       check(
-        new RegExp(`^${inputId}#[0-9]{3}$`).test(d.id) &&
-          !('location' in d) &&
-          textProblems(
-            d.value.replace(/url\(<redacted:url:sha256:[0-9a-f]{64}>\)/g, ''),
-          ).length === 0 &&
-          textProblems(JSON.stringify(d.context)).length === 0,
-        `privacy: accounting ${d.id} carries a path, location, URL or non-ASCII text`,
+        new RegExp(`^${inputId}#[0-9]{3}$`).test(d.id),
+        `privacy: accounting ${d.id} is not an ordinal of ${inputId}`,
       );
-    }
   }
 
   // Reference check: bound to everything it verifies, and well formed.
@@ -960,39 +898,13 @@ export function validateDocs(docs, env) {
       ['pass', 'fail', 'not-evaluated'].includes(row.status),
       `${at} has status ${row.status}`,
     );
-    const results = Array.isArray(row.results) ? row.results : [];
-    check(results.length > 0, `${at} has no result evidence`);
-    for (const r of results)
-      check(
-        typeof r.kind === 'string' &&
-          [true, false, null].includes(r.ok) &&
-          (r.ok === null
-            ? typeof r.note === 'string' && r.note.length > 0
-            : 'measured' in r &&
-              r.measured !== undefined &&
-              r.measured !== null),
-        `${at} has a result without evidence or reason`,
-      );
-    check(
-      results.length > 0 && rowStatus(a.case, results) === row.status,
-      `${at} status is not derived from its results (forged)`,
-    );
     check(row.status !== 'fail', `${at} fails on the reference page`);
     const target =
       a.case === 'negative'
         ? fixture.assertions.find((x) => x.id === a.mustFail)
         : a;
-    if (row.status !== 'not-evaluated') {
-      const required = Object.keys(target.expect ?? {}).filter(
-        (k) => !EXPECT_MODIFIERS.has(k),
-      );
-      if (target.expect?.focusVisible) required.push('paintedIndicator');
-      const kinds = new Set(results.map((r) => r.kind));
-      check(
-        required.every((k) => kinds.has(k)),
-        `${at} lacks a result for ${required.filter((k) => !kinds.has(k)).join(', ')}`,
-      );
-    }
+    const problems = rowProblems(row, a, target);
+    check(problems.length === 0, `${at} ${problems.join('; ')}`);
   }
   for (const id of expectedRows.keys())
     check(seenRows.has(id), `reference check: ${id} has no recorded result`);
@@ -1150,6 +1062,7 @@ function parserFixtures(policy) {
       },
       approvedFixture,
       testKey,
+      registryNames,
     );
   const publishable = (record) =>
     checkPublishedDeclaration(record, 'X', approvedFixture, registryNames)
@@ -1241,8 +1154,9 @@ function parserFixtures(policy) {
   }
   for (const property of [smuggled.toLowerCase(), `1${smuggled.toLowerCase()}`])
     expect(
-      !publishable(police({ property })),
-      `property ${property} is rejected`,
+      !publishable({ ...police({}), property }) &&
+        publishable(police({ property })),
+      `property ${property} is rejected in clear and redacted at extraction`,
     );
   for (const id of [
     `X#001${smuggled}`,
@@ -1290,6 +1204,84 @@ function parserFixtures(policy) {
       policed.context.state.pseudoClasses.join() === ':hover' &&
       policed.context.state.redactedSelectorParts === 1,
     'identifier policy redacts unapproved identifiers in every field',
+  );
+  // Round-3 extraction cases: placeholder kinds, url(), at-rules, properties.
+  const badKind = `<redacted:privatecustomer:hmac-sha256:${'0'.repeat(64)}>`;
+  for (const value of [
+    badKind,
+    `"${badKind}"`,
+    `url(${badKind})`,
+    'url(red)',
+    'url(/private/a.png)',
+  ]) {
+    const policed = police({ value });
+    expect(
+      !policed.value.includes('privatecustomer') &&
+        !policed.value.includes('red)') &&
+        publishable(policed),
+      `value ${value.slice(0, 40)} is redacted at extraction`,
+    );
+    expect(
+      !publishable({ ...policed, value }),
+      `value ${value.slice(0, 40)} is rejected`,
+    );
+  }
+  for (const [field, record] of [
+    ['query', { context: { atRules: [`@media (${badKind})`] } }],
+    ['layer', { context: { layer: badKind } }],
+    ['at-rule', { context: { atRules: ['@privatecustomername x'] } }],
+    ['property', { property: 'privatecustomername' }],
+    ['custom property', { property: `--${badKind}` }],
+  ]) {
+    const policed = police(record);
+    expect(
+      !JSON.stringify(policed).toLowerCase().includes('privatecustomer') &&
+        publishable(policed),
+      `${field} with a private name is redacted at extraction`,
+    );
+  }
+  const unknownAt = extractDeclarations(
+    '@privatecustomername x { a { color: red } }',
+  )[0];
+  expect(
+    /^<redacted:at-rule:sha256:[0-9a-f]{64}>$/.test(
+      unknownAt.context.atRules[0],
+    ),
+    'an unknown at-rule is a placeholder from extraction on',
+  );
+  // The static closed-schema check finds every open string location.
+  const open = (schema) =>
+    schemaOpenLocations({
+      type: 'object',
+      properties: { f: schema },
+      additionalProperties: false,
+    });
+  expect(open({ type: 'string' }).length === 1, 'a plain string type is open');
+  expect(
+    open({ type: 'string', pattern: '^[a-z]+$' }).length === 1,
+    'a pattern without maxLength is open',
+  );
+  expect(
+    open({ type: 'string', pattern: '[a-z]+', maxLength: 8 }).length === 1,
+    'an unanchored pattern is open',
+  );
+  expect(open({ enum: ['a', 'b'] }).length === 0, 'an enum is closed');
+  expect(
+    open({ type: 'string', 'x-closed': 'css-value', maxLength: 64 }).length ===
+      0,
+    'an x-closed type is closed',
+  );
+  expect(
+    open({ type: 'object', properties: {} }).length === 1,
+    'an object without closed keys is open',
+  );
+  expect(
+    open({
+      type: 'object',
+      propertyNames: { enum: ['a'] },
+      additionalProperties: { type: 'integer' },
+    }).length === 0,
+    'closed propertyNames close an object',
   );
   // Private files stay outside the repository, by real path.
   const scratch = fs.mkdtempSync(
@@ -1689,14 +1681,14 @@ const MUTATIONS = [
   ],
   [
     'an e-mail address in the calibration record',
-    /privacy: baseline.* carries e-mail address/,
+    /baseline.v1.json.status: .* not in enum/,
     (d) => {
       d.baseline.status += ' Contact someone@example.org.';
     },
   ],
   [
     'a private URL in the calibration record',
-    /privacy: baseline.* carries URL/,
+    /input.recovery: .* not in enum/,
     (d) => {
       d.baseline.sets[0].input.recovery +=
         ' https://assets.internal.example/build';
@@ -1704,7 +1696,7 @@ const MUTATIONS = [
   ],
   [
     'a consumer file path in the calibration record',
-    /privacy: baseline.* carries file path/,
+    /closed surface: baseline .*open string/,
     (d) => {
       d.baseline.sets[0].description += ' (project/build/main.css)';
     },
@@ -1856,7 +1848,7 @@ const MUTATIONS = [
   ]),
   [
     'free text appended to a set header',
-    /header description is not the calibration record's/,
+    /closed surface: W-UTIL-343 .*open string/,
     (d) => {
       d.sets['W-UTIL-343'].description += ' PrivateCustomerName';
     },
@@ -1870,10 +1862,10 @@ const MUTATIONS = [
     },
   ],
   [
-    'unreviewed calibration-record text',
-    /baseline.v1.json text differs from its publication review/,
+    'an unreviewed calibration-record change',
+    /baseline.v1.json differs from its publication review/,
     (d) => {
-      d.baseline.consumer.publication += ' PrivateCustomerName';
+      d.baseline.originalClassifier.consumerHistorySearched.commits += 1;
     },
   ],
   [
@@ -1925,7 +1917,7 @@ const MUTATIONS = [
   ],
   [
     'a forged pass',
-    /SHELL-L1 status is not derived from its results \(forged\)/,
+    /SHELL-L1 box verdict does not follow from its measurement/,
     (d) => {
       d.referenceCheck.rows.find((r) => r.id === 'SHELL-L1').results[0].ok =
         false;
@@ -1933,7 +1925,7 @@ const MUTATIONS = [
   ],
   [
     'a pass without measured values',
-    /SHELL-L1 has a result without evidence or reason/,
+    /SHELL-L1 box result has fields kind,ok/,
     (d) => {
       delete d.referenceCheck.rows.find((r) => r.id === 'SHELL-L1').results[0]
         .measured;
@@ -1941,7 +1933,7 @@ const MUTATIONS = [
   ],
   [
     'a pass that lacks a required result kind',
-    /FORMS-K1 lacks a result for paintedIndicator/,
+    /FORMS-K1 results focusOrder,focusVisible are not exactly/,
     (d) => {
       const row = d.referenceCheck.rows.find((r) => r.id === 'FORMS-K1');
       row.results = row.results.filter((r) => r.kind !== 'paintedIndicator');
@@ -1988,6 +1980,246 @@ const MUTATIONS = [
     (d) => {
       const f = d.corpus.fixtures.find((x) => x.id === 'CE-CORPUS-FORMS-01');
       f.assertions = f.assertions.filter((a) => a.id !== 'FORMS-K2');
+    },
+  ],
+  // Round-3: closed surface by construction.
+  ...[
+    [
+      'a placeholder of an unlisted kind in a value',
+      /value: .*identifier|token <redacted:privatecustomer/,
+      (r) => {
+        r.value = `<redacted:privatecustomer:hmac-sha256:${'0'.repeat(64)}>`;
+      },
+    ],
+    [
+      'a placeholder of an unlisted kind in a quoted value',
+      /quoted string is not a keyed placeholder|token/,
+      (r) => {
+        r.value = `"<redacted:privatecustomer:hmac-sha256:${'0'.repeat(64)}>"`;
+      },
+    ],
+    [
+      'a placeholder of an unlisted kind in url()',
+      /url\(\) does not hold exactly one keyed placeholder/,
+      (r) => {
+        r.value = `url(<redacted:privatecustomer:hmac-sha256:${'0'.repeat(64)}>)`;
+      },
+    ],
+    [
+      'url() around a bare word',
+      /url\(\) does not hold exactly one keyed placeholder/,
+      (r) => {
+        r.value = 'url(red)';
+      },
+    ],
+    [
+      'a placeholder of an unlisted kind in a query',
+      /at-rule: /,
+      (r) => {
+        r.context.atRules = [
+          `@media (<redacted:privatecustomer:hmac-sha256:${'0'.repeat(64)}>)`,
+        ];
+      },
+    ],
+    [
+      'a placeholder of an unlisted kind as a layer',
+      /layer .* is not approved/,
+      (r) => {
+        r.context.layer = `<redacted:privatecustomer:hmac-sha256:${'0'.repeat(64)}>`;
+      },
+    ],
+    [
+      'a placeholder of an unlisted kind as a property',
+      /custom property .* is neither approved nor redacted|is not a registry property/,
+      (r) => {
+        r.property = `--<redacted:privatecustomer:hmac-sha256:${'0'.repeat(64)}>`;
+      },
+    ],
+    [
+      'an unknown at-rule in clear',
+      /is not a closed at-rule|is not a media or supports condition/,
+      (r) => {
+        r.context.atRules = ['@privatecustomername x'];
+      },
+    ],
+    [
+      'an over-long value',
+      /longer than|too long/,
+      (r) => {
+        r.value = 'red, '.repeat(300) + 'red';
+      },
+    ],
+    [
+      'an unlisted composite longhand',
+      /composite-longhand/,
+      (r) => {
+        r.composite = {
+          rewrite: 'full-longhand-reset',
+          basis: 'other',
+          longhands: ['privatecustomer'],
+          longhandsNotAdmitted: [],
+        };
+      },
+    ],
+  ].map(([name, reason, change]) => [
+    name,
+    reason,
+    (d) => {
+      change(
+        d.sets['W-UTIL-343'].declarations.find(
+          (x) => x.context.layer === 'utilities',
+        ),
+      );
+    },
+  ]),
+  [
+    'a private baseline layer in the extraction header',
+    /baselineLayer: .* not in enum|extraction header is not the canonical header/,
+    (d) => {
+      const x = d.sets['W-UTIL-343'].extraction;
+      x.baselineLayer = 'PrivateCustomerName';
+      x.rules.denominator = 'restricted to @layer PrivateCustomerName';
+    },
+  ],
+  [
+    'a baseline layer that differs from the calibration record',
+    /extraction header is not the canonical header|baseline layer differs/,
+    (d) => {
+      d.sets['W-MOCKUP-1559'].extraction.baselineLayer = 'utilities';
+      d.sets['W-MOCKUP-1559'].extraction.rules.denominator = 'CE-DEN-02';
+    },
+  ],
+  [
+    'a free-text statement in the publication review',
+    /publication-review.v1.json: unexpected property statement|closed surface: review/,
+    (d) => {
+      d.review.statement =
+        'PrivateCustomerName https://private.example/customer/source.css';
+    },
+  ],
+  [
+    'a free-text approval reason',
+    /reason: .* not in enum/,
+    (d) => {
+      d.approved.identifiers[0].reason = 'platform-defined PrivateCustomerName';
+    },
+  ],
+  [
+    'a free-text field in a scope finding',
+    /closed surface: findings .*open/,
+    (d) => {
+      d.findings.findings[0].evidence = 'PrivateCustomerName';
+    },
+  ],
+  [
+    'a free-text scope-finding subject value',
+    /subject.values\[0\]: css-value/,
+    (d) => {
+      d.findings.findings.find((f) => f.id === 'SF-03').subject.values[0] =
+        'PrivateCustomerName';
+    },
+  ],
+  [
+    'an unlisted identifier in the corpus accounting',
+    /authored-css-value: identifier PrivateCustomerName is not approved/,
+    (d) => {
+      d.accounting.stylesheets[0].declarations[0].value = 'PrivateCustomerName';
+    },
+  ],
+  [
+    'a free-text key in the accounting totals',
+    /capabilitiesExercised\[key PrivateCustomerName\]/,
+    (d) => {
+      d.accounting.totals.capabilitiesExercised.PrivateCustomerName = 1;
+    },
+  ],
+  // Round-3: report proof is recomputed, not trusted.
+  [
+    'every row turned into not-evaluated',
+    /is not evaluated without the fixed reason|not-evaluated status outside the documented assertions/,
+    (d) => {
+      for (const r of d.referenceCheck.rows) {
+        r.status = 'not-evaluated';
+        r.results = [{ kind: 'anything', ok: null, note: 'skip' }];
+      }
+      d.referenceCheck.tally = {
+        'not-evaluated': d.referenceCheck.rows.length,
+      };
+    },
+  ],
+  [
+    'a contradictory measurement kept as passing',
+    /SHELL-L1 box verdict does not follow from its measurement/,
+    (d) => {
+      d.referenceCheck.rows
+        .find((r) => r.id === 'SHELL-L1')
+        .results.find((r) => r.kind === 'box').measured.width = 9999;
+    },
+  ],
+  [
+    'an empty measurement kept as passing',
+    /SHELL-L1 box measurement does not have its strict shape/,
+    (d) => {
+      d.referenceCheck.rows
+        .find((r) => r.id === 'SHELL-L1')
+        .results.find((r) => r.kind === 'box').measured = {};
+    },
+  ],
+  [
+    'failed painted evidence kept as passing',
+    /FORMS-K1 paintedIndicator (verdict does not follow from its measurement|measurement does not have its strict shape)/,
+    (d) => {
+      const r = d.referenceCheck.rows
+        .find((x) => x.id === 'FORMS-K1')
+        .results.find((x) => x.kind === 'paintedIndicator');
+      r.measured = r.measured.map((stop) => ({
+        ...stop,
+        changedRingPixels: 0,
+      }));
+    },
+  ],
+  [
+    'a transparent outline kept as a painted indicator',
+    /FORMS-K1 paintedIndicator verdict does not follow from its measurement/,
+    (d) => {
+      const r = d.referenceCheck.rows
+        .find((x) => x.id === 'FORMS-K1')
+        .results.find((x) => x.kind === 'paintedIndicator');
+      r.measured[0].focused[0].outlineColor = 'rgba(0, 0, 0, 0)';
+    },
+  ],
+  [
+    'a not-evaluated row outside the documented list',
+    /SHELL-L1 .*(not-evaluated status outside the documented assertions|is not evaluated without the fixed reason)/,
+    (d) => {
+      const row = d.referenceCheck.rows.find((x) => x.id === 'SHELL-L1');
+      row.status = 'not-evaluated';
+      row.results = [
+        {
+          kind: 'box',
+          ok: null,
+          reason: 'compares-a-build-with-the-reference',
+        },
+      ];
+      d.referenceCheck.tally.pass -= 1;
+      d.referenceCheck.tally['not-evaluated'] += 1;
+    },
+  ],
+  [
+    'an extra result kind',
+    /SHELL-L1 results .* are not exactly box/,
+    (d) => {
+      d.referenceCheck.rows
+        .find((x) => x.id === 'SHELL-L1')
+        .results.push({ kind: 'columns', ok: true, measured: 2 });
+    },
+  ],
+  [
+    'the transparent-outline control dropped',
+    /FORMS-K3/,
+    (d) => {
+      const f = d.corpus.fixtures.find((x) => x.id === 'CE-CORPUS-FORMS-01');
+      f.assertions = f.assertions.filter((a) => a.id !== 'FORMS-K3');
     },
   ],
   // Negative baselines and their findings.
@@ -2100,6 +2332,20 @@ async function main() {
       Object.values(docs.sets)
         .map((s) => `${s.inputId} ${s.counts.baseline}/${s.counts.all}`)
         .join(', '),
+  );
+  let leaves = 0;
+  let keys = 0;
+  const records = [
+    ...CLOSED_DOCUMENTS.map((n) => [docs[n], FILES[n][1]]),
+    ...Object.values(docs.sets).map((set) => [set, SET_SCHEMA]),
+  ];
+  for (const [doc, schemaName] of records) {
+    const walk = walkClosedSurface(SCHEMAS[schemaName], doc);
+    leaves += walk.leaves;
+    keys += walk.keys;
+  }
+  console.log(
+    `closed surface: ${leaves} string leaves and ${keys} keys in ${records.length} consumer records, all at closed schema types`,
   );
   if (!process.argv.includes('--self-test')) return;
   let bad = 0;

@@ -26,6 +26,13 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
+import {
+  NOT_EVALUATED_KINDS,
+  indicatorExtent,
+  judge,
+  requiredResults,
+  rowStatus,
+} from './reference-judge.mjs';
 
 const repo = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -34,11 +41,12 @@ const repo = path.resolve(
 const CORPUS = 'tests/core-evolution/corpus/corpus.v1.json';
 const ORACLES = 'tests/core-evolution/corpus/oracles.v1.json';
 export const CHECKER = 'tests/core-evolution/check-references.mjs';
-// A focus indicator must change at least this many pixels around the
-// focused element (a text caret alone changes fewer).
-export const INDICATOR_MIN_PIXELS = 40;
+// The checker and its verdict logic are both bound into the report.
+export const CHECKER_FILES = Object.freeze([
+  CHECKER,
+  'tests/core-evolution/reference-judge.mjs',
+]);
 const sha256 = (data) => crypto.createHash('sha256').update(data).digest('hex');
-const TOLERANCE = 0.5;
 const BROWSER_ORACLES = new Set([
   'ORC-LAYOUT',
   'ORC-TEXT',
@@ -179,20 +187,6 @@ window.__ce = {
 
 // ---------------------------------------------------------------------------
 
-function near(actual, expected, tolerance = TOLERANCE) {
-  return Math.abs(actual - expected) <= tolerance;
-}
-
-function luminance(rgb) {
-  const [r, g, b] = rgb.map((v) => {
-    const c = v / 255;
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-const AX_ROLE = { img: 'image' };
-
 // Minimal PNG decoder for Chromium screenshots (8-bit RGB or RGBA,
 // non-interlaced): returns { width, height, channels, pixels }.
 export function decodePng(buffer) {
@@ -249,539 +243,440 @@ export function decodePng(buffer) {
   return { width: header.width, height: header.height, channels, pixels };
 }
 
-export function changedPixels(before, after) {
+// Counts changed pixels inside the indicator ring of the candidates: within
+// each node's border box expanded by its indicator extent plus 8px, and
+// outside its content box. `clip` is the screenshot area in viewport pixels.
+export function changedRingPixels(before, after, clip, rings) {
   const a = decodePng(before);
   const b = decodePng(after);
-  if (a.width !== b.width || a.height !== b.height) return Infinity;
+  if (a.width !== b.width || a.height !== b.height) return 0;
   let changed = 0;
-  for (let i = 0; i < a.width * a.height; i++) {
-    for (let k = 0; k < 3; k++) {
-      if (
-        Math.abs(a.pixels[i * a.channels + k] - b.pixels[i * b.channels + k]) >
-        24
-      ) {
-        changed += 1;
-        break;
+  for (let y = 0; y < a.height; y++) {
+    for (let x = 0; x < a.width; x++) {
+      const px = clip.x + x + 0.5;
+      const py = clip.y + y + 0.5;
+      const inRing = rings.some(
+        ({ outer, inner }) =>
+          px >= outer.left &&
+          px <= outer.right &&
+          py >= outer.top &&
+          py <= outer.bottom &&
+          !(
+            px >= inner.left &&
+            px <= inner.right &&
+            py >= inner.top &&
+            py <= inner.bottom
+          ),
+      );
+      if (!inRing) continue;
+      const i = y * a.width + x;
+      for (let k = 0; k < 3; k++) {
+        if (
+          Math.abs(
+            a.pixels[i * a.channels + k] - b.pixels[i * b.channels + k],
+          ) > 24
+        ) {
+          changed += 1;
+          break;
+        }
       }
     }
   }
   return changed;
 }
 
-// Computed indicator styles of the focused element and, when it is visually
-// hidden (a styled sibling carries its indicator), of its next sibling.
+// Computed indicator styles and boxes of the focused element and, when it is
+// visually hidden (a styled sibling carries its indicator), of its next
+// sibling.
 const INDICATOR_SNAPSHOT = `(() => {
   const el = window.__ceFocused;
   const r = el.getBoundingClientRect();
   const hidden = r.width <= 1 && r.height <= 1;
   const nodes = [el, ...(hidden && el.nextElementSibling ? [el.nextElementSibling] : [])];
-  const box = nodes.map((n) => n.getBoundingClientRect()).reduce((u, b) => ({
-    left: Math.min(u.left, b.left), top: Math.min(u.top, b.top),
-    right: Math.max(u.right, b.right), bottom: Math.max(u.bottom, b.bottom) }),
-    { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity });
-  const style = (n) => { const s = getComputedStyle(n); return {
-    outlineStyle: s.outlineStyle, outlineWidth: s.outlineWidth, boxShadow: s.boxShadow,
-    border: ['Top', 'Right', 'Bottom', 'Left'].map((side) => s['border' + side + 'Style'] + ' ' + s['border' + side + 'Width'] + ' ' + s['border' + side + 'Color']).join('|') }; };
-  const pad = 8;
-  return { styles: nodes.map(style),
-    clip: { x: Math.max(0, box.left - pad), y: Math.max(0, box.top - pad),
-      width: Math.min(document.documentElement.clientWidth, box.right + pad) - Math.max(0, box.left - pad),
-      height: Math.min(document.documentElement.clientHeight, box.bottom + pad) - Math.max(0, box.top - pad) } };
+  return nodes.map((n) => {
+    const s = getComputedStyle(n);
+    const b = n.getBoundingClientRect();
+    const px = (v) => parseFloat(v) || 0;
+    const inset = {
+      top: px(s.borderTopWidth) + px(s.paddingTop), right: px(s.borderRightWidth) + px(s.paddingRight),
+      bottom: px(s.borderBottomWidth) + px(s.paddingBottom), left: px(s.borderLeftWidth) + px(s.paddingLeft) };
+    return {
+      style: {
+        outlineStyle: s.outlineStyle, outlineWidth: s.outlineWidth, outlineOffset: s.outlineOffset,
+        outlineColor: s.outlineColor, boxShadow: s.boxShadow,
+        borders: ['Top', 'Right', 'Bottom', 'Left'].map((side) => ({
+          style: s['border' + side + 'Style'], width: s['border' + side + 'Width'], color: s['border' + side + 'Color'] })),
+      },
+      box: { left: b.left, top: b.top, right: b.right, bottom: b.bottom },
+      content: { left: b.left + inset.left, top: b.top + inset.top, right: b.right - inset.right, bottom: b.bottom - inset.bottom },
+    };
+  });
 })()`;
 
-// A painted indicator: a non-none outline of non-zero width, a box shadow, or
-// a changed non-zero border on the focused element (or its styled sibling),
-// and at least INDICATOR_MIN_PIXELS changed pixels against the unfocused page.
-async function paintedIndicator(page) {
+// One keyboard stop: styles focused and unfocused, and the changed pixels of
+// the indicator ring between the two states.
+async function indicatorStop(page) {
   await page.evaluate(() => {
     window.__ceFocused = document.activeElement;
   });
   const focused = await page.evaluate(INDICATOR_SNAPSHOT);
-  const clip = focused.clip;
-  const shotFocused = await page.screenshot({
-    clip,
-    animations: 'disabled',
-    caret: 'hide',
+  const rings = focused.map(({ style, box, content }) => {
+    const grow = indicatorExtent(style) + 8;
+    return {
+      outer: {
+        left: box.left - grow,
+        top: box.top - grow,
+        right: box.right + grow,
+        bottom: box.bottom + grow,
+      },
+      inner: content,
+    };
   });
+  const viewport = await page.evaluate(() => ({
+    width: document.documentElement.clientWidth,
+    height: document.documentElement.clientHeight,
+  }));
+  const left = Math.max(
+    0,
+    Math.floor(Math.min(...rings.map((r) => r.outer.left))),
+  );
+  const top = Math.max(
+    0,
+    Math.floor(Math.min(...rings.map((r) => r.outer.top))),
+  );
+  const right = Math.min(
+    viewport.width,
+    Math.ceil(Math.max(...rings.map((r) => r.outer.right))),
+  );
+  const bottom = Math.min(
+    viewport.height,
+    Math.ceil(Math.max(...rings.map((r) => r.outer.bottom))),
+  );
+  const clip = { x: left, y: top, width: right - left, height: bottom - top };
+  const options = { clip, animations: 'disabled', caret: 'hide' };
+  const shotFocused = await page.screenshot(options);
   await page.evaluate(() => window.__ceFocused.blur());
   const unfocused = await page.evaluate(INDICATOR_SNAPSHOT);
-  const shotUnfocused = await page.screenshot({
-    clip,
-    animations: 'disabled',
-    caret: 'hide',
-  });
+  const shotUnfocused = await page.screenshot(options);
   await page.evaluate(() => window.__ceFocused.focus());
-  const styled = focused.styles.some((f, i) => {
-    const u = unfocused.styles[i];
-    const outline = f.outlineStyle !== 'none' && parseFloat(f.outlineWidth) > 0;
-    const shadow = f.boxShadow !== 'none' && f.boxShadow !== u.boxShadow;
-    const border = f.border !== u.border && !/^none 0px/.test(f.border);
-    return outline || shadow || border;
-  });
-  const pixels = changedPixels(shotFocused, shotUnfocused);
   return {
-    ok: styled && pixels >= INDICATOR_MIN_PIXELS,
-    styled,
-    changedPixels: pixels,
-    outline: focused.styles.map((x) => `${x.outlineStyle} ${x.outlineWidth}`),
+    focused: focused.map((n) => n.style),
+    unfocused: unfocused.map((n) => n.style),
+    changedRingPixels: changedRingPixels(
+      shotFocused,
+      shotUnfocused,
+      clip,
+      rings,
+    ),
   };
 }
 
-export async function evaluateAssertion(ctx, a) {
+// Measures one result kind; the verdict comes from judge().
+async function measure(ctx, a, kind, want) {
   const { page, cdp } = ctx;
   const expect = a.expect;
-  const results = [];
-  const record = (kind, ok, measured, note) =>
-    results.push({ kind, ok, measured, ...(note ? { note } : {}) });
-  for (const [kind, want] of Object.entries(expect)) {
-    if (kind === 'on' || kind === 'pseudoElement') continue;
-    switch (kind) {
-      case 'box':
-      case 'minBox':
-      case 'maxBox': {
-        const r = await page.evaluate((id) => __ce.rect(id), a.target);
-        const ok = Object.entries(want).every(([dim, v]) =>
-          kind === 'box'
-            ? near(r[dim], v)
-            : kind === 'minBox'
-              ? r[dim] >= v - TOLERANCE
-              : r[dim] <= v + TOLERANCE,
-        );
-        record(kind, ok, { width: r.width, height: r.height });
-        break;
-      }
-      case 'noHorizontalOverflow': {
-        const m = await page.evaluate((id) => {
-          const e = __ce.el(id);
-          return { scrollWidth: e.scrollWidth, clientWidth: e.clientWidth };
-        }, a.target);
-        record(kind, m.scrollWidth <= m.clientWidth + 1, m);
-        break;
-      }
-      case 'scrollable': {
-        const m = await page.evaluate((id) => {
-          const e = __ce.el(id);
-          const s = getComputedStyle(e);
+  const el = (fn, arg) => page.evaluate(fn, arg);
+  switch (kind) {
+    case 'box':
+    case 'minBox':
+    case 'maxBox':
+    case 'targetSizeMin': {
+      const r = await el((id) => __ce.rect(id), a.target);
+      return { width: r.width, height: r.height };
+    }
+    case 'noHorizontalOverflow':
+      return el((id) => {
+        const e = __ce.el(id);
+        return { scrollWidth: e.scrollWidth, clientWidth: e.clientWidth };
+      }, a.target);
+    case 'scrollable':
+      return el((id) => {
+        const e = __ce.el(id);
+        const s = getComputedStyle(e);
+        return {
+          x: e.scrollWidth > e.clientWidth && /auto|scroll/.test(s.overflowX),
+          y: e.scrollHeight > e.clientHeight && /auto|scroll/.test(s.overflowY),
+        };
+      }, a.target);
+    case 'stuckAfterScroll':
+      return el(
+        ({ id, w }) => {
+          const c = __ce.el(w.container);
+          if (w.axis === 'x') c.scrollLeft = w.offset;
+          else c.scrollTop = w.offset;
+          const cr = c.getBoundingClientRect();
+          const t = __ce.el(id).getBoundingClientRect();
           return {
-            x: e.scrollWidth > e.clientWidth && /auto|scroll/.test(s.overflowX),
-            y:
-              e.scrollHeight > e.clientHeight &&
-              /auto|scroll/.test(s.overflowY),
+            scrolled: w.axis === 'x' ? c.scrollLeft : c.scrollTop,
+            offset:
+              w.edge === 'left'
+                ? t.left - cr.left - c.clientLeft
+                : t.top - cr.top - c.clientTop,
           };
-        }, a.target);
-        const ok = want === 'both' ? m.x && m.y : m[want];
-        record(kind, ok, m);
-        break;
-      }
-      case 'stuckAfterScroll': {
-        const m = await page.evaluate(
-          ({ id, w }) => {
-            const c = __ce.el(w.container);
-            if (w.axis === 'x') c.scrollLeft = w.offset;
-            else c.scrollTop = w.offset;
-            const cr = c.getBoundingClientRect();
-            const t = __ce.el(id).getBoundingClientRect();
-            return {
-              scrolled: w.axis === 'x' ? c.scrollLeft : c.scrollTop,
-              offset:
-                w.edge === 'left'
-                  ? t.left - cr.left - c.clientLeft
-                  : t.top - cr.top - c.clientTop,
-            };
-          },
-          { id: a.target, w: want },
-        );
-        record(kind, m.scrolled > 0 && near(m.offset, want.value), m);
-        break;
-      }
-      case 'fixedToViewport': {
-        const m = await page.evaluate((id) => {
-          const r = __ce.el(id).getBoundingClientRect();
-          return {
-            right: document.documentElement.clientWidth - r.right,
-            bottom: document.documentElement.clientHeight - r.bottom,
-          };
-        }, a.target);
-        record(
-          kind,
-          near(m.right, want.right) && near(m.bottom, want.bottom),
-          m,
-        );
-        break;
-      }
-      case 'topmostAt': {
-        const m = await page.evaluate(
-          ({ id, w }) => {
-            const c = __ce.el(w.container);
-            c.scrollLeft = w.scrollX;
-            c.scrollTop = w.scrollY;
-            const t = __ce.el(id);
-            const r = t.getBoundingClientRect();
-            const hit = document.elementFromPoint(
-              r.left + r.width / 2,
-              r.top + r.height / 2,
-            );
-            return {
-              hit: t.contains(hit),
-              scrolled: [c.scrollLeft, c.scrollTop],
-            };
-          },
-          { id: a.target, w: want },
-        );
-        record(kind, m.hit, m);
-        break;
-      }
-      case 'columns': {
-        const n = await page.evaluate((id) => __ce.columns(id), a.target);
-        record(kind, n === want, n);
-        break;
-      }
-      case 'edgeOffset': {
-        const m = await page.evaluate(
-          ({ id, w }) => {
-            const t = __ce.el(id).getBoundingClientRect();
-            const o = __ce.el(w.of).getBoundingClientRect();
-            return w.edge === 'left'
-              ? t.left - o.left
-              : w.edge === 'right'
-                ? o.right - t.right
-                : w.edge === 'top'
-                  ? t.top - o.top
-                  : o.bottom - t.bottom;
-          },
-          { id: a.target, w: want },
-        );
-        record(kind, near(m, want.value), m);
-        break;
-      }
-      case 'lineCount': {
-        const lines = await page.evaluate((id) => __ce.lines(id), a.target);
-        const ok =
-          typeof want === 'number'
-            ? lines.length === want
-            : lines.length >= want.min;
-        record(kind, ok, lines.length);
-        break;
-      }
-      case 'preservesBreaks': {
-        const lines = await page.evaluate((id) => __ce.lines(id), a.target);
-        const breaks = await page.evaluate((id) => __ce.breaks(id), a.target);
-        record(
-          kind,
-          lines.length >= want.minLines &&
-            breaks.length > 0 &&
-            breaks.every(Boolean),
-          { lines: lines.length, authorBreaksHonored: breaks },
-        );
-        break;
-      }
-      case 'balancedLines': {
-        const lines = await page.evaluate((id) => __ce.lines(id), a.target);
-        const ratio =
-          lines.length > 1 ? Math.min(...lines) / Math.max(...lines) : 1;
-        record(
-          kind,
-          lines.length > 1 && ratio >= 0.6,
-          { lines: lines.length, ratio: Number(ratio.toFixed(3)) },
-          'balanced: the shortest line is at least 60% of the longest',
-        );
-        break;
-      }
-      case 'truncated': {
-        const m = await page.evaluate((id) => {
-          const e = __ce.el(id);
-          return {
-            overflow: e.scrollWidth > e.clientWidth,
-            textOverflow: getComputedStyle(e).textOverflow,
-          };
-        }, a.target);
-        record(kind, m.overflow === want && m.textOverflow === 'ellipsis', m);
-        break;
-      }
-      case 'noOverflow': {
-        const m = await page.evaluate((id) => {
-          const e = __ce.el(id);
-          const r = e.getBoundingClientRect();
-          const range = document.createRange();
-          range.selectNodeContents(e);
-          const rects = [...range.getClientRects()];
-          return {
-            scrollWidth: e.scrollWidth,
-            clientWidth: e.clientWidth,
-            textRight: Math.max(...rects.map((x) => x.right)),
-            right: r.right,
-          };
-        }, a.target);
-        record(
-          kind,
-          m.scrollWidth <= m.clientWidth + 1 && m.textRight <= m.right + 1,
-          m,
-        );
-        break;
-      }
-      case 'writingMode':
-      case 'direction': {
-        const prop = kind === 'writingMode' ? 'writingMode' : 'direction';
-        const v = await page.evaluate(
-          ({ id, prop }) => getComputedStyle(__ce.el(id))[prop],
-          { id: a.target, prop },
-        );
-        record(kind, v === want, v);
-        break;
-      }
-      case 'computed': {
-        const m = await page.evaluate(
-          ({ id, props, on, pseudo }) => {
-            const t = __ce.el(id);
-            const els =
-              on === 'cells' ? [...t.querySelectorAll('td, th')] : [t];
-            return els.map((e) =>
-              Object.fromEntries(
-                props.map((p) => [
-                  p,
-                  getComputedStyle(e, pseudo || null).getPropertyValue(p),
-                ]),
-              ),
-            );
-          },
-          {
-            id: a.target,
-            props: Object.keys(want),
-            on: expect.on,
-            pseudo: expect.pseudoElement,
-          },
-        );
-        const ok = m.every((values) =>
-          Object.entries(want).every(([p, v]) => values[p] === v),
-        );
-        record(kind, ok, m.length === 1 ? m[0] : m[0]);
-        break;
-      }
-      case 'animationNone': {
-        const names = await page.evaluate(
-          ({ id, desc }) => {
-            const t = __ce.el(id);
-            return (desc ? [...t.querySelectorAll('*')] : [t]).map(
-              (e) => getComputedStyle(e).animationName,
-            );
-          },
-          { id: a.target, desc: want === 'descendants' },
-        );
-        record(
-          kind,
-          names.length > 0 && names.every((n) => n === 'none'),
-          names,
-        );
-        break;
-      }
-      case 'computedUnchanged':
-      case 'sameBoxAsReference':
-        record(
-          kind,
-          null,
-          null,
-          'not applicable to the reference page itself: it compares a build with this reference',
-        );
-        break;
-      case 'focusOrder': {
-        const order = [];
-        const visible = [];
-        await page.evaluate(
-          () => document.activeElement && document.activeElement.blur(),
-        );
-        const painted = [];
-        for (let i = 0; i < want.length; i++) {
-          await page.keyboard.press('Tab');
-          const m = await page.evaluate(() => ({
-            id:
-              document.activeElement?.getAttribute('data-testid') ??
-              document.activeElement?.tagName,
-            fv: document.activeElement?.matches(':focus-visible'),
-          }));
-          order.push(m.id);
-          visible.push(m.fv);
-          if (expect.focusVisible && m.id !== 'BODY')
-            painted.push(await paintedIndicator(page));
-        }
-        record(kind, JSON.stringify(order) === JSON.stringify(want), order);
-        if (expect.focusVisible) {
-          record('focusVisible', visible.every(Boolean), visible);
-          record(
-            'paintedIndicator',
-            painted.length === want.length && painted.every((p) => p.ok),
-            painted,
-            `computed outline, shadow or border change and at least ${INDICATOR_MIN_PIXELS} changed pixels at every stop`,
+        },
+        { id: a.target, w: want },
+      );
+    case 'fixedToViewport':
+      return el((id) => {
+        const r = __ce.el(id).getBoundingClientRect();
+        return {
+          right: document.documentElement.clientWidth - r.right,
+          bottom: document.documentElement.clientHeight - r.bottom,
+        };
+      }, a.target);
+    case 'topmostAt':
+      return el(
+        ({ id, w }) => {
+          const c = __ce.el(w.container);
+          c.scrollLeft = w.scrollX;
+          c.scrollTop = w.scrollY;
+          const t = __ce.el(id);
+          const r = t.getBoundingClientRect();
+          const hit = document.elementFromPoint(
+            r.left + r.width / 2,
+            r.top + r.height / 2,
           );
-        }
-        break;
-      }
-      case 'focusVisible':
-        if (!('focusOrder' in expect))
-          record(kind, null, null, 'evaluated with focusOrder');
-        break;
-      case 'activates': {
-        await page.focus(`[data-testid="${want.target}"]`);
-        for (const key of want.keys) await page.keyboard.press(key);
-        const m = await page.evaluate(
-          ({ w }) => ({
-            checked: __ce.el(w.target).checked,
-            computed: Object.fromEntries(
-              Object.keys(w.then.computed).map((p) => [
+          return {
+            hit: t.contains(hit),
+            scrolled: [c.scrollLeft, c.scrollTop],
+          };
+        },
+        { id: a.target, w: want },
+      );
+    case 'columns':
+      return el((id) => __ce.columns(id), a.target);
+    case 'edgeOffset':
+      return el(
+        ({ id, w }) => {
+          const t = __ce.el(id).getBoundingClientRect();
+          const o = __ce.el(w.of).getBoundingClientRect();
+          if (w.edge === 'left') return t.left - o.left;
+          if (w.edge === 'right') return o.right - t.right;
+          if (w.edge === 'top') return t.top - o.top;
+          return o.bottom - t.bottom;
+        },
+        { id: a.target, w: want },
+      );
+    case 'lineCount':
+      return (await el((id) => __ce.lines(id), a.target)).length;
+    case 'preservesBreaks':
+      return {
+        lines: (await el((id) => __ce.lines(id), a.target)).length,
+        authorBreaksHonored: await el((id) => __ce.breaks(id), a.target),
+      };
+    case 'balancedLines': {
+      const lines = await el((id) => __ce.lines(id), a.target);
+      const ratio =
+        lines.length > 1 ? Math.min(...lines) / Math.max(...lines) : 1;
+      return { lines: lines.length, ratio: Number(ratio.toFixed(3)) };
+    }
+    case 'truncated':
+      return el((id) => {
+        const e = __ce.el(id);
+        return {
+          overflow: e.scrollWidth > e.clientWidth,
+          textOverflow: getComputedStyle(e).textOverflow,
+        };
+      }, a.target);
+    case 'noOverflow':
+      return el((id) => {
+        const e = __ce.el(id);
+        const r = e.getBoundingClientRect();
+        const range = document.createRange();
+        range.selectNodeContents(e);
+        const rects = [...range.getClientRects()];
+        return {
+          scrollWidth: e.scrollWidth,
+          clientWidth: e.clientWidth,
+          textRight: Math.max(...rects.map((x) => x.right)),
+          right: r.right,
+        };
+      }, a.target);
+    case 'writingMode':
+    case 'direction': {
+      const prop = kind === 'writingMode' ? 'writingMode' : 'direction';
+      return el(({ id, p }) => getComputedStyle(__ce.el(id))[p], {
+        id: a.target,
+        p: prop,
+      });
+    }
+    case 'computed':
+      return el(
+        ({ id, props, on, pseudo }) => {
+          const t = __ce.el(id);
+          const els = on === 'cells' ? [...t.querySelectorAll('td, th')] : [t];
+          return els.map((e) =>
+            Object.fromEntries(
+              props.map((p) => [
                 p,
-                getComputedStyle(__ce.el(w.then.computedOn)).getPropertyValue(
-                  p,
-                ),
+                getComputedStyle(e, pseudo || null).getPropertyValue(p),
               ]),
             ),
-          }),
-          { w: want },
-        );
-        const ok =
-          m.checked === want.then.checked &&
-          Object.entries(want.then.computed).every(
-            ([p, v]) => m.computed[p] === v,
           );
-        record(
-          kind,
-          ok,
-          m,
-          'focus is moved with element.focus(); the key press itself goes through the keyboard pipeline',
-        );
-        break;
-      }
-      case 'scrollsWithKeys': {
-        await page.evaluate(
-          () => document.activeElement && document.activeElement.blur(),
-        );
-        let focused = null;
-        for (let i = 0; i < 10 && focused !== want.target; i++) {
-          await page.keyboard.press('Tab');
-          focused = await page.evaluate(() =>
-            document.activeElement?.getAttribute('data-testid'),
+        },
+        {
+          id: a.target,
+          props: Object.keys(want),
+          on: expect.on,
+          pseudo: expect.pseudoElement,
+        },
+      );
+    case 'animationNone':
+      return el(
+        ({ id, desc }) => {
+          const t = __ce.el(id);
+          return (desc ? [...t.querySelectorAll('*')] : [t]).map(
+            (e) => getComputedStyle(e).animationName,
           );
-        }
-        const before = await page.evaluate(
-          (id) => [__ce.el(id).scrollLeft, __ce.el(id).scrollTop],
-          want.target,
-        );
-        for (const key of want.keys) await page.keyboard.press(key);
-        await page.waitForTimeout(300);
-        const after = await page.evaluate(
-          (id) => [__ce.el(id).scrollLeft, __ce.el(id).scrollTop],
-          want.target,
-        );
-        record(
-          kind,
-          focused === want.target &&
-            after[0] > before[0] &&
-            after[1] > before[1],
-          { focused, before, after },
-        );
-        break;
-      }
-      case 'role':
-      case 'name': {
-        const ax = await axNode(cdp, a.target);
-        const actual = kind === 'role' ? ax.role : ax.name;
-        const expected = kind === 'role' ? (AX_ROLE[want] ?? want) : want;
-        record(kind, actual === expected, actual);
-        break;
-      }
-      case 'contrastMin': {
-        const m = await page.evaluate((id) => {
-          const parse = (c) => (c.match(/[\d.]+/g) || []).map(Number);
-          const e = __ce.el(id);
-          const fg = parse(getComputedStyle(e).color);
-          let bg = null;
-          let image = false;
-          for (let n = e; n && !bg; n = n.parentElement) {
-            const s = getComputedStyle(n);
-            if (s.backgroundImage !== 'none') image = true;
-            const c = parse(s.backgroundColor);
-            if (c.length === 3 || (c.length === 4 && c[3] > 0))
-              bg = c.slice(0, 3);
-          }
-          return { fg: fg.slice(0, 3), bg: bg || [255, 255, 255], image };
-        }, a.target);
-        const l1 = luminance(m.fg);
-        const l2 = luminance(m.bg);
-        const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
-        record(kind, ratio >= want && !m.image, {
-          ratio: Number(ratio.toFixed(2)),
-          ...m,
-        });
-        break;
-      }
-      case 'targetSizeMin': {
-        const r = await page.evaluate((id) => __ce.rect(id), a.target);
-        record(
-          kind,
-          r.width >= want - TOLERANCE && r.height >= want - TOLERANCE,
-          { width: r.width, height: r.height },
-        );
-        break;
-      }
-      case 'visuallyHiddenButExposed': {
-        const r = await page.evaluate((id) => __ce.rect(id), a.target);
-        const ax = await axNode(cdp, a.target);
-        record(kind, r.width <= 1 && r.height <= 1 && !ax.ignored, {
-          width: r.width,
-          height: r.height,
-          ignored: ax.ignored,
-        });
-        break;
-      }
-      case 'forcedColorsVisible':
-        record(
-          kind,
-          null,
-          null,
-          'not evaluated: needs a pixel comparison of the forced-colors rendering',
-        );
-        break;
-      case 'violations':
-        record(
-          kind,
-          ctx.violations.length === want,
-          ctx.violations.slice(0, 3),
-        );
-        break;
-      case 'styleElements':
-      case 'styleAttributes':
-      case 'runtimeStyleInsertions':
-      case 'inlineCustomProperties': {
-        const m = await page.evaluate(() => ({
-          styleElements: document.querySelectorAll('style').length,
-          styleAttributes: document.querySelectorAll('[style]').length,
-          runtimeStyleInsertions:
-            [...document.styleSheets].filter((s) => !s.href).length +
-            document.adoptedStyleSheets.length,
-          inlineCustomProperties: [
-            ...document.querySelectorAll('[style]'),
-          ].filter((e) => e.getAttribute('style').includes('--')).length,
-        }));
-        record(kind, m[kind] === want, m[kind]);
-        break;
-      }
-      case 'completeFirstPaint': {
-        const m = await page.evaluate(() => ({
-          links: document.querySelectorAll('link[rel=stylesheet]').length,
-          loaded: [...document.styleSheets].filter(
-            (s) => s.href && s.cssRules.length > 0,
-          ).length,
-          scripts: document.scripts.length,
-        }));
-        record(
-          kind,
-          m.links > 0 && m.loaded === m.links && m.scripts === 0,
-          m,
-          'the reference page has no scripts; every linked stylesheet is applied',
-        );
-        break;
-      }
-      default:
-        record(kind, false, null, 'unknown assertion kind');
+        },
+        { id: a.target, desc: want === 'descendants' },
+      );
+    case 'activates': {
+      await page.focus(`[data-testid="${want.target}"]`);
+      for (const key of want.keys) await page.keyboard.press(key);
+      return el(
+        (w) => ({
+          checked: __ce.el(w.target).checked,
+          computed: Object.fromEntries(
+            Object.keys(w.then.computed).map((p) => [
+              p,
+              getComputedStyle(__ce.el(w.then.computedOn)).getPropertyValue(p),
+            ]),
+          ),
+        }),
+        want,
+      );
     }
+    case 'scrollsWithKeys': {
+      await el(() => document.activeElement && document.activeElement.blur());
+      let focused = null;
+      for (let i = 0; i < 10 && focused !== want.target; i++) {
+        await page.keyboard.press('Tab');
+        focused = await el(
+          () => document.activeElement?.getAttribute('data-testid') ?? null,
+        );
+      }
+      const before = await el(
+        (id) => [__ce.el(id).scrollLeft, __ce.el(id).scrollTop],
+        want.target,
+      );
+      for (const key of want.keys) await page.keyboard.press(key);
+      await page.waitForTimeout(300);
+      const after = await el(
+        (id) => [__ce.el(id).scrollLeft, __ce.el(id).scrollTop],
+        want.target,
+      );
+      return { focused, before, after };
+    }
+    case 'role':
+      return (await axNode(cdp, a.target)).role;
+    case 'name':
+      return (await axNode(cdp, a.target)).name;
+    case 'contrastMin':
+      return el((id) => {
+        const parse = (c) => (c.match(/[\d.]+/g) || []).map(Number);
+        const e = __ce.el(id);
+        const fg = parse(getComputedStyle(e).color).slice(0, 3);
+        let bg = null;
+        let image = false;
+        for (let n = e; n && !bg; n = n.parentElement) {
+          const s = getComputedStyle(n);
+          if (s.backgroundImage !== 'none') image = true;
+          const c = parse(s.backgroundColor);
+          if (c.length === 3 || (c.length === 4 && c[3] > 0))
+            bg = c.slice(0, 3);
+        }
+        return { fg, bg: bg || [255, 255, 255], image };
+      }, a.target);
+    case 'visuallyHiddenButExposed': {
+      const r = await el((id) => __ce.rect(id), a.target);
+      const ax = await axNode(cdp, a.target);
+      return { width: r.width, height: r.height, ignored: ax.ignored };
+    }
+    case 'violations':
+      return ctx.violations.slice(0, 3);
+    case 'styleElements':
+    case 'styleAttributes':
+    case 'runtimeStyleInsertions':
+    case 'inlineCustomProperties':
+      return el(
+        (k) =>
+          ({
+            styleElements: document.querySelectorAll('style').length,
+            styleAttributes: document.querySelectorAll('[style]').length,
+            runtimeStyleInsertions:
+              [...document.styleSheets].filter((s) => !s.href).length +
+              document.adoptedStyleSheets.length,
+            inlineCustomProperties: [
+              ...document.querySelectorAll('[style]'),
+            ].filter((e) => e.getAttribute('style').includes('--')).length,
+          })[k],
+        kind,
+      );
+    case 'completeFirstPaint':
+      return el(() => ({
+        links: document.querySelectorAll('link[rel=stylesheet]').length,
+        loaded: [...document.styleSheets].filter(
+          (s) => s.href && s.cssRules.length > 0,
+        ).length,
+        scripts: document.scripts.length,
+      }));
+    default:
+      throw new Error(`no measurement for ${kind}`);
+  }
+}
+
+// Keyboard order with per-stop :focus-visible and painted-indicator evidence.
+async function measureKeyboard(ctx, want, withIndicator) {
+  const { page } = ctx;
+  const order = [];
+  const visible = [];
+  const painted = [];
+  await page.evaluate(
+    () => document.activeElement && document.activeElement.blur(),
+  );
+  for (let i = 0; i < want.length; i++) {
+    await page.keyboard.press('Tab');
+    const m = await page.evaluate(() => ({
+      id:
+        document.activeElement?.getAttribute('data-testid') ??
+        document.activeElement?.tagName,
+      fv: document.activeElement?.matches(':focus-visible') ?? false,
+    }));
+    order.push(m.id);
+    visible.push(m.fv);
+    if (withIndicator && m.id !== 'BODY')
+      painted.push(await indicatorStop(page));
+  }
+  return { order, visible, painted };
+}
+
+/** Evaluates one assertion: measurements, and verdicts from judge(). */
+export async function evaluateAssertion(ctx, a) {
+  const results = [];
+  let keyboard = null;
+  for (const [kind, want] of requiredResults(a.expect)) {
+    const reason = NOT_EVALUATED_KINDS[kind];
+    if (reason) {
+      results.push({ kind, ok: null, reason });
+      continue;
+    }
+    let measured;
+    if (['focusOrder', 'focusVisible', 'paintedIndicator'].includes(kind)) {
+      keyboard ??= await measureKeyboard(
+        ctx,
+        a.expect.focusOrder,
+        a.expect.focusVisible === true,
+      );
+      measured = {
+        focusOrder: keyboard.order,
+        focusVisible: keyboard.visible,
+        paintedIndicator: keyboard.painted,
+      }[kind];
+    } else {
+      measured = await measure(ctx, a, kind, want);
+    }
+    results.push({ kind, ok: judge(kind, want, measured), measured });
   }
   return results;
 }
@@ -873,14 +768,7 @@ function pageFor(fixture, a, pages) {
   ).name;
 }
 
-/** Row status from its results; the validator recomputes it. */
-export function rowStatus(assertionCase, results) {
-  const evaluated = results.filter((r) => r.ok !== null);
-  if (evaluated.length === 0) return 'not-evaluated';
-  const allPass = evaluated.every((r) => r.ok === true);
-  if (assertionCase === 'negative') return allPass ? 'fail' : 'pass';
-  return allPass ? 'pass' : 'fail';
-}
+export { rowStatus };
 
 // Canonical JSON: sorted keys at every depth.
 export function canonical(value) {
@@ -955,7 +843,9 @@ export function loadBindingInputs() {
   return {
     corpus: JSON.parse(fs.readFileSync(path.join(repo, CORPUS), 'utf8')),
     oracles: JSON.parse(fs.readFileSync(path.join(repo, ORACLES), 'utf8')),
-    checkerSource: fs.readFileSync(path.join(repo, CHECKER)),
+    checkerSource: CHECKER_FILES.map((f) =>
+      fs.readFileSync(path.join(repo, f), 'utf8'),
+    ).join('\n'),
   };
 }
 
@@ -982,25 +872,8 @@ async function checkFixture(browser, postcss, fixture) {
     if (a.case === 'negative') {
       target = byId.get(a.mustFail);
       overrides = mutate(postcss, files, a.mutation);
-      if (overrides == null) {
-        rows.push({
-          id: a.id,
-          fixture: fixture.id,
-          oracle: a.oracle,
-          case: a.case,
-          assertionSha256: assertionDigest(fixture, a),
-          status: 'not-evaluated',
-          results: [
-            {
-              kind: 'mutation',
-              ok: null,
-              measured: null,
-              note: `mutation ${a.mutation.kind} needs a build`,
-            },
-          ],
-        });
-        continue;
-      }
+      if (overrides == null)
+        throw new Error(`${a.id}: mutation ${a.mutation.kind} needs a build`);
     }
     const { server, origin } = await serve(dir, fixture.csp, overrides);
     const page = pageFor(fixture, target, pages);
@@ -1075,8 +948,6 @@ async function main() {
     schemaVersion: 1,
     kind: 'core-evolution-reference-check',
     task: 'CE-00.2',
-    statement:
-      'Reference pages only: the authored outcomes rendered in Chromium. Not compiler, build or product qualification.',
     engine,
     binding: computeBinding({ ...loadBindingInputs(), engine }),
     inputs: Object.fromEntries(

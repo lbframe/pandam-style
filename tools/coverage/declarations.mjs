@@ -189,16 +189,18 @@ export function redactValue(value, digester = PUBLIC_DIGESTER) {
 }
 
 // Context parameters that may carry consumer names are reduced to a digest.
+// At-rule context in closed form: @media and @supports keep their
+// parameters for the publication check, @font-face and @keyframes are named
+// without parameters, and any other at-rule becomes one placeholder.
 function atRuleContext(node, digester) {
   const name = node.name.toLowerCase();
-  let params = node.params.replace(/\s+/g, ' ').trim();
-  if (/keyframes$/.test(name)) params = '<keyframes-name>';
-  else if (
-    !['media', 'supports', 'layer', 'font-face'].includes(name) &&
-    params
-  )
-    params = `<redacted:params:${digester.scheme}:${digester.of(node.params)}>`;
-  return params ? `@${name} ${params}` : `@${name}`;
+  const params = node.params.replace(/\s+/g, ' ').trim();
+  if (name === 'keyframes') return '@keyframes <keyframes-name>';
+  if (name === 'font-face') return '@font-face';
+  if (name === 'layer') return `@layer ${params}`;
+  if ((name === 'media' || name === 'supports') && params)
+    return `@${name} ${params}`;
+  return `<redacted:at-rule:${digester.scheme}:${digester.of(`@${node.name} ${node.params}`)}>`;
 }
 
 /**

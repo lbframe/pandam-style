@@ -190,9 +190,9 @@
         "activates",
         "scrollsWithKeys"
       ],
-      "comparator": "The first Tab stops, starting from the document, must equal the listed targets in order; later stops are not constrained. :focus-visible matching is not enough: at every stop the focused element (or, when it is visually hidden, its next sibling) must have a non-none outline of non-zero width, a box shadow, or a changed non-zero border, and a screenshot of its box plus 8px must differ from the unfocused state in at least 40 pixels (a text caret alone changes fewer).",
+      "comparator": "The first Tab stops, starting from the document, must equal the listed targets in order; later stops are not constrained. :focus-visible matching is not enough. At every stop the focused element (or, when it is visually hidden, its next sibling) needs a visible indicator: an outline that is not none, has non-zero width and a color with alpha above 0; a box shadow that focus added or changed, with alpha above 0 and a non-zero offset, blur or spread; or a changed border side that is not none, has non-zero width and alpha above 0. In addition, at least 40 pixels must change between the focused and unfocused screenshots inside the indicator ring: the border box grown by the indicator extent plus 8px, minus the content box.",
       "independence": "Sequences are authored from the reference markup; the oracle never relies on generated class names.",
-      "negativeControl": "Swap the tabindex of two targets, or remove every focus indicator with `*:focus-visible { outline: none !important; box-shadow: none !important }`; the order or painted-indicator assertion must fail.",
+      "negativeControl": "Swap the tabindex of two targets, remove every focus indicator, or make it transparent (`outline: 3px solid transparent`); the order or painted-indicator assertion must fail.",
       "executionOwners": ["CE-05", "CE-07", "CE-14"]
     },
     {

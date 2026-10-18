@@ -930,6 +930,18 @@
           "note": "Removing every focus indicator keeps :focus-visible matching; the painted-indicator check must still fail."
         },
         {
+          "id": "FORMS-K3",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "*:focus-visible { outline: 3px solid transparent !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "A transparent outline has width but paints nothing; the visible-indicator check must fail."
+        },
+        {
           "id": "FORMS-A1",
           "oracle": "ORC-A11Y",
           "case": "positive",

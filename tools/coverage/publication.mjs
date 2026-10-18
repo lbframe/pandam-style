@@ -24,7 +24,12 @@
 
 import { createRequire } from 'node:module';
 import { CSS_COLOR_KEYWORDS } from './css-colors.mjs';
-import { PLACEHOLDER_SOURCE, PUBLIC_DIGESTER } from './digest.mjs';
+import {
+  KEYED_PLACEHOLDER,
+  PLACEHOLDER_KINDS,
+  PLACEHOLDER_SOURCE,
+  PUBLIC_DIGESTER,
+} from './digest.mjs';
 
 const require = createRequire(import.meta.url);
 const valueParser = require('postcss-value-parser');
@@ -66,6 +71,8 @@ export const CSS_KEYWORDS = new Set([
     'prefers-color-scheme dark contain-intrinsic-size orientation ' +
     'landscape portrait'
   ).split(' '),
+  // Keywords used by the authored reference fixtures.
+  ...'drag isolate non-scaling-stroke'.split(' '),
   // Vendor platform keywords used by preflight stylesheets.
   ...'-apple-system -webkit-appearance -apple-pay-button'.split(' '),
 ]);
@@ -146,11 +153,21 @@ export const STATE_ATTRIBUTES = new Set([
   ).split(' '),
 ]);
 
+// Identifiers authored in the CE-00.2 reference fixtures (a font family and
+// a keyframes name). They are never consumer data and are accepted only when
+// checking the corpus accounting.
+export const AUTHORED_IDENTIFIERS = new Map([
+  ['Georgia', { kind: 'font-family', reason: 'public-font-family' }],
+  ['shimmer', { kind: 'animation-name', reason: 'generic-animation-name' }],
+]);
+
 // @font-face descriptors that are not registry property names.
 export const DESCRIPTOR_NAMES = new Set(['font-display']);
 
+// Longest published value or condition, in characters.
+export const MAX_TEXT_LENGTH = 1024;
+
 const PLACEHOLDER = new RegExp(PLACEHOLDER_SOURCE, 'g');
-const KEYED_PLACEHOLDER = /^<redacted:[a-z-]+:hmac-sha256:[0-9a-f]{64}>$/;
 const SENTINEL = /^__ce_placeholder_(\d+)__$/;
 const NUMBER = /^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?([a-z%]*)$/i;
 const HEX_COLOR = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
@@ -210,10 +227,22 @@ function nodeProblem(node, approved, placeholders, keyed) {
         ? 'quoted string is not a keyed placeholder'
         : problem;
     }
-    case 'function':
-      return CSS_FUNCTIONS.has(node.value.toLowerCase())
-        ? null
-        : `function ${node.value} is not a CSS function`;
+    case 'function': {
+      const name = node.value.toLowerCase();
+      if (!CSS_FUNCTIONS.has(name))
+        return `function ${node.value} is not a CSS function`;
+      // url() may hold nothing but one placeholder.
+      if (name === 'url') {
+        const inner = (node.nodes ?? []).filter((n) => n.type !== 'space');
+        if (
+          inner.length !== 1 ||
+          !['word', 'string'].includes(inner[0].type) ||
+          sentinelProblem(inner[0].value, placeholders, keyed) != null
+        )
+          return 'url() does not hold exactly one keyed placeholder';
+      }
+      return null;
+    }
     case 'unicode-range':
       return UNICODE_RANGE.test(node.value) ? null : 'unicode range';
     case 'comment':
@@ -240,12 +269,15 @@ const restore = (text, placeholders) =>
 /** Problems of every token of a value or condition; empty when publishable. */
 export function tokenProblems(text, approved, { keyed = true } = {}) {
   const problems = [];
+  if (text.length > MAX_TEXT_LENGTH)
+    return [`longer than ${MAX_TEXT_LENGTH} characters`];
   const { masked, placeholders } = withSentinels(text);
   const visit = (nodes) => {
     for (const node of nodes) {
       const problem = nodeProblem(node, approved, placeholders, keyed);
       if (problem) problems.push(problem);
-      else if (node.type === 'function') visit(node.nodes ?? []);
+      else if (node.type === 'function' && node.value.toLowerCase() !== 'url')
+        visit(node.nodes ?? []);
     }
   };
   visit(valueParser(masked).nodes);
@@ -273,13 +305,18 @@ const placeholderFor = (kind, text, digester) =>
 
 /** Rewrites a value so that every disallowed token becomes a placeholder. */
 export function policeTokens(text, approved, redactions, digester) {
+  if (text.length > MAX_TEXT_LENGTH) {
+    redactions.push(entry('token', text, digester));
+    return placeholderFor('token', text, digester);
+  }
   const { masked, placeholders } = withSentinels(text);
   const parsed = valueParser(masked);
   const keyed = digester.scheme === 'hmac-sha256';
   const visit = (nodes) => {
     for (const node of nodes) {
       if (nodeProblem(node, approved, placeholders, keyed) == null) {
-        if (node.type === 'function') visit(node.nodes ?? []);
+        if (node.type === 'function' && node.value.toLowerCase() !== 'url')
+          visit(node.nodes ?? []);
         continue;
       }
       const original = restore(valueParser.stringify(node), placeholders);
@@ -300,16 +337,30 @@ export function policeTokens(text, approved, redactions, digester) {
 }
 
 const QUERY = /^@(media|supports) (.+)$/;
+const CLOSED_AT_RULES = new Set(['@font-face', '@keyframes <keyframes-name>']);
 const singleToken = (text, approved) =>
   IDENT.test(text) && (keyword(text) || approved.has(text));
 
 /** Applies the publication policy to one extracted, value-redacted record. */
-export function policeRecord(record, approved, digester = PUBLIC_DIGESTER) {
+export function policeRecord(
+  record,
+  approved,
+  digester = PUBLIC_DIGESTER,
+  registryNames = null,
+) {
   const redactions = [...record.redactions];
   let property = record.property;
   if (property.startsWith('--') && !approved.has(property)) {
     redactions.push(entry('identifier', property, digester));
     property = `--${placeholderFor('identifier', property, digester)}`;
+  } else if (
+    !property.startsWith('--') &&
+    registryNames != null &&
+    !registryNames.has(property) &&
+    !DESCRIPTOR_NAMES.has(property)
+  ) {
+    redactions.push(entry('property', property, digester));
+    property = placeholderFor('property', property, digester);
   }
   const value = policeTokens(record.value, approved, redactions, digester);
   const context = { ...record.context };
@@ -319,8 +370,13 @@ export function policeRecord(record, approved, digester = PUBLIC_DIGESTER) {
   }
   if (context.atRules != null) {
     context.atRules = context.atRules.map((rule) => {
+      if (CLOSED_AT_RULES.has(rule) || KEYED_PLACEHOLDER.test(rule))
+        return rule;
       const query = QUERY.exec(rule);
-      if (query == null) return rule;
+      if (query == null) {
+        redactions.push(entry('at-rule', rule, digester));
+        return placeholderFor('at-rule', rule, digester);
+      }
       if (tokenProblems(query[2], approved, { keyed: false }).length === 0)
         return rule;
       redactions.push(entry('at-rule-params', query[2], digester));
@@ -382,17 +438,7 @@ const STATE_FIELDS = new Set([
   'redactedAttributes',
   'redactedSelectorParts',
 ]);
-const REDACTION_KINDS = new Set([
-  'url',
-  'string',
-  'email',
-  'uri',
-  'opaque',
-  'non-ascii-text',
-  'identifier',
-  'at-rule-params',
-  'token',
-]);
+const REDACTION_KINDS = new Set(PLACEHOLDER_KINDS);
 
 /** Scans authored free text for URLs, e-mail addresses, paths and non-ASCII. */
 export function textProblems(text, allowed = {}) {
@@ -424,7 +470,14 @@ export function checkPublishedDeclaration(d, inputId, approved, registry) {
   if (property.startsWith('--')) {
     if (!approved.has(property) && !KEYED_PLACEHOLDER.test(property.slice(2)))
       bad(`custom property ${property} is neither approved nor redacted`);
-  } else if (!registry.has(property) && !DESCRIPTOR_NAMES.has(property))
+  } else if (
+    !registry.has(property) &&
+    !DESCRIPTOR_NAMES.has(property) &&
+    !(
+      KEYED_PLACEHOLDER.test(property) &&
+      property.startsWith('<redacted:property:')
+    )
+  )
     bad(`property ${property} is not a registry or descriptor name`);
   for (const problem of tokenProblems(d.value ?? '', approved))
     bad(`value: ${problem}`);
@@ -438,7 +491,8 @@ export function checkPublishedDeclaration(d, inputId, approved, registry) {
   )
     bad(`layer ${c.layer} is not approved`);
   for (const rule of c.atRules ?? []) {
-    if (rule === '@font-face' || rule === '@keyframes <keyframes-name>')
+    if (CLOSED_AT_RULES.has(rule)) continue;
+    if (KEYED_PLACEHOLDER.test(rule) && rule.startsWith('<redacted:at-rule:'))
       continue;
     const query = QUERY.exec(rule);
     if (query == null) {

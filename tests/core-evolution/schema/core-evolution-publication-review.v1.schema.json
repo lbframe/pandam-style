@@ -1,7 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "core-evolution-publication-review.v1.schema.json",
-  "title": "CE-00.2 publication review pin",
+  "title": "CE-00.2 publication review pin (closed surface)",
+  "x-closed-surface": true,
   "type": "object",
   "properties": {
     "schemaVersion": {
@@ -13,26 +14,29 @@
     "task": {
       "const": "CE-00.2"
     },
-    "statement": {
-      "type": "string",
-      "minLength": 1
-    },
     "reviewed": {
       "type": "object",
       "properties": {
         "baseline": {
           "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "pattern": "^[0-9a-f]{64}$",
+          "maxLength": 64
         },
         "approvedIdentifiers": {
           "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "pattern": "^[0-9a-f]{64}$",
+          "maxLength": 64
+        },
+        "scopeFindings": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "maxLength": 64
         }
       },
       "additionalProperties": false,
-      "required": ["baseline", "approvedIdentifiers"]
+      "required": ["baseline", "approvedIdentifiers", "scopeFindings"]
     }
   },
   "additionalProperties": false,
-  "required": ["schemaVersion", "kind", "task", "statement", "reviewed"]
+  "required": ["schemaVersion", "kind", "task", "reviewed"]
 }

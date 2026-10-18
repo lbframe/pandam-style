@@ -51,8 +51,6 @@ export function buildAccounting(corpus, policy, registry, overrides = {}) {
     kind: 'core-evolution-corpus-accounting',
     task: 'CE-00.2',
     generatedBy: 'node tools/coverage/cli.mjs corpus',
-    statement:
-      'Every declaration of every corpus reference stylesheet, classified against the pinned Alpha 1 policy and bound to its CE-00.1 registry entry. Expressible is a policy statement, not compiler acceptance or rendering evidence.',
     registryVersion: registry.version,
     totals: {
       ...countSet(all),

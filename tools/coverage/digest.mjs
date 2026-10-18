@@ -30,6 +30,27 @@ export function makeDigester(key = null) {
 
 export const PUBLIC_DIGESTER = makeDigester(null);
 
+// The finite set of placeholder kinds. A placeholder of any other kind is
+// not a placeholder: masking, extraction and validation all use this list.
+export const PLACEHOLDER_KINDS = Object.freeze([
+  'url',
+  'string',
+  'email',
+  'uri',
+  'opaque',
+  'non-ascii-text',
+  'identifier',
+  'at-rule',
+  'at-rule-params',
+  'params',
+  'property',
+  'token',
+]);
+
 // Matches one placeholder of either scheme.
-export const PLACEHOLDER_SOURCE =
-  '<redacted:[a-z-]+:(?:hmac-)?sha256:[0-9a-f]{64}>';
+export const PLACEHOLDER_SOURCE = `<redacted:(?:${PLACEHOLDER_KINDS.join('|')}):(?:hmac-)?sha256:[0-9a-f]{64}>`;
+
+// A keyed (consumer) placeholder, matched as a whole string.
+export const KEYED_PLACEHOLDER = new RegExp(
+  `^<redacted:(?:${PLACEHOLDER_KINDS.join('|')}):hmac-sha256:[0-9a-f]{64}>$`,
+);
