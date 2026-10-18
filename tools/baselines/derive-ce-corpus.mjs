@@ -28,18 +28,18 @@ import { ALPHA1_POLICY, camel } from '../coverage/classify.mjs';
 import { buildFiles, OUT_DIR, DESIGN_MODULE } from './workloads.mjs';
 
 export const RECORD = 'workloads/ce-corpus.v1.json';
-const CORPUS_COMMIT = '20ce741b8cdd1616560af7cd8be1420024414409';
-const POLICY_COMMIT = '415e05539fcb5d36a78226112b5cf488b200b1aa';
-const ACCOUNTING = 'tests/core-evolution/corpus/accounting.v1.json';
+export const CORPUS_COMMIT = '20ce741b8cdd1616560af7cd8be1420024414409';
+export const POLICY_COMMIT = '415e05539fcb5d36a78226112b5cf488b200b1aa';
+export const ACCOUNTING = 'tests/core-evolution/corpus/accounting.v1.json';
 
-async function loadPolicy() {
+export async function loadPolicy() {
   const bytes = gitBlob(POLICY_COMMIT, ALPHA1_POLICY.path);
   if (sha256(bytes) !== ALPHA1_POLICY.sha256)
     throw new Error('the Alpha 1 policy blob does not match its pinned digest');
   return import(`data:text/javascript;base64,${bytes.toString('base64')}`);
 }
 
-function candidates(accounting, policy) {
+export function candidates(accounting, policy) {
   const tokens = {};
   const stylesheets = [];
   for (const sheet of accounting.stylesheets) {
@@ -94,7 +94,7 @@ function candidates(accounting, policy) {
 }
 
 // Keeps only tokens still referenced, in sorted order.
-function prune(derivation) {
+export function prune(derivation) {
   const used = new Set();
   for (const sheet of derivation.stylesheets)
     for (const d of sheet.declarations) if (d.token != null) used.add(d.token);
@@ -267,7 +267,8 @@ async function main() {
   console.log(JSON.stringify(record.totals));
 }
 
-main().catch((error) => {
-  process.stderr.write(`${error.stack}\n`);
-  process.exitCode = 1;
-});
+if (import.meta.url === `file://${process.argv[1]}`)
+  main().catch((error) => {
+    process.stderr.write(`${error.stack}\n`);
+    process.exitCode = 1;
+  });

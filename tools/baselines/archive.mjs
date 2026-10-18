@@ -326,6 +326,36 @@ function packageRecords(store) {
   });
 }
 
+// Git-pinned inputs recorded file by file: [id, commit, prefixes, description].
+export const CORPORA = Object.freeze({
+  assets: [
+    'alpha1-assets',
+    COMMIT,
+    ['assets'],
+    'Repository assets at the baseline commit (no package ships assets).',
+  ],
+  corpora: [
+    [
+      'ce-00.2-proof-corpus',
+      '20ce741b8cdd1616560af7cd8be1420024414409',
+      ['tests/core-evolution/corpus'],
+      'CE-00.2 proof corpus, calibration and accounting as merged (PR #90).',
+    ],
+    [
+      'alpha1-compiler-fixtures',
+      COMMIT,
+      ['packages/compiler/__tests__/pandamstyle/fixtures', 'tests/fixtures'],
+      'Alpha 1 compiler and design-system fixtures at the baseline commit.',
+    ],
+    [
+      'alpha1-vite-pilot',
+      COMMIT,
+      ['examples/pilots/vite-react'],
+      'Alpha 1 Vite React pilot application at the baseline commit.',
+    ],
+  ],
+});
+
 function corpusRecord(id, commit, prefixes, description) {
   const files = [];
   for (const prefix of prefixes)
@@ -578,32 +608,8 @@ function manifest(store) {
       fcListFiles: fcList.length,
       fcListSha256: sha256(fcList.join('\n')),
     },
-    assets: corpusRecord(
-      'alpha1-assets',
-      COMMIT,
-      ['assets'],
-      'Repository assets at the baseline commit (no package ships assets).',
-    ),
-    corpora: [
-      corpusRecord(
-        'ce-00.2-proof-corpus',
-        '20ce741b8cdd1616560af7cd8be1420024414409',
-        ['tests/core-evolution/corpus'],
-        'CE-00.2 proof corpus, calibration and accounting as merged (PR #90).',
-      ),
-      corpusRecord(
-        'alpha1-compiler-fixtures',
-        COMMIT,
-        ['packages/compiler/__tests__/pandamstyle/fixtures', 'tests/fixtures'],
-        'Alpha 1 compiler and design-system fixtures at the baseline commit.',
-      ),
-      corpusRecord(
-        'alpha1-vite-pilot',
-        COMMIT,
-        ['examples/pilots/vite-react'],
-        'Alpha 1 Vite React pilot application at the baseline commit.',
-      ),
-    ],
+    assets: corpusRecord(...CORPORA.assets),
+    corpora: CORPORA.corpora.map((args) => corpusRecord(...args)),
     reconstruction: [
       'git clone https://github.com/lbframe/pandam-style && cd pandam-style   # any commit containing this manifest',
       'node tools/baselines/archive.mjs build --store <empty dir>   # network: npm registry, nodejs.org, Playwright CDN',
