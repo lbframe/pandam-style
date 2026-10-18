@@ -54,7 +54,10 @@ closes with its evidence classes:
 3. **Classification.** A documented, ordered procedure assigns exactly one
    disposition: curated records first, then obsolete-engine prefixes, BCD
    status, BCD prefix/alternative-name statements, vendor-base derivation. An
-   unclassified name or an entry without a family fails the build.
+   unclassified name or an entry without a family fails the build. A BCD prefix
+   or alternative name becomes a normalized alias only when its relating
+   statements carry no caveat, or when a curated audit finds a behavior caveat
+   with the same grammar (see [Alias audit](#alias-audit)).
 4. **Requirement.** Families name the profiles that require their stable
    canonical properties. Overlay rules add the `rtl` and `svg-media` overlays to
    direction-sensitive or media-related entries. Alpha 1 status then separates
@@ -66,16 +69,23 @@ closes with its evidence classes:
    D-BP-06, or to D-BP-07 when only a prefixed form ships. Required platform
    extensions are routed to D-BP-03. These are inputs to CE-01, not support
    claims.
+6. **Re-derivation.** Entry fields `sources`, `bcd`, `bcdRelations`, `alpha1`
+   and `upstream` are recorded facts. Every other entry field, the counts and
+   the capability, limitation and request sections are derived from those facts
+   and the authored inputs by `tests/core-evolution/tools/derive-registry.mjs`.
+   The validator runs the same derivation offline and requires the committed
+   registry to be identical, so scope, ownership and proof obligations cannot
+   drift from the authored rules.
 
 ## Inventory dispositions
 
 | Disposition                        | Entries  |
 | ---------------------------------- | -------- |
 | `canonical-property`               | 471      |
-| `deprecated-or-experimental`       | 361      |
+| `deprecated-or-experimental`       | 375      |
 | `incompatible-runtime-requirement` | 2        |
 | `non-css-syntax`                   | 24       |
-| `normalized-alias`                 | 187      |
+| `normalized-alias`                 | 173      |
 | `scoped-platform-extension`        | 7        |
 | `system-resource`                  | 56       |
 | **Total**                          | **1108** |
@@ -84,6 +94,7 @@ closes with its evidence classes:
 | --------------------------------------- | ------- |
 | `abandoned-draft`                       | 5       |
 | `deprecated`                            | 52      |
+| `divergent-legacy-variant`              | 14      |
 | `experimental`                          | 134     |
 | `nonstandard`                           | 52      |
 | `obsolete-engine-prefix`                | 101     |
@@ -115,6 +126,47 @@ existing behavior stays in the denominator. The 11 canonical properties no
 profile requires (`all`, `math-*`, the motion-path `offset*` family, `speak`)
 still carry a disposition fixture: admission with full proof, or a structured
 diagnostic.
+
+## Alias audit
+
+Every automatic alias rests on BCD 8.1.6 prefix or alternative-name statements,
+now recorded per entry in `bcdRelations` with their notes,
+partial-implementation and flag caveats. All 180 automatic aliases were audited
+against those statements; 28 carry caveats, none carries flags, and each of the
+28 has a curated `aliasAudit` verdict in the classification rules. The build
+fails on a missing or stale verdict, and a behavior-only verdict on notes that
+mention syntax or values needs an explicit reviewed reason.
+
+**Grammar-divergent (14), reclassified from `normalized-alias` to
+`deprecated-or-experimental/divergent-legacy-variant`:** `-moz-background-clip`
+→ `background-clip`, `-moz-background-origin` → `background-origin`,
+`-moz-border-image` → `border-image`, `-moz-column-rule` → `column-rule`,
+`-moz-font-feature-settings` → `font-feature-settings`,
+`-webkit-background-clip` → `background-clip`, `-webkit-background-origin` →
+`background-origin`, `-webkit-background-size` → `background-size`,
+`-webkit-initial-letter` → `initial-letter`, `-webkit-mask` → `mask`,
+`-webkit-mask-image` → `mask-image`, `-webkit-perspective` → `perspective`,
+`-webkit-ruby-position` → `ruby-position`, `-webkit-scroll-snap-type` →
+`scroll-snap-type`. They are diagnosed toward their target instead of
+normalized. 12 still ship in some engine; for those, any prefixed emission is a
+D-BP-07 transformation decision with emitted-CSS proof (E3) restricted to the
+shared value subset. `-moz-background-clip` and `-moz-background-origin` no
+longer ship.
+
+**Behavior caveat only (14), kept as aliases with the audit recorded:**
+`-moz-box-sizing`, `-moz-column-count`, `-moz-column-width`, `-moz-columns`,
+`-webkit-animation`, `-webkit-box-decoration-break`,
+`-webkit-font-feature-settings`, `-webkit-print-color-adjust`,
+`-webkit-transform`, `scroll-snap-margin`, `scroll-snap-margin-bottom`,
+`scroll-snap-margin-left`, `scroll-snap-margin-right`, `scroll-snap-margin-top`.
+Their notes describe engine bugs or partial behavior with the same grammar, such
+as old Firefox `getComputedStyle` sizing, `display: table-caption` columns,
+inline-only `box-decoration-break` and Safari's fragment-scroll margin.
+
+The remaining 152 automatic aliases have BCD statements without notes, partial
+implementation or flags. That some prefixed forms were later removed from
+engines is recorded as `prefixedFormShips: false`; removal does not change
+grammar equivalence.
 
 ## Upstream emission findings
 
@@ -240,9 +292,10 @@ capability is that CAP; CAP-01 maps the whole inventory.
 
 ## Decisions handed to later lots
 
-Source-format decisions close in CE-13 and browser-profile decisions in CE-01
-(D-BP-12 closes in CE-13). Each records Alpha 1 facts, upstream evidence and
-affected profiles and capabilities. Notable inputs:
+D-SF-01..D-SF-10 close in CE-13. D-BP-01..D-BP-11 and D-BP-13 close in CE-01.
+D-BP-12, the SSR first-paint and hydration binding, closes in CE-13. The
+validator enforces these closing lots. Each records Alpha 1 facts, upstream
+evidence and affected profiles and capabilities. Notable inputs:
 
 - the Alpha 1 hosts disagree on `.mts`/`.cts`;
 - the Vite adapter rejects `.vue`;
