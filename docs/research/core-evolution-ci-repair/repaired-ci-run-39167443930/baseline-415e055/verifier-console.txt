@@ -1,0 +1,65 @@
+PandamStyle native verification
+  repo root      : /home/runner/work/pandam-style/pandam-style
+  tested commit  : 415e05539fcb5d36a78226112b5cf488b200b1aa
+  tested tree    : 26928afeac8822d4789141d7094ccfaf601942ed
+  branch         : HEAD
+  working tree   : clean (as found, before this run wrote anything)
+  batch base ref : HEAD
+  batch base     : 415e05539fcb5d36a78226112b5cf488b200b1aa
+  out dir        : /home/runner/work/pandam-style/pandam-style/evidence/native
+
+== install ==
+   ok (exit 0)
+== build ==
+   ok (exit 0)
+== pandamstyle ==
+   ok (exit 0)
+== pandamstyle-core ==
+   ok (exit 0)
+== semantic-oracle ==
+   ok (exit 0)
+== tooling-tests ==
+   ok (exit 0)
+== pilot ==
+   ok (exit 0)
+== artifacts ==
+   ok (exit 0)
+== donor-closure ==
+   ok (exit 0)
+== package-qualification ==
+   ok (exit 0)
+== next-qualification ==
+   ok (exit 0)
+== rsbuild-qualification ==
+   ok (exit 0)
+summary written
+step install: passed (exit 0) 
+step build: passed (exit 0) 
+step pandamstyle: passed (exit 0) 
+step pandamstyle-core: passed (exit 0) 
+step semantic-oracle: passed (exit 0) 
+step tooling-tests: passed (exit 0) 
+step pilot: passed (exit 0) 
+step artifacts: passed (exit 0) 
+step donor-closure: passed (exit 0) 
+step package-qualification: passed (exit 0) 
+step next-qualification: passed (exit 0) 
+step rsbuild-qualification: passed (exit 0) 
+
+run directory: /home/runner/work/pandam-style/pandam-style/evidence/native
+tests:  1039 passed, 0 failed, 0 skipped
+suites: 62 passed, 0 failed, 0 skipped
+verification verdict: verified
+  install: passed, command, verified
+  build: passed, command, verified
+  pandamstyle: passed, test, verified
+  pandamstyle-core: passed, test, verified
+  semantic-oracle: passed, test, verified
+  tooling-tests: passed, test, verified
+  pilot: passed, pilot, verified
+  artifacts: passed, artifact-check, verified
+  donor-closure: passed, artifact-check, verified
+  package-qualification: passed, artifact-check, verified
+  next-qualification: passed, artifact-check, verified
+  rsbuild-qualification: passed, artifact-check, verified
+VERIFICATION OK

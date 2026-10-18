@@ -1,0 +1,11 @@
+chromium -> /usr/bin/chromium
+chromium-browser -> /usr/bin/chromium-browser
+google-chrome -> /usr/bin/google-chrome
+google-chrome-stable -> /usr/bin/google-chrome-stable
+ls: cannot access '/usr/local/bin/chromium': No such file or directory
+-rwxrwxrwx 1 root root 297798984 Oct  6 00:06 /opt/google/chrome/chrome
+lrwxrwxrwx 1 root root        45 Oct 12 21:21 /usr/bin/chromium -> /usr/local/share/chromium/chrome-linux/chrome
+lrwxrwxrwx 1 root root        45 Oct 12 21:21 /usr/bin/chromium-browser -> /usr/local/share/chromium/chrome-linux/chrome
+kernel.apparmor_restrict_unprivileged_userns = 1
+kernel.unprivileged_userns_clone = 1
+CHROMIUM_BIN= CHROME_BIN=/usr/bin/google-chrome

@@ -9,11 +9,14 @@ extend-exclude = [
   # The English spelling dictionary does not apply to these two documents.
   "docs/architecture/agentic-optimizations-plan.md",
   "docs/architecture/agentic-optimizations-review.md",
+  # Retained CE-00.4 tool output quotes the inherited findings verbatim as
+  # before/after evidence; rewriting it would falsify that evidence.
+  "docs/research/core-evolution-ci-repair/",
 ]
 
 [default]
-# Each pattern accepts one exact inherited occurrence, never a general word, so
-# a new misspelling of the same letters is still reported.
+# These patterns accept only the inherited contexts, not the bare words, so a
+# new misspelling of the same letters elsewhere is still reported.
 extend-ignore-re = [
   # `.styl` is the Stylus stylesheet extension. The compiler deliberately
   # rejects it alongside `.css`, `.scss`, `.sass` and `.less`.

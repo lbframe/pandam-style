@@ -17,3 +17,9 @@ Run the full required qualification from the repository root with
 `./verify-pms.sh`. Package publication is handled only after the later release
 qualification phase; this repository currently keeps its root workspace
 private.
+
+Browser-backed steps launch the executable named by `PMS_CHROMIUM` when it is
+set. Their defaults differ by tool and match only some machines. The CI job sets
+it to the runner's sandbox-capable Google Chrome and pins Node 22.22.0, the
+runtime the package and Next qualifications assert; see the
+[CE-00.4 record](../docs/research/core-evolution-ci-repair.md).
