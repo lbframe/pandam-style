@@ -26,8 +26,10 @@ failures depend on the CI environment, not on the source.
 
 Retained evidence is in [`core-evolution-ci-repair/`](core-evolution-ci-repair/):
 `baseline-415e055/` holds the original failures and
-`repaired-ci-run-39167443930/` holds the corrected results. Spelling
-deliberately skips that directory because it quotes the findings verbatim.
+`repaired-ci-run-39167443930/` holds the corrected results. A
+`*.step-log.txt` file is the verifier's byte-identical `evidence/native/<step>.log`,
+renamed only because the repository ignores `*.log`. Spelling deliberately
+skips that directory because it quotes the findings verbatim.
 
 ## Failure records
 
