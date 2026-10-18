@@ -1,0 +1,3057 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-ce003-ce-corpus-workload",
+  "generatedBy": "node tools/baselines/derive-ce-corpus.mjs --closure <alpha1 closure>",
+  "inputs": {
+    "accounting": {
+      "commit": "20ce741b8cdd1616560af7cd8be1420024414409",
+      "path": "tests/core-evolution/corpus/accounting.v1.json",
+      "sha256": "fa1bcbbe9d57f4a69c38a85e1e6e27c3785dc48c437e33223af66a18dd220b1c"
+    },
+    "policy": {
+      "commit": "415e05539fcb5d36a78226112b5cf488b200b1aa",
+      "path": "packages/compiler/src/design-system/policy/properties.js",
+      "gitBlob": "7c7a6cad5baf7d8e0c67f018fb8d7d2156a1afc0",
+      "sha256": "f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540"
+    },
+    "compiler": "@pandamstyle/compiler@0.1.0-alpha.1 (alpha1 closure)"
+  },
+  "rules": [
+    "Candidates: alpha1-baseline declarations the pinned policy classifies as expressible.",
+    "Category values become public tokens named t<NNN>: the ordinal of the value among the distinct values of its category in code-unit order.",
+    "Structural values stay literal; a value admitted only as a number is emitted as a number.",
+    "Selector and at-rule contexts are flattened into the base style: compile-cost workload, not fidelity.",
+    "A namespace closes when a property repeats, preserving declaration order.",
+    "Declarations rejected by the Alpha 1 compiler are excluded with their diagnostic code."
+  ],
+  "totals": {
+    "candidates": 562,
+    "included": 562,
+    "excluded": 0,
+    "tokens": 110
+  },
+  "excluded": [],
+  "tokens": {
+    "colors": {
+      "t000": "#13200f",
+      "t001": "#1f2421",
+      "t002": "#1f5132",
+      "t003": "#242b24",
+      "t004": "#2f5b3a",
+      "t005": "#2f7d4b",
+      "t006": "#304431",
+      "t007": "#3b423a",
+      "t008": "#3e563f",
+      "t009": "#4b3a6b",
+      "t010": "#697067",
+      "t011": "#6b4c12",
+      "t012": "#7d2a26",
+      "t013": "#8a9284",
+      "t014": "#9cc59f",
+      "t015": "#a83c37",
+      "t016": "#b9c0b3",
+      "t017": "#c4cabe",
+      "t018": "#c9d6c2",
+      "t019": "#d6dbd0",
+      "t020": "#dce5d6",
+      "t021": "#dcefe2",
+      "t022": "#e3b6b2",
+      "t023": "#e3e6de",
+      "t024": "#e3e8dc",
+      "t025": "#e3ebdc",
+      "t026": "#e8ebe3",
+      "t027": "#edf2e8",
+      "t028": "#eef1ea",
+      "t029": "#f4f6f0",
+      "t030": "#f6f7f3",
+      "t031": "#faf3e6",
+      "t032": "#fbefed",
+      "t033": "#ffffff",
+      "t034": "CanvasText",
+      "t035": "GrayText",
+      "t036": "Highlight",
+      "t037": "HighlightText",
+      "t038": "Mark",
+      "t039": "currentColor",
+      "t040": "inherit",
+      "t041": "none",
+      "t042": "transparent"
+    },
+    "durations": {
+      "t000": "0s",
+      "t001": "1.2s",
+      "t002": "120ms",
+      "t003": "2400ms",
+      "t004": "2s",
+      "t005": "800ms"
+    },
+    "easings": {
+      "t000": "ease-in-out",
+      "t001": "linear"
+    },
+    "fontFamilies": {
+      "t000": "Georgia, serif",
+      "t001": "system-ui, sans-serif",
+      "t002": "ui-monospace, monospace"
+    },
+    "fontSizes": {
+      "t000": "12px",
+      "t001": "13px",
+      "t002": "14px",
+      "t003": "15px",
+      "t004": "16px",
+      "t005": "17px",
+      "t006": "18px",
+      "t007": "20px",
+      "t008": "24px",
+      "t009": "28px",
+      "t010": "40px",
+      "t011": "6px"
+    },
+    "fontWeights": {
+      "t000": "500",
+      "t001": "600",
+      "t002": "700"
+    },
+    "letterSpacings": {
+      "t000": "0.04em",
+      "t001": "0.08em"
+    },
+    "lineHeights": {
+      "t000": "1.15",
+      "t001": "1.4",
+      "t002": "1.5",
+      "t003": "1.6"
+    },
+    "radii": {
+      "t000": "12px",
+      "t001": "4px",
+      "t002": "50%",
+      "t003": "6px",
+      "t004": "8px",
+      "t005": "999px"
+    },
+    "shadows": {
+      "t000": "0 1px 0 #e3e6de",
+      "t001": "0 1px 2px rgba(0, 0, 0, 0.08)"
+    },
+    "spacing": {
+      "t000": "0",
+      "t001": "0 0 8px",
+      "t002": "0 16px",
+      "t003": "0 16px 16px",
+      "t004": "0 8px",
+      "t005": "10px",
+      "t006": "12px",
+      "t007": "12px 16px",
+      "t008": "12px 24px",
+      "t009": "16px",
+      "t010": "24px",
+      "t011": "24px 0",
+      "t012": "2px",
+      "t013": "32px",
+      "t014": "32px 16px",
+      "t015": "32px 24px",
+      "t016": "3px",
+      "t017": "4px",
+      "t018": "4px 8px",
+      "t019": "64px",
+      "t020": "64px 24px",
+      "t021": "6px",
+      "t022": "6px 12px",
+      "t023": "6px 8px",
+      "t024": "8px",
+      "t025": "8px 12px",
+      "t026": "auto"
+    }
+  },
+  "stylesheets": [
+    {
+      "fixtureId": "CE-CORPUS-APP-SHELL-01",
+      "slug": "app-shell",
+      "path": "tests/core-evolution/corpus/fixtures/app-shell/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#002",
+          "property": "height",
+          "literal": "100%"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#003",
+          "property": "fontFamily",
+          "token": "fontFamilies.t001"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#004",
+          "property": "fontSize",
+          "token": "fontSizes.t002"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#005",
+          "property": "lineHeight",
+          "token": "lineHeights.t002"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#006",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#007",
+          "property": "backgroundColor",
+          "token": "colors.t030"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#008",
+          "property": "display",
+          "literal": "grid"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#012",
+          "property": "overflow",
+          "literal": "hidden"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#014",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#015",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#016",
+          "property": "justifyContent",
+          "literal": "space-between"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#017",
+          "property": "paddingInline",
+          "token": "spacing.t006"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#020",
+          "property": "borderBottomColor",
+          "token": "colors.t023"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#022",
+          "property": "userSelect",
+          "literal": "none"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#023",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#026",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#027",
+          "property": "flexDirection",
+          "literal": "column"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#028",
+          "property": "gap",
+          "token": "spacing.t017"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#029",
+          "property": "padding",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#032",
+          "property": "backgroundColor",
+          "token": "colors.t028"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#036",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#037",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#038",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#040",
+          "property": "paddingInline",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#041",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#042",
+          "property": "color",
+          "token": "colors.t040"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#045",
+          "property": "backgroundColor",
+          "token": "colors.t024"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#048",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#050",
+          "property": "backgroundColor",
+          "token": "colors.t020"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#051",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#055",
+          "property": "fill",
+          "token": "colors.t039"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#057",
+          "property": "minWidth",
+          "literal": "0"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#058",
+          "property": "overflow",
+          "literal": "hidden"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#059",
+          "property": "whiteSpace",
+          "literal": "nowrap"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#062",
+          "property": "fontSize",
+          "token": "fontSizes.t000"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#063",
+          "property": "display",
+          "literal": "inline-flex"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#064",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#065",
+          "property": "gap",
+          "token": "spacing.t021"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#066",
+          "property": "marginBlockStart",
+          "token": "spacing.t026"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#067",
+          "property": "fontSize",
+          "token": "fontSizes.t000"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#070",
+          "property": "borderRadius",
+          "token": "radii.t002"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#071",
+          "property": "backgroundColor",
+          "token": "colors.t005"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#072",
+          "property": "animationName",
+          "literal": "pulse"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#073",
+          "property": "animationDuration",
+          "token": "durations.t004"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#074",
+          "property": "animationIterationCount",
+          "literal": "infinite"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#075",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#076",
+          "property": "flexDirection",
+          "literal": "column"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#077",
+          "property": "minWidth",
+          "literal": "0"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#081",
+          "property": "top",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#083",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#084",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#085",
+          "property": "justifyContent",
+          "literal": "space-between"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#086",
+          "property": "padding",
+          "token": "spacing.t007"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#087",
+          "property": "backgroundColor",
+          "token": "colors.t030"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#088",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#089",
+          "property": "fontSize",
+          "token": "fontSizes.t006"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#091",
+          "property": "transform",
+          "literal": "translateY(1px)"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#092",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#093",
+          "property": "padding",
+          "token": "spacing.t003"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#098",
+          "property": "borderBottomColor",
+          "token": "colors.t023"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#100",
+          "property": "insetBlockEnd",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#101",
+          "property": "insetInlineEnd",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#103",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#105",
+          "property": "padding",
+          "token": "spacing.t025"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#106",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#107",
+          "property": "color",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#108",
+          "property": "backgroundColor",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#112",
+          "property": "display",
+          "literal": "none"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#113",
+          "property": "justifyContent",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#118",
+          "property": "outlineColor",
+          "token": "colors.t034"
+        },
+        {
+          "id": "CE-CORPUS-APP-SHELL-01:reference#119",
+          "property": "backgroundColor",
+          "token": "colors.t034"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-FORMS-01",
+      "slug": "forms",
+      "path": "tests/core-evolution/corpus/fixtures/forms/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#002",
+          "property": "fontFamily",
+          "token": "fontFamilies.t001"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#003",
+          "property": "fontSize",
+          "token": "fontSizes.t002"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#004",
+          "property": "lineHeight",
+          "token": "lineHeights.t002"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#005",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#006",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#007",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#008",
+          "property": "flexDirection",
+          "literal": "column"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#009",
+          "property": "gap",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#011",
+          "property": "padding",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#012",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#013",
+          "property": "fontSize",
+          "token": "fontSizes.t007"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#014",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#015",
+          "property": "flexDirection",
+          "literal": "column"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#016",
+          "property": "gap",
+          "token": "spacing.t017"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#017",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#018",
+          "property": "padding",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#021",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#023",
+          "property": "paddingInline",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#024",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#025",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#026",
+          "property": "borderColor",
+          "token": "colors.t016"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#027",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#029",
+          "property": "color",
+          "token": "colors.t040"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#030",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#031",
+          "property": "caretColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#033",
+          "property": "color",
+          "token": "colors.t010"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#034",
+          "property": "opacity",
+          "literal": 1
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#035",
+          "property": "borderColor",
+          "token": "colors.t013"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#038",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#040",
+          "property": "borderColor",
+          "token": "colors.t015"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#041",
+          "property": "backgroundColor",
+          "token": "colors.t029"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#043",
+          "property": "fontFamily",
+          "token": "fontFamilies.t002"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#044",
+          "property": "letterSpacing",
+          "token": "letterSpacings.t000"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#046",
+          "property": "color",
+          "token": "colors.t010"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#047",
+          "property": "backgroundColor",
+          "token": "colors.t029"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#049",
+          "property": "paddingBlock",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#051",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#052",
+          "property": "color",
+          "token": "colors.t015"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#054",
+          "property": "marginInlineEnd",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#055",
+          "property": "padding",
+          "token": "spacing.t018"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#056",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#057",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#058",
+          "property": "borderColor",
+          "token": "colors.t016"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#059",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#060",
+          "property": "backgroundColor",
+          "token": "colors.t029"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#062",
+          "property": "display",
+          "literal": "inline-flex"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#063",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#065",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#067",
+          "property": "width",
+          "literal": "16px"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#068",
+          "property": "height",
+          "literal": "16px"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#069",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#071",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#073",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#074",
+          "property": "display",
+          "literal": "inline-flex"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#075",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#076",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#078",
+          "property": "paddingInline",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#079",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#080",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#081",
+          "property": "borderColor",
+          "token": "colors.t042"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#082",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#083",
+          "property": "color",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#084",
+          "property": "backgroundColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#087",
+          "property": "backgroundColor",
+          "token": "colors.t006"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#088",
+          "property": "transform",
+          "literal": "translateY(1px)"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#091",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#094",
+          "property": "opacity",
+          "literal": 0.6
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#099",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#100",
+          "property": "borderColor",
+          "token": "colors.t039"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#101",
+          "property": "borderTopColor",
+          "token": "colors.t042"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#102",
+          "property": "borderRadius",
+          "token": "radii.t002"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#103",
+          "property": "animationName",
+          "literal": "spin"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#104",
+          "property": "animationDuration",
+          "token": "durations.t005"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#105",
+          "property": "animationTimingFunction",
+          "token": "easings.t001"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#106",
+          "property": "animationIterationCount",
+          "literal": "infinite"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#109",
+          "property": "animationDuration",
+          "token": "durations.t003"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#110",
+          "property": "borderColor",
+          "token": "colors.t038"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#111",
+          "property": "color",
+          "token": "colors.t035"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#112",
+          "property": "borderColor",
+          "token": "colors.t035"
+        },
+        {
+          "id": "CE-CORPUS-FORMS-01:reference#113",
+          "property": "borderColor",
+          "token": "colors.t001"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-NOTICES-01",
+      "slug": "notices",
+      "path": "tests/core-evolution/corpus/fixtures/notices/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#002",
+          "property": "fontFamily",
+          "token": "fontFamilies.t001"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#003",
+          "property": "fontSize",
+          "token": "fontSizes.t002"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#004",
+          "property": "lineHeight",
+          "token": "lineHeights.t002"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#005",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#006",
+          "property": "display",
+          "literal": "grid"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#007",
+          "property": "gap",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#009",
+          "property": "padding",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#010",
+          "property": "display",
+          "literal": "grid"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#013",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#014",
+          "property": "padding",
+          "token": "spacing.t006"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#015",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#016",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#017",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#018",
+          "property": "borderColor",
+          "token": "colors.t018"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#019",
+          "property": "backgroundColor",
+          "token": "colors.t027"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#020",
+          "property": "borderColor",
+          "token": "colors.t022"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#021",
+          "property": "color",
+          "token": "colors.t012"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#022",
+          "property": "backgroundColor",
+          "token": "colors.t032"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#023",
+          "property": "width",
+          "literal": "16px"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#024",
+          "property": "height",
+          "literal": "16px"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#025",
+          "property": "marginBlockStart",
+          "token": "spacing.t012"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#026",
+          "property": "fill",
+          "token": "colors.t039"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#027",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#030",
+          "property": "width",
+          "literal": "24px"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#031",
+          "property": "height",
+          "literal": "24px"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#032",
+          "property": "padding",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#034",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#035",
+          "property": "color",
+          "token": "colors.t040"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#036",
+          "property": "backgroundColor",
+          "token": "colors.t042"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#040",
+          "property": "outlineColor",
+          "token": "colors.t039"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#042",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#043",
+          "property": "flexDirection",
+          "literal": "column"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#044",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#045",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#046",
+          "property": "padding",
+          "token": "spacing.t014"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#047",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#049",
+          "property": "borderColor",
+          "token": "colors.t017"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#050",
+          "property": "borderRadius",
+          "token": "radii.t000"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#054",
+          "property": "fill",
+          "token": "colors.t010"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#055",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#056",
+          "property": "fontSize",
+          "token": "fontSizes.t004"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#058",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#060",
+          "property": "color",
+          "token": "colors.t010"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#063",
+          "property": "display",
+          "literal": "grid"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#064",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#065",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#066",
+          "property": "padding",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#068",
+          "property": "height",
+          "literal": "16px"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#069",
+          "property": "borderRadius",
+          "token": "radii.t001"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#070",
+          "property": "backgroundColor",
+          "token": "colors.t026"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#072",
+          "property": "animationDuration",
+          "token": "durations.t001"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#074",
+          "property": "animationIterationCount",
+          "literal": "infinite"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#078",
+          "property": "borderColor",
+          "token": "colors.t034"
+        },
+        {
+          "id": "CE-CORPUS-NOTICES-01:reference#079",
+          "property": "backgroundColor",
+          "token": "colors.t035"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-DATA-GRID-01",
+      "slug": "data-grid",
+      "path": "tests/core-evolution/corpus/fixtures/data-grid/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#002",
+          "property": "fontFamily",
+          "token": "fontFamilies.t001"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#003",
+          "property": "fontSize",
+          "token": "fontSizes.t001"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#004",
+          "property": "lineHeight",
+          "token": "lineHeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#005",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#006",
+          "property": "boxSizing",
+          "literal": "border-box"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#011",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#012",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#013",
+          "property": "borderColor",
+          "token": "colors.t019"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#016",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#022",
+          "property": "padding",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#023",
+          "property": "textAlign",
+          "literal": "start"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#025",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#026",
+          "property": "boxSizing",
+          "literal": "border-box"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#028",
+          "property": "height",
+          "literal": "28px"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#029",
+          "property": "paddingInline",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#032",
+          "property": "borderBottomColor",
+          "token": "colors.t026"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#033",
+          "property": "whiteSpace",
+          "literal": "nowrap"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#035",
+          "property": "textAlign",
+          "literal": "start"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#036",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#038",
+          "property": "top",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#040",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#041",
+          "property": "backgroundColor",
+          "token": "colors.t029"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#043",
+          "property": "left",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#047",
+          "property": "overflow",
+          "literal": "hidden"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#049",
+          "property": "fontWeight",
+          "token": "fontWeights.t000"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#054",
+          "property": "overflow",
+          "literal": "hidden"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#056",
+          "property": "backgroundColor",
+          "token": "colors.t029"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#057",
+          "property": "backgroundColor",
+          "token": "colors.t025"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#060",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#062",
+          "property": "display",
+          "literal": "inline-block"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#063",
+          "property": "paddingInline",
+          "token": "spacing.t021"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#064",
+          "property": "borderRadius",
+          "token": "radii.t005"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#065",
+          "property": "fontSize",
+          "token": "fontSizes.t000"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#066",
+          "property": "color",
+          "token": "colors.t002"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#067",
+          "property": "backgroundColor",
+          "token": "colors.t021"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#068",
+          "property": "color",
+          "token": "colors.t011"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#069",
+          "property": "backgroundColor",
+          "token": "colors.t031"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#070",
+          "property": "color",
+          "token": "colors.t012"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#071",
+          "property": "backgroundColor",
+          "token": "colors.t032"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#072",
+          "property": "color",
+          "token": "colors.t037"
+        },
+        {
+          "id": "CE-CORPUS-DATA-GRID-01:reference#073",
+          "property": "backgroundColor",
+          "token": "colors.t036"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-CONTENT-01",
+      "slug": "content",
+      "path": "tests/core-evolution/corpus/fixtures/content/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#002",
+          "property": "fontFamily",
+          "token": "fontFamilies.t000"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#003",
+          "property": "fontSize",
+          "token": "fontSizes.t005"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#004",
+          "property": "lineHeight",
+          "token": "lineHeights.t003"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#005",
+          "property": "color",
+          "token": "colors.t003"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#006",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#008",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#009",
+          "property": "flexDirection",
+          "literal": "column"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#010",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#011",
+          "property": "gap",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#012",
+          "property": "padding",
+          "token": "spacing.t020"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#015",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#016",
+          "property": "fontSize",
+          "token": "fontSizes.t001"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#017",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#018",
+          "property": "letterSpacing",
+          "token": "letterSpacings.t001"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#020",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#022",
+          "property": "fontSize",
+          "token": "fontSizes.t010"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#023",
+          "property": "lineHeight",
+          "token": "lineHeights.t000"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#025",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#028",
+          "property": "display",
+          "literal": "inline-block"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#029",
+          "property": "padding",
+          "token": "spacing.t008"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#030",
+          "property": "borderRadius",
+          "token": "radii.t005"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#031",
+          "property": "color",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#032",
+          "property": "backgroundColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#034",
+          "property": "backgroundColor",
+          "token": "colors.t006"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#037",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#040",
+          "property": "marginInline",
+          "literal": "auto"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#041",
+          "property": "padding",
+          "token": "spacing.t015"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#042",
+          "property": "fontSize",
+          "token": "fontSizes.t008"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#046",
+          "property": "paddingInlineStart",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#048",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#049",
+          "property": "color",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#051",
+          "property": "paddingInlineStart",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#057",
+          "property": "columnGap",
+          "token": "spacing.t013"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#063",
+          "property": "padding",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#064",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#065",
+          "property": "fontFamily",
+          "token": "fontFamilies.t002"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#066",
+          "property": "fontSize",
+          "token": "fontSizes.t002"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#069",
+          "property": "backgroundColor",
+          "token": "colors.t029"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#070",
+          "property": "color",
+          "token": "colors.t004"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#071",
+          "property": "textDecorationLine",
+          "literal": "underline"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#073",
+          "property": "textUnderlineOffset",
+          "token": "spacing.t016"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#074",
+          "property": "color",
+          "token": "colors.t009"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#075",
+          "property": "padding",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#077",
+          "property": "color",
+          "token": "colors.t010"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#078",
+          "property": "fontSize",
+          "token": "fontSizes.t009"
+        },
+        {
+          "id": "CE-CORPUS-CONTENT-01:reference#081",
+          "property": "display",
+          "literal": "none"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-RTL-VERTICAL-01",
+      "slug": "rtl-vertical",
+      "path": "tests/core-evolution/corpus/fixtures/rtl-vertical/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#002",
+          "property": "padding",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#003",
+          "property": "fontFamily",
+          "token": "fontFamilies.t001"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#004",
+          "property": "fontSize",
+          "token": "fontSizes.t003"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#005",
+          "property": "lineHeight",
+          "token": "lineHeights.t003"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#006",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#007",
+          "property": "position",
+          "literal": "relative"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#009",
+          "property": "marginBlockEnd",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#010",
+          "property": "paddingBlock",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#011",
+          "property": "paddingInlineStart",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#012",
+          "property": "paddingInlineEnd",
+          "token": "spacing.t019"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#016",
+          "property": "borderStartEndRadius",
+          "token": "radii.t000"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#017",
+          "property": "borderEndEndRadius",
+          "token": "radii.t000"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#018",
+          "property": "backgroundColor",
+          "token": "colors.t029"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#019",
+          "property": "position",
+          "literal": "absolute"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#020",
+          "property": "insetBlockStart",
+          "token": "spacing.t006"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#021",
+          "property": "insetInlineEnd",
+          "token": "spacing.t006"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#022",
+          "property": "paddingInline",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#023",
+          "property": "borderRadius",
+          "token": "radii.t005"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#024",
+          "property": "fontSize",
+          "token": "fontSizes.t000"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#025",
+          "property": "color",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#026",
+          "property": "backgroundColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#027",
+          "property": "marginBlock",
+          "token": "spacing.t004"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#028",
+          "property": "fontSize",
+          "token": "fontSizes.t006"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#029",
+          "property": "textAlign",
+          "literal": "start"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#030",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#033",
+          "property": "fontFamily",
+          "token": "fontFamilies.t002"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#034",
+          "property": "display",
+          "literal": "inline-block"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#035",
+          "property": "marginBlockStart",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#036",
+          "property": "color",
+          "token": "colors.t004"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#039",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#042",
+          "property": "marginInlineStart",
+          "token": "spacing.t017"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#045",
+          "property": "padding",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#048",
+          "property": "backgroundColor",
+          "token": "colors.t031"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#049",
+          "property": "marginBlock",
+          "token": "spacing.t002"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#050",
+          "property": "fontSize",
+          "token": "fontSizes.t006"
+        },
+        {
+          "id": "CE-CORPUS-RTL-VERTICAL-01:reference#051",
+          "property": "margin",
+          "token": "spacing.t000"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-SVG-MEDIA-01",
+      "slug": "svg-media",
+      "path": "tests/core-evolution/corpus/fixtures/svg-media/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#002",
+          "property": "padding",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#003",
+          "property": "fontFamily",
+          "token": "fontFamilies.t001"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#004",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#005",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#006",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#007",
+          "property": "gap",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#010",
+          "property": "width",
+          "literal": "32px"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#011",
+          "property": "height",
+          "literal": "32px"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#012",
+          "property": "padding",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#014",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#015",
+          "property": "color",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#016",
+          "property": "backgroundColor",
+          "token": "colors.t042"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#018",
+          "property": "backgroundColor",
+          "token": "colors.t027"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#021",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#025",
+          "property": "fill",
+          "token": "colors.t041"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#026",
+          "property": "stroke",
+          "token": "colors.t039"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#033",
+          "property": "fill",
+          "token": "colors.t041"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#034",
+          "property": "stroke",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#037",
+          "property": "stroke",
+          "token": "colors.t017"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#040",
+          "property": "fontSize",
+          "token": "fontSizes.t011"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#041",
+          "property": "fill",
+          "token": "colors.t010"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#044",
+          "property": "margin",
+          "token": "spacing.t011"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#045",
+          "property": "display",
+          "literal": "block"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#046",
+          "property": "width",
+          "literal": "100%"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#051",
+          "property": "borderRadius",
+          "token": "radii.t000"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#052",
+          "property": "marginBlockStart",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#053",
+          "property": "fontSize",
+          "token": "fontSizes.t001"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#054",
+          "property": "color",
+          "token": "colors.t010"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#057",
+          "property": "padding",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#058",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#059",
+          "property": "width",
+          "literal": "100%"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#060",
+          "property": "height",
+          "literal": "100%"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#065",
+          "property": "backgroundColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-SVG-MEDIA-01:reference#070",
+          "property": "stroke",
+          "token": "colors.t034"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-SSR-01",
+      "slug": "ssr",
+      "path": "tests/core-evolution/corpus/fixtures/ssr/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-SSR-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#002",
+          "property": "fontFamily",
+          "token": "fontFamilies.t001"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#003",
+          "property": "fontSize",
+          "token": "fontSizes.t003"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#004",
+          "property": "lineHeight",
+          "token": "lineHeights.t002"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#005",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#006",
+          "property": "backgroundColor",
+          "token": "colors.t030"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#008",
+          "property": "top",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#009",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#010",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#011",
+          "property": "gap",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#013",
+          "property": "paddingInline",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#014",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#015",
+          "property": "boxShadow",
+          "token": "shadows.t000"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#016",
+          "property": "fontWeight",
+          "token": "fontWeights.t002"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#017",
+          "property": "color",
+          "token": "colors.t040"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#019",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#020",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#021",
+          "property": "padding",
+          "token": "spacing.t022"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#022",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#023",
+          "property": "color",
+          "token": "colors.t040"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#025",
+          "property": "backgroundColor",
+          "token": "colors.t027"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#026",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#029",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#031",
+          "property": "display",
+          "literal": "grid"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#033",
+          "property": "gap",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#034",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#035",
+          "property": "padding",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#038",
+          "property": "padding",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#039",
+          "property": "borderRadius",
+          "token": "radii.t000"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#040",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:reference#041",
+          "property": "boxShadow",
+          "token": "shadows.t001"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-SSR-01",
+      "slug": "ssr",
+      "path": "tests/core-evolution/corpus/fixtures/ssr/route.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-SSR-01:route#001",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#002",
+          "property": "justifyContent",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#003",
+          "property": "padding",
+          "token": "spacing.t015"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#004",
+          "property": "boxSizing",
+          "literal": "border-box"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#005",
+          "property": "width",
+          "literal": "100%"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#007",
+          "property": "padding",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#008",
+          "property": "borderRadius",
+          "token": "radii.t000"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#009",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#010",
+          "property": "margin",
+          "token": "spacing.t001"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#011",
+          "property": "fontSize",
+          "token": "fontSizes.t007"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#012",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-SSR-01:route#013",
+          "property": "color",
+          "token": "colors.t010"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "slug": "component-library",
+      "path": "tests/core-evolution/corpus/fixtures/component-library/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#002",
+          "property": "fontFamily",
+          "token": "fontFamilies.t001"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#003",
+          "property": "fontSize",
+          "token": "fontSizes.t002"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#004",
+          "property": "lineHeight",
+          "token": "lineHeights.t002"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#005",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#006",
+          "property": "display",
+          "literal": "grid"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#007",
+          "property": "gap",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#008",
+          "property": "padding",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#009",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#011",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#012",
+          "property": "gap",
+          "token": "spacing.t006"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#013",
+          "property": "display",
+          "literal": "inline-flex"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#014",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#015",
+          "property": "justifyContent",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#016",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#017",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#018",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#019",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#022",
+          "property": "transitionDuration",
+          "token": "durations.t002"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#023",
+          "property": "transitionTimingFunction",
+          "token": "easings.t000"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#025",
+          "property": "paddingInline",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#026",
+          "property": "fontSize",
+          "token": "fontSizes.t002"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#028",
+          "property": "paddingInline",
+          "token": "spacing.t005"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#029",
+          "property": "fontSize",
+          "token": "fontSizes.t000"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#030",
+          "property": "borderColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#031",
+          "property": "color",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#032",
+          "property": "backgroundColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#033",
+          "property": "backgroundColor",
+          "token": "colors.t006"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#034",
+          "property": "borderColor",
+          "token": "colors.t017"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#035",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#036",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#037",
+          "property": "borderColor",
+          "token": "colors.t015"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#038",
+          "property": "color",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#039",
+          "property": "backgroundColor",
+          "token": "colors.t015"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#042",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#044",
+          "property": "display",
+          "literal": "inline-flex"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#045",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#046",
+          "property": "height",
+          "literal": "20px"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#047",
+          "property": "paddingInline",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#048",
+          "property": "borderRadius",
+          "token": "radii.t005"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#049",
+          "property": "fontSize",
+          "token": "fontSizes.t000"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#050",
+          "property": "fontWeight",
+          "token": "fontWeights.t001"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#051",
+          "property": "whiteSpace",
+          "literal": "nowrap"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#052",
+          "property": "color",
+          "token": "colors.t007"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#053",
+          "property": "backgroundColor",
+          "token": "colors.t026"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#054",
+          "property": "color",
+          "token": "colors.t002"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#055",
+          "property": "backgroundColor",
+          "token": "colors.t021"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#056",
+          "property": "color",
+          "token": "colors.t011"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#057",
+          "property": "backgroundColor",
+          "token": "colors.t031"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#058",
+          "property": "boxSizing",
+          "literal": "border-box"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#059",
+          "property": "display",
+          "literal": "grid"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#061",
+          "property": "maxWidth",
+          "literal": "320px"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#062",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#063",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#064",
+          "property": "borderColor",
+          "token": "colors.t023"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#065",
+          "property": "borderRadius",
+          "token": "radii.t000"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#066",
+          "property": "overflow",
+          "literal": "hidden"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#067",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#068",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#069",
+          "property": "justifyContent",
+          "literal": "space-between"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#070",
+          "property": "padding",
+          "token": "spacing.t007"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#073",
+          "property": "borderBottomColor",
+          "token": "colors.t023"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#074",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#075",
+          "property": "fontSize",
+          "token": "fontSizes.t004"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#076",
+          "property": "padding",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#077",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#078",
+          "property": "justifyContent",
+          "literal": "flex-end"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#079",
+          "property": "padding",
+          "token": "spacing.t007"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#080",
+          "property": "backgroundColor",
+          "token": "colors.t029"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#081",
+          "property": "padding",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#082",
+          "property": "borderRadius",
+          "token": "radii.t000"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#083",
+          "property": "color",
+          "token": "colors.t028"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#084",
+          "property": "backgroundColor",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#085",
+          "property": "borderColor",
+          "token": "colors.t014"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#086",
+          "property": "color",
+          "token": "colors.t000"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#087",
+          "property": "backgroundColor",
+          "token": "colors.t014"
+        },
+        {
+          "id": "CE-CORPUS-COMPONENT-LIBRARY-01:reference#088",
+          "property": "outlineColor",
+          "token": "colors.t014"
+        }
+      ]
+    },
+    {
+      "fixtureId": "CE-CORPUS-INTERACTION-STATES-01",
+      "slug": "interaction-states",
+      "path": "tests/core-evolution/corpus/fixtures/interaction-states/reference.css",
+      "declarations": [
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#001",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#002",
+          "property": "fontFamily",
+          "token": "fontFamilies.t001"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#003",
+          "property": "fontSize",
+          "token": "fontSizes.t002"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#004",
+          "property": "lineHeight",
+          "token": "lineHeights.t002"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#005",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#006",
+          "property": "userSelect",
+          "literal": "none"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#007",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#008",
+          "property": "flexDirection",
+          "literal": "column"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#009",
+          "property": "alignItems",
+          "literal": "flex-start"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#010",
+          "property": "gap",
+          "token": "spacing.t006"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#011",
+          "property": "padding",
+          "token": "spacing.t010"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#012",
+          "property": "display",
+          "literal": "inline-flex"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#013",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#014",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#017",
+          "property": "paddingInline",
+          "token": "spacing.t009"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#018",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#019",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#020",
+          "property": "borderColor",
+          "token": "colors.t016"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#021",
+          "property": "borderRadius",
+          "token": "radii.t003"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#022",
+          "property": "color",
+          "token": "colors.t001"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#023",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#026",
+          "property": "transitionDuration",
+          "token": "durations.t002"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#027",
+          "property": "backgroundColor",
+          "token": "colors.t027"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#028",
+          "property": "transform",
+          "literal": "translateY(1px)"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#031",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#033",
+          "property": "borderColor",
+          "token": "colors.t015"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#034",
+          "property": "color",
+          "token": "colors.t015"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#037",
+          "property": "opacity",
+          "literal": 0.6
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#042",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#043",
+          "property": "borderColor",
+          "token": "colors.t039"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#045",
+          "property": "borderRadius",
+          "token": "radii.t002"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#046",
+          "property": "animationName",
+          "literal": "spin"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#047",
+          "property": "animationDuration",
+          "token": "durations.t005"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#048",
+          "property": "animationTimingFunction",
+          "token": "easings.t001"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#049",
+          "property": "animationIterationCount",
+          "literal": "infinite"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#050",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#051",
+          "property": "color",
+          "token": "colors.t015"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#052",
+          "property": "display",
+          "literal": "flex"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#053",
+          "property": "flexDirection",
+          "literal": "column"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#055",
+          "property": "padding",
+          "token": "spacing.t017"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#056",
+          "property": "borderWidth",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#057",
+          "property": "borderStyle",
+          "literal": "solid"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#058",
+          "property": "borderColor",
+          "token": "colors.t019"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#059",
+          "property": "borderRadius",
+          "token": "radii.t004"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#060",
+          "property": "padding",
+          "token": "spacing.t023"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#062",
+          "property": "borderRadius",
+          "token": "radii.t001"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#063",
+          "property": "textAlign",
+          "literal": "start"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#064",
+          "property": "backgroundColor",
+          "token": "colors.t042"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#068",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#070",
+          "property": "backgroundColor",
+          "token": "colors.t027"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#071",
+          "property": "display",
+          "literal": "inline-flex"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#072",
+          "property": "alignItems",
+          "literal": "center"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#073",
+          "property": "gap",
+          "token": "spacing.t024"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#075",
+          "property": "position",
+          "literal": "absolute"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#076",
+          "property": "width",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#077",
+          "property": "height",
+          "literal": "1px"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#078",
+          "property": "overflow",
+          "literal": "hidden"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#079",
+          "property": "clipPath",
+          "literal": "inset(50%)"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#080",
+          "property": "whiteSpace",
+          "literal": "nowrap"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#081",
+          "property": "width",
+          "literal": "32px"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#083",
+          "property": "borderRadius",
+          "token": "radii.t005"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#084",
+          "property": "backgroundColor",
+          "token": "colors.t016"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#085",
+          "property": "backgroundColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#088",
+          "property": "outlineColor",
+          "token": "colors.t008"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#090",
+          "property": "margin",
+          "token": "spacing.t000"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#095",
+          "property": "backgroundColor",
+          "token": "colors.t033"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#096",
+          "property": "transitionDuration",
+          "token": "durations.t000"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#097",
+          "property": "animationDuration",
+          "token": "durations.t003"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#098",
+          "property": "outlineColor",
+          "token": "colors.t036"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#099",
+          "property": "color",
+          "token": "colors.t035"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#100",
+          "property": "borderColor",
+          "token": "colors.t035"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#101",
+          "property": "backgroundColor",
+          "token": "colors.t036"
+        },
+        {
+          "id": "CE-CORPUS-INTERACTION-STATES-01:reference#102",
+          "property": "borderColor",
+          "token": "colors.t001"
+        }
+      ]
+    }
+  ]
+}

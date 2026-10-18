@@ -1,0 +1,964 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-baseline-epoch-manifest",
+  "epoch": "alpha1",
+  "epochKind": "baseline",
+  "description": "Unchanged PandamStyle Alpha 1 (0.1.0-alpha.1). Every core-evolution and agentic-optimizations comparison names this epoch separately from any evolved epoch; nothing here may be rebuilt from a later commit.",
+  "generatedBy": "node tools/baselines/archive.mjs manifest",
+  "recordedAt": "2026-10-18T21:26:12.737Z",
+  "store": {
+    "defaultPath": "~/.local/share/pandamstyle-baselines/alpha1",
+    "note": "Large binaries live outside Git. Paths below are relative to the store."
+  },
+  "source": {
+    "commit": "415e05539fcb5d36a78226112b5cf488b200b1aa",
+    "tree": "26928afeac8822d4789141d7094ccfaf601942ed",
+    "archive": {
+      "file": "source/pandamstyle-415e055.tar.gz",
+      "sha256": "407f68a6fbae80277a78cfd2f902364e838341e4a66c9004ac347c65d7c83764",
+      "command": "git archive --format=tar --prefix=pandamstyle-415e055/ 415e05539fcb5d36a78226112b5cf488b200b1aa | gzip -n -9 > source/pandamstyle-415e055.tar.gz"
+    },
+    "release": {
+      "version": "0.1.0-alpha.1",
+      "npmDistTag": "alpha",
+      "gitTag": "v0.1.0-alpha.1",
+      "gitTagCommit": "d5cdac1db86faea96812b79eb8e1fc18518ff2b8"
+    },
+    "productEquivalence": {
+      "statement": "Package sources, types, manifests, build configuration, lockfile and package READMEs/licenses are identical at the release tag commit, f3e8803 and the baseline commit; the commits differ in documentation, AgentDoc catalog, CI metadata, .gitignore and typos configuration only.",
+      "command": "git diff --stat v0.1.0-alpha.1 415e05539fcb5d36a78226112b5cf488b200b1aa -- packages/*/src packages/*/types packages/*/package.json packages/*/bin packages/*/README.md packages/*/LICENSE packages/*/ATTRIBUTIONS.md packages/compiler/rollup.config.mjs package.json yarn.lock",
+      "output": ""
+    }
+  },
+  "lockfiles": [
+    {
+      "path": "yarn.lock",
+      "commit": "415e05539fcb5d36a78226112b5cf488b200b1aa",
+      "sha256": "cddb3b97cb5e0fdf78418086336094bbc46e006fe5cf7bc0b3625be67049b28b",
+      "role": "workspace install used to build and pack the source tarballs"
+    },
+    {
+      "path": "benchmarks/core-evolution/epochs/alpha1/closure/package-lock.json",
+      "sha256": "b2b51766289a359a2fe8d9b68a8716b3283b44c9026e93a6d3b4e69088f1439d",
+      "role": "executable closure: published Alpha 1 packages and the exact qualified hosts"
+    },
+    {
+      "path": "benchmarks/core-evolution/epochs/alpha1/closure/package.json",
+      "sha256": "b346ff95df518843a673f990d2971f42d94bc5add94fe502a7f907732256d626",
+      "role": "executable closure manifest"
+    }
+  ],
+  "packages": [
+    {
+      "name": "@pandamstyle/core",
+      "version": "0.1.0-alpha.1",
+      "registry": {
+        "tarball": "https://registry.npmjs.org/@pandamstyle/core/-/core-0.1.0-alpha.1.tgz",
+        "file": "packages/registry/pandamstyle-core-0.1.0-alpha.1.tgz",
+        "bytes": 7290,
+        "sha256": "1b5568e64b0d07b71a1e1d447e2adb62e6579c7f5f4425bb76f3fb59af5fe7b5",
+        "integrity": "sha512-JV3VOGTKawvg5zRDbOpEugVZ+968xfV/0Quge4dax7OCgq9qZ51p9zkvICFKLBgUd8hzDjn8G027Mqm5NY3LqA==",
+        "shasum": "346a5e8ed012ab851791e1360e755375c2b2efb9",
+        "registryIntegrity": "sha512-JV3VOGTKawvg5zRDbOpEugVZ+968xfV/0Quge4dax7OCgq9qZ51p9zkvICFKLBgUd8hzDjn8G027Mqm5NY3LqA==",
+        "registryShasum": "346a5e8ed012ab851791e1360e755375c2b2efb9",
+        "integrityMatchesRegistry": true
+      },
+      "sourcePack": {
+        "file": "packages/source-pack/pandamstyle-core-0.1.0-alpha.1.tgz",
+        "bytes": 7290,
+        "sha256": "1b5568e64b0d07b71a1e1d447e2adb62e6579c7f5f4425bb76f3fb59af5fe7b5",
+        "integrity": "sha512-JV3VOGTKawvg5zRDbOpEugVZ+968xfV/0Quge4dax7OCgq9qZ51p9zkvICFKLBgUd8hzDjn8G027Mqm5NY3LqA==",
+        "repeatSha256": "1b5568e64b0d07b71a1e1d447e2adb62e6579c7f5f4425bb76f3fb59af5fe7b5",
+        "reproducible": true,
+        "identicalToRegistry": true,
+        "contentDifferences": []
+      },
+      "closureLock": {
+        "resolved": "https://registry.npmjs.org/@pandamstyle/core/-/core-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-JV3VOGTKawvg5zRDbOpEugVZ+968xfV/0Quge4dax7OCgq9qZ51p9zkvICFKLBgUd8hzDjn8G027Mqm5NY3LqA==",
+        "matchesRegistryTarball": true
+      }
+    },
+    {
+      "name": "@pandamstyle/compiler",
+      "version": "0.1.0-alpha.1",
+      "registry": {
+        "tarball": "https://registry.npmjs.org/@pandamstyle/compiler/-/compiler-0.1.0-alpha.1.tgz",
+        "file": "packages/registry/pandamstyle-compiler-0.1.0-alpha.1.tgz",
+        "bytes": 279156,
+        "sha256": "06759f24303e4fc2f7b5e46adf51ab3319ad0ef0fe54a2521e6fad7f07b9110a",
+        "integrity": "sha512-BpCHIVMCHcnVsuolKjGWdXEqDNbCpRz6Hw+FNFzmvEKJDGi/iwneraMn1KXVZ+BbaVNhyJSY3uiMNnUuQY5NUQ==",
+        "shasum": "4c261d4c40f4a1d7c3163d7e835c02d1abfad5ee",
+        "registryIntegrity": "sha512-BpCHIVMCHcnVsuolKjGWdXEqDNbCpRz6Hw+FNFzmvEKJDGi/iwneraMn1KXVZ+BbaVNhyJSY3uiMNnUuQY5NUQ==",
+        "registryShasum": "4c261d4c40f4a1d7c3163d7e835c02d1abfad5ee",
+        "integrityMatchesRegistry": true
+      },
+      "sourcePack": {
+        "file": "packages/source-pack/pandamstyle-compiler-0.1.0-alpha.1.tgz",
+        "bytes": 279168,
+        "sha256": "7d94acac284a6dcd3d3449e144d645e5a6015c5cdacd3c7066c12bd51d8ebed4",
+        "integrity": "sha512-tRHIl0gEf2ppgX5M+L6wuj6UDXRRW126BSr1vKwW5fJyesgl83OTIAiAWstjeUrc2a4BJ2gEGq115NBtB0xu5A==",
+        "repeatSha256": "7d94acac284a6dcd3d3449e144d645e5a6015c5cdacd3c7066c12bd51d8ebed4",
+        "reproducible": true,
+        "identicalToRegistry": false,
+        "contentDifferences": [
+          {
+            "file": "package/docs/architecture/phase-4-engine-absorption-map.md",
+            "registrySha256": "978c8cb6a089bb2e8ef20cf68f9d36f104a3fe9e7d00d416e54ef2c7e0987b79",
+            "sourcePackSha256": "0400e48c67d1cbf5d89b18d1ebb07aee4e7bb0a54025b885839002824aba24df"
+          }
+        ]
+      },
+      "closureLock": {
+        "resolved": "https://registry.npmjs.org/@pandamstyle/compiler/-/compiler-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-BpCHIVMCHcnVsuolKjGWdXEqDNbCpRz6Hw+FNFzmvEKJDGi/iwneraMn1KXVZ+BbaVNhyJSY3uiMNnUuQY5NUQ==",
+        "matchesRegistryTarball": true
+      }
+    },
+    {
+      "name": "@pandamstyle/vite",
+      "version": "0.1.0-alpha.1",
+      "registry": {
+        "tarball": "https://registry.npmjs.org/@pandamstyle/vite/-/vite-0.1.0-alpha.1.tgz",
+        "file": "packages/registry/pandamstyle-vite-0.1.0-alpha.1.tgz",
+        "bytes": 12594,
+        "sha256": "913e76dca8b27e6496763f0c05a010a46ddc13cffaba5e7e5a32e918bb9393ad",
+        "integrity": "sha512-ePIW24QMWjkMoAHCiFBzBGck7dr5TCpLSuWWZR6FfFMeyxgMMF3bUy7jLXjeJqfw9vjZav/IkXQ+JYKjmutkFQ==",
+        "shasum": "e1c1a894d6ba0cd6849966f61f33fe7498b038b2",
+        "registryIntegrity": "sha512-ePIW24QMWjkMoAHCiFBzBGck7dr5TCpLSuWWZR6FfFMeyxgMMF3bUy7jLXjeJqfw9vjZav/IkXQ+JYKjmutkFQ==",
+        "registryShasum": "e1c1a894d6ba0cd6849966f61f33fe7498b038b2",
+        "integrityMatchesRegistry": true
+      },
+      "sourcePack": {
+        "file": "packages/source-pack/pandamstyle-vite-0.1.0-alpha.1.tgz",
+        "bytes": 12594,
+        "sha256": "913e76dca8b27e6496763f0c05a010a46ddc13cffaba5e7e5a32e918bb9393ad",
+        "integrity": "sha512-ePIW24QMWjkMoAHCiFBzBGck7dr5TCpLSuWWZR6FfFMeyxgMMF3bUy7jLXjeJqfw9vjZav/IkXQ+JYKjmutkFQ==",
+        "repeatSha256": "913e76dca8b27e6496763f0c05a010a46ddc13cffaba5e7e5a32e918bb9393ad",
+        "reproducible": true,
+        "identicalToRegistry": true,
+        "contentDifferences": []
+      },
+      "closureLock": {
+        "resolved": "https://registry.npmjs.org/@pandamstyle/vite/-/vite-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-ePIW24QMWjkMoAHCiFBzBGck7dr5TCpLSuWWZR6FfFMeyxgMMF3bUy7jLXjeJqfw9vjZav/IkXQ+JYKjmutkFQ==",
+        "matchesRegistryTarball": true
+      }
+    },
+    {
+      "name": "@pandamstyle/next",
+      "version": "0.1.0-alpha.1",
+      "registry": {
+        "tarball": "https://registry.npmjs.org/@pandamstyle/next/-/next-0.1.0-alpha.1.tgz",
+        "file": "packages/registry/pandamstyle-next-0.1.0-alpha.1.tgz",
+        "bytes": 31399,
+        "sha256": "5b0355632cd37b12cbbfe9949052cc8105d839eac98c2234cb051d6e19ad7b99",
+        "integrity": "sha512-CIzeCG/cX5Fr22REgGPT6MxMhlo+ozgKi/OqCdRnh9/VGu5tl1V2GLJItZ+R1TWURGepRRn++fsfWsXrgdKS9A==",
+        "shasum": "dcf815bfdb93d930b5b72674b853aaf73be3658b",
+        "registryIntegrity": "sha512-CIzeCG/cX5Fr22REgGPT6MxMhlo+ozgKi/OqCdRnh9/VGu5tl1V2GLJItZ+R1TWURGepRRn++fsfWsXrgdKS9A==",
+        "registryShasum": "dcf815bfdb93d930b5b72674b853aaf73be3658b",
+        "integrityMatchesRegistry": true
+      },
+      "sourcePack": {
+        "file": "packages/source-pack/pandamstyle-next-0.1.0-alpha.1.tgz",
+        "bytes": 31399,
+        "sha256": "5b0355632cd37b12cbbfe9949052cc8105d839eac98c2234cb051d6e19ad7b99",
+        "integrity": "sha512-CIzeCG/cX5Fr22REgGPT6MxMhlo+ozgKi/OqCdRnh9/VGu5tl1V2GLJItZ+R1TWURGepRRn++fsfWsXrgdKS9A==",
+        "repeatSha256": "5b0355632cd37b12cbbfe9949052cc8105d839eac98c2234cb051d6e19ad7b99",
+        "reproducible": true,
+        "identicalToRegistry": true,
+        "contentDifferences": []
+      },
+      "closureLock": {
+        "resolved": "https://registry.npmjs.org/@pandamstyle/next/-/next-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-CIzeCG/cX5Fr22REgGPT6MxMhlo+ozgKi/OqCdRnh9/VGu5tl1V2GLJItZ+R1TWURGepRRn++fsfWsXrgdKS9A==",
+        "matchesRegistryTarball": true
+      }
+    },
+    {
+      "name": "@pandamstyle/rsbuild",
+      "version": "0.1.0-alpha.1",
+      "registry": {
+        "tarball": "https://registry.npmjs.org/@pandamstyle/rsbuild/-/rsbuild-0.1.0-alpha.1.tgz",
+        "file": "packages/registry/pandamstyle-rsbuild-0.1.0-alpha.1.tgz",
+        "bytes": 10787,
+        "sha256": "eac893bc0bd32cd71fe07ad7da5eabbbc979400224a1a8e2b844fff549b374f3",
+        "integrity": "sha512-MKKkfv5/sHeUz90ZOqo0PIx2BzpTtEurMMXOXllll3ZjTkpZA5Rl33BMAnDOasE1x3xXbYwK1ikcNKeWwdSd3A==",
+        "shasum": "abf9738166c16f14df3d34af99e3bf01c63fbf62",
+        "registryIntegrity": "sha512-MKKkfv5/sHeUz90ZOqo0PIx2BzpTtEurMMXOXllll3ZjTkpZA5Rl33BMAnDOasE1x3xXbYwK1ikcNKeWwdSd3A==",
+        "registryShasum": "abf9738166c16f14df3d34af99e3bf01c63fbf62",
+        "integrityMatchesRegistry": true
+      },
+      "sourcePack": {
+        "file": "packages/source-pack/pandamstyle-rsbuild-0.1.0-alpha.1.tgz",
+        "bytes": 10787,
+        "sha256": "eac893bc0bd32cd71fe07ad7da5eabbbc979400224a1a8e2b844fff549b374f3",
+        "integrity": "sha512-MKKkfv5/sHeUz90ZOqo0PIx2BzpTtEurMMXOXllll3ZjTkpZA5Rl33BMAnDOasE1x3xXbYwK1ikcNKeWwdSd3A==",
+        "repeatSha256": "eac893bc0bd32cd71fe07ad7da5eabbbc979400224a1a8e2b844fff549b374f3",
+        "reproducible": true,
+        "identicalToRegistry": true,
+        "contentDifferences": []
+      },
+      "closureLock": {
+        "resolved": "https://registry.npmjs.org/@pandamstyle/rsbuild/-/rsbuild-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-MKKkfv5/sHeUz90ZOqo0PIx2BzpTtEurMMXOXllll3ZjTkpZA5Rl33BMAnDOasE1x3xXbYwK1ikcNKeWwdSd3A==",
+        "matchesRegistryTarball": true
+      }
+    }
+  ],
+  "closure": {
+    "path": "closure",
+    "install": "npm ci --offline --ignore-scripts --no-audit --no-fund --cache <store>/npm-cache",
+    "installedTree": {
+      "sha256": "f553ff4daf343f54f3d6e9bed4f5f65ca4cad677637ce2d3752f0d1c0a3b0789",
+      "files": 12508,
+      "bytes": 465785416
+    },
+    "installedPandamstyle": {
+      "sha256": "84dd284f3f1ee232494c83fc4097c7a2b84605266c9dd48b72e5420291d45b73",
+      "files": 57,
+      "bytes": 1582595
+    },
+    "lockedPackages": 174,
+    "hosts": {
+      "vite": "8.3.1",
+      "@vitejs/plugin-react": "6.1.1",
+      "next": "16.3.8",
+      "@rsbuild/core": "2.2.11",
+      "@rspack/core": "2.2.8",
+      "react": "19.3.0",
+      "react-dom": "19.3.0",
+      "typescript": "5.9.3",
+      "playwright-core": "1.60.0",
+      "rolldown": "1.2.14",
+      "@babel/core": "7.29.7"
+    },
+    "hostModes": [
+      "Vite 8.3.1: Rolldown development and production",
+      "Next.js 16.3.8: webpack development and production; Turbopack semantic development and strict production",
+      "Rsbuild 2.2.11 with Rspack 2.2.8: development and production"
+    ],
+    "note": "The published compiler declares caret ranges for its Babel/CSS dependencies; this lockfile freezes the resolution observed when the closure was created. React 19.3.0 follows tools/pms/package-qualification.js; the Vite pilot itself pins React 19.2.0.",
+    "npmCache": {
+      "path": "npm-cache",
+      "tree": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "files": 0,
+        "bytes": 0
+      }
+    }
+  },
+  "node": [
+    {
+      "version": "22.22.0",
+      "role": "measurement runtime; Alpha 1 reference dataset Node version",
+      "file": "node/node-v22.22.0-linux-x64.tar.xz",
+      "sha256": "9aa8e9d2298ab68c600bd6fb86a6c13bce11a4eca1ba9b39d79fa021755d7c37",
+      "shasumsFile": "node/SHASUMS256-v22.22.0.txt",
+      "source": "https://nodejs.org/dist/v22.22.0/node-v22.22.0-linux-x64.tar.xz"
+    },
+    {
+      "version": "22.12.0",
+      "role": "minimum engine qualified by Alpha 1 package qualification",
+      "file": "node/node-v22.12.0-linux-x64.tar.xz",
+      "sha256": "22982235e1b71fa8850f82edd09cdae7e3f32df1764a9ec298c72d25ef2c164f",
+      "shasumsFile": "node/SHASUMS256-v22.12.0.txt",
+      "source": "https://nodejs.org/dist/v22.12.0/node-v22.12.0-linux-x64.tar.xz"
+    },
+    {
+      "version": "24.21.0",
+      "role": "second major qualified by Alpha 1 package qualification",
+      "file": "node/node-v24.21.0-linux-x64.tar.xz",
+      "sha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+      "shasumsFile": "node/SHASUMS256-v24.21.0.txt",
+      "source": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz"
+    }
+  ],
+  "measurementNode": {
+    "version": "22.22.0",
+    "binary": "node/node-v22.22.0-linux-x64/bin/node"
+  },
+  "engines": [
+    {
+      "name": "chromium",
+      "browserVersion": "148.0.7778.96",
+      "revision": "1223",
+      "playwrightCore": "1.60.0",
+      "path": "engines/ms-playwright/chromium-1223",
+      "tree": {
+        "sha256": "f003730ac3932a64321583ffe0347066bca13e596d19f6c45eba38b1226a72ee",
+        "files": 303,
+        "bytes": 393407709
+      }
+    },
+    {
+      "name": "chromium-headless-shell",
+      "browserVersion": "148.0.7778.96",
+      "revision": "1223",
+      "playwrightCore": "1.60.0",
+      "path": "engines/ms-playwright/chromium_headless_shell-1223",
+      "tree": {
+        "sha256": "d8c653b0c7b3160f766a721d74a32a40acbdb835a595577bcefdc307becb60e6",
+        "files": 287,
+        "bytes": 270938012
+      }
+    }
+  ],
+  "unpinnedObserved": [
+    {
+      "what": "/usr/local/bin/chromium (Alpha 1 Next qualification default executable)",
+      "version": "Chromium 155.0.8059.79 snap",
+      "pinned": false
+    },
+    {
+      "what": "/opt/google/chrome/chrome (Alpha 1 Rsbuild qualification default executable)",
+      "version": "Google Chrome 145.0.7632.116",
+      "pinned": false
+    },
+    {
+      "what": "playwright-core used by tools/pilot/run-rsbuild-qualification.js",
+      "version": "1.56.1",
+      "pinned": false
+    }
+  ],
+  "unpinnedNote": "Alpha 1 host qualification scripts launch a system browser unless PMS_CHROMIUM is set. Those executables update outside this repository and are recorded, not pinned. Reproductions must set PMS_CHROMIUM to the archived engine executable.",
+  "fonts": {
+    "fontconfig": "fontconfig version 2.15.0",
+    "resolutions": [
+      {
+        "family": "system-ui",
+        "resolvedFile": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "archived": "fonts/DejaVuSans.ttf",
+        "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+      },
+      {
+        "family": "sans-serif",
+        "resolvedFile": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "archived": "fonts/DejaVuSans.ttf",
+        "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+      },
+      {
+        "family": "Georgia",
+        "resolvedFile": "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        "archived": "fonts/DejaVuSerif.ttf",
+        "sha256": "8f2c103bfa3fd5de71f1b92b18f21906b5a26871fb7e19a9a4c9af539c3cc7ab"
+      },
+      {
+        "family": "serif",
+        "resolvedFile": "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        "archived": "fonts/DejaVuSerif.ttf",
+        "sha256": "8f2c103bfa3fd5de71f1b92b18f21906b5a26871fb7e19a9a4c9af539c3cc7ab"
+      },
+      {
+        "family": "ui-monospace",
+        "resolvedFile": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "archived": "fonts/DejaVuSans.ttf",
+        "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+      },
+      {
+        "family": "monospace",
+        "resolvedFile": "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        "archived": "fonts/DejaVuSansMono.ttf",
+        "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88"
+      }
+    ],
+    "fcListFiles": 100,
+    "fcListSha256": "0d20ba9881e5f208c460eba413eb342b196a1e03c29f9c03789225dfabf9f495"
+  },
+  "assets": {
+    "id": "alpha1-assets",
+    "description": "Repository assets at the baseline commit (no package ships assets).",
+    "commit": "415e05539fcb5d36a78226112b5cf488b200b1aa",
+    "files": 1,
+    "sha256": "9791188332fa3e3f87518be823621919d6220ba5ae1f8940f9fb5f8621dd6849",
+    "entries": [
+      {
+        "path": "assets/pandamstyle-alpha1-banner.webp",
+        "sha256": "5162ad20f672aeabfa2b540d385af51c8e9a23861df05c747c5f82b3615f54db"
+      }
+    ]
+  },
+  "corpora": [
+    {
+      "id": "ce-00.2-proof-corpus",
+      "description": "CE-00.2 proof corpus, calibration and accounting as merged (PR #90).",
+      "commit": "20ce741b8cdd1616560af7cd8be1420024414409",
+      "files": 35,
+      "sha256": "9c8d8ac61adc155c2b7693e5acb0745c3479a126b3c3249c17354e8bcba1f517",
+      "entries": [
+        {
+          "path": "tests/core-evolution/corpus/accounting.v1.json",
+          "sha256": "fa1bcbbe9d57f4a69c38a85e1e6e27c3785dc48c437e33223af66a18dd220b1c"
+        },
+        {
+          "path": "tests/core-evolution/corpus/calibration/README.md",
+          "sha256": "484379c1d57b964a7384528a44f335c4f5678afe33c93244e2e521a6e421b2fa"
+        },
+        {
+          "path": "tests/core-evolution/corpus/calibration/approved-identifiers.v1.json",
+          "sha256": "098b4f6323dd7544700ac4102273d64a2aebf0df167cd7f404e010d6e585ddd4"
+        },
+        {
+          "path": "tests/core-evolution/corpus/calibration/baseline.v1.json",
+          "sha256": "852ddfc35f804bbbbd19d532f8ea64dfad8cf07d8dfca27d0f45e60264f72fc9"
+        },
+        {
+          "path": "tests/core-evolution/corpus/calibration/publication-review.v1.json",
+          "sha256": "69c20cddb8170296a6ca4ab06d4cebf47baab370246eaad4a56869ec3876b3c5"
+        },
+        {
+          "path": "tests/core-evolution/corpus/calibration/w-mockup-1559.declarations.v1.json",
+          "sha256": "a2a6ffa26e06ccd201e9cba545dc85b368448bafa0be067e4f4fe73e66fe8ed2"
+        },
+        {
+          "path": "tests/core-evolution/corpus/calibration/w-util-343.declarations.v1.json",
+          "sha256": "c02fb2739897082d389c57aa41532c01fb4e58de277f634efff808fa6143f3c8"
+        },
+        {
+          "path": "tests/core-evolution/corpus/corpus.v1.json",
+          "sha256": "24976ff49639982ecd7f8b65da1826f58bb129b1dfe761f6f5796657540e9436"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/app-shell/reference.css",
+          "sha256": "49b3ef9339b6be682a74eb13d719f9286556073d601da33cb24ecb17628ed4e2"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/app-shell/reference.html",
+          "sha256": "8595956a713d1252cec74863a8dff1aaad7accd2fd163e90727174dbe0a4fe36"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/component-library/reference.css",
+          "sha256": "aa04d2536e8df46b0851e07351191466a9067c7d359902bcd1748bbe7eefa0b3"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/component-library/reference.html",
+          "sha256": "0fbe22ce67f9e658db2a329e9fa23d1d70cf1b59c8ac3a56cbafc6d5bda86f55"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/content/reference.css",
+          "sha256": "b95615c9f609894ffa3868922b4ae8e0e92df819c17d6a7cda16c7f191ba81b3"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/content/reference.html",
+          "sha256": "22ef62e8923d76cf3158c8abf111622b0998913bc236d09ef4e48a2cfc45e33c"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/data-grid/reference.css",
+          "sha256": "93936bdbd975624b7a233d3d5609457e33eb3863a9c25067096b825418459238"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/data-grid/reference.html",
+          "sha256": "acd705cca3540fea05efab07c1ec2807a0cf58ffc1c01b515276f24a647b1276"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/forms/reference.css",
+          "sha256": "971753a50b3120ad67f5dca472f7b0e1c842838ac33248e541860d3dceeec9d3"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/forms/reference.html",
+          "sha256": "da196ff885606c2252955a529eb846ef8e08a9b36086d45b0d44c11d33176e84"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/interaction-states/reference.css",
+          "sha256": "d8c696727aa30cd09dbff537eb622df82c125a56200fc3afcc0544857eeb7db1"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/interaction-states/reference.html",
+          "sha256": "fb283b411fea7c3226b6d5682892e33d88dc022190c8cdd41471a0c3ad0ba755"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/notices/reference.css",
+          "sha256": "313e942cb93efc57615cf7eb823ef836fe9318ed96a236b22f03fde9233583e0"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/notices/reference.html",
+          "sha256": "6da2325581b2727b39c1a8770dd98e628d62c01d15aae766bdede55e467256be"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/rtl-vertical/reference.css",
+          "sha256": "692a2c7122cfda7ffa0a80326de9f3d93fa806616c1dc9396bc7d8e2eb4ab624"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/rtl-vertical/reference.html",
+          "sha256": "e245eb463e541bbf0c6932c0a159f2f22d3ffe72ae9ab0024f527825a5306e27"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/ssr/reference.css",
+          "sha256": "4af52d1413ac4f9a5fd42b85e8a60755be92b491db6e9309f02e2a3af59c174c"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/ssr/reference.html",
+          "sha256": "997f83f5bf1d416951cb0904ee71374438e63a43c6c095e336ec9b2d2a44e760"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/ssr/route.css",
+          "sha256": "1228ffad62c4bffeb9a865204c35a4df0e32eef0bc84cb9f10055b980e12998a"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/ssr/route.html",
+          "sha256": "aad15933a1a9377c06468b0c974e7517bb6ca58b6f2b5b2c10e686ff32a4d747"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/svg-media/media.svg",
+          "sha256": "7afd018d9e8419be2899213867c560b93ed2349211d18042c24962e0e52dfc50"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/svg-media/reference.css",
+          "sha256": "0a0d13729ae505ab14c9481915500951b9d468733b3b1d845f581f1b0b08f7f6"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/svg-media/reference.html",
+          "sha256": "a34bae99c76f775cbd73b0d7bc18ed8efc5365b8f34f333a9e6b5002a90d415c"
+        },
+        {
+          "path": "tests/core-evolution/corpus/negative/vendor-system.v1.json",
+          "sha256": "2825e55e10b9ee57dba89d72c5cd62e928fe2152f5d322cd8ca09425df069a3b"
+        },
+        {
+          "path": "tests/core-evolution/corpus/oracles.v1.json",
+          "sha256": "83bb25599852116d5e0c19990c5e4819edc4a2b896e02972638fd60b044d03fe"
+        },
+        {
+          "path": "tests/core-evolution/corpus/reference-check.v1.json",
+          "sha256": "839c928928f08c87c76bf9f18669ddb4e59e42714ba9f8f3fadc5543358f2fc0"
+        },
+        {
+          "path": "tests/core-evolution/corpus/scope-findings.v1.json",
+          "sha256": "e5d507683f0539457f21206f4ba6fb37d2e5d497d675f25971863a60cee8e4ad"
+        }
+      ]
+    },
+    {
+      "id": "alpha1-compiler-fixtures",
+      "description": "Alpha 1 compiler and design-system fixtures at the baseline commit.",
+      "commit": "415e05539fcb5d36a78226112b5cf488b200b1aa",
+      "files": 92,
+      "sha256": "d2c0c6fec9c7aff86ec70618f8981e8d3008fc2c2bdfa75fcff41f5609870e5f",
+      "entries": [
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/_shared/design.pms.config.mjs",
+          "sha256": "d5e4c56938fe1081d5492adaac0a2837161c41ab99bfa33fcbf4231e7f5b3674"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-composite-form/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-composite-form/src/page.js",
+          "sha256": "1020ba560416d060c1d26276be90172f437410f6a860ef0ea904b2750b27ab74"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import-local/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import-local/src/lazy.jsx",
+          "sha256": "d0c84747d2445f3aab17d700d11902bb100236719a27dd7205212492e33ab70a"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import-local/src/page.js",
+          "sha256": "5a5383e160e08cee984a9141568e87cfb06563741ecd65065556613f0ae5b8f4"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-dynamic-import/src/page.js",
+          "sha256": "43630b86404312e7679537110b3ff383ffe4b7e22db6da4e0b127f1c4cb79178"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-import/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-import/src/page.js",
+          "sha256": "d8847bae55887ed2eb7a71d303e21c492fea6b1198f0a14c5d2f7f453d7cd8d9"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-value-ts/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-value-ts/src/page.tsx",
+          "sha256": "9134fee283830e8f4d307d7869f2447f450699da1afb3a07eb275f06a1410008"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-value/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-forbidden-value/src/page.js",
+          "sha256": "ecae12be8cf0b405ce594b29cfd3a192e74f7f46dcf1d4d1b9663654478a414c"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-helper-shadowed/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-helper-shadowed/src/page.tsx",
+          "sha256": "22bc585ed1c5df5aadb106dedf18531b1f76829fd0f1471014b54c6f17513ac5"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-invalid-variant/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-invalid-variant/src/page.js",
+          "sha256": "3d5bafc275cede3e6ed2cbbc804efc3f9494a94c5f5efe208555f55ae6d0cca6"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-jsx-spread/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-jsx-spread/src/page.tsx",
+          "sha256": "7fbb59c9980cc7fb36e2ee036ef8bebfaa2659c7553e2d28375dfe12b71103bf"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-non-static/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-non-static/src/page.js",
+          "sha256": "19ac2447982e0f7d4fcc465452120351100b1fd95e0674a0fe9237990c3919bb"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-private-token/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-private-token/src/page.js",
+          "sha256": "191cf3c73e009be3031d164362d29c69254449e3bcb8e082ad4f57883188bab2"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-escaped/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-escaped/src/page.tsx",
+          "sha256": "1dda1a26df78c6cbbe1f806bbc111a50ab1dc793de4dc36138daac6fa7c41061"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-mutated/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-mutated/src/page.tsx",
+          "sha256": "f1cedee0379aa1501bcde9569082757104075c503ca69bf9efdbc1eb5d818482"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-raw-object/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-raw-object/src/page.js",
+          "sha256": "b726ab7c696e4cf747f69e30784ad76758be97676ab8dcfc0b3e733bcfb47a6e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-raw-reference/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-raw-reference/src/page.js",
+          "sha256": "ae6c3aeab0f169e759020dfcdf010bbdd34c822c7cb88d6f491770b3981ab179"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-reassigned/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-reassigned/src/page.tsx",
+          "sha256": "c29aee7d8cf2d34fad4b9e3faf94f4009001e6d3be2da46dd63a12ee54de4103"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-shadowing/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-props-shadowing/src/page.tsx",
+          "sha256": "1e31bdc30e061a10ba4c05cf9b84ab1b07b16e4482df5a1ff9387880144b18ad"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/bridge/a.ts",
+          "sha256": "d1412cdffe3d2a444a669ac8031dd7434cd696de1458689ad47ba33e7d699813"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/bridge/b.ts",
+          "sha256": "128a4cc48fe8bab2908ea135ad0740a6976a1eef8f3a8638d84f62a49ba244d5"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/outside/Unsafe.tsx",
+          "sha256": "152d7d00328a088c5581e42dcc062089a28671ad392e559934c04ebd5aeca1e1"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/outside/theme.css",
+          "sha256": "e4ebf74ef1d511d2689dad2e4a46d2203461295d6f2bef2521ee5559eb68cce7"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-barrel-chain/src/page.tsx",
+          "sha256": "e8bd10f8fa5a543b26505cf9a3f55e3f06ea91fcf8d1c27ce24a0805a65b635e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/bridge/index.ts",
+          "sha256": "ae22506be68fee5fb23eef2c80e761f3e7f843d860bd26f5285291d65ad469a9"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/outside/Unsafe.tsx",
+          "sha256": "152d7d00328a088c5581e42dcc062089a28671ad392e559934c04ebd5aeca1e1"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/outside/theme.css",
+          "sha256": "e4ebf74ef1d511d2689dad2e4a46d2203461295d6f2bef2521ee5559eb68cce7"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-named/src/page.tsx",
+          "sha256": "19a930efc6e97a9bda7896d5bcde38ed2bab4b4b1b165235206e16ba3a0ad652"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/bridge/index.ts",
+          "sha256": "51259f9e693edd9f734fa391e8406205444ab059d7c4775dd72af789466b9fe0"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/outside/Unsafe.tsx",
+          "sha256": "152d7d00328a088c5581e42dcc062089a28671ad392e559934c04ebd5aeca1e1"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/outside/theme.css",
+          "sha256": "e4ebf74ef1d511d2689dad2e4a46d2203461295d6f2bef2521ee5559eb68cce7"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-relay-reexport-star/src/page.tsx",
+          "sha256": "19a930efc6e97a9bda7896d5bcde38ed2bab4b4b1b165235206e16ba3a0ad652"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-reserved-authority/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-reserved-authority/src/page.js",
+          "sha256": "b97a8bb3a2d668e9cb2412427579c820de93152242fa68df4b830bb56de438ae"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-role-violation/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-role-violation/src/page.js",
+          "sha256": "c86e5e1cd5ecc7cdd96b3f9c8f573f005b9cc4cd3e06c2311aa44e3002153a4c"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-style-channel/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-style-channel/src/page.tsx",
+          "sha256": "7d23624f3e641460db492434c388ecbfadc2c6fb3e73a867c20c5a6058596794"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-style-channel/src/theme.css",
+          "sha256": "20261fbb12eeebbee85eb2e63fa566ca4e76e3e4f7681f5ec381114b66845d7a"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/bridge/index.ts",
+          "sha256": "16e69ddd8dfabb7caee6a46c22c4672c909b88f195696325bca836966250ebc0"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/outside/theme.css",
+          "sha256": "e4ebf74ef1d511d2689dad2e4a46d2203461295d6f2bef2521ee5559eb68cce7"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/outside/with-css.js",
+          "sha256": "712568cf9c504efe3b3779e67df5ec6044b70032d177544781c27f0bfe80915a"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-stylesheet-via-relay/src/page.js",
+          "sha256": "551642ba8e7c906c5540164a3bba4670559f47627d6615ddc2833189d72180f5"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-token-category/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-token-category/src/page.js",
+          "sha256": "7e41401036dc5c3d28ec00054f1def84fbccdc0a9920f24870ffec7782aef80c"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unknown-condition/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unknown-condition/src/page.js",
+          "sha256": "917084d89a49d4010ee348a845831fb306879d75633cdbeba3a93dfdc725a1a9"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unknown-token/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unknown-token/src/page.js",
+          "sha256": "65235ca71bdb916e243b0d86098506180156583c489615713f2cdd04a1c9c0d7"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unresolved-import/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unresolved-import/src/page.js",
+          "sha256": "8b3ca5098f7fc196b9b3cbb3a0041e8fb0edc3b92a3ef3bf9dcc1899c62877ec"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unsupported-property/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/neg-unsupported-property/src/page.js",
+          "sha256": "f89de285cd623e0e83301fcf8441f907900ab5be0a73e87ce614da4b13adfcd4"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/phase-15a/recipe.json",
+          "sha256": "b3beafd250d2f91419d0ea24fb6a143813cb5c087696997ea50b1768cd3c97b6"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/phase-15a/type-contract.ts",
+          "sha256": "e30becb43361a0919a2b311a185ac352eb996b0ab4d5bf8b0c3d0343d82f6855"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/safe-forwarded-props/package.json",
+          "sha256": "dbf8353f77358bc12169b7bb7301e1978d5b503e002ee927229a8993672818fc"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/safe-forwarded-props/pandamstyle.config.js",
+          "sha256": "39640b53c3e12a139276ff07443a005d58b46844cb01881d9fe2e5217d40eb8e"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/safe-forwarded-props/src/page.tsx",
+          "sha256": "2bf5cbcb3f337ec4db8659482e2dc5e84a6cacbf8b28597e0bb74a963939d4b6"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/package.json",
+          "sha256": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/pandamstyle.config.js",
+          "sha256": "f616aa222a137ed79f8c27850d23f1dd0c28fb36ab39eb5ec78220de82f1b203"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/barrel.js",
+          "sha256": "7a474fd0f2b3db9514ff076afed585c39733f71a3fdc437025acbc5535da46b4"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/business-data.ts",
+          "sha256": "08a346129e84b26508d7f67c69aa10130689f06b069f385279bce8e1d7390ee0"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/conditional-props.tsx",
+          "sha256": "a9640f2f0b3852865848353baf0b13dd6a915f81cbde7f9fb0c76d86d9fe88a5"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/namespace-import.js",
+          "sha256": "25185dbd82268a8c83e57519102e3663d3b22ed6a28e6c97bb16993253ff1670"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/only-recipe.js",
+          "sha256": "c4cb49706194e35880eaccbc517af33ef6191a283781cf4abe10198faed6d6a5"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/page.js",
+          "sha256": "2d2802799d720ffa72c027c118d64ab01c4e705768787a4045496214f91c88e6"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/page.ts",
+          "sha256": "49572bda2e67d64cfba036998b6db620dea7f853c8933f246d2f70917a741440"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/page.tsx",
+          "sha256": "52cb3c7d1fdc411e545b9983da27eac461ff8846d5392918bdad1198896d3792"
+        },
+        {
+          "path": "packages/compiler/__tests__/pandamstyle/fixtures/valid/src/renamed.js",
+          "sha256": "5d30298d1bd07d84adbb768bb6aa89fb3d824241afa068ddc86ea348332940cb"
+        },
+        {
+          "path": "tests/fixtures/design-systems/conformance.js",
+          "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+        },
+        {
+          "path": "tests/fixtures/phase-15b-patterns/patterns.types.ts",
+          "sha256": "b673c4c6c0ef49936f3b737a471de56f9d220fe5a4cb51d768dc90bbcba7b82f"
+        }
+      ]
+    },
+    {
+      "id": "alpha1-vite-pilot",
+      "description": "Alpha 1 Vite React pilot application at the baseline commit.",
+      "commit": "415e05539fcb5d36a78226112b5cf488b200b1aa",
+      "files": 10,
+      "sha256": "058c8f345b820218f97eb4c25cbd6127632ae5954b8d3e75e030cfb649e2d556",
+      "entries": [
+        {
+          "path": "examples/pilots/vite-react/README.md",
+          "sha256": "8d7fbb6d165ffc6ecb39beda21d7fab50e107ebd29ae46dfe16df6df2da1d256"
+        },
+        {
+          "path": "examples/pilots/vite-react/agentdoc.yaml",
+          "sha256": "a5047ef91944be7fd279b4925fad5fbff8bd62401089dc65b9fc151f81feae6b"
+        },
+        {
+          "path": "examples/pilots/vite-react/design.pandamstyle.config.js",
+          "sha256": "e8989fe07719b5ae111af8215baea296ace15a14c83bbe6cdda484fa701024dc"
+        },
+        {
+          "path": "examples/pilots/vite-react/index.html",
+          "sha256": "0c37a9f744f8d7a82d1943879a95bb88f41eeff18602f7a08525ae3143ca81d9"
+        },
+        {
+          "path": "examples/pilots/vite-react/package.json",
+          "sha256": "38f4666531868c1888c7b8713d0207000f1b4125adc89e3f04bc02fc63be2d62"
+        },
+        {
+          "path": "examples/pilots/vite-react/src/main.jsx",
+          "sha256": "596f366817f016616c039d4032794600d64ec6dddbfd87dbc379bf2c691bceb9"
+        },
+        {
+          "path": "examples/pilots/vite-react/src/pages/App.jsx",
+          "sha256": "c74486c685772032dda19da67af71abb5668b3f98caf3e38c86cee3db3611e1f"
+        },
+        {
+          "path": "examples/pilots/vite-react/src/pages/bridge.js",
+          "sha256": "40d2e51de9bacf9e34bf389933bcee2acddd4c2afe1fb9016ca6a103ba89591f"
+        },
+        {
+          "path": "examples/pilots/vite-react/src/pages/forward.js",
+          "sha256": "d93112904965045aac3457575aa239b36ebb0a39c62d2b92dedf774b0812997a"
+        },
+        {
+          "path": "examples/pilots/vite-react/vite.config.js",
+          "sha256": "d6e9dae3b51f8369602c2cf899cb0ae0ad1c464e71f6d9a3ef8389cba8315192"
+        }
+      ]
+    }
+  ],
+  "reconstruction": [
+    "git clone https://github.com/lbframe/pandam-style && cd pandam-style   # any commit containing this manifest",
+    "node tools/baselines/archive.mjs build --store <empty dir>   # network: npm registry, nodejs.org, Playwright CDN",
+    "node tools/baselines/archive.mjs verify --store <dir> --replay"
+  ],
+  "agReuse": "AG-00.3 runs against the same store: use <store>/closure/node_modules (published 0.1.0-alpha.1 packages and hosts) and <store>/node/node-v22.22.0-linux-x64/bin/node, label results with epoch \"alpha1\", and check `archive.mjs verify` first. CE measurements do not complete the AG multi-model agent-efficiency baseline."
+}
