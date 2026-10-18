@@ -23,11 +23,18 @@ jobs:
 
   pandamstyle:
     runs-on: ubuntu-latest
+    env:
+      # On this runner, `chromium` aborts creating its sandbox under the
+      # AppArmor user-namespace restriction; its Google Chrome runs the same
+      # sandboxed launches.
+      PMS_CHROMIUM: /opt/google/chrome/chrome
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: '22.x'
+          # The package and Next qualifications assert this exact host
+          # runtime beside their pinned 22.12.0 and 24.21.0 consumer lanes.
+          node-version: '22.22.0'
           cache: 'yarn'
           cache-dependency-path: yarn.lock
       - run: corepack prepare yarn@1.22.22 --activate
@@ -63,6 +70,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: crate-ci/typos@v1
+      # Pin the release that reported and verified the inherited findings;
+      # the floating `v1` tag is deprecated.
+      - uses: crate-ci/typos@v1.50.2
         with:
           config: .github/workflows/typos.toml
