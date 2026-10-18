@@ -1704,7 +1704,9 @@
             "compile",
             "replace",
             "delete",
-            "write"
+            "write",
+            "rename",
+            "copy"
           ]
         }
       },
@@ -1811,6 +1813,68 @@
               "source": {
                 "type": "string",
                 "pattern": "^[a-z0-9-]+(/[A-Za-z0-9._-]+)+$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "rename"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "to"
+            ],
+            "properties": {
+              "step": {
+                "const": "rename"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "copy"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "to"
+            ],
+            "properties": {
+              "step": {
+                "const": "copy"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
               }
             }
           }

@@ -59,10 +59,26 @@ not repeated below unless they are the discriminating evidence.
     - `bad-patched-generated-js` (a compiled module under `.pandamstyle/js/`).
     - `bad-renamed-data`, `bad-deleted-page` and `bad-protected-symlink`
       (scope).
+  - Second-review probes:
+    - `bad-function-alias`, `bad-constructor-code`, `bad-ref-computed-style`
+      and `bad-effect-style`: rejected by the dynamic trace and the static
+      analyzable subset.
+    - `bad-hidden-item-text`, `bad-template-item-text` and
+      `bad-hidden-title-text`: concealed text is not presented text.
+    - `bad-spread-style-variable` (compiler).
+    - `bad-generated-delete`, `-rename`, `-add` and
+      `bad-generation-state-tamper`: inventory of record.
+    - `bad-clipped-summary`: clipping is undecidable statically, so the verdict
+      is `unmeasured`, never `pass`.
+  - Good controls: `good-idiomatic-indexing` (array indexing and lookup maps)
+    and `good-regenerated` (complete fresh generation).
   - The same class for behavior is covered by
-    `variants-positive-remove-button`. `remove-click` dispatches a click and
-    requires exactly one `onRemove` call; `bad-no-click-handler` and
-    `bad-calls-during-render` fail.
+    `variants-positive-remove-button`. `remove-click` dispatches a click on
+    the rendered, enabled target and requires exactly one `onRemove` call.
+    - Fail: `bad-no-click-handler`, `bad-calls-during-render`,
+      `bad-unrendered-handler` (handler only on unused JSX) and
+      `bad-disabled-button`.
+    - Pass: `good-arrow-handler` and `good-bubbling-handler`.
 
 ## states: `states-boundary-aria-disabled`
 

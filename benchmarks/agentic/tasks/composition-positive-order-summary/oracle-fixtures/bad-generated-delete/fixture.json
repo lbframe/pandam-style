@@ -1,0 +1,16 @@
+{
+  "description": "Review probe: a compiled module is deleted after a correct build.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "steps": [
+    {
+      "step": "delete",
+      "path": ".pandamstyle/js/src/components/OrderSummary.jsx"
+    }
+  ],
+  "regenerate": "before-steps"
+}

@@ -121,6 +121,12 @@ export function applySteps({ taskEntry, steps, dest, project }) {
       const target = inside(dest, s.path);
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.copyFileSync(path.join(taskEntry.dir, s.source), target);
+    } else if (s.step === 'rename' || s.step === 'copy') {
+      const from = inside(dest, s.path);
+      const to = inside(dest, s.to);
+      fs.mkdirSync(path.dirname(to), { recursive: true });
+      if (s.step === 'rename') fs.renameSync(from, to);
+      else fs.copyFileSync(from, to);
     } else if (s.step === 'replace') {
       const target = inside(dest, s.path);
       const text = fs.readFileSync(target, 'utf8');

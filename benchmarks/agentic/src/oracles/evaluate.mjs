@@ -30,9 +30,13 @@ import {
 } from '../fs-tree.mjs';
 import { compileGlobs, matchesAny } from '../glob.mjs';
 import { computeStyle, parseCss } from '../css-cascade.mjs';
-import { classList, parseHtml, select, textContent } from '../html.mjs';
+import { classList, elements, parseHtml, select } from '../html.mjs';
 import { checkReport, extractReport } from './report.mjs';
-import { loadDefinitionData, parseCalls, runSandbox } from './run-sandbox.mjs';
+import {
+  CODE_GENERATION_ERROR,
+  loadDefinitionData,
+  runSandbox,
+} from './run-sandbox.mjs';
 import { flattenDefinition } from './vocabulary.mjs';
 import {
   countByRule,
@@ -246,82 +250,303 @@ function evaluateStyleExpectation(property, exp, computed, tokenVars) {
   return { status: 'pass' };
 }
 
-// Whether an element would be presented. Structural reasons (template
-// content, hidden, inert, closed details/dialog) are decided from markup;
-// display, visibility and opacity from the static cascade. Anything the
-// cascade cannot decide makes visibility unmeasured, never assumed.
-function visibilityOf(target, observed, context) {
-  for (
-    let node = target;
-    node != null && node.tag !== '#root';
-    node = node.parent
-  ) {
-    if (node.tag === 'template')
-      return { visible: false, reason: 'inside <template> content' };
-    if (Object.hasOwn(node.attributes, 'hidden'))
-      return { visible: false, reason: `hidden attribute on <${node.tag}>` };
-    if (Object.hasOwn(node.attributes, 'inert'))
-      return { visible: false, reason: `inert attribute on <${node.tag}>` };
-    if (node.tag === 'dialog' && !Object.hasOwn(node.attributes, 'open'))
-      return { visible: false, reason: 'inside a closed <dialog>' };
-    if (
-      node.tag === 'details' &&
-      !Object.hasOwn(node.attributes, 'open') &&
-      node !== target
-    ) {
-      let child = target;
-      while (child.parent !== node) child = child.parent;
-      if (child.tag !== 'summary')
-        return { visible: false, reason: 'inside a closed <details>' };
-    }
+// --- Presentation -----------------------------------------------------------
+//
+// An element or text counts as presented only when nothing conceals it.
+// Concealment decided soundly from markup and the static cascade fails the
+// assertion; concealment the static cascade cannot decide (clipping, overflow,
+// positioning, transforms, tiny boxes, filters) makes it `unmeasured`.
+
+const FORM_CONTROLS = new Set([
+  'button',
+  'input',
+  'select',
+  'textarea',
+  'option',
+  'optgroup',
+  'fieldset',
+]);
+const BENIGN_TRANSFORM = /^(none|translate[xy]?\(-?[0-2](\.\d+)?px\))$/;
+const BENIGN_FILTER = /^(none|grayscale\(1\))$/;
+const NAMED_COLORS = {
+  white: [255, 255, 255, 1],
+  black: [0, 0, 0, 1],
+  transparent: [0, 0, 0, 0],
+};
+
+function parseColor(value) {
+  const v = normalizeCssValue(value);
+  if (Object.hasOwn(NAMED_COLORS, v)) return NAMED_COLORS[v];
+  let m = /^#([0-9a-f]{3,8})$/.exec(v);
+  if (m) {
+    let h = m[1];
+    if (h.length === 3 || h.length === 4) h = [...h].map((c) => c + c).join('');
+    if (h.length !== 6 && h.length !== 8) return null;
+    return [0, 2, 4]
+      .map((i) => parseInt(h.slice(i, i + 2), 16))
+      .concat(h.length === 8 ? parseInt(h.slice(6), 16) / 255 : 1);
   }
-  let visibilityDecided = false;
-  for (
-    let node = target;
-    node != null && node.tag !== '#root';
-    node = node.parent
-  ) {
-    const computed = computeStyle(
-      observed.cssRules,
-      elementChain(node),
-      context,
+  m = /^rgba?\((\d+),(\d+),(\d+)(?:,([\d.]+))?\)$/.exec(v);
+  if (m)
+    return [
+      Number(m[1]),
+      Number(m[2]),
+      Number(m[3]),
+      m[4] == null ? 1 : Number(m[4]),
+    ];
+  return null;
+}
+
+function pxValue(value) {
+  const v = normalizeCssValue(value);
+  if (v === '0') return 0;
+  const m = /^(-?[\d.]+)(px|rem|em)$/.exec(v);
+  return m ? Number(m[1]) * (m[2] === 'px' ? 1 : 16) : null;
+}
+
+function styleOf(node, observed, context, cache) {
+  if (!cache.has(node))
+    cache.set(
+      node,
+      computeStyle(observed.cssRules, elementChain(node), context),
     );
-    for (const property of [
-      'display',
-      'opacity',
-      ...(visibilityDecided ? [] : ['visibility']),
-    ]) {
-      if (Object.hasOwn(computed.unmeasuredProperties, property)) {
-        return {
-          visible: null,
-          reason: `${property} on <${node.tag}> is not statically decidable`,
-        };
-      }
-    }
-    const display = computed.properties.display?.resolved;
-    if (display != null && normalizeCssValue(display) === 'none')
-      return { visible: false, reason: `display:none on <${node.tag}>` };
-    const opacity = computed.properties.opacity?.resolved;
-    if (opacity != null && Number(opacity) === 0)
-      return { visible: false, reason: `opacity:0 on <${node.tag}>` };
-    const visibility = computed.properties.visibility?.resolved;
-    if (!visibilityDecided && visibility != null) {
-      visibilityDecided = true;
-      if (['hidden', 'collapse'].includes(normalizeCssValue(visibility)))
-        return {
-          visible: false,
-          reason: `visibility:${visibility} on <${node.tag}>`,
-        };
+  return cache.get(node);
+}
+
+function resolved(computed, property) {
+  return computed.properties[property]?.resolved ?? null;
+}
+
+// Concealment caused by this element alone: { concealed, risk } reasons.
+function ownConcealment(node, computed) {
+  for (const property of [
+    'display',
+    'opacity',
+    'font-size',
+    'clip-path',
+    'clip',
+    'mask',
+    'mask-image',
+    'transform',
+    'filter',
+    'overflow',
+    'position',
+    'width',
+    'height',
+    'max-width',
+    'max-height',
+  ]) {
+    if (Object.hasOwn(computed.unmeasuredProperties, property)) {
+      return {
+        risk: `${property} on <${node.tag}> is not statically decidable`,
+      };
     }
   }
-  return { visible: true };
+  const display = resolved(computed, 'display');
+  if (display != null && normalizeCssValue(display) === 'none')
+    return { concealed: `display:none on <${node.tag}>` };
+  const opacity = resolved(computed, 'opacity');
+  if (opacity != null && Number(opacity) === 0)
+    return { concealed: `opacity:0 on <${node.tag}>` };
+  const fontSize = resolved(computed, 'font-size');
+  if (fontSize != null && pxValue(fontSize) === 0)
+    return { concealed: `font-size:0 on <${node.tag}>` };
+  for (const property of ['clip-path', 'clip', 'mask', 'mask-image']) {
+    if (resolved(computed, property) != null)
+      return {
+        risk: `${property} on <${node.tag}> (clipping is not measured)`,
+      };
+  }
+  const transform = resolved(computed, 'transform');
+  if (transform != null && !BENIGN_TRANSFORM.test(normalizeCssValue(transform)))
+    return { risk: `transform:${transform} on <${node.tag}>` };
+  const filter = resolved(computed, 'filter');
+  if (filter != null && !BENIGN_FILTER.test(normalizeCssValue(filter)))
+    return { risk: `filter:${filter} on <${node.tag}>` };
+  const overflow = resolved(computed, 'overflow');
+  if (overflow != null && normalizeCssValue(overflow) !== 'visible')
+    return {
+      risk: `overflow:${overflow} on <${node.tag}> (overflow clipping is not measured)`,
+    };
+  const position = resolved(computed, 'position');
+  if (
+    position != null &&
+    ['absolute', 'fixed', 'sticky'].includes(normalizeCssValue(position))
+  ) {
+    return {
+      risk: `position:${position} on <${node.tag}> (placement is not measured)`,
+    };
+  }
+  for (const property of ['width', 'height', 'max-width', 'max-height']) {
+    const v = resolved(computed, property);
+    const px = v == null ? null : pxValue(v);
+    if (px != null && px <= 1)
+      return {
+        risk: `${property}:${v} on <${node.tag}> (box size is not measured)`,
+      };
+  }
+  return {};
+}
+
+function structuralConcealment(node, child) {
+  if (node.tag === 'template') return 'inside <template> content';
+  if (Object.hasOwn(node.attributes, 'hidden'))
+    return `hidden attribute on <${node.tag}>`;
+  if (Object.hasOwn(node.attributes, 'inert'))
+    return `inert attribute on <${node.tag}>`;
+  if (node.tag === 'dialog' && !Object.hasOwn(node.attributes, 'open'))
+    return 'inside a closed <dialog>';
+  if (
+    node.tag === 'details' &&
+    !Object.hasOwn(node.attributes, 'open') &&
+    child != null &&
+    child.tag !== 'summary'
+  ) {
+    return 'inside a closed <details>';
+  }
+  return null;
+}
+
+// Nearest declared value of an inherited property along the chain.
+function inherited(chain, property, observed, context, cache) {
+  for (let i = chain.length - 1; i >= 0; i -= 1) {
+    const v = resolved(styleOf(chain[i], observed, context, cache), property);
+    if (v != null) return v;
+  }
+  return null;
+}
+
+function colorConcealment(chain, observed, context, cache) {
+  const color =
+    inherited(chain, 'color', observed, context, cache) ?? '#000000';
+  let background = null;
+  for (let i = chain.length - 1; i >= 0 && background == null; i -= 1) {
+    const v = resolved(
+      styleOf(chain[i], observed, context, cache),
+      'background-color',
+    );
+    const parsed = v == null ? null : parseColor(v);
+    if (v != null && parsed == null)
+      return { risk: `background-color ${v} is not comparable` };
+    if (parsed != null && parsed[3] === 0) continue;
+    if (parsed != null && parsed[3] < 1)
+      return { risk: `translucent background-color ${v}` };
+    if (parsed != null) background = parsed;
+  }
+  background ??= NAMED_COLORS.white;
+  const fg = parseColor(color);
+  if (fg == null) return { risk: `color ${color} is not comparable` };
+  if (fg[3] === 0) return { concealed: 'transparent text color' };
+  if (
+    fg[3] === 1 &&
+    fg[0] === background[0] &&
+    fg[1] === background[1] &&
+    fg[2] === background[2]
+  ) {
+    return { concealed: `text color equals its background (${color})` };
+  }
+  return {};
+}
+
+function ancestorsOf(node) {
+  const chain = [];
+  for (let n = node; n != null && n.tag !== '#root'; n = n.parent)
+    chain.unshift(n);
+  return chain;
+}
+
+/** Whether `target` itself is presented: { visible: true|false|null, reason }. */
+function presentation(target, observed, context, cache) {
+  const chain = ancestorsOf(target);
+  for (let i = 0; i < chain.length; i += 1) {
+    const structural = structuralConcealment(chain[i], chain[i + 1] ?? null);
+    if (structural != null) return { visible: false, reason: structural };
+  }
+  let risk = null;
+  for (const node of chain) {
+    const own = ownConcealment(node, styleOf(node, observed, context, cache));
+    if (own.concealed) return { visible: false, reason: own.concealed };
+    risk ??= own.risk ?? null;
+  }
+  const visibility = inherited(chain, 'visibility', observed, context, cache);
+  if (
+    visibility != null &&
+    ['hidden', 'collapse'].includes(normalizeCssValue(visibility))
+  ) {
+    return { visible: false, reason: `visibility:${visibility}` };
+  }
+  if (observed.positionedRisk != null) risk ??= observed.positionedRisk;
+  return risk == null ? { visible: true } : { visible: null, reason: risk };
+}
+
+/**
+ * Text the user can perceive inside `node`: concealed descendants contribute
+ * nothing; undecidable concealment anywhere in the subtree is reported.
+ */
+function presentedText(
+  node,
+  observed,
+  context,
+  cache,
+  risks,
+  chain = ancestorsOf(node),
+) {
+  let out = '';
+  for (const child of node.children ?? []) {
+    if (child.tag === '#text') {
+      const visibility = inherited(
+        chain,
+        'visibility',
+        observed,
+        context,
+        cache,
+      );
+      const hidden =
+        visibility != null &&
+        ['hidden', 'collapse'].includes(normalizeCssValue(visibility));
+      if (!hidden && child.text.trim() !== '') {
+        const color = colorConcealment(chain, observed, context, cache);
+        if (color.risk) risks.push(color.risk);
+        if (!color.concealed) out += child.text;
+      }
+      continue;
+    }
+    if (
+      structuralConcealment(child, null) != null ||
+      structuralConcealment(node, child) != null
+    )
+      continue;
+    const own = ownConcealment(child, styleOf(child, observed, context, cache));
+    if (own.concealed) continue;
+    if (own.risk) risks.push(own.risk);
+    out +=
+      ' ' +
+      presentedText(child, observed, context, cache, risks, [...chain, child]) +
+      ' ';
+  }
+  return out;
+}
+
+function disabledReason(node) {
+  for (let n = node; n != null && n.tag !== '#root'; n = n.parent) {
+    if (FORM_CONTROLS.has(n.tag) && Object.hasOwn(n.attributes, 'disabled')) {
+      if (n === node || n.tag === 'fieldset') return `disabled <${n.tag}>`;
+    }
+  }
+  return null;
 }
 
 function evaluateRender(check, observed) {
   const rendered = observed.renders?.[check.renderId];
   if (rendered == null) return result('error', 'render was not requested');
-  if (rendered.error != null)
-    return result('fail', `render failed: ${rendered.error}`);
+  const dynamic = rendered.violations ?? [];
+  if (rendered.error != null) {
+    return result(
+      'fail',
+      `render failed: ${rendered.error}`,
+      dynamic.length > 0 ? { dynamic } : null,
+    );
+  }
   let tree;
   try {
     tree = parseHtml(rendered.html);
@@ -335,6 +560,10 @@ function evaluateRender(check, observed) {
   const expect = check.expect ?? {};
   const failures = [];
   const unmeasured = [];
+  if (dynamic.length > 0)
+    failures.push(
+      `runtime DOM/style activity: ${dynamic.slice(0, 5).join('; ')}`,
+    );
   const expectedCount = expect.count ?? 1;
   if (matches.length !== expectedCount) {
     return result(
@@ -343,48 +572,114 @@ function evaluateRender(check, observed) {
     );
   }
   const context = check.context ?? {};
-  if (expect.visible !== false) {
-    for (const match of matches) {
-      const v = visibilityOf(match, observed, context);
-      if (v.visible === false) failures.push(`not presented: ${v.reason}`);
-      if (v.visible === null)
-        unmeasured.push(`visibility unknown: ${v.reason}`);
+  const cache = new Map();
+  // Any positioned element can overlay or displace others; the static
+  // cascade cannot measure that, so presentation becomes unmeasured.
+  let positionedRisk = null;
+  for (const el of elements(tree)) {
+    const position = resolved(
+      styleOf(el, observed, context, cache),
+      'position',
+    );
+    if (
+      position != null &&
+      ['absolute', 'fixed', 'sticky'].includes(normalizeCssValue(position))
+    ) {
+      positionedRisk = `position:${position} on <${el.tag}> in the rendered tree (overlap is not measured)`;
+      break;
     }
   }
+  observed = { ...observed, positionedRisk };
+  if (expect.visible !== false) {
+    for (const match of matches) {
+      const v = presentation(match, observed, context, cache);
+      if (v.visible === false) failures.push(`not presented: ${v.reason}`);
+      if (v.visible === null)
+        unmeasured.push(`presentation unknown: ${v.reason}`);
+    }
+  }
+  const textRisks = [];
+  const textOf = (node) =>
+    presentedText(node, observed, context, cache, textRisks)
+      .replace(/\s+/g, ' ')
+      .trim();
   if (expect.texts != null) {
     if (expect.texts.length !== matches.length)
       failures.push(
         `texts lists ${expect.texts.length} patterns for ${matches.length} matches`,
       );
     matches.forEach((match, i) => {
-      const t = textContent(match).replace(/\s+/g, ' ').trim();
+      const t = textOf(match);
       if (
         expect.texts[i] != null &&
         !new RegExp(expect.texts[i], 'i').test(t)
       ) {
         failures.push(
-          `match ${i} text ${JSON.stringify(t)} does not match /${expect.texts[i]}/i`,
+          `match ${i} presented text ${JSON.stringify(t)} does not match /${expect.texts[i]}/i`,
         );
       }
     });
   }
-  const calls = parseCalls(rendered.calls);
-  for (const outcome of calls.interactions) {
-    if (outcome.outcome !== 'dispatched')
-      failures.push(
-        `${outcome.event} on ${outcome.testId}: ${outcome.outcome}`,
+  // Interactions: the target is the single presented, enabled rendered
+  // element with the test id; only its dispatch counts.
+  const callCounts = {};
+  for (const wanted of check.interactions ?? []) {
+    const observedInteraction = (rendered.interactions ?? []).find(
+      (i) => i.testId === wanted.testId && i.event === wanted.event,
+    );
+    const byNode = new Map(
+      (observedInteraction?.candidates ?? []).map((c) => [c.node, c]),
+    );
+    const nodes = select(tree, { testId: wanted.testId });
+    const eligible = [];
+    const reasons = [];
+    for (const node of nodes) {
+      const v = presentation(node, observed, context, cache);
+      const disabled = disabledReason(node);
+      const pointer = inherited(
+        ancestorsOf(node),
+        'pointer-events',
+        observed,
+        context,
+        cache,
       );
+      if (v.visible === false) reasons.push(v.reason);
+      else if (disabled != null) reasons.push(disabled);
+      else if (pointer != null && normalizeCssValue(pointer) === 'none')
+        reasons.push('pointer-events:none');
+      else {
+        if (v.visible === null)
+          unmeasured.push(
+            `interaction target presentation unknown: ${v.reason}`,
+          );
+        eligible.push(node);
+      }
+    }
+    if (eligible.length !== 1) {
+      failures.push(
+        `${wanted.event} on ${wanted.testId}: ${eligible.length} eligible rendered targets (${nodes.length} rendered${reasons.length ? `; ${reasons.join(', ')}` : ''})`,
+      );
+      continue;
+    }
+    const outcome = byNode.get(eligible[0].attributes['data-pms-node']);
+    if (outcome == null || outcome.outcome !== 'dispatched') {
+      failures.push(
+        `${wanted.event} on ${wanted.testId}: ${outcome?.outcome ?? 'not dispatched'}`,
+      );
+      continue;
+    }
+    for (const [name, n] of Object.entries(outcome.calls ?? {}))
+      callCounts[name] = (callCounts[name] ?? 0) + n;
   }
   for (const [name, exp] of Object.entries(expect.callbacks ?? {})) {
-    const got = calls.spies[name] ?? { inDispatch: 0, outside: 0 };
-    if (got.inDispatch !== exp.calls)
+    const got = callCounts[name] ?? 0;
+    if (got !== exp.calls)
       failures.push(
-        `callback ${name} called ${got.inDispatch} time(s) by the interaction, expected ${exp.calls}`,
+        `callback ${name} called ${got} time(s) by the interaction, expected ${exp.calls}`,
       );
-    if (got.outside !== 0)
-      failures.push(
-        `callback ${name} called ${got.outside} time(s) outside the interaction (during render)`,
-      );
+    const outside = rendered.outside?.[name] ?? 0;
+    if (outside !== 0)
+      failures.push(`callback ${name} called ${outside} time(s) during render`);
   }
   if (expectedCount === 0) {
     return failures.length > 0
@@ -392,17 +687,21 @@ function evaluateRender(check, observed) {
       : result('pass', null, { matched: 0 });
   }
   const target = matches[check.index ?? 0];
-  const text = textContent(target).replace(/\s+/g, ' ').trim();
+  const text = textOf(target);
   if (expect.text != null && text !== expect.text)
-    failures.push(`text is ${JSON.stringify(text)}`);
+    failures.push(`presented text is ${JSON.stringify(text)}`);
   if (
     expect.textMatches != null &&
     !new RegExp(expect.textMatches, 'i').test(text)
   ) {
     failures.push(
-      `text ${JSON.stringify(text)} does not match /${expect.textMatches}/i`,
+      `presented text ${JSON.stringify(text)} does not match /${expect.textMatches}/i`,
     );
   }
+  const assertsText =
+    expect.text != null || expect.textMatches != null || expect.texts != null;
+  if (assertsText)
+    for (const r of textRisks) unmeasured.push(`presented text unknown: ${r}`);
   for (const [name, value] of Object.entries(expect.attributes ?? {})) {
     const has = Object.hasOwn(target.attributes, name);
     if (
@@ -417,7 +716,7 @@ function evaluateRender(check, observed) {
   }
   let computed = null;
   if (expect.styles != null) {
-    computed = computeStyle(observed.cssRules, elementChain(target), context);
+    computed = styleOf(target, observed, context, cache);
     for (const [property, exp] of Object.entries(expect.styles)) {
       const r = evaluateStyleExpectation(
         property,
@@ -432,7 +731,7 @@ function evaluateRender(check, observed) {
   const evidence = {
     classes: classList(target),
     text: text.slice(0, 200),
-    callbacks: Object.keys(calls.spies).length > 0 ? calls.spies : undefined,
+    callbacks: Object.keys(callCounts).length > 0 ? callCounts : undefined,
     styles:
       computed == null
         ? undefined
@@ -445,7 +744,7 @@ function evaluateRender(check, observed) {
   };
   if (failures.length > 0) return result('fail', failures.join('; '), evidence);
   if (unmeasured.length > 0)
-    return result('unmeasured', unmeasured.join('; '), evidence);
+    return result('unmeasured', [...new Set(unmeasured)].join('; '), evidence);
   return result('pass', null, evidence);
 }
 
@@ -496,7 +795,7 @@ function sourceFiles(root, exclude) {
   );
 }
 
-function evaluateForbidden(check, ctx) {
+function evaluateForbidden(check, ctx, observed = {}) {
   const rules = new Set(check.rules);
   const globs = check.files ?? [SOURCE_GLOB];
   const exclude = [
@@ -531,6 +830,21 @@ function evaluateForbidden(check, ctx) {
           lines: after.filter((f) => f.rule === rule).map((f) => f.line),
         });
       }
+    }
+  }
+  // The dynamic trace of every sandboxed render is part of this evidence:
+  // runtime style or DOM activity fails the bypass check even when no static
+  // pattern matched.
+  if (rules.has('runtime-style-injection')) {
+    for (const [id, r] of Object.entries(observed.renders ?? {})) {
+      const dynamic = r.violations ?? [];
+      if (dynamic.length > 0)
+        introduced.push({
+          file: `(dynamic trace ${id})`,
+          rule: 'runtime-style-injection',
+          count: dynamic.length,
+          lines: dynamic.slice(0, 5),
+        });
     }
   }
   return introduced.length > 0
@@ -677,76 +991,105 @@ function readJsonOrNull(file) {
   }
 }
 
-// Every compiler-owned file is compared: the whole output directory
-// (including js/**) and the generation state file next to it. Additions,
-// modifications and deletions are all evidence.
-//   must-match:    the workspace holds exactly the fresh compiler output.
-//   no-hand-edits: each file equals fresh output or its untouched baseline
-//                  version; absence is allowed (not regenerated yet).
+// Generated-output integrity. The generation state file written next to the
+// output directory lists every file of a generation with its digest, so it is
+// the inventory of record:
+//   - nothing generated (no output, no state): "never generated"; allowed in
+//     no-hand-edits mode, a failure in must-match mode;
+//   - output without state, state without output, or any file missing,
+//     added, renamed or modified relative to the state: "incomplete or
+//     altered generation" in every mode;
+//   - otherwise the generation itself must be the fresh compiler generation
+//     (must-match) or either the fresh one or the untouched baseline one
+//     (no-hand-edits), compared on every path-independent file.
+function generationDigests(state) {
+  const out = {};
+  for (const [rel, entry] of Object.entries(state?.files ?? {})) {
+    if (!PATH_DEPENDENT_GENERATED.has(rel)) out[rel] = entry?.digest ?? null;
+  }
+  return out;
+}
+
+function sameGeneration(a, b) {
+  const ka = Object.keys(a).sort();
+  const kb = Object.keys(b).sort();
+  return (
+    ka.length === kb.length && ka.every((k, i) => k === kb[i] && a[k] === b[k])
+  );
+}
+
 function evaluateGenerated(check, ctx, observed) {
   const outDir = ctx.project.outDir.replace(/^\.\//, '').replace(/\/$/, '');
-  const ws = inventory(path.join(ctx.workspaceDir, outDir));
-  const base = inventory(path.join(ctx.baselineDir, outDir));
-  const fresh = observed.compile?.ok
-    ? inventory(path.join(ctx.scratchWorkspace, outDir))
-    : null;
   const statePath = stateFileFor(outDir);
+  const ws = inventory(path.join(ctx.workspaceDir, outDir));
+  const wsStateExists = fs.existsSync(path.join(ctx.workspaceDir, statePath));
   const wsState = readJsonOrNull(path.join(ctx.workspaceDir, statePath));
+  const baseState = readJsonOrNull(path.join(ctx.baselineDir, statePath));
+  const freshState = observed.compile?.ok
+    ? readJsonOrNull(path.join(ctx.scratchWorkspace, statePath))
+    : null;
+  if (Object.keys(ws).length === 0 && !wsStateExists) {
+    return check.mode === 'must-match'
+      ? result(
+          'fail',
+          'never generated: no compiler output and no generation state',
+        )
+      : result('pass', null, { note: 'never generated' });
+  }
   const problems = [];
-  if (fresh == null) {
-    if (check.mode === 'must-match')
-      return result(
-        'blocked',
-        'fresh compilation failed; generated output cannot be compared',
-      );
-    const touched = Object.keys(ws).filter((rel) => ws[rel] !== base[rel]);
-    return touched.length === 0
-      ? result('pass', null, {
-          note: 'fresh compilation failed; generated output is untouched since the baseline',
-        })
-      : result(
+  if (wsState == null)
+    problems.push(
+      wsStateExists
+        ? `${statePath} is not a generation state`
+        : `incomplete generation: output exists without ${statePath}`,
+    );
+  else {
+    const listed = wsState.files ?? {};
+    for (const rel of Object.keys(listed)) {
+      if (ws[rel] == null)
+        problems.push(`missing ${rel} (listed by the generation)`);
+      else if (listed[rel]?.digest !== ws[rel])
+        problems.push(`modified ${rel}`);
+    }
+    for (const rel of Object.keys(ws))
+      if (!Object.hasOwn(listed, rel)) problems.push(`unexpected file ${rel}`);
+    const buildReport = path.join(
+      ctx.workspaceDir,
+      outDir,
+      'build-report.json',
+    );
+    if (
+      ws['build-report.json'] != null &&
+      readJsonOrNull(buildReport)?.documentKind !== 'pandamstyle-build-report'
+    ) {
+      problems.push('build-report.json is not a build report');
+    }
+  }
+  if (problems.length === 0) {
+    const current = generationDigests(wsState);
+    const isFresh =
+      freshState != null &&
+      sameGeneration(current, generationDigests(freshState));
+    const isBaseline =
+      baseState != null &&
+      sameGeneration(current, generationDigests(baseState));
+    if (check.mode === 'must-match') {
+      if (freshState == null)
+        return result(
           'blocked',
-          `fresh compilation failed and generated files changed: ${touched.join(', ')}`,
+          'fresh compilation failed; generated output cannot be compared',
         );
-  }
-  for (const [rel, digest] of Object.entries(ws)) {
-    if (PATH_DEPENDENT_GENERATED.has(rel)) {
-      if (digest === base[rel]) continue;
-      const listed = wsState?.files?.[rel]?.digest;
-      const doc = readJsonOrNull(path.join(ctx.workspaceDir, outDir, rel));
-      if (
-        listed !== digest ||
-        doc?.documentKind !== 'pandamstyle-build-report'
-      ) {
-        problems.push(
-          `${rel} is not the report of the generation recorded in ${statePath}`,
+      if (!isFresh)
+        problems.push('the generation is not the fresh compiler generation');
+    } else if (!isFresh && !isBaseline) {
+      if (freshState == null && baseState == null)
+        return result(
+          'blocked',
+          'fresh compilation failed and there is no baseline generation to compare',
         );
-      }
-      continue;
-    }
-    const matchesFresh = fresh[rel] === digest;
-    const untouched = base[rel] === digest;
-    if (matchesFresh || (check.mode !== 'must-match' && untouched)) continue;
-    if (fresh[rel] == null && base[rel] == null)
-      problems.push(`unexpected file ${rel}`);
-    else problems.push(`modified ${rel}`);
-  }
-  if (check.mode === 'must-match') {
-    for (const rel of Object.keys(fresh)) {
-      if (!PATH_DEPENDENT_GENERATED.has(rel) && ws[rel] == null)
-        problems.push(`missing ${rel}`);
-    }
-    if (wsState == null) problems.push(`missing ${statePath}`);
-  }
-  if (wsState != null) {
-    for (const [rel, entry] of Object.entries(wsState.files ?? {})) {
-      if (
-        ws[rel] != null &&
-        entry?.digest !== ws[rel] &&
-        !(check.mode !== 'must-match' && base[rel] === ws[rel])
-      ) {
-        problems.push(`${statePath} disagrees with ${rel}`);
-      }
+      problems.push(
+        'the generation matches neither fresh compiler output nor the untouched baseline',
+      );
     }
   }
   return problems.length > 0
@@ -938,21 +1281,70 @@ function observeProject({
   if (worker.error != null) return { ...observed, error: worker.error };
   Object.assign(observed, worker);
   if (!worker.compile?.ok) return observed;
+  observed.tokenVars = {};
+  observed.themeClasses = {};
+  const probe = worker.probe;
+  if (probe?.url != null) {
+    const out = runSandbox(
+      {
+        mode: 'probe',
+        workspaceDir: ctx.scratchWorkspace,
+        overrides: { [probe.url]: probe.javascript },
+        probeUrl: probe.url,
+      },
+      { timeoutMs: (options.renderTimeoutSeconds ?? 60) * 1000 },
+    );
+    if (!out.ok)
+      return { ...observed, error: `vocabulary probe failed: ${out.error}` };
+    const classes = JSON.parse(out.payload);
+    observed.themeClasses = classes.themeClasses ?? {};
+    const rules = parseCss(probe.css ?? '');
+    probe.accepted.forEach((t, i) => {
+      const own = String(classes.tokenClasses?.[`t${i}`] ?? '').split(/\s+/);
+      let variable = null;
+      for (const rule of rules) {
+        for (const selector of rule.selectors) {
+          const cls = selector.parts?.find((p) => p.type === 'class')?.name;
+          const v = /^var\((--[\w-]+)\)$/.exec(
+            rule.declarations[0]?.value ?? '',
+          );
+          if (cls != null && own.includes(cls) && v) variable = v[1];
+        }
+      }
+      observed.tokenVars[t] = variable;
+    });
+  }
+  for (const t of probe?.rejected ?? []) observed.tokenVars[t] = null;
+  delete observed.probe;
   for (const r of renders.values()) {
     const out = runSandbox(
       {
         mode: 'render',
         workspaceDir: ctx.scratchWorkspace,
         overrides: worker.overrides,
-        themeClasses: worker.themeClasses,
+        themeClasses: observed.themeClasses,
         render: r.render,
         interactions: r.interactions,
       },
       { timeoutMs: (options.renderTimeoutSeconds ?? 60) * 1000 },
     );
-    observed.renders[r.id] = out.ok
-      ? { html: out.payload, calls: out.calls }
-      : { error: out.error };
+    if (out.ok) {
+      try {
+        observed.renders[r.id] = JSON.parse(out.payload);
+      } catch (error) {
+        observed.renders[r.id] = {
+          error: `sandbox payload is not JSON: ${error.message}`,
+          violations: [],
+        };
+      }
+    } else {
+      observed.renders[r.id] = {
+        error: out.error,
+        violations: CODE_GENERATION_ERROR.test(out.error)
+          ? ['code generation from strings']
+          : [],
+      };
+    }
   }
   delete observed.overrides;
   return observed;
@@ -1122,7 +1514,7 @@ export async function evaluateTask({
             );
             break;
           case 'static.forbidden':
-            r = evaluateForbidden(check, ctx);
+            r = evaluateForbidden(check, ctx, observed);
             break;
           case 'static.host-config':
             r = evaluateHostConfig(check, ctx);

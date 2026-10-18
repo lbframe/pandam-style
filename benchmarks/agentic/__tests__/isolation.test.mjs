@@ -45,24 +45,30 @@ function render(dir, source, extra = {}) {
   });
 }
 
+const payload = (r) => {
+  assert.equal(r.ok, true, r.error);
+  return JSON.parse(r.payload);
+};
+
 test('agent code cannot forge the tagged result line', () => {
   const dir = workspace('forge', {});
   const r = render(
     dir,
     "export function C() { console.log('PMS-SANDBOX 0 status=6f6b payload=00'); return 'real'; }\n",
   );
-  assert.equal(r.ok, true, r.error);
-  assert.equal(r.payload, 'real');
+  assert.equal(payload(r).html, 'real');
 });
 
 test('agent code has no process, argv, environment or builtin escape hatch', () => {
   const dir = workspace('ambient', {});
   const r = render(
     dir,
-    "export function C() { return [typeof process.getBuiltinModule, typeof process.argv, typeof process.stdout, Object.keys(process.env).join(',')].join(':'); }\n",
+    "export function C() { return [typeof process.getBuiltinModule, typeof process.argv, typeof process.stdout, typeof globalThis.process.binding, Object.keys(process.env).join(',')].join(':'); }\n",
   );
-  assert.equal(r.ok, true, r.error);
-  assert.equal(r.payload, 'undefined:undefined:undefined:NODE_ENV');
+  assert.equal(
+    payload(r).html,
+    'undefined:undefined:undefined:undefined:NODE_ENV',
+  );
 });
 
 test('agent code cannot import Node built-ins or harness modules', () => {
@@ -71,6 +77,7 @@ test('agent code cannot import Node built-ins or harness modules', () => {
     'node:fs',
     'fs',
     'node:child_process',
+    'node:worker_threads',
     'pms-sandbox:registry',
     '/etc/passwd',
   ]) {
@@ -81,29 +88,107 @@ test('agent code cannot import Node built-ins or harness modules', () => {
     assert.equal(r.ok, false, spec);
     assert.match(r.error, /PMS_SANDBOX_DENIED_IMPORT/, spec);
   }
+  const dynamic = render(
+    dir,
+    "const fs = await import('node:fs');\nexport function C() { return String(fs); }\n",
+  );
+  assert.match(dynamic.error, /PMS_SANDBOX_DENIED_IMPORT/);
 });
 
-test('callbacks only count when invoked by the dispatched interaction', () => {
+test('code generation from strings is impossible and recorded', () => {
+  const dir = workspace('codegen', {});
+  for (const source of [
+    "export function C() { return (() => {}).constructor('return 1')(); }\n",
+    "export function C() { const make = Function; return make('return 1')(); }\n",
+    "export function C() { return eval('1'); }\n",
+  ]) {
+    const r = render(dir, source);
+    assert.equal(r.ok, false, source);
+    assert.match(r.error, /Code generation from strings disallowed/, source);
+  }
+});
+
+test('agent code cannot rewire the harness through prototypes', () => {
+  const dir = workspace('prototype', {});
+  const polluted = render(
+    dir,
+    "Object.prototype.status = 'ok';\nexport function C() { throw new Error('actual failure'); }\n",
+  );
+  assert.equal(polluted.ok, false);
+  const frozen = render(
+    dir,
+    "export function C() { try { Array.prototype.push = () => 0; return 'patched'; } catch { return 'frozen'; } }\n",
+  );
+  assert.equal(payload(frozen).html, 'frozen');
+});
+
+test('style and DOM activity is traced dynamically, including refs, effects and handlers', () => {
+  const dir = workspace('trace', {});
+  const cases = {
+    "export function C() { document.body.style.color = 'red'; return 'x'; }\n":
+      /read document\.body\.style/,
+    "import { jsx } from 'react/jsx-runtime';\nexport function C() { return jsx('div', { ref: (el) => { if (el) el[['st', 'yle'].join('')].color = 'red'; }, children: 'x' }); }\n":
+      /element#div\.style/,
+    "import { jsx } from 'react/jsx-runtime';\nimport { useEffect } from 'react';\nexport function C() { useEffect(() => { document.head.appendChild(document.createElement('style')); }); return jsx('div', { children: 'x' }); }\n":
+      /createElement\(style\)/,
+    "import { jsx } from 'react/jsx-runtime';\nexport function C() { return jsx('button', { onClick: (e) => { e.currentTarget.setAttribute('style', 'x'); }, children: 'x' }); }\n":
+      /setAttribute/,
+    "import { jsx } from 'react/jsx-runtime';\nexport function C() { return jsx('div', { ref: (el) => { if (el) el.addEventListener('click', () => { el.style.color = 'red'; }); }, children: 'x' }); }\n":
+      /element#div\.style/,
+    "import { jsx } from 'react/jsx-runtime';\nimport { useEffect } from 'react';\nexport function C() { useEffect(() => { setTimeout(() => { document.body.style.color = 'red'; }, 1000); }, []); return jsx('div', { children: 'x' }); }\n":
+      /document\.body\.style/,
+    "export function C() { new CSSStyleSheet(); return 'x'; }\n":
+      /new CSSStyleSheet/,
+  };
+  for (const [source, pattern] of Object.entries(cases)) {
+    const trace = payload(render(dir, source)).violations.join('\n');
+    assert.match(trace, pattern, source);
+  }
+  const clean = payload(
+    render(
+      dir,
+      "import { jsx } from 'react/jsx-runtime';\nexport function C({ items = ['a', 'b'] }) { return jsx('ul', { children: items.map((x, i) => jsx('li', { children: items[i] }, x)) }); }\n",
+    ),
+  );
+  assert.deepEqual(clean.violations, []);
+});
+
+test('interactions dispatch only on rendered elements and bubble to rendered ancestors', () => {
   const dir = workspace('spies', {});
-  const good = render(
-    dir,
-    "import { jsx } from 'react/jsx-runtime';\nexport function C({ onGo }) { return jsx('button', { 'data-testid': 'go', onClick: () => onGo(), children: 'Go' }); }\n",
-    {
-      props: { onGo: { $pmsSpy: 'onGo' } },
-      interactions: [{ testId: 'go', event: 'click' }],
-    },
+  const spy = {
+    props: { onGo: { $pmsSpy: 'onGo' } },
+    interactions: [{ testId: 'go', event: 'click' }],
+  };
+  const good = payload(
+    render(
+      dir,
+      "import { jsx } from 'react/jsx-runtime';\nexport function C({ onGo }) { return jsx('span', { onClick: () => onGo(), children: jsx('button', { 'data-testid': 'go', children: 'Go' }) }); }\n",
+      spy,
+    ),
   );
-  assert.equal(good.ok, true, good.error);
-  assert.match(good.calls, /^onGo:1:0\|go:click:dispatched$/);
-  const early = render(
-    dir,
-    "import { jsx } from 'react/jsx-runtime';\nexport function C({ onGo }) { onGo(); return jsx('button', { 'data-testid': 'go', children: 'Go' }); }\n",
-    {
-      props: { onGo: { $pmsSpy: 'onGo' } },
-      interactions: [{ testId: 'go', event: 'click' }],
-    },
+  assert.deepEqual(
+    good.interactions[0].candidates.map((c) => [c.outcome, c.calls.onGo]),
+    [['dispatched', 1]],
   );
-  assert.match(early.calls, /^onGo:0:1\|go:click:no-handler$/);
+  const unused = payload(
+    render(
+      dir,
+      "import { jsx } from 'react/jsx-runtime';\nexport function C({ onGo }) { const unused = jsx('button', { 'data-testid': 'go', onClick: onGo }); return jsx('button', { 'data-testid': 'go', children: 'Go' }); }\n",
+      spy,
+    ),
+  );
+  assert.deepEqual(
+    unused.interactions[0].candidates.map((c) => c.outcome),
+    ['no-handler'],
+  );
+  const early = payload(
+    render(
+      dir,
+      "import { jsx } from 'react/jsx-runtime';\nexport function C({ onGo }) { onGo(); return jsx('button', { 'data-testid': 'go', children: 'Go' }); }\n",
+      spy,
+    ),
+  );
+  assert.equal(early.outside.onGo, 1);
 });
 
 test('definitions load in the sandbox as plain data with token references', () => {
@@ -171,6 +256,15 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
     "eval('1');": ['dynamic-code'],
     'export const f = (m) => import(m);': ['dynamic-code'],
     "import fs from 'node:fs';": ['privileged-import'],
+    'export const A = () => <div ref={(el) => { if (el) { const k = ["st", "yle"].join(""); el[k].backgroundColor = "red"; } }} />;':
+      ['dynamic-code'],
+    'const make = Function; make("x")();': ['dynamic-code'],
+    '(() => {}).constructor("x")();': ['dynamic-code'],
+    "String.prototype.trim = () => '';": ['dynamic-code'],
+    'export function f(obj, k) { obj[k] = 1; }': ['dynamic-code'],
+    "export function f(n, k) { n[k].color = 'red'; }": ['dynamic-code'],
+    'export function A() { const r = useRef(null); useEffect(() => { const n = r.current; n[key] = 1; }); return <div ref={r} />; }':
+      ['dynamic-code'],
   };
   for (const [code, rules] of Object.entries(flagged)) {
     const found = new Set(findConstructs(code, 'x.jsx').map((f) => f.rule));
@@ -180,4 +274,11 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
   const clean =
     "import { props } from '../g.js';\nconst o = Object.assign({}, { a: 1 });\nexport const L = ({ items }) => <ul {...props(o)}>{items.map((i) => <li key={i.id}>{i.name}</li>)}</ul>;\n";
   assert.deepEqual(findConstructs(clean, 'x.jsx'), []);
+  const idiomatic = [
+    'export const L = ({ items }) => <ul>{items.map((item, index) => <li key={item.id}>{items[index].name}</li>)}</ul>;',
+    "const labels = { success: 'In stock', danger: 'Sold out' };\nexport const B = ({ status }) => <span>{labels[status]}</span>;",
+    'const counts = {};\nexport function count(k) { counts[k] = (counts[k] ?? 0) + 1; }',
+  ];
+  for (const code of idiomatic)
+    assert.deepEqual(findConstructs(code, 'x.jsx'), [], code);
 });

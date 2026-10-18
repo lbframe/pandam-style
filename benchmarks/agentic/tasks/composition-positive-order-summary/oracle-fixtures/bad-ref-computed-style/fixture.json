@@ -1,0 +1,9 @@
+{
+  "description": "Review probe: a ref callback writes el[[\"st\",\"yle\"].join(\"\")]; the sandbox exercises the ref against an instrumented element.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-card": "fail"
+  }
+}

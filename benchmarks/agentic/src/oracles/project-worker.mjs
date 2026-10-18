@@ -14,12 +14,11 @@
 // definition arrives as data produced by the sandbox (sandbox.mjs); token
 // references are re-minted with the trusted compiler's own `token()`.
 // Application modules are only compiled here, never executed: rendering
-// happens in the sandbox. The only modules it executes are compiler output
-// (the generated design module) and the harness's own vocabulary probe.
+// happens in the sandbox. Nothing derived from agent input is executed here:
+// the vocabulary probe is compiled here and run in the sandbox.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { register } from 'node:module';
 import { pathToFileURL } from 'node:url';
 
 const SOURCE = /\.(jsx?|tsx?|mjs)$/;
@@ -304,37 +303,15 @@ async function main() {
       request.tokenProbes ?? [],
       manifest.themes ?? [],
     );
-    if (probe.probeUrl != null) {
-      // Only the harness probe (compiled by the trusted compiler) and the
-      // generated design module it imports are executed here.
-      register(new URL('./loader-hooks.mjs', import.meta.url), {
-        data: {
-          overrides: { [probe.probeUrl]: probe.probeJs },
-          workspaceUrl: pathToFileURL(ws + path.sep).href,
-        },
-      });
-      const mod = await import(probe.probeUrl);
-      response.themeClasses = { ...mod.themeClasses };
-      const { parseCss } = await import('../css-cascade.mjs');
-      const rules = parseCss(probe.probeCss);
-      probe.accepted.forEach((t, i) => {
-        const classes = mod.tokenClasses[`t${i}`].split(/\s+/);
-        let variable = null;
-        for (const rule of rules) {
-          for (const selector of rule.selectors) {
-            const cls = selector.parts?.find((p) => p.type === 'class')?.name;
-            if (cls != null && classes.includes(cls)) {
-              const v = /^var\((--[\w-]+)\)$/.exec(
-                rule.declarations[0]?.value ?? '',
-              );
-              if (v) variable = v[1];
-            }
-          }
-        }
-        response.tokenVars[t] = variable;
-      });
-    }
-    for (const t of probe.rejected ?? []) response.tokenVars[t] = null;
+    // The probe is compiled here but executed by the parent in the sandbox:
+    // this process never runs code derived from agent input.
+    response.probe = {
+      url: probe.probeUrl,
+      javascript: probe.probeJs ?? null,
+      css: probe.probeCss ?? null,
+      accepted: probe.accepted ?? [],
+      rejected: probe.rejected ?? [],
+    };
   }
   fs.writeFileSync(responsePath, JSON.stringify(response));
 }

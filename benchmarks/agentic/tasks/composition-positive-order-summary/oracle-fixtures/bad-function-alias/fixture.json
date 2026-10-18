@@ -1,0 +1,9 @@
+{
+  "description": "Review probe: `const make = Function; make(src)()` mutates document.body.style.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-card": "fail"
+  }
+}

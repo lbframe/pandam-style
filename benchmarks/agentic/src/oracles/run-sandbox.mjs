@@ -13,10 +13,10 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-const SANDBOX = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'sandbox.mjs',
-);
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const SANDBOX = path.join(HERE, 'sandbox.mjs');
+// The sandbox's own (trusted) HTML parser, imported before agent code runs.
+const HTML_PARSER = path.join(HERE, '../html.mjs');
 
 /** Nearest node_modules directory the workspace resolves packages from. */
 export function resolveNodeModules(fromDir) {
@@ -37,7 +37,7 @@ export function resolveNodeModules(fromDir) {
  * are readable because module format detection walks up to them.
  */
 export function sandboxReadPaths(workspaceDir) {
-  const paths = new Set([fs.realpathSync(workspaceDir), SANDBOX]);
+  const paths = new Set([fs.realpathSync(workspaceDir), SANDBOX, HTML_PARSER]);
   const nodeModules = resolveNodeModules(workspaceDir);
   if (nodeModules != null) {
     const real = fs.realpathSync(nodeModules);
@@ -84,6 +84,9 @@ export function runSandbox(request, { timeoutMs = 60000 } = {}) {
   const nonce = crypto.randomBytes(24).toString('hex');
   const args = [
     '--permission',
+    // Agent code can never construct code from strings (eval, Function and
+    // its aliases or `.constructor` forms); attempts surface as EvalError.
+    '--disallow-code-generation-from-strings',
     ...sandboxReadPaths(request.workspaceDir).map(
       (p) => `--allow-fs-read=${p}`,
     ),
@@ -117,26 +120,10 @@ export function runSandbox(request, { timeoutMs = 60000 } = {}) {
   }
   if (fields.status !== 'ok')
     return { ok: false, error: fields.error || 'sandbox error' };
-  return { ok: true, payload: fields.payload, calls: fields.calls };
+  return { ok: true, payload: fields.payload };
 }
 
-/** Parses the `calls` field of a render result. */
-export function parseCalls(text) {
-  const [spyPart = '', outcomePart = ''] = (text ?? '').split('|');
-  const spies = {};
-  for (const item of spyPart.split(';').filter(Boolean)) {
-    const [name, inDispatch, outside] = item.split(':');
-    spies[name] = { inDispatch: Number(inDispatch), outside: Number(outside) };
-  }
-  const interactions = outcomePart
-    .split(';')
-    .filter(Boolean)
-    .map((item) => {
-      const [testId, event, outcome] = item.split(':');
-      return { testId, event, outcome };
-    });
-  return { spies, interactions };
-}
+export const CODE_GENERATION_ERROR = /Code generation from strings disallowed/;
 
 /** Loads a definition module in the sandbox and returns its data. */
 export function loadDefinitionData(workspaceDir, definition) {

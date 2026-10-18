@@ -21,9 +21,19 @@
 //
 // The output is data the agent's code produced (markup, a definition, callback
 // counts). The parent treats it as untrusted input and validates it.
+//
+// Render mode also records a dynamic trace. Code generation from strings is
+// disabled by the parent (`--disallow-code-generation-from-strings`); an
+// instrumented fake DOM (`document`, `window`, CSSOM constructors) records any
+// style-channel access, DOM write or insertion; and after rendering, every
+// rendered element's ref, every effect and every event handler is exercised
+// against instrumented elements so that code paths SSR does not run are
+// observed too. Intrinsics the harness relies on are frozen before agent code
+// loads, so agent code cannot rewire the harness's own logic.
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { parseHtml, elements } from '../html.mjs';
 import { createRequire, isBuiltin, registerHooks } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -54,7 +64,7 @@ function encode(text) {
 
 function emit(fields) {
   let line = 'PMS-SANDBOX ' + nonce;
-  for (const key of ['status', 'payload', 'error', 'calls']) {
+  for (const key of ['status', 'payload', 'error']) {
     line += ' ' + key + '=' + encode(fields[key] ?? '');
   }
   writeSync(1, line + '\n');
@@ -102,25 +112,42 @@ const reactExportNames =
         (k) => /^[A-Za-z_$][\w$]*$/.test(k) && k !== 'default',
       );
 
+// Host elements created through JSX get a `data-pms-node` id, so the markup
+// identifies exactly which created elements were rendered. Handlers and refs
+// are looked up by that id: unused JSX never counts.
 const REGISTRY_SOURCE = `
-const byTestId = new Map();
-export function record(type, props) {
-  if (typeof type === 'string' && props != null && typeof props['data-testid'] === 'string') byTestId.set(props['data-testid'], props);
+let next = 1;
+const nodes = new Map();
+const effects = [];
+export function mark(type, props) {
+  if (typeof type !== 'string' || props == null || typeof props !== 'object') return props;
+  const id = String(next++);
+  nodes.set(id, props);
+  return { ...props, 'data-pms-node': id };
 }
-export function propsFor(testId) { return byTestId.get(testId) ?? null; }
+export function nodeProps(id) { return nodes.get(id) ?? null; }
+export function recordEffect(kind, fn) { effects.push({ kind, fn }); }
+export function takeEffects() { return effects.slice(); }
 `;
 const JSX_SHIM_SOURCE = `
-import * as real from ${JSON.stringify(jsxRuntimeUrl ?? '')};
-import { record } from 'pms-sandbox:registry';
+import real from ${JSON.stringify(jsxRuntimeUrl ?? '')};
+import { mark } from 'pms-sandbox:registry';
 export const Fragment = real.Fragment;
-export function jsx(type, props, key) { record(type, props); return real.jsx(type, props, key); }
-export function jsxs(type, props, key) { record(type, props); return real.jsxs(type, props, key); }
-export function jsxDEV(type, props, key) { record(type, props); return real.jsx(type, props, key); }
+export function jsx(type, props, key) { return real.jsx(type, mark(type, props), key); }
+export function jsxs(type, props, key) { return real.jsxs(type, mark(type, props), key); }
+export function jsxDEV(type, props, key) { return real.jsx(type, mark(type, props), key); }
 `;
 const REACT_SHIM_SOURCE = `
 import real from ${JSON.stringify(reactUrl ?? '')};
-import { record } from 'pms-sandbox:registry';
-const wrapped = { ...real, createElement(type, props, ...children) { record(type, props); return real.createElement(type, props, ...children); } };
+import { mark, recordEffect } from 'pms-sandbox:registry';
+const effect = (kind, hook) => (fn, deps) => { recordEffect(kind, fn); return hook(fn, deps); };
+const wrapped = {
+  ...real,
+  createElement(type, props, ...children) { return real.createElement(type, mark(type, props ?? {}), ...children); },
+  useEffect: effect('effect', real.useEffect),
+  useLayoutEffect: effect('layout', real.useLayoutEffect),
+  useInsertionEffect: effect('insertion', real.useInsertionEffect),
+};
 export default wrapped;
 ${reactExportNames.map((n) => `export const ${n} = wrapped[${JSON.stringify(n)}];`).join('\n')}
 `;
@@ -207,7 +234,155 @@ registerHooks({
   },
 });
 
-// Remove ambient authority before any agent code is evaluated.
+// --- Dynamic trace ---------------------------------------------------------
+
+const violations = [];
+// Callbacks agent code hands to the DOM or to timers. They never run during
+// SSR; the exercise phase runs them so their effects are observed.
+const deferred = [];
+const defer = (fn) => {
+  if (deferred.length < 500) deferred[deferred.length] = fn;
+};
+const violation = (text) => {
+  if (violations.length < 100) violations[violations.length] = text;
+};
+// Reading these yields a style or markup channel; touching them is a violation.
+const STYLE_PROPS = new Set([
+  'style',
+  'cssText',
+  'styleSheets',
+  'adoptedStyleSheets',
+  'sheet',
+  'cssRules',
+  'attributeStyleMap',
+  'innerHTML',
+  'outerHTML',
+  'className',
+  'classList',
+  'attributes',
+]);
+// Calls that mutate the document, attributes or style sheets.
+const MUTATING_CALLS = new Set([
+  'setAttribute',
+  'setAttributeNS',
+  'setAttributeNode',
+  'toggleAttribute',
+  'removeAttribute',
+  'insertRule',
+  'deleteRule',
+  'addRule',
+  'replace',
+  'replaceSync',
+  'setProperty',
+  'removeProperty',
+  'appendChild',
+  'append',
+  'prepend',
+  'insertBefore',
+  'replaceChild',
+  'replaceWith',
+  'after',
+  'before',
+  'insertAdjacentElement',
+  'insertAdjacentHTML',
+  'insertAdjacentText',
+  'replaceChildren',
+  'write',
+  'writeln',
+  'animate',
+  'attachShadow',
+  'importNode',
+  'adoptNode',
+  'execCommand',
+  'add',
+  'toggle',
+]);
+const EMPTY_ITERATOR = function* emptyIterator() {};
+
+// A recording stand-in for any DOM object. Reads return further stand-ins,
+// so agent code can navigate freely; what it does is recorded, not executed.
+function fakeNode(label) {
+  const target = function fake() {};
+  return new Proxy(target, {
+    get(t, prop) {
+      if (typeof prop === 'symbol') {
+        if (prop === Symbol.toPrimitive) return () => '';
+        if (prop === Symbol.iterator) return EMPTY_ITERATOR;
+        return undefined;
+      }
+      if (prop === 'then') return undefined;
+      if (prop === 'toString' || prop === 'valueOf') return () => '';
+      if (STYLE_PROPS.has(prop)) violation(`read ${label}.${prop}`);
+      return fakeNode(`${label}.${prop}`);
+    },
+    set(t, prop) {
+      violation(`write ${label}.${String(prop)}`);
+      return true;
+    },
+    defineProperty(t, prop) {
+      violation(`define ${label}.${String(prop)}`);
+      return true;
+    },
+    deleteProperty(t, prop) {
+      violation(`delete ${label}.${String(prop)}`);
+      return true;
+    },
+    apply(t, thisArg, args) {
+      const name = label.slice(label.lastIndexOf('.') + 1);
+      if (MUTATING_CALLS.has(name)) violation(`call ${label}()`);
+      if (
+        (name === 'createElement' || name === 'createElementNS') &&
+        (typeof args[args.length - 1] !== 'string' ||
+          /^(style|link)$/i.test(args[args.length - 1]))
+      ) {
+        violation(
+          `call ${label}(${typeof args[args.length - 1] === 'string' ? args[args.length - 1] : 'non-literal'})`,
+        );
+      }
+      for (const arg of args) if (typeof arg === 'function') defer(arg);
+      return fakeNode(`${label}()`);
+    },
+    construct() {
+      violation(`new ${label}`);
+      return fakeNode(`new ${label}`);
+    },
+  });
+}
+
+const DOM_GLOBALS = [
+  'document',
+  'window',
+  'self',
+  'top',
+  'frames',
+  'parent',
+  'navigator',
+  'location',
+  'localStorage',
+  'sessionStorage',
+  'CSSStyleSheet',
+  'CSS',
+  'StyleSheet',
+  'CSSStyleDeclaration',
+  'HTMLElement',
+  'Element',
+  'Node',
+  'MutationObserver',
+  'getComputedStyle',
+  'requestAnimationFrame',
+];
+if (request.mode === 'render') {
+  for (const name of DOM_GLOBALS) {
+    Object.defineProperty(globalThis, name, {
+      value: fakeNode(name),
+      writable: false,
+      configurable: false,
+    });
+  }
+}
+
+// --- Remove ambient authority and freeze what the harness relies on ----------
+
 const NOOP = () => undefined;
 Object.defineProperty(globalThis, 'process', {
   value: Object.freeze({ env: Object.freeze({ NODE_ENV: 'production' }) }),
@@ -226,6 +401,92 @@ Object.defineProperty(globalThis, 'console', {
   writable: false,
   configurable: false,
 });
+const EvalErrorRef = EvalError;
+const setTimeoutRef = setTimeout;
+if (request.mode === 'render') {
+  for (const name of [
+    'setTimeout',
+    'setInterval',
+    'setImmediate',
+    'requestIdleCallback',
+  ]) {
+    Object.defineProperty(globalThis, name, {
+      value: (fn) => {
+        if (typeof fn === 'function') defer(fn);
+        return 0;
+      },
+      writable: false,
+      configurable: false,
+    });
+  }
+}
+const iteratorPrototypes = [
+  Object.getPrototypeOf([][Symbol.iterator]()),
+  Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]())),
+  Object.getPrototypeOf(new Map()[Symbol.iterator]()),
+  Object.getPrototypeOf(new Set()[Symbol.iterator]()),
+  Object.getPrototypeOf(''[Symbol.iterator]()),
+  Object.getPrototypeOf(/x/[Symbol.matchAll]('x')),
+];
+for (const intrinsic of [
+  Object,
+  Object.prototype,
+  Array,
+  Array.prototype,
+  Function.prototype,
+  String,
+  String.prototype,
+  Number.prototype,
+  Boolean.prototype,
+  Symbol,
+  Symbol.prototype,
+  RegExp,
+  RegExp.prototype,
+  Map,
+  Map.prototype,
+  Set,
+  Set.prototype,
+  WeakMap.prototype,
+  WeakSet.prototype,
+  Promise,
+  Promise.prototype,
+  JSON,
+  Reflect,
+  Math,
+  Proxy,
+  ...iteratorPrototypes,
+]) {
+  Object.freeze(intrinsic);
+}
+for (const name of [
+  'Object',
+  'Array',
+  'Function',
+  'String',
+  'Number',
+  'Boolean',
+  'Symbol',
+  'RegExp',
+  'Map',
+  'Set',
+  'WeakMap',
+  'WeakSet',
+  'Promise',
+  'JSON',
+  'Reflect',
+  'Math',
+  'Proxy',
+  'Error',
+  'EvalError',
+  'TypeError',
+  'URL',
+]) {
+  Object.defineProperty(globalThis, name, {
+    value: globalThis[name],
+    writable: false,
+    configurable: false,
+  });
+}
 
 const TOKEN_REF = Symbol.for('pandamstyle.tokenRef');
 
@@ -304,14 +565,15 @@ async function runDefinition() {
 }
 
 async function runRender() {
-  const { propsFor } = await import('pms-sandbox:registry');
-  const spies = {};
-  let dispatching = false;
+  const { nodeProps, takeEffects } = await import('pms-sandbox:registry');
+  const outside = {};
+  let mode = 'render';
+  let attribution = null;
   const spyFor = (name) => {
-    spies[name] ??= { inDispatch: 0, outside: 0 };
+    outside[name] ??= 0;
     return function spy() {
-      if (dispatching) spies[name].inDispatch += 1;
-      else spies[name].outside += 1;
+      if (mode === 'dispatch') attribution[name] = (attribution[name] ?? 0) + 1;
+      else if (mode === 'render') outside[name] += 1;
     };
   };
   const withSpies = (value) => {
@@ -324,63 +586,173 @@ async function runRender() {
     }
     return value;
   };
+  const isCodeGeneration = (error) => error instanceof EvalErrorRef;
   const r = request.render;
   const url = pathToFileURL(path.resolve(workspaceDir, r.module)).href;
   if (!overrides.has(url))
     throw new Error(`PMS_ORACLE_UNCOVERED_MODULE: ${r.module}`);
-  const mod = await import(url);
-  const Component = mod[r.export ?? 'default'];
-  if (typeof Component !== 'function')
-    throw new Error(
-      `PMS_ORACLE_MISSING_EXPORT: ${r.module}#${r.export ?? 'default'}`,
-    );
-  let element = createElement(Component, withSpies(r.props ?? {}));
-  if (r.theme != null) {
-    const className = request.themeClasses?.[r.theme];
-    if (className == null)
-      throw new Error(`PMS_ORACLE_UNKNOWN_THEME: ${r.theme}`);
-    element = createElement(
-      'div',
-      { className, 'data-pms-oracle-theme': r.theme },
-      element,
-    );
+  let html;
+  try {
+    const mod = await import(url);
+    const Component = mod[r.export ?? 'default'];
+    if (typeof Component !== 'function')
+      throw new Error(
+        `PMS_ORACLE_MISSING_EXPORT: ${r.module}#${r.export ?? 'default'}`,
+      );
+    let element = createElement(Component, withSpies(r.props ?? {}));
+    if (r.theme != null) {
+      const className = request.themeClasses?.[r.theme];
+      if (className == null)
+        throw new Error(`PMS_ORACLE_UNKNOWN_THEME: ${r.theme}`);
+      element = createElement(
+        'div',
+        { className, 'data-pms-oracle-theme': r.theme },
+        element,
+      );
+    }
+    html = renderToStaticMarkup(element);
+  } catch (error) {
+    if (isCodeGeneration(error))
+      violation('code generation from strings during render');
+    throw error;
   }
-  const html = renderToStaticMarkup(element);
-  const outcomes = [];
+  const tree = parseHtml(html);
+  const rendered = elements(tree).filter(
+    (el) => typeof el.attributes['data-pms-node'] === 'string',
+  );
+  const event = (type, node) => ({
+    type,
+    defaultPrevented: false,
+    propagationStopped: false,
+    preventDefault() {
+      this.defaultPrevented = true;
+    },
+    stopPropagation() {
+      this.propagationStopped = true;
+    },
+    persist: NOOP,
+    target: fakeNode(`element#${node.attributes['data-testid'] ?? node.tag}`),
+    currentTarget: fakeNode(
+      `element#${node.attributes['data-testid'] ?? node.tag}`,
+    ),
+    nativeEvent: fakeNode('nativeEvent'),
+  });
+  // Dispatch on the rendered element and bubble through its rendered
+  // ancestors, as the browser would. Eligibility (disabled, inert, hidden,
+  // pointer-events) is decided by the parent, which owns the cascade.
+  const interactions = [];
   for (const interaction of request.interactions ?? []) {
-    const props = propsFor(interaction.testId);
     const handlerName = `on${interaction.event[0].toUpperCase()}${interaction.event.slice(1)}`;
-    const handler = props?.[handlerName];
-    if (typeof handler !== 'function') {
-      outcomes.push(`${interaction.testId}:${interaction.event}:no-handler`);
-      continue;
+    const candidates = [];
+    for (const node of rendered) {
+      if (node.attributes['data-testid'] !== interaction.testId) continue;
+      const calls = {};
+      let outcome = 'no-handler';
+      const e = event(interaction.event, node);
+      mode = 'dispatch';
+      attribution = calls;
+      try {
+        for (
+          let current = node;
+          current != null && current.tag !== '#root';
+          current = current.parent
+        ) {
+          const props = nodeProps(current.attributes?.['data-pms-node']);
+          const handler = props?.[handlerName];
+          if (typeof handler === 'function') {
+            outcome = 'dispatched';
+            handler(e);
+            if (e.propagationStopped) break;
+          }
+        }
+      } catch (error) {
+        outcome = isCodeGeneration(error) ? 'code-generation' : 'threw';
+        if (isCodeGeneration(error))
+          violation('code generation from strings in a handler');
+      } finally {
+        mode = 'exercise';
+        attribution = null;
+      }
+      candidates[candidates.length] = {
+        node: node.attributes['data-pms-node'],
+        outcome,
+        calls,
+      };
     }
-    const event = {
-      type: interaction.event,
-      defaultPrevented: false,
-      preventDefault() {
-        this.defaultPrevented = true;
-      },
-      stopPropagation: NOOP,
-      persist: NOOP,
-      currentTarget: { value: '' },
-      target: { value: '' },
+    interactions[interactions.length] = {
+      testId: interaction.testId,
+      event: interaction.event,
+      candidates,
     };
-    dispatching = true;
+  }
+  mode = 'exercise';
+  // Exercise code SSR never runs: refs, effects and every handler of every
+  // rendered element, against recording stand-ins.
+  const run = (label, fn) => {
     try {
-      handler(event);
-      outcomes.push(`${interaction.testId}:${interaction.event}:dispatched`);
-    } catch {
-      outcomes.push(`${interaction.testId}:${interaction.event}:threw`);
-    } finally {
-      dispatching = false;
+      const result = fn();
+      if (result != null && typeof result.then === 'function')
+        result.then(NOOP, NOOP);
+      return result;
+    } catch (error) {
+      if (isCodeGeneration(error))
+        violation(`code generation from strings in ${label}`);
+      return undefined;
+    }
+  };
+  for (const node of rendered) {
+    const props = nodeProps(node.attributes['data-pms-node']);
+    const ref = props?.ref;
+    const fake = fakeNode(
+      `element#${node.attributes['data-testid'] ?? node.tag}`,
+    );
+    if (typeof ref === 'function') {
+      const cleanup = run('a ref callback', () => ref(fake));
+      if (typeof cleanup === 'function') run('a ref cleanup', cleanup);
+      else run('a ref callback', () => ref(null));
+    } else if (ref != null && typeof ref === 'object') {
+      run('a ref object', () => {
+        ref.current = fake;
+      });
     }
   }
-  let calls = '';
-  for (const name of Object.keys(spies)) {
-    calls += `${calls ? ';' : ''}${name}:${'' + spies[name].inDispatch}:${'' + spies[name].outside}`;
+  for (const { kind, fn } of takeEffects()) {
+    const cleanup = run(`a ${kind} effect`, fn);
+    if (typeof cleanup === 'function') run(`a ${kind} effect cleanup`, cleanup);
   }
-  return { payload: html, calls: `${calls}|${outcomes.join(';')}` };
+  for (const node of rendered) {
+    const props = nodeProps(node.attributes['data-pms-node']);
+    for (const key of Object.keys(props ?? {})) {
+      if (/^on[A-Z]/.test(key) && typeof props[key] === 'function')
+        run(`handler ${key}`, () =>
+          props[key](event(key.slice(2).toLowerCase(), node)),
+        );
+    }
+  }
+  // Run callbacks deferred to timers or DOM APIs (they may defer more) and
+  // let asynchronous continuations settle, in bounded rounds.
+  let next = 0;
+  for (let round = 0; round < 5; round += 1) {
+    for (; next < deferred.length; next += 1) {
+      const fn = deferred[next];
+      run('a deferred callback', () => fn(fakeNode('event')));
+    }
+    await new Promise((resolve) => setTimeoutRef(resolve, 0));
+  }
+  return { payload: serialize({ html, interactions, outside, violations }) };
+}
+
+// Evaluates the harness's vocabulary probe (compiled by the trusted compiler)
+// here rather than in the trusted worker: it executes generated code.
+async function runProbe() {
+  const mod = await import(request.probeUrl);
+  return serialize(
+    toData(
+      { themeClasses: mod.themeClasses, tokenClasses: mod.tokenClasses },
+      'probe',
+      new Set(),
+    ),
+  );
 }
 
 async function main() {
@@ -388,7 +760,9 @@ async function main() {
     if (request.mode === 'definition')
       emit({ status: 'ok', payload: await runDefinition() });
     else if (request.mode === 'render')
-      emit({ status: 'ok', ...(await runRender()) });
+      emit({ status: 'ok', payload: (await runRender()).payload });
+    else if (request.mode === 'probe')
+      emit({ status: 'ok', payload: await runProbe() });
     else emit({ status: 'error', error: `unknown mode ${request.mode}` });
   } catch (error) {
     let message = 'unknown error';

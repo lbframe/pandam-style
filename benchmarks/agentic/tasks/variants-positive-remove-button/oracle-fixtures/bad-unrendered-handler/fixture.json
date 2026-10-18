@@ -1,0 +1,9 @@
+{
+  "description": "Review probe: an unused, never-rendered button with the same test id carries the handler; the rendered one has none.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "remove-click": "fail",
+    "remove-default": "pass"
+  }
+}

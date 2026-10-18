@@ -1,0 +1,18 @@
+{
+  "description": "The generation state file is altered after a correct build.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "steps": [
+    {
+      "step": "replace",
+      "path": "..pandamstyle.pms-state.json",
+      "find": "\"files\"",
+      "replace": "\"filez\""
+    }
+  ],
+  "regenerate": "before-steps"
+}

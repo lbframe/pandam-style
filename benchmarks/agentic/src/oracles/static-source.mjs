@@ -215,6 +215,191 @@ function walkWithParent(node, visit, parent = null, key = null) {
   }
 }
 
+// --- Analyzable subset ------------------------------------------------------
+//
+// Code outside the subset the analysis can decide fails `dynamic-code`, never
+// passes: string-built code (eval, Function and any alias, `.constructor`),
+// prototype mutation, `with`, calls through computed members or call results,
+// computed writes on values not provably plain data, and computed reads on
+// values that may be DOM nodes. Computed reads on ordinary data (array
+// indexing, lookup maps) stay inside the subset.
+
+const DOM_PROPERTIES = new Set([
+  'current',
+  'target',
+  'currentTarget',
+  'srcElement',
+  'relatedTarget',
+  'nativeEvent',
+  'parentNode',
+  'parentElement',
+  'firstChild',
+  'lastChild',
+  'firstElementChild',
+  'lastElementChild',
+  'nextSibling',
+  'previousSibling',
+  'nextElementSibling',
+  'previousElementSibling',
+  'children',
+  'childNodes',
+  'ownerDocument',
+  'documentElement',
+  'body',
+  'head',
+  'defaultView',
+  'view',
+  'shadowRoot',
+  'style',
+  'sheet',
+  'frameElement',
+]);
+const DOM_QUERIES = new Set([
+  'querySelector',
+  'querySelectorAll',
+  'getElementById',
+  'getElementsByClassName',
+  'getElementsByTagName',
+  'getElementsByName',
+  'closest',
+  'item',
+  'elementFromPoint',
+  'elementsFromPoint',
+  'cloneNode',
+  'getRootNode',
+  'getComputedStyle',
+  'useRef',
+  'createRef',
+]);
+const PLAIN_CONSTRUCTORS = new Set([
+  'Map',
+  'Set',
+  'Array',
+  'Object',
+  'WeakMap',
+  'WeakSet',
+]);
+
+function isPlainDataInit(init) {
+  if (init == null) return false;
+  if (init.type === 'ObjectExpression' || init.type === 'ArrayExpression')
+    return true;
+  if (
+    init.type === 'NewExpression' &&
+    PLAIN_CONSTRUCTORS.has(init.callee?.name)
+  )
+    return true;
+  if (init.type === 'CallExpression') {
+    const callee = init.callee;
+    const owner = callee?.object?.name;
+    const name = propertyName(callee);
+    if (
+      owner === 'Object' &&
+      ['freeze', 'fromEntries', 'assign'].includes(name)
+    )
+      return name !== 'assign' || isPlainDataInit(init.arguments?.[0]);
+    if (owner === 'Array' && name === 'from') return true;
+  }
+  return false;
+}
+
+function collectBindings(program) {
+  const plain = new Set();
+  const declarators = [];
+  const domParams = new Set();
+  walkWithParent(program, (node) => {
+    if (node.type === 'VariableDeclarator') {
+      declarators.push(node);
+      if (node.id.type === 'Identifier' && isPlainDataInit(node.init))
+        plain.add(node.id.name);
+    }
+    if (node.type === 'JSXAttribute') {
+      const name = node.name?.name;
+      const fn = node.value?.expression;
+      if (
+        (name === 'ref' || /^on[A-Z]/.test(name ?? '')) &&
+        fn != null &&
+        (fn.type === 'ArrowFunctionExpression' ||
+          fn.type === 'FunctionExpression')
+      ) {
+        for (const param of fn.params)
+          walkWithParent(
+            param,
+            (p) => p.type === 'Identifier' && domParams.add(p.name),
+          );
+      }
+    }
+  });
+  const tainted = new Set(domParams);
+  const isTainted = (expr) => {
+    if (expr == null) return false;
+    if (expr.type === 'Identifier')
+      return tainted.has(expr.name) || DOM_GLOBALS.has(expr.name);
+    if (
+      expr.type === 'MemberExpression' ||
+      expr.type === 'OptionalMemberExpression'
+    ) {
+      const name = propertyName(expr);
+      return (
+        (name != null && DOM_PROPERTIES.has(name)) || isTainted(expr.object)
+      );
+    }
+    if (
+      expr.type === 'CallExpression' ||
+      expr.type === 'OptionalCallExpression'
+    ) {
+      const name = propertyName(expr.callee) ?? expr.callee?.name;
+      return (
+        (name != null && DOM_QUERIES.has(name)) ||
+        isTainted(expr.callee?.object)
+      );
+    }
+    if (
+      expr.type === 'LogicalExpression' ||
+      expr.type === 'ConditionalExpression'
+    ) {
+      return (
+        isTainted(expr.left ?? expr.consequent) ||
+        isTainted(expr.right ?? expr.alternate)
+      );
+    }
+    if (
+      expr.type === 'TSAsExpression' ||
+      expr.type === 'TSNonNullExpression' ||
+      expr.type === 'TypeCastExpression'
+    )
+      return isTainted(expr.expression);
+    return false;
+  };
+  const namesIn = (pattern) => {
+    const names = [];
+    walkWithParent(
+      pattern,
+      (p) => p.type === 'Identifier' && names.push(p.name),
+    );
+    return names;
+  };
+  let size = -1;
+  while (tainted.size !== size) {
+    size = tainted.size;
+    for (const d of declarators) {
+      if (isTainted(d.init))
+        for (const name of namesIn(d.id)) tainted.add(name);
+    }
+  }
+  return { plain, isTainted };
+}
+
+function isNonConstantComputed(node) {
+  return (
+    (node?.type === 'MemberExpression' ||
+      node?.type === 'OptionalMemberExpression') &&
+    node.computed &&
+    constantKey(node.property) == null &&
+    node.property?.type !== 'NumericLiteral'
+  );
+}
+
 /**
  * Returns `[{ rule, line, detail }]` for one file. Rules fail closed: a
  * construct that could mutate styles and cannot be proven harmless statically
@@ -260,7 +445,85 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
       add('generated-internal-import', node, source);
     if (isBuiltin(source)) add('privileged-import', node, source);
   };
+  const bindings = collectBindings(ast.program);
+  const writeTarget = (target, node, how) => {
+    if (
+      target?.type === 'MemberExpression' ||
+      target?.type === 'OptionalMemberExpression'
+    ) {
+      if (
+        propertyName(target.object) === 'prototype' ||
+        propertyName(target) === 'prototype' ||
+        propertyName(target) === '__proto__'
+      ) {
+        add('dynamic-code', node, `prototype mutation (${how})`);
+      }
+      for (
+        let link = target.object;
+        link?.type === 'MemberExpression' ||
+        link?.type === 'OptionalMemberExpression';
+        link = link.object
+      ) {
+        if (
+          isNonConstantComputed(link) &&
+          !(
+            link.object?.type === 'Identifier' &&
+            bindings.plain.has(link.object.name)
+          )
+        ) {
+          add('dynamic-code', node, `${how} through a computed member chain`);
+          break;
+        }
+      }
+      if (isNonConstantComputed(target)) {
+        const owner = target.object;
+        const provablyPlain =
+          owner?.type === 'Identifier' && bindings.plain.has(owner.name);
+        if (!provablyPlain)
+          add(
+            'dynamic-code',
+            node,
+            `computed ${how} on a value not provably plain data`,
+          );
+      }
+    }
+  };
   walkWithParent(ast.program, (node, parent, key) => {
+    if (node.type === 'WithStatement')
+      add('dynamic-code', node, 'with statement');
+    if (node.type === 'UpdateExpression')
+      writeTarget(node.argument, node, 'update');
+    if (node.type === 'UnaryExpression' && node.operator === 'delete')
+      writeTarget(node.argument, node, 'delete');
+    if (
+      node.type === 'CallExpression' ||
+      node.type === 'OptionalCallExpression' ||
+      node.type === 'NewExpression'
+    ) {
+      const callee = node.callee;
+      if (
+        callee?.type === 'CallExpression' ||
+        callee?.type === 'OptionalCallExpression'
+      )
+        add('dynamic-code', node, 'call of a call result');
+      if (isNonConstantComputed(callee))
+        add('dynamic-code', node, 'call through a computed member');
+    }
+    if (
+      (node.type === 'MemberExpression' ||
+        node.type === 'OptionalMemberExpression') &&
+      !(parent?.type === 'AssignmentExpression' && key === 'left')
+    ) {
+      const name = propertyName(node);
+      if (name === 'constructor' || name === '__proto__')
+        add('dynamic-code', node, `.${name} access`);
+      if (isNonConstantComputed(node) && bindings.isTainted(node.object))
+        add(
+          'dynamic-code',
+          node,
+          'computed access on a value that may be a DOM node',
+        );
+    }
     switch (node.type) {
       case 'JSXAttribute': {
         const name = node.name?.name;
@@ -425,6 +688,13 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
       }
       case 'AssignmentExpression': {
         const target = node.left;
+        writeTarget(target, node, 'write');
+        if (isNonConstantComputed(target) && bindings.isTainted(target.object))
+          add(
+            'dynamic-code',
+            node,
+            'computed write on a value that may be a DOM node',
+          );
         if (propertyName(target) === 'className')
           add('raw-classname', node, 'className assignment');
         break;
@@ -438,6 +708,8 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
         break;
       case 'Identifier':
         if (isReference(node, parent, key)) {
+          if (node.name === 'Function' || node.name === 'eval')
+            add('dynamic-code', node, `${node.name} reference`);
           if (DOM_GLOBALS.has(node.name))
             add('dom-global-access', node, node.name);
           if (STYLE_GLOBALS.has(node.name))

@@ -1,0 +1,9 @@
+{
+  "description": "Review probe: `(() => {}).constructor(src)()` builds code from a string.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-card": "fail"
+  }
+}

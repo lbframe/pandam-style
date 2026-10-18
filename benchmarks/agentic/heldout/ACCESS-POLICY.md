@@ -48,6 +48,13 @@ the 16 tasks listed in [`MANIFEST.json`](MANIFEST.json).
 | --- | --- | --- | --- |
 | 2026-10-18 | `pre-freeze-revision` | Independent review of AG-00.1 (PR #88) found oracle classes that asserted structure but not content or behavior, a too-narrow generated-integrity check and missing static bypass rules. The held-out set had not been consumed (no baseline, no feature work), so its author applied the same fixes. | Corpus 1.1.0: content assertions, the extended static rule set and generated-integrity checks were added to the affected held-out tasks. The set was re-sealed and verified by a seal-verification round trip, and the plaintext was deleted. |
 
+Other custody events:
+
+- 2026-10-18, corpus 1.2.0 (second independent review): no unseal and no
+  revision. Held-out task content was unchanged: the oracle fixes needed no
+  task change. Only the manifest's `corpusVersion` was updated; the archive,
+  its digest and every task digest are unchanged.
+
 ## Rotation and changes
 
 Any change to held-out content requires a new corpus version, a new manifest

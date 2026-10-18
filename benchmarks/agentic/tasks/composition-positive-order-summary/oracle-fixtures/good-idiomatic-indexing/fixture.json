@@ -1,0 +1,10 @@
+{
+  "description": "Array indexing and lookup maps in render (including a write to a module-level plain object) stay inside the analyzable subset.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "no-bypass": "pass",
+    "summary-items": "pass",
+    "mounted-on-page": "pass"
+  }
+}

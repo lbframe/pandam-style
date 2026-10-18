@@ -9,10 +9,10 @@ no product behavior depends on it.
 
 Status:
 
-- **Present:** corpus `1.1.0`, reference epoch `alpha1`. It has 47 development
+- **Present:** corpus `1.2.0`, reference epoch `alpha1`. It has 47 development
   tasks and 16 held-out tasks (encrypted in the repository; see
   [held-out policy](heldout/ACCESS-POLICY.md)), 8 project shapes on 5 hosts, the
-  oracles, and 115 development oracle fixtures (known-good and known-bad
+  oracles, and 134 development oracle fixtures (known-good and known-bad
   solutions, including the independent review's probes).
 - **Not present:** the runner, the provider adapters, the frozen baseline and the
   thresholds. Those are AG-00.2 (#6) and AG-00.3 (#7). No LLM run has been
@@ -174,74 +174,132 @@ Further rules make content and behavior part of the evidence, not just
 structure:
 
 - An application task needs at least one required render check asserting
-  rendered content (`text`, `textMatches` or `texts`).
-- A render check matching several elements must assert each element's content
-  (`texts`).
-- Every matched element must be presented. Markup inside `<template>`, under
-  `hidden` or `inert`, in a closed `<dialog>` or `<details>`, or with
-  `display:none`, `visibility:hidden` or `opacity:0` anywhere on its ancestor
-  chain fails. Visibility the static cascade cannot decide is `unmeasured`.
-- Requested interactions are invoked, not inferred. A render prop written
-  `{"$pmsSpy": "onRemove"}` becomes a spy, `interactions` dispatch the event
-  to the handler recorded for a test id, and `expect.callbacks` counts calls
-  made during the dispatch. Calls made during render always fail.
-- Generated integrity covers the whole compiler-owned inventory: every file of
-  the output directory, including `js/**`, plus the generation state file. It
-  catches additions, modifications and deletions. Path-dependent reports are
-  verified against the generation's own digest list. A task whose generated
-  directory is harness-ignored must carry a `generated.consistent` check.
-- Static bypass rules fail closed:
-  - **Covered:** style objects (member access, destructuring, constant-folded
-    computed keys), CSSOM and `adoptedStyleSheets`, `insertRule`,
-    `setProperty`/`cssText`, `createElement('style'|'link')`, JSX `<style>` and
-    `<link>`, `setAttribute('style'|'class')`.
-  - **Undecidable mutation targets:** `Object.assign`, `defineProperty` and
-    `Reflect` on non-literal targets.
-  - **Other rules:** DOM globals (`dom-global-access`), `eval` and non-literal
-    imports (`dynamic-code`), and Node built-ins or `process` (`privileged-import`).
-  - Constructs present in the baseline are not attributed to the agent.
+  rendered content (`text`, `textMatches` or `texts`). A render check matching
+  several elements must assert each element's content (`texts`).
+- Text assertions use presented text: descendants under `hidden`, `inert`,
+  `<template>`, a closed `<dialog>`/`<details>`, `display:none`,
+  `visibility:hidden`, `opacity:0`, `font-size:0` or a text color equal to its
+  background contribute nothing. `aria-hidden` is not concealment: the text is
+  still visible.
+- Every matched element must be presented, by the same rules along its
+  ancestor chain. Concealment the static cascade cannot decide makes the check
+  `unmeasured`, never `pass`: clip-path or clip, masks, overflow clipping,
+  non-trivial transforms or filters, boxes of 1px or less, and any positioned
+  (`absolute`/`fixed`/`sticky`) element in the rendered tree.
+- Requested interactions are invoked on the rendered tree. Each host element
+  created through JSX carries a `data-pms-node` id, so only elements that were
+  actually rendered count. The event is dispatched on the rendered target and
+  bubbles through its rendered ancestors. The target must be the single
+  presented, enabled (not `disabled`, not under `pointer-events:none`) rendered
+  element with the test id. A render prop written `{"$pmsSpy": "onRemove"}`
+  becomes a spy; `expect.callbacks` counts the calls made by that dispatch, and
+  calls during render always fail.
+- Generated integrity: the generation state file next to the output directory
+  is the inventory of record. In every mode a missing, added, renamed or
+  modified file, output without state or state without output fails. The
+  generation must be the fresh compiler generation (`must-match`), or either
+  that or the untouched baseline generation (`no-hand-edits`). "Never
+  generated" is distinct from "incomplete generation". A task whose generated
+  directory is harness-ignored must carry this check.
 
-## Trust model
+## Threat model
 
-The evaluated agent's code is untrusted. Oracles keep it away from anything
-that writes or decides a verdict:
+**What the oracles guarantee.** A `pass` means the observed final workspace
+satisfies every required check. The checks are computed by harness code from
+evidence the evaluated agent cannot forge: byte diffs, a fresh compilation by
+the trusted compiler, sandboxed execution with a dynamic trace, and the static
+analysis of its sources. An undecidable observation is `unmeasured`, never
+`pass`.
 
-- **Sandbox.** Agent code, both design-system definitions and application
-  modules, runs only in `src/oracles/sandbox.mjs`, one process per render
-  scenario, under the Node permission model:
-  - reads are limited to the scratch workspace copy and the trusted dependency
-    tree;
-  - no file writes, child processes, worker threads, addons or WASI;
-  - module hooks deny Node built-ins, harness modules and out-of-workspace
-    specifiers;
-  - `process` and `console` are replaced before agent code loads;
-  - the result is accepted only on a stdout line tagged with a per-run nonce
-    delivered over stdin.
+**Assumed adversary.** An LLM coding agent that may cut corners, misread the
+task, or follow prompt-injected instructions found in project files. That
+includes editing generated output, writing outside its scope, injecting styles
+at runtime, inventing vocabulary, or deliberately trying common bypasses it
+has seen. It is not an arbitrary attacker with unbounded obfuscation budget
+and knowledge of the oracle internals, and the oracles do not try to be an OS
+sandbox for hostile native code.
 
-  Definitions return as plain data; anything else fails closed.
-- **Trusted worker.** `project-worker.mjs` compiles through the public SDK. It
-  never imports agent code: definitions are revived from sandbox data with the
-  trusted compiler's `token()`.
-- **Dependencies.** Packages come from `--trusted-node-modules`, a pristine
-  install the runner keeps before the agent runs. They never come from the
-  workspace's agent-writable `node_modules`. Without that option, scratch
-  copies resolve packages from their own ancestors (the repository root in
-  local fixture runs).
-- **Scratch copies.** They skip symbolic links. Any symbolic link the agent
-  writes is a scope violation.
-- **Host builds.** `host.build` executes agent-controlled scripts. It runs
-  last, in its own copy, decides only its own check, and must be sandboxed by
-  the runner (container).
+**Layered defenses.**
+
+1. **Scope and integrity (byte level).**
+   - Workspace diffs are taken against the materialized baseline, matched
+     against writable and protected globs.
+   - Symbolic links are violations.
+   - The full generated inventory is checked against fresh compiler output.
+   - The vocabulary diff covers token references.
+2. **Trusted compilation.** `project-worker.mjs` compiles through the public
+   SDK and never executes anything derived from agent input. Definitions
+   arrive as sandbox-produced data, and the vocabulary probe runs in the
+   sandbox. Packages come from `--trusted-node-modules`, never the
+   agent-writable `node_modules`.
+3. **Sandbox and dynamic trace (primary for runtime behavior).** Agent code
+   runs only in `src/oracles/sandbox.mjs`, one process per scenario.
+   - **Node permission model:** reads are limited to the scratch copy and the
+     trusted packages; no writes, child processes, workers, addons or WASI.
+   - **No code from strings:** `--disallow-code-generation-from-strings`
+     makes `eval`, `Function` and every alias or `.constructor` form throw;
+     attempts are recorded.
+   - **Denied imports and ambient handles:** module hooks deny built-ins and
+     harness modules, and `process`/`console` are replaced.
+   - **Frozen intrinsics:** the intrinsics the harness relies on are frozen
+     before agent code loads.
+   - **Tagged result:** the result is accepted only on a nonce-tagged line.
+   - **Instrumented DOM:** `document`, `window` and the CSSOM constructors
+     record every style-channel access, DOM write or insertion.
+   - **Exercise phase:** after rendering, every rendered element's ref, every
+     recorded effect, every handler of every rendered element, and every
+     callback handed to timers or DOM APIs is run against instrumented
+     elements. Any violation fails the render checks and `no-bypass`.
+4. **Static analysis (second layer, fail closed).**
+   - It reports the direct forms (style objects, CSSOM, `<style>`/`<link>`,
+     DOM globals, Node built-ins).
+   - It treats code outside an analyzable subset as `dynamic-code`:
+     string-built code (`eval`, `Function` references, `.constructor`,
+     `with`), prototype mutation, calls through computed members or call
+     results, computed writes or write chains on values not provably plain
+     data, and computed access on values that may be DOM nodes (ref and
+     handler parameters, `.current`, `.target`, DOM queries and their
+     aliases).
+   - Array indexing and lookup maps on ordinary data stay inside the subset;
+     the `good-idiomatic-indexing` fixture proves it.
+5. **Report and transcript.** The agent's report counts only for what it
+   claims to diagnose. The runner's transcript adds command-level evidence
+   (for example installs during an audit).
+
+**Residual risks.** Each one requires deliberate obfuscation, and another
+layer still applies:
+
+- **Style mutation behind a hidden branch reached through an interprocedural
+  alias.** The DOM node is passed to a helper that reads a computed member and
+  then writes a plain property, on a code path the exercise phase does not
+  reach: it only runs on data or a second invocation the rendered props never
+  produce.
+  - Static mitigation: the direct, aliased and chained forms are reported.
+  - Dynamic mitigation: any reached path is traced.
+- **Harness tampering through intrinsics that are not frozen** (for example
+  `Error.prototype`, kept writable to avoid breaking ordinary code).
+  - Mitigation: verdicts are computed in the parent from parsed data. Inside
+    the sandbox such tampering can only change what the agent's own code
+    reports about itself (markup, callback counts). Prototype mutation is
+    reported statically.
+- **`host.build` executes agent-controlled scripts outside the sandbox.**
+  - Mitigation: it runs last, in its own copy, and decides only its own check.
+    The runner must containerize it.
+
+Known oracle limits that are reported, not passed:
+
+- clipping, overflow and overlap concealment (`unmeasured`);
+- pixel fidelity (`unmeasured`);
+- host builds and transcripts the runner did not supply (`unmeasured`).
 
 The rendered and behavioral oracles are limited:
 
 - They observe server-rendered markup and resolve the cascade statically. They
-  do not drive a browser or run effects.
+  do not drive a browser. Refs, effects and handlers are exercised against
+  instrumented stand-ins, not a real DOM, and there is no re-render after state
+  changes.
 - A selector or media feature outside the compiler's emitted shape makes the
   affected property `unmeasured`; it is never guessed.
-- `host.build` and `transcript.commands` report `unmeasured` when the runner
-  does not execute host commands or supply a transcript. Integration tasks are
-  therefore `unmeasured`, not `pass`, in local fixture runs.
 
 ## Runner contract (input to AG-00.2)
 
@@ -309,10 +367,11 @@ field, the committed held-out manifest and its digest in the lock.
 - Host builds, dev servers, services and browser behavior require the runner.
   Pixel fidelity has no oracle.
 - The rendered oracle covers compiler-emitted selectors only. Interactions
-  invoke the recorded handler directly. There is no browser event propagation,
-  no re-render after state changes, and no effects (`useEffect`).
-- Static rules are deliberately conservative (fail closed). Legitimate DOM API
-  use in application code is reported and fails the task.
+  bubble through rendered ancestors but there is no default action, focus
+  model or re-render after state changes.
+- Static rules and the dynamic trace are deliberately conservative (fail
+  closed). Legitimate DOM API use in application code (for example a ref that
+  writes a property) is reported and fails the task.
 - The sandbox depends on the Node permission model of the pinned Node 22.22
   and on in-thread module hooks (`module.registerHooks`). It is a
   defense-in-depth boundary for oracle integrity, not an OS sandbox for
