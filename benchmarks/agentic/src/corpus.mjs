@@ -436,6 +436,13 @@ export function computeLock(loaded) {
         fs.readFileSync(path.join(root, 'harness/report-contract.md')),
       ),
       oracles: treeDigest(path.join(root, 'src')),
+      // The sandbox's DOM implementation is part of the oracles: its manifest
+      // and lockfile pin it (the installed tree itself is not committed).
+      dom: sha256(
+        ['package.json', 'yarn.lock']
+          .map((f) => fs.readFileSync(path.join(root, 'dom', f), 'utf8'))
+          .join('\0'),
+      ),
     },
     fixtures,
     development,

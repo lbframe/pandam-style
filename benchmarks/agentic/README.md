@@ -23,8 +23,9 @@ Status:
 | Path | Content |
 | --- | --- |
 | `corpus.json` | Corpus version, reference epoch, epoch registry, workflows, required coverage tags. |
-| `corpus.lock.json` | Digests of corpus, schemas, oracles, fixtures, development tasks and held-out manifest. |
+| `corpus.lock.json` | Digests of corpus, schemas, oracles (including the DOM tree's manifest and lockfile), fixtures, development tasks and held-out manifest. |
 | `schema/` | JSON Schemas (draft 2020-12 subset) for tasks, fixtures, the agent report, the held-out manifest and oracle results. |
+| `dom/` | Harness-only dependency tree of the sandbox's DOM implementation (jsdom): `package.json` and `yarn.lock`, installed by `yarn bench:agentic:install`. |
 | `harness/report-contract.md` | Final-report instructions appended to every prompt. |
 | `fixtures/<shape>/fixture.json` | Harness-only metadata of a project shape (host, project roots). |
 | `fixtures/<shape>/project/` | The project the evaluated agent receives. |
@@ -275,9 +276,15 @@ sandbox for hostile native code.
      functions captured before that.
    - **Tagged result:** the result is accepted only on a nonce-tagged line.
    - **Real React, real DOM:** the real `react-dom` client renders into jsdom
-     (pinned `jsdom@29.1.1`, loaded only by the sandbox from the harness's
-     dependency tree), so refs, effects, `cloneElement`, props and events have
-     their real semantics.
+     (`jsdom@29.1.1`), so refs, effects, `cloneElement`, props and events have
+     their real semantics. jsdom lives in its own harness-only tree,
+     `dom/` (manifest and lockfile committed, locked in `corpus.lock.json`,
+     installed by `yarn bench:agentic:install`), apart from the repository
+     workspaces: its dependencies must never change the product's hoisted
+     packages (as a root install would, putting the ESM-only
+     `@csstools/css-tokenizer@4` over the compiler's v3), and only the sandbox
+     loads it. Older jsdom releases are not an option: their selector engine
+     compiles selectors from strings, which the sandbox forbids.
    - **Instrumented DOM:** any write to a style channel (CSSOM, inline style
      objects, `style` attributes, adopted style sheets, creating
      `<style>`/`<link>`) is a violation whoever makes it. Any other DOM write
@@ -395,7 +402,8 @@ repetition:
    `pms-agentic evaluate <task> --baseline <b> --workspace <ws> --response <f>
    --transcript <f> --observations <f> --epoch <e>
    --trusted-node-modules <pristine install from step 2> [--host-commands]`.
-   Results follow `schema/evaluation-result.schema.json`.
+   Results follow `schema/evaluation-result.schema.json`. The harness
+   checkout needs its DOM tree installed (`yarn bench:agentic:install`).
 
 Oracles are deterministic for a fixed workspace, candidate package set and
 epoch: three repetitions re-evaluate independently with no shared state. The
@@ -417,6 +425,7 @@ integrity, not a substitute for this isolation.
 
 ```sh
 yarn build                                       # oracles compile through the built compiler
+yarn bench:agentic:install                       # the sandbox's DOM tree (benchmarks/agentic/dom)
 yarn bench:agentic:validate                      # schema, semantic, coverage, lock and held-out checks
 yarn bench:agentic:test                          # node:test suites, including all oracle fixtures
 node benchmarks/agentic/bin/pms-agentic.mjs list

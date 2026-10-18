@@ -157,7 +157,10 @@ function deny(specifier, parent) {
 
 // --- Render-mode dependencies (loaded before any agent code) ---------------
 
-const harnessRequire = createRequire(import.meta.url);
+// The DOM implementation comes from the harness's own dependency tree
+// (`benchmarks/agentic/dom`), installed apart from the repository workspaces.
+const DOM_TREE = path.join(path.dirname(SANDBOX_FILE), '../../dom');
+const harnessRequire = createRequire(path.join(DOM_TREE, 'package.json'));
 const requireFromWs = createRequire(path.join(workspaceDir, 'package.json'));
 const packageDir = (req, name) =>
   path.dirname(realpathSync(req.resolve(`${name}/package.json`)));
@@ -180,8 +183,15 @@ let sink = null;
 let harnessDepth = 0;
 
 if (request.mode === 'render') {
-  ({ JSDOM, VirtualConsole } = harnessRequire('jsdom'));
-  jsdomDir = packageDir(harnessRequire, 'jsdom');
+  try {
+    ({ JSDOM, VirtualConsole } = harnessRequire('jsdom'));
+  } catch (error) {
+    throw new Error(
+      `PMS_SANDBOX_DOM_MISSING: the harness DOM tree is not installed (yarn bench:agentic:install): ${error.message}`,
+    );
+  }
+  // Frames anywhere in that tree are the DOM implementation itself.
+  jsdomDir = realpathSync(path.join(DOM_TREE, 'node_modules'));
 }
 
 const realSetTimeout = setTimeout;

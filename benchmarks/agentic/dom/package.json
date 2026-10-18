@@ -1,0 +1,9 @@
+{
+  "name": "pms-agentic-dom",
+  "private": true,
+  "description": "Harness-only dependency tree of the AG-00.1 oracle sandbox: the standards DOM implementation. Installed apart from the repository's workspaces so it never changes the product's hoisted dependencies. Install with `yarn bench:agentic:install`.",
+  "license": "MIT",
+  "dependencies": {
+    "jsdom": "29.1.1"
+  }
+}

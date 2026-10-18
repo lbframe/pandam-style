@@ -67,9 +67,12 @@ jobs:
         with:
           node-version: '22.x'
           cache: 'yarn'
-          cache-dependency-path: yarn.lock
+          cache-dependency-path: |
+            yarn.lock
+            benchmarks/agentic/dom/yarn.lock
       - run: corepack prepare yarn@1.22.22 --activate
       - run: yarn install --frozen-lockfile
+      - run: yarn bench:agentic:install
       - run: yarn build
       - run: yarn bench:agentic:validate
       - run: yarn bench:agentic:test

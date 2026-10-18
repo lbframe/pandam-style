@@ -386,6 +386,9 @@ test('no corpus input on disk is excluded by an ignore rule', () => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const abs = path.join(dir, entry.name);
       if (abs.startsWith(path.join(CORPUS_ROOT, 'heldout', '.'))) continue;
+      // The installed DOM tree is ignored by design; its manifest and
+      // lockfile are the corpus inputs.
+      if (abs === path.join(CORPUS_ROOT, 'dom', 'node_modules')) continue;
       if (entry.isDirectory()) walk(abs);
       else files.push(path.relative(CORPUS_ROOT, abs));
     }

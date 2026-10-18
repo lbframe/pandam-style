@@ -15,6 +15,9 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SANDBOX = path.join(HERE, 'sandbox.mjs');
+// The harness's own dependency tree for the DOM implementation (jsdom),
+// installed apart from the repository workspaces by `bench:agentic:install`.
+const DOM_NODE_MODULES = path.join(HERE, '../../dom/node_modules');
 
 /** Nearest node_modules directory the workspace resolves packages from. */
 export function resolveNodeModules(fromDir) {
@@ -40,9 +43,9 @@ export function sandboxReadPaths(workspaceDir) {
   // the harness's own tree (the jsdom standards DOM implementation).
   for (const nodeModules of new Set([
     resolveNodeModules(workspaceDir),
-    resolveNodeModules(HERE),
+    DOM_NODE_MODULES,
   ])) {
-    if (nodeModules == null) continue;
+    if (nodeModules == null || !fs.existsSync(nodeModules)) continue;
     const real = fs.realpathSync(nodeModules);
     paths.add(real);
     const scan = (dir) => {
