@@ -12,7 +12,6 @@ export function OrderSummary({ items }) {
       <ul {...props(card.body)}>
         {items.map((item) => (
           <li key={item.id} data-testid="order-summary-item">
-            
           </li>
         ))}
       </ul>

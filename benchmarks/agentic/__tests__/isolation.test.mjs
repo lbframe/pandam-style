@@ -40,15 +40,22 @@ function render(dir, source, extra = {}) {
     mode: 'render',
     workspaceDir: dir,
     overrides: { [pathToFileURL(file).href]: source },
-    render: { module: 'src/C.jsx', export: 'C', props: extra.props ?? {} },
-    interactions: extra.interactions ?? [],
+    scenarios: [
+      {
+        render: { module: 'src/C.jsx', export: 'C', props: extra.props ?? {} },
+        interactions: extra.interactions ?? [],
+      },
+    ],
   });
 }
 
+// The single scenario of a render request; a sandbox-level failure throws.
 const payload = (r) => {
   assert.equal(r.ok, true, r.error);
-  return JSON.parse(r.payload);
+  return JSON.parse(r.payload).scenarios[0];
 };
+const failure = (r) =>
+  r.ok ? JSON.parse(r.payload).scenarios[0].error : r.error;
 
 test('agent code cannot forge the tagged result line', () => {
   const dir = workspace('forge', {});
@@ -71,7 +78,7 @@ test('agent code has no process, argv, environment or builtin escape hatch', () 
   );
 });
 
-test('agent code cannot import Node built-ins or harness modules', () => {
+test('agent code cannot import Node built-ins, harness modules or undeclared packages', () => {
   const dir = workspace('builtins', {});
   for (const spec of [
     'node:fs',
@@ -79,20 +86,26 @@ test('agent code cannot import Node built-ins or harness modules', () => {
     'node:child_process',
     'node:worker_threads',
     'pms-sandbox:registry',
+    'pms-cjs:file:///x.js',
     '/etc/passwd',
+    'jsdom',
+    'parse5',
   ]) {
     const r = render(
       dir,
       `import x from ${JSON.stringify(spec)};\nexport function C() { return String(x); }\n`,
     );
-    assert.equal(r.ok, false, spec);
-    assert.match(r.error, /PMS_SANDBOX_DENIED_IMPORT/, spec);
+    assert.match(failure(r), /PMS_SANDBOX_DENIED_IMPORT/, spec);
   }
-  const dynamic = render(
-    dir,
-    "const fs = await import('node:fs');\nexport function C() { return String(fs); }\n",
+  assert.match(
+    failure(
+      render(
+        dir,
+        "const fs = await import('node:fs');\nexport function C() { return String(fs); }\n",
+      ),
+    ),
+    /PMS_SANDBOX_DENIED_IMPORT/,
   );
-  assert.match(dynamic.error, /PMS_SANDBOX_DENIED_IMPORT/);
 });
 
 test('code generation from strings is impossible and recorded', () => {
@@ -102,43 +115,68 @@ test('code generation from strings is impossible and recorded', () => {
     "export function C() { const make = Function; return make('return 1')(); }\n",
     "export function C() { return eval('1'); }\n",
   ]) {
-    const r = render(dir, source);
-    assert.equal(r.ok, false, source);
-    assert.match(r.error, /Code generation from strings disallowed/, source);
+    const scenario = payload(render(dir, source));
+    assert.match(
+      scenario.error,
+      /Code generation from strings disallowed/,
+      source,
+    );
+    assert.ok(
+      scenario.violations.includes('code generation from strings'),
+      source,
+    );
   }
 });
 
 test('agent code cannot rewire the harness through prototypes', () => {
   const dir = workspace('prototype', {});
-  const polluted = render(
-    dir,
-    "Object.prototype.status = 'ok';\nexport function C() { throw new Error('actual failure'); }\n",
+  const polluted = payload(
+    render(
+      dir,
+      "Object.prototype.status = 'ok';\nexport function C() { throw new Error('actual failure'); }\n",
+    ),
   );
-  assert.equal(polluted.ok, false);
-  const frozen = render(
-    dir,
-    "export function C() { try { Array.prototype.push = () => 0; return 'patched'; } catch { return 'frozen'; } }\n",
+  assert.ok(polluted.error != null);
+  const frozen = payload(
+    render(
+      dir,
+      "export function C() { try { Array.prototype.push = () => 0; return 'patched'; } catch { return 'frozen'; } }\n",
+    ),
   );
-  assert.equal(payload(frozen).html, 'frozen');
+  assert.equal(frozen.html, 'frozen');
 });
 
-test('style and DOM activity is traced dynamically, including refs, effects and handlers', () => {
+test('the committed DOM and its instrumentation observe React refs, effects, handlers and deferred work', () => {
   const dir = workspace('trace', {});
+  const jsxHeader =
+    "import { jsx } from 'react/jsx-runtime';\nimport { useEffect, useRef, cloneElement } from 'react';\n";
   const cases = {
     "export function C() { document.body.style.color = 'red'; return 'x'; }\n":
-      /read document\.body\.style/,
-    "import { jsx } from 'react/jsx-runtime';\nexport function C() { return jsx('div', { ref: (el) => { if (el) el[['st', 'yle'].join('')].color = 'red'; }, children: 'x' }); }\n":
-      /element#div\.style/,
-    "import { jsx } from 'react/jsx-runtime';\nimport { useEffect } from 'react';\nexport function C() { useEffect(() => { document.head.appendChild(document.createElement('style')); }); return jsx('div', { children: 'x' }); }\n":
+      /style channel/,
+    [`${jsxHeader}export function C() { return jsx('div', { ref: (el) => { if (el) el[['st', 'yle'].join('')].color = 'red'; }, children: 'x' }); }\n`]:
+      /style channel CSSStyle\w+\.color written by code at src\/C\.jsx/,
+    [`${jsxHeader}export function C() { return jsx('div', { ref: (el) => { if (el?.nodeType === 1) el.hidden = true; }, children: 'x' }); }\n`]:
+      /DOM write HTMLElement\.hidden by code at src\/C\.jsx/,
+    [`${jsxHeader}export function C() { return jsx('section', { ref: (el) => { if (el?.tagName === 'SECTION') el.textContent = 'Gone'; }, children: 'x' }); }\n`]:
+      /DOM write Node\.textContent by code/,
+    [`${jsxHeader}export function C() { useEffect(() => { document.head.appendChild(document.createElement('style')); }); return jsx('div', { children: 'x' }); }\n`]:
       /createElement\(style\)/,
-    "import { jsx } from 'react/jsx-runtime';\nexport function C() { return jsx('button', { onClick: (e) => { e.currentTarget.setAttribute('style', 'x'); }, children: 'x' }); }\n":
-      /setAttribute/,
-    "import { jsx } from 'react/jsx-runtime';\nexport function C() { return jsx('div', { ref: (el) => { if (el) el.addEventListener('click', () => { el.style.color = 'red'; }); }, children: 'x' }); }\n":
-      /element#div\.style/,
-    "import { jsx } from 'react/jsx-runtime';\nimport { useEffect } from 'react';\nexport function C() { useEffect(() => { setTimeout(() => { document.body.style.color = 'red'; }, 1000); }, []); return jsx('div', { children: 'x' }); }\n":
-      /document\.body\.style/,
-    "export function C() { new CSSStyleSheet(); return 'x'; }\n":
-      /new CSSStyleSheet/,
+    [`${jsxHeader}export function C() { return jsx('button', { onClick: (e) => { e.currentTarget.setAttribute('style', 'x'); }, children: 'x' }); }\n`]:
+      /style channel Element\.setAttribute/,
+    [`${jsxHeader}export function C() { useEffect(() => { document.adoptedStyleSheets = [new CSSStyleSheet()]; }, []); return jsx('div', { children: 'x' }); }\n`]:
+      /adoptedStyleSheets/,
+    [`${jsxHeader}export function C() { return jsx('div', { ref: (el) => { if (el) el.addEventListener('click', () => { el.style.color = 'red'; }); }, children: 'x' }); }\n`]:
+      /style channel CSSStyle\w+\./,
+    [`${jsxHeader}export function C() { useEffect(() => { setTimeout(() => { document.body.style.color = 'red'; }, 100000); }, []); return jsx('div', { children: 'x' }); }\n`]:
+      /style channel/,
+    [`${jsxHeader}export function C() { useEffect(() => { requestAnimationFrame(() => { document.body.hidden = true; }); }, []); return jsx('div', { children: 'x' }); }\n`]:
+      /DOM write HTMLElement\.hidden/,
+    [`${jsxHeader}export function C() { const ref = useRef(null); useEffect(() => { const el = ref.current; const impl = el[Object.getOwnPropertySymbols(el)[0]]; impl.setAttributeNS(null, 'hidden', ''); }, []); return jsx('div', { ref, children: 'x' }); }\n`]:
+      /unattributed DOM attributes mutation \(hidden\)/,
+    [`${jsxHeader}export function C() { const b = jsx('div', { children: 'x' }); return cloneElement(b, { ref: (n) => { if (n) { const s = n[['st', 'yle'].join('')]; s.color = 'red'; } } }); }\n`]:
+      /style channel/,
+    [`${jsxHeader}export function C() { useEffect(() => { customElements.define('x-y', class extends HTMLElement {}); }, []); return jsx('div', { children: 'x' }); }\n`]:
+      /CustomElementRegistry\.define/,
   };
   for (const [source, pattern] of Object.entries(cases)) {
     const trace = payload(render(dir, source)).violations.join('\n');
@@ -147,48 +185,156 @@ test('style and DOM activity is traced dynamically, including refs, effects and 
   const clean = payload(
     render(
       dir,
-      "import { jsx } from 'react/jsx-runtime';\nexport function C({ items = ['a', 'b'] }) { return jsx('ul', { children: items.map((x, i) => jsx('li', { children: items[i] }, x)) }); }\n",
+      `${jsxHeader}export function C({ items = ['a', 'b'] }) { const ref = useRef(null); useEffect(() => { ref.current?.focus(); }, []); return jsx('ul', { ref, tabIndex: -1, children: items.map((x, i) => jsx('li', { children: items[i] }, x)) }); }\n`,
     ),
   );
   assert.deepEqual(clean.violations, []);
+  assert.equal(clean.html, '<ul tabindex="-1"><li>a</li><li>b</li></ul>');
 });
 
-test('interactions dispatch only on rendered elements and bubble to rendered ancestors', () => {
+test('interactions are native events on the committed DOM', () => {
   const dir = workspace('spies', {});
   const spy = {
     props: { onGo: { $pmsSpy: 'onGo' } },
     interactions: [{ testId: 'go', event: 'click' }],
   };
-  const good = payload(
-    render(
-      dir,
-      "import { jsx } from 'react/jsx-runtime';\nexport function C({ onGo }) { return jsx('span', { onClick: () => onGo(), children: jsx('button', { 'data-testid': 'go', children: 'Go' }) }); }\n",
-      spy,
+  const jsxHeader =
+    "import { jsx } from 'react/jsx-runtime';\nimport { cloneElement } from 'react';\n";
+  const calls = (source) =>
+    payload(
+      render(dir, `${jsxHeader}${source}`, spy),
+    ).interactions[0].candidates.map((c) => c.calls.onGo ?? 0);
+  assert.deepEqual(
+    calls(
+      "export function C({ onGo }) { return jsx('span', { onClick: () => onGo(), children: jsx('button', { 'data-testid': 'go', children: 'Go' }) }); }\n",
     ),
+    [1],
+    'bubbling to a rendered ancestor',
   );
   assert.deepEqual(
-    good.interactions[0].candidates.map((c) => [c.outcome, c.calls.onGo]),
-    [['dispatched', 1]],
-  );
-  const unused = payload(
-    render(
-      dir,
-      "import { jsx } from 'react/jsx-runtime';\nexport function C({ onGo }) { const unused = jsx('button', { 'data-testid': 'go', onClick: onGo }); return jsx('button', { 'data-testid': 'go', children: 'Go' }); }\n",
-      spy,
+    calls(
+      "export function C({ onGo }) { return jsx('button', { 'data-testid': 'go', onClick: (e) => { if (e.button === 0 && e.target === e.currentTarget) onGo(); }, children: 'Go' }); }\n",
     ),
+    [1],
+    'native MouseEvent fields',
   );
   assert.deepEqual(
-    unused.interactions[0].candidates.map((c) => c.outcome),
-    ['no-handler'],
+    calls(
+      "export function C({ onGo }) { const unused = jsx('button', { 'data-testid': 'go', onClick: onGo }); return jsx('button', { 'data-testid': 'go', children: 'Go' }); }\n",
+    ),
+    [0],
+    'unused JSX never counts',
+  );
+  assert.deepEqual(
+    calls(
+      "export function C({ onGo }) { return cloneElement(jsx('button', { 'data-testid': 'go', onClick: onGo, children: 'Go' }), { onClick: undefined }); }\n",
+    ),
+    [0],
+    'cloneElement removing the handler',
+  );
+  assert.deepEqual(
+    calls(
+      "export function C({ onGo }) { return cloneElement(jsx('button', { 'data-testid': 'go', children: 'Go' }), { onClick: onGo }); }\n",
+    ),
+    [1],
+    'cloneElement adding the handler',
+  );
+  assert.deepEqual(
+    calls(
+      "export function C({ onGo }) { return jsx('button', { 'data-testid': 'go', disabled: true, onClick: onGo, children: 'Go' }); }\n",
+    ),
+    [0],
+    'disabled buttons do not fire',
   );
   const early = payload(
     render(
       dir,
-      "import { jsx } from 'react/jsx-runtime';\nexport function C({ onGo }) { onGo(); return jsx('button', { 'data-testid': 'go', children: 'Go' }); }\n",
+      `${jsxHeader}export function C({ onGo }) { onGo(); return jsx('button', { 'data-testid': 'go', children: 'Go' }); }\n`,
       spy,
     ),
   );
   assert.equal(early.outside.onGo, 1);
+});
+
+test('the committed DOM must be what React committed, read through frozen interfaces', () => {
+  const dir = workspace('committed', {});
+  const jsxHeader =
+    "import { jsx, jsxs } from 'react/jsx-runtime';\nimport { useEffect, useRef, useState } from 'react';\n";
+  const violations = (body) =>
+    payload(render(dir, `${jsxHeader}${body}\n`)).violations.join('\n');
+  // Bound DOM methods leave no agent stack frame.
+  assert.match(
+    violations(
+      "export function C() { const [t, setT] = useState(null); return jsxs('div', { children: [jsx('span', { ref: setT, children: 'a' }), jsx('i', { ref: t ? t.remove.bind(t) : null, children: 'b' })] }); }",
+    ),
+    /committed DOM diverges from React \(render\): children of <div>/,
+  );
+  assert.match(
+    violations(
+      "export function C() { return jsx('b', { ref: (el) => el?.addEventListener('click', el.toggleAttribute.bind(el, 'hidden')), children: 'x' }); }",
+    ),
+    /DOM write Element\.toggleAttribute by a native callback/,
+  );
+  // Shadowing a DOM member on a node is reported; interfaces are frozen.
+  assert.match(
+    violations(
+      "export function C() { return jsx('div', { ref: (el) => { if (el) Object.defineProperty(el, 'childNodes', { value: [] }); }, children: 'x' }); }",
+    ),
+    /own property childNodes shadows the DOM on <div>/,
+  );
+  assert.match(
+    failure(
+      render(
+        dir,
+        "Element.prototype.querySelectorAll = () => [];\nexport function C() { return 'x'; }\n",
+      ),
+    ),
+    /read only/,
+  );
+  // Network APIs throw; stray rejections stay on the scenario.
+  assert.equal(
+    payload(
+      render(
+        dir,
+        "export function C() { try { fetch('http://localhost/'); return 'sent'; } catch (e) { return e.message; } }\n",
+      ),
+    ).html,
+    'PMS_SANDBOX_NO_NETWORK',
+  );
+  assert.match(
+    failure(
+      render(
+        dir,
+        "export function C() { Promise.reject(new Error('stray')); return 'x'; }\n",
+      ),
+    ),
+    /uncaught error: stray/,
+  );
+  // The evidence is the structured committed DOM, not a re-parse of markup.
+  const raw = payload(
+    render(
+      dir,
+      `${jsxHeader}export function C() { return jsxs('ul', { children: [jsx('xmp', { children: '</xmp><li>forged</li><xmp>' }), jsx('template', { children: jsx('li', { children: 'inert' }) })] }); }\n`,
+    ),
+  );
+  assert.deepEqual(raw.violations, []);
+  assert.deepEqual(raw.tree, [
+    {
+      t: 'ul',
+      a: [],
+      c: [
+        { t: 'xmp', a: [], c: [{ x: '</xmp><li>forged</li><xmp>' }] },
+        { t: 'template', a: [], c: [{ t: 'li', a: [], c: [{ x: 'inert' }] }] },
+      ],
+    },
+  ]);
+  // Honest form controls, SVG and portals are consistent with React.
+  assert.equal(
+    violations(
+      "import { createPortal } from 'react-dom';\nexport function C() { const [v, setV] = useState('a'); return jsxs('form', { children: [jsx('input', { value: v, onChange: (e) => setV(e.target.value) }), jsx('select', { value: 'b', onChange: () => {}, children: [jsx('option', { value: 'a', children: 'A' }), jsx('option', { value: 'b', children: 'B' })] }), jsx('textarea', { defaultValue: 't' }), jsx('details', { children: jsx('summary', { children: 'S' }) }), jsx('svg', { viewBox: '0 0 1 1', children: jsx('path', { d: 'M0 0' }) }), createPortal(jsx('p', { children: 'p' }), document.body)] }); }",
+    ),
+    '',
+  );
 });
 
 test('definitions load in the sandbox as plain data with token references', () => {
@@ -261,8 +407,6 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
     'const make = Function; make("x")();': ['dynamic-code'],
     '(() => {}).constructor("x")();': ['dynamic-code'],
     "String.prototype.trim = () => '';": ['dynamic-code'],
-    'export function f(obj, k) { obj[k] = 1; }': ['dynamic-code'],
-    "export function f(n, k) { n[k].color = 'red'; }": ['dynamic-code'],
     'export function A() { const r = useRef(null); useEffect(() => { const n = r.current; n[key] = 1; }); return <div ref={r} />; }':
       ['dynamic-code'],
   };
@@ -278,6 +422,11 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
     'export const L = ({ items }) => <ul>{items.map((item, index) => <li key={item.id}>{items[index].name}</li>)}</ul>;',
     "const labels = { success: 'In stock', danger: 'Sold out' };\nexport const B = ({ status }) => <span>{labels[status]}</span>;",
     'const counts = {};\nexport function count(k) { counts[k] = (counts[k] ?? 0) + 1; }',
+    'export const onKey = (e) => { const handlers = { Enter: () => {} }; handlers[e.key]?.(); };',
+    'export const index = (items) => items.reduce((acc, item) => { acc[item.id] = item; return acc; }, {});',
+    'export function L({ items }) { const refs = useRef([]); return items.map((x, i) => <li key={x} ref={(el) => { refs.current[i] = el; }} />); }',
+    'export const add = (a) => (b) => a + b;\nexport const three = add(1)(2);',
+    'export function f(obj, k) { obj[k] = 1; }',
   ];
   for (const code of idiomatic)
     assert.deepEqual(findConstructs(code, 'x.jsx'), [], code);

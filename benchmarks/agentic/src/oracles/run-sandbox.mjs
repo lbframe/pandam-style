@@ -15,8 +15,6 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SANDBOX = path.join(HERE, 'sandbox.mjs');
-// The sandbox's own (trusted) HTML parser, imported before agent code runs.
-const HTML_PARSER = path.join(HERE, '../html.mjs');
 
 /** Nearest node_modules directory the workspace resolves packages from. */
 export function resolveNodeModules(fromDir) {
@@ -37,9 +35,14 @@ export function resolveNodeModules(fromDir) {
  * are readable because module format detection walks up to them.
  */
 export function sandboxReadPaths(workspaceDir) {
-  const paths = new Set([fs.realpathSync(workspaceDir), SANDBOX, HTML_PARSER]);
-  const nodeModules = resolveNodeModules(workspaceDir);
-  if (nodeModules != null) {
+  const paths = new Set([fs.realpathSync(workspaceDir), SANDBOX]);
+  // The workspace's trusted dependency tree (React, the compiler runtime) and
+  // the harness's own tree (the jsdom standards DOM implementation).
+  for (const nodeModules of new Set([
+    resolveNodeModules(workspaceDir),
+    resolveNodeModules(HERE),
+  ])) {
+    if (nodeModules == null) continue;
     const real = fs.realpathSync(nodeModules);
     paths.add(real);
     const scan = (dir) => {

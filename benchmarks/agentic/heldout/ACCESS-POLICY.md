@@ -54,6 +54,13 @@ Other custody events:
   revision. Held-out task content was unchanged: the oracle fixes needed no
   task change. Only the manifest's `corpusVersion` was updated; the archive,
   its digest and every task digest are unchanged.
+- 2026-10-18, corpus 1.3.0 (third independent review): no unseal and no
+  revision. The fixes are in the oracles (real React client and DOM in the
+  sandbox, committed-tree consistency, presented-text rules, generated
+  integrity against the baseline snapshot and a fresh recompilation) and the
+  task schema is unchanged, so no held-out task needed to change. Only the
+  manifest's `corpusVersion` was updated; the archive, its digest and every
+  task digest are unchanged.
 
 ## Rotation and changes
 

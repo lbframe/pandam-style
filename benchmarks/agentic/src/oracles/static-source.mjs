@@ -71,6 +71,8 @@ const DOM_GLOBALS = new Set([
   'self',
   'top',
   'frames',
+  'navigator',
+  'location',
 ]);
 const MUTATORS = new Set([
   'assign',
@@ -458,33 +460,24 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
       ) {
         add('dynamic-code', node, `prototype mutation (${how})`);
       }
-      for (
-        let link = target.object;
-        link?.type === 'MemberExpression' ||
-        link?.type === 'OptionalMemberExpression';
-        link = link.object
+      // Computed writes on ordinary values are left to the dynamic trace,
+      // which observes their effect on the DOM; only DOM-reachable targets
+      // are undecidable here. A ref container (`refs.current[i] = el`) is
+      // ordinary data.
+      const owner = target.object;
+      const refContainer =
+        propertyName(owner) === 'current' &&
+        owner?.object?.type === 'Identifier';
+      if (
+        isNonConstantComputed(target) &&
+        !refContainer &&
+        bindings.isTainted(owner)
       ) {
-        if (
-          isNonConstantComputed(link) &&
-          !(
-            link.object?.type === 'Identifier' &&
-            bindings.plain.has(link.object.name)
-          )
-        ) {
-          add('dynamic-code', node, `${how} through a computed member chain`);
-          break;
-        }
-      }
-      if (isNonConstantComputed(target)) {
-        const owner = target.object;
-        const provablyPlain =
-          owner?.type === 'Identifier' && bindings.plain.has(owner.name);
-        if (!provablyPlain)
-          add(
-            'dynamic-code',
-            node,
-            `computed ${how} on a value not provably plain data`,
-          );
+        add(
+          'dynamic-code',
+          node,
+          `computed ${how} on a value that may be a DOM node`,
+        );
       }
     }
   };
@@ -501,13 +494,16 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
       node.type === 'NewExpression'
     ) {
       const callee = node.callee;
-      if (
-        callee?.type === 'CallExpression' ||
-        callee?.type === 'OptionalCallExpression'
-      )
-        add('dynamic-code', node, 'call of a call result');
-      if (isNonConstantComputed(callee))
-        add('dynamic-code', node, 'call through a computed member');
+      // Computed calls on ordinary values (lookup maps such as
+      // `handlers[e.key]?.()`) are left to the dynamic trace; a computed call
+      // on a DOM-reachable value (`el[name](...)`) is undecidable.
+      if (isNonConstantComputed(callee) && bindings.isTainted(callee.object)) {
+        add(
+          'dynamic-code',
+          node,
+          'computed call on a value that may be a DOM node',
+        );
+      }
     }
     if (
       (node.type === 'MemberExpression' ||
@@ -689,12 +685,6 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
       case 'AssignmentExpression': {
         const target = node.left;
         writeTarget(target, node, 'write');
-        if (isNonConstantComputed(target) && bindings.isTainted(target.object))
-          add(
-            'dynamic-code',
-            node,
-            'computed write on a value that may be a DOM node',
-          );
         if (propertyName(target) === 'className')
           add('raw-classname', node, 'className assignment');
         break;

@@ -30,7 +30,7 @@ import {
 } from '../fs-tree.mjs';
 import { compileGlobs, matchesAny } from '../glob.mjs';
 import { computeStyle, parseCss } from '../css-cascade.mjs';
-import { classList, elements, parseHtml, select } from '../html.mjs';
+import { classList, elements, select } from '../html.mjs';
 import { checkReport, extractReport } from './report.mjs';
 import {
   CODE_GENERATION_ERROR,
@@ -300,8 +300,14 @@ function parseColor(value) {
 function pxValue(value) {
   const v = normalizeCssValue(value);
   if (v === '0') return 0;
-  const m = /^(-?[\d.]+)(px|rem|em)$/.exec(v);
-  return m ? Number(m[1]) * (m[2] === 'px' ? 1 : 16) : null;
+  const m = /^(-?[\d.]+)(px|rem|em|%|vw|vh)$/.exec(v);
+  if (m == null) return null;
+  if (Number(m[1]) === 0) return 0;
+  return m[2] === 'px'
+    ? Number(m[1])
+    : m[2] === 'rem' || m[2] === 'em'
+      ? Number(m[1]) * 16
+      : null;
 }
 
 function styleOf(node, observed, context, cache) {
@@ -335,6 +341,7 @@ function ownConcealment(node, computed) {
     'height',
     'max-width',
     'max-height',
+    ...EXTRA_CONCEALMENT,
   ]) {
     if (Object.hasOwn(computed.unmeasuredProperties, property)) {
       return {
@@ -385,11 +392,147 @@ function ownConcealment(node, computed) {
         risk: `${property}:${v} on <${node.tag}> (box size is not measured)`,
       };
   }
+  const contentVisibility = resolved(computed, 'content-visibility');
+  if (
+    contentVisibility != null &&
+    normalizeCssValue(contentVisibility) === 'hidden'
+  ) {
+    return { concealed: `content-visibility:hidden on <${node.tag}>` };
+  }
+  // Anything else that can move, clip, shrink or skip content is undecidable
+  // without layout: unmeasured, never passed.
+  for (const property of EXTRA_CONCEALMENT) {
+    const v = resolved(computed, property);
+    if (v == null) continue;
+    const value = normalizeCssValue(v);
+    if (BENIGN_VALUES[property]?.test(value)) continue;
+    return { risk: `${property}:${v} on <${node.tag}> (not measured)` };
+  }
   return {};
 }
 
+const EXTRA_CONCEALMENT = [
+  'content-visibility',
+  'scale',
+  'translate',
+  'rotate',
+  'overflow-x',
+  'overflow-y',
+  'overflow-clip-margin',
+  'text-indent',
+  'line-height',
+  'letter-spacing',
+  'word-spacing',
+  'zoom',
+  'contain',
+  'margin',
+  'margin-top',
+  'margin-right',
+  'margin-bottom',
+  'margin-left',
+  'margin-inline',
+  'margin-inline-start',
+  'margin-inline-end',
+  'margin-block',
+  'margin-block-start',
+  'margin-block-end',
+  'inset',
+  'top',
+  'right',
+  'bottom',
+  'left',
+  'z-index',
+  'backface-visibility',
+  'perspective',
+  'mix-blend-mode',
+  // Keyframes can conceal (opacity, transforms) for as long as they run.
+  'animation-name',
+  'animation',
+];
+// Values of those properties that cannot conceal content.
+const BENIGN_VALUES = {
+  'content-visibility': /^visible$/,
+  scale: /^(none|1)$/,
+  translate: /^(none|0(px)?)$/,
+  rotate: /^(none|0(deg)?)$/,
+  'overflow-x': /^visible$/,
+  'overflow-y': /^visible$/,
+  'text-indent': /^0(px)?$/,
+  'line-height':
+    /^(normal|[1-9][\d.]*|0?\.[1-9]\d*|[\d.]+(px|rem|em)|var\(.*\))$/,
+  'letter-spacing': /^(normal|0(px)?|[\d.]+(px|rem|em))$/,
+  'word-spacing': /^(normal|0(px)?|[\d.]+(px|rem|em))$/,
+  zoom: /^(normal|1|100%)$/,
+  contain: /^none$/,
+  margin: /^[^-]*$/,
+  'margin-top': /^[^-]*$/,
+  'margin-right': /^[^-]*$/,
+  'margin-bottom': /^[^-]*$/,
+  'margin-left': /^[^-]*$/,
+  'margin-inline': /^[^-]*$/,
+  'margin-inline-start': /^[^-]*$/,
+  'margin-inline-end': /^[^-]*$/,
+  'margin-block': /^[^-]*$/,
+  'margin-block-start': /^[^-]*$/,
+  'margin-block-end': /^[^-]*$/,
+  'backface-visibility': /^visible$/,
+  'mix-blend-mode': /^normal$/,
+  // A negative z-index can paint an element below its parent's background.
+  'z-index': /^(auto|\d+)$/,
+  'animation-name': /^none$/,
+  animation: /^none$/,
+};
+
+// Elements whose content is never presented as text.
+// (The user agent style sheet hides them: display:none.)
+const UNRENDERED = new Set([
+  'template',
+  'script',
+  'noscript',
+  'style',
+  'title',
+  'head',
+  'meta',
+  'base',
+  'link',
+  'area',
+  'param',
+  'rp',
+  'noembed',
+  'noframes',
+]);
+// Content whose presentation depends on rendering the static cascade cannot
+// decide (form controls, embedded content).
+const UNDECIDABLE_CONTENT = new Set([
+  'select',
+  'option',
+  'optgroup',
+  'datalist',
+  'textarea',
+  'iframe',
+  'object',
+  'embed',
+  'canvas',
+  'video',
+  'audio',
+  'picture',
+  'slot',
+  'marquee',
+  // SVG and MathML only render text in specific elements and positions.
+  'svg',
+  'math',
+]);
+
+function undecidableReason(node) {
+  if (Object.hasOwn(node.attributes ?? {}, 'popover'))
+    return `popover on <${node.tag}> (popover state is not measured)`;
+  if (UNDECIDABLE_CONTENT.has(node.tag))
+    return `content of <${node.tag}> is not measured`;
+  return null;
+}
+
 function structuralConcealment(node, child) {
-  if (node.tag === 'template') return 'inside <template> content';
+  if (UNRENDERED.has(node.tag)) return `inside <${node.tag}> (not rendered)`;
   if (Object.hasOwn(node.attributes, 'hidden'))
     return `hidden attribute on <${node.tag}>`;
   if (Object.hasOwn(node.attributes, 'inert'))
@@ -436,8 +579,22 @@ function colorConcealment(chain, observed, context, cache) {
   background ??= NAMED_COLORS.white;
   const fg = parseColor(color);
   if (fg == null) return { risk: `color ${color} is not comparable` };
-  if (fg[3] === 0) return { concealed: 'transparent text color' };
+  // Text painted through its background (background-clip:text) or carried by
+  // a shadow is visible even with a transparent or matching color.
+  for (const node of chain) {
+    const style = styleOf(node, observed, context, cache);
+    const clip = resolved(style, 'background-clip');
+    if (clip != null && /\btext\b/.test(normalizeCssValue(clip)))
+      return { risk: `background-clip:${clip} on <${node.tag}>` };
+  }
+  const shadow = inherited(chain, 'text-shadow', observed, context, cache);
+  const shadowed = shadow != null && normalizeCssValue(shadow) !== 'none';
+  if (fg[3] === 0)
+    return shadowed
+      ? { risk: 'transparent text color with a text shadow' }
+      : { concealed: 'transparent text color' };
   if (
+    !shadowed &&
     fg[3] === 1 &&
     fg[0] === background[0] &&
     fg[1] === background[1] &&
@@ -464,6 +621,7 @@ function presentation(target, observed, context, cache) {
   }
   let risk = null;
   for (const node of chain) {
+    risk ??= undecidableReason(node);
     const own = ownConcealment(node, styleOf(node, observed, context, cache));
     if (own.concealed) return { visible: false, reason: own.concealed };
     risk ??= own.risk ?? null;
@@ -480,18 +638,23 @@ function presentation(target, observed, context, cache) {
 }
 
 /**
- * Text the user can perceive inside `node`: concealed descendants contribute
- * nothing; undecidable concealment anywhere in the subtree is reported.
+ * Text the user can perceive inside `node`, as `{ strict, lenient }`.
+ * Soundly concealed descendants contribute to neither. Content whose
+ * presentation cannot be decided (popovers, form controls, clipping, overflow,
+ * transforms, uncomparable colors) contributes only to `lenient`: an
+ * assertion that holds on `strict` passes, one that only holds on `lenient`
+ * is unmeasured, and one that holds on neither fails.
  */
 function presentedText(
   node,
   observed,
   context,
   cache,
-  risks,
   chain = ancestorsOf(node),
+  decided = true,
 ) {
-  let out = '';
+  let strict = '';
+  let lenient = '';
   for (const child of node.children ?? []) {
     if (child.tag === '#text') {
       const visibility = inherited(
@@ -506,8 +669,10 @@ function presentedText(
         ['hidden', 'collapse'].includes(normalizeCssValue(visibility));
       if (!hidden && child.text.trim() !== '') {
         const color = colorConcealment(chain, observed, context, cache);
-        if (color.risk) risks.push(color.risk);
-        if (!color.concealed) out += child.text;
+        if (!color.concealed) {
+          lenient += child.text;
+          if (decided && !color.risk) strict += child.text;
+        }
       }
       continue;
     }
@@ -518,13 +683,20 @@ function presentedText(
       continue;
     const own = ownConcealment(child, styleOf(child, observed, context, cache));
     if (own.concealed) continue;
-    if (own.risk) risks.push(own.risk);
-    out +=
-      ' ' +
-      presentedText(child, observed, context, cache, risks, [...chain, child]) +
-      ' ';
+    const childDecided =
+      decided && own.risk == null && undecidableReason(child) == null;
+    const inner = presentedText(
+      child,
+      observed,
+      context,
+      cache,
+      [...chain, child],
+      childDecided,
+    );
+    strict += ` ${inner.strict} `;
+    lenient += ` ${inner.lenient} `;
   }
-  return out;
+  return { strict, lenient };
 }
 
 function disabledReason(node) {
@@ -549,17 +721,16 @@ function evaluateRender(check, observed) {
   }
   let tree;
   try {
-    tree = parseHtml(rendered.html);
+    tree = committedTree(rendered.tree);
   } catch (error) {
-    return result(
-      'fail',
-      `rendered markup is not well formed: ${error.message}`,
-    );
+    return result('fail', `committed DOM is not readable: ${error.message}`);
   }
   const matches = select(tree, check.select);
   const expect = check.expect ?? {};
   const failures = [];
-  const unmeasured = [];
+  const unmeasured = (rendered.unmeasured ?? []).map(
+    (u) => `committed DOM not fully compared: ${u}`,
+  );
   if (dynamic.length > 0)
     failures.push(
       `runtime DOM/style activity: ${dynamic.slice(0, 5).join('; ')}`,
@@ -598,26 +769,37 @@ function evaluateRender(check, observed) {
         unmeasured.push(`presentation unknown: ${v.reason}`);
     }
   }
-  const textRisks = [];
-  const textOf = (node) =>
-    presentedText(node, observed, context, cache, textRisks)
-      .replace(/\s+/g, ' ')
-      .trim();
+  const textOf = (node) => {
+    const t = presentedText(node, observed, context, cache);
+    return {
+      strict: t.strict.replace(/\s+/g, ' ').trim(),
+      lenient: t.lenient.replace(/\s+/g, ' ').trim(),
+    };
+  };
+  // Pass on strict text, unmeasured when only the undecidable content makes
+  // the assertion hold, fail otherwise.
+  const assertText = (t, ok, describe) => {
+    if (ok(t.strict)) return;
+    if (ok(t.lenient))
+      unmeasured.push(
+        `presented text unknown: ${describe(t.lenient)} relies on content whose presentation is not measured`,
+      );
+    else failures.push(describe(t.strict));
+  };
   if (expect.texts != null) {
     if (expect.texts.length !== matches.length)
       failures.push(
         `texts lists ${expect.texts.length} patterns for ${matches.length} matches`,
       );
     matches.forEach((match, i) => {
-      const t = textOf(match);
-      if (
-        expect.texts[i] != null &&
-        !new RegExp(expect.texts[i], 'i').test(t)
-      ) {
-        failures.push(
+      if (expect.texts[i] == null) return;
+      const re = new RegExp(expect.texts[i], 'i');
+      assertText(
+        textOf(match),
+        (t) => re.test(t),
+        (t) =>
           `match ${i} presented text ${JSON.stringify(t)} does not match /${expect.texts[i]}/i`,
-        );
-      }
+      );
     });
   }
   // Interactions: the target is the single presented, enabled rendered
@@ -627,10 +809,23 @@ function evaluateRender(check, observed) {
     const observedInteraction = (rendered.interactions ?? []).find(
       (i) => i.testId === wanted.testId && i.event === wanted.event,
     );
-    const byNode = new Map(
-      (observedInteraction?.candidates ?? []).map((c) => [c.node, c]),
+    // Candidates are the committed elements with the test id, in document
+    // order; the sandbox dispatched natively on each one.
+    const byIndex = new Map(
+      (observedInteraction?.candidates ?? []).map((c) => [c.index, c]),
     );
     const nodes = select(tree, { testId: wanted.testId });
+    // The sandbox dispatched on the committed elements with the test id, in
+    // document order; they must be exactly the markup's elements.
+    if (
+      observedInteraction != null &&
+      observedInteraction.candidates.length !== nodes.length
+    ) {
+      failures.push(
+        `${wanted.event} on ${wanted.testId}: ${observedInteraction.candidates.length} dispatch candidates for ${nodes.length} elements in the committed markup`,
+      );
+      continue;
+    }
     const eligible = [];
     const reasons = [];
     for (const node of nodes) {
@@ -661,11 +856,9 @@ function evaluateRender(check, observed) {
       );
       continue;
     }
-    const outcome = byNode.get(eligible[0].attributes['data-pms-node']);
-    if (outcome == null || outcome.outcome !== 'dispatched') {
-      failures.push(
-        `${wanted.event} on ${wanted.testId}: ${outcome?.outcome ?? 'not dispatched'}`,
-      );
+    const outcome = byIndex.get(nodes.indexOf(eligible[0]));
+    if (outcome == null) {
+      failures.push(`${wanted.event} on ${wanted.testId}: not dispatched`);
       continue;
     }
     for (const [name, n] of Object.entries(outcome.calls ?? {}))
@@ -687,21 +880,24 @@ function evaluateRender(check, observed) {
       : result('pass', null, { matched: 0 });
   }
   const target = matches[check.index ?? 0];
-  const text = textOf(target);
-  if (expect.text != null && text !== expect.text)
-    failures.push(`presented text is ${JSON.stringify(text)}`);
-  if (
-    expect.textMatches != null &&
-    !new RegExp(expect.textMatches, 'i').test(text)
-  ) {
-    failures.push(
-      `presented text ${JSON.stringify(text)} does not match /${expect.textMatches}/i`,
+  const targetText = textOf(target);
+  const text = targetText.strict;
+  if (expect.text != null) {
+    assertText(
+      targetText,
+      (t) => t === expect.text,
+      (t) => `presented text is ${JSON.stringify(t)}`,
     );
   }
-  const assertsText =
-    expect.text != null || expect.textMatches != null || expect.texts != null;
-  if (assertsText)
-    for (const r of textRisks) unmeasured.push(`presented text unknown: ${r}`);
+  if (expect.textMatches != null) {
+    const re = new RegExp(expect.textMatches, 'i');
+    assertText(
+      targetText,
+      (t) => re.test(t),
+      (t) =>
+        `presented text ${JSON.stringify(t)} does not match /${expect.textMatches}/i`,
+    );
+  }
   for (const [name, value] of Object.entries(expect.attributes ?? {})) {
     const has = Object.hasOwn(target.attributes, name);
     if (
@@ -991,114 +1187,169 @@ function readJsonOrNull(file) {
   }
 }
 
-// Generated-output integrity. The generation state file written next to the
-// output directory lists every file of a generation with its digest, so it is
-// the inventory of record:
-//   - nothing generated (no output, no state): "never generated"; allowed in
-//     no-hand-edits mode, a failure in must-match mode;
-//   - output without state, state without output, or any file missing,
-//     added, renamed or modified relative to the state: "incomplete or
-//     altered generation" in every mode;
-//   - otherwise the generation itself must be the fresh compiler generation
-//     (must-match) or either the fresh one or the untouched baseline one
-//     (no-hand-edits), compared on every path-independent file.
-function generationDigests(state) {
-  const out = {};
-  for (const [rel, entry] of Object.entries(state?.files ?? {})) {
-    if (!PATH_DEPENDENT_GENERATED.has(rel)) out[rel] = entry?.digest ?? null;
-  }
-  return out;
+// Generated-output integrity. References come only from places the agent
+// cannot edit: the harness's baseline snapshot and a fresh trusted
+// recompilation of the final sources. The workspace's own generation state is
+// never trusted as an inventory.
+//   - Path inventories (output directory files plus the state file) are
+//     compared exactly: missing, added and renamed files all count.
+//   - Deterministic files must be byte-identical. The build report and the
+//     state file embed paths and session identities, so they are compared in
+//     a normal form that keeps every path-independent field.
+//   - must-match: the workspace generation is the fresh generation.
+//   - no-hand-edits: it is byte-identical to the baseline generation (never
+//     touched), or the fresh generation, or absent when the baseline had none.
+//     Deleting a baseline generation is never "never generated".
+const REPORT_FIELDS = [
+  'documentKind',
+  'schemaVersion',
+  'contractVersion',
+  'systemId',
+  'registryDigest',
+  'coveredFileCount',
+  'analysedFileCount',
+  'designSystemRuleCount',
+  'consumerRuleCount',
+  'ruleCount',
+  'cssBytes',
+  'coverageSummary',
+  'coverageConsistency',
+  'externalRequests',
+];
+
+function readGeneration(root, outDir, statePath) {
+  const files = inventory(path.join(root, outDir));
+  const stateFile = path.join(root, statePath);
+  const stateExists = fs.existsSync(stateFile);
+  return {
+    files,
+    stateExists,
+    stateDigest: stateExists ? fileDigest(stateFile) : null,
+    state: stateExists ? readJsonOrNull(stateFile) : null,
+    report:
+      files['build-report.json'] != null
+        ? readJsonOrNull(path.join(root, outDir, 'build-report.json'))
+        : null,
+    empty: Object.keys(files).length === 0 && !stateExists,
+  };
 }
 
-function sameGeneration(a, b) {
-  const ka = Object.keys(a).sort();
-  const kb = Object.keys(b).sort();
+function reportForm(report) {
+  if (report == null || typeof report !== 'object') return null;
+  const out = {};
+  for (const key of REPORT_FIELDS) {
+    if (!Object.hasOwn(report, key)) return null;
+    out[key] = report[key];
+  }
+  out.coveredRoots = Array.isArray(report.coveredRoots)
+    ? report.coveredRoots.length
+    : null;
+  out.relayEdges = Array.isArray(report.relayEdges)
+    ? report.relayEdges.length
+    : null;
+  return JSON.stringify(out);
+}
+
+function stateForm(state) {
+  if (state == null || typeof state !== 'object' || state.files == null)
+    return null;
+  const files = {};
+  for (const rel of Object.keys(state.files).sort()) {
+    const entry = state.files[rel] ?? {};
+    files[rel] = PATH_DEPENDENT_GENERATED.has(rel)
+      ? { kind: entry.kind ?? null }
+      : {
+          digest: entry.digest ?? null,
+          size: entry.size ?? null,
+          kind: entry.kind ?? null,
+        };
+  }
+  return JSON.stringify({ version: state.version ?? null, files });
+}
+
+function sameAsFresh(ws, fresh) {
+  const problems = [];
+  const wsPaths = Object.keys(ws.files).sort();
+  const freshPaths = Object.keys(fresh.files).sort();
+  for (const rel of freshPaths)
+    if (ws.files[rel] == null) problems.push(`missing ${rel}`);
+  for (const rel of wsPaths)
+    if (fresh.files[rel] == null) problems.push(`unexpected file ${rel}`);
+  for (const rel of wsPaths) {
+    if (fresh.files[rel] == null || PATH_DEPENDENT_GENERATED.has(rel)) continue;
+    if (ws.files[rel] !== fresh.files[rel]) problems.push(`modified ${rel}`);
+  }
+  if (
+    fresh.files['build-report.json'] != null &&
+    ws.files['build-report.json'] != null
+  ) {
+    const form = reportForm(ws.report);
+    if (form == null || form !== reportForm(fresh.report))
+      problems.push('build-report.json differs from the fresh build report');
+  }
+  if (ws.stateExists !== fresh.stateExists)
+    problems.push(
+      ws.stateExists
+        ? 'unexpected generation state'
+        : 'missing generation state',
+    );
+  else if (ws.stateExists) {
+    const form = stateForm(ws.state);
+    if (form == null || form !== stateForm(fresh.state))
+      problems.push('generation state differs from the fresh generation');
+  }
+  return problems;
+}
+
+function sameAsBaseline(ws, base) {
+  if (base.empty || ws.stateDigest !== base.stateDigest) return false;
+  const a = Object.keys(ws.files).sort();
+  const b = Object.keys(base.files).sort();
   return (
-    ka.length === kb.length && ka.every((k, i) => k === kb[i] && a[k] === b[k])
+    a.length === b.length &&
+    a.every((rel, i) => rel === b[i] && ws.files[rel] === base.files[rel])
   );
 }
 
 function evaluateGenerated(check, ctx, observed) {
   const outDir = ctx.project.outDir.replace(/^\.\//, '').replace(/\/$/, '');
   const statePath = stateFileFor(outDir);
-  const ws = inventory(path.join(ctx.workspaceDir, outDir));
-  const wsStateExists = fs.existsSync(path.join(ctx.workspaceDir, statePath));
-  const wsState = readJsonOrNull(path.join(ctx.workspaceDir, statePath));
-  const baseState = readJsonOrNull(path.join(ctx.baselineDir, statePath));
-  const freshState = observed.compile?.ok
-    ? readJsonOrNull(path.join(ctx.scratchWorkspace, statePath))
+  const ws = readGeneration(ctx.workspaceDir, outDir, statePath);
+  const base = readGeneration(ctx.baselineDir, outDir, statePath);
+  const fresh = observed.compile?.ok
+    ? readGeneration(ctx.scratchWorkspace, outDir, statePath)
     : null;
-  if (Object.keys(ws).length === 0 && !wsStateExists) {
-    return check.mode === 'must-match'
-      ? result(
-          'fail',
-          'never generated: no compiler output and no generation state',
-        )
-      : result('pass', null, { note: 'never generated' });
-  }
-  const problems = [];
-  if (wsState == null)
-    problems.push(
-      wsStateExists
-        ? `${statePath} is not a generation state`
-        : `incomplete generation: output exists without ${statePath}`,
-    );
-  else {
-    const listed = wsState.files ?? {};
-    for (const rel of Object.keys(listed)) {
-      if (ws[rel] == null)
-        problems.push(`missing ${rel} (listed by the generation)`);
-      else if (listed[rel]?.digest !== ws[rel])
-        problems.push(`modified ${rel}`);
-    }
-    for (const rel of Object.keys(ws))
-      if (!Object.hasOwn(listed, rel)) problems.push(`unexpected file ${rel}`);
-    const buildReport = path.join(
-      ctx.workspaceDir,
-      outDir,
-      'build-report.json',
-    );
-    if (
-      ws['build-report.json'] != null &&
-      readJsonOrNull(buildReport)?.documentKind !== 'pandamstyle-build-report'
-    ) {
-      problems.push('build-report.json is not a build report');
-    }
-  }
-  if (problems.length === 0) {
-    const current = generationDigests(wsState);
-    const isFresh =
-      freshState != null &&
-      sameGeneration(current, generationDigests(freshState));
-    const isBaseline =
-      baseState != null &&
-      sameGeneration(current, generationDigests(baseState));
-    if (check.mode === 'must-match') {
-      if (freshState == null)
-        return result(
-          'blocked',
-          'fresh compilation failed; generated output cannot be compared',
-        );
-      if (!isFresh)
-        problems.push('the generation is not the fresh compiler generation');
-    } else if (!isFresh && !isBaseline) {
-      if (freshState == null && baseState == null)
-        return result(
-          'blocked',
-          'fresh compilation failed and there is no baseline generation to compare',
-        );
-      problems.push(
-        'the generation matches neither fresh compiler output nor the untouched baseline',
-      );
-    }
-  }
-  return problems.length > 0
-    ? result(
+  if (ws.empty) {
+    if (!base.empty)
+      return result(
         'fail',
-        `generated output is not compiler output: ${problems.slice(0, 8).join('; ')}`,
-        problems,
-      )
-    : result('pass', null, { files: Object.keys(ws).length });
+        'the baseline generation was deleted and not regenerated',
+      );
+    return check.mode === 'must-match'
+      ? result('fail', 'never generated: no compiler output')
+      : result('pass', null, {
+          note: 'never generated (the baseline had no generation either)',
+        });
+  }
+  const untouched = sameAsBaseline(ws, base);
+  if (check.mode !== 'must-match' && untouched)
+    return result('pass', null, { note: 'baseline generation untouched' });
+  if (fresh == null)
+    return result(
+      'blocked',
+      'fresh compilation failed; a changed generation cannot be compared',
+    );
+  const problems = sameAsFresh(ws, fresh);
+  if (problems.length === 0)
+    return result('pass', null, {
+      note: 'fresh compiler generation',
+      files: Object.keys(ws.files).length,
+    });
+  return result(
+    'fail',
+    `generated output is not compiler output: ${problems.slice(0, 8).join('; ')}`,
+    problems,
+  );
 }
 
 function evaluateTranscript(check, transcript) {
@@ -1230,6 +1481,76 @@ function aggregate(statuses) {
   return 'pass';
 }
 
+// Every class name the compiler emitted (atomic and theme classes).
+function compilerClasses(css) {
+  const out = new Set();
+  for (const m of css.matchAll(/\.((?:\\.|[\w-])+)/g))
+    out.add(m[1].replace(/\\(.)/g, '$1'));
+  return out;
+}
+
+// Final-state checks on the committed DOM: no inline style, no style sheet
+// element, and no class the compiler did not emit (raw classes would bypass
+// the design system through global CSS).
+// The sandbox's structured snapshot of the committed DOM, as the node shape
+// the selectors and the cascade use. Serialized markup is never re-parsed:
+// raw-text elements serialize their text unescaped, so a re-parse could see
+// elements that do not exist.
+function committedTree(snapshot) {
+  const root = { tag: '#root', attributes: {}, children: [], parent: null };
+  const build = (items, parent, depth) => {
+    if (!Array.isArray(items) || depth > 256)
+      throw new Error('malformed committed DOM snapshot');
+    for (const item of items) {
+      if (typeof item?.x === 'string') {
+        // Adjacent text nodes render as one run of text.
+        const last = parent.children[parent.children.length - 1];
+        if (last?.tag === '#text') last.text += item.x;
+        else parent.children.push({ tag: '#text', text: item.x, parent });
+        continue;
+      }
+      if (typeof item?.t !== 'string' || !Array.isArray(item.a))
+        throw new Error('malformed committed DOM snapshot');
+      const attributes = {};
+      for (const pair of item.a) {
+        if (
+          !Array.isArray(pair) ||
+          typeof pair[0] !== 'string' ||
+          typeof pair[1] !== 'string'
+        )
+          throw new Error('malformed committed DOM snapshot');
+        attributes[pair[0]] = pair[1];
+      }
+      const element = { tag: item.t, attributes, children: [], parent };
+      parent.children.push(element);
+      build(item.c, element, depth + 1);
+    }
+  };
+  build(snapshot, root, 0);
+  return root;
+}
+
+function committedDomViolations(snapshot, knownClasses) {
+  let tree;
+  try {
+    tree = committedTree(snapshot);
+  } catch (error) {
+    return [`committed DOM is not readable: ${error.message}`];
+  }
+  const out = [];
+  for (const el of elements(tree)) {
+    if (Object.hasOwn(el.attributes, 'style'))
+      out.push(`committed <${el.tag}> carries a style attribute`);
+    if (el.tag === 'style' || el.tag === 'link')
+      out.push(`committed <${el.tag}> element`);
+    for (const cls of classList(el)) {
+      if (!knownClasses.has(cls))
+        out.push(`committed class "${cls}" was not emitted by the compiler`);
+    }
+  }
+  return out;
+}
+
 function observeProject({
   ctx,
   project,
@@ -1316,35 +1637,56 @@ function observeProject({
   }
   for (const t of probe?.rejected ?? []) observed.tokenVars[t] = null;
   delete observed.probe;
-  for (const r of renders.values()) {
+  // All scenarios of one evaluation render in one sandbox process; each gets
+  // its own DOM window and its own instances of workspace modules.
+  const list = [...renders.values()];
+  const knownClasses = compilerClasses(observed.css ?? '');
+  if (list.length > 0) {
     const out = runSandbox(
       {
         mode: 'render',
         workspaceDir: ctx.scratchWorkspace,
         overrides: worker.overrides,
         themeClasses: observed.themeClasses,
-        render: r.render,
-        interactions: r.interactions,
+        scenarios: list.map((r) => ({
+          render: r.render,
+          interactions: r.interactions,
+        })),
       },
-      { timeoutMs: (options.renderTimeoutSeconds ?? 60) * 1000 },
+      { timeoutMs: (options.renderTimeoutSeconds ?? 120) * 1000 },
     );
+    let results = null;
     if (out.ok) {
       try {
-        observed.renders[r.id] = JSON.parse(out.payload);
+        results = JSON.parse(out.payload).scenarios;
       } catch (error) {
-        observed.renders[r.id] = {
-          error: `sandbox payload is not JSON: ${error.message}`,
-          violations: [],
-        };
+        out.error = `sandbox payload is not JSON: ${error.message}`;
       }
-    } else {
-      observed.renders[r.id] = {
-        error: out.error,
-        violations: CODE_GENERATION_ERROR.test(out.error)
-          ? ['code generation from strings']
-          : [],
-      };
     }
+    list.forEach((r, i) => {
+      const scenario = results?.[i];
+      if (scenario == null) {
+        observed.renders[r.id] = {
+          error: out.error ?? 'scenario missing from sandbox result',
+          violations: CODE_GENERATION_ERROR.test(out.error ?? '')
+            ? ['code generation from strings']
+            : [],
+        };
+        return;
+      }
+      const violations = [...(scenario.violations ?? [])];
+      if (scenario.error != null && CODE_GENERATION_ERROR.test(scenario.error))
+        violations.push('code generation from strings');
+      if (scenario.tree != null)
+        violations.push(...committedDomViolations(scenario.tree, knownClasses));
+      observed.renders[r.id] = {
+        ...scenario,
+        violations,
+        error:
+          scenario.error ??
+          (scenario.tree == null ? 'nothing was committed' : null),
+      };
+    });
   }
   delete observed.overrides;
   return observed;

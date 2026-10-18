@@ -1,0 +1,9 @@
+{
+  "description": "Review probe: cloneElement adds a ref that writes a computed style key; React runs the ref, the instrumented DOM records the style write.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-card": "fail"
+  }
+}

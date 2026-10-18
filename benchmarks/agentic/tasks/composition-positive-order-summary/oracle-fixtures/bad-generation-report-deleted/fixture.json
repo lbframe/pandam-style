@@ -1,0 +1,16 @@
+{
+  "description": "Review probe: build-report.json and its state entry are deleted.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "generationEdits": [
+    {
+      "op": "delete-entry",
+      "rel": "build-report.json"
+    }
+  ],
+  "regenerate": true
+}

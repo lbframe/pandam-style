@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: copies a marker from an unused element with the handler; nothing but the committed DOM counts.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "remove-click": "fail"
+  }
+}

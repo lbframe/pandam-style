@@ -18,14 +18,14 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { copyTree, readJson } from './fs-tree.mjs';
+import { copyTree, readJson, sha256 } from './fs-tree.mjs';
 import {
   applyEvent,
   applySteps,
   compileInPlace,
   materializeTask,
 } from './materialize.mjs';
-import { evaluateTask } from './oracles/evaluate.mjs';
+import { evaluateTask, stateFileFor } from './oracles/evaluate.mjs';
 
 export function listOracleFixtures(taskEntry) {
   const dir = path.join(taskEntry.dir, 'oracle-fixtures');
@@ -94,6 +94,30 @@ export async function runOracleFixture({
   }
   if (fixture.spec.regenerate === true)
     compileInPlace({ dir: workspaceDir, project });
+  // Agent-style tampering with a generation, keeping the generation's own
+  // state file consistent with the tampered bytes.
+  for (const edit of fixture.spec.generationEdits ?? []) {
+    const outDir = path.join(workspaceDir, project.outDir);
+    const statePath = path.join(workspaceDir, stateFileFor(project.outDir));
+    if (edit.op === 'delete-all') {
+      fs.rmSync(outDir, { recursive: true, force: true });
+      fs.rmSync(statePath, { force: true });
+      continue;
+    }
+    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    if (edit.op === 'rewrite') {
+      fs.writeFileSync(path.join(outDir, edit.rel), edit.content);
+      state.files[edit.rel] = {
+        ...state.files[edit.rel],
+        digest: sha256(edit.content),
+        size: Buffer.byteLength(edit.content),
+      };
+    } else if (edit.op === 'delete-entry') {
+      fs.rmSync(path.join(outDir, edit.rel), { force: true });
+      delete state.files[edit.rel];
+    }
+    fs.writeFileSync(statePath, JSON.stringify(state));
+  }
   const responsePath = path.join(fixture.dir, 'response.md');
   const result = await evaluateTask({
     task: taskEntry.task,

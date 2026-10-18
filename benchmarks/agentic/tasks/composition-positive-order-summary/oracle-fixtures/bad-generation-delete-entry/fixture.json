@@ -1,0 +1,16 @@
+{
+  "description": "Review probe: a compiled module and its state entry are both deleted.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "generationEdits": [
+    {
+      "op": "delete-entry",
+      "rel": "js/src/components/OrderSummary.jsx"
+    }
+  ],
+  "regenerate": true
+}

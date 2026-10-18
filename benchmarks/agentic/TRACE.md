@@ -9,7 +9,10 @@ wrong one. Check IDs refer to `expectations.alpha1.checks` in each
 
 Every task also has a required `scope.diff` (byte diff against writable and
 protected globs), and every task with a PandamStyle project has
-`generated-untouched` (full generated inventory). Application tasks also have
+`generated-untouched` (full generated inventory against the baseline snapshot
+and a fresh recompilation; `composition-boundary-generated-shortcut` has
+`bad-deleted-baseline-generation`, which proves that deleting a baseline
+generation is never "never generated"). Application tasks also have
 `compile` and `no-bypass` (`static.forbidden`), and at least one render check
 asserting rendered content. Every rendered match must be presented. These are
 not repeated below unless they are the discriminating evidence.
@@ -70,15 +73,49 @@ not repeated below unless they are the discriminating evidence.
       `bad-generation-state-tamper`: inventory of record.
     - `bad-clipped-summary`: clipping is undecidable statically, so the verdict
       is `unmeasured`, never `pass`.
-  - Good controls: `good-idiomatic-indexing` (array indexing and lookup maps)
-    and `good-regenerated` (complete fresh generation).
+  - Third-review probes, against the real React client and DOM:
+    - `bad-ref-guarded-hidden` and `bad-ref-guarded-text` (refs guarded by
+      `nodeType`/`tagName` that hide or replace content) and
+      `bad-clone-style-ref` (a `cloneElement` ref writing a computed style
+      key): the instrumented DOM and the committed-tree check reject them.
+    - `bad-bound-native-ref` (self-review): a bound DOM method handed to React
+      as a ref writes with no agent stack frame; the committed DOM no longer
+      matches React's committed tree.
+    - `bad-raw-text-forgery` (self-review): `<xmp>` text that spells item
+      markup; the evaluator reads the structured committed DOM, so no item
+      exists.
+    - `bad-script-item-text` and `bad-noscript-item-text`: never presented.
+      `bad-popover-item-text` and `bad-select-item-text`: undecidable, so
+      `unmeasured`.
+    - `bad-content-visibility`, `bad-scale-zero`, `bad-translate-offscreen`,
+      `bad-overflow-x` and `bad-font-size-percent` are rejected by the
+      compiler; the evaluator also treats those properties as concealment or
+      undecidable.
+    - `bad-generation-delete-entry`, `-rehash-modified`, `-forged-report` and
+      `-report-deleted` edit the generation and keep its state file
+      consistent; the baseline snapshot and the fresh recompilation reject
+      them.
+    - `broken-select-on-section`: calling `select()` on a `<section>` throws,
+      as in a browser, so the render fails.
+  - Good controls: `good-idiomatic-indexing` (array indexing and lookup maps),
+    `good-handler-map` (`handlers[e.key]?.()`), `good-focus-ref`,
+    `good-memo-hooks` and `good-regenerated` (complete fresh generation).
   - The same class for behavior is covered by
     `variants-positive-remove-button`. `remove-click` dispatches a click on
     the rendered, enabled target and requires exactly one `onRemove` call.
     - Fail: `bad-no-click-handler`, `bad-calls-during-render`,
-      `bad-unrendered-handler` (handler only on unused JSX) and
-      `bad-disabled-button`.
-    - Pass: `good-arrow-handler` and `good-bubbling-handler`.
+      `bad-unrendered-handler` (handler only on unused JSX),
+      `bad-disabled-button`, `bad-clone-remove-handler` (`cloneElement`
+      removes `onClick`), `bad-clone-forge-marker` (props copied from an
+      unused element), `bad-bound-native-listener` (a bound DOM method
+      registered as a listener) and `bad-template-decoy-handler` (a handler
+      on a decoy inside a `<template>`).
+    - Unmeasured: `bad-popover-button` (a closed popover's presentation is not
+      measurable).
+    - Pass: `good-arrow-handler`, `good-bubbling-handler`,
+      `good-clone-add-handler`, `good-primary-button-check`
+      (`e.button === 0`) and `good-target-equality`
+      (`e.target === e.currentTarget`).
 
 ## states: `states-boundary-aria-disabled`
 

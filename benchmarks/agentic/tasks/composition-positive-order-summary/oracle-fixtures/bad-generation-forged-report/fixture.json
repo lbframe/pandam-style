@@ -1,0 +1,17 @@
+{
+  "description": "Review probe: build-report.json is replaced by a forged report and re-hashed in the state.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "generationEdits": [
+    {
+      "op": "rewrite",
+      "rel": "build-report.json",
+      "content": "{\"documentKind\":\"pandamstyle-build-report\",\"forged\":true}"
+    }
+  ],
+  "regenerate": true
+}

@@ -1,0 +1,8 @@
+{
+  "description": "Review case: the effect calls select() on a <section>, which has no select method; React reports the uncaught error and unmounts, as a browser would. A real defect, so it fails.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "summary-card": "fail"
+  }
+}
