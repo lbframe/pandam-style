@@ -25,7 +25,7 @@ extend-ignore-re = [
   # digest-pinned reviewed evidence, so translating it requires re-review.
   'Un seul registre alimente politique, compilation et manifeste',
   'les styles passent tous par le moteur du fork',
-  '// Mouvement\b',
+  '(?m)^\s*// Mouvement$',
 ]
 
 [default.extend-identifiers]

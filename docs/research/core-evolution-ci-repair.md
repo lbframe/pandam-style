@@ -66,8 +66,8 @@ verbatim.
   repository spelling gate.
 - **Repair.** In `.github/workflows/typos.toml`:
   - `.styl` is accepted only after `.` or `|`;
-  - the two exact French comment phrases and the exact French label are
-    accepted;
+  - the two exact French comment phrases are accepted, and so is the French
+    label, but only as a whole comment line;
   - "ANDed" is accepted as a whole identifier;
   - the word `unparseable` is accepted, because changing the emitted string
     would be a product behavior change.
@@ -88,8 +88,17 @@ verbatim.
   identity, as #43's identity criterion requires. On the repaired run, CI
   downloaded `crate-ci/typos@v1.50.2` (SHA `512fc24f…`) and typos v1.50.2, and
   the deprecation warning is gone **[executed]**.
-- **Sensitivity.** A probe that uses each flagged spelling on its own, outside
-  these contexts, is still reported: 5 of 5 **[executed]**.
+- **Sensitivity (class-level) [executed].** An accept/reject matrix of 15
+  probe lines covers every exception boundary and matches 15 of 15:
+  - the same spellings outside the accepted contexts are still reported,
+    including the extension's letters as a standalone word, the French words
+    in other sentences, the label followed by more words or after code, and
+    the split half of "ANDed" on its own;
+  - the accepted contexts pass.
+
+  The matrix found the first label pattern, a word-bounded match, too broad.
+  It is now anchored to the whole comment line. `unparseable` is accepted as a word
+  anywhere: that breadth is deliberate, because it is the product's own term.
 - **Spelling denominator.** Every file that `main`'s configuration scans is
   still scanned (393 → 394; the new file is this record). The only skipped
   additions are the 21 retained evidence files **[executed]**.
@@ -138,6 +147,14 @@ verbatim.
     `DEFERRED`.
   - Only the 6 `browser.*` rows changed their match flags, to all `true`.
     Every other row, including the deferred ones, is identical.
+- **Not a vacuous pass (class-level) [executed].** A temporary mutation set
+  the expected `gap` of `browser.token-values` to `17px`, run with
+  `PMS_CHROMIUM=/opt/google/chrome/chrome`. Exactly that case failed, in both
+  the fresh and incremental lanes, with the browser's computed `gap: 16px`;
+  the other 5 cases passed. The mutation was reverted.
+- **Failure-path coverage [executed].** A browser that cannot create its
+  sandbox still fails all 6 cases (the local copy above), and a missing
+  browser still fails next-qualification (F4 before).
 - **Product behavior.** Unchanged.
 
 ### F3: package-qualification
@@ -206,6 +223,10 @@ records the pinned runtime. The pilot step passed in every run.
 - Spelling: `typos --config .github/workflows/typos.toml --format brief` with
   `typos-cli 1.50.2`, run on `git archive 415e055`, `git archive main` and
   `git archive HEAD`; `typos --files` to compare the scanned files.
+- Spelling exceptions: the 15-line accept/reject probe matrix with the same
+  binary and configuration.
+- Browser oracle mutation: a temporary `17px` edit to `tests/semantic/cases/browser.js`,
+  then the browser-suite command below, then a revert.
 - Browser mechanism:
   `PMS_CHROMIUM=<binary> PMS_SEMANTIC_REPORT_DIR=<dir> node node_modules/jest/bin/jest.js --config tools/semantic-oracle/jest.config.js --ci --runInBand tests/semantic/__tests__/browser-test.js`,
   plus a direct `--headless --dump-dom` launch of each binary.
