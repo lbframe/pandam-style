@@ -134,19 +134,27 @@ only. Nothing instruments the measured packages.
 each round and alternates their order between rounds. It shuffles the order of
 workloads per round with seed 307.
 
-- **Quiet rule:** a final batch starts only if whole-machine CPU use stays at or
-  below 10% over 5 s and no foreign heavy tool process uses half a core or more.
-- **Load records:** the batch records the load before and after, plus the
-  1-minute load average before each sample.
-- **Busy machine:** after a bounded wait, the batch writes
-  `READY-TO-MEASURE.json` and measures nothing.
+- **Shared host:** the measurement host is shared with work outside both epics
+  and is never quiet, so absolute times are not comparable across runs. Every
+  run therefore includes the unchanged `alpha1` control, interleaved with the
+  candidate, and timing budgets use the paired ratio of each round.
+- **Load records:** each sample records the load averages before and after it
+  and the whole-machine CPU utilisation during it. Each batch records a load
+  snapshot (CPU share, foreign busy and heavy-tool cores, no process names)
+  before and after, and the batch maxima.
+- **Optional quiet rule:** with `--require-quiet`, a batch starts only if
+  whole-machine CPU use stays at or below 10% over 5 s and no foreign heavy tool
+  process uses half a core or more; after a bounded wait it writes
+  `READY-TO-MEASURE.json` and measures nothing. The frozen baseline was measured
+  without it.
 
 **Statistics.** Per (epoch, workload, metric), the summary gives the median and
 nearest-rank p95 over independent samples, each with a distribution-free 95%
 order-statistic interval. `null` means the bound is undefined at that n. An
 incremental edit contributes one value per sample: the median of its warm
 iterations. All warm iterations are also pooled for the tail. Epoch comparisons
-use the ratio of medians, with a seeded 2,000-round percentile bootstrap.
+pair the two adjacent samples of each round and report the median of the
+per-round ratios, with a seeded 2,000-round percentile bootstrap over pairs.
 Deterministic outputs must be identical across samples; they are never averaged.
 
 ## Results
@@ -163,15 +171,26 @@ and `alpha1-replay`.
 [`budget-policy.v1.json`](budget-policy.v1.json) is the versioned threshold
 rule. It lists the budgeted metrics, the metrics that stay `unknown` and the
 change policy. [`budgets.v1.json`](budgets.v1.json) is generated from the policy
-and the baseline runs by `budgets.mjs freeze`, never by hand. Rerunning the
-same freeze command must reproduce it byte for byte.
+and the baseline runs by `budgets.mjs freeze`, never by hand. Rerunning the same
+freeze command must reproduce it byte for byte.
 
-- **Timing, memory and runtime:** the limit is a ratio of the candidate's median
-  (and p95) to the `alpha1` median measured in the same interleaved run. It is
-  the larger of a floor and 1 + 2 × the null noise that the identical artifact
-  showed, rounded up to 0.05.
-  - Floors: 10% on the median and 25% on p95 for time; 10%/20% for memory;
-    15%/30% for runtime selection.
+- **Timing and runtime (paired ratios):** for each round, the candidate sample
+  is divided by the adjacent `alpha1` sample. A budget passes when the upper
+  bound of the bootstrap interval of the median ratio is within the limit, fails
+  when the median ratio exceeds it, and is otherwise `inconclusive`.
+  - Limit: the larger of a floor and the largest null upper bound
+    (`alpha1-replay` against `alpha1`) in each baseline batch and pooled,
+    rounded up to 0.05. Floors are 10% for time, 15% for runtime selection and
+    10% for memory measured as a ratio.
+  - Noise ceiling: if the `alpha1` control's interquartile range over median
+    exceeds max(0.10, 2 × the noisiest baseline batch), the budget is
+    `inconclusive`. So are runs without adjacent `alpha1` pairs or with fewer
+    than 5 pairs.
+  - Absolute times are kept as informational evidence only.
+- **Memory:** peak RSS proved stable under the shared load (pilot CV 0.2–4.4%).
+  A cell whose baseline CV is at most 5% gets an absolute limit on the candidate
+  median, baseline median × max(1.10, 1 + 3 CV), rounded up to 0.05. Any other
+  cell is a paired ratio.
 - **Deterministic outputs:** absolute limits on the frozen `alpha1` values.
   - 5% for CSS bytes, rule and declaration counts and host bundle bytes.
   - 10% for generated modules.
@@ -181,12 +200,15 @@ same freeze command must reproduce it byte for byte.
   are listed by every gate report and never count as passing.
 - **Gate verdicts:**
   - `pass`: every budget passes;
-  - `incomplete`: a budgeted metric was not run;
-  - `fail`: any failure, workload mismatch, changed `alpha1` tarball, or
-    policy-chain problem.
+  - `fail`: any failing budget, workload mismatch, changed `alpha1` tarball, or
+    policy-chain problem;
+  - `inconclusive`: no interleaved `alpha1` control, too few pairs, a noise
+    ceiling exceeded, or an interval straddling a limit;
+  - `incomplete`: a budgeted metric was not run.
+  - Only `pass` passes.
 
 ```sh
-node tools/baselines/measure.mjs --plan final --require-quiet --label <label> \
+node tools/baselines/measure.mjs --plan final --label <label> \
   --epoch alpha1=<store>/closure --epoch <candidate>=<candidate closure> \
   --node <store>/node/node-v22.22.0-linux-x64/bin/node
 node tools/baselines/budgets.mjs gate --budgets benchmarks/core-evolution/budgets.v1.json \

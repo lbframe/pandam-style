@@ -14,19 +14,51 @@
 // with distribution-free 95% order-statistic intervals. Deterministic output
 // metrics must be identical across every sample; a difference is reported as
 // non-determinism, never averaged. With two or more epochs, every timing,
-// memory and runtime metric also gets the ratio of medians against the first
-// epoch with a seeded percentile-bootstrap interval.
+// memory and runtime metric also gets the paired comparison against the first
+// epoch: the median of per-round ratios with a seeded bootstrap interval.
 
 import path from 'node:path';
-import {
-  bootstrapRatio,
-  readJson,
-  summarize,
-  writeJson,
-  median,
-} from './lib.mjs';
+import { pairedRatio, readJson, summarize, writeJson, median } from './lib.mjs';
 
 const warm = (iterations) => iterations.filter((i) => i.iteration > 0);
+
+// Pairs of (reference, candidate) values of one metric: the two samples of
+// the same run, round, workload and kind. `interleaved` is false when a
+// pair's samples were not adjacent in the run order.
+export function pairsOf(raws, reference, candidate, workload, metric) {
+  const pairs = [];
+  let interleaved = true;
+  let unpaired = 0;
+  for (const raw of raws) {
+    const cell = (epoch) =>
+      new Map(
+        raw.samples
+          .filter(
+            (s) =>
+              s.epoch === epoch &&
+              s.workload === workload &&
+              s.kind === metric.kind,
+          )
+          .map((s) => [s.round, s]),
+      );
+    const refs = cell(reference);
+    const cands = cell(candidate);
+    for (const [round, c] of cands) {
+      const r = refs.get(round);
+      if (r == null) {
+        unpaired++;
+        continue;
+      }
+      if (Math.abs(r.index - c.index) !== 1) interleaved = false;
+      if (!r.result.ok || !c.result.ok) continue;
+      const a = metric.get(r.result);
+      const b = metric.get(c.result);
+      if (a != null && b != null) pairs.push([a, b]);
+    }
+    unpaired += [...refs.keys()].filter((round) => !cands.has(round)).length;
+  }
+  return { pairs, interleaved, unpaired };
+}
 
 // class: timing | memory | runtime | deterministic
 export const METRICS = [
@@ -422,23 +454,20 @@ export function summarizeRun(...raws) {
       );
       if (base?.stats == null) continue;
       const metric = metrics.find((m) => m.id === entry.metric);
-      const valuesOf = (epoch) =>
-        samples
-          .filter(
-            (s) =>
-              s.epoch === epoch &&
-              s.workload === entry.workload &&
-              s.kind === metric.kind &&
-              s.result.ok,
-          )
-          .map((s) => metric.get(s.result))
-          .filter((v) => v != null);
+      const { pairs, interleaved } = pairsOf(
+        raws,
+        reference,
+        entry.epoch,
+        entry.workload,
+        metric,
+      );
       comparisons.push({
         workload: entry.workload,
         metric: entry.metric,
         reference,
         candidate: entry.epoch,
-        medianRatio: bootstrapRatio(valuesOf(reference), valuesOf(entry.epoch)),
+        interleaved,
+        pairedRatio: pairedRatio(pairs),
       });
     }
     for (const entry of results) {
@@ -466,7 +495,7 @@ export function summarizeRun(...raws) {
     kind: 'pandamstyle-ce003-summary',
     labels: raws.map((r) => r.label),
     statisticalMethod:
-      'Per (epoch, workload, metric): median and nearest-rank p95 over independent fresh-process samples, each with a distribution-free 95% order-statistic interval (null = unbounded at this n). Incremental edits: one value per sample (median of warm iterations, iteration 0 excluded); pooledIterations also summarizes every warm iteration for the tail. Epoch comparisons: ratio of medians with a seeded (307) 2,000-round percentile bootstrap. Deterministic metrics must be identical across samples.',
+      'Per (epoch, workload, metric): median and nearest-rank p95 over independent fresh-process samples, each with a distribution-free 95% order-statistic interval (null = unbounded at this n). Incremental edits: one value per sample (median of warm iterations, iteration 0 excluded); pooledIterations also summarizes every warm iteration for the tail. Epoch comparisons: per-round paired ratios candidate/reference (adjacent samples of the same round, workload and kind); median of ratios with a seeded (307) 2,000-round percentile bootstrap over pairs. Deterministic metrics must be identical across samples.',
     epochs,
     sampleCount: samples.length,
     failures,

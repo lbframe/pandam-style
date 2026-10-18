@@ -31,6 +31,7 @@ import {
   BENCH,
   DEFAULT_STORE,
   REPO,
+  cpuCounters,
   environment,
   fileSha256,
   isQuiet,
@@ -38,7 +39,9 @@ import {
   mulberry32,
   QUIET_RULE,
   readJson,
+  redactHome,
   treeDigest,
+  utilisationBetween,
   writeJson,
 } from './lib.mjs';
 import { loadWorkloads, materialize, WORKLOADS_FILE } from './workloads.mjs';
@@ -110,7 +113,7 @@ export function epochIdentity(closure) {
       path.join(closure, 'node_modules', name, 'package.json'),
     ).version;
   return {
-    closure,
+    closure: redactHome(closure),
     packageLockSha256: fileSha256(lockFile),
     packages,
     installedPandamstyle: treeDigest(
@@ -128,7 +131,7 @@ async function waitForQuiet(args, records) {
     if (isQuiet(snapshot)) return true;
     if (Date.now() + 60_000 > deadline) return false;
     process.stderr.write(
-      `machine busy (cpu ${snapshot.cpuUtilisation}, ${snapshot.foreignBusyProcesses.filter((p) => p.heavy).length} heavy); retrying in 5 min\n`,
+      `machine busy (cpu ${snapshot.cpuUtilisation}, ${snapshot.foreignHeavyCores} foreign heavy cores); retrying in 5 min\n`,
     );
     await new Promise((resolve) =>
       setTimeout(resolve, Math.min(300_000, deadline - Date.now())),
@@ -268,6 +271,7 @@ async function main() {
     return;
   }
   raw.load.quietAtStart = quiet;
+  raw.load.quietRequired = args.requireQuiet;
 
   // Templates, materialized once from frozen inputs (digest-checked).
   const templates = {};
@@ -332,9 +336,13 @@ async function main() {
           specFile,
           sampleSpec(args, plan, item.workload, item.kind, dir),
         );
-        const loadavg1 = Math.round(os.loadavg()[0] * 100) / 100;
+        const loadavg = () =>
+          os.loadavg().map((v) => Math.round(v * 100) / 100);
+        const loadBefore = loadavg();
+        const cpuBefore = cpuCounters();
         const startedAt = new Date().toISOString();
         const result = runSample(args, specFile);
+        if (!result.ok) result.error = redactHome(result.error);
         raw.samples.push({
           index: index++,
           round: r,
@@ -342,7 +350,14 @@ async function main() {
           workload: item.workload.id,
           kind: item.kind,
           startedAt,
-          loadavg1Before: loadavg1,
+          // Machine load around this sample: load averages before and after,
+          // and whole-machine CPU utilisation during it (this sample's own
+          // process included).
+          load: {
+            loadavgBefore: loadBefore,
+            loadavgAfter: loadavg(),
+            cpuUtilisation: utilisationBetween(cpuBefore, cpuCounters()),
+          },
           result,
         });
         if (!runtime) fs.rmSync(dir, { recursive: true, force: true });
@@ -354,6 +369,20 @@ async function main() {
   }
   raw.load.after = await loadSnapshot();
   raw.load.quietAtEnd = isQuiet(raw.load.after);
+  const perSample = raw.samples.map((x) => x.load);
+  const utilisations = perSample
+    .map((l) => l.cpuUtilisation)
+    .filter((v) => v != null);
+  raw.load.batch = {
+    maxLoadavg1: Math.max(
+      ...perSample.flatMap((l) => [l.loadavgBefore[0], l.loadavgAfter[0]]),
+    ),
+    maxSampleCpuUtilisation: Math.max(...utilisations),
+    meanSampleCpuUtilisation:
+      Math.round(
+        (utilisations.reduce((a, b) => a + b, 0) / utilisations.length) * 1000,
+      ) / 1000,
+  };
   raw.finishedAt = new Date().toISOString();
   writeJson(path.join(args.out, 'raw.json'), raw);
   writeJson(path.join(args.out, 'summary.json'), summarizeRun(raw));

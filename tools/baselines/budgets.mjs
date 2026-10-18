@@ -14,30 +14,38 @@
 //
 // `freeze` applies the versioned threshold rule of a policy file to observed
 // baseline results; rerunning freeze on the same inputs reproduces the
-// committed budgets, so a budget cannot differ from its rule and data. `gate` compares a
-// candidate epoch with the unchanged alpha1 artifact measured in the same
-// interleaved run(s): timing, memory and runtime budgets are ratios of
-// contemporaneous medians and p95s, deterministic budgets are absolute
-// limits on the frozen alpha1 values. Metrics without a budget stay `unknown`
-// and are listed; an unrun budgeted metric makes the verdict `incomplete`,
-// never `pass`.
+// committed budgets, so a budget cannot differ from its rule and data.
+//
+// `gate` compares a candidate epoch with the unchanged alpha1 control
+// measured in the same interleaved run(s). Timing and runtime budgets (and
+// memory cells too noisy for an absolute limit) are paired ratios: the
+// median of per-round ratios candidate/alpha1 with a bootstrap interval. A
+// ratio budget passes when the interval's upper bound is within the limit,
+// fails when the median ratio exceeds it, and is otherwise `inconclusive`;
+// it is also `inconclusive` when the run lacks interleaved alpha1 pairs or
+// when the alpha1 control's own spread exceeds the frozen noise ceiling.
+// Stable memory and deterministic outputs have absolute limits. Metrics
+// without a budget stay `unknown`. Only a run where every budget passes is
+// `pass`; absolute times are informational only.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import {
   REPO,
+  coefficientOfVariation,
   fileSha256,
   git,
   median,
-  quantile,
+  pairedRatio,
   readJson,
+  relativeSpread,
   sha256,
   summarize,
   writeJson,
 } from './lib.mjs';
-import { metricsFor } from './summarize.mjs';
+import { metricsFor, pairsOf } from './summarize.mjs';
 
-const RATIO_CLASSES = new Set(['timing', 'memory', 'runtime']);
+const MEASURED_CLASSES = new Set(['timing', 'memory', 'runtime']);
 
 export function roundUp(value, step) {
   return Math.round(Math.ceil(value / step - 1e-9) * step * 1000) / 1000;
@@ -59,42 +67,6 @@ function valuesOf(raws, epochs, workload, metric) {
   return out;
 }
 
-const deviation = (a, b) =>
-  a == null || b == null || a === 0 ? null : Math.abs(b / a - 1);
-
-// Observed null noise of one metric: the largest relative difference of
-// medians (and of p95s) between any two measurements of the same unchanged
-// artifact, within a run (epochs) and across runs (same epoch).
-export function noiseOf(raws, epochs, workload, metric) {
-  const cells = [];
-  for (const raw of raws)
-    for (const epoch of epochs) {
-      const values = valuesOf([raw], [epoch], workload, metric);
-      if (values.length > 0)
-        cells.push({
-          label: `${raw.label}/${epoch}`,
-          median: median(values),
-          p95: quantile(values, 0.95),
-        });
-    }
-  let medianNoise = 0;
-  let p95Noise = 0;
-  for (let i = 0; i < cells.length; i++)
-    for (let j = i + 1; j < cells.length; j++) {
-      medianNoise = Math.max(
-        medianNoise,
-        deviation(cells[i].median, cells[j].median) ?? 0,
-      );
-      p95Noise = Math.max(p95Noise, deviation(cells[i].p95, cells[j].p95) ?? 0);
-    }
-  const round = (v) => Math.round(v * 10000) / 10000;
-  return {
-    cells: cells.length,
-    medianNoise: round(medianNoise),
-    p95Noise: round(p95Noise),
-  };
-}
-
 function resultRef(file) {
   const raw = readJson(file);
   return {
@@ -107,7 +79,7 @@ function resultRef(file) {
 // Derives budgets from a policy (threshold rule, budgeted metrics, unknown
 // metrics) and baseline raws. Pure: identical inputs give identical output.
 export function deriveBudgets(policy, raws, resultRefs) {
-  const epochs = policy.baseline.pooledEpochs;
+  const epochs = [policy.baseline.reference, policy.baseline.nullEpoch];
   const samples = raws.flatMap((r) => r.samples);
   const metrics = metricsFor(samples);
   const budgets = [];
@@ -130,34 +102,75 @@ export function deriveBudgets(policy, raws, resultRefs) {
         class: metric.class,
         unit: metric.unit ?? null,
       };
-      if (RATIO_CLASSES.has(metric.class)) {
-        const rule = policy.thresholdRule[metric.class];
+      if (MEASURED_CLASSES.has(metric.class)) {
         const stats = summarize(values);
-        const noise = noiseOf(raws, epochs, workload, metric);
         entry.baseline = {
+          informational: true,
           n: stats.n,
           median: stats.median,
           p95: stats.p95,
           medianCi95: [stats.medianCi95.lower, stats.medianCi95.upper],
-          p95Ci95: [stats.p95Ci95.lower, stats.p95Ci95.upper],
         };
-        entry.noise = noise;
-        entry.limit = {
-          maxMedianRatio: roundUp(
-            Math.max(
-              rule.minMedianRatio,
-              1 + rule.noiseMultiplier * noise.medianNoise,
+        const memory = policy.thresholdRule.memory;
+        const cv = coefficientOfVariation(values);
+        if (metric.class === 'memory' && cv != null && cv <= memory.maxCv) {
+          entry.baseline.informational = false;
+          entry.baseline.cv = cv;
+          const factor = roundUp(
+            Math.max(memory.floor, 1 + memory.cvMultiplier * cv),
+            memory.roundUpTo,
+          );
+          entry.limit = {
+            mode: 'absolute',
+            maxMedian: Math.floor(stats.median * factor),
+            factor,
+          };
+        } else {
+          const rule = policy.thresholdRule.pairedRatio;
+          const { reference, nullEpoch } = policy.baseline;
+          const uppers = [];
+          const spreads = [];
+          for (const raw of raws) {
+            const { pairs } = pairsOf(
+              [raw],
+              reference,
+              nullEpoch,
+              workload,
+              metric,
+            );
+            const ratio = pairedRatio(pairs);
+            if (ratio != null) uppers.push(ratio.upper);
+            spreads.push(
+              relativeSpread(valuesOf([raw], [reference], workload, metric)) ??
+                0,
+            );
+          }
+          const pooled = pairedRatio(
+            pairsOf(raws, reference, nullEpoch, workload, metric).pairs,
+          );
+          if (pooled != null) uppers.push(pooled.upper);
+          entry.null = {
+            pooled,
+            maxUpper: Math.max(...uppers),
+            maxControlSpread: Math.max(...spreads),
+          };
+          if (metric.class === 'memory') entry.baseline.cv = cv;
+          entry.limit = {
+            mode: 'paired-ratio',
+            maxRatio: roundUp(
+              Math.max(rule.floor[metric.class], ...uppers),
+              rule.roundUpTo,
             ),
-            rule.roundUpTo,
-          ),
-          maxP95Ratio: roundUp(
-            Math.max(
-              rule.minP95Ratio,
-              1 + rule.noiseMultiplier * noise.p95Noise,
+            noiseCeiling: roundUp(
+              Math.max(
+                rule.noiseCeiling.floor,
+                rule.noiseCeiling.multiplier * Math.max(...spreads),
+              ),
+              rule.noiseCeiling.roundUpTo,
             ),
-            rule.roundUpTo,
-          ),
-        };
+            minPairs: rule.minPairs,
+          };
+        }
       } else if (metric.class === 'deterministic') {
         const distinct = [...new Set(values)];
         if (distinct.length !== 1)
@@ -195,7 +208,8 @@ export function deriveBudgets(policy, raws, resultRefs) {
     relaxations: policy.relaxations ?? [],
     policy: { path: policy.__path, sha256: policy.__sha256 },
     baseline: {
-      epoch: policy.baseline.epoch,
+      epoch: policy.baseline.reference,
+      nullEpoch: policy.baseline.nullEpoch,
       pooledEpochs: epochs,
       manifest: {
         path: policy.baseline.manifest,
@@ -260,12 +274,15 @@ export function frozenFileChange(
 
 function looser(previous, next) {
   if (previous == null || next == null) return false;
-  for (const key of ['maxMedianRatio', 'maxP95Ratio', 'maxValue'])
+  if (previous.mode !== next.mode) return true;
+  for (const key of ['maxRatio', 'noiseCeiling', 'maxMedian', 'maxValue'])
     if (
       previous[key] != null &&
       (next[key] == null || next[key] > previous[key])
     )
       return true;
+  if (previous.minPairs != null && !(next.minPairs >= previous.minPairs))
+    return true;
   if (previous.equals != null && next.equals !== previous.equals) return true;
   return false;
 }
@@ -351,12 +368,15 @@ export function evaluate(
   { candidate, reference = 'alpha1', manifest },
 ) {
   const problems = [];
+  const refusals = [];
   for (const raw of raws) {
     const names = raw.epochs.map((e) => e.name);
-    if (!names.includes(reference) || !names.includes(candidate))
-      problems.push(
-        `${raw.label}: ${reference} and ${candidate} must be measured in the same run`,
+    if (!names.includes(reference))
+      refusals.push(
+        `${raw.label}: no interleaved ${reference} control in the run`,
       );
+    if (!names.includes(candidate))
+      refusals.push(`${raw.label}: candidate ${candidate} is not in the run`);
     if (raw.workloadsRecord.sha256 !== budgets.baseline.workloads.sha256)
       problems.push(
         `${raw.label}: workloads record differs from the budgets baseline`,
@@ -406,27 +426,78 @@ export function evaluate(
       });
       continue;
     }
-    if (cand.length === 0 || ref.length === 0) {
+    if (cand.length === 0) {
       results.push({ ...entry, status: 'not-run' });
       continue;
     }
-    if (RATIO_CLASSES.has(budget.class)) {
-      const medianRatio = median(cand) / median(ref);
-      const p95Ratio = quantile(cand, 0.95) / quantile(ref, 0.95);
-      const pass =
-        medianRatio <= budget.limit.maxMedianRatio &&
-        p95Ratio <= budget.limit.maxP95Ratio;
+    if (budget.limit.mode === 'paired-ratio') {
+      const { pairs, interleaved, unpaired } = pairsOf(
+        raws,
+        reference,
+        candidate,
+        budget.workload,
+        metric,
+      );
+      const spread = Math.max(
+        ...raws.map(
+          (raw) =>
+            relativeSpread(
+              valuesOf([raw], [reference], budget.workload, metric),
+            ) ?? 0,
+        ),
+      );
+      const ratio = pairedRatio(pairs);
+      const detail = {
+        pairedRatio: ratio,
+        controlSpread: spread,
+        interleaved,
+        unpaired,
+      };
+      if (!interleaved || unpaired > 0 || pairs.length < budget.limit.minPairs)
+        results.push({
+          ...entry,
+          ...detail,
+          status: 'inconclusive',
+          reason: 'missing or non-interleaved alpha1 control pairs',
+        });
+      else if (spread > budget.limit.noiseCeiling)
+        results.push({
+          ...entry,
+          ...detail,
+          status: 'inconclusive',
+          reason: 'alpha1 control spread exceeds the noise ceiling',
+        });
+      else if (ratio.upper <= budget.limit.maxRatio)
+        results.push({ ...entry, ...detail, status: 'pass' });
+      else if (ratio.median > budget.limit.maxRatio)
+        results.push({
+          ...entry,
+          ...detail,
+          status: 'fail',
+          reason: 'median paired ratio exceeds the limit',
+        });
+      else
+        results.push({
+          ...entry,
+          ...detail,
+          status: 'inconclusive',
+          reason: 'interval straddles the limit',
+        });
+    } else if (budget.limit.mode === 'absolute') {
+      const value = median(cand);
       results.push({
         ...entry,
-        status: pass ? 'pass' : 'fail',
-        medianRatio: Math.round(medianRatio * 1e4) / 1e4,
-        p95Ratio: Math.round(p95Ratio * 1e4) / 1e4,
-        n: { reference: ref.length, candidate: cand.length },
+        status: value <= budget.limit.maxMedian ? 'pass' : 'fail',
+        value,
+        n: cand.length,
       });
     } else if (budget.class === 'deterministic') {
       const refDistinct = [...new Set(ref)];
       const candDistinct = [...new Set(cand)];
-      if (refDistinct.length !== 1 || refDistinct[0] !== budget.baseline.value)
+      if (
+        ref.length > 0 &&
+        (refDistinct.length !== 1 || refDistinct[0] !== budget.baseline.value)
+      )
         problems.push(
           `${budget.workload} ${budget.metric}: ${reference} did not reproduce its frozen value ${budget.baseline.value} (${refDistinct.join(', ')})`,
         );
@@ -451,14 +522,15 @@ export function evaluate(
     }
   }
   problems.push(...policyChainProblems(budgets));
-  const failed = results.filter((r) => r.status === 'fail').length;
-  const notRun = results.filter((r) => r.status === 'not-run').length;
+  const count = (status) => results.filter((r) => r.status === status).length;
   const verdict =
-    problems.length > 0 || failed > 0
+    problems.length > 0 || count('fail') > 0
       ? 'fail'
-      : notRun > 0
-        ? 'incomplete'
-        : 'pass';
+      : refusals.length > 0 || count('inconclusive') > 0
+        ? 'inconclusive'
+        : count('not-run') > 0
+          ? 'incomplete'
+          : 'pass';
   return {
     kind: 'pandamstyle-ce003-gate',
     budgets: { policyVersion: budgets.policyVersion },
@@ -466,12 +538,20 @@ export function evaluate(
     candidate,
     verdict,
     problems,
+    refusals,
     counts: {
-      pass: results.filter((r) => r.status === 'pass').length,
-      fail: failed,
-      notRun,
+      pass: count('pass'),
+      fail: count('fail'),
+      inconclusive: count('inconclusive'),
+      notRun: count('not-run'),
       unknown: (budgets.unknown ?? []).length,
     },
+    load: raws.map((raw) => ({
+      label: raw.label,
+      before: raw.load.before?.at(-1) ?? null,
+      after: raw.load.after,
+      batch: raw.load.batch ?? null,
+    })),
     results,
     unknown: (budgets.unknown ?? []).map((u) => ({ ...u, status: 'unknown' })),
   };

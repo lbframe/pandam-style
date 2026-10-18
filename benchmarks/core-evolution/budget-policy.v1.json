@@ -5,27 +5,30 @@
   "supersedes": null,
   "justification": "Initial CE-00.3 non-regression budgets, frozen from the measured alpha1 baseline before any core-evolution product behavior change.",
   "baseline": {
-    "epoch": "alpha1",
-    "pooledEpochs": ["alpha1", "alpha1-replay"],
+    "reference": "alpha1",
+    "nullEpoch": "alpha1-replay",
     "manifest": "benchmarks/core-evolution/epochs/alpha1/manifest.v1.json"
   },
   "thresholdRule": {
-    "timing": {
-      "minMedianRatio": 1.1,
-      "minP95Ratio": 1.25,
-      "noiseMultiplier": 2,
-      "roundUpTo": 0.05
+    "pairedRatio": {
+      "applies": "timing and runtime metrics, and memory cells whose baseline CV exceeds memory.maxCv",
+      "floor": {
+        "timing": 1.1,
+        "runtime": 1.15,
+        "memory": 1.1
+      },
+      "roundUpTo": 0.05,
+      "minPairs": 5,
+      "noiseCeiling": {
+        "multiplier": 2,
+        "floor": 0.1,
+        "roundUpTo": 0.05
+      }
     },
     "memory": {
-      "minMedianRatio": 1.1,
-      "minP95Ratio": 1.2,
-      "noiseMultiplier": 2,
-      "roundUpTo": 0.05
-    },
-    "runtime": {
-      "minMedianRatio": 1.15,
-      "minP95Ratio": 1.3,
-      "noiseMultiplier": 2,
+      "maxCv": 0.05,
+      "cvMultiplier": 3,
+      "floor": 1.1,
       "roundUpTo": 0.05
     },
     "deterministic": {
@@ -42,10 +45,12 @@
     }
   },
   "rationale": [
-    "Timing, memory and runtime budgets are ratios against the unchanged alpha1 artifact measured in the same interleaved run, so machine speed and background drift cancel; absolute milliseconds are recorded for reference only.",
-    "Each ratio limit is the larger of a fixed floor and 1 + 2 x the null noise observed between measurements of the identical artifact (store closure versus offline replay closure, and batch versus batch), rounded up to 0.05. A limit is therefore never tighter than twice the difference an unchanged artifact actually showed, and never looser than the floor without evidence.",
-    "Floors: 10% on medians and 25% on p95 for compile time and CPU (a deliberate slow-down of one tenth is a reviewable regression; tails are noisier); 10%/20% for peak RSS; 15%/30% for sub-microsecond runtime selection, where JIT and allocation effects dominate.",
-    "Deterministic outputs (bytes, rule counts, selection counts) have zero measurement noise, so their limits are absolute: at most 5% growth for CSS bytes, rule and declaration counts and host bundle bytes on the same Alpha 1 workload; 10% for generated JavaScript/TypeScript modules, whose metadata grows with catalog breadth; and no growth at all in the finite recipe selection domain, which the unchanged definitions fix.",
+    "The host is shared with work outside both epics and is never quiet, so absolute times are not comparable across runs. Every measurement and gate run therefore includes the unchanged alpha1 control, interleaved with the candidate in alternating order within each round, and timing budgets apply to the paired ratio candidate/alpha1 of the two adjacent samples of each round. Load that affects both samples of a pair cancels; absolute times and per-sample load records are kept as informational evidence only.",
+    "Paired ratio statistic: the median of per-round ratios, with a seeded (307) 2,000-round percentile-bootstrap 95% interval resampling whole pairs. A budget passes when the interval's upper bound is at most the limit, fails when the median ratio exceeds the limit, and is otherwise inconclusive (the run cannot resolve the question).",
+    "Ratio limit = the larger of a floor and the largest upper bound observed for the null comparison (alpha1-replay, an offline reinstall of the identical artifact, against alpha1) in each baseline batch and in both batches pooled, rounded up to 0.05. The unchanged artifact therefore passes in the baseline conditions, and no limit is tighter than the precision the shared host actually delivered. Floors: 10% for compile, import and host-build time and CPU (a deliberate slow-down of one tenth is a reviewable regression), 15% for sub-microsecond runtime selection, where JIT and allocation effects dominate, and 10% for memory measured as a ratio.",
+    "Noise ceiling: the gate refuses (inconclusive) a budget when the alpha1 control's own interquartile range over median in a gate run exceeds max(0.10, 2 x the largest value seen in any baseline batch), rounded up to 0.05; a run noisier than twice the noisiest baseline cannot pass. It also refuses a run without interleaved, adjacent alpha1 pairs for every candidate sample, or with fewer than 5 pairs.",
+    "Memory: pilot runs under the same shared load showed peak-RSS coefficients of variation of 0.2% to 4.4% per cell (time: 3% to 58%), so peak RSS is not load-sensitive here. A memory cell whose pooled baseline CV is at most 5% gets an absolute limit on the candidate median: baseline median x max(1.10, 1 + 3 CV), rounded up to 0.05; a cell above 5% falls back to a paired ratio.",
+    "Deterministic outputs (bytes, rule and declaration counts, selection domain) have no measurement noise, so their limits are absolute: at most 5% growth for CSS bytes, rule and declaration counts and host bundle bytes on the same Alpha 1 workload; 10% for generated JavaScript/TypeScript modules, whose metadata grows with catalog breadth; and no growth in the finite recipe selection domain, which the unchanged definitions fix.",
     "Incremental output must keep equalling a fresh canonical compile of the same state for every edit."
   ],
   "budgetedMetrics": [
@@ -76,7 +81,7 @@
     "vite.cssBytes",
     "vite.jsBytes"
   ],
-  "comparison": "Run tools/baselines/measure.mjs with the final plan and both --epoch alpha1=<alpha1 closure> and --epoch <candidate>=<candidate closure>, on one machine, quiet at start. budgets.mjs gate compares candidate/alpha1 medians and p95s per workload against the ratio limits, checks deterministic candidate outputs against the frozen alpha1 values and limits, requires alpha1 to reproduce its frozen deterministic outputs, and reports unknown metrics separately. Verdict pass requires every budget to pass; an unrun budget gives incomplete; any failure, workload-record mismatch, altered alpha1 package or policy-chain problem gives fail.",
+  "comparison": "Run tools/baselines/measure.mjs with the final plan and both --epoch alpha1=<alpha1 closure> and --epoch <candidate>=<candidate closure> on one machine (--require-quiet is optional). budgets.mjs gate pairs each candidate sample with the adjacent alpha1 sample of the same round, applies the paired-ratio, absolute-memory, deterministic and identity budgets, requires alpha1 to reproduce its frozen deterministic outputs, and lists unknown metrics. Verdicts: pass only when every budget passes; fail on any failing budget, workload-record mismatch, altered alpha1 tarball or policy-chain problem; inconclusive when the run lacks the interleaved control, has too few pairs, exceeds a noise ceiling or cannot resolve a limit; incomplete when a budgeted metric was not run.",
   "unknown": [
     {
       "id": "host.next.build-and-dev",
@@ -144,6 +149,10 @@
     "Committed policy, budgets, workloads, derivation and baseline result files are immutable; `budgets.mjs gate` compares the budgets file with the version of the commit that added it and fails on any difference.",
     "Changing a threshold, metric set or workload requires a new budget-policy.vN.json and budgets.vN.json (N incremented), a justification, a predecessor reference by path and SHA-256, and a new comparable baseline run of the unchanged alpha1 artifact; reusing an old result file is rejected.",
     "Every budget loosened or removed relative to the predecessor must be listed in `relaxations` with its own justification; an unknown metric may only leave the unknown list by gaining a budget.",
-    "No release may pass against a weakened budget retroactively: the gate evaluates the budgets version current at the evaluated commit and fails on any policy-chain problem."
-  ]
+    "No release may pass against a weakened budget retroactively: the gate evaluates the budgets version current at the evaluated commit, fails on any policy-chain problem, and never reports inconclusive or incomplete as pass."
+  ],
+  "amendment": {
+    "note": "Version 1 was first committed in 52cf7b0 with absolute timing ratios that required a quiet host. Before any final baseline data existed it was replaced by this text: the shared host never becomes quiet (load 7.0/9.0/6.4 on 16 cores at 00:22 on 2026-10-19, mostly from other projects' work that cannot be paused), so timing budgets became paired ratios against the interleaved alpha1 control and the quiet rule became optional.",
+    "finalDataExistedWhenAmended": false
+  }
 }

@@ -254,9 +254,8 @@ export function environment(nodeBinary = process.execPath, workDir = REPO) {
     node: execFileSync(nodeBinary, ['-p', 'process.version'], {
       encoding: 'utf8',
     }).trim(),
-    nodeBinary,
+    nodeBinary: redactHome(nodeBinary),
     nodeBinarySha256: fileSha256(fs.realpathSync(nodeBinary)),
-    hostname: os.hostname(),
   };
 }
 
@@ -293,11 +292,6 @@ function cpuTotals() {
   return { total: values.reduce((a, b) => a + b, 0), idle };
 }
 
-function commandLine(pid) {
-  const raw = readOptional(`/proc/${pid}/cmdline`);
-  return raw == null ? null : raw.replace(/\0/g, ' ').trim().slice(0, 160);
-}
-
 const HEAVY =
   /^(node|MainThread|chrome|chromium|headless_shell|next-server|rspack|esbuild|vite|jest|tsc|flow|java|cc1plus|rustc|cargo|webpack|bun|deno|python3?)$/;
 
@@ -327,12 +321,11 @@ export async function loadSnapshot({ windowMs = 5000, threshold = 0.2 } = {}) {
     const ticks = info.ticks - (before?.ticks ?? 0);
     const cores = ticks / hz / seconds;
     if (cores >= threshold && !ownTree.has(pid))
+      // Only the CPU share and the heavy-tool class are recorded: process
+      // names and command lines may name other projects on a shared host.
       busy.push({
-        pid,
-        comm: info.comm,
         cores: Math.round(cores * 100) / 100,
         heavy: HEAVY.test(info.comm),
-        cmd: commandLine(pid),
       });
   }
   busy.sort((a, b) => b.cores - a.cores);
@@ -347,7 +340,13 @@ export async function loadSnapshot({ windowMs = 5000, threshold = 0.2 } = {}) {
     cpuUtilisation:
       utilisation == null ? null : Math.round(utilisation * 1000) / 1000,
     busyCores: Math.round((utilisation ?? 0) * os.cpus().length * 100) / 100,
-    foreignBusyProcesses: busy,
+    foreignBusyProcesses: busy.length,
+    foreignBusyCores:
+      Math.round(busy.reduce((n, p) => n + p.cores, 0) * 100) / 100,
+    foreignHeavyCores:
+      Math.round(
+        busy.filter((p) => p.heavy).reduce((n, p) => n + p.cores, 0) * 100,
+      ) / 100,
   };
 }
 
@@ -360,12 +359,67 @@ export const QUIET_RULE = Object.freeze({
 });
 
 export function isQuiet(snapshot) {
-  const heavyCores = snapshot.foreignBusyProcesses
-    .filter((p) => p.heavy)
-    .reduce((sum, p) => sum + p.cores, 0);
   return (
     snapshot.cpuUtilisation != null &&
     snapshot.cpuUtilisation <= QUIET_RULE.maxCpuUtilisation &&
-    heavyCores < QUIET_RULE.maxForeignHeavyCores
+    snapshot.foreignHeavyCores < QUIET_RULE.maxForeignHeavyCores
   );
+}
+
+// Whole-machine CPU counters, for the utilisation during one sample.
+export function cpuCounters() {
+  return cpuTotals();
+}
+
+export function utilisationBetween(before, after) {
+  const total = after.total - before.total;
+  return total > 0
+    ? Math.round((1 - (after.idle - before.idle) / total) * 1000) / 1000
+    : null;
+}
+
+// Replaces the home directory so committed records hold no user paths.
+export const redactHome = (value) =>
+  typeof value === 'string' ? value.split(os.homedir()).join('~') : value;
+
+// Paired comparison: the median of per-pair ratios candidate/reference, with
+// a seeded percentile-bootstrap 95% interval that resamples whole pairs.
+export function pairedRatio(pairs, { seed = 307, rounds = 2000 } = {}) {
+  const ratios = pairs.map(([reference, candidate]) => candidate / reference);
+  if (ratios.length === 0) return null;
+  const random = mulberry32(seed);
+  const medians = [];
+  for (let i = 0; i < rounds; i++)
+    medians.push(
+      median(ratios.map(() => ratios[Math.floor(random() * ratios.length)])),
+    );
+  const s = sorted(medians);
+  const r4 = (v) => Math.round(v * 10000) / 10000;
+  return {
+    n: ratios.length,
+    median: r4(median(ratios)),
+    lower: r4(s[Math.floor(0.025 * rounds)]),
+    upper: r4(s[Math.ceil(0.975 * rounds) - 1]),
+    rounds,
+    seed,
+  };
+}
+
+// Robust relative spread: interquartile range over median (nearest-rank).
+export function relativeSpread(values) {
+  if (values.length < 2) return null;
+  const m = median(values);
+  return m === 0
+    ? null
+    : Math.round(
+        ((quantile(values, 0.75) - quantile(values, 0.25)) / m) * 10000,
+      ) / 10000;
+}
+
+export function coefficientOfVariation(values) {
+  if (values.length < 2) return null;
+  const mean = values.reduce((a, b) => a + b, 0) / values.length;
+  const variance =
+    values.reduce((a, b) => a + (b - mean) ** 2, 0) / (values.length - 1);
+  return Math.round((Math.sqrt(variance) / mean) * 10000) / 10000;
 }
