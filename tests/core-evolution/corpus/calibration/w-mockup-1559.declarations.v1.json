@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "kind": "core-evolution-declaration-set",
   "task": "CE-00.2",
-  "description": "Declarations of the consumer designer mockup stylesheet (reported 1,559-declaration redesign baseline).",
+  "description": "Designer mockup stylesheet of the consumer desktop redesign.",
   "input": {
     "sha256": "ff85a7213c9e280f0925b6ebe09332ad4025702aa1b97057d4b7319ede1d4d90",
     "bytes": 36690,
-    "provenance": "recovered exact input: its digest matches the mockup package manifest; see baseline.v1.json",
+    "role": "recovered-exact",
     "positionMapSha256": "b34c15a92a69e986b9918abd5b98d0186814ae9befb63600bc313d36066733a4"
   },
   "inputId": "W-MOCKUP-1559",
@@ -23,7 +23,7 @@
       "scheme": "hmac-sha256",
       "keyFingerprint": "166638cbb8c45cf3a1cf0d4e15917543694e5b2ed7542e4b26345fbae6bfa4f4"
     },
-    "redactionPolicy": "url(), non-empty quoted strings, e-mail addresses, URIs, long opaque tokens, non-ASCII text, unapproved identifiers and unapproved query parameters are replaced by a placeholder carrying the SHA-256 of the removed text."
+    "redactionPolicy": "Every value and condition token that is not CSS vocabulary, a number with a CSS unit, a hex color, an approved identifier or punctuation is replaced by a placeholder carrying a keyed HMAC-SHA256 digest of the removed text, as are url(), quoted strings, e-mail addresses, URIs, opaque tokens, non-ASCII text, unapproved custom-property and layer names and unclean query parameters."
   },
   "registryVersion": "1.1.0",
   "counts": {

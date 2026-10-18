@@ -38,6 +38,7 @@ import {
   serializeSet,
 } from './declaration-set.mjs';
 import { makeDigester } from './digest.mjs';
+import { privateFile } from './private-paths.mjs';
 import { loadApproved } from './publication.mjs';
 
 export const BASELINE_RECORD =
@@ -135,12 +136,7 @@ async function main() {
       'redaction-key',
     ])
       if (!args[k]) throw new Error(`extract needs --${k}`);
-    const outside = (name) => {
-      const file = path.resolve(args[name]);
-      if (!path.relative(REPO, file).startsWith('..'))
-        throw new Error(`--${name} must be outside the repository`);
-      return file;
-    };
+    const outside = (name) => privateFile(args[name], REPO, name);
     const positionsOut = outside('positions-out');
     const digester = makeDigester(fs.readFileSync(outside('redaction-key')));
     const header = args.header ? readJson(args.header) : {};

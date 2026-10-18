@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-publication-review.v1.schema.json",
+  "title": "CE-00.2 publication review pin",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-publication-review"
+    },
+    "task": {
+      "const": "CE-00.2"
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewed": {
+      "type": "object",
+      "properties": {
+        "baseline": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "approvedIdentifiers": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["baseline", "approvedIdentifiers"]
+    }
+  },
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "task", "statement", "reviewed"]
+}

@@ -918,6 +918,18 @@
           "note": "The select inside the disabled fieldset and the disabled button are skipped; the aria-disabled busy button stays focusable."
         },
         {
+          "id": "FORMS-K2",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "*:focus-visible { outline: none !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "Removing every focus indicator keeps :focus-visible matching; the painted-indicator check must still fail."
+        },
+        {
           "id": "FORMS-A1",
           "oracle": "ORC-A11Y",
           "case": "positive",

@@ -18,7 +18,7 @@
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { PUBLIC_DIGESTER } from './digest.mjs';
-import { STATE_ATTRIBUTE } from './publication.mjs';
+import { STATE_ATTRIBUTES } from './publication.mjs';
 
 const require = createRequire(import.meta.url);
 const postcss = require('postcss');
@@ -107,7 +107,7 @@ export function selectorState(selector, into = null) {
         .split(/[~|^$*]?=/)[0]
         .trim()
         .toLowerCase();
-      if (STATE_ATTRIBUTE.test(name)) out.attributes.add(name);
+      if (STATE_ATTRIBUTES.has(name)) out.attributes.add(name);
       else out.redactedAttributes++;
       i = end;
     } else if (c === ':') {

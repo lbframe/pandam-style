@@ -17,7 +17,7 @@ import {
   sha256,
 } from './declarations.mjs';
 import { PUBLIC_DIGESTER } from './digest.mjs';
-import { applyIdentifierPolicy } from './publication.mjs';
+import { policeRecord } from './publication.mjs';
 import {
   accountRegistry,
   boundaryFlags,
@@ -173,7 +173,7 @@ export function extractSet({
     const redacted = { ...base, value, redactions };
     return approved == null
       ? redacted
-      : applyIdentifierPolicy(redacted, approved, digester);
+      : policeRecord(redacted, approved, digester);
   });
   const derive = (records) =>
     deriveSet({}, records, policy, registry).declarations.map((d) =>
@@ -196,31 +196,36 @@ export function extractSet({
         ...(header.input ?? {}),
         positionMapSha256: sha256(serializePositions(positions)),
       },
-      extraction: {
-        parser: { ...PARSER },
-        command: 'node tools/coverage/cli.mjs extract',
-        baselineLayer,
-        denominatorRule:
-          'Alpha 1 baseline: every declaration except custom properties and declarations inside @keyframes' +
-          (baselineLayer ? `, restricted to @layer ${baselineLayer}` : '') +
-          '. Excluded declarations stay in the set with their reason.',
-        selectorPolicy:
-          'Selectors are not published; only allow-listed pseudo-classes, pseudo-elements and state attribute names are kept. Declarations are identified by ordinal only.',
-        redactionDigest: {
-          scheme: digester.scheme,
-          ...(digester.keyFingerprint
-            ? { keyFingerprint: digester.keyFingerprint }
-            : {}),
-        },
-        redactionPolicy:
-          'url(), non-empty quoted strings, e-mail addresses, URIs, long opaque tokens, non-ASCII text, unapproved identifiers and unapproved query parameters are replaced by a placeholder carrying the SHA-256 of the removed text.',
-      },
+      extraction: extractionHeader(baselineLayer, digester),
     },
     rawRecords,
     policy,
     registry,
   );
   return { set, positions };
+}
+
+/** The extraction header of a set; the validator recomputes and compares it. */
+export function extractionHeader(baselineLayer, digester) {
+  return {
+    parser: { ...PARSER },
+    command: 'node tools/coverage/cli.mjs extract',
+    baselineLayer,
+    denominatorRule:
+      'Alpha 1 baseline: every declaration except custom properties and declarations inside @keyframes' +
+      (baselineLayer ? `, restricted to @layer ${baselineLayer}` : '') +
+      '. Excluded declarations stay in the set with their reason.',
+    selectorPolicy:
+      'Selectors are not published; only allow-listed pseudo-classes, pseudo-elements and state attribute names are kept. Declarations are identified by ordinal only.',
+    redactionDigest: {
+      scheme: digester.scheme,
+      ...(digester.keyFingerprint
+        ? { keyFingerprint: digester.keyFingerprint }
+        : {}),
+    },
+    redactionPolicy:
+      'Every value and condition token that is not CSS vocabulary, a number with a CSS unit, a hex color, an approved identifier or punctuation is replaced by a placeholder carrying a keyed HMAC-SHA256 digest of the removed text, as are url(), quoted strings, e-mail addresses, URIs, opaque tokens, non-ASCII text, unapproved custom-property and layer names and unclean query parameters.',
+  };
 }
 
 // The private position map: kept outside the repository with the private

@@ -21,6 +21,7 @@
 
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -42,13 +43,25 @@ import {
   redactValue,
   selectorState,
 } from '../../tools/coverage/declarations.mjs';
+import { extractionHeader } from '../../tools/coverage/declaration-set.mjs';
+import { makeDigester } from '../../tools/coverage/digest.mjs';
+import { privateFile } from '../../tools/coverage/private-paths.mjs';
 import {
-  applyIdentifierPolicy,
+  STATE_ATTRIBUTES,
   checkPublishedDeclaration,
-  identifiersOf,
   loadApproved,
+  policeRecord,
+  policeTokens,
   textProblems,
+  wordsOf,
 } from '../../tools/coverage/publication.mjs';
+import {
+  CHECKER,
+  assertionDigest,
+  canonical,
+  computeBinding,
+  rowStatus,
+} from './check-references.mjs';
 
 const require = createRequire(import.meta.url);
 const postcss = require('postcss');
@@ -63,6 +76,8 @@ const sha256 = (data) => crypto.createHash('sha256').update(data).digest('hex');
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
 const SCHEMA_DIR = 'tests/core-evolution/schema';
+const PUBLICATION_REVIEW =
+  'tests/core-evolution/corpus/calibration/publication-review.v1.json';
 const FILES = {
   corpus: [
     'tests/core-evolution/corpus/corpus.v1.json',
@@ -78,12 +93,30 @@ const FILES = {
   ],
   baseline: [BASELINE_RECORD, 'core-evolution-classifier-calibration.v1'],
   approved: [APPROVED_IDENTIFIERS, 'core-evolution-approved-identifiers.v1'],
+  review: [PUBLICATION_REVIEW, 'core-evolution-publication-review.v1'],
   findings: [
     'tests/core-evolution/corpus/scope-findings.v1.json',
     'core-evolution-scope-findings.v1',
   ],
 };
 const REFERENCE_CHECK = 'tests/core-evolution/corpus/reference-check.v1.json';
+const PINNED_ENGINE = {
+  browser: 'chromium',
+  version: '148.0.7778.96',
+  playwrightCore: '1.60.0',
+};
+
+// Digest of every string leaf of a reviewed document, with its JSON path.
+export function reviewedTextDigest(doc) {
+  const leaves = [];
+  const walk = (value, at) => {
+    if (typeof value === 'string') leaves.push([at, value]);
+    else if (value && typeof value === 'object')
+      for (const [k, v] of Object.entries(value)) walk(v, `${at}.${k}`);
+  };
+  walk(doc, '$');
+  return sha256(canonical(leaves));
+}
 const BROWSER_ORACLES = new Set([
   'ORC-LAYOUT',
   'ORC-TEXT',
@@ -217,7 +250,7 @@ function validateSchema(schema, value, where, out) {
 // ---------------------------------------------------------------------------
 // Loading.
 
-function loadDocs() {
+export function loadDocs() {
   const docs = Object.fromEntries(
     Object.entries(FILES).map(([name, [file]]) => [name, json(file)]),
   );
@@ -225,6 +258,7 @@ function loadDocs() {
     docs.baseline.sets.map((s) => [s.inputId, json(s.declarationSet)]),
   );
   docs.referenceCheck = json(REFERENCE_CHECK);
+  docs.checkerSource = read(CHECKER).toString('utf8');
   docs.profiles = json('tests/core-evolution/profiles.v1.json');
   docs.capabilities = json('tests/core-evolution/capabilities.v1.json');
   return docs;
@@ -281,7 +315,7 @@ function cssRule(css, selector) {
 // ---------------------------------------------------------------------------
 // Validation.
 
-function validateDocs(docs, env) {
+export function validateDocs(docs, env) {
   const failures = [];
   let checks = 0;
   const check = (condition, message) => {
@@ -457,6 +491,17 @@ function validateDocs(docs, env) {
               ),
               `${at}: mutation property ${m.property} not declared by ${m.selector}`,
             );
+        } else if (m.kind === 'append-css') {
+          check(
+            fixture.inputs.some(
+              (i) =>
+                i.role === 'reference-stylesheet' &&
+                i.path.endsWith(`/${m.file}`),
+            ) &&
+              typeof m.css === 'string' &&
+              m.css.length > 0,
+            `${at}: append-css needs a pinned stylesheet and CSS text`,
+          );
         } else if (m.kind === 'set-attribute') {
           check(
             ids.has(m.target),
@@ -762,26 +807,70 @@ function validateDocs(docs, env) {
     'privacy: approved identifiers must be unique',
   );
   const used = new Set();
+  const fingerprints = new Set();
   for (const [id, set] of Object.entries(sets)) {
+    // Set headers carry no free text of their own: the description and role
+    // come from the calibration record, the extraction block is canonical.
+    const entry = baseline.sets.find((x) => x.inputId === id);
+    check(
+      set.description === entry?.description,
+      `privacy: ${id} header description is not the calibration record's`,
+    );
+    check(
+      set.input?.role === entry?.input.role,
+      `privacy: ${id} header role is not the calibration record's`,
+    );
+    const fingerprint = set.extraction?.redactionDigest?.keyFingerprint;
+    fingerprints.add(fingerprint);
+    check(
+      /^[0-9a-f]{64}$/.test(fingerprint ?? '') &&
+        canonical(set.extraction) ===
+          canonical(
+            extractionHeader(set.extraction.baselineLayer, {
+              scheme: 'hmac-sha256',
+              keyFingerprint: fingerprint,
+            }),
+          ),
+      `privacy: ${id} extraction header is not the canonical header`,
+    );
+    check(
+      set.registryVersion === env.registry.version,
+      `privacy: ${id} registry version differs`,
+    );
     for (const problem of textProblems(
       JSON.stringify({ ...set, declarations: [] }),
       SET_HEADER_ALLOWED,
     ))
       check(false, `privacy: ${id} header carries ${problem}`);
     for (const d of set.declarations) {
-      const problems = checkPublishedDeclaration(d, id, approved);
+      const problems = checkPublishedDeclaration(
+        d,
+        id,
+        approved,
+        env.registry.byName,
+      );
       check(
         problems.length === 0,
         `privacy: ${id} ${problems.slice(0, 2).join('; ')}`,
       );
-      for (const i of [
-        d.property,
-        d.context?.layer,
-        ...identifiersOf(d.value ?? ''),
-      ])
+      for (const i of [d.property, d.context?.layer, ...wordsOf(d.value ?? '')])
         if (approved.has(i)) used.add(i);
     }
   }
+  check(
+    fingerprints.size === 1,
+    'privacy: the sets use different redaction keys',
+  );
+  // Authored publication text is pinned to its review.
+  const review = docs.review;
+  check(
+    reviewedTextDigest(baseline) === review.reviewed.baseline,
+    'privacy: baseline.v1.json text differs from its publication review (review it, then update publication-review.v1.json)',
+  );
+  check(
+    reviewedTextDigest(docs.approved) === review.reviewed.approvedIdentifiers,
+    'privacy: approved-identifiers.v1.json differs from its publication review (review it, then update publication-review.v1.json)',
+  );
   for (const identifier of approved.keys())
     check(
       used.has(identifier),
@@ -817,8 +906,24 @@ function validateDocs(docs, env) {
     }
   }
 
-  // Reference check: recorded against the current pinned inputs.
+  // Reference check: bound to everything it verifies, and well formed.
   const report = docs.referenceCheck;
+  check(
+    canonical(report.engine) === canonical(PINNED_ENGINE),
+    'reference check: engine identity is not the pinned Chromium 148.0.7778.96 / playwright-core 1.60.0',
+  );
+  check(
+    canonical(report.binding) ===
+      canonical(
+        computeBinding({
+          corpus,
+          oracles,
+          checkerSource: docs.checkerSource,
+          engine: PINNED_ENGINE,
+        }),
+      ),
+    'reference check: binding differs from the current assertions, fixtures, oracles, checker or engine; rerun check-references.mjs',
+  );
   const currentInputs = Object.fromEntries(
     corpus.fixtures.flatMap((f) => f.inputs).map((i) => [i.path, i.sha256]),
   );
@@ -826,27 +931,75 @@ function validateDocs(docs, env) {
     JSON.stringify(report.inputs) === JSON.stringify(currentInputs),
     'reference check: recorded against different inputs; rerun check-references.mjs',
   );
-  check(
-    report.engine?.version === '148.0.7778.96' &&
-      report.engine?.playwrightCore === '1.60.0',
-    'reference check: engine identity is not the pinned Chromium 148.0.7778.96 / playwright-core 1.60.0',
-  );
-  const rows = new Map(report.rows.map((r) => [r.id, r]));
+  const expectedRows = new Map();
   for (const f of corpus.fixtures)
-    for (const a of f.assertions.filter((x) => BROWSER_ORACLES.has(x.oracle))) {
-      const row = rows.get(a.id);
-      check(row != null, `reference check: ${a.id} has no recorded result`);
-      if (row == null) continue;
+    for (const a of f.assertions.filter((x) => BROWSER_ORACLES.has(x.oracle)))
+      expectedRows.set(a.id, { fixture: f, assertion: a });
+  const seenRows = new Set();
+  const tallied = {};
+  for (const row of report.rows ?? []) {
+    const at = `reference check: ${row.id}`;
+    check(!seenRows.has(row.id), `${at} is a duplicate row`);
+    seenRows.add(row.id);
+    tallied[row.status] = (tallied[row.status] ?? 0) + 1;
+    const expected = expectedRows.get(row.id);
+    check(expected != null, `${at} is not a browser assertion of the corpus`);
+    if (expected == null) continue;
+    const { fixture, assertion: a } = expected;
+    check(
+      row.fixture === fixture.id &&
+        row.oracle === a.oracle &&
+        row.case === a.case,
+      `${at} names another fixture, oracle or case`,
+    );
+    check(
+      row.assertionSha256 === assertionDigest(fixture, a),
+      `${at} is stale: it verified a different assertion, viewport, state, CSP or input`,
+    );
+    check(
+      ['pass', 'fail', 'not-evaluated'].includes(row.status),
+      `${at} has status ${row.status}`,
+    );
+    const results = Array.isArray(row.results) ? row.results : [];
+    check(results.length > 0, `${at} has no result evidence`);
+    for (const r of results)
       check(
-        row.status !== 'fail',
-        `reference check: ${a.id} fails on the reference page`,
+        typeof r.kind === 'string' &&
+          [true, false, null].includes(r.ok) &&
+          (r.ok === null
+            ? typeof r.note === 'string' && r.note.length > 0
+            : 'measured' in r &&
+              r.measured !== undefined &&
+              r.measured !== null),
+        `${at} has a result without evidence or reason`,
       );
-      if (row.status === 'not-evaluated' || row.status === 'not-applicable')
-        check(
-          (row.results ?? [{ note: row.note }]).every((r) => r.note),
-          `reference check: ${a.id} is not evaluated without a stated reason`,
-        );
+    check(
+      results.length > 0 && rowStatus(a.case, results) === row.status,
+      `${at} status is not derived from its results (forged)`,
+    );
+    check(row.status !== 'fail', `${at} fails on the reference page`);
+    const target =
+      a.case === 'negative'
+        ? fixture.assertions.find((x) => x.id === a.mustFail)
+        : a;
+    if (row.status !== 'not-evaluated') {
+      const required = Object.keys(target.expect ?? {}).filter(
+        (k) => !EXPECT_MODIFIERS.has(k),
+      );
+      if (target.expect?.focusVisible) required.push('paintedIndicator');
+      const kinds = new Set(results.map((r) => r.kind));
+      check(
+        required.every((k) => kinds.has(k)),
+        `${at} lacks a result for ${required.filter((k) => !kinds.has(k)).join(', ')}`,
+      );
     }
+  }
+  for (const id of expectedRows.keys())
+    check(seenRows.has(id), `reference check: ${id} has no recorded result`);
+  check(
+    canonical(report.tally) === canonical(tallied),
+    'reference check: tally is not recomputed from the rows',
+  );
 
   return { failures, checks };
 }
@@ -977,24 +1130,159 @@ function parserFixtures(policy) {
       'position' in one('.a { color: red }')[0],
     'positions are separate from records',
   );
+  // Publication policy at extraction: every reviewer case and every
+  // unit-, hash- and number-prefixed smuggling form, in each field type.
   const approvedFixture = new Map([
     ['--ok', {}],
     ['Brand', {}],
   ]);
-  const policed = applyIdentifierPolicy(
-    {
-      id: 'X#001',
-      property: '--secret-name',
-      value: 'AcmeSans, Brand, sans-serif',
-      context: {
-        layer: 'acme-layer',
-        atRules: ['@media (min-width: 1px) and (acme: 1)'],
-        state: { pseudoClasses: [':hover', ':acme'] },
+  const testKey = makeDigester(Buffer.alloc(32, 7));
+  const registryNames = loadRegistry().byName;
+  const police = (record) =>
+    policeRecord(
+      {
+        id: 'X#001',
+        property: 'color',
+        value: 'red',
+        context: {},
+        redactions: [],
+        ...record,
       },
-      redactions: [],
-    },
-    approvedFixture,
+      approvedFixture,
+      testKey,
+    );
+  const publishable = (record) =>
+    checkPublishedDeclaration(record, 'X', approvedFixture, registryNames)
+      .length === 0;
+  const smuggled = 'PrivateCustomerName';
+  const valueCases = [
+    smuggled,
+    `#${smuggled}`,
+    `1${smuggled}`,
+    `.5${smuggled}`,
+    `-2${smuggled}`,
+    `red/*#${smuggled}*/`,
+    `calc(1${smuggled} + 2px)`,
+    `${smuggled}(1px)`,
+    `var(--${smuggled})`,
+    `"${smuggled}"`,
+  ];
+  for (const value of valueCases) {
+    const policed = police({ value });
+    expect(
+      !JSON.stringify(policed).includes(smuggled) && publishable(policed),
+      `value ${value} is redacted at extraction`,
+    );
+    expect(
+      !publishable({ ...policed, value }),
+      `value ${value} is rejected by the publication check`,
+    );
+  }
+  expect(
+    [
+      '#fff',
+      '#0a0b0c0d',
+      '1px',
+      '50%',
+      '.5s',
+      '-2rem',
+      '1fr',
+      'calc(100% - 2px)',
+      'oklch(22% 0.02 240/0.35)',
+      'var(--ok)',
+      'Brand, sans-serif',
+    ].every(
+      (value) => policeTokens(value, approvedFixture, [], testKey) === value,
+    ),
+    'allowed tokens pass unchanged',
   );
+  for (const params of [
+    `(#${smuggled})`,
+    `(min-width: 1${smuggled})`,
+    `(${smuggled}: 1px)`,
+    `screen and (min-width: 1px) and (.5${smuggled})`,
+  ]) {
+    const policed = police({ context: { atRules: [`@media ${params}`] } });
+    expect(
+      !JSON.stringify(policed).includes(smuggled) && publishable(policed),
+      `query ${params} is redacted at extraction`,
+    );
+    expect(
+      !publishable({ ...policed, context: { atRules: [`@media ${params}`] } }),
+      `query ${params} is rejected by the publication check`,
+    );
+  }
+  for (const layer of [
+    smuggled,
+    `#${smuggled}`,
+    `1${smuggled}`,
+    `private/${smuggled}.css`,
+  ]) {
+    const policed = police({ context: { layer } });
+    expect(
+      !JSON.stringify(policed).includes(smuggled) && publishable(policed),
+      `layer ${layer} is redacted at extraction`,
+    );
+    expect(
+      !publishable({ ...policed, context: { layer } }),
+      `layer ${layer} is rejected`,
+    );
+  }
+  for (const property of [`--${smuggled}`, `--1${smuggled}`]) {
+    const policed = police({ property });
+    expect(
+      !JSON.stringify(policed).includes(smuggled) && publishable(policed),
+      `custom property ${property} is redacted at extraction`,
+    );
+    expect(
+      !publishable({ ...policed, property }),
+      `custom property ${property} is rejected`,
+    );
+  }
+  for (const property of [smuggled.toLowerCase(), `1${smuggled.toLowerCase()}`])
+    expect(
+      !publishable(police({ property })),
+      `property ${property} is rejected`,
+    );
+  for (const id of [
+    `X#001${smuggled}`,
+    `X#${smuggled}`,
+    'X#private/source.css:7',
+  ])
+    expect(!publishable({ ...police({}), id }), `id ${id} is rejected`);
+  const probe = extractDeclarations(
+    `a[aria-${smuggled.toLowerCase()}] { --blur: 1${smuggled}; }`,
+  )[0];
+  expect(
+    !(probe.context.state.attributes ?? []).length &&
+      probe.context.state.redactedAttributes === 1,
+    'an unlisted aria-* attribute is not kept at extraction',
+  );
+  expect(
+    !publishable({
+      ...police({}),
+      context: { state: { attributes: [`aria-${smuggled.toLowerCase()}`] } },
+    }) &&
+      STATE_ATTRIBUTES.has('aria-checked') &&
+      !STATE_ATTRIBUTES.has('aria-description'),
+    'state attributes come from the explicit WAI-ARIA 1.2 list',
+  );
+  expect(
+    !publishable({
+      ...police({ value: `url(${smuggled})` }),
+      value: 'url(<redacted:url:sha256:' + 'a'.repeat(64) + '>)',
+    }),
+    'an unkeyed placeholder is rejected',
+  );
+  const policed = police({
+    property: '--secret-name',
+    value: 'AcmeSans, Brand, sans-serif',
+    context: {
+      layer: 'acme-layer',
+      atRules: ['@media (min-width: 1px) and (acme: 1)'],
+      state: { pseudoClasses: [':hover', ':acme'] },
+    },
+  });
   expect(
     !JSON.stringify(policed).includes('cme') &&
       !JSON.stringify(policed).includes('secret') &&
@@ -1003,6 +1291,51 @@ function parserFixtures(policy) {
       policed.context.state.redactedSelectorParts === 1,
     'identifier policy redacts unapproved identifiers in every field',
   );
+  // Private files stay outside the repository, by real path.
+  const scratch = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'ce002-private-paths-'),
+  );
+  try {
+    fs.symlinkSync(path.join(repo, 'tests'), path.join(scratch, 'into-repo'));
+    fs.symlinkSync(
+      path.join(repo, 'tests', 'missing.key'),
+      path.join(scratch, 'dangling'),
+    );
+    const accepts = (file) => {
+      try {
+        privateFile(file, repo, 'file');
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    expect(
+      !accepts(`${repo}/..private/redaction.key`),
+      'a sibling-looking name inside the repository is rejected',
+    );
+    expect(
+      !accepts(path.join(repo, 'tests', 'redaction.key')),
+      'a path inside the repository is rejected',
+    );
+    expect(
+      !accepts(path.join(scratch, 'into-repo', 'redaction.key')),
+      'a symlinked directory into the repository is rejected',
+    );
+    expect(
+      !accepts(path.join(scratch, 'dangling')),
+      'a symbolic link is rejected',
+    );
+    expect(
+      accepts(path.join(scratch, 'redaction.key')),
+      'a path outside the repository is accepted',
+    );
+    expect(
+      accepts(path.join(repo, '..', 'sibling-private', 'redaction.key')),
+      'a real sibling directory is accepted',
+    );
+  } finally {
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
   d = one('.a { color: red !important }')[0];
   expect(
     d.important === true && d.value === 'red',
@@ -1315,7 +1648,7 @@ const MUTATIONS = [
   ],
   [
     'an unapproved font identifier in a value',
-    /privacy: .*value identifier AcmeCorpSans is not approved/,
+    /privacy: .*value: identifier AcmeCorpSans is not approved/,
     (d) => {
       d.sets['W-MOCKUP-1559'].declarations.find(
         (x) => x.property === 'font-family',
@@ -1324,7 +1657,7 @@ const MUTATIONS = [
   ],
   [
     'an unapproved animation name',
-    /privacy: .*value identifier acme-checkout-in is not approved/,
+    /privacy: .*value: identifier acme-checkout-in is not approved/,
     (d) => {
       d.sets['W-MOCKUP-1559'].declarations.find(
         (x) => x.property === 'animation',
@@ -1407,6 +1740,254 @@ const MUTATIONS = [
         ...r,
         digest: r.digest.replace('hmac-', ''),
       }));
+    },
+  ],
+  // Round-2 publication bypasses: explicit attribute list and token
+  // allow-list in every field type.
+  ...[
+    [
+      'an unlisted aria-* attribute',
+      /attribute aria-privatecustomer is not allow-listed/,
+      (r) => {
+        r.context.state = { attributes: ['aria-privatecustomer'] };
+      },
+    ],
+    [
+      'a hash-prefixed identifier in a value',
+      /value: hash #PrivateCustomerName is not a hex color/,
+      (r) => {
+        r.value = '#PrivateCustomerName';
+      },
+    ],
+    [
+      'a number-prefixed identifier in a value',
+      /value: unit PrivateCustomerName is not a CSS unit/,
+      (r) => {
+        r.value = '1PrivateCustomerName';
+      },
+    ],
+    [
+      'a decimal-prefixed identifier in a value',
+      /value: unit PrivateCustomerName is not a CSS unit/,
+      (r) => {
+        r.value = '.5PrivateCustomerName';
+      },
+    ],
+    [
+      'a comment in a value',
+      /value: comment/,
+      (r) => {
+        r.value = 'red/*#PrivateCustomerName*/';
+      },
+    ],
+    [
+      'an unknown function in a value',
+      /value: function PrivateCustomerName is not a CSS function/,
+      (r) => {
+        r.value = 'PrivateCustomerName(1px)';
+      },
+    ],
+    [
+      'a quoted string in a value',
+      /value: quoted string is not a keyed placeholder/,
+      (r) => {
+        r.value = '"PrivateCustomerName"';
+      },
+    ],
+    [
+      'a hash-prefixed identifier in a query',
+      /at-rule: hash #PrivateCustomerName is not a hex color/,
+      (r) => {
+        r.context.atRules = ['@media (#PrivateCustomerName)'];
+      },
+    ],
+    [
+      'a number-prefixed identifier in a query',
+      /at-rule: unit PrivateCustomerName is not a CSS unit/,
+      (r) => {
+        r.context.atRules = ['@media (min-width: 1PrivateCustomerName)'];
+      },
+    ],
+    [
+      'a hash-prefixed layer name',
+      /layer #PrivateCustomerName is not approved/,
+      (r) => {
+        r.context.layer = '#PrivateCustomerName';
+      },
+    ],
+    [
+      'a number-prefixed layer name',
+      /layer 1PrivateCustomerName is not approved/,
+      (r) => {
+        r.context.layer = '1PrivateCustomerName';
+      },
+    ],
+    [
+      'a number-prefixed custom property',
+      /custom property --1PrivateCustomerName is neither approved nor redacted/,
+      (r) => {
+        r.property = '--1PrivateCustomerName';
+      },
+    ],
+    [
+      'a property outside the registry',
+      /property privatecustomer is not a registry or descriptor name/,
+      (r) => {
+        r.property = 'privatecustomer';
+      },
+    ],
+    [
+      'a number-suffixed ordinal id',
+      /id is not an ordinal of its input/,
+      (r) => {
+        r.id = 'W-UTIL-343#0011PrivateCustomerName';
+      },
+    ],
+  ].map(([name, reason, change]) => [
+    name,
+    reason,
+    (d) => {
+      change(
+        d.sets['W-UTIL-343'].declarations.find(
+          (x) => x.context.layer === 'utilities',
+        ),
+      );
+    },
+  ]),
+  [
+    'free text appended to a set header',
+    /header description is not the calibration record's/,
+    (d) => {
+      d.sets['W-UTIL-343'].description += ' PrivateCustomerName';
+    },
+  ],
+  [
+    'a tampered extraction header',
+    /extraction header is not the canonical header/,
+    (d) => {
+      d.sets['W-MOCKUP-1559'].extraction.redactionPolicy +=
+        ' PrivateCustomerName';
+    },
+  ],
+  [
+    'unreviewed calibration-record text',
+    /baseline.v1.json text differs from its publication review/,
+    (d) => {
+      d.baseline.consumer.publication += ' PrivateCustomerName';
+    },
+  ],
+  [
+    'an unreviewed approved identifier',
+    /approved-identifiers.v1.json differs from its publication review/,
+    (d) => {
+      d.approved.identifiers[0].reason += ' PrivateCustomerName';
+    },
+  ],
+  // Reference report binding and structure.
+  [
+    'a stale expectation',
+    /SHELL-L1 is stale|binding differs/,
+    (d) => {
+      d.corpus.fixtures[0].assertions.find(
+        (a) => a.id === 'SHELL-L1',
+      ).expect.box.width = 9999;
+    },
+  ],
+  [
+    'a changed viewport',
+    /is stale|binding differs/,
+    (d) => {
+      d.corpus.fixtures[0].viewports[0].width = 1024;
+    },
+  ],
+  [
+    'a changed oracle definition',
+    /binding differs/,
+    (d) => {
+      d.oracles.oracles
+        .find((o) => o.id === 'ORC-KEYBOARD')
+        .assertionKinds.push('anything');
+    },
+  ],
+  [
+    'a changed checker',
+    /binding differs/,
+    (d) => {
+      d.checkerSource += '\n// changed\n';
+    },
+  ],
+  [
+    'empty result evidence',
+    /has no result evidence/,
+    (d) => {
+      for (const r of d.referenceCheck.rows) delete r.results;
+    },
+  ],
+  [
+    'a forged pass',
+    /SHELL-L1 status is not derived from its results \(forged\)/,
+    (d) => {
+      d.referenceCheck.rows.find((r) => r.id === 'SHELL-L1').results[0].ok =
+        false;
+    },
+  ],
+  [
+    'a pass without measured values',
+    /SHELL-L1 has a result without evidence or reason/,
+    (d) => {
+      delete d.referenceCheck.rows.find((r) => r.id === 'SHELL-L1').results[0]
+        .measured;
+    },
+  ],
+  [
+    'a pass that lacks a required result kind',
+    /FORMS-K1 lacks a result for paintedIndicator/,
+    (d) => {
+      const row = d.referenceCheck.rows.find((r) => r.id === 'FORMS-K1');
+      row.results = row.results.filter((r) => r.kind !== 'paintedIndicator');
+    },
+  ],
+  [
+    'a missing row',
+    /reference check: FORMS-K2 has no recorded result/,
+    (d) => {
+      d.referenceCheck.rows = d.referenceCheck.rows.filter(
+        (r) => r.id !== 'FORMS-K2',
+      );
+      d.referenceCheck.tally.pass -= 1;
+    },
+  ],
+  [
+    'a duplicate row',
+    /SHELL-L1 is a duplicate row/,
+    (d) => {
+      d.referenceCheck.rows.push(
+        d.referenceCheck.rows.find((r) => r.id === 'SHELL-L1'),
+      );
+      d.referenceCheck.tally.pass += 1;
+    },
+  ],
+  [
+    'a wrong tally',
+    /tally is not recomputed from the rows/,
+    (d) => {
+      d.referenceCheck.tally.pass += 1;
+    },
+  ],
+  [
+    'an unknown status',
+    /has status not-applicable/,
+    (d) => {
+      d.referenceCheck.rows.find((r) => r.id === 'SHELL-A4').status =
+        'not-applicable';
+    },
+  ],
+  [
+    'the indicator-removal control dropped',
+    /FORMS-K2|ORC-KEYBOARD has no negative/,
+    (d) => {
+      const f = d.corpus.fixtures.find((x) => x.id === 'CE-CORPUS-FORMS-01');
+      f.assertions = f.assertions.filter((a) => a.id !== 'FORMS-K2');
     },
   ],
   // Negative baselines and their findings.
@@ -1493,10 +2074,14 @@ const MUTATIONS = [
 
 // ---------------------------------------------------------------------------
 
-async function main() {
+export async function loadEnvironment() {
   const { policy, identity } = await loadAlpha1Policy();
-  const registry = loadRegistry();
-  const env = { policy, registry, policyIdentity: identity };
+  return { policy, registry: loadRegistry(), policyIdentity: identity };
+}
+
+async function main() {
+  const env = await loadEnvironment();
+  const { policy } = env;
   const docs = loadDocs();
   const base = validateDocs(docs, env);
   const extra = [...parserFixtures(policy), ...regexParity(docs)];
@@ -1541,7 +2126,12 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  console.error(error.stack ?? error.message);
-  process.exit(1);
-});
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  main().catch((error) => {
+    console.error(error.stack ?? error.message);
+    process.exit(1);
+  });
+}

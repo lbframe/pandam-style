@@ -28,6 +28,7 @@ behavior and are not part of the product test suites.
 | `corpus/calibration/*.declarations.v1.json`                        | generated | Redacted consumer declaration sets; extract them with `tools/coverage`, never edit them                                                            |
 | `corpus/accounting.v1.json`                                        | generated | Accounting of every corpus declaration; regenerate with `node tools/coverage/cli.mjs corpus`                                                       |
 | `corpus/calibration/approved-identifiers.v1.json`                  | authored  | Consumer identifiers that may be published, each with a reason                                                                                     |
+| `corpus/calibration/publication-review.v1.json`                    | authored  | Review pin over the published calibration text and approved identifiers                                                                            |
 | `corpus/scope-findings.v1.json`                                    | authored  | Findings handed to owning lots (SF-01 to SF-03)                                                                                                    |
 | `corpus/negative/vendor-system.v1.json`                            | authored  | Second design system of the mixed-system negative fixture                                                                                          |
 | `corpus/reference-check.v1.json`                                   | generated | Reference-page results in Chromium; rerun `check-references.mjs`, never edit                                                                       |
@@ -172,9 +173,14 @@ with the references) belongs to the lots named in each oracle.
 - **Reference check.** `check-references.mjs` renders each reference page in
   Chromium 148.0.7778.96 (playwright-core 1.60.0) under its CSP. It evaluates
   every layout, text, state, keyboard, accessibility and CSP assertion and every
-  negative control that applies to a page. The result is
-  `corpus/reference-check.v1.json`. It covers the authored outcomes only, not a
-  build.
+  negative control that applies to a page.
+  - Keyboard stops need a painted indicator, not only `:focus-visible`: a
+    computed outline, shadow or border change, and at least 40 changed pixels
+    against the unfocused state.
+  - The result is `corpus/reference-check.v1.json`. It is bound by digest to
+    every row's assertion, viewports, states, CSP and inputs, to the browser
+    oracle definitions, to the checker source and to the engine identity.
+  - It covers the authored outcomes only, not a build.
 - **States.** Pointer, touch, keyboard, error, loading, disabled, forced colors
   and increased contrast are all exercised, plus reduced motion, print, RTL,
   scrolled and hydrated states.
@@ -224,7 +230,7 @@ node tests/core-evolution/check-references.mjs --playwright <playwright-core 1.6
 
 The corpus validator needs the repository install for postcss. It checks:
 
-- the seven schemas and every input, source and definition digest;
+- the eight schemas and every input, source and definition digest;
 - profile, capability fixture set, oracle, viewport, state and target bindings;
 - the selectors and properties named by each mutation;
 - coverage: a positive fixture, a boundary assertion and a negative fixture for
@@ -234,15 +240,17 @@ The corpus validator needs the repository install for postcss. It checks:
 - consistency of each negative's observed Alpha 1 outcome, and a compiler-defect
   finding for every accepted negative;
 - the scope findings' lots and issues;
-- the recorded reference check against the current inputs, with no failing
+- the recorded reference check: its binding, one row per browser assertion,
+  statuses recomputed from per-row result evidence, the tally, and no failing
   assertion;
 - re-derivation of the accounting and of both consumer sets, the reported counts
   and each calibration limit;
 - regular-expression parity of the parser on every corpus stylesheet;
-- the publication rules on every published field of the consumer sets, the
+- the token allow-list publication rules, canonical set headers and the
+  publication-review pin, on every published field of the consumer sets, the
   calibration record and the accounting.
 
-`--self-test` applies 49 mutations, and each must fail for its stated reason.
+`--self-test` applies 80 mutations, and each must fail for its stated reason.
 They include every publication bypass found in review.
 
 Changing a fixture input, expectation or negative fixture is a corpus change and

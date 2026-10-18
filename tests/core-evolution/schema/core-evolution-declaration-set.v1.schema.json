@@ -28,9 +28,8 @@
           "type": "integer",
           "minimum": 1
         },
-        "provenance": {
-          "type": "string",
-          "minLength": 1
+        "role": {
+          "enum": ["recovered-exact", "replacement-candidate"]
         },
         "utilitiesBlockSpan": {
           "type": "integer"
@@ -45,7 +44,7 @@
         }
       },
       "additionalProperties": false,
-      "required": ["sha256", "bytes", "provenance", "positionMapSha256"]
+      "required": ["sha256", "bytes", "role", "positionMapSha256"]
     },
     "inputId": {
       "type": "string",
@@ -229,7 +228,8 @@
                     "opaque",
                     "non-ascii-text",
                     "identifier",
-                    "at-rule-params"
+                    "at-rule-params",
+                    "token"
                   ]
                 },
                 "digest": {

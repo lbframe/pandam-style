@@ -55,6 +55,7 @@ badges under CSP. It is a different, separate check, and nothing here uses it.
 | `publication.mjs`     | CSS vocabulary, approved-identifier policy and the per-field publication check              |
 | `css-colors.mjs`      | CSS Color 4 named and system colors, hex notation and color functions                       |
 | `digest.mjs`          | plain SHA-256 for authored data, keyed HMAC-SHA256 for consumer redactions                  |
+| `private-paths.mjs`   | real-path containment check for the private key and position maps                           |
 | `classify.mjs`        | pinned Alpha 1 policy loader, Alpha 1 buckets, composite longhands, registry binding, flags |
 | `declaration-set.mjs` | builds and re-derives a publishable declaration set                                         |
 | `accounting.mjs`      | accounts for every declaration of the corpus reference stylesheets                          |
@@ -111,24 +112,50 @@ following:
 - input digests and counts.
 
 Selectors, class names, attribute values, file paths, source positions and the
-original script are never written. These become a placeholder carrying the
-SHA-256 of the removed text:
+original script are never written.
 
-- URLs, non-empty quoted strings, e-mail addresses, URIs, long opaque tokens and
-  non-ASCII text;
-- consumer identifiers: custom-property names, animation and font names, layer
-  names and any other word that is neither CSS vocabulary (`publication.mjs`)
-  nor listed with a reason in
+Every value and every media or supports condition is tokenized with
+postcss-value-parser, and each token must be exactly one of the following.
+Nothing is skipped by prefix:
+
+- a CSS keyword or function name from the fixed vocabulary in `publication.mjs`;
+- a number, or a dimension whose unit is in the fixed CSS unit list;
+- a hash token that is a 3, 4, 6 or 8 digit hex color;
+- an identifier listed with a reason in
   [`approved-identifiers.v1.json`](../../tests/core-evolution/corpus/calibration/approved-identifiers.v1.json);
-- query parameters that contain such identifiers;
-- pseudo-classes and pseudo-elements outside the allow-list (counted only).
+- a keyed redaction placeholder;
+- whitespace, a comma, slash or colon separator, a `calc()` operator or a
+  parenthesized group.
+
+At extraction, any other token becomes a placeholder: an unknown identifier, a
+non-hex `#name` hash, a number with an unknown unit, an unknown function, a
+comment or a quoted string. URLs, e-mail addresses, URIs, long opaque tokens and
+non-ASCII text are replaced first, and so is a condition that holds a disallowed
+token. Further rules:
+
+- **Custom-property and layer names** must be approved.
+- **Other properties** must be CE-00.1 registry names or `font-display`.
+- **Pseudo-classes and pseudo-elements** must be on their allow-lists (others
+  are only counted).
+- **State attributes** come from an explicit list: every WAI-ARIA 1.2 state and
+  property, the HTML state attributes and the listed `data-` state names.
+- **Ids** are ordinals of their input.
+
+Set headers carry no free text of their own. Their description and role equal
+the calibration record's, and their extraction block must equal the canonical
+header that `extractionHeader()` produces. The authored text of
+`baseline.v1.json` and `approved-identifiers.v1.json` is pinned by
+`publication-review.v1.json`: any wording or identifier change fails until it is
+reviewed and the pin is updated in the same diff.
 
 Extraction fails if a redaction would change a classification or a composite
-accounting. The corpus validator applies the same rules to every published field
-of the declaration sets, to the calibration record and to the corpus accounting.
-It rejects unknown fields, non-ordinal ids, unapproved identifiers, unlisted
-attributes or pseudo-classes, URLs, e-mail addresses, file paths and non-ASCII
-text. It also rejects approvals that are never used.
+accounting. The corpus validator applies these rules to every published field
+and rejects any record that breaks them. It also rejects approvals that are
+never used.
+
+The private files (the redaction key and the position maps) must lie outside the
+repository, judged on real paths. A `..`-prefixed name inside the repository, a
+symlinked directory into it and a symbolic link file are all refused.
 
 ## Composite accounting
 

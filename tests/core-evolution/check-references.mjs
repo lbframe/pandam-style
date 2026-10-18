@@ -25,12 +25,18 @@ import http from 'node:http';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import zlib from 'node:zlib';
 
 const repo = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../..',
 );
 const CORPUS = 'tests/core-evolution/corpus/corpus.v1.json';
+const ORACLES = 'tests/core-evolution/corpus/oracles.v1.json';
+export const CHECKER = 'tests/core-evolution/check-references.mjs';
+// A focus indicator must change at least this many pixels around the
+// focused element (a text caret alone changes fewer).
+export const INDICATOR_MIN_PIXELS = 40;
 const sha256 = (data) => crypto.createHash('sha256').update(data).digest('hex');
 const TOLERANCE = 0.5;
 const BROWSER_ORACLES = new Set([
@@ -46,7 +52,7 @@ const BROWSER_ORACLES = new Set([
 // Static server: serves one fixture directory with the fixture CSP header and
 // optional in-memory overrides (negative-control mutations).
 
-function serve(dir, csp, overrides) {
+export function serve(dir, csp, overrides) {
   const server = http.createServer((req, res) => {
     const name = decodeURIComponent(
       new URL(req.url, 'http://x').pathname,
@@ -111,6 +117,9 @@ function mutate(postcss, files, mutation) {
       return out;
     case 'remove-rule':
       css(mutation.file, (root) => rule(root).remove());
+      return out;
+    case 'append-css':
+      out[mutation.file] = `${files[mutation.file]}\n${mutation.css}\n`;
       return out;
     case 'set-attribute':
       out[mutation.file] = files[mutation.file].replace(
@@ -184,7 +193,141 @@ function luminance(rgb) {
 
 const AX_ROLE = { img: 'image' };
 
-async function evaluateAssertion(ctx, a) {
+// Minimal PNG decoder for Chromium screenshots (8-bit RGB or RGBA,
+// non-interlaced): returns { width, height, channels, pixels }.
+export function decodePng(buffer) {
+  let offset = 8;
+  let header = null;
+  const data = [];
+  while (offset < buffer.length) {
+    const length = buffer.readUInt32BE(offset);
+    const type = buffer.toString('ascii', offset + 4, offset + 8);
+    const body = buffer.subarray(offset + 8, offset + 8 + length);
+    if (type === 'IHDR')
+      header = {
+        width: body.readUInt32BE(0),
+        height: body.readUInt32BE(4),
+        depth: body[8],
+        color: body[9],
+        interlace: body[12],
+      };
+    else if (type === 'IDAT') data.push(body);
+    offset += 12 + length;
+  }
+  if (
+    header.depth !== 8 ||
+    header.interlace !== 0 ||
+    ![2, 6].includes(header.color)
+  )
+    throw new Error('unsupported PNG layout');
+  const channels = header.color === 6 ? 4 : 3;
+  const raw = zlib.inflateSync(Buffer.concat(data));
+  const stride = header.width * channels;
+  const pixels = Buffer.alloc(stride * header.height);
+  for (let y = 0; y < header.height; y++) {
+    const filter = raw[y * (stride + 1)];
+    const line = raw.subarray(y * (stride + 1) + 1, (y + 1) * (stride + 1));
+    for (let x = 0; x < stride; x++) {
+      const a = x >= channels ? pixels[y * stride + x - channels] : 0;
+      const b = y > 0 ? pixels[(y - 1) * stride + x] : 0;
+      const c =
+        x >= channels && y > 0 ? pixels[(y - 1) * stride + x - channels] : 0;
+      let v = line[x];
+      if (filter === 1) v += a;
+      else if (filter === 2) v += b;
+      else if (filter === 3) v += (a + b) >> 1;
+      else if (filter === 4) {
+        const p = a + b - c;
+        const pa = Math.abs(p - a);
+        const pb = Math.abs(p - b);
+        const pc = Math.abs(p - c);
+        v += pa <= pb && pa <= pc ? a : pb <= pc ? b : c;
+      }
+      pixels[y * stride + x] = v & 255;
+    }
+  }
+  return { width: header.width, height: header.height, channels, pixels };
+}
+
+export function changedPixels(before, after) {
+  const a = decodePng(before);
+  const b = decodePng(after);
+  if (a.width !== b.width || a.height !== b.height) return Infinity;
+  let changed = 0;
+  for (let i = 0; i < a.width * a.height; i++) {
+    for (let k = 0; k < 3; k++) {
+      if (
+        Math.abs(a.pixels[i * a.channels + k] - b.pixels[i * b.channels + k]) >
+        24
+      ) {
+        changed += 1;
+        break;
+      }
+    }
+  }
+  return changed;
+}
+
+// Computed indicator styles of the focused element and, when it is visually
+// hidden (a styled sibling carries its indicator), of its next sibling.
+const INDICATOR_SNAPSHOT = `(() => {
+  const el = window.__ceFocused;
+  const r = el.getBoundingClientRect();
+  const hidden = r.width <= 1 && r.height <= 1;
+  const nodes = [el, ...(hidden && el.nextElementSibling ? [el.nextElementSibling] : [])];
+  const box = nodes.map((n) => n.getBoundingClientRect()).reduce((u, b) => ({
+    left: Math.min(u.left, b.left), top: Math.min(u.top, b.top),
+    right: Math.max(u.right, b.right), bottom: Math.max(u.bottom, b.bottom) }),
+    { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity });
+  const style = (n) => { const s = getComputedStyle(n); return {
+    outlineStyle: s.outlineStyle, outlineWidth: s.outlineWidth, boxShadow: s.boxShadow,
+    border: ['Top', 'Right', 'Bottom', 'Left'].map((side) => s['border' + side + 'Style'] + ' ' + s['border' + side + 'Width'] + ' ' + s['border' + side + 'Color']).join('|') }; };
+  const pad = 8;
+  return { styles: nodes.map(style),
+    clip: { x: Math.max(0, box.left - pad), y: Math.max(0, box.top - pad),
+      width: Math.min(document.documentElement.clientWidth, box.right + pad) - Math.max(0, box.left - pad),
+      height: Math.min(document.documentElement.clientHeight, box.bottom + pad) - Math.max(0, box.top - pad) } };
+})()`;
+
+// A painted indicator: a non-none outline of non-zero width, a box shadow, or
+// a changed non-zero border on the focused element (or its styled sibling),
+// and at least INDICATOR_MIN_PIXELS changed pixels against the unfocused page.
+async function paintedIndicator(page) {
+  await page.evaluate(() => {
+    window.__ceFocused = document.activeElement;
+  });
+  const focused = await page.evaluate(INDICATOR_SNAPSHOT);
+  const clip = focused.clip;
+  const shotFocused = await page.screenshot({
+    clip,
+    animations: 'disabled',
+    caret: 'hide',
+  });
+  await page.evaluate(() => window.__ceFocused.blur());
+  const unfocused = await page.evaluate(INDICATOR_SNAPSHOT);
+  const shotUnfocused = await page.screenshot({
+    clip,
+    animations: 'disabled',
+    caret: 'hide',
+  });
+  await page.evaluate(() => window.__ceFocused.focus());
+  const styled = focused.styles.some((f, i) => {
+    const u = unfocused.styles[i];
+    const outline = f.outlineStyle !== 'none' && parseFloat(f.outlineWidth) > 0;
+    const shadow = f.boxShadow !== 'none' && f.boxShadow !== u.boxShadow;
+    const border = f.border !== u.border && !/^none 0px/.test(f.border);
+    return outline || shadow || border;
+  });
+  const pixels = changedPixels(shotFocused, shotUnfocused);
+  return {
+    ok: styled && pixels >= INDICATOR_MIN_PIXELS,
+    styled,
+    changedPixels: pixels,
+    outline: focused.styles.map((x) => `${x.outlineStyle} ${x.outlineWidth}`),
+  };
+}
+
+export async function evaluateAssertion(ctx, a) {
   const { page, cdp } = ctx;
   const expect = a.expect;
   const results = [];
@@ -446,6 +589,7 @@ async function evaluateAssertion(ctx, a) {
         await page.evaluate(
           () => document.activeElement && document.activeElement.blur(),
         );
+        const painted = [];
         for (let i = 0; i < want.length; i++) {
           await page.keyboard.press('Tab');
           const m = await page.evaluate(() => ({
@@ -456,10 +600,19 @@ async function evaluateAssertion(ctx, a) {
           }));
           order.push(m.id);
           visible.push(m.fv);
+          if (expect.focusVisible && m.id !== 'BODY')
+            painted.push(await paintedIndicator(page));
         }
         record(kind, JSON.stringify(order) === JSON.stringify(want), order);
-        if (expect.focusVisible)
+        if (expect.focusVisible) {
           record('focusVisible', visible.every(Boolean), visible);
+          record(
+            'paintedIndicator',
+            painted.length === want.length && painted.every((p) => p.ok),
+            painted,
+            `computed outline, shadow or border change and at least ${INDICATOR_MIN_PIXELS} changed pixels at every stop`,
+          );
+        }
         break;
       }
       case 'focusVisible':
@@ -652,7 +805,7 @@ async function axNode(cdp, id) {
 }
 
 // Opens the page holding the assertion's targets in the assertion's state.
-async function openState(browser, origin, fixture, a, page) {
+export async function openState(browser, origin, fixture, a, page) {
   const viewport =
     fixture.viewports.find((v) => v.id === a.viewport) ?? fixture.viewports[0];
   const state = a.state ?? 'rest';
@@ -720,6 +873,92 @@ function pageFor(fixture, a, pages) {
   ).name;
 }
 
+/** Row status from its results; the validator recomputes it. */
+export function rowStatus(assertionCase, results) {
+  const evaluated = results.filter((r) => r.ok !== null);
+  if (evaluated.length === 0) return 'not-evaluated';
+  const allPass = evaluated.every((r) => r.ok === true);
+  if (assertionCase === 'negative') return allPass ? 'fail' : 'pass';
+  return allPass ? 'pass' : 'fail';
+}
+
+// Canonical JSON: sorted keys at every depth.
+export function canonical(value) {
+  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
+  if (value && typeof value === 'object')
+    return `{${Object.keys(value)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${canonical(value[k])}`)
+      .join(',')}}`;
+  return JSON.stringify(value);
+}
+
+/**
+ * Digest of everything one row verifies: the assertion (and, for a negative
+ * control, the assertion it must fail), the fixture's viewports, states, CSP
+ * and pinned inputs.
+ */
+export function assertionDigest(fixture, a) {
+  const target =
+    a.case === 'negative'
+      ? fixture.assertions.find((x) => x.id === a.mustFail)
+      : null;
+  return sha256(
+    canonical({
+      fixture: fixture.id,
+      assertion: a,
+      target,
+      viewports: fixture.viewports,
+      states: fixture.states,
+      csp: fixture.csp,
+      inputs: fixture.inputs,
+    }),
+  );
+}
+
+/** Binding of a whole report to its verification inputs. */
+export function computeBinding({ corpus, oracles, checkerSource, engine }) {
+  const browserOracles = oracles.oracles.filter((o) =>
+    BROWSER_ORACLES.has(o.id),
+  );
+  const parts = {
+    fixtures: Object.fromEntries(
+      corpus.fixtures.map((f) => [
+        f.id,
+        sha256(
+          canonical({
+            assertions: f.assertions.filter((a) =>
+              BROWSER_ORACLES.has(a.oracle),
+            ),
+            viewports: f.viewports,
+            states: f.states,
+            csp: f.csp,
+            inputs: f.inputs,
+          }),
+        ),
+      ]),
+    ),
+    oracles: sha256(
+      canonical({
+        oracles: browserOracles,
+        states: oracles.states,
+        requiredInteractionStates: oracles.requiredInteractionStates,
+      }),
+    ),
+    checker: sha256(checkerSource),
+    engine,
+  };
+  return { ...parts, verificationSha256: sha256(canonical(parts)) };
+}
+
+export function loadBindingInputs() {
+  return {
+    corpus: JSON.parse(fs.readFileSync(path.join(repo, CORPUS), 'utf8')),
+    oracles: JSON.parse(fs.readFileSync(path.join(repo, ORACLES), 'utf8')),
+    checkerSource: fs.readFileSync(path.join(repo, CHECKER)),
+  };
+}
+
 async function checkFixture(browser, postcss, fixture) {
   const dir = path.join(repo, path.dirname(fixture.inputs[0].path));
   const files = Object.fromEntries(
@@ -746,10 +985,19 @@ async function checkFixture(browser, postcss, fixture) {
       if (overrides == null) {
         rows.push({
           id: a.id,
+          fixture: fixture.id,
           oracle: a.oracle,
           case: a.case,
-          status: 'not-applicable',
-          note: `mutation ${a.mutation.kind} needs a build`,
+          assertionSha256: assertionDigest(fixture, a),
+          status: 'not-evaluated',
+          results: [
+            {
+              kind: 'mutation',
+              ok: null,
+              measured: null,
+              note: `mutation ${a.mutation.kind} needs a build`,
+            },
+          ],
         });
         continue;
       }
@@ -767,19 +1015,16 @@ async function checkFixture(browser, postcss, fixture) {
     }
     await session.context.close();
     server.close();
-    const evaluated = results.filter((r) => r.ok !== null);
-    const allPass = evaluated.length > 0 && evaluated.every((r) => r.ok);
-    let status;
-    if (evaluated.length === 0) status = 'not-evaluated';
-    else if (a.case === 'negative') status = allPass ? 'fail' : 'pass';
-    else status = allPass ? 'pass' : 'fail';
+    const status = rowStatus(a.case, results);
     rows.push({
       id: a.id,
+      fixture: fixture.id,
       oracle: a.oracle,
       case: a.case,
       page,
       state: target.state ?? 'rest',
       viewport: target.viewport,
+      assertionSha256: assertionDigest(fixture, a),
       status,
       ...(a.case === 'negative'
         ? { mutation: a.mutation.kind, mustFail: a.mustFail }
@@ -806,11 +1051,16 @@ async function main() {
   const postcss = createRequire(import.meta.url)('postcss');
   const corpus = JSON.parse(fs.readFileSync(path.join(repo, CORPUS), 'utf8'));
   const browser = await chromium.launch();
+  const engine = {
+    browser: 'chromium',
+    version: browser.version(),
+    playwrightCore: playwrightVersion,
+  };
   const rows = [];
   try {
     for (const fixture of corpus.fixtures) {
       for (const row of await checkFixture(browser, postcss, fixture)) {
-        rows.push({ fixture: fixture.id, ...row });
+        rows.push(row);
         console.log(
           `${row.status.padEnd(14)} ${fixture.id} ${row.id} ${row.oracle} ${row.case}`,
         );
@@ -827,11 +1077,8 @@ async function main() {
     task: 'CE-00.2',
     statement:
       'Reference pages only: the authored outcomes rendered in Chromium. Not compiler, build or product qualification.',
-    engine: {
-      browser: 'chromium',
-      version: browser.version(),
-      playwrightCore: playwrightVersion,
-    },
+    engine,
+    binding: computeBinding({ ...loadBindingInputs(), engine }),
     inputs: Object.fromEntries(
       corpus.fixtures
         .flatMap((f) => f.inputs)
@@ -850,7 +1097,12 @@ async function main() {
   if (tally.fail) process.exit(1);
 }
 
-main().catch((error) => {
-  console.error(error.stack ?? error.message);
-  process.exit(1);
-});
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  main().catch((error) => {
+    console.error(error.stack ?? error.message);
+    process.exit(1);
+  });
+}

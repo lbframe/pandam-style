@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "kind": "core-evolution-declaration-set",
   "task": "CE-00.2",
-  "description": "Declarations of the consumer desktop renderer stylesheet built by PandaCSS. The reported 343-declaration baseline is its @layer utilities block.",
+  "description": "PandaCSS @layer utilities block of the consumer desktop renderer stylesheet.",
   "input": {
     "sha256": "f706b14992356988e605226ce930d89bfc969fbbc67ae0befc8c7ffe1dda268b",
     "bytes": 21318,
-    "provenance": "pinned replacement candidate: a rebuild from unchanged sources whose category counts reconcile with the reported run; byte identity with the measured file is unproven; see baseline.v1.json",
     "utilitiesBlockSpan": 14938,
     "utilitiesBlockSha256": "c5429335abe9758e8c14975943eec74263d556cca01de9eacb5934127259d8ec",
+    "role": "replacement-candidate",
     "positionMapSha256": "de324855078fc1862ec97eeb8f7ee85ab1cce0701ca2d5765c6592295d3ad96d"
   },
   "inputId": "W-UTIL-343",
@@ -25,7 +25,7 @@
       "scheme": "hmac-sha256",
       "keyFingerprint": "166638cbb8c45cf3a1cf0d4e15917543694e5b2ed7542e4b26345fbae6bfa4f4"
     },
-    "redactionPolicy": "url(), non-empty quoted strings, e-mail addresses, URIs, long opaque tokens, non-ASCII text, unapproved identifiers and unapproved query parameters are replaced by a placeholder carrying the SHA-256 of the removed text."
+    "redactionPolicy": "Every value and condition token that is not CSS vocabulary, a number with a CSS unit, a hex color, an approved identifier or punctuation is replaced by a placeholder carrying a keyed HMAC-SHA256 digest of the removed text, as are url(), quoted strings, e-mail addresses, URIs, opaque tokens, non-ASCII text, unapproved custom-property and layer names and unclean query parameters."
   },
   "registryVersion": "1.1.0",
   "counts": {

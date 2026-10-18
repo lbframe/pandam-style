@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-publication-review",
+  "task": "CE-00.2",
+  "statement": "Authored text published about the private consumer (the calibration record and the approved identifiers with their reasons) is pinned to its review. The validator recomputes a digest over every string of each document, with its JSON path; any wording or identifier change fails until it is reviewed and this pin is updated in the same reviewable diff. Consumer declaration sets have no free text of their own: their headers are canonical.",
+  "reviewed": {
+    "baseline": "a92cb61a5d19f1c3e6d2fa7a83390381b8344deac6017e798af7ebc250dcf0f7",
+    "approvedIdentifiers": "c8efa80064657489b11fc8b496ff621ad7487a510a89f703b47534518c2a34d3"
+  }
+}
