@@ -1,0 +1,10 @@
+{
+  "description": "Hard-codes the normal emphasis to silence the diagnostic.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "compile": "pass",
+    "hot": "fail",
+    "omitted": "pass"
+  }
+}

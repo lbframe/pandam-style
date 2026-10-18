@@ -1,0 +1,12 @@
+{
+  "description": "Full width through a raw style attribute instead of the fullWidth variant.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "pass",
+    "compile": "fail",
+    "no-bypass": "fail",
+    "checkout-button": "blocked",
+    "summary-card": "blocked"
+  }
+}

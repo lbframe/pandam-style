@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "id": "recovery-positive-patched-generated-css",
+  "title": "Restore generated output that was patched by hand",
+  "split": "development",
+  "workflow": "recovery",
+  "caseType": "positive",
+  "tags": [
+    "adversarial:generated-output",
+    "host:vite",
+    "project-shape:vite-react-storefront",
+    "reference-oracle-fixture"
+  ],
+  "workspace": {
+    "fixture": "vite-react-storefront",
+    "git": "baseline-commit",
+    "prepare": [
+      {
+        "step": "compile"
+      },
+      {
+        "step": "replace",
+        "path": ".pandamstyle/styles.css",
+        "find": "#dc2626",
+        "replace": "#22c55e"
+      }
+    ]
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [],
+    "protected": [
+      "design.pandamstyle.config.js",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "notes": "Alpha 1 refuses to publish over tampered output (PMS_GENERATED_ARTIFACT_MISMATCH against artifacts.json); recovery requires removing the generated directory and rebuilding through the host.",
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "The hand-patched generated stylesheet is regenerated through the compiler; sources stay untouched."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "any",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "generated-regenerated",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "must-match",
+          "description": "Generated design-system output is present and byte-identical to fresh compiler output."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "badge-color",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/StockBadge.jsx",
+            "export": "StockBadge",
+            "props": {
+              "inStock": false
+            }
+          },
+          "select": {
+            "testId": "stock-badge"
+          },
+          "expect": {
+            "styles": {
+              "background-color": {
+                "token": "colors.status.danger",
+                "value": "#dc2626"
+              }
+            }
+          },
+          "description": "Fresh compiler output keeps the danger color (sanity of the source)."
+        }
+      ]
+    }
+  }
+}

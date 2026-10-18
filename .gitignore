@@ -36,3 +36,9 @@ packages/compiler/__tests__/pandamstyle/fixtures/*/generated/
 
 # AgentDoc is generated locally and in CI with the exact documented CLI pin.
 .agentdoc/
+
+# Agentic evaluation held-out set (benchmarks/agentic/heldout/ACCESS-POLICY.md).
+# Plaintext is authored and unsealed only in these ignored locations; the
+# repository tracks the encrypted archive and its manifest, never plaintext.
+benchmarks/agentic/heldout/.plaintext/
+benchmarks/agentic/heldout/.unsealed/

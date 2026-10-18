@@ -1,0 +1,12 @@
+{
+  "description": "Compiles cleanly but uses the flat card and a neutral button: compilation alone does not pass.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "pass",
+    "compile": "pass",
+    "no-bypass": "pass",
+    "summary-card": "fail",
+    "checkout-button": "fail"
+  }
+}

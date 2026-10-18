@@ -1,0 +1,18 @@
+{
+  "description": "Size change only.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "scope": "pass",
+    "wip-heading": "pass",
+    "wip-component": "pass",
+    "button-small": "pass",
+    "commands": "pass"
+  },
+  "transcript": [
+    {
+      "type": "command",
+      "command": "git status"
+    }
+  ]
+}

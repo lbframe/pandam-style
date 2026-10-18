@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "id": "themes-positive-dark-mode",
+  "title": "Apply the existing dark theme to the storefront on demand",
+  "split": "development",
+  "workflow": "themes",
+  "caseType": "positive",
+  "tags": [
+    "host:vite",
+    "project-shape:vite-react-storefront"
+  ],
+  "workspace": {
+    "fixture": "vite-react-storefront",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/App.jsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.js",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "A theme reference is selected from a finite prop and composed at the shell; nested components inherit."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "dark-shell",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/App.jsx",
+            "export": "App",
+            "props": {
+              "theme": "dark"
+            }
+          },
+          "select": {
+            "testId": "app-shell"
+          },
+          "expect": {
+            "styles": {
+              "background-color": {
+                "value": "#0b1220"
+              },
+              "color": {
+                "value": "#ffffff"
+              }
+            }
+          },
+          "description": "Dark theme remaps the shell surface and text."
+        },
+        {
+          "id": "dark-card",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/App.jsx",
+            "export": "App",
+            "props": {
+              "theme": "dark"
+            }
+          },
+          "select": {
+            "testIdPrefix": "product-card-"
+          },
+          "expect": {
+            "count": 3,
+            "styles": {
+              "background-color": {
+                "value": "#0b1220"
+              },
+              "color": {
+                "value": "#ffffff"
+              }
+            }
+          },
+          "description": "Nested cards inherit the dark mapping.",
+          "index": 0
+        },
+        {
+          "id": "light-default",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/App.jsx",
+            "export": "App",
+            "props": {}
+          },
+          "select": {
+            "testId": "app-shell"
+          },
+          "expect": {
+            "styles": {
+              "background-color": {
+                "value": "#ffffff"
+              },
+              "color": {
+                "value": "#111827"
+              }
+            }
+          },
+          "description": "Default stays light."
+        }
+      ]
+    }
+  }
+}

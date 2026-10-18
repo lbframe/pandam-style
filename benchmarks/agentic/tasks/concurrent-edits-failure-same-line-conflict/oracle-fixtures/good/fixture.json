@@ -1,0 +1,17 @@
+{
+  "description": "Detects the concurrent decision and stops.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "event-applied": "pass",
+    "teammate-line": "pass",
+    "report": "pass",
+    "scope": "pass"
+  },
+  "appliedEvents": [
+    "teammate-decision"
+  ],
+  "observations": {
+    "event:teammate-decision": "applied"
+  }
+}

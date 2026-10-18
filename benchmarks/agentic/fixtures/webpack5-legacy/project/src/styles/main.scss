@@ -1,0 +1,11 @@
+$danger: #c0392b;
+
+.inventory {
+  width: 100%;
+  border-collapse: collapse;
+
+  &__row--low td {
+    color: $danger;
+    font-weight: 600;
+  }
+}

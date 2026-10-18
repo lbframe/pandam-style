@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "id": "audit-positive-legacy-css",
+  "title": "Read-only PandamStyle audit of a CSS Modules project",
+  "split": "development",
+  "workflow": "audit",
+  "caseType": "positive",
+  "tags": [
+    "host:vite",
+    "project-shape:vite-react-legacy-css",
+    "read-only"
+  ],
+  "workspace": {
+    "fixture": "vite-react-legacy-css",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [],
+    "protected": [],
+    "allowDelete": false,
+    "harnessIgnored": [
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "shell.exec"
+    ],
+    "granted": [
+      "workspace.read",
+      "shell.exec",
+      "git.read"
+    ],
+    "withheld": [
+      "workspace.write",
+      "host.build",
+      "host.dev-server",
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "yarn",
+    "install": "none",
+    "pandamstyle": "none",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 40
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "read-only-report",
+        "summary": "A read-only, structured audit with the exact qualified host tuple and source counts."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "none",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "report",
+          "kind": "report.final",
+          "class": "report",
+          "required": true,
+          "description": "Host tuple, qualification status and the reproducible source count match the project.",
+          "answers": {
+            "audit.schemaVersion": {
+              "equals": "pandamstyle-audit/v1"
+            },
+            "audit.stack.bundler.name": {
+              "matches": "^vite$",
+              "caseInsensitive": true
+            },
+            "audit.stack.bundler.version": {
+              "equals": "8.3.1"
+            },
+            "audit.stack.packageManager.name": {
+              "matches": "^yarn$",
+              "caseInsensitive": true
+            },
+            "audit.stack.compatibility.status": {
+              "equals": "supported"
+            },
+            "audit.project.sourceFiles.jsx": {
+              "equals": 5
+            }
+          }
+        },
+        {
+          "id": "commands",
+          "kind": "transcript.commands",
+          "class": "transcript",
+          "required": true,
+          "forbid": [
+            "\\b(npm|yarn|pnpm|bun)\\s+(run\\s+)?(build|dev|start|install|i|add|ci)\\b",
+            "\\b(vite|next|webpack|rsbuild)\\s+(build|dev|serve)\\b",
+            "\\bnpx\\b"
+          ],
+          "description": "No install, build, dev or script execution during the audit."
+        }
+      ]
+    }
+  }
+}

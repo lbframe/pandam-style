@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "id": "installation-boundary-turbopack-modes",
+  "title": "Install on Turbopack with distinct development and production publication modes",
+  "split": "development",
+  "workflow": "installation",
+  "caseType": "boundary",
+  "tags": [
+    "host:next-turbopack",
+    "project-shape:next-turbopack-docs"
+  ],
+  "workspace": {
+    "fixture": "next-turbopack-docs",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "package.json",
+      "package-lock.json",
+      "next.config.ts",
+      "design.pandamstyle.config.mjs",
+      "components/ui/**",
+      ".gitignore"
+    ],
+    "protected": [
+      "app/**",
+      "components/SiteNav.tsx"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".next/**",
+      ".pandamstyle-next-host/**",
+      "next-env.d.ts",
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "package.install",
+      "network.registry",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "package.install",
+      "network.registry",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "next-turbopack",
+    "hostVersion": "16.3.8",
+    "packageManager": "npm",
+    "install": "none",
+    "pandamstyle": "candidate-packages",
+    "network": "package-registry",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 1200,
+    "maxTurns": 60
+  },
+  "project": {
+    "definition": "design.pandamstyle.config.mjs",
+    "roots": [
+      "components/ui"
+    ],
+    "outDir": ".pandamstyle"
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "integration-success",
+        "summary": "Dev uses semantic-dev, production uses strict, through the wrapper commands; nothing else changes."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "host-config",
+          "kind": "static.host-config",
+          "class": "static",
+          "required": true,
+          "file": "next.config.ts",
+          "module": "@pandamstyle/next",
+          "expect": {
+            "backend": "turbopack",
+            "definition": "design.pandamstyle.config.mjs",
+            "roots": [
+              "components/ui"
+            ]
+          },
+          "forbidOptions": [
+            "passthroughUncovered"
+          ],
+          "description": "withPandamStyle with the Turbopack backend and the dedicated root."
+        },
+        {
+          "id": "modes",
+          "kind": "files.contains",
+          "class": "static",
+          "required": true,
+          "path": "next.config.ts",
+          "description": "Development uses semantic-dev and production uses strict publication.",
+          "patterns": [
+            "semantic-dev",
+            "strict"
+          ]
+        },
+        {
+          "id": "scripts",
+          "kind": "files.contains",
+          "class": "static",
+          "required": true,
+          "path": "package.json",
+          "description": "Entry points use the qualified wrapper commands.",
+          "patterns": [
+            "\"dev\":\\s*\"pandamstyle-next dev --turbopack\"",
+            "\"build\":\\s*\"pandamstyle-next build --turbopack\""
+          ]
+        },
+        {
+          "id": "packages",
+          "kind": "static.package-json",
+          "class": "static",
+          "required": true,
+          "require": [
+            {
+              "name": "@pandamstyle/core",
+              "section": "dependencies",
+              "spec": "^(alpha|0\\.1\\.0-alpha\\.1)$"
+            },
+            {
+              "name": "@pandamstyle/compiler",
+              "spec": "^(alpha|0\\.1\\.0-alpha\\.1)$"
+            },
+            {
+              "name": "@pandamstyle/next",
+              "spec": "^(alpha|0\\.1\\.0-alpha\\.1)$"
+            }
+          ],
+          "sameSpec": true,
+          "forbid": [
+            "@pandamstyle/vite",
+            "@pandamstyle/rsbuild"
+          ],
+          "preserveExisting": true,
+          "allowScriptChanges": [
+            "dev",
+            "build"
+          ],
+          "description": "Core, compiler and the Next host package on one Alpha 1 spec."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "host-build",
+          "kind": "host.build",
+          "class": "compile",
+          "required": true,
+          "script": "build",
+          "timeoutSeconds": 600,
+          "description": "Strict Turbopack production build passes (runner-executed; unmeasured otherwise)."
+        }
+      ]
+    }
+  }
+}

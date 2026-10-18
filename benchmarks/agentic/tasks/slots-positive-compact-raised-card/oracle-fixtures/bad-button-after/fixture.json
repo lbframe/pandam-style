@@ -1,0 +1,10 @@
+{
+  "description": "Button placed after Add to cart and card left flat.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "card-root": "fail",
+    "footer-order": "fail",
+    "save-button": "pass"
+  }
+}

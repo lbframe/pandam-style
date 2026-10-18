@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "id": "slots-boundary-compound-emphasis",
+  "title": "Strong emphasis for failed syncs through compound variants",
+  "split": "development",
+  "workflow": "slots",
+  "caseType": "boundary",
+  "tags": [
+    "host:rsbuild",
+    "project-shape:rsbuild-ledger-ts"
+  ],
+  "workspace": {
+    "fixture": "rsbuild-ledger-ts",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/components/SyncAlert.tsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.js",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "rsbuild",
+    "hostVersion": "2.2.11",
+    "packageManager": "pnpm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "Selecting emphasis per status activates the declared compound variants across slots."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "failed-root",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/SyncAlert.tsx",
+            "export": "SyncAlert",
+            "props": {
+              "status": "failed"
+            }
+          },
+          "select": {
+            "testId": "sync-alert"
+          },
+          "expect": {
+            "styles": {
+              "background-color": {
+                "token": "colors.feedback.critical"
+              },
+              "border-color": {
+                "token": "colors.feedback.critical"
+              }
+            }
+          },
+          "description": "Compound critical+strong root background."
+        },
+        {
+          "id": "failed-icon",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/SyncAlert.tsx",
+            "export": "SyncAlert",
+            "props": {
+              "status": "failed"
+            }
+          },
+          "select": {
+            "testId": "sync-alert-icon"
+          },
+          "expect": {
+            "styles": {
+              "color": {
+                "token": "colors.fg.onAccent"
+              }
+            }
+          },
+          "description": "Compound output overrides the tone branch on the icon slot."
+        },
+        {
+          "id": "failed-title",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/SyncAlert.tsx",
+            "export": "SyncAlert",
+            "props": {
+              "status": "failed"
+            }
+          },
+          "select": {
+            "testId": "sync-alert-title"
+          },
+          "expect": {
+            "styles": {
+              "color": {
+                "token": "colors.fg.onAccent"
+              }
+            }
+          },
+          "description": "Strong emphasis branch on the title slot."
+        },
+        {
+          "id": "stale-subtle",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/SyncAlert.tsx",
+            "export": "SyncAlert",
+            "props": {
+              "status": "stale"
+            }
+          },
+          "select": {
+            "testId": "sync-alert"
+          },
+          "expect": {
+            "styles": {
+              "background-color": {
+                "token": "colors.bg.panel"
+              }
+            }
+          },
+          "description": "Stale stays subtle."
+        },
+        {
+          "id": "stale-icon",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/SyncAlert.tsx",
+            "export": "SyncAlert",
+            "props": {
+              "status": "stale"
+            }
+          },
+          "select": {
+            "testId": "sync-alert-icon"
+          },
+          "expect": {
+            "styles": {
+              "color": {
+                "token": "colors.feedback.caution"
+              }
+            }
+          },
+          "description": "Stale icon keeps the caution tone."
+        }
+      ]
+    }
+  }
+}

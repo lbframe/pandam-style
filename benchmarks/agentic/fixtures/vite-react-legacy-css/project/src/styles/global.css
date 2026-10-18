@@ -1,0 +1,20 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  color: var(--color-text);
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.site-header__title {
+  font-size: 24px;
+  margin: 0 0 var(--space-4);
+}

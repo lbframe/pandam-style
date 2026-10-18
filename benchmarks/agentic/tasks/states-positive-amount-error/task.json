@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "id": "states-positive-amount-error",
+  "title": "Error state for the transfer amount hint",
+  "split": "development",
+  "workflow": "states",
+  "caseType": "positive",
+  "tags": [
+    "host:rsbuild",
+    "project-shape:rsbuild-ledger-ts"
+  ],
+  "workspace": {
+    "fixture": "rsbuild-ledger-ts",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/components/TransferForm.tsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.js",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "rsbuild",
+    "hostVersion": "2.2.11",
+    "packageManager": "pnpm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "A conditional style composed after the hint slot expresses the error state."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "hint-error",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/TransferForm.tsx",
+            "export": "TransferForm",
+            "props": {
+              "amountError": "Insufficient funds"
+            }
+          },
+          "select": {
+            "testId": "amount-hint"
+          },
+          "expect": {
+            "text": "Insufficient funds",
+            "styles": {
+              "color": {
+                "token": "colors.feedback.critical"
+              },
+              "font-size": {
+                "token": "fontSizes.caption"
+              }
+            }
+          },
+          "description": "Error hint uses the critical color at the hint size."
+        },
+        {
+          "id": "input-invalid",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/TransferForm.tsx",
+            "export": "TransferForm",
+            "props": {
+              "amountError": "Insufficient funds"
+            }
+          },
+          "select": {
+            "testId": "amount-input"
+          },
+          "expect": {
+            "attributes": {
+              "aria-invalid": "true"
+            },
+            "styles": {
+              "border-color": {
+                "token": "colors.feedback.critical"
+              }
+            }
+          },
+          "description": "Invalid condition applies to the input."
+        },
+        {
+          "id": "hint-default",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/TransferForm.tsx",
+            "export": "TransferForm",
+            "props": {}
+          },
+          "select": {
+            "testId": "amount-hint"
+          },
+          "expect": {
+            "styles": {
+              "color": {
+                "token": "colors.fg.subtle"
+              }
+            }
+          },
+          "description": "Default hint color unchanged."
+        },
+        {
+          "id": "input-default",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/TransferForm.tsx",
+            "export": "TransferForm",
+            "props": {}
+          },
+          "select": {
+            "testId": "amount-input"
+          },
+          "expect": {
+            "styles": {
+              "border-color": {
+                "token": "colors.line.default"
+              }
+            }
+          },
+          "description": "Default input border unchanged."
+        }
+      ]
+    }
+  }
+}

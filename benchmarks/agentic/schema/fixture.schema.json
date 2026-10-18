@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/schema/fixture.schema.json",
+  "title": "Project shape fixture metadata",
+  "description": "Harness-only metadata. The sibling project/ directory is what the evaluated agent receives; this file never is.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "description",
+    "shape",
+    "host",
+    "pandamstyleInstalled",
+    "project"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "shape": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      }
+    },
+    "host": {
+      "enum": [
+        "vite",
+        "rsbuild",
+        "next-webpack",
+        "next-turbopack",
+        "webpack",
+        "none"
+      ]
+    },
+    "hostVersion": {
+      "type": "string"
+    },
+    "language": {
+      "enum": [
+        "javascript",
+        "typescript"
+      ]
+    },
+    "pandamstyleInstalled": {
+      "type": "boolean"
+    },
+    "project": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/project"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "definition",
+        "roots",
+        "outDir"
+      ],
+      "properties": {
+        "definition": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+        },
+        "roots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+          }
+        },
+        "outDir": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+        }
+      }
+    }
+  }
+}

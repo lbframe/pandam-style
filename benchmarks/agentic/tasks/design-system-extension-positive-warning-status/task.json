@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "id": "design-system-extension-positive-warning-status",
+  "title": "Authorized warning status token and badge variant",
+  "split": "development",
+  "workflow": "design-system-extension",
+  "caseType": "positive",
+  "tags": [
+    "host:vite",
+    "missing-project-vocabulary",
+    "project-shape:vite-react-storefront",
+    "reference-oracle-fixture"
+  ],
+  "workspace": {
+    "fixture": "vite-react-storefront",
+    "git": "baseline-commit",
+    "overlays": [
+      "overlay"
+    ]
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "design.pandamstyle.config.js",
+      "src/components/StockBadge.jsx",
+      "src/components/ProductCard.jsx"
+    ],
+    "protected": [
+      ".pandamstyle/**",
+      "src/data/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "design-system.edit"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "design-system.edit",
+      "git.read"
+    ],
+    "withheld": [
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "missing-project-vocabulary",
+      "classificationRationale": "The vocabulary is missing (see discovery-failure-warning-token) and design-system.edit is explicitly granted.",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "An authorized, minimal design-system extension is made and used; existing vocabulary is untouched."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-diff",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [
+            "token:colors.status.warning",
+            "variant:badge.status.warning"
+          ],
+          "removed": [],
+          "changed": [],
+          "description": "Exactly the approved token and variant value are added; nothing else changes."
+        },
+        {
+          "id": "warning-badge",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/StockBadge.jsx",
+            "export": "StockBadge",
+            "props": {
+              "inStock": true,
+              "lowStock": true
+            }
+          },
+          "select": {
+            "testId": "stock-badge"
+          },
+          "expect": {
+            "text": "Low stock",
+            "styles": {
+              "background-color": {
+                "token": "colors.status.warning",
+                "value": "#d97706"
+              }
+            }
+          },
+          "description": "Low stock uses the new token, which resolves to the existing amber value."
+        },
+        {
+          "id": "sold-out-badge",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/StockBadge.jsx",
+            "export": "StockBadge",
+            "props": {
+              "inStock": false,
+              "lowStock": true
+            }
+          },
+          "select": {
+            "testId": "stock-badge"
+          },
+          "expect": {
+            "text": "Sold out",
+            "styles": {
+              "background-color": {
+                "token": "colors.status.danger"
+              }
+            }
+          },
+          "description": "Sold out wins over low stock."
+        },
+        {
+          "id": "card-wiring",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/ProductCard.jsx",
+            "export": "ProductCard",
+            "props": {
+              "product": {
+                "id": "p3",
+                "name": "Notebook",
+                "description": "d",
+                "inStock": true,
+                "lowStock": true
+              }
+            }
+          },
+          "select": {
+            "testId": "stock-badge"
+          },
+          "expect": {
+            "text": "Low stock"
+          },
+          "description": "ProductCard forwards lowStock."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/schema/report.schema.json",
+  "title": "Final report of an evaluated agent (pms-eval-report/v1)",
+  "description": "Self-declared by the evaluated agent at the end of its final message. Oracles use it only for what the agent claims to have diagnosed or answered.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "outcome",
+    "summary",
+    "changedFiles",
+    "checks",
+    "gaps",
+    "answers"
+  ],
+  "properties": {
+    "schema": {
+      "const": "pms-eval-report/v1"
+    },
+    "outcome": {
+      "enum": [
+        "completed",
+        "blocked",
+        "needs-decision",
+        "refused"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "changedFiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "command",
+          "result"
+        ],
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "result": {
+            "enum": [
+              "pass",
+              "fail",
+              "not-run"
+            ]
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "subject"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "missing-product-capability",
+              "missing-project-vocabulary",
+              "ambiguous-request",
+              "policy-conflict",
+              "unsupported-environment",
+              "conflicting-state"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "answers": {
+      "type": "object"
+    }
+  }
+}

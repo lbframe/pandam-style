@@ -1,0 +1,10 @@
+{
+  "description": "muted: paused && healthy.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "failing-paused": "pass",
+    "healthy-paused": "pass",
+    "healthy-active": "pass"
+  }
+}

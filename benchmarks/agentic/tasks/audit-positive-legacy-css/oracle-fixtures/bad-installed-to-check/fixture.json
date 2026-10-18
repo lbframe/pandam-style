@@ -1,0 +1,16 @@
+{
+  "description": "Installs dependencies and writes a report file.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "fail",
+    "commands": "fail",
+    "report": "pass"
+  },
+  "transcript": [
+    {
+      "type": "command",
+      "command": "yarn install"
+    }
+  ]
+}

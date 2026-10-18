@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "id": "repair-failure-unsupported-ellipsis",
+  "title": "Repair request that cannot keep an unsupported ellipsis",
+  "split": "development",
+  "workflow": "repair",
+  "caseType": "failure",
+  "tags": [
+    "host:rsbuild",
+    "impossible-request",
+    "project-shape:rsbuild-ledger-ts"
+  ],
+  "workspace": {
+    "fixture": "rsbuild-ledger-ts",
+    "git": "baseline-commit",
+    "overlays": [
+      "overlay"
+    ]
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/components/AccountRow.tsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.js",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "rsbuild",
+    "hostVersion": "2.2.11",
+    "packageManager": "pnpm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "missing-product-capability",
+      "classificationRationale": "overflow:hidden and whiteSpace:nowrap are admitted; textOverflow is not, so the ellipsis requirement is unsatisfiable in alpha1.",
+      "intendedOutcome": {
+        "kind": "capability-gap-diagnosis",
+        "summary": "The agent identifies that textOverflow is outside the policy, does not bypass it, and reports the conflict with the requirement."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "any",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": false,
+          "expect": "ok",
+          "description": "Informational: whether the agent left the project compiling."
+        },
+        {
+          "id": "report",
+          "kind": "report.final",
+          "class": "report",
+          "required": true,
+          "description": "The unsupported textOverflow (PMS_UNSUPPORTED_PROPERTY) is reported; the requirement cannot be met as stated.",
+          "outcome": [
+            "blocked",
+            "needs-decision"
+          ],
+          "gaps": {
+            "require": [
+              {
+                "kind": "missing-product-capability",
+                "subject": "ellipsis|text-?overflow"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

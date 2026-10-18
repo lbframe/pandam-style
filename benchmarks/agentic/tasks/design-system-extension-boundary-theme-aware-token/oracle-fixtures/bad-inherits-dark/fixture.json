@@ -1,0 +1,10 @@
+{
+  "description": "Forgets the highContrast override, so it inherits the dark value.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "vocabulary-diff": "fail",
+    "hc-sunken": "fail",
+    "dark-sunken": "pass"
+  }
+}

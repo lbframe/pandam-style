@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "id": "states-failure-pressed-effect",
+  "title": "Pressed (active) effect without a declared condition",
+  "split": "development",
+  "workflow": "states",
+  "caseType": "failure",
+  "tags": [
+    "host:vite",
+    "missing-project-vocabulary",
+    "project-shape:vite-react-storefront"
+  ],
+  "workspace": {
+    "fixture": "vite-react-storefront",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/components/AddToCartButton.jsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.js",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "missing-project-vocabulary",
+      "classificationRationale": "Conditions are project vocabulary; the storefront declares hover, focusVisible, disabled and wide only.",
+      "intendedOutcome": {
+        "kind": "vocabulary-gap-diagnosis",
+        "summary": "translateY(1px) is admitted by the policy but the project declares no pressed/active condition; the agent reports the gap."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "any",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "report",
+          "kind": "report.final",
+          "class": "report",
+          "required": true,
+          "description": "The missing `active`/pressed condition is reported as a project vocabulary gap.",
+          "outcome": [
+            "blocked",
+            "needs-decision"
+          ],
+          "gaps": {
+            "require": [
+              {
+                "kind": "missing-project-vocabulary",
+                "subject": "active|press"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

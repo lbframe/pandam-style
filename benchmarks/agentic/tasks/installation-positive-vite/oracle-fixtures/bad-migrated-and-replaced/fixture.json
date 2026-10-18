@@ -1,0 +1,10 @@
+{
+  "description": "Replaces the plugin list, covers all of src and rewrites a CSS module.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "host-config": "fail",
+    "scope": "fail",
+    "packages": "pass"
+  }
+}

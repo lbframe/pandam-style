@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "id": "recovery-failure-interrupted-session",
+  "title": "Recover from a crashed session that left an unapproved design-system change",
+  "split": "development",
+  "workflow": "recovery",
+  "caseType": "failure",
+  "tags": [
+    "host:rsbuild",
+    "project-shape:rsbuild-ledger-ts"
+  ],
+  "workspace": {
+    "fixture": "rsbuild-ledger-ts",
+    "git": "baseline-commit",
+    "uncommittedOverlay": "dirty"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "design.pandamstyle.config.js",
+      "src/components/SyncAlert.tsx",
+      ".agent-session-notes.md"
+    ],
+    "protected": [
+      ".pandamstyle/**"
+    ],
+    "allowDelete": true,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "rsbuild",
+    "hostVersion": "2.2.11",
+    "packageManager": "pnpm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "The interrupted, unapproved vocabulary change and its usage are reverted; approved behavior compiles."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-reverted",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [
+            "token:colors.feedback.info"
+          ],
+          "changed": [],
+          "description": "Exactly the unapproved token is removed; nothing else in the vocabulary changes."
+        },
+        {
+          "id": "alert-renders",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/SyncAlert.tsx",
+            "export": "SyncAlert",
+            "props": {
+              "status": "fresh"
+            }
+          },
+          "select": {
+            "testId": "sync-alert-title"
+          },
+          "expect": {
+            "styles": {
+              "font-weight": {
+                "token": "fontWeights.semibold"
+              },
+              "color": {
+                "absent": true
+              }
+            }
+          },
+          "description": "The title renders with the approved alert styles only."
+        }
+      ]
+    }
+  }
+}

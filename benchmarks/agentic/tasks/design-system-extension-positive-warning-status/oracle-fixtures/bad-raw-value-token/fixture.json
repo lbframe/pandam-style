@@ -1,0 +1,10 @@
+{
+  "description": "Adds the token with a new raw value instead of referring to the existing amber color.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "vocabulary-diff": "pass",
+    "warning-badge": "fail",
+    "compile": "pass"
+  }
+}

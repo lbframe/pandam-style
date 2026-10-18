@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "id": "installation-positive-vite",
+  "title": "Install PandamStyle into a qualified Vite project without migrating",
+  "split": "development",
+  "workflow": "installation",
+  "caseType": "positive",
+  "tags": [
+    "host:vite",
+    "project-shape:vite-react-legacy-css"
+  ],
+  "workspace": {
+    "fixture": "vite-react-legacy-css",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "package.json",
+      "yarn.lock",
+      "vite.config.js",
+      "design.pandamstyle.config.js",
+      "src/pandamstyle/**",
+      ".gitignore"
+    ],
+    "protected": [
+      "src/styles/**",
+      "src/components/**",
+      "src/App.jsx",
+      "src/main.jsx",
+      "index.html"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      "dist/**",
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "package.install",
+      "network.registry",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "package.install",
+      "network.registry",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "yarn",
+    "install": "none",
+    "pandamstyle": "candidate-packages",
+    "network": "package-registry",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 1200,
+    "maxTurns": 60
+  },
+  "project": {
+    "definition": "design.pandamstyle.config.js",
+    "roots": [
+      "src/pandamstyle"
+    ],
+    "outDir": ".pandamstyle"
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "integration-success",
+        "summary": "Packages, host plugin and an empty definition are added; existing styling is untouched."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "host-config",
+          "kind": "static.host-config",
+          "class": "static",
+          "required": true,
+          "file": "vite.config.js",
+          "module": "@pandamstyle/vite",
+          "expect": {
+            "definition": "design.pandamstyle.config.js",
+            "roots": [
+              "src/pandamstyle"
+            ]
+          },
+          "forbidOptions": [
+            "passthroughUncovered"
+          ],
+          "preservePlugins": true,
+          "description": "The Vite plugin is registered with the dedicated root, existing plugins preserved, no blanket passthrough."
+        },
+        {
+          "id": "packages",
+          "kind": "static.package-json",
+          "class": "static",
+          "required": true,
+          "require": [
+            {
+              "name": "@pandamstyle/core",
+              "section": "dependencies",
+              "spec": "^(alpha|0\\.1\\.0-alpha\\.1)$"
+            },
+            {
+              "name": "@pandamstyle/compiler",
+              "spec": "^(alpha|0\\.1\\.0-alpha\\.1)$"
+            },
+            {
+              "name": "@pandamstyle/vite",
+              "spec": "^(alpha|0\\.1\\.0-alpha\\.1)$"
+            }
+          ],
+          "sameSpec": true,
+          "forbid": [
+            "@pandamstyle/next",
+            "@pandamstyle/rsbuild"
+          ],
+          "preserveExisting": true,
+          "description": "Core, compiler and exactly the Vite host package on one Alpha 1 spec; existing dependencies and scripts unchanged."
+        },
+        {
+          "id": "definition",
+          "kind": "files.contains",
+          "class": "static",
+          "required": true,
+          "path": "design.pandamstyle.config.js",
+          "description": "Definition created with the requested identity.",
+          "patterns": [
+            "systemId:\\s*['\\\"]booking@1['\\\"]"
+          ]
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "host-build",
+          "kind": "host.build",
+          "class": "compile",
+          "required": true,
+          "script": "build",
+          "timeoutSeconds": 300,
+          "description": "The project production build passes through the qualified host (runner-executed; unmeasured otherwise)."
+        }
+      ]
+    }
+  }
+}

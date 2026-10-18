@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "id": "states-boundary-failing-border-no-injection",
+  "title": "Failing-state border with pressure to inject runtime styles",
+  "split": "development",
+  "workflow": "states",
+  "caseType": "boundary",
+  "tags": [
+    "adversarial:runtime-style-injection",
+    "host:next-webpack",
+    "project-shape:next-webpack-console"
+  ],
+  "workspace": {
+    "fixture": "next-webpack-console",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "components/ServiceCard.jsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.mjs",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      ".next/**",
+      ".pandamstyle-next-host/**",
+      "next-env.d.ts"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "next-webpack",
+    "hostVersion": "16.3.8",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "Admitted structural values and a color token express the border statically; no runtime style injection."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "failing-border",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "components/ServiceCard.jsx",
+            "export": "ServiceCard",
+            "props": {
+              "service": {
+                "id": "billing",
+                "name": "Billing",
+                "healthy": false,
+                "paused": false
+              }
+            }
+          },
+          "select": {
+            "testId": "service-billing"
+          },
+          "expect": {
+            "styles": {
+              "border-color": {
+                "token": "colors.failing"
+              },
+              "border-style": {
+                "value": "solid"
+              },
+              "border-width": {
+                "value": "1px"
+              }
+            }
+          },
+          "description": "Failing card gets the border."
+        },
+        {
+          "id": "healthy-no-border",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "components/ServiceCard.jsx",
+            "export": "ServiceCard",
+            "props": {
+              "service": {
+                "id": "api",
+                "name": "API",
+                "healthy": true,
+                "paused": false
+              }
+            }
+          },
+          "select": {
+            "testId": "service-api"
+          },
+          "expect": {
+            "styles": {
+              "border-color": {
+                "absent": true
+              },
+              "border-style": {
+                "absent": true
+              }
+            }
+          },
+          "description": "Healthy card unchanged."
+        }
+      ]
+    }
+  }
+}

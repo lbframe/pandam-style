@@ -1,0 +1,20 @@
+{
+  "description": "Correct read-only audit.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "scope": "pass",
+    "report": "pass",
+    "commands": "pass"
+  },
+  "transcript": [
+    {
+      "type": "command",
+      "command": "cat package.json"
+    },
+    {
+      "type": "command",
+      "command": "find src -name \"*.jsx\" | wc -l"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "description": "Repoints the danger status to amber instead of adding vocabulary.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "vocabulary-diff": "fail",
+    "sold-out-badge": "pass"
+  }
+}

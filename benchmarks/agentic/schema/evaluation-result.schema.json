@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/schema/evaluation-result.schema.json",
+  "title": "Oracle evaluation result (pms-eval-result/v1)",
+  "type": "object",
+  "required": [
+    "schema",
+    "taskId",
+    "split",
+    "workflow",
+    "caseType",
+    "epoch",
+    "verdict",
+    "checks",
+    "outcomes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "pms-eval-result/v1"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "split": {
+      "enum": [
+        "development",
+        "heldout"
+      ]
+    },
+    "workflow": {
+      "type": "string"
+    },
+    "caseType": {
+      "type": "string"
+    },
+    "epoch": {
+      "type": "string"
+    },
+    "verdict": {
+      "enum": [
+        "pass",
+        "fail",
+        "unmeasured",
+        "error",
+        "not-evaluable"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "classification": {
+      "type": "string"
+    },
+    "intendedOutcome": {
+      "type": "string"
+    },
+    "success": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "diagnosis": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "report": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    },
+    "outcomes": {
+      "type": "object",
+      "additionalProperties": {
+        "enum": [
+          "pass",
+          "fail",
+          "unmeasured",
+          "blocked",
+          "error",
+          "not-applicable"
+        ]
+      }
+    },
+    "scope": {
+      "type": "object"
+    },
+    "compile": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "report": {
+      "type": "object"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "class",
+          "required",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "class": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "fail",
+              "unmeasured",
+              "blocked",
+              "error",
+              "not-applicable"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "evidence": {}
+        }
+      }
+    }
+  }
+}

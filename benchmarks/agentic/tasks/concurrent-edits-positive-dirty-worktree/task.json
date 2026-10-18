@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "id": "concurrent-edits-positive-dirty-worktree",
+  "title": "Change a component while preserving uncommitted user work",
+  "split": "development",
+  "workflow": "concurrent-edits",
+  "caseType": "positive",
+  "tags": [
+    "host:vite",
+    "project-shape:vite-react-storefront"
+  ],
+  "workspace": {
+    "fixture": "vite-react-storefront",
+    "git": "baseline-commit",
+    "uncommittedOverlay": "dirty"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/components/AddToCartButton.jsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.js",
+      ".pandamstyle/**",
+      "src/pages/ProductPage.jsx",
+      "src/components/Newsletter.jsx"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "The requested change is made while uncommitted and untracked user changes survive byte for byte."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "wip-heading",
+          "kind": "files.contains",
+          "class": "scope",
+          "required": true,
+          "path": "src/pages/ProductPage.jsx",
+          "description": "Uncommitted heading change preserved.",
+          "patterns": [
+            "This week's picks"
+          ]
+        },
+        {
+          "id": "wip-component",
+          "kind": "files.contains",
+          "class": "scope",
+          "required": true,
+          "path": "src/components/Newsletter.jsx",
+          "description": "Untracked component preserved.",
+          "patterns": [
+            "data-testid=\"newsletter\""
+          ]
+        },
+        {
+          "id": "button-small",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/AddToCartButton.jsx",
+            "export": "AddToCartButton",
+            "props": {}
+          },
+          "select": {
+            "testId": "add-to-cart"
+          },
+          "expect": {
+            "styles": {
+              "font-size": {
+                "token": "fontSizes.sm"
+              },
+              "padding-block": {
+                "token": "spacing.xs"
+              }
+            }
+          },
+          "description": "Small size selected."
+        },
+        {
+          "id": "commands",
+          "kind": "transcript.commands",
+          "class": "transcript",
+          "required": true,
+          "forbid": [
+            "\\bgit\\s+(stash|checkout\\s+(--|\\.)|reset|restore|clean)\\b"
+          ],
+          "description": "No command that discards or hides working-tree changes."
+        }
+      ]
+    }
+  }
+}

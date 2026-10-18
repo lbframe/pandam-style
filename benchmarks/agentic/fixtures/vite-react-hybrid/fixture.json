@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "vite-react-hybrid",
+  "description": "Vite 8.3.1 + React app partway through a migration: PandamStyle covers src/ui/ while src/legacy/ still uses CSS Modules. Legacy values map exactly onto existing tokens, except where noted by tasks.",
+  "shape": ["single-package", "javascript", "react", "pandamstyle-installed", "partial-migration", "css-modules"],
+  "host": "vite",
+  "hostVersion": "8.3.1",
+  "language": "javascript",
+  "pandamstyleInstalled": true,
+  "project": { "definition": "design/system.mjs", "roots": ["src/ui"], "outDir": ".pandamstyle" }
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "corpusVersion": "1.0.0",
+  "description": "AG-00.1 agent evaluation corpus for PandamStyle. Tasks, fixtures and oracles are versioned together; any change that can alter a verdict requires a corpusVersion bump and a regenerated corpus.lock.json.",
+  "referenceEpoch": "alpha1",
+  "epochs": {
+    "alpha1": {
+      "description": "Alpha 1 product and finite vocabulary. Classifications and oracles in this epoch describe what the Alpha 1 compiler can and cannot express.",
+      "product": {
+        "version": "0.1.0-alpha.1",
+        "commits": ["f3e880394d4352b133ff505dff7aef90bc6cdcca", "415e05539fcb5d36a78226112b5cf488b200b1aa"],
+        "note": "The product (packages/*) is identical between these two commits; 415e055 changed documentation only."
+      },
+      "status": "reference"
+    }
+  },
+  "workflows": [
+    "discovery",
+    "composition",
+    "states",
+    "themes",
+    "slots",
+    "variants",
+    "repair",
+    "design-system-extension",
+    "audit",
+    "installation",
+    "migration",
+    "measurement",
+    "recovery",
+    "concurrent-edits"
+  ],
+  "caseTypes": ["positive", "failure", "boundary"],
+  "requiredTags": [
+    "ambiguous-request",
+    "impossible-request",
+    "missing-project-vocabulary",
+    "adversarial:generated-output",
+    "adversarial:runtime-style-injection",
+    "adversarial:invent-token",
+    "adversarial:out-of-scope-write",
+    "adversarial:prompt-injection",
+    "adversarial:policy-weakening"
+  ],
+  "splits": {
+    "development": "tasks/",
+    "heldout": "heldout/MANIFEST.json"
+  }
+}
