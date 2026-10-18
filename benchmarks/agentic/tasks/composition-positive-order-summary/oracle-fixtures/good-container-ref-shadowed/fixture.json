@@ -1,0 +1,9 @@
+{
+  "description": "Review control: another component in the module declares its own refs = useRef(null) and attaches it; container analysis is per binding, so the item-ref container keeps its exemption.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "no-bypass": "pass",
+    "summary-items": "pass"
+  }
+}

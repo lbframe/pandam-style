@@ -82,6 +82,12 @@ Other custody events:
   `current`); the static rule was corrected in the oracles. Only the
   manifest's `corpusVersion` was updated; the archive, its digest and every
   task digest are unchanged.
+- 2026-10-19, corpus 1.4.3 (1.4.2 follow-up): no unseal and no revision.
+  Ref-container analysis now resolves bindings by scope and treats every
+  assignment-target form of `ref.current` (destructuring, for-of/for-in,
+  compound, update, delete) as a store; corrected in the oracles only. Only
+  the manifest's `corpusVersion` was updated; the archive, its digest and
+  every task digest are unchanged.
 
 ## Rotation and changes
 

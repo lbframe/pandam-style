@@ -454,6 +454,49 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
     'export const Meta = () => <product-meta text="sku-123" color="blue" width={3} />;',
     "import { useRef as useNodeRefs } from 'react';\nexport function L({ items }) { const refs = useNodeRefs(new Array(items.length)); return items.map((it, i) => <li key={it.id} ref={(el) => { refs.current[i] = el; }} onKeyDown={() => refs.current[(i + 1) % items.length]?.focus()} />); }",
   ];
+  // A ref container stops being one when `current` can receive a node: every
+  // assignment-target form of `r.current` (and a reassigned ref binding).
+  const containerWith = (store, init = 'new Array(1)') =>
+    `export function A({ k, items }) { const r = useRef(${init}); useEffect(() => { r.current[k] = 1; }); return <ul ref={(el) => { ${store} }}>{items.map((x, i) => <li key={x} ref={(n) => { r.current[i] = n; }} />)}</ul>; }`;
+  for (const store of [
+    'r.current = el;',
+    'r.current += el;',
+    'r.current ??= el;',
+    '[r.current] = [el];',
+    '({ node: r.current } = { node: el });',
+    '({ node: [r.current] } = { node: [el] });',
+    '[r.current = el] = [];',
+    '[...r.current] = [el];',
+    '({ ...r.current } = { a: el });',
+    "[r['current']] = [el];",
+    'for (r.current of [el]) {}',
+    'for (r.current in { a: el }) {}',
+    'r.current++;',
+    'delete r.current;',
+  ]) {
+    const found = findConstructs(containerWith(store), 'x.jsx').map(
+      (f) => f.rule,
+    );
+    assert.ok(found.includes('dynamic-code'), `not reported for: ${store}`);
+  }
+  for (const store of [
+    'r.current = [];',
+    'r.current.length = 0;',
+    'const [a = r.current] = [];',
+  ])
+    assert.deepEqual(
+      findConstructs(containerWith(store, '[]'), 'x.jsx'),
+      [],
+      store,
+    );
+  assert.deepEqual(
+    findConstructs(
+      `${containerWith('', '[]')}\nexport function B() { const r = useRef(null); return <span ref={r} />; }`,
+      'x.jsx',
+    ),
+    [],
+    'a shadowing binding elsewhere does not affect the container',
+  );
   for (const code of idiomatic)
     assert.deepEqual(findConstructs(code, 'x.jsx'), [], code);
 });

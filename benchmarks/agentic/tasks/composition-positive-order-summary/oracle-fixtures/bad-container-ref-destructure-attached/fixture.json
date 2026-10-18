@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: a ref initialised with new Array(1) receives the <section> element through a destructuring assignment in a callback ref ([r.current] = [el]); a computed write through it is not a container write.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail"
+  }
+}

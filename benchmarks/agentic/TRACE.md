@@ -121,6 +121,12 @@ not repeated below unless they are the discriminating evidence.
     - `bad-container-ref-attached-dom` and `bad-container-ref-unreached-style`
       (1.4.2): a ref with a plain initial value that is attached to an element
       is not a container.
+    - `bad-container-ref-destructure-attached`,
+      `bad-container-ref-for-of-attached` and
+      `bad-container-ref-destructure-unreached-style` (1.4.3): storing the
+      element into `current` through a destructuring pattern or a for-of head
+      also ends the exemption. Controls: `good-container-ref-reset` and
+      `good-container-ref-shadowed`.
   - Good controls: `good-idiomatic-indexing` (array indexing and lookup maps),
     `good-handler-map` (`handlers[e.key]?.()`), `good-focus-ref`,
     `good-memo-hooks` and `good-regenerated` (complete fresh generation).

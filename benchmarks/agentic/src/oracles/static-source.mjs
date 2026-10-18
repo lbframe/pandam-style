@@ -14,6 +14,7 @@ import { HTML_ELEMENTS, presentationalChannel } from './style-channels.mjs';
 
 const require = createRequire(import.meta.url);
 const { parse } = require('@babel/parser');
+const traverse = require('@babel/traverse').default;
 
 const CSS_IN_JS =
   /^(styled-components|@emotion\/|@stitches\/|@vanilla-extract\/|goober|jss|@pandacss\/|twin\.macro|styled-jsx)/;
@@ -306,7 +307,7 @@ function isPlainDataInit(init) {
   return false;
 }
 
-function collectBindings(program) {
+function collectBindings(program, file) {
   const plain = new Set();
   const declarators = [];
   const domParams = new Set();
@@ -393,7 +394,6 @@ function collectBindings(program) {
   // Ref containers: `const refs = useRef([])` (or `{}`, `new Array(n)`, ...)
   // holds a collection;
   // `refs.current` is plain data even though its elements may be nodes.
-  const refContainers = new Set();
   // Local names of React's useRef (`import { useRef as useR } from 'react'`);
   // `React.useRef` is matched by member name.
   const useRefNames = new Set(['useRef']);
@@ -413,54 +413,110 @@ function collectBindings(program) {
   // Accumulators of `reduce(fn, <plain literal>)`: the callback's first
   // parameter, by name and callback source range.
   const accumulators = [];
-  for (const d of declarators) {
-    const init = d.init;
-    if (
-      d.id.type === 'Identifier' &&
-      init?.type === 'CallExpression' &&
-      (useRefNames.has(init.callee?.name) ||
-        propertyName(init.callee) === 'useRef') &&
-      plainInitial(init.arguments?.[0])
-    )
-      refContainers.add(d.id.name);
-  }
-  // React can replace `current` with a DOM element whenever the ref object
-  // itself reaches it (a `ref` attribute or prop, createElement/jsx props,
-  // forwardRef, useImperativeHandle, any call, alias or spread). A ref stays
-  // a container only while it is used purely through `X.current`, and
-  // `X.current` itself is never reassigned (`el => { X.current = el; }`).
-  walkWithParent(program, (node, parent, key) => {
-    if (node.type === 'Identifier' && refContainers.has(node.name)) {
-      const declaration = parent?.type === 'VariableDeclarator' && key === 'id';
-      const propertyKey =
-        ((parent?.type === 'MemberExpression' ||
-          parent?.type === 'OptionalMemberExpression') &&
-          key === 'property' &&
-          !parent.computed) ||
-        ((parent?.type === 'ObjectProperty' ||
-          parent?.type === 'ObjectMethod') &&
-          key === 'key' &&
-          !parent.computed);
-      const currentAccess =
-        (parent?.type === 'MemberExpression' ||
-          parent?.type === 'OptionalMemberExpression') &&
-        key === 'object' &&
-        propertyName(parent) === 'current';
-      if (!declaration && !propertyKey && !currentAccess)
-        refContainers.delete(node.name);
+  // Ref containers, by scope binding: `const refs = useRef(<plain data>)`
+  // holds a collection, so `refs.current` is plain data even though its
+  // elements may be nodes. React replaces `current` with a DOM element
+  // whenever the ref object reaches it (a `ref` attribute or prop,
+  // createElement/jsx props, forwardRef, useImperativeHandle, context, any
+  // call, alias, spread or return) or code stores into `current`. A binding
+  // stays a container only if it is never reassigned, every reference is
+  // `refs.current` (or `refs['current']`), and `refs.current` is never in an
+  // assignment-target position: compound or destructuring assignment at any
+  // depth (defaults and rest included), for-of/for-in heads, ++/--, delete.
+  // The one store kept is a plain `refs.current = <plain literal>` reset,
+  // which cannot carry a node. Container uses are identified by the
+  // Identifier node of `refs`, so a shadowing binding never counts.
+  const containerUses = new Set();
+  const PATTERN_PARENTS = new Set([
+    'ArrayPattern',
+    'ObjectPattern',
+    'AssignmentPattern',
+    'RestElement',
+  ]);
+  const TYPE_WRAPPERS = new Set([
+    'TSNonNullExpression',
+    'TSAsExpression',
+    'TSSatisfiesExpression',
+    'TSTypeAssertion',
+    'TypeCastExpression',
+    'ParenthesizedExpression',
+  ]);
+  const isCurrent = (member) =>
+    propertyName(member) === 'current' ||
+    (member.computed && constantKey(member.property) === 'current');
+  // Whether `path` (an `X.current` expression) is written to.
+  const written = (path) => {
+    let child = path;
+    let parent = path.parentPath;
+    let nested = false;
+    for (;;) {
+      const p = parent?.node;
+      if (p == null) return false;
+      if (TYPE_WRAPPERS.has(p.type)) {
+        // `r.current!`, `(r.current as T)`: the same target.
+      } else if (PATTERN_PARENTS.has(p.type)) {
+        if (p.type === 'AssignmentPattern' && child.key !== 'left')
+          return false;
+        nested = true;
+      } else if (
+        p.type === 'ObjectProperty' &&
+        parent.parentPath?.node?.type === 'ObjectPattern' &&
+        child.key === 'value'
+      ) {
+        nested = true;
+      } else break;
+      child = parent;
+      parent = parent.parentPath;
     }
-    const target =
-      node.type === 'AssignmentExpression'
-        ? node.left
-        : node.type === 'UpdateExpression'
-          ? node.argument
-          : null;
+    const p = parent.node;
+    if (p.type === 'AssignmentExpression' && child.key === 'left')
+      return (
+        nested ||
+        p.operator !== '=' ||
+        !(isLiteralObject(p.right) || isPlainDataInit(p.right))
+      );
     if (
-      target != null &&
-      propertyName(target) === 'current' &&
-      target.object?.type === 'Identifier'
+      (p.type === 'ForOfStatement' || p.type === 'ForInStatement') &&
+      child.key === 'left'
     )
-      refContainers.delete(target.object.name);
+      return true;
+    if (p.type === 'UpdateExpression') return true;
+    if (p.type === 'UnaryExpression' && p.operator === 'delete') return true;
+    return nested;
+  };
+  traverse(file, {
+    noScope: false,
+    VariableDeclarator(path) {
+      const { id, init } = path.node;
+      if (
+        id.type !== 'Identifier' ||
+        init?.type !== 'CallExpression' ||
+        !(
+          useRefNames.has(init.callee?.name) ||
+          propertyName(init.callee) === 'useRef'
+        ) ||
+        !plainInitial(init.arguments?.[0])
+      )
+        return;
+      const binding = path.scope.getBinding(id.name);
+      if (binding == null || binding.constantViolations.length > 0) return;
+      const uses = [];
+      for (const ref of binding.referencePaths) {
+        const member = ref.parentPath;
+        if (
+          !(
+            (member?.isMemberExpression() ||
+              member?.isOptionalMemberExpression()) &&
+            ref.key === 'object' &&
+            isCurrent(member.node)
+          ) ||
+          written(member)
+        )
+          return;
+        uses.push(ref.node);
+      }
+      for (const node of uses) containerUses.add(node);
+    },
   });
   walkWithParent(program, (node) => {
     if (
@@ -491,9 +547,10 @@ function collectBindings(program) {
           (a) => a.name === expr.name && at.start >= a.start && at.end <= a.end,
         )));
   const isRefContainer = (expr) =>
-    propertyName(expr) === 'current' &&
-    expr.object?.type === 'Identifier' &&
-    refContainers.has(expr.object.name);
+    (expr?.type === 'MemberExpression' ||
+      expr?.type === 'OptionalMemberExpression') &&
+    isCurrent(expr) &&
+    containerUses.has(expr.object);
   return { plain, isTainted, isPlainTarget, isRefContainer };
 }
 
@@ -552,7 +609,7 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
       add('generated-internal-import', node, source);
     if (isBuiltin(source)) add('privileged-import', node, source);
   };
-  const bindings = collectBindings(ast.program);
+  const bindings = collectBindings(ast.program, ast);
   // JSX elements inside <svg> carry SVG's own attributes.
   const insideSvg = new Set();
   walk(ast.program, (node) => {
