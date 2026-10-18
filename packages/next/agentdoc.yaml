@@ -1,0 +1,112 @@
+apiVersion: agentdoc.dev/v1
+kind: Component
+metadata:
+  name: next
+  description: The Next adapter connects explicit webpack and Turbopack modes to revision-bound compiler sessions.
+spec:
+  type: library
+  system: pandamstyle
+  requirements:
+    - id: constraints-publication-and-integrations
+      key: requirement.constraints-publication-and-integrations
+      value: implemented
+      source:
+        path: docs/CONSTRAINTS.md
+        section: publication-and-integrations
+        sha256: 9d7d3a29be34b74116aa6e1c4be8127bd70937a7afa2297e17a9ecc0c02fd012
+    - id: product-compilation-and-repair
+      key: requirement.product-compilation-and-repair
+      value: implemented
+      source:
+        path: docs/PRODUCT.md
+        section: compilation-and-repair
+        sha256: 5c084787261ef58a362c5cb03128bd7a9ad1e4e8815b39c6b137e6afe504008d
+    - id: agent-install-qualified-hosts
+      key: requirement.agent-install-qualified-hosts
+      value: implemented
+      source:
+        path: docs/agent-install.md
+        section: qualified-hosts
+        sha256: a957989db3fe729fd9f27758218cf4271d89f97d7e964aa6fb015c8e995befcc
+    - id: agent-install-allowed-actions
+      key: requirement.agent-install-allowed-actions
+      value: implemented
+      source:
+        path: docs/agent-install.md
+        section: allowed-actions
+        sha256: bf9647e3d8baf88bf317929fa135a52019d4e9b762a1a3c974efb079f78afde2
+    - id: adr0001-decision
+      key: requirement.adr0001-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0001-package-topology.md
+        section: decision
+        sha256: df5374fbe090f56fb3e30748f86a1d2214124e35088e54c608aaebcb3c995cb4
+    - id: adr0001-consequences-and-acceptance-evidence
+      key: requirement.adr0001-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0001-package-topology.md
+        section: consequences-and-acceptance-evidence
+        sha256: 969c3d83cfdded07b8b170b445b7075870c818698a0f6106b14ed3392be6f146
+    - id: adr0010-decision
+      key: requirement.adr0010-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0010-host-adapter-isolation.md
+        section: decision
+        sha256: a4b11a78eb9059a697892e5277a84b099e44acd821a0ed34b11b4c2d45677d56
+    - id: adr0010-consequences-and-acceptance-evidence
+      key: requirement.adr0010-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0010-host-adapter-isolation.md
+        section: consequences-and-acceptance-evidence
+        sha256: e1960b62b4abaf733c51489230ccf12f2cae6e86905fb6f5f1e9f5da6eb6d022
+    - id: package-architecture-v1-dependency-boundaries
+      key: requirement.package-architecture-v1-dependency-boundaries
+      value: implemented
+      source:
+        path: docs/architecture/package-architecture-v1.md
+        section: dependency-boundaries
+        sha256: 8b45506059eae0bada03fb7c4877352ca30ad29bdeea43041003f1d31500925f
+    - id: public-api-v0-1-package-apis
+      key: requirement.public-api-v0-1-package-apis
+      value: implemented
+      source:
+        path: docs/architecture/public-api-v0.1.md
+        section: package-apis
+        sha256: b32a0e2c361bd89f2261930b7e52bae1813af9b5a8f0659520aa56a13aa43fed
+    - id: compiler-api-public-package-exports
+      key: requirement.compiler-api-public-package-exports
+      value: implemented
+      source:
+        path: docs/reference/compiler-api.md
+        section: public-package-exports
+        sha256: e578854409a3b75e0c2718a52e610bc0304f3468dc7193a708b0e65172cfffd8
+    - id: compiler-api-host-option-types
+      key: requirement.compiler-api-host-option-types
+      value: implemented
+      source:
+        path: docs/reference/compiler-api.md
+        section: host-option-types
+        sha256: 41af94a78f4341b1c80b60e3891eb9524ecc97fc17f530cc96f727cbbe67ffe4
+    - id: compiler-api-compiler-project-service
+      key: requirement.compiler-api-compiler-project-service
+      value: implemented
+      source:
+        path: docs/reference/compiler-api.md
+        section: compiler-project-service
+        sha256: bfa325eacdaa669a5a3e544127a320e1f766606b9e54e8d0d31961f5069d7b5a
+    - id: alpha1-qualified-hosts
+      key: requirement.alpha1-qualified-hosts
+      value: implemented
+      source:
+        path: docs/release/alpha1.md
+        section: qualified-hosts
+        sha256: 86e3dcf9510f8c8f28a36c2371e2e1a0a344ef2d68625b2c6d46efdce1d3a645
+  context:
+    docs:
+      - docs/agent-install.md
+      - docs/architecture/adr/0010-host-adapter-isolation.md
+      - packages/next/ATTRIBUTIONS.md

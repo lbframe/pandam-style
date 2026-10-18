@@ -2,8 +2,9 @@
 
 # PandamStyle
 
-PandamStyle is a constrained styling language and compiler. It lets AI coding
-agents compose interfaces from design-system semantics instead of inventing
+PandamStyle is a constrained styling language and compiler exclusively for
+AI/LLM agents. It lets agents
+compose interfaces from design-system semantics instead of inventing
 arbitrary micro-design.
 
 **Agents compose. PandamStyle enforces the design system.**
@@ -98,3 +99,6 @@ These contracts keep task instructions focused; load only the workflow needed:
 - [Benchmark](docs/agent-benchmark.md)
 - [Repair compiler diagnostics](docs/agent-repair.md) and the [reference](docs/reference/README.md)
 - [PandamStyle agent skill](.agents/skills/pandamstyle/SKILL.md)
+
+For agents developing PandamStyle itself, start with [AGENTS](AGENTS.md), the
+[product contract](docs/PRODUCT.md), and [catalog maintenance](docs/agentdoc.md).

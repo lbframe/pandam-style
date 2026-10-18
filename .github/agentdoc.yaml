@@ -1,0 +1,22 @@
+apiVersion: agentdoc.dev/v1
+kind: Component
+metadata:
+  name: automation
+  description: Repository automation configures contributor verification and documentation integrity gates.
+spec:
+  type: other
+  system: pandamstyle
+  requirements:
+    - id: constraints-documentation-integrity
+      key: requirement.constraints-documentation-integrity
+      value: implemented
+      source:
+        path: docs/CONSTRAINTS.md
+        section: documentation-integrity
+        sha256: 9ef5fe5537362a5d36596e8ea390a681bbdc44a629e401af379254cf6a3a1da5
+  context:
+    docs:
+      - .github/CONTRIBUTING.md
+      - .github/copilot-instructions.md
+    runbooks:
+      - docs/agentdoc.md

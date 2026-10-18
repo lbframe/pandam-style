@@ -1,0 +1,191 @@
+apiVersion: agentdoc.dev/v1
+kind: Component
+metadata:
+  name: core
+  description: The runtime composes authenticated compiled references and selects finite recipe data without compiling or injecting CSS.
+spec:
+  type: library
+  system: pandamstyle
+  requirements:
+    - id: constraints-generated-artifacts-and-execution
+      key: requirement.constraints-generated-artifacts-and-execution
+      value: implemented
+      source:
+        path: docs/CONSTRAINTS.md
+        section: generated-artifacts-and-execution
+        sha256: c20a5c5cbb08b9ea2df0a84bffee88928d71d00c3d6af4b571620aa6a0f28e7a
+    - id: product-compilation-and-repair
+      key: requirement.product-compilation-and-repair
+      value: implemented
+      source:
+        path: docs/PRODUCT.md
+        section: compilation-and-repair
+        sha256: 5c084787261ef58a362c5cb03128bd7a9ad1e4e8815b39c6b137e6afe504008d
+    - id: agent-repair-common-categories-and-local-repair
+      key: requirement.agent-repair-common-categories-and-local-repair
+      value: implemented
+      source:
+        path: docs/agent-repair.md
+        section: common-categories-and-local-repair
+        sha256: 06bc442dd8b2c501b9a50b3eedc04854b76543ec4cfbd062419e6a22b0cae141
+    - id: agent-use-choose-a-primitive
+      key: requirement.agent-use-choose-a-primitive
+      value: implemented
+      source:
+        path: docs/agent-use.md
+        section: choose-a-primitive
+        sha256: e6dbc0673daf99d353fcc44dda0813f7a018b50ce6cd5ac111197c5a73f7bfce
+    - id: agent-use-composition-contract
+      key: requirement.agent-use-composition-contract
+      value: implemented
+      source:
+        path: docs/agent-use.md
+        section: composition-contract
+        sha256: 3322c049d3e679a64e4444b497b6adc12002757c8b4b82135e7c72d6b94344fc
+    - id: agent-use-responsive-behavior-and-finite-selection
+      key: requirement.agent-use-responsive-behavior-and-finite-selection
+      value: implemented
+      source:
+        path: docs/agent-use.md
+        section: responsive-behavior-and-finite-selection
+        sha256: 8b251a0b2bc043c7d3f48d13595cf653e510652e25662565885fadf519a45fe4
+    - id: adr0001-decision
+      key: requirement.adr0001-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0001-package-topology.md
+        section: decision
+        sha256: df5374fbe090f56fb3e30748f86a1d2214124e35088e54c608aaebcb3c995cb4
+    - id: adr0001-consequences-and-acceptance-evidence
+      key: requirement.adr0001-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0001-package-topology.md
+        section: consequences-and-acceptance-evidence
+        sha256: 969c3d83cfdded07b8b170b445b7075870c818698a0f6106b14ed3392be6f146
+    - id: adr0002-decision
+      key: requirement.adr0002-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0002-runtime-package-name.md
+        section: decision
+        sha256: fda7088f5ecec44781207af7b1ec88dc72dfb5d8ef26ccd9300862b26fca0808
+    - id: adr0002-consequences-and-acceptance-evidence
+      key: requirement.adr0002-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0002-runtime-package-name.md
+        section: consequences-and-acceptance-evidence
+        sha256: a37462c98e66cd09a04c76b1a9d7466ff71bb5995175d93d0eba5bdf9b208460
+    - id: adr0003-decision
+      key: requirement.adr0003-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0003-authoring-api.md
+        section: decision
+        sha256: 39700977a54eee2c4e426392a5844762940b17e3f902eed3c632df724ad99332
+    - id: adr0003-consequences-and-acceptance-evidence
+      key: requirement.adr0003-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0003-authoring-api.md
+        section: consequences-and-acceptance-evidence
+        sha256: 63f58e5956add8434ed403467ae1cee7d0e96d94e36caa15f3a3a7184591593e
+    - id: adr0005-decision
+      key: requirement.adr0005-decision
+      value: implemented
+      source:
+        path: docs/architecture/adr/0005-runtime-compiler-boundary.md
+        section: decision
+        sha256: 6ab588e34eadfe01a7960ab80b4e414a8b397af11dbb2d143ff95173d4f40cbf
+    - id: adr0005-consequences-and-acceptance-evidence
+      key: requirement.adr0005-consequences-and-acceptance-evidence
+      value: implemented
+      source:
+        path: docs/architecture/adr/0005-runtime-compiler-boundary.md
+        section: consequences-and-acceptance-evidence
+        sha256: 2fa4ca4b584fd7992854766186bf54897e7015d724250348fb6eb67372d39861
+    - id: diagnostics-protocol-v1-stable-code-families-and-repairs
+      key: requirement.diagnostics-protocol-v1-stable-code-families-and-repairs
+      value: implemented
+      source:
+        path: docs/architecture/diagnostics-protocol-v1.md
+        section: stable-code-families-and-repairs
+        sha256: 9d4a7c1dcb202289f83f12f60032cf5849ca94fd2d84c6408691844c867c6135
+    - id: generated-design-system-abi-v1-runtime-references
+      key: requirement.generated-design-system-abi-v1-runtime-references
+      value: implemented
+      source:
+        path: docs/architecture/generated-design-system-abi-v1.md
+        section: runtime-references
+        sha256: d68b22ee20fb590c8536fac258e4de55fd8294673e5540956f0704f7b1dde3bc
+    - id: generated-design-system-abi-v1-identity-and-consistency
+      key: requirement.generated-design-system-abi-v1-identity-and-consistency
+      value: implemented
+      source:
+        path: docs/architecture/generated-design-system-abi-v1.md
+        section: identity-and-consistency
+        sha256: aaef7d353d6139111aca00898c59906b2f9f0c17bfdff3953853911466e31596
+    - id: package-architecture-v1-dependency-boundaries
+      key: requirement.package-architecture-v1-dependency-boundaries
+      value: implemented
+      source:
+        path: docs/architecture/package-architecture-v1.md
+        section: dependency-boundaries
+        sha256: 8b45506059eae0bada03fb7c4877352ca30ad29bdeea43041003f1d31500925f
+    - id: public-api-v0-1-package-apis
+      key: requirement.public-api-v0-1-package-apis
+      value: implemented
+      source:
+        path: docs/architecture/public-api-v0.1.md
+        section: package-apis
+        sha256: b32a0e2c361bd89f2261930b7e52bae1813af9b5a8f0659520aa56a13aa43fed
+    - id: authoring-props-composition
+      key: requirement.authoring-props-composition
+      value: implemented
+      source:
+        path: docs/reference/authoring.md
+        section: props-composition
+        sha256: 2cc605f6dc2c82f06288ed42f16a45f0712361a1bfc79a95373594e79b62429d
+    - id: authoring-recipes-slots-and-compounds
+      key: requirement.authoring-recipes-slots-and-compounds
+      value: implemented
+      source:
+        path: docs/reference/authoring.md
+        section: recipes-slots-and-compounds
+        sha256: 8fa0dc87f90a65f3d9ffce54c4b3921a5d11e2db1d47a1950bae35e3ea969c8f
+    - id: compiler-api-public-package-exports
+      key: requirement.compiler-api-public-package-exports
+      value: implemented
+      source:
+        path: docs/reference/compiler-api.md
+        section: public-package-exports
+        sha256: e578854409a3b75e0c2718a52e610bc0304f3468dc7193a708b0e65172cfffd8
+    - id: compiler-api-compiler-project-service
+      key: requirement.compiler-api-compiler-project-service
+      value: implemented
+      source:
+        path: docs/reference/compiler-api.md
+        section: compiler-project-service
+        sha256: bfa325eacdaa669a5a3e544127a320e1f766606b9e54e8d0d31961f5069d7b5a
+    - id: design-system-recipe-definitions
+      key: requirement.design-system-recipe-definitions
+      value: implemented
+      source:
+        path: docs/reference/design-system.md
+        section: recipe-definitions
+        sha256: 34f30decb4e15dd8dd8185a2f8ef95908bf4507f64518da6fc8ffca45b55a845
+  context:
+    docs:
+      - docs/reference/README.md
+      - docs/reference/authoring.md
+      - docs/agent-use.md
+      - docs/architecture/generated-design-system-abi-v1.md
+      - docs/architecture/adr/0005-runtime-compiler-boundary.md
+      - packages/core/ATTRIBUTIONS.md
+      - docs/architecture/adr/0001-package-topology.md
+      - docs/architecture/adr/0002-runtime-package-name.md
+      - docs/architecture/package-architecture-v1.md
+      - docs/architecture/agentic-optimizations-plan.md
+      - docs/architecture/agentic-optimizations-review.md
+      - .agents/skills/pandamstyle/SKILL.md
