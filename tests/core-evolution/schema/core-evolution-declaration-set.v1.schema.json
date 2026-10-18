@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-declaration-set.v1.schema.json",
+  "title": "CE-00.2 consumer declaration set",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-declaration-set"
+    },
+    "task": {
+      "const": "CE-00.2"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "utilitiesBlockSpan": {
+          "type": "integer"
+        },
+        "utilitiesBlockSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["sha256", "bytes", "provenance"]
+    },
+    "inputId": {
+      "type": "string",
+      "pattern": "^[A-Z0-9-]+$"
+    },
+    "extraction": {
+      "type": "object",
+      "properties": {
+        "parser": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "const": "postcss"
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": ["name", "version"]
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baselineLayer": {
+          "type": ["string", "null"]
+        },
+        "denominatorRule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selectorPolicy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "redactionPolicy": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "parser",
+        "command",
+        "baselineLayer",
+        "denominatorRule",
+        "selectorPolicy",
+        "redactionPolicy"
+      ]
+    },
+    "registryVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "counts": {
+      "type": "object"
+    },
+    "declarations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "location": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "property": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string"
+          },
+          "important": {
+            "const": true
+          },
+          "context": {
+            "type": "object",
+            "properties": {
+              "layer": {
+                "type": "string",
+                "minLength": 1
+              },
+              "atRules": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "keyframes": {
+                "const": true
+              },
+              "descriptor": {
+                "enum": ["font-face"]
+              },
+              "state": {
+                "type": "object",
+                "properties": {
+                  "pseudoClasses": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "pseudoElements": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "attributes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "redactedAttributes": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "additionalProperties": false,
+                "required": []
+              },
+              "nestedRules": {
+                "type": "integer",
+                "minimum": 2
+              }
+            },
+            "additionalProperties": false,
+            "required": []
+          },
+          "denominator": {
+            "enum": ["alpha1-baseline", "outside-alpha1-baseline"]
+          },
+          "excludedReason": {
+            "enum": [
+              "custom-property",
+              "keyframes-frame",
+              "layer-outside-measured-input"
+            ]
+          },
+          "redactions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "url",
+                    "string",
+                    "email",
+                    "uri",
+                    "opaque",
+                    "non-ascii-text"
+                  ]
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["kind", "sha256"]
+            }
+          },
+          "alpha1": {
+            "type": "object",
+            "properties": {
+              "bucket": {
+                "enum": [
+                  "category",
+                  "structural-ok",
+                  "structural-forbidden",
+                  "composite",
+                  "unsupported"
+                ]
+              },
+              "outcome": {
+                "enum": ["expressible", "composite-rewrite", "gap"]
+              },
+              "gapKind": {
+                "enum": ["absent-property", "out-of-domain"]
+              }
+            },
+            "additionalProperties": false,
+            "required": ["bucket", "outcome"]
+          },
+          "composite": {
+            "type": "object",
+            "properties": {
+              "rewrite": {
+                "enum": ["single-longhand", "full-longhand-reset"]
+              },
+              "longhands": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "longhandsNotAdmitted": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": ["rewrite", "longhands", "longhandsNotAdmitted"]
+          },
+          "registry": {
+            "type": "object",
+            "properties": {
+              "entry": {
+                "type": ["string", "null"]
+              },
+              "requirement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "fixtureId": {
+                "type": "string",
+                "pattern": "^CE-FX-PROP-"
+              },
+              "descriptorOf": {
+                "enum": ["font-face"]
+              },
+              "unregisteredReason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": ["entry"]
+          },
+          "flags": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "enum": [
+                "numeric-coercion",
+                "font-face-descriptor",
+                "vendor-prefixed",
+                "important-ignored",
+                "conditional-context-not-checked",
+                "pseudo-element-not-checked",
+                "raw-value-needs-token"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "location",
+          "property",
+          "value",
+          "context",
+          "denominator",
+          "registry"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "task",
+    "description",
+    "input",
+    "inputId",
+    "extraction",
+    "registryVersion",
+    "counts",
+    "declarations"
+  ]
+}

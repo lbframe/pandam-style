@@ -1,0 +1,504 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-classifier-calibration.v1.schema.json",
+  "title": "CE-00.2 classifier calibration record",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-classifier-calibration"
+    },
+    "task": {
+      "const": "CE-00.2"
+    },
+    "fixtureSet": {
+      "const": "CE-FX-CAP-45-calibrated-classifier-343-1559"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "consumer": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visibility": {
+          "const": "private"
+        },
+        "publication": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": ["repository", "visibility", "publication"]
+    },
+    "reportedBaseline": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "noteBlobs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "commit": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              },
+              "blob": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              },
+              "role": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": ["commit", "blob", "role"]
+          }
+        },
+        "tableIdenticalInEveryBlob": {
+          "type": "boolean"
+        },
+        "rerunBeforeCe002": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "noteBlobs",
+        "tableIdenticalInEveryBlob",
+        "rerunBeforeCe002"
+      ]
+    },
+    "originalClassifier": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": ["recovered", "unavailable"]
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordedWriteAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "gitBlob": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "bytes": {
+          "type": "integer"
+        },
+        "transcriptSha256AtRecovery": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "published": {
+          "const": false
+        },
+        "publicationReason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "algorithm": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "policyModule": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pandamStyleCommit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "gitBlob": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "identicalAt": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              }
+            },
+            "consumerPackage": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "pandamStyleCommit",
+            "gitBlob",
+            "sha256",
+            "identicalAt",
+            "consumerPackage"
+          ]
+        },
+        "bucketMapping": {
+          "type": "object",
+          "properties": {
+            "expressible": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "compositeRewrite": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "gap": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "absentProperty": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "outOfDomain": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "expressible",
+            "compositeRewrite",
+            "gap",
+            "absentProperty",
+            "outOfDomain"
+          ]
+        },
+        "recordedRuns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "inputId": {
+                "type": ["string", "null"]
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1
+              },
+              "resultAt": {
+                "type": "string",
+                "minLength": 1
+              },
+              "buckets": {
+                "type": "object"
+              },
+              "total": {
+                "type": "integer"
+              }
+            },
+            "additionalProperties": false,
+            "required": ["inputId", "resultAt", "buckets", "total"]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "location",
+        "recordedWriteAt",
+        "contentSha256",
+        "gitBlob",
+        "bytes",
+        "transcriptSha256AtRecovery",
+        "published",
+        "publicationReason",
+        "algorithm",
+        "policyModule",
+        "bucketMapping",
+        "recordedRuns"
+      ]
+    },
+    "reconstructedClassifier": {
+      "type": "object",
+      "properties": {
+        "tool": {
+          "const": "tools/coverage/cli.mjs"
+        },
+        "parser": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "const": "postcss"
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "resolution": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": ["name", "version", "resolution"]
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "differencesFromOriginal": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["tool", "parser", "policy", "differencesFromOriginal"]
+    },
+    "sets": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "properties": {
+          "inputId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "declarationSet": {
+            "type": "string",
+            "minLength": 1
+          },
+          "profiles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "input": {
+            "type": "object",
+            "required": ["sha256", "bytes", "role", "recovery", "evidence"],
+            "properties": {
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer"
+              },
+              "role": {
+                "enum": [
+                  "recovered-exact",
+                  "recovered-candidate",
+                  "replacement"
+                ]
+              },
+              "recovery": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "reported": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "expressible": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "compositeRewrite": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "gap": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "absentProperty": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "outOfDomain": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "total",
+              "expressible",
+              "compositeRewrite",
+              "gap",
+              "absentProperty",
+              "outOfDomain"
+            ]
+          },
+          "reproduction": {
+            "type": "object",
+            "properties": {
+              "recoveredClassifierOnRecoveredInput": {
+                "enum": ["exact", "differs", "not-run"]
+              },
+              "reconstructedClassifierOnRecoveredInput": {
+                "enum": ["exact", "differs", "not-run"]
+              },
+              "extractionParity": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "recoveredClassifierOnRecoveredInput",
+              "reconstructedClassifierOnRecoveredInput",
+              "extractionParity"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "inputId",
+          "declarationSet",
+          "profiles",
+          "description",
+          "input",
+          "reported",
+          "reproduction"
+        ]
+      }
+    },
+    "calibrationLimits": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CAL-[0-9]{2}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "measure": {
+            "type": "object",
+            "properties": {
+              "counter": {
+                "type": "string",
+                "minLength": 1
+              },
+              "key": {
+                "type": ["string", "null"]
+              }
+            },
+            "additionalProperties": false,
+            "required": ["counter", "key"]
+          },
+          "values": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["id", "title", "statement"]
+      }
+    },
+    "separateGates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "task",
+    "fixtureSet",
+    "status",
+    "consumer",
+    "reportedBaseline",
+    "originalClassifier",
+    "reconstructedClassifier",
+    "sets",
+    "calibrationLimits",
+    "separateGates"
+  ]
+}
