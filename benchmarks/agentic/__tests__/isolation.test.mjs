@@ -421,6 +421,10 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
       ['dynamic-code'],
     'export const T = () => <table><tbody><tr><td align="left">a</td></tr></tbody></table>;':
       ['jsx-style-prop'],
+    'export function A({ k }) { const r = useRef(new Array(1)); useEffect(() => { r.current[k] = 1; }); return <section ref={r} />; }':
+      ['dynamic-code'],
+    'export function A({ k }) { const r = useRef({}); useEffect(() => { r.current[k] = 1; }); return <b ref={(el) => { r.current = el; }} />; }':
+      ['dynamic-code'],
     '(() => {}).constructor("x")();': ['dynamic-code'],
     "String.prototype.trim = () => '';": ['dynamic-code'],
     'export function A() { const r = useRef(null); useEffect(() => { const n = r.current; n[key] = 1; }); return <div ref={r} />; }':

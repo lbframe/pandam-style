@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: as above, with a computed style access through the attached ref behind a branch the render never reaches.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail"
+  }
+}

@@ -9,10 +9,10 @@ no product behavior depends on it.
 
 Status:
 
-- **Present:** corpus `1.4.1`, reference epoch `alpha1`. It has 47 development
+- **Present:** corpus `1.4.2`, reference epoch `alpha1`. It has 47 development
   tasks and 16 held-out tasks (encrypted in the repository; see
   [held-out policy](heldout/ACCESS-POLICY.md)), 8 project shapes on 5 hosts, the
-  oracles, and 186 development oracle fixtures (known-good and known-bad
+  oracles, and 188 development oracle fixtures (known-good and known-bad
   solutions, including the independent reviews' probes).
 - **Not present:** the runner, the provider adapters, the frozen baseline and the
   thresholds. Those are AG-00.2 (#6) and AG-00.3 (#7). No LLM run has been
@@ -341,7 +341,10 @@ sandbox for hostile native code.
      lookup maps such as `handlers[e.key]?.()`, accumulators, ref containers
      created with React's `useRef` (also imported under another name, or as
      `React.useRef`) from provably plain data (`[]`, `{}`, `new Array(n)`,
-     `Array.from(...)`, or a local bound to one), like `refs.current[i] = el`
+     `Array.from(...)`, or a local bound to one) and used only through
+     `refs.current` (never passed as a `ref`, to a call or an alias, and
+     `refs.current` never reassigned, since React may then fill `current`
+     with a DOM element), like `refs.current[i] = el`
      and `refs.current[(i + 1) % n]?.focus()`) stay inside the subset and are left to the
      dynamic trace, which observes their effect on the DOM. The
      `good-idiomatic-indexing`, `good-handler-map` and `good-roving-focus-refs`

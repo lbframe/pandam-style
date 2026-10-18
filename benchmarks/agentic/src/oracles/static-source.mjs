@@ -424,6 +424,44 @@ function collectBindings(program) {
     )
       refContainers.add(d.id.name);
   }
+  // React can replace `current` with a DOM element whenever the ref object
+  // itself reaches it (a `ref` attribute or prop, createElement/jsx props,
+  // forwardRef, useImperativeHandle, any call, alias or spread). A ref stays
+  // a container only while it is used purely through `X.current`, and
+  // `X.current` itself is never reassigned (`el => { X.current = el; }`).
+  walkWithParent(program, (node, parent, key) => {
+    if (node.type === 'Identifier' && refContainers.has(node.name)) {
+      const declaration = parent?.type === 'VariableDeclarator' && key === 'id';
+      const propertyKey =
+        ((parent?.type === 'MemberExpression' ||
+          parent?.type === 'OptionalMemberExpression') &&
+          key === 'property' &&
+          !parent.computed) ||
+        ((parent?.type === 'ObjectProperty' ||
+          parent?.type === 'ObjectMethod') &&
+          key === 'key' &&
+          !parent.computed);
+      const currentAccess =
+        (parent?.type === 'MemberExpression' ||
+          parent?.type === 'OptionalMemberExpression') &&
+        key === 'object' &&
+        propertyName(parent) === 'current';
+      if (!declaration && !propertyKey && !currentAccess)
+        refContainers.delete(node.name);
+    }
+    const target =
+      node.type === 'AssignmentExpression'
+        ? node.left
+        : node.type === 'UpdateExpression'
+          ? node.argument
+          : null;
+    if (
+      target != null &&
+      propertyName(target) === 'current' &&
+      target.object?.type === 'Identifier'
+    )
+      refContainers.delete(target.object.name);
+  });
   walkWithParent(program, (node) => {
     if (
       node.type === 'CallExpression' &&

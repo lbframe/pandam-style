@@ -76,6 +76,12 @@ Other custody events:
   custom-element attributes, ref-container aliases and constructed arrays).
   Only the manifest's `corpusVersion` was updated; the archive, its digest and
   every task digest are unchanged.
+- 2026-10-18, corpus 1.4.2 (fifth review, 1.4.1 follow-up): no unseal and no
+  revision. A ref with a plain initial value is a container only while the ref
+  object never reaches React as a `ref` (or any call, alias or reassignment of
+  `current`); the static rule was corrected in the oracles. Only the
+  manifest's `corpusVersion` was updated; the archive, its digest and every
+  task digest are unchanged.
 
 ## Rotation and changes
 

@@ -118,6 +118,9 @@ not repeated below unless they are the discriminating evidence.
       `unmeasured-custom-element-attrs` (custom-element attributes stay
       `unmeasured`), `good-ref-container-alias` and
       `good-ref-container-new-array`.
+    - `bad-container-ref-attached-dom` and `bad-container-ref-unreached-style`
+      (1.4.2): a ref with a plain initial value that is attached to an element
+      is not a container.
   - Good controls: `good-idiomatic-indexing` (array indexing and lookup maps),
     `good-handler-map` (`handlers[e.key]?.()`), `good-focus-ref`,
     `good-memo-hooks` and `good-regenerated` (complete fresh generation).
