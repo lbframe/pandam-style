@@ -32,6 +32,53 @@ jobs:
           cache-dependency-path: yarn.lock
       - run: corepack prepare yarn@1.22.22 --activate
       - run: ./verify-pms.sh
+      # The per-step logs and reports are the only record of why a required
+      # step failed; keep them with the run instead of discarding the runner.
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pandamstyle-evidence
+          path: |
+            evidence/native/**/*.log
+            evidence/native/**/*.json
+            evidence/native/steps.tsv
+          if-no-files-found: warn
+          retention-days: 30
+
+  # TEMPORARY (CE-00.4 diagnosis, removed before review): reproduce the
+  # inherited failures on the immutable Alpha 1 baseline with retained logs.
+  baseline-415e055:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 415e05539fcb5d36a78226112b5cf488b200b1aa
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.x'
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+      - run: corepack prepare yarn@1.22.22 --activate
+      - name: Browser and sandbox facts
+        run: |
+          git rev-parse HEAD
+          for b in chromium chromium-browser google-chrome google-chrome-stable; do
+            printf '%s -> %s\n' "$b" "$(command -v "$b" || echo missing)"
+          done
+          ls -la /usr/local/bin/chromium /usr/bin/chromium /usr/bin/chromium-browser /opt/google/chrome/chrome 2>&1 || true
+          sysctl kernel.apparmor_restrict_unprivileged_userns kernel.unprivileged_userns_clone 2>&1 || true
+          echo "CHROMIUM_BIN=${CHROMIUM_BIN:-} CHROME_BIN=${CHROME_BIN:-}"
+      - run: ./verify-pms.sh
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: baseline-415e055-evidence
+          path: |
+            evidence/native/**/*.log
+            evidence/native/**/*.json
+            evidence/native/steps.tsv
+          if-no-files-found: warn
+          retention-days: 30
 
   prettier:
     runs-on: ubuntu-latest
