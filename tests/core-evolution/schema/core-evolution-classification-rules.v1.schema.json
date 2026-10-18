@@ -88,7 +88,55 @@
       "type": "object"
     },
     "aliases": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["canonical", "aliasKind", "equivalence", "sources"],
+        "properties": {
+          "canonical": {
+            "type": "string"
+          },
+          "aliasKind": {
+            "type": "string"
+          },
+          "equivalence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "ref"],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "bcd",
+                    "specification",
+                    "engine-source",
+                    "upstream-source"
+                  ]
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "minItems": 1
+          }
+        }
+      }
     },
     "deprecated": {
       "type": "object"
@@ -119,14 +167,54 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["verdict", "reason"],
+        "required": ["verdict", "sources"],
         "properties": {
           "verdict": {
-            "enum": ["grammar-divergent", "behavior-caveat-only"]
+            "enum": [
+              "equivalent",
+              "grammar-divergent",
+              "behavior-caveat-only",
+              "superseded"
+            ]
           },
           "reason": {
             "type": "string",
             "minLength": 1
+          },
+          "equivalence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "ref"],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "bcd",
+                    "specification",
+                    "engine-source",
+                    "upstream-source"
+                  ]
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "minItems": 1
           },
           "grammarHintReviewed": {
             "type": "string",

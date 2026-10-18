@@ -133,12 +133,40 @@ export function deriveRegistry({
   for (const name of Object.keys(rules.notes)) {
     if (!names.has(name)) fail(`note for unknown inventory name ${name}`);
   }
+  const VERDICTS = [
+    'equivalent',
+    'grammar-divergent',
+    'behavior-caveat-only',
+    'superseded',
+  ];
+  const hasSources = (record) =>
+    Array.isArray(record.sources) &&
+    record.sources.length > 0 &&
+    record.sources.every((src) => src.kind && src.ref);
   const usedAudits = new Set();
   for (const [name, audit] of Object.entries(rules.aliasAudit)) {
     if (!names.has(name))
       fail(`alias audit for unknown inventory name ${name}`);
-    if (!['grammar-divergent', 'behavior-caveat-only'].includes(audit.verdict))
+    if (!VERDICTS.includes(audit.verdict))
       fail(`${name}: unknown alias audit verdict ${audit.verdict}`);
+    if (!hasSources(audit)) fail(`${name}: alias audit without sources`);
+    const vendor = VENDOR.test(name);
+    if (vendor && ['equivalent', 'superseded'].includes(audit.verdict))
+      fail(
+        `${name}: a vendor-prefixed name cannot be audited ${audit.verdict}`,
+      );
+    if (!vendor && audit.verdict === 'behavior-caveat-only')
+      fail(`${name}: an unprefixed alias needs a positive equivalent verdict`);
+    if (audit.verdict === 'equivalent' && !audit.equivalence)
+      fail(`${name}: an equivalent verdict needs an equivalence statement`);
+  }
+  for (const [name, record] of Object.entries(rules.aliases)) {
+    if (VENDOR.test(name))
+      fail(`${name}: vendor-prefixed names cannot be curated aliases`);
+    if (!record.equivalence || !hasSources(record))
+      fail(
+        `${name}: a curated alias needs an equivalence statement and sources`,
+      );
   }
 
   const memo = new Map();
@@ -151,56 +179,76 @@ export function deriveRegistry({
     return result;
   }
 
-  // An automatic alias rests on BCD statements relating `name` to `target`.
-  // Statements with notes, partial implementation or flags must be audited:
-  // grammar or value differences make the name a divergent legacy variant,
-  // not another spelling of the canonical property.
+  // A BCD prefix or alternative-name statement relates `name` to a canonical
+  // `target`. The absence of a BCD note is not evidence of equivalence:
+  // vendor-prefixed names never become aliases, and unprefixed names need a
+  // curated verdict with sources. Statements with notes, partial
+  // implementation or flags always need a verdict.
   function automaticAlias(name, target, via, relation) {
     const audit = rules.aliasAudit[name];
     const caveats = relation?.caveats ?? [];
+    const vendor = VENDOR.test(name);
+    if (audit) usedAudits.add(name);
     if (caveats.length && !audit) {
       fail(
         `${name}: BCD statements relating it to ${target} carry caveats; add an aliasAudit verdict`,
       );
     }
-    if (!audit) {
+    if (!vendor && !audit) {
+      fail(
+        `${name}: an unprefixed BCD alternative name needs an aliasAudit verdict with sources`,
+      );
+    }
+    const hinted = caveats.some((c) =>
+      c.notes.some((n) => GRAMMAR_HINT.test(n)),
+    );
+    if (
+      hinted &&
+      ['equivalent', 'behavior-caveat-only'].includes(audit?.verdict) &&
+      !audit.grammarHintReviewed
+    ) {
+      fail(
+        `${name}: BCD notes describe syntax or values; a ${audit.verdict} verdict needs grammarHintReviewed`,
+      );
+    }
+    const recorded = audit ? { aliasAudit: audit } : {};
+    const ships = relation?.shipping;
+    const variant = (subkind) => ({
+      disposition: 'deprecated-or-experimental',
+      subkind,
+      variantOf: target,
+      replacement: target,
+      familyKey: target,
+      ...recorded,
+      prefixedFormShips: ships,
+      emissionDecision: ships ? 'D-BP-07' : undefined,
+    });
+    if (audit?.verdict === 'grammar-divergent')
+      return variant('divergent-legacy-variant');
+    if (vendor) return variant('vendor-legacy-variant');
+    if (audit?.verdict === 'equivalent') {
       return {
         disposition: 'normalized-alias',
         canonical: target,
         aliasKind: via,
         familyKey: target,
-        prefixedFormShips: relation?.shipping,
+        equivalence: {
+          statement: audit.equivalence,
+          sources: audit.sources,
+        },
+        ...recorded,
+        prefixedFormShips: ships,
       };
     }
-    usedAudits.add(name);
-    if (!caveats.length) fail(`${name}: alias audit without BCD caveats`);
-    if (audit.verdict === 'grammar-divergent') {
-      return {
-        disposition: 'deprecated-or-experimental',
-        subkind: 'divergent-legacy-variant',
-        variantOf: target,
-        replacement: target,
-        familyKey: target,
-        aliasAudit: { verdict: audit.verdict, reason: audit.reason },
-        prefixedFormShips: relation.shipping,
-        emissionDecision: relation.shipping ? 'D-BP-07' : undefined,
-      };
-    }
-    const hinted = caveats.some((c) =>
-      c.notes.some((n) => GRAMMAR_HINT.test(n)),
-    );
-    if (hinted && !audit.grammarHintReviewed) {
-      fail(
-        `${name}: BCD notes describe syntax or values; a behavior-caveat-only verdict needs grammarHintReviewed`,
-      );
-    }
+    // A superseded or unaudited unprefixed name is diagnosed toward its target.
     return {
-      disposition: 'normalized-alias',
-      canonical: target,
-      aliasKind: via,
+      disposition: 'deprecated-or-experimental',
+      subkind: 'superseded-name',
+      variantOf: target,
+      replacement: target,
       familyKey: target,
-      aliasAudit: { verdict: audit.verdict, reason: audit.reason },
-      prefixedFormShips: relation.shipping,
+      ...recorded,
+      prefixedFormShips: ships,
     };
   }
 
@@ -239,7 +287,11 @@ export function deriveRegistry({
             : undefined,
         aliasKind: r.aliasKind,
         replacement: r.replacement,
-        reason: r.reason ?? r.note ?? r.evidence,
+        reason: r.reason ?? r.note,
+        equivalence:
+          c.disposition === 'normalized-alias'
+            ? { statement: r.equivalence, sources: r.sources }
+            : undefined,
         familyKey: r.family
           ? null
           : r.canonical && c.disposition === 'normalized-alias'
@@ -524,6 +576,7 @@ export function deriveRegistry({
       ...(result.replacement ? { replacement: result.replacement } : {}),
       ...(result.variantOf ? { variantOf: result.variantOf } : {}),
       ...(result.equivalents ? { equivalents: result.equivalents } : {}),
+      ...(result.equivalence ? { equivalence: result.equivalence } : {}),
       ...(result.aliasAudit ? { aliasAudit: result.aliasAudit } : {}),
       ...(result.prefixedFormShips != null
         ? { prefixedFormShips: result.prefixedFormShips }

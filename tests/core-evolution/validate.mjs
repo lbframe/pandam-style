@@ -56,6 +56,34 @@ const FROZEN = {
     'dd13310283d52f707ec272f814fc609728ff4e83c695514e185c68ef3c387716',
 };
 
+// The repository inputs the registry must cite, with their fixed paths. A
+// missing, extra or redirected path fails, so no digest check can be skipped.
+const INPUT_PATHS = {
+  inventory: 'docs/research/core-evolution-inventory.json',
+  evidenceLock: 'docs/research/core-evolution-evidence.json',
+  reviewEvidence: 'docs/research/core-evolution-review-evidence.json',
+  observations: 'docs/research/core-evolution-upstream-observations.v1.json',
+  plan: 'docs/architecture/core-evolution-plan.md',
+  coverage: 'docs/architecture/core-evolution-coverage.md',
+  review: 'docs/architecture/core-evolution-review.md',
+  alpha1Policy: 'packages/compiler/src/design-system/policy/properties.js',
+  rules: 'tests/core-evolution/classification-rules.v1.json',
+  profiles: 'tests/core-evolution/profiles.v1.json',
+  capabilities: 'tests/core-evolution/capabilities.v1.json',
+  decisions: 'tests/core-evolution/scope-decisions.v1.json',
+};
+// Raw upstream outputs are not committed; their digests are bound to the
+// observation record or the evidence lock.
+const RAW_INPUTS = [
+  'upstreamKeyExtraction',
+  'stylexEmissionProbe',
+  'pandaEmissionProbe',
+  'bcdData',
+];
+const VENDOR = /^-(webkit|moz|ms|o|khtml)-/;
+const CLOSING_LOT = (id) =>
+  id.startsWith('D-SF-') || id === 'D-BP-12' ? 'CE-13' : 'CE-01';
+
 // Validated documents: [path, schema file].
 const DOCS = {
   registry: [
@@ -317,7 +345,30 @@ function validateDocs(docs) {
     'registry capabilities must be CAP-01..CAP-48 in order',
   );
   const specs = new Map(capabilities.capabilities.map((c) => [c.id, c]));
+  // Proof identity belongs to its own capability, in authored and generated
+  // records alike; source inspection alone is never a proof.
+  const proofIdentity = (id, proof, where) => {
+    check(
+      proof?.id === `CE-PROOF-${id}` &&
+        proof?.plannedPath === `tests/core-evolution/proofs/${id}.json`,
+      `${where} ${id}: proof id and planned path must be CE-PROOF-${id} and tests/core-evolution/proofs/${id}.json`,
+    );
+    check(
+      Array.isArray(proof?.fixtureSets) &&
+        proof.fixtureSets.length > 0 &&
+        proof.fixtureSets.every((f) => f.startsWith(`CE-FX-${id}-`)),
+      `${where} ${id}: every fixture set must be scoped CE-FX-${id}-*`,
+    );
+    check(
+      Array.isArray(proof?.evidenceClasses) &&
+        proof.evidenceClasses.some((c) => c !== 'E1'),
+      `${where} ${id}: a proof record needs an evidence class beyond source inspection (E1)`,
+    );
+  };
+  for (const spec of capabilities.capabilities)
+    proofIdentity(spec.id, spec.proofRecord, 'authored');
   for (const cap of caps.values()) {
+    proofIdentity(cap.id, cap.proofRecord, 'registry');
     const spec = specs.get(cap.id);
     check(
       spec &&
@@ -334,6 +385,10 @@ function validateDocs(docs) {
     );
   }
   for (const e of entries) {
+    check(
+      e.proof?.fixtureId === `CE-FX-PROP-${e.name.replace(/^-+/, '')}`,
+      `${e.name}: fixture id must be derived from the entry name`,
+    );
     const cap = caps.get(e.capability);
     check(cap, `${e.name}: unknown capability ${e.capability}`);
     if (!cap) continue;
@@ -354,9 +409,46 @@ function validateDocs(docs) {
         `${e.name}: alias target ${e.canonical} is not canonical`,
       );
       check(
-        !(e.bcdRelations?.[0]?.caveats.length > 0) ||
-          e.aliasAudit?.verdict === 'behavior-caveat-only',
-        `${e.name}: alias with BCD caveats lacks a behavior-caveat-only audit`,
+        !VENDOR.test(e.name),
+        `${e.name}: a vendor-prefixed name cannot be a normalized alias`,
+      );
+      check(
+        e.equivalence?.statement &&
+          e.equivalence.sources?.length > 0 &&
+          e.equivalence.sources.every((src) => src.kind && src.ref),
+        `${e.name}: a normalized alias needs a positive equivalence statement with sources`,
+      );
+      check(
+        !e.bcdRelations?.length || e.aliasAudit?.verdict === 'equivalent',
+        `${e.name}: a BCD-related alias needs an equivalent audit verdict`,
+      );
+    }
+    if (
+      [
+        'divergent-legacy-variant',
+        'vendor-legacy-variant',
+        'superseded-name',
+      ].includes(e.subkind)
+    ) {
+      check(
+        byName.get(e.replacement)?.disposition === 'canonical-property' ||
+          byName.get(e.replacement)?.disposition ===
+            'scoped-platform-extension',
+        `${e.name}: a legacy variant must point at a canonical replacement`,
+      );
+      check(
+        !e.prefixedFormShips ||
+          (e.emissionDecision === 'D-BP-07' &&
+            e.proof.evidenceClasses.includes('E3')) ||
+          e.subkind === 'superseded-name',
+        `${e.name}: a shipping prefixed form needs D-BP-07 and E3 proof`,
+      );
+    }
+    if (e.subkind === 'divergent-legacy-variant') {
+      check(
+        e.aliasAudit?.verdict === 'grammar-divergent' &&
+          e.aliasAudit.sources?.length > 0,
+        `${e.name}: a divergent variant needs a sourced grammar-divergent audit`,
       );
     }
     if (
@@ -385,6 +477,17 @@ function validateDocs(docs) {
       e.disposition === 'canonical-property' && e.requiredIn.length > 0,
       `${e.name}: Alpha 1 admitted property must stay a required canonical property`,
     );
+    // Accepted Alpha 1 input is never silently dropped; a vendor-prefixed
+    // admitted name would need an explicit migration record.
+    check(
+      !VENDOR.test(e.name) || Boolean(e.migration),
+      `${e.name}: a vendor-prefixed Alpha 1 name needs a migration record`,
+    );
+  }
+  // Every variant or alias resolves to an existing inventory target.
+  for (const e of entries.filter((x) => x.variantOf || x.canonical)) {
+    const target = byName.get(e.variantOf ?? e.canonical);
+    check(target, `${e.name}: unknown target ${e.variantOf ?? e.canonical}`);
   }
   const requiredSomewhere = new Set(
     profiles.profiles.flatMap((p) => p.requiredCapabilities),
@@ -433,25 +536,45 @@ function validateDocs(docs) {
       `counts.requiredByProfile.${p.id} does not match the entries`,
     );
   }
+  // Decision kind and closing lot follow from the decision identity.
   for (const decision of decisions.decisions) {
-    const expected =
-      decision.kind === 'source-format' || decision.id === 'D-BP-12'
-        ? 'CE-13'
-        : 'CE-01';
+    const kind = decision.id.startsWith('D-SF-')
+      ? 'source-format'
+      : 'browser-profile';
     check(
-      decision.closingLot === expected,
-      `${decision.id}: must close in ${expected}`,
+      decision.kind === kind,
+      `${decision.id}: kind must be ${kind} from its identifier`,
+    );
+    check(
+      decision.closingLot === CLOSING_LOT(decision.id),
+      `${decision.id}: must close in ${CLOSING_LOT(decision.id)}`,
     );
   }
 
-  // Input digests recorded by the builder must match the committed files.
-  for (const [key, ref] of Object.entries(registry.inputs ?? {})) {
-    if (ref.path)
-      check(
-        digest(ref.path) === ref.sha256,
-        `registry input ${key} (${ref.path}) changed since the registry was built`,
-      );
+  // Input digests: the fixed key set, exact paths and matching digests.
+  const recordedInputs = registry.inputs ?? {};
+  check(
+    JSON.stringify(Object.keys(recordedInputs).sort()) ===
+      JSON.stringify([...Object.keys(INPUT_PATHS), ...RAW_INPUTS].sort()),
+    'registry inputs must be exactly the fixed repository and raw input keys',
+  );
+  for (const [key, file] of Object.entries(INPUT_PATHS)) {
+    const ref = recordedInputs[key];
+    check(
+      ref?.path === file,
+      `registry input ${key} must cite ${file}, not ${ref?.path}`,
+    );
+    check(
+      /^sha256:[0-9a-f]{64}$/.test(ref?.sha256 ?? '') &&
+        digest(file) === ref.sha256,
+      `registry input ${key} (${file}) digest is missing or stale`,
+    );
   }
+  check(
+    recordedInputs.bcdData?.sha256 ===
+      docs.evidenceLock.sourcePins.bcd.publishedDataDigest,
+    'registry bcdData digest differs from the evidence lock',
+  );
 
   // Upstream observation: comparator retained, deltas explicit, digests matched.
   for (const pkg of docs.evidenceLock.packages) {
@@ -523,6 +646,32 @@ function validateDocs(docs) {
   return { failures, checks };
 }
 
+// Totals that make an authored weakening visible in review output.
+function summary(registry) {
+  const entries = registry.entries;
+  const classes = (list) => {
+    const out = {};
+    for (const c of list.flat()) out[c] = (out[c] ?? 0) + 1;
+    return Object.entries(out)
+      .sort()
+      .map(([k, v]) => `${k}=${v}`)
+      .join(' ');
+  };
+  return [
+    `required entries by profile: ${Object.entries(
+      registry.counts.requiredByProfile,
+    )
+      .map(([k, v]) => `${k}=${v}`)
+      .join(' ')}`,
+    `requirements: ${Object.entries(registry.counts.byRequirement)
+      .map(([k, v]) => `${k}=${v}`)
+      .join(' ')}`,
+    `entry proof classes: ${classes(entries.map((e) => e.proof.evidenceClasses))}`,
+    `capability proof classes: ${classes(registry.capabilities.map((c) => c.proofRecord.evidenceClasses))}`,
+    `capabilities required by profile: ${registry.capabilities.reduce((n, c) => n + c.requiredByProfiles.length, 0)} profile links`,
+  ];
+}
+
 // ---------------------------------------------------------------------------
 // Self-test: each mutation is drift that validation must reject.
 
@@ -532,16 +681,45 @@ function recount(registry, field, key) {
   registry.counts[field] = Object.fromEntries(Object.entries(out).sort());
 }
 const entry = (registry, name) => registry.entries.find((e) => e.name === name);
+// Re-derives the registry after an authored mutation, keeping the recorded
+// input digests, so the mutation is internally consistent like a careful edit.
+function rederive(d) {
+  const facts = d.registry.entries.map((e) => ({
+    name: e.name,
+    ...Object.fromEntries(
+      FACT_FIELDS.map((f) => [f, f === 'bcdRelations' ? (e[f] ?? []) : e[f]]),
+    ),
+  }));
+  const derived = deriveRegistry({
+    inventory: d.inventory,
+    rules: d.rules,
+    profiles: d.profiles,
+    capSpec: d.capabilities,
+    decisions: d.decisions,
+    coverageText: d.coverageText,
+    facts,
+  });
+  if (derived.registry) {
+    // Round-trip through JSON so the record has exactly its committed shape.
+    d.registry = { ...clone(derived.registry), inputs: d.registry.inputs };
+  }
+}
 const MUTATIONS = [
-  ['registry: drop an entry', (d) => d.registry.entries.pop()],
+  [
+    'registry: drop an entry',
+    /fewer than 1108 items/,
+    (d) => d.registry.entries.pop(),
+  ],
   [
     'registry: redirect alias start to the physical left',
+    /entries\[start\]\.canonical/,
     (d) => {
       entry(d.registry, 'start').canonical = 'left';
     },
   ],
   [
     'registry: remove the aspect-ratio requirement and recount',
+    /drifted/,
     (d) => {
       const e = entry(d.registry, 'aspect-ratio');
       e.requiredIn = [];
@@ -551,6 +729,7 @@ const MUTATIONS = [
   ],
   [
     'registry: assign aspect-ratio to CE-15 and recount',
+    /drifted|outside the Work lots/,
     (d) => {
       entry(d.registry, 'aspect-ratio').owner = 'CE-15';
       recount(d.registry, 'byOwner', (x) => x.owner);
@@ -558,18 +737,21 @@ const MUTATIONS = [
   ],
   [
     'registry: replace CAP-01 proof classes with E1',
+    /CAP-01/,
     (d) => {
       d.registry.capabilities[0].proofRecord.evidenceClasses = ['E1'];
     },
   ],
   [
     'registry: set the web required-entry count to 0',
+    /requiredByProfile/,
     (d) => {
       d.registry.counts.requiredByProfile.web = 0;
     },
   ],
   [
     'registry: turn the grammar-divergent -webkit-ruby-position into an alias',
+    /-webkit-ruby-position|drifted/,
     (d) => {
       const e = entry(d.registry, '-webkit-ruby-position');
       e.disposition = 'normalized-alias';
@@ -582,18 +764,21 @@ const MUTATIONS = [
   ],
   [
     'rules: drop the alias audit of -webkit-scroll-snap-type',
+    /-webkit-scroll-snap-type: BCD statements/,
     (d) => {
       delete d.rules.aliasAudit['-webkit-scroll-snap-type'];
     },
   ],
   [
     'rules: audit -webkit-mask as a behavior caveat only',
+    /-webkit-mask: BCD notes describe syntax/,
     (d) => {
       d.rules.aliasAudit['-webkit-mask'].verdict = 'behavior-caveat-only';
     },
   ],
   [
     'rules: add a stale alias audit for width',
+    /aliasAudit\.width|width: alias audit/,
     (d) => {
       d.rules.aliasAudit.width = {
         verdict: 'behavior-caveat-only',
@@ -603,18 +788,115 @@ const MUTATIONS = [
   ],
   [
     'rules: give the tables family an owner outside its capability lots',
+    /owner CE-15 is not a Work lot/,
     (d) => {
       d.rules.families.find((f) => f.id === 'tables').owner = 'CE-15';
     },
   ],
   [
     'capabilities: drop E4 from the authored CAP-04 proof record only',
+    /CAP-04/,
     (d) => {
       d.capabilities.capabilities[3].proofRecord.evidenceClasses = ['E2', 'E3'];
     },
   ],
   [
+    'registry: delete the rules input path after an authored alias change',
+    /inputs\.rules: missing path|input rules must cite/,
+    (d) => {
+      d.rules.aliases.start.canonical = 'left';
+      rederive(d);
+      delete d.registry.inputs.rules.path;
+    },
+  ],
+  [
+    'registry: redirect the rules input to the profiles file and digest',
+    /input rules must cite/,
+    (d) => {
+      d.registry.inputs.rules = { ...d.registry.inputs.profiles };
+    },
+  ],
+  [
+    'registry: drop the decisions input entirely',
+    /missing decisions|exactly the fixed/,
+    (d) => {
+      delete d.registry.inputs.decisions;
+    },
+  ],
+  [
+    'authored+generated: give CAP-01 the proof identity of CAP-02',
+    /CAP-01: proof id and planned path/,
+    (d) => {
+      const proof = d.capabilities.capabilities[0].proofRecord;
+      proof.id = 'CE-PROOF-CAP-02';
+      proof.plannedPath = 'tests/core-evolution/proofs/CAP-02.json';
+      proof.fixtureSets = ['CE-FX-CAP-02-unrelated'];
+      rederive(d);
+    },
+  ],
+  [
+    'authored+generated: reduce the CAP-04 proof record to E1',
+    /CAP-04: a proof record needs an evidence class beyond/,
+    (d) => {
+      d.capabilities.capabilities[3].proofRecord.evidenceClasses = ['E1'];
+      rederive(d);
+    },
+  ],
+  [
+    'authored+generated: relabel D-BP-01 as a source-format decision closing in CE-13',
+    /D-BP-01: kind must be browser-profile/,
+    (d) => {
+      const decision = d.decisions.decisions.find((x) => x.id === 'D-BP-01');
+      decision.kind = 'source-format';
+      decision.closingLot = 'CE-13';
+      rederive(d);
+    },
+  ],
+  [
+    'authored+generated: curate the vendor-prefixed -webkit-border-radius as an alias',
+    /vendor-prefixed names cannot be curated aliases/,
+    (d) => {
+      delete d.rules.aliasAudit['-webkit-border-radius'];
+      d.rules.aliases['-webkit-border-radius'] = {
+        canonical: 'border-radius',
+        aliasKind: 'legacy-name',
+        equivalence: 'claimed',
+        sources: [{ kind: 'bcd', ref: 'claimed' }],
+      };
+      rederive(d);
+    },
+  ],
+  [
+    'authored+generated: drop the sources of the grid-gap equivalence',
+    /grid-gap/,
+    (d) => {
+      d.rules.aliases['grid-gap'].sources = [];
+      rederive(d);
+    },
+  ],
+  [
+    'authored+generated: drop the equivalent verdict of word-wrap',
+    /word-wrap: an unprefixed BCD alternative name needs/,
+    (d) => {
+      delete d.rules.aliasAudit['word-wrap'];
+      rederive(d);
+    },
+  ],
+  [
+    'registry: relabel the vendor variant -webkit-transform as an alias',
+    /-webkit-transform: a vendor-prefixed name cannot be a normalized alias/,
+    (d) => {
+      const e = entry(d.registry, '-webkit-transform');
+      e.disposition = 'normalized-alias';
+      delete e.subkind;
+      e.canonical = 'transform';
+      e.aliasKind = 'bcd-prefix';
+      recount(d.registry, 'byDisposition', (x) => x.disposition);
+    },
+  ],
+  [
     'facts: drop the Panda type key of accent-color',
+    /sourceFlagMismatches/,
     (d) => {
       delete entry(d.registry, 'accent-color').sources.pandaType;
     },
@@ -631,15 +913,17 @@ function selfTest() {
     passed: baseline.failures.length === 0,
     detail: baseline.failures[0] ?? `${baseline.checks} checks`,
   });
-  for (const [name, mutate] of MUTATIONS) {
+  for (const [name, expected, mutate] of MUTATIONS) {
     const docs = clone(base);
     mutate(docs);
     const outcome = validateDocs(docs);
+    // A mutation must fail for its intended reason, not an incidental one.
+    const hit = outcome.failures.find((f) => expected.test(f));
     results.push({
       case: name,
-      expected: 'fail',
-      passed: outcome.failures.length > 0,
-      detail: outcome.failures[0] ?? 'validation passed',
+      expected: `fail matching ${expected}`,
+      passed: Boolean(hit),
+      detail: hit ?? outcome.failures[0] ?? 'validation passed',
     });
   }
   for (const r of results) {
@@ -662,7 +946,11 @@ if (failures.length) {
   process.exitCode = 1;
 } else {
   process.stdout.write(
-    `core-evolution validation passed: ${checks} checks, registry re-derived and identical\n`,
+    `core-evolution validation passed: ${checks} checks, registry re-derived and identical\n${summary(
+      loadDocs().registry,
+    )
+      .map((line) => `  ${line}\n`)
+      .join('')}`,
   );
 }
 if (process.argv.includes('--self-test') && !selfTest()) process.exitCode = 1;

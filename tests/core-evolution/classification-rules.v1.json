@@ -9,7 +9,7 @@
       "proof": "Required entries: accepted finite domains and structured rejections (E2), emitted and transformed CSS (E3) and computed behavior in each profile target (E4). Recognized but not required entries: either the same proof when admitted, or a structured diagnostic fixture (E2)."
     },
     "normalized-alias": {
-      "definition": "Another spelling of exactly one canonical property or scoped platform extension with the same grammar: a BCD prefix/alternative name whose statements carry no grammar caveat, a legacy name alias or an upstream shorthand key. Behavior caveats from BCD are recorded with an alias audit. The canonical property carries the requirement.",
+      "definition": "An unprefixed spelling of exactly one canonical property or scoped platform extension with a curated positive equivalence statement and sources: a specified legacy name alias, an engine-declared alias or an upstream authoring key whose compiler source rewrites it to the target. Vendor-prefixed names are never normalized aliases. The canonical property carries the requirement.",
       "proof": "Normalization or a diagnostic naming the canonical property (E2), and emitted CSS equivalent to the canonical form (E3). CE-02 decides whether the spelling is accepted or diagnosed; prefix emission belongs to the CE-01 transformation."
     },
     "system-resource": {
@@ -21,8 +21,8 @@
       "proof": "Scoped admission (E2), emitted CSS (E3) and computed behavior on the exact platform engine (E4) when required; otherwise a scoped diagnostic (E2)."
     },
     "deprecated-or-experimental": {
-      "definition": "Deprecated, experimental, non-standard, abandoned-draft, unimplemented-specification, obsolete-engine-prefix or divergent-legacy-variant entries. A divergent legacy variant is a BCD prefix/alternative name whose documented grammar or values differ from its target. They remain in the denominator with a replacement or equivalent where one exists.",
-      "proof": "A structured diagnostic fixture (E2). Experimental entries also need a CE-11 target fact record (E1) before any promotion. A divergent legacy variant that still ships and may be emitted by the CE-01 transformation (emissionDecision D-BP-07) also needs emitted-CSS proof (E3) restricted to the value subset it shares with its target."
+      "definition": "Deprecated, experimental, non-standard, abandoned-draft, unimplemented-specification, obsolete-engine-prefix, vendor-legacy-variant, divergent-legacy-variant or superseded-name entries. A vendor legacy variant is a -webkit-/-moz- name related by BCD to a canonical target; agents author the target, and any prefixed emission is a CE-01 transformation. A divergent legacy variant additionally has a documented grammar or value difference. A superseded name is an unprefixed historical name without established equivalence. They remain in the denominator with a replacement where one exists.",
+      "proof": "A structured diagnostic fixture naming the replacement (E2). Experimental entries also need a CE-11 target fact record (E1) before any promotion. A vendor or divergent legacy variant whose prefixed form still ships in some engine (emissionDecision D-BP-07) also needs emitted-CSS proof (E3) restricted to the value subset it shares with its target."
     },
     "non-css-syntax": {
       "definition": "An upstream authoring key that is not a CSS property: selector, condition, pseudo-element, axis or multi-property helpers, development helpers and theme keys.",
@@ -34,10 +34,10 @@
     }
   },
   "procedure": [
-    "1. Curated records win in this order: incompatibleRuntime, systemResources, nonCssSyntax, platformExtensions, aliases, deprecated, experimental, nonstandard.",
+    "1. Curated records win in this order: incompatibleRuntime, systemResources, nonCssSyntax, platformExtensions, aliases (unprefixed only, each with a positive equivalence statement and sources), deprecated, experimental, nonstandard.",
     "2. Names with an obsolete-engine prefix (-ms-, -o-, -khtml-) are deprecated-or-experimental/obsolete-engine-prefix; their current equivalent is recorded, CE-01 owns the engine incompatibility.",
     "3. Otherwise a BCD css.properties status decides: standard track and neither deprecated nor experimental is a canonical property; deprecated, experimental and non-standard keep that subkind.",
-    "4. A name without BCD status that BCD records as a prefix or alternative name of another property is a normalized alias of that property when the target is canonical; otherwise it inherits the target's deprecated or experimental disposition. When the relating BCD statements carry notes, partial implementation or flags, an aliasAudit verdict is required: grammar-divergent makes the name a deprecated-or-experimental/divergent-legacy-variant of the target, behavior-caveat-only keeps the alias with the audit recorded. A behavior-caveat-only verdict on notes that mention syntax or values (derive-registry.mjs GRAMMAR_HINT) needs grammarHintReviewed. A stale or missing verdict fails the build.",
+    "4. A name without BCD status that BCD records as a prefix or alternative name of another property relates to that target. If the target is not canonical, the name inherits the target's deprecated or experimental disposition. Otherwise the absence of a BCD note is never treated as equivalence: (a) a vendor-prefixed name is never a normalized alias; it is deprecated-or-experimental/vendor-legacy-variant, or divergent-legacy-variant when an aliasAudit grammar-divergent verdict cites a BCD note, engine source or specification; (b) an unprefixed name needs an aliasAudit verdict: equivalent with a positive equivalence statement and sources keeps it a normalized alias, grammar-divergent makes it a divergent-legacy-variant, superseded makes it deprecated-or-experimental/superseded-name. Relating statements with notes, partial implementation or flags always need a verdict, and an equivalent or behavior-caveat-only verdict on notes that mention syntax or values needs grammarHintReviewed. Missing, stale or source-less verdicts fail the build. Prefixed emission for targets is the CE-01 transformation (D-BP-07), not an authoring alias.",
     "5. A remaining -webkit-/-moz- name whose unprefixed base is an inventory entry follows its base in the same way; a vendor-only name is deprecated-or-experimental/nonstandard.",
     "6. Any remaining name is a build error. Every entry must also match exactly one family; the family supplies the capability family, the owner of canonical/platform entries and the profiles that require them.",
     "7. An entry's capability family is its curated requirementCarrier, else its family's. Its owner is curated, else set by disposition subkind (aliases CE-02), else its family's owner; the owner must belong to that capability's coverage Work lots, except CAP-01 and the CE-01/CE-02/CE-11 disposition owners of non-canonical entries.",
@@ -50,7 +50,9 @@
     "abandoned-draft": "CE-02",
     "experimental": "CE-11",
     "obsolete-engine-prefix": "CE-01",
-    "divergent-legacy-variant": "CE-02"
+    "divergent-legacy-variant": "CE-02",
+    "vendor-legacy-variant": "CE-02",
+    "superseded-name": "CE-02"
   },
   "aliasOwner": "CE-02",
   "incompatibleRuntime": {
@@ -645,6 +647,13 @@
       "family": "custom-properties",
       "equivalent": "existing PandamStyle theme scopes",
       "requirementCarrier": "CAP-22"
+    },
+    "font-smoothing": {
+      "syntaxKind": "value-mapping-utility",
+      "owner": "CE-06",
+      "family": "font-rendering",
+      "equivalent": "-webkit-font-smoothing; Panda 2.2.0 maps the value subpixel-antialiased to auto (preset-base typography.ts fontSmoothing)",
+      "requirementCarrier": "CAP-13"
     }
   },
   "platformExtensions": {
@@ -704,37 +713,85 @@
     "grid-gap": {
       "canonical": "gap",
       "aliasKind": "legacy-name",
-      "evidence": "CSS Grid legacy name alias; StyleX, Panda types and utility key"
+      "equivalence": "Specified legacy name alias: grid-gap parses and computes exactly as gap.",
+      "sources": [
+        {
+          "kind": "specification",
+          "ref": "https://www.w3.org/TR/2025/WD-css-align-3-20250311/#gap-legacy",
+          "sha256": "sha256:42f71ad8991f9a874b337eb029434455be07cd168f68c154d4722d225189dc71",
+          "statement": "grid-row-gap, grid-column-gap and grid-gap must be supported as legacy name aliases of row-gap, column-gap and gap."
+        },
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L10573",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "gap declares the alias grid-gap."
+        }
+      ]
     },
     "grid-row-gap": {
       "canonical": "row-gap",
       "aliasKind": "legacy-name",
-      "evidence": "CSS Grid legacy name alias"
+      "equivalence": "Specified legacy name alias: grid-row-gap parses and computes exactly as row-gap.",
+      "sources": [
+        {
+          "kind": "specification",
+          "ref": "https://www.w3.org/TR/2025/WD-css-align-3-20250311/#gap-legacy",
+          "sha256": "sha256:42f71ad8991f9a874b337eb029434455be07cd168f68c154d4722d225189dc71",
+          "statement": "grid-row-gap, grid-column-gap and grid-gap must be supported as legacy name aliases of row-gap, column-gap and gap."
+        },
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L10555",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "row-gap declares the alias grid-row-gap."
+        }
+      ]
     },
     "grid-column-gap": {
       "canonical": "column-gap",
       "aliasKind": "legacy-name",
-      "evidence": "CSS Grid legacy name alias"
+      "equivalence": "Specified legacy name alias: grid-column-gap parses and computes exactly as column-gap.",
+      "sources": [
+        {
+          "kind": "specification",
+          "ref": "https://www.w3.org/TR/2025/WD-css-align-3-20250311/#gap-legacy",
+          "sha256": "sha256:42f71ad8991f9a874b337eb029434455be07cd168f68c154d4722d225189dc71",
+          "statement": "grid-row-gap, grid-column-gap and grid-gap must be supported as legacy name aliases of row-gap, column-gap and gap."
+        },
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L10536",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "column-gap declares the alias grid-column-gap."
+        }
+      ]
     },
     "start": {
       "canonical": "inset-inline-start",
       "aliasKind": "upstream-shorthand-key",
-      "evidence": "StyleX 0.19.1 emits inset-inline-start; Panda 2.2.0 emits inset-inline-start"
+      "equivalence": "StyleX authoring key that its compiler rewrites to inset-inline-start with the same value; the StyleX 0.19.1 and Panda 2.2.0 emission probes both emit inset-inline-start.",
+      "sources": [
+        {
+          "kind": "upstream-source",
+          "ref": "https://github.com/facebook/stylex/blob/1fcb9a51cbecad2c82255e0f4b45cc072fa1a95a/packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/property-specificity.js#L220-L221",
+          "sha256": "sha256:e406c3954ab7eec27897d7abff2df45199ca0a37f38da52611d872edf0872e71",
+          "statement": "StyleX expands start to insetInlineStart and end to insetInlineEnd."
+        }
+      ]
     },
     "end": {
       "canonical": "inset-inline-end",
       "aliasKind": "upstream-shorthand-key",
-      "evidence": "StyleX 0.19.1 emits inset-inline-end; Panda 2.2.0 emits inset-inline-end"
-    },
-    "text-fill-color": {
-      "canonical": "-webkit-text-fill-color",
-      "aliasKind": "upstream-unprefixed-spelling",
-      "evidence": "StyleX type key; the BCD standard property is -webkit-text-fill-color"
-    },
-    "font-smoothing": {
-      "canonical": "-webkit-font-smoothing",
-      "aliasKind": "upstream-shorthand-key",
-      "evidence": "Panda 2.2.0 utility emits -webkit-font-smoothing"
+      "equivalence": "StyleX authoring key that its compiler rewrites to inset-inline-end with the same value; the StyleX 0.19.1 and Panda 2.2.0 emission probes both emit inset-inline-end.",
+      "sources": [
+        {
+          "kind": "upstream-source",
+          "ref": "https://github.com/facebook/stylex/blob/1fcb9a51cbecad2c82255e0f4b45cc072fa1a95a/packages/@stylexjs/babel-plugin/src/shared/preprocess-rules/property-specificity.js#L220-L221",
+          "sha256": "sha256:e406c3954ab7eec27897d7abff2df45199ca0a37f38da52611d872edf0872e71",
+          "statement": "StyleX expands start to insetInlineStart and end to insetInlineEnd."
+        }
+      ]
     }
   },
   "deprecated": {
@@ -894,6 +951,10 @@
     },
     "overflow-clip-box": {
       "reason": "Removed Firefox-internal property; Panda type and utility key only."
+    },
+    "text-fill-color": {
+      "reason": "StyleX type key without a specification; StyleX 0.19.1 emits it verbatim as text-fill-color, which no engine implements. Not evidence of equivalence with -webkit-text-fill-color.",
+      "replacement": "-webkit-text-fill-color"
     }
   },
   "notes": {
@@ -978,115 +1039,549 @@
   "aliasAudit": {
     "-moz-background-clip": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: Firefox used the padding | border value syntax, not the standard box keywords."
+      "reason": "BCD: Firefox used the padding | border value syntax, not the standard box keywords.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.background-clip support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-moz-background-origin": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: Firefox used the padding | border value syntax, not the standard box keywords."
+      "reason": "BCD: Firefox used the padding | border value syntax, not the standard box keywords.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.background-origin support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-moz-border-image": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: before Firefox 15 an earlier version of the specification was implemented."
+      "reason": "BCD: before Firefox 15 an earlier version of the specification was implemented.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.border-image support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-moz-box-sizing": {
       "verdict": "behavior-caveat-only",
-      "reason": "BCD note is a getComputedStyle bug before Firefox 23; the value grammar is that of box-sizing."
+      "reason": "BCD note is a getComputedStyle bug before Firefox 23; the value grammar is that of box-sizing.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.box-sizing support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-moz-column-count": {
       "verdict": "behavior-caveat-only",
-      "reason": "BCD note is a display: table-caption bug before version 37; same grammar."
+      "reason": "BCD note is a display: table-caption bug before version 37; same grammar.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.column-count support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-moz-column-rule": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: before Firefox 3 the normal keyword had a different default value (0, not 1em)."
+      "reason": "BCD: before Firefox 3 the normal keyword had a different default value (0, not 1em).",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.column-rule support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-moz-column-width": {
       "verdict": "behavior-caveat-only",
-      "reason": "BCD note is a display: table-caption bug before version 37; same grammar."
+      "reason": "BCD note is a display: table-caption bug before version 37; same grammar.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.column-width support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-moz-columns": {
       "verdict": "behavior-caveat-only",
-      "reason": "BCD note is a display: table-caption bug before version 37; same grammar."
+      "reason": "BCD note is a display: table-caption bug before version 37; same grammar.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.columns support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-moz-font-feature-settings": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: Firefox 4 to 14 supported an older, different syntax."
+      "reason": "BCD: Firefox 4 to 14 supported an older, different syntax.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.font-feature-settings support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-animation": {
       "verdict": "behavior-caveat-only",
-      "reason": "BCD note concerns animation-fill-mode support in Android below 2.3; same grammar."
+      "reason": "BCD note concerns animation-fill-mode support in Android below 2.3; same grammar.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.animation support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-background-clip": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: the prefixed property accepts the extra value synonyms padding, border and content."
+      "reason": "BCD: the prefixed property accepts the extra value synonyms padding, border and content.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.background-clip support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-background-origin": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: the prefixed property accepts the extra value synonyms padding, border and content."
+      "reason": "BCD: the prefixed property accepts the extra value synonyms padding, border and content.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.background-origin support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-background-size": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: an older draft where an omitted second value duplicates the first and contain/cover are absent."
+      "reason": "BCD: an older draft where an omitted second value duplicates the first and contain/cover are absent.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.background-size support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "-webkit-border-image": {
+      "verdict": "grammar-divergent",
+      "reason": "Always includes the fill keyword in border-image-slice, and length values in border-image-width override the corresponding border-*-width.",
+      "sources": [
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L10190",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "Differs from border-image in that it always includes the 'fill' keyword and makes border-image-width lengths override border-*-width."
+        }
+      ]
+    },
+    "-webkit-border-radius": {
+      "verdict": "grammar-divergent",
+      "reason": "Two lengths are read as horizontal and vertical radii: '-webkit-border-radius: l1 l2' equals 'border-radius: l1 / l2'.",
+      "sources": [
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L10207",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "Differs from border-radius only in the interpretation of a value consisting of two lengths."
+        }
+      ]
     },
     "-webkit-box-decoration-break": {
       "verdict": "behavior-caveat-only",
-      "reason": "BCD partial implementation applies only to inline elements; same grammar. The restriction is a target fact of box-decoration-break (D-BP-07)."
+      "reason": "BCD partial implementation applies only to inline elements; same grammar. The restriction is a target fact of box-decoration-break (D-BP-07).",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.box-decoration-break support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-font-feature-settings": {
       "verdict": "behavior-caveat-only",
-      "reason": "BCD note records that Firefox 129 added the alias for compatibility; same grammar."
+      "reason": "BCD note records that Firefox 129 added the alias for compatibility; same grammar.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.font-feature-settings support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-initial-letter": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: the prefixed WebKit form does not accept decimal values."
+      "reason": "BCD: the prefixed WebKit form does not accept decimal values.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.initial-letter support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "-webkit-line-clamp": {
+      "verdict": "grammar-divergent",
+      "reason": "Legacy shorthand with syntax none | <integer [1,inf]> that sets continue to -webkit-discard and block-ellipsis to auto, unlike line-clamp.",
+      "sources": [
+        {
+          "kind": "specification",
+          "ref": "https://www.w3.org/TR/2023/WD-css-overflow-4-20230321/#webkit-line-clamp",
+          "sha256": "sha256:a67d978f45fd0e179916cb532f186426948bedbee5c28d5fde23009537514583",
+          "statement": "-webkit-line-clamp has the syntax none | <integer [1,inf]>, sets continue to -webkit-discard and unconditionally sets block-ellipsis to auto, unlike line-clamp."
+        },
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L11894",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "Non-standard shorthand of max-lines, block-ellipsis and continue with grammar none | <integer [1,inf]>."
+        }
+      ]
     },
     "-webkit-mask": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: a different shorthand syntax that also sets the non-standard -webkit-mask-attachment."
+      "reason": "BCD: a different shorthand syntax that also sets the non-standard -webkit-mask-attachment.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.mask support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-mask-image": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: engines initially accepted only -webkit- prefixed gradient values."
+      "reason": "BCD: engines initially accepted only -webkit- prefixed gradient values.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.mask-image support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-perspective": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: Firefox accepts unitless values for the prefixed form only."
+      "reason": "BCD: Firefox accepts unitless values for the prefixed form only.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.perspective support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-print-color-adjust": {
       "verdict": "behavior-caveat-only",
-      "reason": "BCD notes are printing behavior of the body background and clipped sprites; same grammar."
+      "reason": "BCD notes are printing behavior of the body background and clipped sprites; same grammar.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.print-color-adjust support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-ruby-position": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: legacy before/after values whose meaning depends on ruby-align, not the standard over/under/inter-character values."
+      "reason": "BCD: legacy before/after values whose meaning depends on ruby-align, not the standard over/under/inter-character values.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.ruby-position support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-scroll-snap-type": {
       "verdict": "grammar-divergent",
-      "reason": "BCD: older Safari implements an earlier draft without axis values."
+      "reason": "BCD: older Safari implements an earlier draft without axis values.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-snap-type support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "-webkit-transform": {
       "verdict": "behavior-caveat-only",
-      "reason": "BCD note is an Android 2.3 form-input bug; same grammar."
+      "reason": "BCD note is an Android 2.3 form-input bug; same grammar.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.transform support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "inset-area": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of position-area. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward position-area instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.position-area support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "motion": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of offset. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward offset instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.offset support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "motion-distance": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of offset-distance. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward offset-distance instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.offset-distance support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "motion-path": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of offset-path. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward offset-path instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.offset-path support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "motion-rotation": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of offset-rotate. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward offset-rotate instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.offset-rotate support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "offset-block": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of inset-block. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward inset-block instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.inset-block support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "offset-block-end": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of inset-block-end. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward inset-block-end instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.inset-block-end support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "offset-block-start": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of inset-block-start. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward inset-block-start instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.inset-block-start support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "offset-inline": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of inset-inline. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward inset-inline instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.inset-inline support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "offset-inline-end": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of inset-inline-end. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward inset-inline-end instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.inset-inline-end support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "offset-inline-start": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of inset-inline-start. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward inset-inline-start instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.inset-inline-start support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "offset-rotation": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of offset-rotate. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward offset-rotate instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.offset-rotate support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
+    },
+    "position-try-options": {
+      "verdict": "superseded",
+      "reason": "Historical draft or pre-release name that BCD records as an alternative name of position-try-fallbacks. No specification or pinned engine source states that it is a legacy name alias, so it is diagnosed toward position-try-fallbacks instead of normalized.",
+      "sources": [
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.position-try-fallbacks support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+        }
+      ]
     },
     "scroll-snap-margin": {
-      "verdict": "behavior-caveat-only",
-      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
+      "verdict": "equivalent",
+      "equivalence": "WebKit, the only engine that shipped scroll-snap-margin, implements it as an alias of scroll-margin; the BCD partial-implementation note on older Safari applies to scroll-margin itself.",
+      "sources": [
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13137",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "scroll-margin declares the alias scroll-snap-margin."
+        },
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71",
+          "statement": "Only safari, safari_ios and webview_ios record scroll-snap-margin as an alternative name of scroll-margin."
+        }
+      ]
     },
     "scroll-snap-margin-bottom": {
-      "verdict": "behavior-caveat-only",
-      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
+      "verdict": "equivalent",
+      "equivalence": "WebKit, the only engine that shipped scroll-snap-margin-bottom, implements it as an alias of scroll-margin-bottom; the BCD partial-implementation note on older Safari applies to scroll-margin-bottom itself.",
+      "sources": [
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13157",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "scroll-margin-bottom declares the alias scroll-snap-margin-bottom."
+        },
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin-bottom support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71",
+          "statement": "Only safari, safari_ios and webview_ios record scroll-snap-margin-bottom as an alternative name of scroll-margin-bottom."
+        }
+      ]
     },
     "scroll-snap-margin-left": {
-      "verdict": "behavior-caveat-only",
-      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
+      "verdict": "equivalent",
+      "equivalence": "WebKit, the only engine that shipped scroll-snap-margin-left, implements it as an alias of scroll-margin-left; the BCD partial-implementation note on older Safari applies to scroll-margin-left itself.",
+      "sources": [
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13180",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "scroll-margin-left declares the alias scroll-snap-margin-left."
+        },
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin-left support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71",
+          "statement": "Only safari, safari_ios and webview_ios record scroll-snap-margin-left as an alternative name of scroll-margin-left."
+        }
+      ]
     },
     "scroll-snap-margin-right": {
-      "verdict": "behavior-caveat-only",
-      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
+      "verdict": "equivalent",
+      "equivalence": "WebKit, the only engine that shipped scroll-snap-margin-right, implements it as an alias of scroll-margin-right; the BCD partial-implementation note on older Safari applies to scroll-margin-right itself.",
+      "sources": [
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13203",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "scroll-margin-right declares the alias scroll-snap-margin-right."
+        },
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin-right support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71",
+          "statement": "Only safari, safari_ios and webview_ios record scroll-snap-margin-right as an alternative name of scroll-margin-right."
+        }
+      ]
     },
     "scroll-snap-margin-top": {
-      "verdict": "behavior-caveat-only",
-      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
+      "verdict": "equivalent",
+      "equivalence": "WebKit, the only engine that shipped scroll-snap-margin-top, implements it as an alias of scroll-margin-top; the BCD partial-implementation note on older Safari applies to scroll-margin-top itself.",
+      "sources": [
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L13226",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "scroll-margin-top declares the alias scroll-snap-margin-top."
+        },
+        {
+          "kind": "bcd",
+          "ref": "@mdn/browser-compat-data@8.1.6 data.json css.properties.scroll-margin-top support statements",
+          "sha256": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71",
+          "statement": "Only safari, safari_ios and webview_ios record scroll-snap-margin-top as an alternative name of scroll-margin-top."
+        }
+      ]
+    },
+    "word-wrap": {
+      "verdict": "equivalent",
+      "equivalence": "Specified legacy name alias: word-wrap parses and computes exactly as overflow-wrap.",
+      "sources": [
+        {
+          "kind": "specification",
+          "ref": "https://www.w3.org/TR/2026/CRD-css-text-3-20260814/#overflow-wrap-property",
+          "sha256": "sha256:17c26f1b41455947f106dac81736944b12da328ee4892c7c5b601f5b65ced55a",
+          "statement": "For legacy reasons, UAs must treat word-wrap as a legacy name alias of the overflow-wrap property."
+        },
+        {
+          "kind": "engine-source",
+          "ref": "https://github.com/WebKit/WebKit/blob/77f8a2bc5a964cb740a0b27dcb2c757b0861a0c1/Source/WebCore/css/CSSProperties.json#L7778",
+          "sha256": "sha256:f56793c6ac7a23a32ce70620febbfcee54f0fc8ae0e3c7fb18f42a68ca043343",
+          "statement": "overflow-wrap declares the alias word-wrap."
+        }
+      ]
     }
   },
   "families": [
