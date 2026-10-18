@@ -5,6 +5,10 @@ extend-exclude = [
   "flow-typed/*",
   # Too many false positives on inline snapshots
   "packages/**/__tests__/",
+  # Preserve the accepted French planning/review records byte for byte.
+  # The English spelling dictionary does not apply to these two documents.
+  "docs/architecture/agentic-optimizations-plan.md",
+  "docs/architecture/agentic-optimizations-review.md",
 ]
 
 [default.extend-words]
