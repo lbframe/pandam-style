@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-ce003-budget-policy",
+  "policyVersion": 1,
+  "supersedes": null,
+  "justification": "Initial CE-00.3 non-regression budgets, frozen from the measured alpha1 baseline before any core-evolution product behavior change.",
+  "baseline": {
+    "epoch": "alpha1",
+    "pooledEpochs": ["alpha1", "alpha1-replay"],
+    "manifest": "benchmarks/core-evolution/epochs/alpha1/manifest.v1.json"
+  },
+  "thresholdRule": {
+    "timing": {
+      "minMedianRatio": 1.1,
+      "minP95Ratio": 1.25,
+      "noiseMultiplier": 2,
+      "roundUpTo": 0.05
+    },
+    "memory": {
+      "minMedianRatio": 1.1,
+      "minP95Ratio": 1.2,
+      "noiseMultiplier": 2,
+      "roundUpTo": 0.05
+    },
+    "runtime": {
+      "minMedianRatio": 1.15,
+      "minP95Ratio": 1.3,
+      "noiseMultiplier": 2,
+      "roundUpTo": 0.05
+    },
+    "deterministic": {
+      "growth": {
+        "default": 0.05,
+        "variants.recipeSelections": 0,
+        "compiledModules.bytes": 0.1,
+        "designModule.bytes": 0.1,
+        "declarations.bytes": 0.1
+      }
+    },
+    "identity": {
+      "consistency.incrementalEqualsCanonical": "true"
+    }
+  },
+  "rationale": [
+    "Timing, memory and runtime budgets are ratios against the unchanged alpha1 artifact measured in the same interleaved run, so machine speed and background drift cancel; absolute milliseconds are recorded for reference only.",
+    "Each ratio limit is the larger of a fixed floor and 1 + 2 x the null noise observed between measurements of the identical artifact (store closure versus offline replay closure, and batch versus batch), rounded up to 0.05. A limit is therefore never tighter than twice the difference an unchanged artifact actually showed, and never looser than the floor without evidence.",
+    "Floors: 10% on medians and 25% on p95 for compile time and CPU (a deliberate slow-down of one tenth is a reviewable regression; tails are noisier); 10%/20% for peak RSS; 15%/30% for sub-microsecond runtime selection, where JIT and allocation effects dominate.",
+    "Deterministic outputs (bytes, rule counts, selection counts) have zero measurement noise, so their limits are absolute: at most 5% growth for CSS bytes, rule and declaration counts and host bundle bytes on the same Alpha 1 workload; 10% for generated JavaScript/TypeScript modules, whose metadata grows with catalog breadth; and no growth at all in the finite recipe selection domain, which the unchanged definitions fix.",
+    "Incremental output must keep equalling a fresh canonical compile of the same state for every edit."
+  ],
+  "budgetedMetrics": [
+    "full.totalMs",
+    "full.toDiagnosticsMs",
+    "full.cpuMs",
+    "compiler.importMs",
+    "incremental.*",
+    "full.maxRssBytes",
+    "session.maxRssBytes",
+    "css.bytes",
+    "css.gzipBytes",
+    "css.styleRules",
+    "css.atRules",
+    "css.declarations",
+    "designModule.bytes",
+    "declarations.bytes",
+    "compiledModules.bytes",
+    "report.ruleCount",
+    "variants.recipeSelections",
+    "consistency.incrementalEqualsCanonical",
+    "runtime.propsNsPerCall",
+    "runtime.recipeSelectNsPerCall",
+    "runtime.renderNsPerCall",
+    "runtime.moduleLoadMs",
+    "vite.buildMs",
+    "vite.maxRssBytes",
+    "vite.cssBytes",
+    "vite.jsBytes"
+  ],
+  "comparison": "Run tools/baselines/measure.mjs with the final plan and both --epoch alpha1=<alpha1 closure> and --epoch <candidate>=<candidate closure>, on one machine, quiet at start. budgets.mjs gate compares candidate/alpha1 medians and p95s per workload against the ratio limits, checks deterministic candidate outputs against the frozen alpha1 values and limits, requires alpha1 to reproduce its frozen deterministic outputs, and reports unknown metrics separately. Verdict pass requires every budget to pass; an unrun budget gives incomplete; any failure, workload-record mismatch, altered alpha1 package or policy-chain problem gives fail.",
+  "unknown": [
+    {
+      "id": "host.next.build-and-dev",
+      "scope": "Next.js 16.3.8 webpack and Turbopack build/dev time, memory and output bytes",
+      "reason": "Hosts are pinned and installable in the alpha1 closure, but CE-00.3 measured no Next workload; no baseline exists.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)"
+    },
+    {
+      "id": "host.rsbuild.build-and-dev",
+      "scope": "Rsbuild 2.2.11 / Rspack 2.2.8 build/dev time, memory and output bytes",
+      "reason": "Pinned and installable, not measured in CE-00.3.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)"
+    },
+    {
+      "id": "host.vite.dev-and-hmr",
+      "scope": "Vite dev server start, HMR and browser-visible update latency",
+      "reason": "Only the Vite production build of the pilot is measured; no dev-server or browser-visible latency harness ran.",
+      "owner": "CE-12.3 (#76), CE-13.1 (#78)"
+    },
+    {
+      "id": "compiler.watcher-latency",
+      "scope": "Filesystem edit to diagnostics through ProjectSession.watch()",
+      "reason": "Incremental cost is measured from an explicit verified-explicit transaction; watcher debounce and filesystem notification latency are excluded.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "browser.style-cost",
+      "scope": "Browser CSS parse, style recalculation, layout and paint cost of emitted CSS",
+      "reason": "No browser performance trace was taken; runtime selection is measured in Node only.",
+      "owner": "CE-12.3 (#76), CE-14 (#82-#84)"
+    },
+    {
+      "id": "runtime.non-v8",
+      "scope": "Runtime selection cost in browsers and engines other than Node 22.22.0 V8",
+      "reason": "Measured in Node only.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "output.new-resource-kinds",
+      "scope": "CSS/module bytes of capabilities absent in Alpha 1 (keyframes, fonts, assets, globals, typed resources, new conditions)",
+      "reason": "Alpha 1 cannot express them, so no comparable baseline exists; each must be baselined by its owning lot under a new policy version before its budget can exist.",
+      "owner": "Owning capability lots (CE-03 to CE-11), CE-12.2 (#75)"
+    },
+    {
+      "id": "compiler.invalidation-counters",
+      "scope": "Rebuild, fallback and dependency-invalidation counts per incremental edit",
+      "reason": "Not exposed by the public compiler API; reading the internal perf collector would instrument the measured package.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "runtime.c10000",
+      "scope": "Runtime selection cost and compile-to-canonical consistency at 10,000 components",
+      "reason": "The c10000 workload is measured for compile, incremental, memory and output only; runtime replay ran at c1000 and below.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "cold-install",
+      "scope": "Package install time, cold disk cache and first-run cost",
+      "reason": "Samples run with a warm operating-system file cache and a preinstalled closure.",
+      "owner": "CE-15.1 (#77)"
+    }
+  ],
+  "changePolicy": [
+    "budgets.v1.json is generated by `node tools/baselines/budgets.mjs freeze` from this policy and the committed baseline results, and is never edited by hand; tools/baselines/validate.mjs re-derives it and rejects any difference.",
+    "Committed policy, budgets, workloads, derivation and baseline result files are immutable: the validator and the gate compare each with the version of the commit that added it.",
+    "Changing a threshold, metric set or workload requires a new budget-policy.vN.json and budgets.vN.json (N incremented), a justification, a predecessor reference by path and SHA-256, and a new comparable baseline run of the unchanged alpha1 artifact; reusing an old result file is rejected.",
+    "Every budget loosened or removed relative to the predecessor must be listed in `relaxations` with its own justification; an unknown metric may only leave the unknown list by gaining a budget.",
+    "No release may pass against a weakened budget retroactively: the gate evaluates the budgets version current at the evaluated commit and fails on any policy-chain problem."
+  ]
+}
