@@ -370,20 +370,33 @@ export function indicatorResets(focused, unfocused) {
 
 // Suppresses only the indicator paint on the candidates, through their inline
 // style with !important. Clip, masks, overlays, opacity, transforms and
-// position stay exactly as focused.
+// position stay exactly as focused. Only the CSSOM is used: under the page CSP
+// a written style attribute is not applied.
 function suppressIndicator(resets) {
-  window.__ceSaved = window.__ceNodes.map((n) => n.getAttribute('style'));
+  window.__ceSaved = window.__ceNodes.map((n, i) => ({
+    cssText: n.style.cssText,
+    values: resets[i].map(([property]) => [
+      property,
+      n.style.getPropertyValue(property),
+      n.style.getPropertyPriority(property),
+    ]),
+  }));
   window.__ceNodes.forEach((n, i) => {
     for (const [property, value] of resets[i])
       n.style.setProperty(property, value, 'important');
   });
 }
 
+// Puts the candidates' inline declarations back; true when each inline style
+// is exactly as before the suppression.
 function restoreIndicator() {
-  window.__ceNodes.forEach((n, i) => {
-    const saved = window.__ceSaved[i];
-    if (saved == null) n.removeAttribute('style');
-    else n.setAttribute('style', saved);
+  return window.__ceNodes.every((n, i) => {
+    const { cssText, values } = window.__ceSaved[i];
+    for (const [property, value, priority] of values) {
+      if (value === '') n.style.removeProperty(property);
+      else n.style.setProperty(property, value, priority);
+    }
+    return n.style.cssText === cssText;
   });
 }
 
@@ -443,7 +456,8 @@ async function indicatorStop(page, stop, id) {
     );
     await page.evaluate(suppressIndicator, resets);
     const shotB = await page.screenshot(options);
-    await page.evaluate(restoreIndicator);
+    if (!(await page.evaluate(restoreIndicator)))
+      throw new Error(`${id}: the suppressed indicator was not restored`);
     pixels = counterfactualPixels(shotA, shotB, clip, rings);
   }
   return {
