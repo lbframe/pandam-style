@@ -510,7 +510,8 @@
               "nonstandard",
               "abandoned-draft",
               "unimplemented-specification",
-              "obsolete-engine-prefix"
+              "obsolete-engine-prefix",
+              "divergent-legacy-variant"
             ]
           },
           "basis": {
@@ -829,6 +830,86 @@
           },
           "note": {
             "type": "string"
+          },
+          "bcdRelations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "target",
+                "via",
+                "statements",
+                "shipping",
+                "caveats"
+              ],
+              "properties": {
+                "target": {
+                  "type": "string"
+                },
+                "via": {
+                  "enum": ["bcd-prefix", "bcd-alternative-name"]
+                },
+                "statements": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "shipping": {
+                  "type": "boolean"
+                },
+                "caveats": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["engines", "partial", "flags", "notes"],
+                    "properties": {
+                      "engines": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "minItems": 1
+                      },
+                      "partial": {
+                        "type": "boolean"
+                      },
+                      "flags": {
+                        "type": "boolean"
+                      },
+                      "notes": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "aliasAudit": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["verdict", "reason"],
+            "properties": {
+              "verdict": {
+                "enum": ["grammar-divergent", "behavior-caveat-only"]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "prefixedFormShips": {
+            "type": "boolean"
+          },
+          "emissionDecision": {
+            "type": "string",
+            "pattern": "^D-BP-\\d\\d$"
           }
         },
         "additionalProperties": false,

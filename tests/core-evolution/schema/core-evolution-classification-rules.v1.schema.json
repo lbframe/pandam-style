@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-classification-rules.v1.schema.json",
+  "title": "Core evolution classification rules v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "task",
+    "status",
+    "dispositionDefinitions",
+    "procedure",
+    "ownerBySubkind",
+    "aliasOwner",
+    "incompatibleRuntime",
+    "systemResources",
+    "nonCssSyntax",
+    "platformExtensions",
+    "aliases",
+    "deprecated",
+    "abandonedDraft",
+    "unimplementedSpecification",
+    "experimental",
+    "nonstandard",
+    "notes",
+    "overlayRequirements",
+    "aliasAudit",
+    "families"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-classification-rules"
+    },
+    "task": {
+      "const": "CE-00.1"
+    },
+    "status": {
+      "type": "string"
+    },
+    "dispositionDefinitions": {
+      "type": "object",
+      "required": [
+        "canonical-property",
+        "normalized-alias",
+        "system-resource",
+        "scoped-platform-extension",
+        "deprecated-or-experimental",
+        "non-css-syntax",
+        "incompatible-runtime-requirement"
+      ],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["definition", "proof"]
+      }
+    },
+    "procedure": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "ownerBySubkind": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^CE-(0\\d|1[0-5])$"
+      }
+    },
+    "aliasOwner": {
+      "type": "string",
+      "pattern": "^CE-(0\\d|1[0-5])$"
+    },
+    "incompatibleRuntime": {
+      "type": "object"
+    },
+    "systemResources": {
+      "type": "object"
+    },
+    "nonCssSyntax": {
+      "type": "object"
+    },
+    "platformExtensions": {
+      "type": "object"
+    },
+    "aliases": {
+      "type": "object"
+    },
+    "deprecated": {
+      "type": "object"
+    },
+    "abandonedDraft": {
+      "type": "object"
+    },
+    "unimplementedSpecification": {
+      "type": "object"
+    },
+    "experimental": {
+      "type": "object"
+    },
+    "nonstandard": {
+      "type": "object"
+    },
+    "overlayRequirements": {
+      "type": "object"
+    },
+    "notes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "aliasAudit": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["verdict", "reason"],
+        "properties": {
+          "verdict": {
+            "enum": ["grammar-divergent", "behavior-caveat-only"]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "grammarHintReviewed": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "families": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "cap", "owner", "requiredIn"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "cap": {
+            "type": "string",
+            "pattern": "^CAP-\\d\\d$"
+          },
+          "owner": {
+            "type": "string",
+            "pattern": "^CE-(0\\d|1[0-5])$"
+          },
+          "requiredIn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "minItems": 1
+    }
+  }
+}

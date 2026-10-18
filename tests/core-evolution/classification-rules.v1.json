@@ -9,7 +9,7 @@
       "proof": "Required entries: accepted finite domains and structured rejections (E2), emitted and transformed CSS (E3) and computed behavior in each profile target (E4). Recognized but not required entries: either the same proof when admitted, or a structured diagnostic fixture (E2)."
     },
     "normalized-alias": {
-      "definition": "Another spelling of exactly one canonical property or scoped platform extension: a BCD prefix/alternative name, a legacy name alias or an upstream shorthand key. The canonical property carries the requirement.",
+      "definition": "Another spelling of exactly one canonical property or scoped platform extension with the same grammar: a BCD prefix/alternative name whose statements carry no grammar caveat, a legacy name alias or an upstream shorthand key. Behavior caveats from BCD are recorded with an alias audit. The canonical property carries the requirement.",
       "proof": "Normalization or a diagnostic naming the canonical property (E2), and emitted CSS equivalent to the canonical form (E3). CE-02 decides whether the spelling is accepted or diagnosed; prefix emission belongs to the CE-01 transformation."
     },
     "system-resource": {
@@ -21,8 +21,8 @@
       "proof": "Scoped admission (E2), emitted CSS (E3) and computed behavior on the exact platform engine (E4) when required; otherwise a scoped diagnostic (E2)."
     },
     "deprecated-or-experimental": {
-      "definition": "Deprecated, experimental, non-standard, abandoned-draft, unimplemented-specification or obsolete-engine-prefix entries. They remain in the denominator with a replacement or equivalent where one exists.",
-      "proof": "A structured diagnostic fixture (E2). Experimental entries also need a CE-11 target fact record (E1) before any promotion."
+      "definition": "Deprecated, experimental, non-standard, abandoned-draft, unimplemented-specification, obsolete-engine-prefix or divergent-legacy-variant entries. A divergent legacy variant is a BCD prefix/alternative name whose documented grammar or values differ from its target. They remain in the denominator with a replacement or equivalent where one exists.",
+      "proof": "A structured diagnostic fixture (E2). Experimental entries also need a CE-11 target fact record (E1) before any promotion. A divergent legacy variant that still ships and may be emitted by the CE-01 transformation (emissionDecision D-BP-07) also needs emitted-CSS proof (E3) restricted to the value subset it shares with its target."
     },
     "non-css-syntax": {
       "definition": "An upstream authoring key that is not a CSS property: selector, condition, pseudo-element, axis or multi-property helpers, development helpers and theme keys.",
@@ -37,7 +37,7 @@
     "1. Curated records win in this order: incompatibleRuntime, systemResources, nonCssSyntax, platformExtensions, aliases, deprecated, experimental, nonstandard.",
     "2. Names with an obsolete-engine prefix (-ms-, -o-, -khtml-) are deprecated-or-experimental/obsolete-engine-prefix; their current equivalent is recorded, CE-01 owns the engine incompatibility.",
     "3. Otherwise a BCD css.properties status decides: standard track and neither deprecated nor experimental is a canonical property; deprecated, experimental and non-standard keep that subkind.",
-    "4. A name without BCD status that BCD records as a prefix or alternative name of another property is a normalized alias of that property when the target is canonical; otherwise it inherits the target's deprecated or experimental disposition.",
+    "4. A name without BCD status that BCD records as a prefix or alternative name of another property is a normalized alias of that property when the target is canonical; otherwise it inherits the target's deprecated or experimental disposition. When the relating BCD statements carry notes, partial implementation or flags, an aliasAudit verdict is required: grammar-divergent makes the name a deprecated-or-experimental/divergent-legacy-variant of the target, behavior-caveat-only keeps the alias with the audit recorded. A behavior-caveat-only verdict on notes that mention syntax or values (derive-registry.mjs GRAMMAR_HINT) needs grammarHintReviewed. A stale or missing verdict fails the build.",
     "5. A remaining -webkit-/-moz- name whose unprefixed base is an inventory entry follows its base in the same way; a vendor-only name is deprecated-or-experimental/nonstandard.",
     "6. Any remaining name is a build error. Every entry must also match exactly one family; the family supplies the capability family, the owner of canonical/platform entries and the profiles that require them.",
     "7. An entry's capability family is its curated requirementCarrier, else its family's. Its owner is curated, else set by disposition subkind (aliases CE-02), else its family's owner; the owner must belong to that capability's coverage Work lots, except CAP-01 and the CE-01/CE-02/CE-11 disposition owners of non-canonical entries.",
@@ -49,7 +49,8 @@
     "unimplemented-specification": "CE-02",
     "abandoned-draft": "CE-02",
     "experimental": "CE-11",
-    "obsolete-engine-prefix": "CE-01"
+    "obsolete-engine-prefix": "CE-01",
+    "divergent-legacy-variant": "CE-02"
   },
   "aliasOwner": "CE-02",
   "incompatibleRuntime": {
@@ -972,6 +973,120 @@
         "max-width",
         "max-height"
       ]
+    }
+  },
+  "aliasAudit": {
+    "-moz-background-clip": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: Firefox used the padding | border value syntax, not the standard box keywords."
+    },
+    "-moz-background-origin": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: Firefox used the padding | border value syntax, not the standard box keywords."
+    },
+    "-moz-border-image": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: before Firefox 15 an earlier version of the specification was implemented."
+    },
+    "-moz-box-sizing": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD note is a getComputedStyle bug before Firefox 23; the value grammar is that of box-sizing."
+    },
+    "-moz-column-count": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD note is a display: table-caption bug before version 37; same grammar."
+    },
+    "-moz-column-rule": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: before Firefox 3 the normal keyword had a different default value (0, not 1em)."
+    },
+    "-moz-column-width": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD note is a display: table-caption bug before version 37; same grammar."
+    },
+    "-moz-columns": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD note is a display: table-caption bug before version 37; same grammar."
+    },
+    "-moz-font-feature-settings": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: Firefox 4 to 14 supported an older, different syntax."
+    },
+    "-webkit-animation": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD note concerns animation-fill-mode support in Android below 2.3; same grammar."
+    },
+    "-webkit-background-clip": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: the prefixed property accepts the extra value synonyms padding, border and content."
+    },
+    "-webkit-background-origin": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: the prefixed property accepts the extra value synonyms padding, border and content."
+    },
+    "-webkit-background-size": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: an older draft where an omitted second value duplicates the first and contain/cover are absent."
+    },
+    "-webkit-box-decoration-break": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD partial implementation applies only to inline elements; same grammar. The restriction is a target fact of box-decoration-break (D-BP-07)."
+    },
+    "-webkit-font-feature-settings": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD note records that Firefox 129 added the alias for compatibility; same grammar."
+    },
+    "-webkit-initial-letter": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: the prefixed WebKit form does not accept decimal values."
+    },
+    "-webkit-mask": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: a different shorthand syntax that also sets the non-standard -webkit-mask-attachment."
+    },
+    "-webkit-mask-image": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: engines initially accepted only -webkit- prefixed gradient values."
+    },
+    "-webkit-perspective": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: Firefox accepts unitless values for the prefixed form only."
+    },
+    "-webkit-print-color-adjust": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD notes are printing behavior of the body background and clipped sprites; same grammar."
+    },
+    "-webkit-ruby-position": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: legacy before/after values whose meaning depends on ruby-align, not the standard over/under/inter-character values."
+    },
+    "-webkit-scroll-snap-type": {
+      "verdict": "grammar-divergent",
+      "reason": "BCD: older Safari implements an earlier draft without axis values."
+    },
+    "-webkit-transform": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD note is an Android 2.3 form-input bug; same grammar."
+    },
+    "scroll-snap-margin": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
+    },
+    "scroll-snap-margin-bottom": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
+    },
+    "scroll-snap-margin-left": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
+    },
+    "scroll-snap-margin-right": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
+    },
+    "scroll-snap-margin-top": {
+      "verdict": "behavior-caveat-only",
+      "reason": "BCD partial implementation: older Safari ignores scroll margin for fragment and scrollIntoView scrolls; same grammar."
     }
   },
   "families": [

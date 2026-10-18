@@ -51,4 +51,4 @@ node "$tools/observe-upstreams.mjs" \
 node "$tools/build-registry.mjs" --keys "$work/keys.json" \
   --stylex-probe "$work/stylex-probe.json" --panda-probe "$work/panda-probe.json" \
   --bcd-data "$bcd_data" --out docs/research/core-evolution-registry.v1.json
-node tests/core-evolution/validate.mjs
+node tests/core-evolution/validate.mjs --self-test
