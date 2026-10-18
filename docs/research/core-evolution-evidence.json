@@ -1,0 +1,993 @@
+{
+  "schemaVersion": 1,
+  "kind": "research-snapshot",
+  "status": "source-inspection-only",
+  "retrievedAt": "2026-10-18T12:56:26.948406+00:00",
+  "baseline": {
+    "repository": "https://github.com/lbframe/pandam-style",
+    "commit": "415e05539fcb5d36a78226112b5cf488b200b1aa",
+    "version": "0.1.0-alpha.1",
+    "fileDigests": {
+      "packages/compiler/src/design-system/policy/properties.js": "sha256:f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540",
+      "packages/compiler/src/design-system/registry/index.js": "sha256:a5ecb1065008e02e06642cce29641d3724b181c33380822fc43d97a5a0a415f1",
+      "packages/compiler/src/engine/lowering/styles.js": "sha256:a582e48ef5531f2aed05a102367e8d407254952f99f478fa0498445a64d78b2a",
+      "packages/compiler/src/artifacts/types/design-declarations.js": "sha256:b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5",
+      "packages/compiler/src/frontend/babel/plugin.js": "sha256:1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f",
+      "packages/compiler/src/design-system/patterns/compile.js": "sha256:573fd2160a85a277f180eb3fceb17ada746c75fd7a447771a086d73a1345ba7b",
+      "packages/core/src/props.js": "sha256:b06b1192d16e673dc0dfe991064d70e0de89573960a8cf20073d5484e463acaf"
+    }
+  },
+  "packages": [
+    {
+      "package": "@stylexjs/stylex",
+      "version": "0.19.1",
+      "publishedAt": "2026-09-15T21:19:27.336Z",
+      "registry": "https://registry.npmjs.org/@stylexjs/stylex/0.19.1",
+      "tarball": "https://registry.npmjs.org/@stylexjs/stylex/-/stylex-0.19.1.tgz",
+      "integrity": "sha512-JwNFm0MOYPqi+M4Ax5Un4ZxfZp4HEAX2sAWetZ88KALFcv1eEiHNJs75oO3V3U7RVWnzfkiM8i9eBowC3hqgUw==",
+      "integrityVerified": true
+    },
+    {
+      "package": "@stylexjs/babel-plugin",
+      "version": "0.19.1",
+      "publishedAt": "2026-09-15T21:19:49.940Z",
+      "registry": "https://registry.npmjs.org/@stylexjs/babel-plugin/0.19.1",
+      "tarball": "https://registry.npmjs.org/@stylexjs/babel-plugin/-/babel-plugin-0.19.1.tgz",
+      "integrity": "sha512-Ig3crX6MuGWDEAx+f89aLxTQUWVeEc2Aco2moIdcObyvo7hZJgU26rxJN3k7geFjhi+5dfna6TNR8iTRK0PQGA==",
+      "integrityVerified": true
+    },
+    {
+      "package": "@stylexjs/unplugin",
+      "version": "0.19.1",
+      "publishedAt": "2026-09-15T21:19:31.522Z",
+      "registry": "https://registry.npmjs.org/@stylexjs/unplugin/0.19.1",
+      "tarball": "https://registry.npmjs.org/@stylexjs/unplugin/-/unplugin-0.19.1.tgz",
+      "integrity": "sha512-MJz/IPrFe3hSHbZtjbxaYd3kLgS718/NFBEY/Mf+njteJKLdY7bHHfVka3051LCYy9fKfyZapGCmUpibraHqmQ==",
+      "integrityVerified": true
+    },
+    {
+      "package": "@pandacss/dev",
+      "version": "2.2.0",
+      "publishedAt": "2026-10-09T20:42:13.344Z",
+      "registry": "https://registry.npmjs.org/@pandacss/dev/2.2.0",
+      "tarball": "https://registry.npmjs.org/@pandacss/dev/-/dev-2.2.0.tgz",
+      "integrity": "sha512-tflRs0WLaESwmHptVls+SrkJpjepf9M29LJwjeh2H3BxH9BA1+/2riWFGweXoW7vmylkG98ns6BDqLBkqEVUJg==",
+      "integrityVerified": true
+    },
+    {
+      "package": "@pandacss/compiler",
+      "version": "2.2.0",
+      "publishedAt": "2026-10-09T20:43:43.949Z",
+      "registry": "https://registry.npmjs.org/@pandacss/compiler/2.2.0",
+      "tarball": "https://registry.npmjs.org/@pandacss/compiler/-/compiler-2.2.0.tgz",
+      "integrity": "sha512-wuaOhKNwUoF+18qBA9RtcQeTbbRKgDGOX8ynCPkobsT6I3tsXX4NSbeD/G25qF/262DYwcdbEldMgollOJ5zfQ==",
+      "integrityVerified": true
+    },
+    {
+      "package": "@pandacss/preset-base",
+      "version": "2.2.0",
+      "publishedAt": "2026-10-09T20:41:53.486Z",
+      "registry": "https://registry.npmjs.org/@pandacss/preset-base/2.2.0",
+      "tarball": "https://registry.npmjs.org/@pandacss/preset-base/-/preset-base-2.2.0.tgz",
+      "integrity": "sha512-Cu3A/5ElXI3o5CuVLn/Y9/+CppaMzE/2pXCS5z2bb3k09Ucq3QVA7CQN4VoizIH1Fw8ibc99jOwqR8qZRRkqbQ==",
+      "integrityVerified": true
+    },
+    {
+      "package": "@pandacss/types",
+      "version": "2.2.0",
+      "publishedAt": "2026-10-09T20:44:57.878Z",
+      "registry": "https://registry.npmjs.org/@pandacss/types/2.2.0",
+      "tarball": "https://registry.npmjs.org/@pandacss/types/-/types-2.2.0.tgz",
+      "integrity": "sha512-XeUt/mWUkghn4oyKqcFMz6whTr4SHxmiKksNVNX3EAB1ceyrvQ68tHrYWNK59NtBrRPeJxSOibHhZWVRqHcuvQ==",
+      "integrityVerified": true
+    },
+    {
+      "package": "@mdn/browser-compat-data",
+      "version": "8.1.6",
+      "publishedAt": "2026-10-15T13:36:46.918Z",
+      "registry": "https://registry.npmjs.org/@mdn/browser-compat-data/8.1.6",
+      "tarball": "https://registry.npmjs.org/@mdn/browser-compat-data/-/browser-compat-data-8.1.6.tgz",
+      "integrity": "sha512-bTP5c58cBsgMOokwa/ECLcAxTkIwBe9csIts92Nq2wviediIJadh9iHI4Ezn2q6RiZhy7b54SNRn/tZpPKtTsA==",
+      "integrityVerified": true
+    }
+  ],
+  "sourcePins": {
+    "stylex": {
+      "repository": "https://github.com/facebook/stylex",
+      "tag": "0.19.1",
+      "commit": "1fcb9a51cbecad2c82255e0f4b45cc072fa1a95a",
+      "inspectedFileDigests": {
+        "packages/@stylexjs/stylex/src/types/StyleXCSSTypes.js": "sha256:f6eb8a1966af83db3202f118669216f80ccd16f1f8dc476877c012b07161545d",
+        "packages/@stylexjs/babel-plugin/src/shared/utils/default-options.js": "sha256:6397a156b31196338df76a9bc64e86c02f11d3be032bbc6d7a82a8e8701fe261",
+        "packages/@stylexjs/unplugin/README.md": "sha256:198575a2bf834698c548eeeb8e1c95f4f0e4caa9fd22e98c56648884c5e43e16",
+        "packages/docs/content/docs/api/javascript/when.mdx": "sha256:ff4877f33c1bb21c6f77fa6b647eb9dac32b2226358dc583d296f5875b46e5e3",
+        "packages/docs/content/docs/api/javascript/positionTry.mdx": "sha256:79eaa0f9a360786d11797dd8741de515d7523a283a48edf3a0b863ca461803b7",
+        "packages/docs/content/docs/api/javascript/viewTransitionClass.mdx": "sha256:feeb6a533042434ebcac79a19107c808de794d313efd106acfa836b0d280f885"
+      }
+    },
+    "panda": {
+      "repository": "https://github.com/chakra-ui/panda",
+      "tag": "@pandacss/dev@2.2.0",
+      "commit": "d149285ee26cd40488909cbf4aa4143980e2e05c",
+      "inspectedFileDigests": {
+        "packages/types/src/csstype.d.ts": "sha256:ac51dd7d31333793807a6abaa5ae168512b6131bd41d9c5b98477fc3b7800f9f",
+        "packages/types/src/system-types.ts": "sha256:68b6fc69b5609f457c1e2d282f6dc42ef1e616369ebae8734ccc5850a2fab1e0",
+        "packages/types/src/config.ts": "sha256:4ca750ca08b71e599ec665a9bdea09b5c0db56d082bef4ac51b597cc5a73cd9e",
+        "packages/preset-base/src/patterns.ts": "sha256:9d2b44790df1f58cee6b4c3998ee24b98357a7331a21053f7812c2e9c10b49ef",
+        "packages/preset-base/src/conditions.ts": "sha256:3c6f9f572d9ddcfe208d48a1587c5c8404ea3624edac779b47317c88420a0af6",
+        "website/content/docs/get-started/upgrading-to-v2.mdx": "sha256:8b1b9be990d39aceb55d34310804fc064c7384555df7f1faa9438c376345adc1",
+        "website/content/docs/get-started/faq.mdx": "sha256:d14a73faebba59c60d1c66319e83f2e0c6beaace8bd85a5ee74fdd19e01303e1",
+        "website/content/docs/recipes/responsive-variants.mdx": "sha256:a614dc49250eff0795066e9361147135a9fd7250e00e17b313ab9a272e62ab07",
+        "crates/pandacss_stylesheet/src/polyfill.rs": "sha256:d8a345cba4a7e9e397ea31cfbf76bbffccaa847a8a65a2a4b04dd919210cdd39"
+      },
+      "baseUtilityFileDigests": {
+        "packages/preset-base/src/utilities/background.ts": "sha256:aad10823acd4ebb9001f4f13062a9ad40c757f673c7aaab60a6e8e56515b92fb",
+        "packages/preset-base/src/utilities/border.ts": "sha256:ce4243e5b36e0364e16083815d4b896266bfc486a02684e753c157a2642d316d",
+        "packages/preset-base/src/utilities/container.ts": "sha256:85dfd69296fee77042bd1ddb6b2f68ce12f4a0c58e9df19190820c1ea2a51767",
+        "packages/preset-base/src/utilities/cursor.ts": "sha256:b69d6d1d1fd03c341099ab6125241dd8a560a02b818494e627c6ad9eac69248d",
+        "packages/preset-base/src/utilities/display.ts": "sha256:67870ccaefe1ab3df6715b91da7ed1f51aa6eabb6bbee21ca905edaede793420",
+        "packages/preset-base/src/utilities/divide.ts": "sha256:db4758a296ea22887c69a9429c68ce0c0ded58910536483b2c8ba0193f96506a",
+        "packages/preset-base/src/utilities/effects.ts": "sha256:91d2ba1e4f322e34353164b304490a8494bdb45a0d019f601b6c74b7de11a724",
+        "packages/preset-base/src/utilities/flex-and-grid.ts": "sha256:25620062b076c9ad892abe9fa99f674092382ce11ddbba1f902f7a667f637ee7",
+        "packages/preset-base/src/utilities/focus-ring.ts": "sha256:c118a4176caca32f45469b32099cc5711b444b7169cfbc10ce16601088a3fe37",
+        "packages/preset-base/src/utilities/gradient.ts": "sha256:ebca77d460fb702f5187350a293c03464011a68e4256b320d134d47a4604fc1d",
+        "packages/preset-base/src/utilities/helpers.ts": "sha256:502999cf0ed5751a4de4051bb1c60790ebe0e2a9ed7f7e45734acdeb9cccbe9f",
+        "packages/preset-base/src/utilities/interactivity.ts": "sha256:f5456f4b695b3fd38ed94ae913ed7a5ce66aedc2a6ec9ea865be65a6bed3b9fb",
+        "packages/preset-base/src/utilities/layout.ts": "sha256:de41c9ad7cbe2f3153a84eaa3faf65e1e25e911176a578bce3a34556201752b7",
+        "packages/preset-base/src/utilities/list.ts": "sha256:d4689900f2326142cf8507c672f940268a7199b2f5e2ff1a168b5094ba601a98",
+        "packages/preset-base/src/utilities/mask.ts": "sha256:971746fac816f2dc48410c2ec39060ec19dff9b56c611a807e6a2b4294582354",
+        "packages/preset-base/src/utilities/outline.ts": "sha256:e53bc09fe346ce72d344d1c6cc22ba4d765edb7a14567a2c37a73f2e43c348a5",
+        "packages/preset-base/src/utilities/polyfill.ts": "sha256:91a78adab807c9617d084e87f4e769cf42b548f8448b7ca9dc281b4034f8f8f6",
+        "packages/preset-base/src/utilities/sizing.ts": "sha256:8b6916c9bb8e1c6c5ab4bbba866a94e7fb800709ef9683a880b09ffde5e6a7c0",
+        "packages/preset-base/src/utilities/spacing.ts": "sha256:5f5e823bccc8a390a115c4f26a08aaa26d4ea7930f8af9019b9ffb0dbd1c2871",
+        "packages/preset-base/src/utilities/svg.ts": "sha256:7f33618acc60d483195407ab55182c7b402126625be9a65fd63a439c8f38b410",
+        "packages/preset-base/src/utilities/tables.ts": "sha256:89147c420657e38337bde13486421a006161d63b5355ab23abd9388e0ae1091b",
+        "packages/preset-base/src/utilities/transforms.ts": "sha256:536cecda45e9312848355dbab5b377fde8ee1b62c72c9ea95568510bd9f89ca4",
+        "packages/preset-base/src/utilities/transitions.ts": "sha256:9e767805ec2633ea18a931d92c5fdd063bc5628780968e53126c4fab9e28a6dc",
+        "packages/preset-base/src/utilities/typography.ts": "sha256:e2fbd4c4e5d42beb3d481230865533ed50a97b36ba6af585f43631173c6af2da"
+      }
+    },
+    "bcd": {
+      "repository": "https://github.com/mdn/browser-compat-data",
+      "version": "8.1.6",
+      "commit": "3e5665883c3dcaa610e2ed2478e24ade34d57ff4",
+      "license": "CC0-1.0",
+      "publishedDataDigest": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+    }
+  },
+  "consumerObservation": {
+    "repository": "https://github.com/lbframe/wacando",
+    "integrationNoteBlob": "4ed2e94b3f11c770db257f89ec52bc0d6610700e",
+    "renderComparisonScriptBlob": "8a97a049f1a9a3117342532c66ca407d1a6ecfbd",
+    "desktopManifestBlob": "ab0711f9fd433c146d33a49f2ae4f712507cb25e",
+    "declaredVersions": {
+      "vite": "8.3.1",
+      "vitest": "4.1.11",
+      "electron": "44.7.2",
+      "@testing-library/react": "16.3.3",
+      "@playwright/test": "1.55.1"
+    },
+    "classificationResultsRerun": false,
+    "originalClassifierRecovered": false
+  },
+  "browserSupportStatements": [
+    {
+      "path": "css.at-rules.layer",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/At-rules/@layer",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "99"
+        },
+        "edge": {
+          "version_added": "99"
+        },
+        "firefox": {
+          "version_added": "97"
+        },
+        "safari": {
+          "version_added": "15.4"
+        },
+        "safari_ios": {
+          "version_added": "15.4"
+        },
+        "webview_android": {
+          "version_added": "99"
+        }
+      }
+    },
+    {
+      "path": "css.properties.custom-property",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Properties/--*",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "49"
+        },
+        "edge": {
+          "version_added": "15"
+        },
+        "firefox": {
+          "version_added": "31"
+        },
+        "safari": {
+          "version_added": "9.1"
+        },
+        "safari_ios": {
+          "version_added": "9.3"
+        },
+        "webview_android": {
+          "version_added": "49"
+        }
+      }
+    },
+    {
+      "path": "css.selectors.is",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Selectors/:is",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": [
+          {
+            "version_added": "88"
+          },
+          {
+            "alternative_name": ":-webkit-any()",
+            "notes": "Doesn't support combinators.",
+            "version_added": "12"
+          }
+        ],
+        "edge": [
+          {
+            "version_added": "88"
+          },
+          {
+            "alternative_name": ":-webkit-any()",
+            "notes": "Doesn't support combinators.",
+            "version_added": "79"
+          }
+        ],
+        "firefox": [
+          {
+            "version_added": "78"
+          },
+          {
+            "alternative_name": ":-moz-any()",
+            "notes": [
+              "Doesn't support combinators.",
+              "See <a href=\"https://bugzil.la/906353\">bug 906353</a>."
+            ],
+            "version_added": "4"
+          }
+        ],
+        "safari": [
+          {
+            "version_added": "14"
+          },
+          {
+            "alternative_name": ":matches()",
+            "version_added": "9"
+          },
+          {
+            "alternative_name": ":-webkit-any()",
+            "notes": "Doesn't support combinators.",
+            "version_added": "5"
+          }
+        ],
+        "safari_ios": [
+          {
+            "version_added": "14"
+          },
+          {
+            "alternative_name": ":matches()",
+            "version_added": "9"
+          },
+          {
+            "alternative_name": ":-webkit-any()",
+            "notes": "Doesn't support combinators.",
+            "version_added": "5"
+          }
+        ],
+        "webview_android": [
+          {
+            "version_added": "88"
+          },
+          {
+            "alternative_name": ":-webkit-any()",
+            "notes": "Doesn't support combinators.",
+            "version_added": "4.4"
+          }
+        ]
+      }
+    },
+    {
+      "path": "css.selectors.where",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Selectors/:where",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "88"
+        },
+        "edge": {
+          "version_added": "88"
+        },
+        "firefox": {
+          "version_added": "78"
+        },
+        "safari": {
+          "version_added": "14"
+        },
+        "safari_ios": {
+          "version_added": "14"
+        },
+        "webview_android": {
+          "version_added": "88"
+        }
+      }
+    },
+    {
+      "path": "css.selectors.has",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Selectors/:has",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "105"
+        },
+        "edge": {
+          "version_added": "105"
+        },
+        "firefox": {
+          "version_added": "121"
+        },
+        "safari": {
+          "version_added": "15.4"
+        },
+        "safari_ios": {
+          "version_added": "15.4"
+        },
+        "webview_android": {
+          "version_added": "105"
+        }
+      }
+    },
+    {
+      "path": "css.at-rules.property",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/At-rules/@property",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "85"
+        },
+        "edge": {
+          "version_added": "85"
+        },
+        "firefox": {
+          "version_added": "128"
+        },
+        "safari": {
+          "version_added": "16.4"
+        },
+        "safari_ios": {
+          "version_added": "16.4"
+        },
+        "webview_android": {
+          "version_added": "85"
+        }
+      }
+    },
+    {
+      "path": "css.at-rules.container",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/At-rules/@container",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "105"
+        },
+        "edge": {
+          "version_added": "105"
+        },
+        "firefox": {
+          "version_added": "110"
+        },
+        "safari": {
+          "version_added": "16"
+        },
+        "safari_ios": {
+          "version_added": "16"
+        },
+        "webview_android": {
+          "version_added": "105"
+        }
+      }
+    },
+    {
+      "path": "css.properties.grid-template-columns.subgrid",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Guides/Grid_layout/Subgrid",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "117"
+        },
+        "edge": {
+          "version_added": "117"
+        },
+        "firefox": {
+          "version_added": "71"
+        },
+        "safari": {
+          "version_added": "16"
+        },
+        "safari_ios": {
+          "version_added": "16"
+        },
+        "webview_android": {
+          "version_added": "117"
+        }
+      }
+    },
+    {
+      "path": "css.properties.aspect-ratio",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Properties/aspect-ratio",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "88"
+        },
+        "edge": {
+          "version_added": "88"
+        },
+        "firefox": {
+          "version_added": "89"
+        },
+        "safari": {
+          "version_added": "15"
+        },
+        "safari_ios": {
+          "version_added": "15"
+        },
+        "webview_android": {
+          "version_added": "88"
+        }
+      }
+    },
+    {
+      "path": "css.properties.text-wrap",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Properties/text-wrap",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "114"
+        },
+        "edge": {
+          "version_added": "114"
+        },
+        "firefox": {
+          "version_added": "121"
+        },
+        "safari": {
+          "version_added": "17.4"
+        },
+        "safari_ios": {
+          "version_added": "17.4"
+        },
+        "webview_android": {
+          "version_added": "114"
+        }
+      }
+    },
+    {
+      "path": "css.properties.text-wrap-style.balance",
+      "mdnUrl": null,
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "130"
+        },
+        "edge": {
+          "version_added": "130"
+        },
+        "firefox": {
+          "version_added": "124"
+        },
+        "safari": {
+          "version_added": "17.5"
+        },
+        "safari_ios": {
+          "version_added": "17.5"
+        },
+        "webview_android": {
+          "version_added": "130"
+        }
+      }
+    },
+    {
+      "path": "css.properties.text-wrap-style.pretty",
+      "mdnUrl": null,
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "130"
+        },
+        "edge": {
+          "version_added": "130"
+        },
+        "firefox": {
+          "version_added": false
+        },
+        "safari": {
+          "version_added": "26"
+        },
+        "safari_ios": {
+          "version_added": "26"
+        },
+        "webview_android": {
+          "version_added": "130"
+        }
+      }
+    },
+    {
+      "path": "css.at-rules.position-try",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/At-rules/@position-try",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "125"
+        },
+        "edge": {
+          "version_added": "125"
+        },
+        "firefox": {
+          "version_added": "147"
+        },
+        "safari": {
+          "version_added": "26"
+        },
+        "safari_ios": {
+          "version_added": "26"
+        },
+        "webview_android": {
+          "version_added": "125"
+        }
+      }
+    },
+    {
+      "path": "css.properties.anchor-name",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Properties/anchor-name",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "125"
+        },
+        "edge": {
+          "version_added": "125"
+        },
+        "firefox": {
+          "version_added": "147"
+        },
+        "safari": {
+          "version_added": "26"
+        },
+        "safari_ios": {
+          "version_added": "26"
+        },
+        "webview_android": {
+          "version_added": "125"
+        }
+      }
+    },
+    {
+      "path": "css.properties.view-transition-class",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Properties/view-transition-class",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "125"
+        },
+        "edge": {
+          "version_added": "125"
+        },
+        "firefox": {
+          "version_added": "144"
+        },
+        "safari": {
+          "version_added": "18.2"
+        },
+        "safari_ios": {
+          "version_added": "18.2"
+        },
+        "webview_android": {
+          "version_added": "125"
+        }
+      }
+    },
+    {
+      "path": "css.at-rules.starting-style",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/At-rules/@starting-style",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "117"
+        },
+        "edge": {
+          "version_added": "117"
+        },
+        "firefox": {
+          "version_added": "129"
+        },
+        "safari": {
+          "version_added": "17.5"
+        },
+        "safari_ios": {
+          "version_added": "17.5"
+        },
+        "webview_android": {
+          "version_added": "117"
+        }
+      }
+    },
+    {
+      "path": "css.properties.animation-timeline",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Properties/animation-timeline",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "115"
+        },
+        "edge": {
+          "version_added": "115"
+        },
+        "firefox": {
+          "version_added": "preview"
+        },
+        "safari": {
+          "version_added": "26"
+        },
+        "safari_ios": {
+          "version_added": "26"
+        },
+        "webview_android": {
+          "version_added": "115"
+        }
+      }
+    },
+    {
+      "path": "css.at-rules.scope",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/At-rules/@scope",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "118"
+        },
+        "edge": {
+          "version_added": "118"
+        },
+        "firefox": {
+          "version_added": "146"
+        },
+        "safari": [
+          {
+            "version_added": "26.4"
+          },
+          {
+            "notes": "CSS rules within <code>@scope</code> are not applied to <code>&lt;input&gt;</code> and <code>&lt;textarea&gt;</code> elements.",
+            "partial_implementation": true,
+            "version_added": "26",
+            "version_last": "26.3",
+            "version_removed": "26.4"
+          },
+          {
+            "version_added": "17.4",
+            "version_last": "18.6",
+            "version_removed": "26"
+          }
+        ],
+        "safari_ios": [
+          {
+            "version_added": "26.4"
+          },
+          {
+            "notes": "CSS rules within <code>@scope</code> are not applied to <code>&lt;input&gt;</code> and <code>&lt;textarea&gt;</code> elements.",
+            "partial_implementation": true,
+            "version_added": "26",
+            "version_last": "26.3",
+            "version_removed": "26.4"
+          },
+          {
+            "version_added": "17.4",
+            "version_last": "18.6",
+            "version_removed": "26"
+          }
+        ],
+        "webview_android": {
+          "version_added": "118"
+        }
+      }
+    },
+    {
+      "path": "css.types.color.color-mix",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Values/color_value/color-mix",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "111"
+        },
+        "edge": {
+          "version_added": "111"
+        },
+        "firefox": {
+          "version_added": "113"
+        },
+        "safari": {
+          "version_added": "16.2"
+        },
+        "safari_ios": {
+          "version_added": "16.2"
+        },
+        "webview_android": {
+          "version_added": "111"
+        }
+      }
+    },
+    {
+      "path": "css.types.color.light-dark",
+      "mdnUrl": "https://developer.mozilla.org/docs/Web/CSS/Reference/Values/color_value/light-dark",
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "impl_url": "https://crbug.com/40284803",
+          "version_added": "123"
+        },
+        "edge": {
+          "impl_url": "https://crbug.com/40284803",
+          "version_added": "123"
+        },
+        "firefox": {
+          "version_added": "120"
+        },
+        "safari": {
+          "impl_url": "https://webkit.org/b/262914",
+          "version_added": "17.5"
+        },
+        "safari_ios": {
+          "impl_url": "https://webkit.org/b/262914",
+          "version_added": "17.5"
+        },
+        "webview_android": {
+          "impl_url": "https://crbug.com/40284803",
+          "version_added": "123"
+        }
+      }
+    },
+    {
+      "path": "css.properties.text-wrap.balance",
+      "mdnUrl": null,
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "114"
+        },
+        "edge": {
+          "version_added": "114"
+        },
+        "firefox": {
+          "version_added": "121"
+        },
+        "safari": {
+          "version_added": "17.5"
+        },
+        "safari_ios": {
+          "version_added": "17.5"
+        },
+        "webview_android": {
+          "version_added": "114"
+        }
+      }
+    },
+    {
+      "path": "css.properties.text-wrap.pretty",
+      "mdnUrl": null,
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "117"
+        },
+        "edge": {
+          "version_added": "117"
+        },
+        "firefox": {
+          "version_added": false
+        },
+        "safari": {
+          "version_added": "26"
+        },
+        "safari_ios": {
+          "version_added": "26"
+        },
+        "webview_android": {
+          "version_added": "117"
+        }
+      }
+    },
+    {
+      "path": "css.types.length.viewport_percentage_units_dynamic",
+      "mdnUrl": null,
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "108"
+        },
+        "edge": {
+          "version_added": "108"
+        },
+        "firefox": {
+          "version_added": "101"
+        },
+        "safari": {
+          "version_added": "15.4"
+        },
+        "safari_ios": {
+          "version_added": "15.4"
+        },
+        "webview_android": {
+          "version_added": "108"
+        }
+      }
+    },
+    {
+      "path": "css.types.length.viewport_percentage_units_small",
+      "mdnUrl": null,
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "108"
+        },
+        "edge": {
+          "version_added": "108"
+        },
+        "firefox": {
+          "version_added": "101"
+        },
+        "safari": {
+          "version_added": "15.4"
+        },
+        "safari_ios": {
+          "version_added": "15.4"
+        },
+        "webview_android": {
+          "version_added": "108"
+        }
+      }
+    },
+    {
+      "path": "css.types.length.container_query_length_units",
+      "mdnUrl": null,
+      "status": {
+        "deprecated": false,
+        "experimental": false,
+        "standard_track": true
+      },
+      "support": {
+        "chrome": {
+          "version_added": "105"
+        },
+        "edge": {
+          "version_added": "105"
+        },
+        "firefox": {
+          "version_added": "110"
+        },
+        "safari": {
+          "version_added": "16"
+        },
+        "safari_ios": {
+          "version_added": "16"
+        },
+        "webview_android": {
+          "version_added": "105"
+        }
+      }
+    }
+  ],
+  "executedProductChecks": [],
+  "limits": [
+    "Tarball integrity and source inspection do not qualify runtime behavior.",
+    "Type occurrences are inventory evidence, not compiler or browser support claims.",
+    "BCD support for a property does not qualify all values and subfeatures.",
+    "No product test, browser run, benchmark or migration was executed."
+  ]
+}
