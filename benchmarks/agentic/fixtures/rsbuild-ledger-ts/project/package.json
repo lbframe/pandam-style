@@ -1,0 +1,26 @@
+{
+  "name": "ledger",
+  "version": "2.0.3",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "rsbuild dev",
+    "build": "rsbuild build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pandamstyle/core": "0.1.0-alpha.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@pandamstyle/compiler": "0.1.0-alpha.1",
+    "@pandamstyle/rsbuild": "0.1.0-alpha.1",
+    "@rsbuild/core": "2.2.11",
+    "@rsbuild/plugin-react": "2.0.1",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "typescript": "5.9.3"
+  }
+}

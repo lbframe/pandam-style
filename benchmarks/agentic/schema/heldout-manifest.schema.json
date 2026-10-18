@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/schema/heldout-manifest.schema.json",
+  "title": "Held-out set manifest",
+  "description": "Committed metadata of the encrypted held-out set. Integrity and coverage are checkable without decryption.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "corpusVersion",
+    "digestAlgorithm",
+    "encryption",
+    "sealed",
+    "tasks"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "corpusVersion": {
+      "type": "string"
+    },
+    "digestAlgorithm": {
+      "const": "pms-tree-sha256/v1"
+    },
+    "encryption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool",
+        "cipher",
+        "mode",
+        "archive"
+      ],
+      "properties": {
+        "tool": {
+          "const": "gpg"
+        },
+        "cipher": {
+          "const": "AES256"
+        },
+        "mode": {
+          "const": "symmetric"
+        },
+        "archive": {
+          "type": "string"
+        }
+      }
+    },
+    "sealed": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "archiveSha256",
+            "plaintextSetDigest"
+          ],
+          "properties": {
+            "archiveSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "plaintextSetDigest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      ]
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "workflow",
+          "caseType",
+          "tags",
+          "fixture",
+          "classification",
+          "sha256"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "workflow": {
+            "$ref": "#/$defs/workflow"
+          },
+          "caseType": {
+            "enum": [
+              "positive",
+              "failure",
+              "boundary"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fixture": {
+            "type": "string"
+          },
+          "classification": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "enum": [
+                "expressible",
+                "missing-product-capability",
+                "missing-project-vocabulary"
+              ]
+            }
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "workflow": {
+      "enum": [
+        "discovery",
+        "composition",
+        "states",
+        "themes",
+        "slots",
+        "variants",
+        "repair",
+        "design-system-extension",
+        "audit",
+        "installation",
+        "migration",
+        "measurement",
+        "recovery",
+        "concurrent-edits"
+      ]
+    }
+  }
+}

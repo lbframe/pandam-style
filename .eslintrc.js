@@ -56,6 +56,12 @@ module.exports = {
     // `__tests__/pandamstyle/fixtures` tree above is not, and they are
     // regenerable from their committed manifests.
     '.pms-bench/',
+    // Agentic evaluation inputs: fixture projects, task overlays, oracle
+    // fixtures and held-out staging stand in for third-party applications,
+    // and their bytes are digested into corpus.lock.json.
+    'benchmarks/agentic/fixtures/',
+    'benchmarks/agentic/tasks/',
+    'benchmarks/agentic/heldout/',
     'evidence/*/artifacts/',
     'evidence/*/pilot/',
     'build',

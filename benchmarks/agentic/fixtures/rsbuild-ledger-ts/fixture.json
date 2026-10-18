@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "rsbuild-ledger-ts",
+  "description": "Rsbuild 2.2.11 + React TypeScript finance app. Three themes (light, dark, highContrast extends dark), state conditions driven by ARIA/data attributes, an alert slot recipe with compound variants and a field slot recipe with invalid/disabled states.",
+  "shape": ["single-package", "typescript", "react", "pandamstyle-installed", "theme-inheritance"],
+  "host": "rsbuild",
+  "hostVersion": "2.2.11",
+  "language": "typescript",
+  "pandamstyleInstalled": true,
+  "project": { "definition": "design.pandamstyle.config.js", "roots": ["src"], "outDir": ".pandamstyle" }
+}

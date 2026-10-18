@@ -1,0 +1,1885 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/schema/task.schema.json",
+  "title": "PandamStyle agentic evaluation task (pms-agentic-task/v1)",
+  "description": "One evaluation task: inputs given to the evaluated agent, its permissions and environment, and per-epoch independent oracles executed by the harness.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "title",
+    "split",
+    "workflow",
+    "caseType",
+    "tags",
+    "workspace",
+    "prompt",
+    "permissions",
+    "capabilities",
+    "environment",
+    "budget",
+    "expectations"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 80
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "split": {
+      "enum": [
+        "development",
+        "heldout"
+      ]
+    },
+    "workflow": {
+      "$ref": "#/$defs/workflow"
+    },
+    "caseType": {
+      "enum": [
+        "positive",
+        "failure",
+        "boundary"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+(:[a-z0-9.-]+)?$"
+      }
+    },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixture"
+      ],
+      "properties": {
+        "fixture": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "overlays": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+(/[a-z0-9-]+)*$"
+          }
+        },
+        "uncommittedOverlay": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+(/[a-z0-9-]+)*$"
+        },
+        "git": {
+          "enum": [
+            "baseline-commit",
+            "none"
+          ]
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/event"
+          }
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/service"
+          }
+        },
+        "prepare": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        }
+      }
+    },
+    "prompt": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+\\.md$"
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "writable",
+        "protected",
+        "allowDelete",
+        "harnessIgnored"
+      ],
+      "properties": {
+        "writable": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+          }
+        },
+        "protected": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+          }
+        },
+        "allowDelete": {
+          "type": "boolean"
+        },
+        "harnessIgnored": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "granted",
+        "withheld"
+      ],
+      "properties": {
+        "required": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "workspace.read",
+              "workspace.write",
+              "shell.exec",
+              "host.build",
+              "host.dev-server",
+              "design-system.edit",
+              "package.install",
+              "network.registry",
+              "git.read",
+              "git.write"
+            ]
+          }
+        },
+        "granted": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "workspace.read",
+              "workspace.write",
+              "shell.exec",
+              "host.build",
+              "host.dev-server",
+              "design-system.edit",
+              "package.install",
+              "network.registry",
+              "git.read",
+              "git.write"
+            ]
+          }
+        },
+        "withheld": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "workspace.read",
+              "workspace.write",
+              "shell.exec",
+              "host.build",
+              "host.dev-server",
+              "design-system.edit",
+              "package.install",
+              "network.registry",
+              "git.read",
+              "git.write"
+            ]
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "host",
+        "packageManager",
+        "install",
+        "pandamstyle",
+        "network"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "host": {
+          "enum": [
+            "vite",
+            "rsbuild",
+            "next-webpack",
+            "next-turbopack",
+            "webpack",
+            "none"
+          ]
+        },
+        "hostVersion": {
+          "type": "string"
+        },
+        "packageManager": {
+          "enum": [
+            "npm",
+            "yarn",
+            "pnpm"
+          ]
+        },
+        "install": {
+          "enum": [
+            "before-agent",
+            "none"
+          ]
+        },
+        "pandamstyle": {
+          "enum": [
+            "candidate-packages",
+            "none"
+          ]
+        },
+        "network": {
+          "enum": [
+            "none",
+            "package-registry"
+          ]
+        },
+        "browser": {
+          "type": "boolean"
+        },
+        "resources": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "pandamstyle-agent-docs"
+            ]
+          },
+          "description": "Read-only agent resources the runner mounts outside the workspace. pandamstyle-agent-docs: docs/agent-*.md, docs/reference/ and benchmarks/alpha1-reference.json of the product revision under test."
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeoutSeconds",
+        "maxTurns"
+      ],
+      "properties": {
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 7200
+        },
+        "maxTurns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    },
+    "project": {
+      "$ref": "#/$defs/project"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "expectations": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/expectation"
+      }
+    }
+  },
+  "$defs": {
+    "workflow": {
+      "enum": [
+        "discovery",
+        "composition",
+        "states",
+        "themes",
+        "slots",
+        "variants",
+        "repair",
+        "design-system-extension",
+        "audit",
+        "installation",
+        "migration",
+        "measurement",
+        "recovery",
+        "concurrent-edits"
+      ]
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "definition",
+        "roots",
+        "outDir"
+      ],
+      "properties": {
+        "definition": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+        },
+        "roots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+          }
+        },
+        "outDir": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "trigger",
+        "steps"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "trigger": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "after-tool-calls",
+                "after-seconds",
+                "after-file-write"
+              ]
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "seconds": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "glob": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+            }
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "command",
+        "readyPattern"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "command": {
+          "type": "string"
+        },
+        "readyPattern": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "expectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "intendedOutcome",
+        "checks"
+      ],
+      "properties": {
+        "classification": {
+          "enum": [
+            "expressible",
+            "missing-product-capability",
+            "missing-project-vocabulary"
+          ]
+        },
+        "classificationRationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intendedOutcome": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "summary"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "application-success",
+                "integration-success",
+                "read-only-report",
+                "capability-gap-diagnosis",
+                "vocabulary-gap-diagnosis",
+                "clarification",
+                "refusal",
+                "conflict-diagnosis"
+              ]
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "class",
+        "required",
+        "description"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "scope.diff",
+            "scope.unchanged",
+            "files.contains",
+            "compile.project",
+            "host.build",
+            "generated.consistent",
+            "definition.diff",
+            "static.forbidden",
+            "static.host-config",
+            "static.package-json",
+            "render.styles",
+            "report.final",
+            "transcript.commands",
+            "observation.runner",
+            "visual.fidelity"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "scope.diff"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "scope.diff"
+              },
+              "class": {
+                "enum": [
+                  "scope"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectChanges": {
+                "enum": [
+                  "none",
+                  "some",
+                  "any"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "scope.unchanged"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "scope.unchanged"
+              },
+              "class": {
+                "enum": [
+                  "scope"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "paths": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description",
+              "paths"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "files.contains"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "files.contains"
+              },
+              "class": {
+                "enum": [
+                  "scope",
+                  "static"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              },
+              "patterns": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "absent": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "exists": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description",
+              "path"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "compile.project"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "compile.project"
+              },
+              "class": {
+                "enum": [
+                  "compile"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expect": {
+                "enum": [
+                  "ok",
+                  "fail"
+                ]
+              },
+              "diagnosticCodes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^PMS_[A-Z_]+$"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description",
+              "expect"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "host.build"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "host.build"
+              },
+              "class": {
+                "enum": [
+                  "compile"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "script": {
+                "type": "string"
+              },
+              "timeoutSeconds": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "generated.consistent"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "generated.consistent"
+              },
+              "class": {
+                "enum": [
+                  "integrity"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "mode": {
+                "enum": [
+                  "no-hand-edits",
+                  "must-match"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description",
+              "mode"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "definition.diff"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "definition.diff"
+              },
+              "class": {
+                "enum": [
+                  "integrity"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "allowExtraAdded": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "static.forbidden"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "static.forbidden"
+              },
+              "class": {
+                "enum": [
+                  "static"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "files": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+                }
+              },
+              "rules": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "jsx-style-prop",
+                    "runtime-style-injection",
+                    "css-in-js-import",
+                    "stylesheet-import",
+                    "raw-classname",
+                    "type-escape",
+                    "direct-pandamstyle-import",
+                    "generated-internal-import",
+                    "dom-global-access",
+                    "dynamic-code",
+                    "privileged-import"
+                  ]
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description",
+              "rules"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "static.host-config"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "static.host-config"
+              },
+              "class": {
+                "enum": [
+                  "static"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              },
+              "module": {
+                "enum": [
+                  "@pandamstyle/vite",
+                  "@pandamstyle/rsbuild",
+                  "@pandamstyle/next"
+                ]
+              },
+              "expect": {
+                "type": "object"
+              },
+              "forbidOptions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "preservePlugins": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description",
+              "file",
+              "module",
+              "expect"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "static.package-json"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "static.package-json"
+              },
+              "class": {
+                "enum": [
+                  "static"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              },
+              "require": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "section": {
+                      "enum": [
+                        "dependencies",
+                        "devDependencies"
+                      ]
+                    },
+                    "spec": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "sameSpec": {
+                "type": "boolean"
+              },
+              "forbid": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "preserveExisting": {
+                "type": "boolean"
+              },
+              "allowScriptChanges": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description",
+              "require"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "render.styles"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "render.styles"
+              },
+              "class": {
+                "enum": [
+                  "rendered",
+                  "behavioral"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "render": {
+                "$ref": "#/$defs/render"
+              },
+              "select": {
+                "$ref": "#/$defs/selector"
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "context": {
+                "$ref": "#/$defs/renderContext"
+              },
+              "expect": {
+                "$ref": "#/$defs/renderExpect"
+              },
+              "interactions": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "testId",
+                    "event"
+                  ],
+                  "properties": {
+                    "testId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "event": {
+                      "enum": [
+                        "click",
+                        "change",
+                        "submit",
+                        "input"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description",
+              "render",
+              "select",
+              "expect"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "report.final"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "report.final"
+              },
+              "class": {
+                "enum": [
+                  "report"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/reportOutcome"
+                }
+              },
+              "gaps": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "require": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "kind"
+                      ],
+                      "properties": {
+                        "kind": {
+                          "$ref": "#/$defs/gapKind"
+                        },
+                        "subject": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "forbidKinds": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/gapKind"
+                    }
+                  }
+                }
+              },
+              "answers": {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/$defs/answerMatcher"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "transcript.commands"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "transcript.commands"
+              },
+              "class": {
+                "enum": [
+                  "transcript"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "forbid": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "require": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "observation.runner"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "observation.runner"
+              },
+              "class": {
+                "enum": [
+                  "environment"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expect": {},
+              "invalidatesRun": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description",
+              "observation",
+              "expect"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "visual.fidelity"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "kind": {
+                "const": "visual.fidelity"
+              },
+              "class": {
+                "enum": [
+                  "visual"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reference": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "class",
+              "required",
+              "description"
+            ]
+          }
+        }
+      ]
+    },
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "testId": {
+          "type": "string"
+        },
+        "testIdPrefix": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "within": {
+          "$ref": "#/$defs/selector"
+        }
+      }
+    },
+    "render": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module"
+      ],
+      "properties": {
+        "module": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+        },
+        "export": {
+          "type": "string"
+        },
+        "props": {
+          "type": "object"
+        },
+        "theme": {
+          "type": "string"
+        }
+      }
+    },
+    "renderContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "viewportWidth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "hover",
+              "focus",
+              "focus-visible",
+              "focus-within",
+              "active",
+              "visited",
+              "checked"
+            ]
+          }
+        },
+        "reducedMotion": {
+          "type": "boolean"
+        },
+        "colorScheme": {
+          "enum": [
+            "light",
+            "dark"
+          ]
+        }
+      }
+    },
+    "renderExpect": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "text": {
+          "type": "string"
+        },
+        "textMatches": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "styles": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "properties": {
+              "token": {
+                "type": "string"
+              },
+              "notToken": {
+                "type": "string"
+              },
+              "oneOfTokens": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "value": {
+                "type": "string"
+              },
+              "absent": {
+                "const": true
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "One case-insensitive regular expression per matched element, in document order."
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Default true: every match must be presented (not hidden, inert, template content, display:none, visibility:hidden or opacity:0)."
+        },
+        "callbacks": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "calls"
+            ],
+            "properties": {
+              "calls": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "description": "Spy callbacks (render props written {\"$pmsSpy\": name}) and how many times the interactions must call them; calls outside the interactions always fail."
+        }
+      }
+    },
+    "reportOutcome": {
+      "enum": [
+        "completed",
+        "blocked",
+        "needs-decision",
+        "refused"
+      ]
+    },
+    "gapKind": {
+      "enum": [
+        "missing-product-capability",
+        "missing-project-vocabulary",
+        "ambiguous-request",
+        "policy-conflict",
+        "unsupported-environment",
+        "conflicting-state"
+      ]
+    },
+    "answerMatcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "equals": {},
+        "oneOf": {
+          "type": "array"
+        },
+        "matches": {
+          "type": "string"
+        },
+        "includesAll": {
+          "type": "array"
+        },
+        "excludesAll": {
+          "type": "array"
+        },
+        "setEquals": {
+          "type": "array"
+        },
+        "absent": {
+          "const": true
+        },
+        "caseInsensitive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": [
+        "step"
+      ],
+      "properties": {
+        "step": {
+          "enum": [
+            "compile",
+            "replace",
+            "delete",
+            "write",
+            "rename",
+            "copy"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "compile"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "properties": {
+              "step": {
+                "const": "compile"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "replace"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "find",
+              "replace"
+            ],
+            "properties": {
+              "step": {
+                "const": "replace"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              },
+              "find": {
+                "type": "string",
+                "minLength": 1
+              },
+              "replace": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "delete"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ],
+            "properties": {
+              "step": {
+                "const": "delete"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "write"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "source"
+            ],
+            "properties": {
+              "step": {
+                "const": "write"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              },
+              "source": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+(/[A-Za-z0-9._-]+)+$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "rename"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "to"
+            ],
+            "properties": {
+              "step": {
+                "const": "rename"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "copy"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "to"
+            ],
+            "properties": {
+              "step": {
+                "const": "copy"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!\\./)(?!(.*/)?\\.\\.(/|$))[^\\s]+$"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

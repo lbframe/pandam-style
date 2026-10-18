@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "id": "measurement-boundary-theme-edit-estimate",
+  "title": "Quick estimate for one workload kind with exact reference cells",
+  "split": "development",
+  "workflow": "measurement",
+  "caseType": "boundary",
+  "tags": [
+    "host:next-webpack",
+    "project-shape:next-webpack-console",
+    "read-only"
+  ],
+  "workspace": {
+    "fixture": "next-webpack-console",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [],
+    "protected": [
+      "design.pandamstyle.config.mjs",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      ".next/**",
+      ".pandamstyle-next-host/**",
+      "next-env.d.ts"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "shell.exec"
+    ],
+    "granted": [
+      "workspace.read",
+      "shell.exec",
+      "git.read"
+    ],
+    "withheld": [
+      "workspace.write",
+      "host.build",
+      "host.dev-server",
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "next-webpack",
+    "hostVersion": "16.3.8",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 600,
+    "maxTurns": 30
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "read-only-report",
+        "summary": "The quick estimate names the exact theme reference cell and states that nothing was measured."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "none",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "report",
+          "kind": "report.final",
+          "class": "report",
+          "required": true,
+          "description": "Cites the exact reference corpus and theme row; never presents it as a prediction or measurement.",
+          "answers": {
+            "mode": {
+              "equals": "quick-estimate"
+            },
+            "measured": {
+              "equals": false
+            },
+            "referenceCorpus": {
+              "equals": "c10000-t1000-r100-s307"
+            },
+            "referenceRange": {
+              "matches": "theme",
+              "caseInsensitive": true
+            },
+            "statement": {
+              "matches": "no workload was executed",
+              "caseInsensitive": true
+            }
+          }
+        },
+        {
+          "id": "commands",
+          "kind": "transcript.commands",
+          "class": "transcript",
+          "required": true,
+          "forbid": [
+            "\\b(npm|yarn|pnpm)\\s+(run\\s+)?(build|dev|install|i|add|ci)\\b",
+            "\\bnext\\s+(build|dev)\\b"
+          ],
+          "description": "No build, dev or install command ran."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        }
+      ]
+    }
+  }
+}

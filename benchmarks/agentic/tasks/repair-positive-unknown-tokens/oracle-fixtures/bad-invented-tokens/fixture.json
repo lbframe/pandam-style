@@ -1,0 +1,12 @@
+{
+  "description": "Adds colors.surface.subtle and fontSizes.base to the definition so the build passes.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "fail",
+    "compile": "pass",
+    "vocabulary-unchanged": "fail",
+    "banner-surface": "fail",
+    "banner-text": "fail"
+  }
+}

@@ -1,0 +1,12 @@
+:root {
+  --docs-accent: #2563eb;
+  --docs-text: #111827;
+}
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: var(--docs-text);
+}
+.prose a {
+  color: var(--docs-accent);
+}

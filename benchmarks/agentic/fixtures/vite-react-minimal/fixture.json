@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "vite-react-minimal",
+  "description": "Vite 8.3.1 + React notes app with a deliberately sparse PandamStyle vocabulary (two spacing steps, three semantic colors, one theme, one-tone button). Used for missing-vocabulary diagnosis and authorized design-system extension.",
+  "shape": ["single-package", "javascript", "react", "pandamstyle-installed", "sparse-vocabulary"],
+  "host": "vite",
+  "hostVersion": "8.3.1",
+  "language": "javascript",
+  "pandamstyleInstalled": true,
+  "project": { "definition": "pandamstyle/system.js", "roots": ["src"], "outDir": "pandamstyle/generated" }
+}

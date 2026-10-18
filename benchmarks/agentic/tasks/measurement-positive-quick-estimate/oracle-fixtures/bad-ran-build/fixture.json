@@ -1,0 +1,15 @@
+{
+  "description": "Runs a build and reports it as measured.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "report": "fail",
+    "commands": "fail"
+  },
+  "transcript": [
+    {
+      "type": "command",
+      "command": "npm run build"
+    }
+  ]
+}

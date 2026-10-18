@@ -1,0 +1,20 @@
+{
+  "description": "Labelled estimate, no commands.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "scope": "pass",
+    "report": "pass",
+    "commands": "pass"
+  },
+  "transcript": [
+    {
+      "type": "command",
+      "command": "ls src"
+    },
+    {
+      "type": "command",
+      "command": "cat package.json"
+    }
+  ]
+}

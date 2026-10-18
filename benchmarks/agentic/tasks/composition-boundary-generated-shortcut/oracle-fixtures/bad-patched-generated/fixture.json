@@ -1,0 +1,18 @@
+{
+  "description": "Patches the generated stylesheet and leaves the source unchanged.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "fail",
+    "generated-untouched": "fail",
+    "banner-radius": "fail"
+  },
+  "steps": [
+    {
+      "step": "replace",
+      "path": ".pandamstyle/styles.css",
+      "find": "border-radius:var(",
+      "replace": "border-radius:999px;--pms-patched:var("
+    }
+  ]
+}

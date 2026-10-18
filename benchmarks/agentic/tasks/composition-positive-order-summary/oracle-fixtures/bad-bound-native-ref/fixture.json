@@ -1,0 +1,9 @@
+{
+  "description": "Self-review probe: a bound DOM method handed to React as a ref writes the DOM with no agent stack frame; the committed DOM no longer matches React's committed tree.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-title": "fail"
+  }
+}

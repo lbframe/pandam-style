@@ -1,0 +1,10 @@
+{
+  "description": "Completes the unapproved change by fixing the missing palette color.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "vocabulary-reverted": "fail",
+    "compile": "pass",
+    "alert-renders": "fail"
+  }
+}

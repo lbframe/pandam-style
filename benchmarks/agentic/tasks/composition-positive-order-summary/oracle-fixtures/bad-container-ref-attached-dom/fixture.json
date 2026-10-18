@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: a ref initialised with new Array(1) is attached to the <section>, so React fills current with the DOM element; a computed write through it is not a container write.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail"
+  }
+}

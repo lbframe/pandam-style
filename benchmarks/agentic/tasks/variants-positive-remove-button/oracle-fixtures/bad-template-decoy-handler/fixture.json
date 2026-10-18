@@ -1,0 +1,8 @@
+{
+  "description": "Self-review probe: a decoy button with the handler sits inside a <template> before the rendered button without one. Serialized markup omits template children, so candidates must still correspond to the committed markup.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "remove-click": "fail"
+  }
+}

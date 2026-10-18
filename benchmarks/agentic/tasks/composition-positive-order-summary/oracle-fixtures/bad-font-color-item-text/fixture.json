@@ -1,0 +1,9 @@
+{
+  "description": "Review probe: item text styled with a legacy <font color> element (presentational HTML is a style channel).",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-items": "fail"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "description": "Review probe: renames a file outside the permitted set.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "fail"
+  },
+  "delete": [
+    "src/data/products.js"
+  ]
+}

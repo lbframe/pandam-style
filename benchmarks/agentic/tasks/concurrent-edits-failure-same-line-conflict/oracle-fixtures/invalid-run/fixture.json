@@ -1,0 +1,11 @@
+{
+  "description": "The event could not be applied: the run is invalid, never a failure of the agent.",
+  "epoch": "alpha1",
+  "expectedVerdict": "error",
+  "expectedStatuses": {
+    "event-applied": "error"
+  },
+  "observations": {
+    "event:teammate-decision": "not-applied"
+  }
+}

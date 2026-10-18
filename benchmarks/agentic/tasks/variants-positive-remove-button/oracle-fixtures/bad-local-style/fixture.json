@@ -1,0 +1,10 @@
+{
+  "description": "Recreates the danger look with a local create() style instead of the recipe (no hover).",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "remove-default": "fail",
+    "remove-hover": "fail",
+    "compile": "pass"
+  }
+}

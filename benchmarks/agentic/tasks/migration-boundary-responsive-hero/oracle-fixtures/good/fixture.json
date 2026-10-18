@@ -1,0 +1,16 @@
+{
+  "description": "Responsive map over base/wide.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "hero-small": "pass",
+    "hero-breakpoint": "pass",
+    "hero-title": "pass",
+    "hero-lead": "pass",
+    "legacy-removed": "pass"
+  },
+  "delete": [
+    "src/legacy/PromoHero.jsx",
+    "src/legacy/PromoHero.module.css"
+  ]
+}

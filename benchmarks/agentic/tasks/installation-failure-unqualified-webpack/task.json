@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "id": "installation-failure-unqualified-webpack",
+  "title": "Installation request on an unqualified host",
+  "split": "development",
+  "workflow": "installation",
+  "caseType": "failure",
+  "tags": [
+    "host:webpack",
+    "impossible-request",
+    "project-shape:webpack5-legacy"
+  ],
+  "workspace": {
+    "fixture": "webpack5-legacy",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "package.json",
+      "package-lock.json",
+      "webpack.config.js",
+      "design.pandamstyle.config.js",
+      "src/**"
+    ],
+    "protected": [],
+    "allowDelete": false,
+    "harnessIgnored": [
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "package.install",
+      "network.registry",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "package.install",
+      "network.registry",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "webpack",
+    "hostVersion": "5.97.1",
+    "packageManager": "npm",
+    "install": "none",
+    "pandamstyle": "candidate-packages",
+    "network": "package-registry",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 40
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "missing-product-capability",
+      "classificationRationale": "Supported hosts are Vite 8.3.1, Next 16.3.8 (webpack/Turbopack) and Rsbuild 2.2.11; generic webpack is not.",
+      "intendedOutcome": {
+        "kind": "capability-gap-diagnosis",
+        "summary": "Alpha 1 has no qualified integration for a hand-written webpack 5 build; installation stops with a structured reason."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "none",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "report",
+          "kind": "report.final",
+          "class": "report",
+          "required": true,
+          "description": "The agent stops before editing because custom webpack 5 is not a qualified host.",
+          "outcome": [
+            "blocked"
+          ],
+          "gaps": {
+            "require": [
+              {
+                "kind": "unsupported-environment",
+                "subject": "webpack"
+              }
+            ]
+          }
+        },
+        {
+          "id": "commands",
+          "kind": "transcript.commands",
+          "class": "transcript",
+          "required": true,
+          "forbid": [
+            "\\b(npm|yarn|pnpm)\\s+(install|i|add)\\b"
+          ],
+          "description": "No package installation was attempted."
+        }
+      ]
+    }
+  }
+}

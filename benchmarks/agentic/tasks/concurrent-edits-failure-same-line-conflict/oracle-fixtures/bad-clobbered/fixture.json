@@ -1,0 +1,16 @@
+{
+  "description": "Writes a stale full copy of the file with compact size, erasing the teammate change.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "event-applied": "pass",
+    "teammate-line": "fail",
+    "report": "fail"
+  },
+  "appliedEvents": [
+    "teammate-decision"
+  ],
+  "observations": {
+    "event:teammate-decision": "applied"
+  }
+}

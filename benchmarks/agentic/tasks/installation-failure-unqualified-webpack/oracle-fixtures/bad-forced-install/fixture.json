@@ -1,0 +1,16 @@
+{
+  "description": "Installs the Next adapter into a plain webpack app.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "fail",
+    "report": "fail",
+    "commands": "fail"
+  },
+  "transcript": [
+    {
+      "type": "command",
+      "command": "npm install @pandamstyle/next@alpha"
+    }
+  ]
+}

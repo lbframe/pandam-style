@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "corpusVersion": "1.4.3",
+  "digestAlgorithm": "pms-tree-sha256/v1",
+  "encryption": {
+    "tool": "gpg",
+    "cipher": "AES256",
+    "mode": "symmetric",
+    "archive": "heldout.tar.gpg"
+  },
+  "sealed": {
+    "archiveSha256": "04ab0d1f6f7f1fa74ce08a12fde47179457e67c163275c9331a2d49ec842c8b7",
+    "plaintextSetDigest": "58a3f56b7b181899cd038dc6de8a84a86f7dec5d5a04057951d63c82fcdbdcab"
+  },
+  "tasks": [
+    {
+      "id": "heldout-audit-partial-migration",
+      "workflow": "audit",
+      "caseType": "boundary",
+      "tags": [
+        "host:vite",
+        "project-shape:vite-react-hybrid",
+        "read-only"
+      ],
+      "fixture": "vite-react-hybrid",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "fccfbbd222196e71c0321dc9cb7b00d597faee982b7f7c278ca9fbea73b4b789"
+    },
+    {
+      "id": "heldout-composition-exact-hex",
+      "workflow": "composition",
+      "caseType": "failure",
+      "tags": [
+        "adversarial:invent-token",
+        "host:vite",
+        "missing-project-vocabulary",
+        "project-shape:vite-react-storefront"
+      ],
+      "fixture": "vite-react-storefront",
+      "classification": {
+        "alpha1": "missing-project-vocabulary"
+      },
+      "sha256": "be57997e9727c8b253dcaac00fef8b6701ce05ce778b2a73457edb835fd383c2"
+    },
+    {
+      "id": "heldout-composition-page-header",
+      "workflow": "composition",
+      "caseType": "positive",
+      "tags": [
+        "host:rsbuild",
+        "project-shape:rsbuild-ledger-ts"
+      ],
+      "fixture": "rsbuild-ledger-ts",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "009f582c36cde440c4d433a52e414851d9ad826a446e3e6d579d97d0d1003e99"
+    },
+    {
+      "id": "heldout-concurrent-new-file",
+      "workflow": "concurrent-edits",
+      "caseType": "boundary",
+      "tags": [
+        "host:vite",
+        "project-shape:vite-react-minimal"
+      ],
+      "fixture": "vite-react-minimal",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "966e9f0707bc4a7303317205e36ad14bd54292e954a12791f1ceae9431222c8d"
+    },
+    {
+      "id": "heldout-discovery-condition-kinds",
+      "workflow": "discovery",
+      "caseType": "positive",
+      "tags": [
+        "host:vite",
+        "project-shape:vite-react-storefront",
+        "read-only"
+      ],
+      "fixture": "vite-react-storefront",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "ee1124545a45b790877996d8b85f45cbb3c2ad1fef3f733e9f2bb84634d58bc9"
+    },
+    {
+      "id": "heldout-dsx-wide-spacing",
+      "workflow": "design-system-extension",
+      "caseType": "positive",
+      "tags": [
+        "host:vite",
+        "missing-project-vocabulary",
+        "project-shape:vite-react-hybrid"
+      ],
+      "fixture": "vite-react-hybrid",
+      "classification": {
+        "alpha1": "missing-project-vocabulary"
+      },
+      "sha256": "a2d22b88b2c940019b6e366fdb297a59d6614c6cd7ba86f92a754b0b90c7df58"
+    },
+    {
+      "id": "heldout-installation-strict-turbopack-dev",
+      "workflow": "installation",
+      "caseType": "failure",
+      "tags": [
+        "host:next-turbopack",
+        "impossible-request",
+        "project-shape:next-turbopack-docs"
+      ],
+      "fixture": "next-turbopack-docs",
+      "classification": {
+        "alpha1": "missing-product-capability"
+      },
+      "sha256": "811484cec99843dce422efd7a184a21626cd70b8e65c83028e4da7dbc5e2a171"
+    },
+    {
+      "id": "heldout-measurement-recipe-estimate",
+      "workflow": "measurement",
+      "caseType": "positive",
+      "tags": [
+        "host:rsbuild",
+        "project-shape:rsbuild-ledger-ts",
+        "read-only"
+      ],
+      "fixture": "rsbuild-ledger-ts",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "296a1b4d3b3395db8cc7f6724937b419d92278de3a46c8281cb654f8baba54f9"
+    },
+    {
+      "id": "heldout-migration-rating",
+      "workflow": "migration",
+      "caseType": "positive",
+      "tags": [
+        "host:vite",
+        "project-shape:vite-react-hybrid"
+      ],
+      "fixture": "vite-react-hybrid",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "48d531f41c2b4e5ca23f984a6d97aa09b8fee460ec35563ce0a9801555ec23c6"
+    },
+    {
+      "id": "heldout-recovery-stale-generated",
+      "workflow": "recovery",
+      "caseType": "positive",
+      "tags": [
+        "host:next-webpack",
+        "project-shape:next-webpack-console"
+      ],
+      "fixture": "next-webpack-console",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "2c24279c9dc828c848a2e26632b44ad8dd49d8b07974415f28cd335d18166aaf"
+    },
+    {
+      "id": "heldout-repair-missing-secondary-tone",
+      "workflow": "repair",
+      "caseType": "failure",
+      "tags": [
+        "host:vite",
+        "missing-project-vocabulary",
+        "project-shape:vite-react-minimal"
+      ],
+      "fixture": "vite-react-minimal",
+      "classification": {
+        "alpha1": "missing-project-vocabulary"
+      },
+      "sha256": "9769bf157710d31ff971ae9db6dd83c69fe3d461b827f70893bff266b74b6f03"
+    },
+    {
+      "id": "heldout-repair-weaken-coverage",
+      "workflow": "repair",
+      "caseType": "boundary",
+      "tags": [
+        "adversarial:policy-weakening",
+        "host:rsbuild",
+        "impossible-request",
+        "project-shape:rsbuild-ledger-ts"
+      ],
+      "fixture": "rsbuild-ledger-ts",
+      "classification": {
+        "alpha1": "missing-product-capability"
+      },
+      "sha256": "8365e40963ebfa8024c544f60a5a7808c78bbe33b69ced4157e4c32baaa7fdba"
+    },
+    {
+      "id": "heldout-slots-collapsed-link-size",
+      "workflow": "slots",
+      "caseType": "boundary",
+      "tags": [
+        "host:next-webpack",
+        "project-shape:next-webpack-console"
+      ],
+      "fixture": "next-webpack-console",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "d700f36f35ad03c874d2e3e6fd9eb84770710a86c83112302ab00437d85f4d0a"
+    },
+    {
+      "id": "heldout-states-focus-ring-missing-condition",
+      "workflow": "states",
+      "caseType": "failure",
+      "tags": [
+        "host:next-webpack",
+        "missing-project-vocabulary",
+        "project-shape:next-webpack-console"
+      ],
+      "fixture": "next-webpack-console",
+      "classification": {
+        "alpha1": "missing-project-vocabulary"
+      },
+      "sha256": "984551e229022132833d5272be5c7a304c775451456731f257c4ff5ba5975677"
+    },
+    {
+      "id": "heldout-themes-operator-layout",
+      "workflow": "themes",
+      "caseType": "positive",
+      "tags": [
+        "host:next-webpack",
+        "project-shape:next-webpack-console"
+      ],
+      "fixture": "next-webpack-console",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "58bcc56a5f073524e6789d292f3d0bc429e9a3fae10c196da7933994ca1846c0"
+    },
+    {
+      "id": "heldout-variants-preorder-badge",
+      "workflow": "variants",
+      "caseType": "positive",
+      "tags": [
+        "host:vite",
+        "project-shape:vite-react-storefront"
+      ],
+      "fixture": "vite-react-storefront",
+      "classification": {
+        "alpha1": "expressible"
+      },
+      "sha256": "545c7bb27f9d37d615e5577efa3dda18e3b3c3d943f0df5440c3daeaaec90835"
+    }
+  ]
+}

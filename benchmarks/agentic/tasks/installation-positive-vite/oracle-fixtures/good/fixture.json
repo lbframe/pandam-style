@@ -1,0 +1,13 @@
+{
+  "description": "Correct installation; the host build is not executed in local fixture runs, so the verdict is unmeasured, not pass.",
+  "epoch": "alpha1",
+  "expectedVerdict": "unmeasured",
+  "expectedStatuses": {
+    "scope": "pass",
+    "host-config": "pass",
+    "packages": "pass",
+    "definition": "pass",
+    "compile": "pass",
+    "host-build": "unmeasured"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "description": "Review probe: item lines render without content (count alone would pass).",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "summary-items": "fail",
+    "mounted-on-page": "fail",
+    "summary-card": "pass"
+  }
+}

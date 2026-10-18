@@ -1,0 +1,11 @@
+{
+  "description": "Review probe: the summary root carries the hidden attribute.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "summary-card": "fail",
+    "summary-title": "fail",
+    "mounted-on-page": "fail",
+    "compile": "pass"
+  }
+}

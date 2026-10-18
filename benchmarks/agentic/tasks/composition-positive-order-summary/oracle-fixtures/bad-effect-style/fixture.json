@@ -1,0 +1,9 @@
+{
+  "description": "An effect mutates document.body.style; SSR never runs effects, the sandbox exercise does.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-card": "fail"
+  }
+}

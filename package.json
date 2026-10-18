@@ -13,7 +13,10 @@
     "prettier:report": "prettier --check \"**/*.{js,jsx,mjs,cjs,flow,tsx,mts,ts}\"",
     "lint": "npm run lint:report -- --fix",
     "lint:report": "eslint . --ext .flow,.js,.jsx,.mjs,.cjs,.ts,.tsx,.mts",
-    "test": "./verify-pms.sh"
+    "test": "./verify-pms.sh",
+    "bench:agentic:validate": "node benchmarks/agentic/bin/pms-agentic.mjs validate && node benchmarks/agentic/bin/pms-agentic.mjs heldout guard",
+    "bench:agentic:install": "yarn --cwd benchmarks/agentic/dom install --frozen-lockfile --non-interactive",
+    "bench:agentic:test": "node --test benchmarks/agentic/__tests__/*.test.mjs"
   },
   "workspaces": [
     "packages/core",

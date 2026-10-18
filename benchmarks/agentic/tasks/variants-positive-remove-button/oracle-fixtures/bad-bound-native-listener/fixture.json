@@ -1,0 +1,9 @@
+{
+  "description": "Self-review probe: a bound DOM method registered as an event listener writes the DOM during the interaction with no agent stack frame.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "remove-click": "fail"
+  }
+}

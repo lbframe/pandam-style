@@ -1,0 +1,10 @@
+{
+  "description": "Accepts the prop but always applies the light theme.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "dark-shell": "fail",
+    "light-default": "pass",
+    "compile": "pass"
+  }
+}

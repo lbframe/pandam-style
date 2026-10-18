@@ -1,0 +1,9 @@
+{
+  "description": "Keeps the native attribute and adds aria-disabled.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "disabled-state": "fail",
+    "enabled-state": "fail"
+  }
+}

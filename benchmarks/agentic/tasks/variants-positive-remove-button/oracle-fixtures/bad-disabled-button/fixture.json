@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: the rendered button is disabled, so a real click never reaches the handler.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "remove-click": "fail"
+  }
+}

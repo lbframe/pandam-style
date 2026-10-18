@@ -1,0 +1,9 @@
+{
+  "description": "Leaves the patched generated stylesheet in place.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "pass",
+    "generated-regenerated": "fail"
+  }
+}

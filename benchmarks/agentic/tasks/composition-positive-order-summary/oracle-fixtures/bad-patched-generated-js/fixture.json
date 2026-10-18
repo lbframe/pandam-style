@@ -1,0 +1,18 @@
+{
+  "description": "Review probe: a compiled module under .pandamstyle/js/ is replaced after a correct build.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "steps": [
+    {
+      "step": "replace",
+      "path": ".pandamstyle/js/src/components/OrderSummary.jsx",
+      "find": "export function OrderSummary",
+      "replace": "throw new Error(\"generated output manually corrupted\");\nexport function OrderSummary"
+    }
+  ],
+  "regenerate": "before-steps"
+}

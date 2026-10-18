@@ -1,0 +1,9 @@
+{
+  "description": "Review probe: a checkout click injects an inline-styled element through raw markup.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-card": "fail"
+  }
+}

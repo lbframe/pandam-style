@@ -1,0 +1,17 @@
+{
+  "description": "A file is added to the generated directory after a correct build.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "steps": [
+    {
+      "step": "copy",
+      "path": ".pandamstyle/js/src/components/OrderSummary.jsx",
+      "to": ".pandamstyle/js/extra.js"
+    }
+  ],
+  "regenerate": "before-steps"
+}

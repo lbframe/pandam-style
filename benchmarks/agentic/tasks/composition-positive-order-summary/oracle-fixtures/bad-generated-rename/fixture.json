@@ -1,0 +1,17 @@
+{
+  "description": "A compiled module is renamed after a correct build.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "steps": [
+    {
+      "step": "rename",
+      "path": ".pandamstyle/js/src/components/OrderSummary.jsx",
+      "to": ".pandamstyle/js/src/components/OrderSummary.jsx.renamed"
+    }
+  ],
+  "regenerate": "before-steps"
+}

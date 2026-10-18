@@ -1,0 +1,15 @@
+{
+  "description": "Chip recipe, wired, legacy deleted.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "tag-parity": "pass",
+    "portal-wired": "pass",
+    "legacy-removed": "pass",
+    "scope": "pass"
+  },
+  "delete": [
+    "src/legacy/PriceTag.jsx",
+    "src/legacy/PriceTag.module.css"
+  ]
+}

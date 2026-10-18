@@ -1,0 +1,15 @@
+{
+  "description": "Writes from a stale buffer, losing the memo field.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "memo-kept": "fail",
+    "hint-text": "pass"
+  },
+  "appliedEvents": [
+    "memo-field"
+  ],
+  "observations": {
+    "event:memo-field": "applied"
+  }
+}

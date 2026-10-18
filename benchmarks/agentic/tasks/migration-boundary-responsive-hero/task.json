@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "id": "migration-boundary-responsive-hero",
+  "title": "Migrate responsive padding onto a declared media condition",
+  "split": "development",
+  "workflow": "migration",
+  "caseType": "boundary",
+  "tags": [
+    "host:vite",
+    "project-shape:vite-react-hybrid"
+  ],
+  "workspace": {
+    "fixture": "vite-react-hybrid",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/ui/PromoHero.jsx",
+      "src/Portal.jsx",
+      "src/legacy/PromoHero.jsx",
+      "src/legacy/PromoHero.module.css"
+    ],
+    "protected": [
+      "design/system.mjs",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": true,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "The legacy min-width 900px query maps exactly onto the declared `wide` condition."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "hero-small",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/ui/PromoHero.jsx",
+            "export": "PromoHero",
+            "props": {
+              "title": "Autumn"
+            }
+          },
+          "select": {
+            "testId": "promo-hero"
+          },
+          "expect": {
+            "styles": {
+              "padding": {
+                "token": "spacing.s4"
+              },
+              "gap": {
+                "token": "spacing.s3"
+              },
+              "background-color": {
+                "token": "colors.surface.muted"
+              },
+              "border-radius": {
+                "token": "radii.card"
+              }
+            }
+          },
+          "description": "Below 900px: base padding.",
+          "context": {
+            "viewportWidth": 899
+          }
+        },
+        {
+          "id": "hero-breakpoint",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/ui/PromoHero.jsx",
+            "export": "PromoHero",
+            "props": {
+              "title": "Autumn"
+            }
+          },
+          "select": {
+            "testId": "promo-hero"
+          },
+          "expect": {
+            "styles": {
+              "padding": {
+                "token": "spacing.s6"
+              }
+            }
+          },
+          "description": "At exactly 900px the legacy min-width query applies.",
+          "context": {
+            "viewportWidth": 900
+          }
+        },
+        {
+          "id": "hero-title",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/ui/PromoHero.jsx",
+            "export": "PromoHero",
+            "props": {
+              "title": "Autumn"
+            }
+          },
+          "select": {
+            "testId": "promo-title"
+          },
+          "expect": {
+            "text": "Autumn",
+            "styles": {
+              "font-size": {
+                "token": "fontSizes.xl"
+              },
+              "font-weight": {
+                "token": "fontWeights.bold"
+              }
+            }
+          },
+          "description": "Title parity."
+        },
+        {
+          "id": "hero-lead",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/ui/PromoHero.jsx",
+            "export": "PromoHero",
+            "props": {
+              "title": "Autumn"
+            }
+          },
+          "select": {
+            "testId": "promo-lead"
+          },
+          "expect": {
+            "text": "Hand-picked stays for long weekends.",
+            "styles": {
+              "font-size": {
+                "token": "fontSizes.md"
+              }
+            }
+          },
+          "description": "Lead parity."
+        },
+        {
+          "id": "legacy-removed",
+          "kind": "files.contains",
+          "class": "scope",
+          "required": true,
+          "path": "src/legacy/PromoHero.module.css",
+          "description": "Legacy stylesheet removed.",
+          "exists": false
+        }
+      ]
+    }
+  }
+}

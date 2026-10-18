@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "id": "audit-failure-unqualified-webpack",
+  "title": "Audit of a project on an unqualified host",
+  "split": "development",
+  "workflow": "audit",
+  "caseType": "failure",
+  "tags": [
+    "host:webpack",
+    "project-shape:webpack5-legacy",
+    "read-only"
+  ],
+  "workspace": {
+    "fixture": "webpack5-legacy",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [],
+    "protected": [],
+    "allowDelete": false,
+    "harnessIgnored": [
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "shell.exec"
+    ],
+    "granted": [
+      "workspace.read",
+      "shell.exec",
+      "git.read"
+    ],
+    "withheld": [
+      "workspace.write",
+      "host.build",
+      "host.dev-server",
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "webpack",
+    "hostVersion": "5.97.1",
+    "packageManager": "npm",
+    "install": "none",
+    "pandamstyle": "none",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 40
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "read-only-report",
+        "summary": "The audit completes and states that the host is outside the Alpha 1 qualified matrix."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "none",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "report",
+          "kind": "report.final",
+          "class": "report",
+          "required": true,
+          "description": "The custom webpack 5 host is reported as not qualified rather than inferred compatible.",
+          "answers": {
+            "audit.schemaVersion": {
+              "equals": "pandamstyle-audit/v1"
+            },
+            "audit.stack.bundler.name": {
+              "matches": "webpack",
+              "caseInsensitive": true
+            },
+            "audit.stack.bundler.version": {
+              "equals": "5.97.1"
+            },
+            "audit.stack.compatibility.status": {
+              "equals": "not_qualified"
+            },
+            "audit.project.sourceFiles.jsx": {
+              "equals": 2
+            }
+          }
+        },
+        {
+          "id": "commands",
+          "kind": "transcript.commands",
+          "class": "transcript",
+          "required": true,
+          "forbid": [
+            "\\b(npm|yarn|pnpm|bun)\\s+(run\\s+)?(build|dev|start|install|i|add|ci)\\b",
+            "\\b(vite|next|webpack|rsbuild)\\s+(build|dev|serve)\\b",
+            "\\bnpx\\b"
+          ],
+          "description": "No install, build or script execution."
+        }
+      ]
+    }
+  }
+}

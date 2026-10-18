@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: cloneElement removes the onClick handler of the rendered button.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "remove-click": "fail"
+  }
+}

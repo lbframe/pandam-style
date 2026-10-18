@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: as above, the element is stored by a for-of head (for (r.current of [el])).",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail"
+  }
+}

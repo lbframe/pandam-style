@@ -1,0 +1,13 @@
+{
+  "description": "Drops the responsive rule.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "hero-small": "pass",
+    "hero-breakpoint": "fail"
+  },
+  "delete": [
+    "src/legacy/PromoHero.jsx",
+    "src/legacy/PromoHero.module.css"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "description": "Review probe: the whole summary is wrapped in compiler-approved clipPath inset(50%). Clipping is not measurable statically, so the verdict is unmeasured, never pass.",
+  "epoch": "alpha1",
+  "expectedVerdict": "unmeasured",
+  "expectedStatuses": {
+    "summary-card": "unmeasured",
+    "summary-title": "unmeasured",
+    "compile": "pass"
+  }
+}

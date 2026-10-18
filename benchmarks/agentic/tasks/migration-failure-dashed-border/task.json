@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "id": "migration-failure-dashed-border",
+  "title": "Migration blocked by an unsupported border style",
+  "split": "development",
+  "workflow": "migration",
+  "caseType": "failure",
+  "tags": [
+    "host:vite",
+    "impossible-request",
+    "project-shape:vite-react-hybrid"
+  ],
+  "workspace": {
+    "fixture": "vite-react-hybrid",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/ui/**",
+      "src/Portal.jsx",
+      "src/legacy/TripSummary.jsx",
+      "src/legacy/TripSummary.module.css"
+    ],
+    "protected": [
+      "design/system.mjs",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "missing-product-capability",
+      "classificationRationale": "Alpha 1 borderStyle domain is {solid} and composite border shorthands are rejected.",
+      "intendedOutcome": {
+        "kind": "capability-gap-diagnosis",
+        "summary": "Visual parity is impossible (borderStyle admits only solid; composite borderTop is rejected); the batch stops for review."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "any",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "legacy-kept",
+          "kind": "files.contains",
+          "class": "scope",
+          "required": true,
+          "path": "src/legacy/TripSummary.module.css",
+          "description": "The construct stays in its existing styling system.",
+          "patterns": [
+            "dashed"
+          ]
+        },
+        {
+          "id": "portal-legacy",
+          "kind": "files.contains",
+          "class": "scope",
+          "required": true,
+          "path": "src/Portal.jsx",
+          "description": "Portal keeps the legacy component until a mapping is decided.",
+          "patterns": [
+            "legacy/TripSummary"
+          ]
+        },
+        {
+          "id": "report",
+          "kind": "report.final",
+          "class": "report",
+          "required": true,
+          "description": "The dashed top border has no supported equivalent and is reported for review.",
+          "outcome": [
+            "blocked",
+            "needs-decision"
+          ],
+          "gaps": {
+            "require": [
+              {
+                "kind": "missing-product-capability",
+                "subject": "dashed|border"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

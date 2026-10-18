@@ -1,0 +1,17 @@
+{
+  "description": "Review probe: a compiled module is replaced and its digest updated in the generation state.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "generationEdits": [
+    {
+      "op": "rewrite",
+      "rel": "js/src/components/OrderSummary.jsx",
+      "content": "export const tampered = true;\n"
+    }
+  ],
+  "regenerate": true
+}

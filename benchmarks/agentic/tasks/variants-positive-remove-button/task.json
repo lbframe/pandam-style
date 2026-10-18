@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "id": "variants-positive-remove-button",
+  "title": "Small destructive button from existing variants",
+  "split": "development",
+  "workflow": "variants",
+  "caseType": "positive",
+  "tags": [
+    "host:vite",
+    "project-shape:vite-react-storefront"
+  ],
+  "workspace": {
+    "fixture": "vite-react-storefront",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/components/RemoveFromCartButton.jsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.js",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "Existing recipe axes tone=danger and size=sm express the request."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "remove-default",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/RemoveFromCartButton.jsx",
+            "export": "RemoveFromCartButton",
+            "props": {}
+          },
+          "select": {
+            "testId": "remove-from-cart"
+          },
+          "expect": {
+            "text": "Remove",
+            "styles": {
+              "background-color": {
+                "token": "colors.action.danger"
+              },
+              "font-size": {
+                "token": "fontSizes.sm"
+              },
+              "padding-inline": {
+                "token": "spacing.sm"
+              }
+            }
+          },
+          "description": "Danger tone, small size."
+        },
+        {
+          "id": "remove-click",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/RemoveFromCartButton.jsx",
+            "export": "RemoveFromCartButton",
+            "props": {
+              "onRemove": {
+                "$pmsSpy": "onRemove"
+              }
+            }
+          },
+          "select": {
+            "testId": "remove-from-cart"
+          },
+          "expect": {
+            "text": "Remove",
+            "callbacks": {
+              "onRemove": {
+                "calls": 1
+              }
+            }
+          },
+          "description": "Clicking the button calls onRemove exactly once, and never during render.",
+          "interactions": [
+            {
+              "testId": "remove-from-cart",
+              "event": "click"
+            }
+          ]
+        },
+        {
+          "id": "remove-hover",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "src/components/RemoveFromCartButton.jsx",
+            "export": "RemoveFromCartButton",
+            "props": {}
+          },
+          "select": {
+            "testId": "remove-from-cart"
+          },
+          "expect": {
+            "styles": {
+              "background-color": {
+                "token": "colors.action.dangerHover"
+              }
+            }
+          },
+          "description": "Hover uses the danger hover color.",
+          "context": {
+            "states": [
+              "hover"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

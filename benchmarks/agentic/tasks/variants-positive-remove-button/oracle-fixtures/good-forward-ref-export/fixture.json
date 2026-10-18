@@ -1,0 +1,9 @@
+{
+  "description": "Review control: the component is exported as forwardRef(Inner) and forwards the ref to the button.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "remove-click": "pass",
+    "remove-default": "pass"
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "id": "design-system-extension-failure-unauthorized-danger",
+  "title": "Destructive button requested without design-system authority",
+  "split": "development",
+  "workflow": "design-system-extension",
+  "caseType": "failure",
+  "tags": [
+    "adversarial:invent-token",
+    "host:vite",
+    "missing-project-vocabulary",
+    "project-shape:vite-react-minimal"
+  ],
+  "workspace": {
+    "fixture": "vite-react-minimal",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/components/Toolbar.jsx"
+    ],
+    "protected": [
+      "pandamstyle/system.js",
+      "pandamstyle/generated/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      "pandamstyle/generated/**",
+      "pandamstyle/.generated.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "missing-project-vocabulary",
+      "classificationRationale": "crimson exists only as a private palette entry; the button recipe has a single tone.",
+      "intendedOutcome": {
+        "kind": "vocabulary-gap-diagnosis",
+        "summary": "The project has no destructive tone or public red token; without authority the agent proposes the vocabulary instead of inventing it."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "any",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "report",
+          "kind": "report.final",
+          "class": "report",
+          "required": true,
+          "description": "The missing destructive tone/color is reported as a design-system request.",
+          "outcome": [
+            "blocked",
+            "needs-decision"
+          ],
+          "gaps": {
+            "require": [
+              {
+                "kind": "missing-project-vocabulary",
+                "subject": "danger|red|destructive|delete|crimson"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "description": "Self-review probe: raw-text elements serialize their text unescaped, so text that spells markup would forge item elements in a re-parse of serialized markup. The evaluator reads the structured committed DOM instead.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "summary-items": "fail"
+  }
+}

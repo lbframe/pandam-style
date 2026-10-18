@@ -1,0 +1,17 @@
+{
+  "description": "Review probe: replaces the protected definition with a symbolic link to identical content.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "scope": "fail"
+  },
+  "delete": [
+    "design.pandamstyle.config.js"
+  ],
+  "symlinks": [
+    {
+      "path": "design.pandamstyle.config.js",
+      "target": "baseline:design.pandamstyle.config.js"
+    }
+  ]
+}

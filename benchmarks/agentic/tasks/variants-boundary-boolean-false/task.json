@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "id": "variants-boundary-boolean-false",
+  "title": "Boolean variant where false is a real selection",
+  "split": "development",
+  "workflow": "variants",
+  "caseType": "boundary",
+  "tags": [
+    "host:next-webpack",
+    "project-shape:next-webpack-console"
+  ],
+  "workspace": {
+    "fixture": "next-webpack-console",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "components/ServiceCard.jsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.mjs",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      ".next/**",
+      ".pandamstyle-next-host/**",
+      "next-env.d.ts"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "next-webpack",
+    "hostVersion": "16.3.8",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "The boolean muted axis is selected from a derived boolean; false is an explicit selection."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "failing-paused",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "components/ServiceCard.jsx",
+            "export": "ServiceCard",
+            "props": {
+              "service": {
+                "id": "b",
+                "name": "Billing",
+                "healthy": false,
+                "paused": true
+              }
+            }
+          },
+          "select": {
+            "testId": "service-health"
+          },
+          "expect": {
+            "text": "Failing",
+            "styles": {
+              "opacity": {
+                "absent": true
+              },
+              "background-color": {
+                "token": "colors.failing"
+              }
+            }
+          },
+          "description": "Failing and paused: not muted."
+        },
+        {
+          "id": "healthy-paused",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "components/ServiceCard.jsx",
+            "export": "ServiceCard",
+            "props": {
+              "service": {
+                "id": "s",
+                "name": "Search",
+                "healthy": true,
+                "paused": true
+              }
+            }
+          },
+          "select": {
+            "testId": "service-health"
+          },
+          "expect": {
+            "text": "Healthy",
+            "styles": {
+              "opacity": {
+                "value": "0.6"
+              },
+              "background-color": {
+                "token": "colors.healthy"
+              }
+            }
+          },
+          "description": "Healthy and paused: muted."
+        },
+        {
+          "id": "healthy-active",
+          "kind": "render.styles",
+          "class": "behavioral",
+          "required": true,
+          "render": {
+            "module": "components/ServiceCard.jsx",
+            "export": "ServiceCard",
+            "props": {
+              "service": {
+                "id": "a",
+                "name": "API",
+                "healthy": true,
+                "paused": false
+              }
+            }
+          },
+          "select": {
+            "testId": "service-health"
+          },
+          "expect": {
+            "styles": {
+              "opacity": {
+                "absent": true
+              }
+            }
+          },
+          "description": "Active: not muted."
+        }
+      ]
+    }
+  }
+}

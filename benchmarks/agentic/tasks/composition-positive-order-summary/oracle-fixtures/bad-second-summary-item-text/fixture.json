@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: item text in the second <summary> of a closed <details>; only the first summary is presented.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "summary-items": "fail"
+  }
+}

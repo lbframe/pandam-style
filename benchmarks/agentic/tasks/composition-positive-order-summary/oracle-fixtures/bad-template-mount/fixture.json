@@ -1,0 +1,9 @@
+{
+  "description": "Review probe: the summary is mounted inside <template> content on the page.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "mounted-on-page": "fail",
+    "summary-card": "pass"
+  }
+}

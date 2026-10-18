@@ -1,0 +1,16 @@
+{
+  "description": "Minimal edit after re-reading the file.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "event-applied": "pass",
+    "memo-kept": "pass",
+    "hint-text": "pass"
+  },
+  "appliedEvents": [
+    "memo-field"
+  ],
+  "observations": {
+    "event:memo-field": "applied"
+  }
+}

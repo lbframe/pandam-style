@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "next-webpack-console",
+  "description": "Next.js 16.3.8 App Router admin console built with the webpack backend. Two PandamStyle roots (app/, components/), a nav slot recipe, a status pill recipe with boolean axis and an operator theme.",
+  "shape": ["single-package", "javascript", "next-app-router", "multiple-roots", "pandamstyle-installed"],
+  "host": "next-webpack",
+  "hostVersion": "16.3.8",
+  "language": "javascript",
+  "pandamstyleInstalled": true,
+  "project": { "definition": "design.pandamstyle.config.mjs", "roots": ["app", "components"], "outDir": ".pandamstyle" }
+}

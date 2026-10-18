@@ -1,0 +1,8 @@
+{
+  "description": "Review probe: the element is stored through an object destructuring pattern ({ node: r.current } = { node: el }) and a computed style access through the ref sits behind a branch the render never reaches.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail"
+  }
+}

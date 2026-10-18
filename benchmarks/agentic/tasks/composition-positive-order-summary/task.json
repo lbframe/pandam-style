@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "id": "composition-positive-order-summary",
+  "title": "Compose an order summary card on the product page",
+  "split": "development",
+  "workflow": "composition",
+  "caseType": "positive",
+  "tags": [
+    "host:vite",
+    "project-shape:vite-react-storefront",
+    "reference-oracle-fixture"
+  ],
+  "workspace": {
+    "fixture": "vite-react-storefront",
+    "git": "baseline-commit"
+  },
+  "prompt": "prompt.md",
+  "permissions": {
+    "writable": [
+      "src/components/OrderSummary.jsx",
+      "src/pages/ProductPage.jsx"
+    ],
+    "protected": [
+      "design.pandamstyle.config.js",
+      ".pandamstyle/**"
+    ],
+    "allowDelete": false,
+    "harnessIgnored": [
+      ".pandamstyle/**",
+      "..pandamstyle.pms-state.json",
+      "dist/**"
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build"
+    ],
+    "granted": [
+      "workspace.read",
+      "workspace.write",
+      "shell.exec",
+      "host.build",
+      "git.read"
+    ],
+    "withheld": [
+      "design-system.edit",
+      "package.install",
+      "network.registry",
+      "git.write"
+    ]
+  },
+  "environment": {
+    "node": "22.22.0",
+    "host": "vite",
+    "hostVersion": "8.3.1",
+    "packageManager": "npm",
+    "install": "before-agent",
+    "pandamstyle": "candidate-packages",
+    "network": "none",
+    "browser": false,
+    "resources": [
+      "pandamstyle-agent-docs"
+    ]
+  },
+  "budget": {
+    "timeoutSeconds": 900,
+    "maxTurns": 60
+  },
+  "expectations": {
+    "alpha1": {
+      "classification": "expressible",
+      "intendedOutcome": {
+        "kind": "application-success",
+        "summary": "A raised card with title, item lines and a full-width primary button is composed from existing recipes and mounted on the page."
+      },
+      "checks": [
+        {
+          "id": "scope",
+          "kind": "scope.diff",
+          "class": "scope",
+          "required": true,
+          "expectChanges": "some",
+          "description": "Every workspace change matches the permitted files; protected paths are untouched."
+        },
+        {
+          "id": "compile",
+          "kind": "compile.project",
+          "class": "compile",
+          "required": true,
+          "expect": "ok",
+          "description": "A fresh compile of the final sources through the Project Service succeeds (necessary, never sufficient)."
+        },
+        {
+          "id": "no-bypass",
+          "kind": "static.forbidden",
+          "class": "static",
+          "required": true,
+          "rules": [
+            "jsx-style-prop",
+            "runtime-style-injection",
+            "css-in-js-import",
+            "stylesheet-import",
+            "raw-classname",
+            "type-escape",
+            "direct-pandamstyle-import",
+            "generated-internal-import",
+            "dom-global-access",
+            "dynamic-code",
+            "privileged-import"
+          ],
+          "description": "No newly introduced raw style channel, runtime style injection, stylesheet, CSS-in-JS, type escape or generated-internal import."
+        },
+        {
+          "id": "generated-untouched",
+          "kind": "generated.consistent",
+          "class": "integrity",
+          "required": true,
+          "mode": "no-hand-edits",
+          "description": "Generated design-system output is either untouched or byte-identical to fresh compiler output."
+        },
+        {
+          "id": "vocabulary-unchanged",
+          "kind": "definition.diff",
+          "class": "integrity",
+          "required": true,
+          "added": [],
+          "removed": [],
+          "changed": [],
+          "description": "The design-system vocabulary (tokens, conditions, themes, recipes) is unchanged."
+        },
+        {
+          "id": "summary-card",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/OrderSummary.jsx",
+            "export": "OrderSummary",
+            "props": {
+              "items": [
+                {
+                  "id": "a",
+                  "name": "Mug",
+                  "quantity": 1
+                },
+                {
+                  "id": "b",
+                  "name": "Tote",
+                  "quantity": 2
+                }
+              ]
+            }
+          },
+          "select": {
+            "testId": "order-summary"
+          },
+          "expect": {
+            "styles": {
+              "box-shadow": {
+                "token": "shadows.raised"
+              },
+              "background-color": {
+                "token": "colors.surface.page"
+              },
+              "border-radius": {
+                "token": "radii.md"
+              }
+            }
+          },
+          "description": "Card root uses the raised card vocabulary."
+        },
+        {
+          "id": "summary-title",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/OrderSummary.jsx",
+            "export": "OrderSummary",
+            "props": {
+              "items": [
+                {
+                  "id": "a",
+                  "name": "Mug",
+                  "quantity": 1
+                },
+                {
+                  "id": "b",
+                  "name": "Tote",
+                  "quantity": 2
+                }
+              ]
+            }
+          },
+          "select": {
+            "testId": "order-summary-title"
+          },
+          "expect": {
+            "text": "Order summary",
+            "styles": {
+              "font-size": {
+                "token": "fontSizes.lg"
+              },
+              "font-weight": {
+                "token": "fontWeights.bold"
+              }
+            }
+          },
+          "description": "Title uses the card title slot."
+        },
+        {
+          "id": "summary-items",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/OrderSummary.jsx",
+            "export": "OrderSummary",
+            "props": {
+              "items": [
+                {
+                  "id": "a",
+                  "name": "Mug",
+                  "quantity": 1
+                },
+                {
+                  "id": "b",
+                  "name": "Tote",
+                  "quantity": 2
+                }
+              ]
+            }
+          },
+          "select": {
+            "testId": "order-summary-item"
+          },
+          "expect": {
+            "count": 2,
+            "texts": [
+              "\\b1\\b.*\\bMug\\b|\\bMug\\b.*\\b1\\b",
+              "\\b2\\b.*\\bTote\\b|\\bTote\\b.*\\b2\\b"
+            ]
+          },
+          "description": "One visible line per item showing its quantity and name."
+        },
+        {
+          "id": "checkout-button",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/components/OrderSummary.jsx",
+            "export": "OrderSummary",
+            "props": {
+              "items": [
+                {
+                  "id": "a",
+                  "name": "Mug",
+                  "quantity": 1
+                },
+                {
+                  "id": "b",
+                  "name": "Tote",
+                  "quantity": 2
+                }
+              ]
+            }
+          },
+          "select": {
+            "testId": "checkout-button"
+          },
+          "expect": {
+            "text": "Checkout",
+            "styles": {
+              "background-color": {
+                "token": "colors.action.primary"
+              },
+              "color": {
+                "token": "colors.text.inverse"
+              },
+              "width": {
+                "value": "100%"
+              }
+            }
+          },
+          "description": "Full-width primary button."
+        },
+        {
+          "id": "mounted-on-page",
+          "kind": "render.styles",
+          "class": "rendered",
+          "required": true,
+          "render": {
+            "module": "src/pages/ProductPage.jsx",
+            "export": "ProductPage"
+          },
+          "select": {
+            "testId": "order-summary-item",
+            "within": {
+              "testId": "order-summary"
+            }
+          },
+          "expect": {
+            "count": 1,
+            "texts": [
+              "\\b2\\b.*Canvas tote|Canvas tote.*\\b2\\b"
+            ]
+          },
+          "description": "The product page shows the summary with the requested item data (2 x Canvas tote)."
+        },
+        {
+          "id": "visual-fidelity",
+          "kind": "visual.fidelity",
+          "class": "visual",
+          "required": false,
+          "description": "Spacing and alignment of the summary match the existing product cards. Unmeasured in alpha1: no pixel-level oracle exists; never counted as passed."
+        }
+      ]
+    }
+  }
+}
