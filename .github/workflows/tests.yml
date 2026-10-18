@@ -110,6 +110,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: crate-ci/typos@v1
+      # Pin the exact release: the floating `v1` tag is deprecated and its
+      # dictionary changes would move the oracle without a repository change.
+      - uses: crate-ci/typos@v1.50.2
         with:
           config: .github/workflows/typos.toml

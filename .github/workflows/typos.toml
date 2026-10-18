@@ -11,7 +11,31 @@ extend-exclude = [
   "docs/architecture/agentic-optimizations-review.md",
 ]
 
+[default]
+# Each pattern accepts one exact inherited occurrence, never a general word, so
+# a new misspelling of the same letters is still reported.
+extend-ignore-re = [
+  # `.styl` is the Stylus stylesheet extension. The compiler deliberately
+  # rejects it alongside `.css`, `.scss`, `.sass` and `.less`.
+  '(?:\.|\|)styl\b',
+  # French comments inherited from the demonstrator. `policy/properties.js` is
+  # digest-pinned reviewed evidence, so translating it requires re-review.
+  'Un seul registre alimente politique, compilation et manifeste',
+  'les styles passent tous par le moteur du fork',
+  '// Mouvement\b',
+]
+
+[default.extend-identifiers]
+# "ANDed" is the boolean-AND verb in the digest-pinned composition contract of
+# docs/agent-use.md, not a misspelling of "Dead".
+ANDed = "ANDed"
+
 [default.extend-words]
 # Ignore false-positives
 stylex = "stylex"
 nd = "nd"
+# `<unparseable>` is an emitted coverage-gap request identifier
+# (project/graph/coverage.js, project/session/fresh.js); comments name the same
+# state. Renaming it to the dictionary's preferred `unparsable` would change
+# product output.
+unparseable = "unparseable"
