@@ -303,10 +303,11 @@ export function compositeContrast(m) {
   for (const node of m.chain) {
     if (node.image && back.T > 0)
       return { ratio: null, reason: 'background-image' };
-    const [br, bg, bb, ba] = node.background;
+    const color = node.background.slice(0, 3);
+    const layerAlpha = node.background[3];
     const group = ({ P, T }) => {
-      const premultiplied = [br, bg, bb].map((c, k) => P[k] + T * ba * c);
-      const coverage = 1 - T + T * ba;
+      const premultiplied = color.map((c, k) => P[k] + T * layerAlpha * c);
+      const coverage = 1 - T + T * layerAlpha;
       return {
         P: premultiplied.map((c) => node.opacity * c),
         T: 1 - node.opacity * coverage,
