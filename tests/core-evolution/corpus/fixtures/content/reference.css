@@ -1,0 +1,162 @@
+/* Content and marketing reference outcome. Authored for CE-00.2; not compiler output. */
+
+body {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #242b24;
+  background-color: #ffffff;
+  text-rendering: optimizeLegibility;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 64px 24px;
+  text-align: center;
+  background-image: linear-gradient(180deg, #edf2e8 0%, #ffffff 100%);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  margin: 0;
+  max-width: 24ch;
+  font-size: 40px;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.hero-lede {
+  margin: 0;
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+.cta {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 999px;
+  color: #ffffff;
+  background-color: #3e563f;
+  text-decoration-line: none;
+}
+
+.cta:hover {
+  background-color: #304431;
+}
+
+.cta:focus-visible {
+  outline-width: 3px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 3px;
+}
+
+.article {
+  max-width: 62ch;
+  margin-inline: auto;
+  padding: 32px 24px;
+}
+
+.article-heading {
+  font-size: 24px;
+  scroll-margin-top: 64px;
+}
+
+.article-body {
+  hyphens: auto;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+.steps {
+  padding-inline-start: 24px;
+  list-style-type: decimal;
+}
+
+.step::marker {
+  font-weight: 600;
+  color: #3e563f;
+}
+
+.quote {
+  margin-inline: 0;
+  padding-inline-start: 16px;
+  border-inline-start-width: 4px;
+  border-inline-start-style: solid;
+  border-inline-start-color: #c9d6c2;
+  font-style: italic;
+}
+
+.columns {
+  column-count: 2;
+  column-gap: 32px;
+  column-rule-width: 1px;
+  column-rule-style: solid;
+  column-rule-color: #e8ebe3;
+  hyphens: auto;
+}
+
+.code {
+  overflow-x: auto;
+  padding: 16px;
+  border-radius: 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  white-space: pre;
+  tab-size: 2;
+  background-color: #f4f6f0;
+}
+
+.inline-link {
+  color: #2f5b3a;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.inline-link:visited {
+  color: #4b3a6b;
+}
+
+.footer {
+  padding: 24px;
+  text-align: center;
+  color: #697067;
+}
+
+@media (max-width: 650px) {
+  .hero-title {
+    font-size: 28px;
+  }
+  .columns {
+    column-count: 1;
+  }
+}
+
+@media print {
+  .hero {
+    background-image: none;
+  }
+  .cta {
+    display: none;
+  }
+  .article {
+    max-width: none;
+  }
+  .article-heading {
+    break-after: avoid;
+  }
+  .quote {
+    break-inside: avoid;
+  }
+}

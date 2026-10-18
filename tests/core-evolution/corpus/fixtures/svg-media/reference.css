@@ -1,0 +1,128 @@
+/* SVG and media reference outcome. Authored for CE-00.2; not compiler output. */
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: system-ui, sans-serif;
+  color: #1f2421;
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-style: none;
+  border-radius: 6px;
+  color: #3e563f;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background-color: #edf2e8;
+}
+
+.icon-button:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 2px;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart {
+  width: 240px;
+  height: 80px;
+  overflow: visible;
+}
+
+.chart-line {
+  fill: none;
+  stroke: #3e563f;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-guide {
+  stroke: #c4cabe;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-label {
+  font-size: 6px;
+  fill: #697067;
+  dominant-baseline: middle;
+}
+
+.media {
+  width: 320px;
+  margin: 24px 0;
+}
+
+.media-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: 50% 30%;
+  border-radius: 12px;
+}
+
+.media-caption {
+  margin-block-start: 8px;
+  font-size: 13px;
+  color: #697067;
+}
+
+.qr {
+  width: 220px;
+  height: 220px;
+  padding: 8px;
+  background-color: #ffffff;
+}
+
+.qr-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.masked {
+  width: 64px;
+  height: 64px;
+  background-color: #3e563f;
+  mask-image: url('media.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mix-blend-mode: multiply;
+}
+
+@media (forced-colors: active) {
+  .icon,
+  .chart-line {
+    stroke: CanvasText;
+  }
+  .masked {
+    forced-color-adjust: none;
+  }
+}

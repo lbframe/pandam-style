@@ -1,0 +1,230 @@
+/* Application shell reference outcome. Authored for CE-00.2; not compiler output. */
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1f2421;
+  background-color: #f6f7f3;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  grid-template-rows: 40px minmax(0, 1fr);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.titlebar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 12px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #e3e6de;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.titlebar-name {
+  font-weight: 600;
+}
+
+.titlebar-action {
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: #eef1ea;
+  border-inline-end-width: 1px;
+  border-inline-end-style: solid;
+  border-inline-end-color: #e3e6de;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding-inline: 8px;
+  border-radius: 6px;
+  color: inherit;
+  text-decoration-line: none;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background-color: #e3e8dc;
+}
+
+.nav-item:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 2px;
+}
+
+.nav-item[aria-current='page'] {
+  background-color: #dce5d6;
+  font-weight: 600;
+}
+
+.nav-icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.nav-label {
+  flex: 1 1 0%;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.nav-count {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
+.presence {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-block-start: auto;
+  font-size: 12px;
+}
+
+.presence-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #2f7d4b;
+  animation-name: pulse;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: #f6f7f3;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.primary-action {
+  cursor: pointer;
+}
+
+.primary-action:active {
+  transform: translateY(1px);
+}
+
+.feed {
+  margin: 0;
+  padding: 0 16px 16px;
+  list-style-type: none;
+}
+
+.feed-item {
+  min-height: 64px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #e3e6de;
+}
+
+.toast-region {
+  position: fixed;
+  inset-block-end: 16px;
+  inset-inline-end: 16px;
+  z-index: 10;
+}
+
+.toast {
+  margin: 0;
+  max-width: 420px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #ffffff;
+  background-color: #1f2421;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.4;
+  }
+}
+
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+  .nav-label,
+  .nav-count {
+    display: none;
+  }
+  .nav-item {
+    justify-content: center;
+  }
+}
+
+@media (pointer: coarse) {
+  .nav-item {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presence-dot {
+    animation-name: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .nav-item[aria-current='page'] {
+    outline-width: 1px;
+    outline-style: solid;
+    outline-color: CanvasText;
+  }
+  .presence-dot {
+    background-color: CanvasText;
+  }
+}

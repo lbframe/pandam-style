@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-oracles.v1.schema.json",
+  "title": "CE-00.2 proof oracle definitions",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-proof-oracles"
+    },
+    "task": {
+      "const": "CE-00.2"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "outcomeClasses": {
+      "type": "object",
+      "properties": {
+        "compiler-accepted": {
+          "type": "string",
+          "minLength": 1
+        },
+        "compiler-rejected": {
+          "type": "string",
+          "minLength": 1
+        },
+        "vocabulary-gap": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unsupported-behavior": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fidelity-pass": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fidelity-failure": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "compiler-accepted",
+        "compiler-rejected",
+        "vocabulary-gap",
+        "unsupported-behavior",
+        "fidelity-pass",
+        "fidelity-failure"
+      ]
+    },
+    "states": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "requiredInteractionStates": {
+      "type": "object",
+      "properties": {
+        "pointer": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "touch": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "keyboard": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "error": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "loading": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "disabled": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "high-contrast": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "pointer",
+        "touch",
+        "keyboard",
+        "error",
+        "loading",
+        "disabled",
+        "high-contrast"
+      ]
+    },
+    "oracles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^ORC-[A-Z0-9]+$"
+          },
+          "class": {
+            "enum": [
+              "accepted-vocabulary",
+              "expected-css",
+              "layout",
+              "text",
+              "state",
+              "keyboard",
+              "accessibility",
+              "csp"
+            ]
+          },
+          "evidenceClass": {
+            "enum": ["E2", "E3", "E4"]
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "inputs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "procedure": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "assertionKinds": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "comparator": {
+            "type": "string",
+            "minLength": 1
+          },
+          "independence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "negativeControl": {
+            "type": "string",
+            "minLength": 1
+          },
+          "executionOwners": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^CE-[0-9]{2}$"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "class",
+          "evidenceClass",
+          "question",
+          "inputs",
+          "procedure",
+          "assertionKinds",
+          "independence",
+          "negativeControl",
+          "executionOwners"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "task",
+    "status",
+    "policy",
+    "outcomeClasses",
+    "states",
+    "requiredInteractionStates",
+    "oracles"
+  ]
+}

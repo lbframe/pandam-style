@@ -1,26 +1,41 @@
-# Core evolution inventory and profile specifications
+# Core evolution inventory, profiles and proof corpus
 
 These files implement the CE-00.1 scope contract described in
-[the registry document](../../docs/research/core-evolution-registry.md). They
-contain specifications and record tooling only. They change no product behavior
-and are not part of the product test suites.
+[the registry document](../../docs/research/core-evolution-registry.md) and the
+CE-00.2 proof corpus and classifier calibration described
+[below](#proof-corpus-and-classifier-calibration-ce-002). They contain
+specifications, fixtures and record tooling only. They change no product
+behavior and are not part of the product test suites.
 
 ## Files
 
 | Path                                                               | Kind      | Content                                                                                                                                            |
 | ------------------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Path                                                               | Kind      | Content                                                                                                                                            |
-| ---                                                                | ---       | ---                                                                                                                                                |
 | `classification-rules.v1.json`                                     | authored  | Disposition definitions, ordered procedure, curated records, alias audits, families and overlay requirements                                       |
 | `profiles.v1.json`                                                 | authored  | The nine accepted project profiles and their required capability families                                                                          |
 | `capabilities.v1.json`                                             | authored  | CAP-01–CAP-48 dispositions, owners, planned proof records, limitations, request cases and lot issues                                               |
 | `scope-decisions.v1.json`                                          | authored  | Source-format decisions (D-SF-01..10, closing in CE-13) and browser-profile decisions (D-BP-01..11 and D-BP-13 closing in CE-01, D-BP-12 in CE-13) |
-| `schema/*.schema.json`                                             | authored  | JSON Schemas for the six validated records                                                                                                         |
+| `schema/*.schema.json`                                             | authored  | JSON Schemas for the six CE-00.1 records and the seven CE-00.2 records                                                                             |
 | `validate.mjs`                                                     | tool      | Dependency-free validator and drift self-test                                                                                                      |
 | `tools/derive-registry.mjs`                                        | tool      | Pure derivation of the registry from authored inputs and recorded facts, shared by builder and validator                                           |
 | `tools/*.mjs`, `tools/regenerate.sh`                               | tool      | Key extraction, emission probes, registry observation and registry build                                                                           |
 | `../../docs/research/core-evolution-registry.v1.json`              | generated | The registry; rebuild it, never edit it                                                                                                            |
 | `../../docs/research/core-evolution-upstream-observations.v1.json` | generated | Timestamped comparator refresh; regenerate it, never edit it                                                                                       |
+| `corpus/corpus.v1.json`                                            | authored  | CE-00.2 positive fixtures, success criteria, assertions and negative fixtures                                                                      |
+| `corpus/oracles.v1.json`                                           | authored  | CE-00.2 oracle definitions, outcome classes and interaction states                                                                                 |
+| `corpus/fixtures/*/`                                               | authored  | Reference pages, stylesheets and assets pinned by the corpus manifest                                                                              |
+| `corpus/calibration/baseline.v1.json`                              | authored  | Reported consumer baseline, recovered classifier provenance, inputs, reproduction and calibration limits                                           |
+| `corpus/calibration/*.declarations.v1.json`                        | generated | Redacted consumer declaration sets; extract them with `tools/coverage`, never edit them                                                            |
+| `corpus/accounting.v1.json`                                        | generated | Accounting of every corpus declaration; regenerate with `node tools/coverage/cli.mjs corpus`                                                       |
+| `corpus/calibration/approved-identifiers.v1.json`                  | authored  | Consumer identifiers that may be published, each with a reason                                                                                     |
+| `corpus/calibration/publication-review.v1.json`                    | authored  | Review pin over the published calibration text and approved identifiers                                                                            |
+| `corpus/scope-findings.v1.json`                                    | authored  | Findings handed to owning lots (SF-01 to SF-03)                                                                                                    |
+| `corpus/negative/vendor-system.v1.json`                            | authored  | Second design system of the mixed-system negative fixture                                                                                          |
+| `corpus/reference-check.v1.json`                                   | generated | Reference-page results in Chromium; rerun `check-references.mjs`, never edit                                                                       |
+| `validate-corpus.mjs`                                              | tool      | CE-00.2 validator and mutation self-test                                                                                                           |
+| `run-negatives.mjs`, `check-references.mjs`                        | tool      | Negative fixtures against the Alpha 1 build; reference pages in Chromium                                                                           |
+| `closed-surface.mjs`, `reference-judge.mjs`                        | tool      | Closed-type checks and walker; shared reference verdicts                                                                                           |
+| `corpus/calibration/README.md`                                     | authored  | Prose for every id the closed calibration records use                                                                                              |
 
 Changing an authored record requires regenerating the registry. Each registry
 entry keeps its recorded upstream facts (`sources`, `bcd`, `bcdRelations`,
@@ -140,3 +155,168 @@ The extraction and both emission probes are deterministic, and the observation
 record names their digests. Each run refreshes the npm observation, so its
 timestamps and response digests change. A newer `latest` tag is recorded as
 `newer-latest-requires-delta-review`; it never replaces the pinned comparator.
+
+## Proof corpus and classifier calibration (CE-00.2)
+
+The corpus binds reproducible outcomes to the CE-00.1 profiles and capability
+fixture sets. Its parts are kept apart: compiler acceptance, vocabulary gaps,
+unsupported behavior and rendered fidelity are separate outcome classes. The
+reference pages are checked in a real browser, and the negative fixtures run
+against the Alpha 1 compiler build. Product oracle execution (a build compared
+with the references) belongs to the lots named in each oracle.
+
+- **Positive fixtures.** Ten authored reference pages: application shell, forms,
+  notices and empty states, dense data grid, content, RTL and vertical text, SVG
+  and media, SSR with a lazy route, component library, and an interaction-state
+  matrix. Every profile's fixture classes are covered. Each fixture states
+  accepted vocabulary, expected CSS, geometry, text wrapping, state behavior,
+  keyboard, accessibility and CSP criteria as positive, boundary or negative
+  oracle assertions.
+- **Reference check.** `check-references.mjs` renders each reference page in
+  Chromium 148.0.7778.96 (playwright-core 1.60.0) under its CSP. It evaluates
+  every layout, text, state, keyboard, accessibility and CSP assertion and every
+  negative control that applies to a page.
+  - Keyboard stops need a painted indicator, not only `:focus-visible`. That
+    means a visible outline, shadow or border that focus added or changed
+    (non-zero width and alpha), on a node that stays visible after compositing
+    (opacity, filter, visibility, display and content-visibility of the element
+    and its ancestors).
+  - The pixel evidence is counterfactual. With the element focused, screenshot A
+    is the page as is. Screenshot B is the same focused page with only the
+    indicator paint suppressed. An adopted constructed style sheet, in a cascade
+    layer and only for the focused element (and its styled sibling when it is
+    visually hidden), so the DOM is untouched, uses `!important` declarations to
+    put each focus-changed outline and box-shadow longhand back to its unfocused
+    value, and give each focus-changed border side its unfocused color (or
+    `transparent`) while keeping its focused width and style, so B never changes
+    geometry. At least 40 pixels of the indicator ring must differ between A and
+    B by more than 24 in some RGB channel. Clipping, masks, overlays, transforms
+    and positioning are the same in A and B, so an indicator they hide cancels
+    out.
+  - Isolation guard: the scroll position and the `getBoundingClientRect()` box
+    of the focused node and of every element or text node meeting the ring
+    region must agree between A and B within 0.5px. Otherwise the stop records
+    `isolation: false` with its reason, attributes no pixel and fails.
+  - Residual limitation: a background-color, pseudo-element or text change is
+    not attributed as an indicator, so a stop whose only focus change is of such
+    a kind fails. An indicator whose focus change is layout only (a wider border
+    of the same color, a size or padding change) is not attributed and fails; it
+    needs a different oracle in CE-05.1 (#59). A layout and paint change is
+    credited for its paint only. No reference stop relies on either.
+  - Documented limitation, not fixed: the keyboard oracle can credit removal of
+    a contrasting unfocused indicator as a visible focused indicator when
+    screenshot B restores the unfocused paint. It is handed to CE-05.1 (#59)
+    below.
+  - Contrast composites, it does not read RGB alone. The painted text color
+    (`-webkit-text-fill-color`) keeps its alpha. Each node from the element to
+    the root records its background color with alpha, its group opacity
+    (`opacity` times `filter: opacity()`), a background image, and any other
+    filter, backdrop filter or blend mode. The text and background pixels are
+    composited through those groups, then over the measured canvas color when
+    the chain is not opaque. A background image showing through, a non-opaque
+    result, an unmodelled effect, a color outside `rgb()`/`rgba()` or text that
+    is not rendered fails with that reason. The validator recomputes the
+    recorded ratio and reason. FORMS-A5 (white text), FORMS-A6 (alpha 0),
+    FORMS-A7 (alpha 0.01) and FORMS-A8 (ancestor at opacity 0.1) are negative
+    controls that must fail.
+  - FORMS-K2 (indicators removed), FORMS-K3 (transparent outline), FORMS-K4
+    (`opacity: 0`), FORMS-K5 (`filter: opacity(0)`), FORMS-K6 (ancestor at
+    opacity 0), FORMS-K7 (`clip-path: inset(50%)` with a white outline),
+    FORMS-K8 (transparent `mask-image`), FORMS-K9 (covering white overlay),
+    FORMS-K10 (`transform: scale(0)`), FORMS-K11 (off screen), FORMS-K12 and
+    FORMS-K13 (clipped outline with a 10px or 4px focus border that moves
+    neighbouring text) are negative controls that must fail.
+  - Every multi-element measurement records its subjects (stop index and id,
+    cell, descendant or author-break index). The validator derives the expected
+    subjects from the pinned reference HTML and the assertion; missing, extra,
+    duplicated or reordered subjects fail.
+  - The result is `corpus/reference-check.v1.json`. It is bound by digest to
+    every row's assertion, viewports, states, CSP and inputs, to the browser
+    oracle definitions, to the checker source and to the engine identity.
+  - It covers the authored outcomes only, not a build.
+- **States.** Pointer, touch, keyboard, error, loading, disabled, forced colors
+  and increased contrast are all exercised, plus reduced motion, print, RTL,
+  scrolled and hydrated states.
+- **Negative fixtures.** Sixteen consumer sources against the existing
+  `tests/fixtures/design-systems/conformance.js` definition. The mixed-system
+  fixture also pins `corpus/negative/vendor-system.v1.json`. Each fixture
+  records two things separately:
+
+  - the intended rejection, which every later lot must keep;
+  - the Alpha 1 behavior observed by `run-negatives.mjs`.
+
+  CE-NEG-UNKNOWN-SELECTOR-03 is accepted by Alpha 1 and its raw selector is
+  emitted. That is compiler defect SF-02, owned by CE-07.1 (#54). Until it is
+  fixed, the rtl profile has no executed rejection.
+
+- **Scope findings.** `corpus/scope-findings.v1.json` hands three findings to
+  their owning lots:
+  - SF-01: `font-display` has no registry entry (CE-09.1);
+  - SF-02: the raw-selector defect (CE-07.1);
+  - SF-03: invalid `direction` values in the consumer data (CE-14.1).
+- **Keyboard oracle handoff to CE-05.1 (#59).** The scope-findings schema has no
+  oracle subject, so these limitations are handed over here:
+  - The keyboard oracle can credit removal of a contrasting unfocused indicator
+    as a visible focused indicator when screenshot B restores the unfocused
+    paint.
+  - An indicator whose focus change is layout only is not attributed and fails.
+- **Accounting.** `accounting.v1.json` classifies every declaration of every
+  reference stylesheet (840, of which 834 are in the Alpha 1 denominator)
+  against the pinned Alpha 1 policy. Each declaration is bound to its registry
+  entry and `CE-FX-PROP-*` fixture, and composites carry the longhands their
+  rewrite needs.
+- **Calibration.** The consumer's reported 343 = 212 + 37 + 94 and 1,559 =
+  1,111 + 124 + 324 reconcile exactly with the recovered original classifier and
+  with [`tools/coverage`](../../tools/coverage/README.md).
+  - The mockup input was recovered exactly.
+  - The utilities input is a pinned replacement candidate: its category counts
+    reconcile, but its byte identity with the measured file is unproven.
+  - `calibration/baseline.v1.json` records the evidence and thirteen calibration
+    limits.
+  - `calibration/approved-identifiers.v1.json` lists, with reasons, the only
+    consumer identifiers that may be published.
+  - The baseline supersedes the CE-00.1 evidence lock's
+    `originalClassifierRecovered: false` and
+    `classificationResultsRerun: false`. That frozen record is left unchanged.
+
+```sh
+node tests/core-evolution/validate-corpus.mjs --self-test
+node tools/coverage/cli.mjs calibrate
+yarn workspace @pandamstyle/compiler run build
+node tests/core-evolution/run-negatives.mjs
+node tests/core-evolution/check-references.mjs --playwright <playwright-core 1.60.0 install dir>
+```
+
+The corpus validator needs the repository install for postcss. It checks:
+
+- the eight schemas and every input, source and definition digest;
+- profile, capability fixture set, oracle, viewport, state and target bindings;
+- the selectors and properties named by each mutation;
+- coverage: a positive fixture, a boundary assertion and a negative fixture for
+  every profile; positive, boundary and negative cases for every oracle; every
+  required interaction state and negative category;
+- every success criterion of each positive fixture;
+- consistency of each negative's observed Alpha 1 outcome, and a compiler-defect
+  finding for every accepted negative;
+- the scope findings' lots and issues;
+- the recorded reference check: its binding, one row per browser assertion,
+  exactly the expected result kinds per row, strict measurement shapes, verdicts
+  and statuses recomputed from the measurements (`reference-judge.mjs`),
+  not-evaluated only for the nine documented assertions with their fixed reason,
+  the tally, and no failing assertion;
+- re-derivation of the accounting and of both consumer sets, the reported counts
+  and each calibration limit;
+- regular-expression parity of the parser on every corpus stylesheet;
+- the closed surface: every string leaf and key of every record derived from or
+  describing the consumer sits at a closed schema type, and every string-capable
+  node of those schemas is closed (`closed-surface.mjs`);
+- the token allow-list publication rules, canonical set headers and the
+  publication-review pin, on every published field of the consumer sets, the
+  calibration record and the accounting.
+
+`--self-test` applies 167 mutations, and each must fail for its stated reason.
+They include every publication bypass found in review.
+
+Changing a fixture input, expectation or negative fixture is a corpus change and
+needs a reviewed reason. Rerun the reference check and regenerate the accounting
+rather than editing them.

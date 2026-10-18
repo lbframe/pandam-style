@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-classifier-calibration",
+  "task": "CE-00.2",
+  "fixtureSet": "CE-FX-CAP-45-calibrated-classifier-343-1559",
+  "status": "calibrated",
+  "consumer": {
+    "repository": "https://github.com/lbframe/wacando",
+    "visibility": "private"
+  },
+  "publicationPolicy": "CE-PUB-01",
+  "reportedBaseline": {
+    "noteSection": 6,
+    "noteBlobs": [
+      {
+        "commit": "0ce8997eda1ecbffa6f66fdf2884542fe29ec98f",
+        "blob": "d51e9785e36afdb743f8f8b29cb008cbd0319b7d",
+        "role": "introduced"
+      },
+      {
+        "commit": "f54dc1253bb753eb1a9a88e0a277adaf437e0834",
+        "blob": "4cc35013c417ac2d12ed3c378a0cf96ca5375e9e",
+        "role": "intermediate"
+      },
+      {
+        "commit": "777d9ae6b56b31de198766d27f8689ab950aa12b",
+        "blob": "4ed2e94b3f11c770db257f89ec52bc0d6610700e",
+        "role": "inspected-by-research"
+      }
+    ],
+    "tableIdenticalInEveryBlob": true,
+    "rerunBeforeCe002": false
+  },
+  "originalClassifier": {
+    "status": "recovered",
+    "recoveredFrom": "consumer-agent-session-transcript",
+    "recordedWriteAt": "2026-10-18T01:10:41.799Z",
+    "contentSha256": "e26cfe34885ea90fe4cfb4ff5eebe0ad8075295a19d1e2a97c0022e1aea1bce8",
+    "gitBlob": "345dcaaf871857b2478a1d6e5bebe6c9fa429853",
+    "bytes": 1655,
+    "transcriptSha256AtRecovery": "187a0236839a7124a323dabea360cf9052f9c6b48de7751cf8c5d54d17c6f7d9",
+    "published": false,
+    "publicationDecision": "consumer-material-digest-only",
+    "algorithm": "CE-ALG-R0",
+    "consumerHistorySearched": {
+      "commits": 629,
+      "blobs": 4753,
+      "classifierFound": false
+    },
+    "policyModule": {
+      "path": "packages/compiler/src/design-system/policy/properties.js",
+      "pandamStyleCommit": "f3e880394d4352b133ff505dff7aef90bc6cdcca",
+      "gitBlob": "7c7a6cad5baf7d8e0c67f018fb8d7d2156a1afc0",
+      "sha256": "f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540",
+      "identicalAt": [
+        "415e05539fcb5d36a78226112b5cf488b200b1aa",
+        "943adf7fb37f275070e81b5154db64aa3ff76a1e"
+      ],
+      "consumerPackage": "@pandamstyle/compiler@0.1.0-alpha.1"
+    },
+    "bucketMapping": {
+      "expressible": ["category", "structural-ok"],
+      "compositeRewrite": ["composite"],
+      "gap": ["unsupported", "structural-forbidden"],
+      "absentProperty": ["unsupported"],
+      "outOfDomain": ["structural-forbidden"]
+    },
+    "recordedRuns": [
+      {
+        "inputId": "W-UTIL-343",
+        "reported": true,
+        "resultAt": "2026-10-18T01:10:56.514Z",
+        "buckets": {
+          "category": 160,
+          "structural-ok": 52,
+          "structural-forbidden": 47,
+          "composite": 37,
+          "unsupported": 47
+        },
+        "total": 343
+      },
+      {
+        "inputId": "W-MOCKUP-1559",
+        "reported": true,
+        "resultAt": "2026-10-18T01:11:08.716Z",
+        "buckets": {
+          "category": 811,
+          "structural-ok": 300,
+          "structural-forbidden": 212,
+          "composite": 124,
+          "unsupported": 112
+        },
+        "total": 1559
+      },
+      {
+        "inputId": null,
+        "reported": false,
+        "resultAt": "2026-10-18T01:10:45.250Z",
+        "buckets": {
+          "category": 195,
+          "structural-ok": 63,
+          "structural-forbidden": 54,
+          "composite": 45,
+          "unsupported": 81
+        },
+        "total": 438
+      }
+    ]
+  },
+  "reconstructedClassifier": {
+    "tool": "tools/coverage/cli.mjs",
+    "parser": {
+      "name": "postcss",
+      "version": "8.5.28",
+      "resolution": "yarn-lock-via-vite-8.3.1"
+    },
+    "policyLoading": "digest-pinned-bytes",
+    "differences": ["CE-DIFF-01", "CE-DIFF-02", "CE-DIFF-03", "CE-DIFF-04"]
+  },
+  "sets": [
+    {
+      "inputId": "W-UTIL-343",
+      "declarationSet": "tests/core-evolution/corpus/calibration/w-util-343.declarations.v1.json",
+      "profiles": ["desktop-renderer"],
+      "baselineLayer": "utilities",
+      "input": {
+        "sha256": "f706b14992356988e605226ce930d89bfc969fbbc67ae0befc8c7ffe1dda268b",
+        "bytes": 21318,
+        "role": "replacement-candidate",
+        "recovery": "rebuild-in-consumer-worktree",
+        "rebuiltAt": "2026-10-18T01:34:05Z",
+        "consumerCommitOfRebuild": "f54dc1253bb753eb1a9a88e0a277adaf437e0834",
+        "consumerCommitOfMeasuredSources": "0ce8997eda1ecbffa6f66fdf2884542fe29ec98f",
+        "evidence": [
+          "EV-UNCHANGED-SOURCES",
+          "EV-SPAN-MATCH",
+          "EV-BUCKETS-MATCH"
+        ],
+        "utilitiesBlockSpan": 14938,
+        "utilitiesBlockSha256": "c5429335abe9758e8c14975943eec74263d556cca01de9eacb5934127259d8ec",
+        "byteIdentity": "unproven",
+        "positionMapSha256": "de324855078fc1862ec97eeb8f7ee85ab1cce0701ca2d5765c6592295d3ad96d"
+      },
+      "reported": {
+        "total": 343,
+        "expressible": 212,
+        "compositeRewrite": 37,
+        "gap": 94,
+        "absentProperty": 47,
+        "outOfDomain": 47
+      },
+      "reproduction": {
+        "recoveredClassifierOnRecoveredInput": "exact",
+        "reconstructedClassifierOnRecoveredInput": "exact",
+        "extractionParity": "identical-multisets"
+      }
+    },
+    {
+      "inputId": "W-MOCKUP-1559",
+      "declarationSet": "tests/core-evolution/corpus/calibration/w-mockup-1559.declarations.v1.json",
+      "profiles": ["desktop-renderer"],
+      "baselineLayer": null,
+      "input": {
+        "sha256": "ff85a7213c9e280f0925b6ebe09332ad4025702aa1b97057d4b7319ede1d4d90",
+        "bytes": 36690,
+        "role": "recovered-exact",
+        "recovery": "designer-package-in-session-scratch",
+        "evidence": ["EV-MANIFEST-DIGEST"],
+        "manifestSha256": "4340e1181ce7325ca4aa04905b0e6240419a0c37191a4cc9569ae708e08d3ce8",
+        "byteIdentity": "proven-by-manifest",
+        "positionMapSha256": "b34c15a92a69e986b9918abd5b98d0186814ae9befb63600bc313d36066733a4"
+      },
+      "reported": {
+        "total": 1559,
+        "expressible": 1111,
+        "compositeRewrite": 124,
+        "gap": 324,
+        "absentProperty": 112,
+        "outOfDomain": 212
+      },
+      "reproduction": {
+        "recoveredClassifierOnRecoveredInput": "exact",
+        "reconstructedClassifierOnRecoveredInput": "exact",
+        "extractionParity": "identical-multisets"
+      }
+    }
+  ],
+  "calibrationLimits": [
+    {
+      "id": "CAL-01",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "numeric-coercion"
+      },
+      "values": {
+        "W-UTIL-343": 5,
+        "W-MOCKUP-1559": 3
+      }
+    },
+    {
+      "id": "CAL-02",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "raw-value-needs-token"
+      },
+      "values": {
+        "W-UTIL-343": 125,
+        "W-MOCKUP-1559": 722
+      }
+    },
+    {
+      "id": "CAL-03",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "conditional-context-not-checked"
+      },
+      "values": {
+        "W-UTIL-343": 39,
+        "W-MOCKUP-1559": 332
+      }
+    },
+    {
+      "id": "CAL-04",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "pseudo-element-not-checked"
+      },
+      "values": {
+        "W-UTIL-343": 0,
+        "W-MOCKUP-1559": 25
+      }
+    },
+    {
+      "id": "CAL-05",
+      "measure": {
+        "counter": "compositeRewrites",
+        "key": "full-longhand-reset/some-longhands-not-admitted"
+      },
+      "values": {
+        "W-UTIL-343": 16,
+        "W-MOCKUP-1559": 25
+      }
+    },
+    {
+      "id": "CAL-06",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "font-face-descriptor"
+      },
+      "values": {
+        "W-UTIL-343": 0,
+        "W-MOCKUP-1559": 4
+      }
+    },
+    {
+      "id": "CAL-07",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "vendor-prefixed"
+      },
+      "values": {
+        "W-UTIL-343": 1,
+        "W-MOCKUP-1559": 2
+      }
+    },
+    {
+      "id": "CAL-08",
+      "measure": {
+        "counter": "baselineFlags",
+        "key": "important-ignored"
+      },
+      "values": {
+        "W-UTIL-343": 0,
+        "W-MOCKUP-1559": 6
+      }
+    },
+    {
+      "id": "CAL-09",
+      "measure": {
+        "counter": "all",
+        "key": null
+      },
+      "values": {
+        "W-UTIL-343": 528,
+        "W-MOCKUP-1559": 1587
+      }
+    },
+    {
+      "id": "CAL-10"
+    },
+    {
+      "id": "CAL-11"
+    },
+    {
+      "id": "CAL-12"
+    },
+    {
+      "id": "CAL-13"
+    }
+  ],
+  "separateGates": [
+    {
+      "id": "GATE-01",
+      "consumerScriptBlob": "8a97a049f1a9a3117342532c66ca407d1a6ecfbd",
+      "usedHere": false
+    },
+    {
+      "id": "GATE-02",
+      "fixtureSet": "CE-FX-CAP-45-render-behavior-fidelity",
+      "owner": "CE-14"
+    },
+    {
+      "id": "GATE-03",
+      "fixtureSet": "CE-FX-CAP-45-full-denominator-zero-unexpressible",
+      "owner": "CE-14"
+    }
+  ]
+}

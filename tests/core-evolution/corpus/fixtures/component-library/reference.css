@@ -1,0 +1,158 @@
+/* Reusable component package reference outcome: recipes, slots, variants and a nested theme. Authored for CE-00.2; not compiler output. */
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1f2421;
+}
+
+.gallery {
+  display: grid;
+  gap: 24px;
+  padding: 24px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition-property: background-color, border-color;
+  transition-duration: 120ms;
+  transition-timing-function: ease-in-out;
+}
+
+.btn-md {
+  min-height: 36px;
+  padding-inline: 16px;
+  font-size: 14px;
+}
+
+.btn-sm {
+  min-height: 28px;
+  padding-inline: 10px;
+  font-size: 12px;
+}
+
+.btn-primary {
+  border-color: #3e563f;
+  color: #ffffff;
+  background-color: #3e563f;
+}
+
+.btn-primary:hover {
+  background-color: #304431;
+}
+
+.btn-secondary {
+  border-color: #c4cabe;
+  color: #1f2421;
+  background-color: #ffffff;
+}
+
+.btn-danger {
+  border-color: #a83c37;
+  color: #ffffff;
+  background-color: #a83c37;
+}
+
+.btn:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: #3e563f;
+  outline-offset: 2px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-neutral {
+  color: #3b423a;
+  background-color: #e8ebe3;
+}
+
+.badge-success {
+  color: #1f5132;
+  background-color: #dcefe2;
+}
+
+.badge-warning {
+  color: #6b4c12;
+  background-color: #faf3e6;
+}
+
+.card {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  max-width: 320px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e3e6de;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #e3e6de;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.card-body {
+  padding: 16px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  background-color: #f4f6f0;
+}
+
+.theme-dark {
+  padding: 16px;
+  border-radius: 12px;
+  color: #eef1ea;
+  background-color: #1f2421;
+}
+
+.theme-dark .btn-primary {
+  border-color: #9cc59f;
+  color: #13200f;
+  background-color: #9cc59f;
+}
+
+.theme-dark .btn:focus-visible {
+  outline-color: #9cc59f;
+}

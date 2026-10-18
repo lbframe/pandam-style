@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "core-evolution-scope-findings.v1.schema.json",
+  "title": "CE-00.2 scope findings (closed surface)",
+  "x-closed-surface": true,
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "core-evolution-scope-findings"
+    },
+    "task": {
+      "const": "CE-00.2"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "enum": ["SF-01", "SF-02", "SF-03"]
+          },
+          "kind": {
+            "enum": ["registry-scope", "compiler-defect", "measurement-data"]
+          },
+          "owner": {
+            "type": "string",
+            "pattern": "^CE-\\d{2}\\.\\d$",
+            "maxLength": 7
+          },
+          "issue": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "subject": {
+            "type": "object",
+            "properties": {
+              "inputId": {
+                "enum": ["W-UTIL-343", "W-MOCKUP-1559"]
+              },
+              "property": {
+                "type": "string",
+                "x-closed": "css-property",
+                "maxLength": 64
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "x-closed": "css-value",
+                  "maxLength": 64
+                },
+                "minItems": 1
+              },
+              "negativeFixture": {
+                "type": "string",
+                "pattern": "^CE-NEG-[A-Z-]+-\\d{2}$",
+                "maxLength": 48
+              }
+            },
+            "additionalProperties": false,
+            "required": []
+          },
+          "profileImpact": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "web",
+                "desktop-renderer",
+                "content",
+                "forms",
+                "data",
+                "rtl",
+                "svg-media",
+                "ssr",
+                "reusable-package"
+              ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false,
+        "required": ["id", "kind", "owner", "issue", "subject"]
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "task", "findings"]
+}

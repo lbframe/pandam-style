@@ -1,0 +1,4198 @@
+{
+  "schemaVersion": 1,
+  "kind": "core-evolution-proof-corpus",
+  "task": "CE-00.2",
+  "status": "defined: immutable inputs and independently checkable expectations; reference pages checked in Chromium (reference-check.v1.json); negative fixtures executed against the Alpha 1 build; product oracle execution belongs to the owning lots",
+  "policy": [
+    "Reference pages are authored outcomes, not compiler output. A future implementation reproduces them through the design system; it never edits them to match.",
+    "Each positive fixture states success separately for accepted vocabulary (E2), expected CSS (E3), geometry, text wrapping, state behavior, keyboard, accessibility and CSP (E4). Passing one class says nothing about another.",
+    "Inputs are pinned by SHA-256 and are immutable. Changing an expectation or an input needs a reviewed reason, like an expectation edit in the semantic migration oracle.",
+    "Every declaration of every reference stylesheet is accounted for in accounting.v1.json, composites included, against the Alpha 1 policy and the CE-00.1 registry.",
+    "Negative fixtures record the intended rejection, which must hold after every core-evolution lot, separately from the observed Alpha 1 behavior, which tests/core-evolution/run-negatives.mjs executes against the workspace compiler build. An observed acceptance is a recorded compiler defect with an owning lot, never a met expectation.",
+    "Reference pages are rendered and checked by tests/core-evolution/check-references.mjs in a pinned Chromium; that checks the authored outcomes only, not any build.",
+    "Consumer calibration sets are measurement inputs for the classifier only. They carry no rendering expectation."
+  ],
+  "references": {
+    "oracles": "tests/core-evolution/corpus/oracles.v1.json",
+    "accounting": "tests/core-evolution/corpus/accounting.v1.json",
+    "calibration": "tests/core-evolution/corpus/calibration/baseline.v1.json",
+    "profiles": "tests/core-evolution/profiles.v1.json",
+    "capabilities": "tests/core-evolution/capabilities.v1.json",
+    "referenceCheck": "tests/core-evolution/corpus/reference-check.v1.json",
+    "scopeFindings": "tests/core-evolution/corpus/scope-findings.v1.json"
+  },
+  "fixtures": [
+    {
+      "id": "CE-CORPUS-APP-SHELL-01",
+      "title": "Desktop-style application shell with sidebar, sticky toolbar, scroll container and toast region",
+      "fixtureClass": "application-shell",
+      "profiles": ["web", "desktop-renderer", "data"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-03-size-token-and-keyword-mixed-domain",
+        "CE-FX-CAP-04-flex-none-normalization",
+        "CE-FX-CAP-04-approved-flex-tuple-1-1-0",
+        "CE-FX-CAP-05-track-resource-232px-minmax-0-1fr",
+        "CE-FX-CAP-06-sticky-fixed-containing-block",
+        "CE-FX-CAP-06-z-index-tokens-isolation",
+        "CE-FX-CAP-07-overflow-axis-computed-interaction",
+        "CE-FX-CAP-07-scroll-snap-overscroll-gutter",
+        "CE-FX-CAP-10-focus-visible-ring-forced-colors",
+        "CE-FX-CAP-11-cursor-pointer-default-not-allowed-text",
+        "CE-FX-CAP-11-electron-app-region-drag-no-drag",
+        "CE-FX-CAP-12-ellipsis-overflow-wrap-word-break",
+        "CE-FX-CAP-19-keyframe-registry-typed-reference",
+        "CE-FX-CAP-25-print-and-input-capability-queries",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/app-shell/reference.html",
+          "role": "reference-page",
+          "sha256": "8595956a713d1252cec74863a8dff1aaad7accd2fd163e90727174dbe0a4fe36"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/app-shell/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "49b3ef9339b6be682a74eb13d719f9286556073d601da33cb24ecb17628ed4e2"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1120,
+          "height": 780
+        },
+        {
+          "id": "narrow",
+          "width": 860,
+          "height": 600
+        },
+        {
+          "id": "at-900",
+          "width": 900,
+          "height": 700
+        },
+        {
+          "id": "at-901",
+          "width": 901,
+          "height": 700
+        }
+      ],
+      "states": [
+        "rest",
+        "pointer-hover",
+        "pointer-active",
+        "touch",
+        "keyboard-focus",
+        "high-contrast",
+        "reduced-motion",
+        "scrolled"
+      ],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "sidebar",
+            "value": "232px"
+          },
+          {
+            "category": "sizes",
+            "name": "rail",
+            "value": "76px"
+          },
+          {
+            "category": "sizes",
+            "name": "titlebar",
+            "value": "40px"
+          },
+          {
+            "category": "sizes",
+            "name": "icon-xs",
+            "value": "14px"
+          },
+          {
+            "category": "sizes",
+            "name": "dot",
+            "value": "6px"
+          },
+          {
+            "category": "sizes",
+            "name": "toast",
+            "value": "420px"
+          },
+          {
+            "category": "sizes",
+            "name": "touch-target",
+            "value": "44px"
+          },
+          {
+            "category": "zIndices",
+            "name": "sticky",
+            "value": "1"
+          },
+          {
+            "category": "zIndices",
+            "name": "toast",
+            "value": "10"
+          },
+          {
+            "category": "radii",
+            "name": "round",
+            "value": "50%"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "hover",
+            "meaning": ":hover"
+          },
+          {
+            "name": "active",
+            "meaning": ":active"
+          },
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          },
+          {
+            "name": "currentPage",
+            "meaning": "[aria-current=page]"
+          },
+          {
+            "name": "narrow",
+            "meaning": "@media (max-width: 900px)"
+          },
+          {
+            "name": "coarsePointer",
+            "meaning": "@media (pointer: coarse)"
+          },
+          {
+            "name": "reducedMotion",
+            "meaning": "@media (prefers-reduced-motion: reduce)"
+          },
+          {
+            "name": "forcedColors",
+            "meaning": "@media (forced-colors: active)"
+          }
+        ],
+        "resources": [
+          {
+            "kind": "grid-tracks",
+            "name": "shell",
+            "value": "232px minmax(0, 1fr)"
+          },
+          {
+            "kind": "grid-tracks",
+            "name": "shell-rail",
+            "value": "76px minmax(0, 1fr)"
+          },
+          {
+            "kind": "grid-tracks",
+            "name": "shell-rows",
+            "value": "40px minmax(0, 1fr)"
+          },
+          {
+            "kind": "keyframes",
+            "name": "pulse"
+          },
+          {
+            "kind": "platform-extension",
+            "name": "-webkit-app-region",
+            "profiles": ["desktop-renderer"]
+          }
+        ]
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/app-shell/reference.css"
+        ]
+      },
+      "knownLimitations": [
+        {
+          "subject": "-webkit-app-region",
+          "outcome": "unsupported-behavior",
+          "statement": "Window drag regions exist only in the desktop renderer profile (D-BP-03). In the web profile the declaration has no effect and must be rejected, not emitted."
+        }
+      ],
+      "assertions": [
+        {
+          "id": "SHELL-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "SHELL-V2",
+          "oracle": "ORC-VOCAB",
+          "case": "boundary",
+          "profiles": ["web"],
+          "expect": {
+            "rejectedWithout": "-webkit-app-region"
+          },
+          "note": "Accepted in desktop-renderer, rejected in web."
+        },
+        {
+          "id": "SHELL-V3",
+          "oracle": "ORC-VOCAB",
+          "case": "negative",
+          "mutation": {
+            "kind": "withdraw-vocabulary",
+            "item": "sizes.sidebar"
+          },
+          "mustFail": "SHELL-V1"
+        },
+        {
+          "id": "SHELL-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css"
+          }
+        },
+        {
+          "id": "SHELL-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "sidebar",
+          "expect": {
+            "box": {
+              "width": 232
+            }
+          }
+        },
+        {
+          "id": "SHELL-L2",
+          "oracle": "ORC-LAYOUT",
+          "case": "boundary",
+          "viewport": "at-900",
+          "state": "rest",
+          "target": "sidebar",
+          "expect": {
+            "box": {
+              "width": 76
+            }
+          },
+          "note": "max-width: 900px includes 900."
+        },
+        {
+          "id": "SHELL-L3",
+          "oracle": "ORC-LAYOUT",
+          "case": "boundary",
+          "viewport": "at-901",
+          "state": "rest",
+          "target": "sidebar",
+          "expect": {
+            "box": {
+              "width": 232
+            }
+          }
+        },
+        {
+          "id": "SHELL-L4",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "scrolled",
+          "target": "toolbar",
+          "expect": {
+            "stuckAfterScroll": {
+              "container": "content",
+              "offset": 400,
+              "edge": "top",
+              "value": 0
+            }
+          }
+        },
+        {
+          "id": "SHELL-L5",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "toast-region",
+          "expect": {
+            "fixedToViewport": {
+              "right": 16,
+              "bottom": 16
+            }
+          }
+        },
+        {
+          "id": "SHELL-L6",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "presence-dot",
+          "expect": {
+            "box": {
+              "width": 6,
+              "height": 6
+            }
+          }
+        },
+        {
+          "id": "SHELL-L7",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "nav-icon",
+          "expect": {
+            "box": {
+              "width": 14,
+              "height": 14
+            }
+          }
+        },
+        {
+          "id": "SHELL-L8",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "narrow",
+          "state": "rest",
+          "target": "content",
+          "expect": {
+            "noHorizontalOverflow": true,
+            "scrollable": "y"
+          }
+        },
+        {
+          "id": "SHELL-L9",
+          "oracle": "ORC-LAYOUT",
+          "case": "negative",
+          "mutation": {
+            "kind": "remove-declaration",
+            "file": "reference.css",
+            "selector": ".shell",
+            "property": "grid-template-columns"
+          },
+          "mustFail": "SHELL-L1"
+        },
+        {
+          "id": "SHELL-T1",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "nav-label-long",
+          "expect": {
+            "lineCount": 1,
+            "truncated": true
+          }
+        },
+        {
+          "id": "SHELL-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "pointer-hover",
+          "target": "nav-projects",
+          "expect": {
+            "computed": {
+              "background-color": "rgb(227, 232, 220)"
+            }
+          }
+        },
+        {
+          "id": "SHELL-S2",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "pointer-active",
+          "target": "primary-action",
+          "expect": {
+            "computed": {
+              "transform": "matrix(1, 0, 0, 1, 0, 1)"
+            }
+          }
+        },
+        {
+          "id": "SHELL-S3",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "touch",
+          "target": "nav-inbox",
+          "expect": {
+            "computed": {
+              "min-height": "44px"
+            }
+          }
+        },
+        {
+          "id": "SHELL-S4",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "reduced-motion",
+          "target": "presence-dot",
+          "expect": {
+            "animationNone": true
+          }
+        },
+        {
+          "id": "SHELL-S5",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "target": "nav-projects",
+          "expect": {
+            "computed": {
+              "outline-style": "solid",
+              "outline-width": "2px",
+              "outline-offset": "2px"
+            }
+          }
+        },
+        {
+          "id": "SHELL-S6",
+          "oracle": "ORC-STATE",
+          "case": "boundary",
+          "profiles": ["desktop-renderer"],
+          "viewport": "wide",
+          "state": "rest",
+          "target": "titlebar-action",
+          "expect": {
+            "computed": {
+              "-webkit-app-region": "no-drag"
+            }
+          },
+          "note": "The no-drag button inside the drag titlebar."
+        },
+        {
+          "id": "SHELL-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "expect": {
+            "focusOrder": [
+              "titlebar-action",
+              "nav-inbox",
+              "nav-projects",
+              "nav-archive",
+              "primary-action"
+            ],
+            "focusVisible": true
+          }
+        },
+        {
+          "id": "SHELL-A1",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "sidebar",
+          "expect": {
+            "role": "navigation",
+            "name": "Primary"
+          }
+        },
+        {
+          "id": "SHELL-A2",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "toast-region",
+          "expect": {
+            "role": "status"
+          }
+        },
+        {
+          "id": "SHELL-A3",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "touch",
+          "target": "nav-inbox",
+          "expect": {
+            "targetSizeMin": 44
+          }
+        },
+        {
+          "id": "SHELL-A4",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "high-contrast",
+          "target": "nav-inbox",
+          "expect": {
+            "forcedColorsVisible": true
+          }
+        },
+        {
+          "id": "SHELL-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0
+          }
+        }
+      ],
+      "csp": "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    },
+    {
+      "id": "CE-CORPUS-FORMS-01",
+      "title": "Account form with validation error, read-only, file, checkbox, disabled and busy controls",
+      "fixtureClass": "forms-and-validation",
+      "profiles": ["forms", "web"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-09-outline-width-style-color-offset",
+        "CE-FX-CAP-10-focus-visible-ring-forced-colors",
+        "CE-FX-CAP-10-appearance-accent-system-colors",
+        "CE-FX-CAP-10-reduced-motion-contrast-modes",
+        "CE-FX-CAP-11-cursor-pointer-default-not-allowed-text",
+        "CE-FX-CAP-11-user-select-text-touch-action",
+        "CE-FX-CAP-12-ellipsis-overflow-wrap-word-break",
+        "CE-FX-CAP-18-transform-none-disabled-reduced-motion",
+        "CE-FX-CAP-23-named-pseudo-aria-data-state-conditions",
+        "CE-FX-CAP-23-placeholder-file-backdrop-selection-content",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/forms/reference.html",
+          "role": "reference-page",
+          "sha256": "da196ff885606c2252955a529eb846ef8e08a9b36086d45b0d44c11d33176e84"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/forms/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "971753a50b3120ad67f5dca472f7b0e1c842838ac33248e541860d3dceeec9d3"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1024,
+          "height": 900
+        },
+        {
+          "id": "tight",
+          "width": 240,
+          "height": 900
+        }
+      ],
+      "states": [
+        "rest",
+        "pointer-hover",
+        "pointer-active",
+        "touch",
+        "keyboard-focus",
+        "error",
+        "loading",
+        "disabled",
+        "high-contrast",
+        "increased-contrast",
+        "reduced-motion"
+      ],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "control",
+            "value": "36px"
+          },
+          {
+            "category": "sizes",
+            "name": "touch-target",
+            "value": "44px"
+          },
+          {
+            "category": "sizes",
+            "name": "checkbox",
+            "value": "16px"
+          },
+          {
+            "category": "sizes",
+            "name": "form",
+            "value": "46ch"
+          },
+          {
+            "category": "opacities",
+            "name": "disabled",
+            "value": "0.6"
+          },
+          {
+            "category": "colors",
+            "name": "danger",
+            "value": "#a83c37"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "hover",
+            "meaning": ":hover"
+          },
+          {
+            "name": "active",
+            "meaning": ":active"
+          },
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          },
+          {
+            "name": "invalid",
+            "meaning": "[aria-invalid=true]"
+          },
+          {
+            "name": "readOnly",
+            "meaning": ":read-only"
+          },
+          {
+            "name": "disabled",
+            "meaning": ":disabled, [aria-disabled=true]"
+          },
+          {
+            "name": "placeholder",
+            "meaning": "::placeholder"
+          },
+          {
+            "name": "fileButton",
+            "meaning": "::file-selector-button"
+          },
+          {
+            "name": "coarsePointer",
+            "meaning": "@media (pointer: coarse)"
+          },
+          {
+            "name": "reducedMotion",
+            "meaning": "@media (prefers-reduced-motion: reduce)"
+          },
+          {
+            "name": "forcedColors",
+            "meaning": "@media (forced-colors: active)"
+          },
+          {
+            "name": "moreContrast",
+            "meaning": "@media (prefers-contrast: more)"
+          }
+        ],
+        "resources": [
+          {
+            "kind": "keyframes",
+            "name": "spin"
+          }
+        ]
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/forms/reference.css"
+        ]
+      },
+      "knownLimitations": [],
+      "assertions": [
+        {
+          "id": "FORMS-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "FORMS-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css"
+          }
+        },
+        {
+          "id": "FORMS-C2",
+          "oracle": "ORC-CSS",
+          "case": "boundary",
+          "expect": {
+            "declarationsEquivalent": "font: inherit expands to its seven longhands, each inherit"
+          },
+          "note": "The only composite form in the corpus fixtures."
+        },
+        {
+          "id": "FORMS-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "input-name",
+          "expect": {
+            "minBox": {
+              "height": 36
+            }
+          }
+        },
+        {
+          "id": "FORMS-L2",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "touch",
+          "target": "input-name",
+          "expect": {
+            "minBox": {
+              "height": 44
+            }
+          }
+        },
+        {
+          "id": "FORMS-L3",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "input-check",
+          "expect": {
+            "box": {
+              "width": 16,
+              "height": 16
+            }
+          }
+        },
+        {
+          "id": "FORMS-T1",
+          "oracle": "ORC-TEXT",
+          "case": "boundary",
+          "viewport": "tight",
+          "state": "error",
+          "target": "email-error",
+          "expect": {
+            "noOverflow": true
+          },
+          "note": "overflow-wrap: anywhere in a 240px viewport."
+        },
+        {
+          "id": "FORMS-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "error",
+          "target": "input-email",
+          "expect": {
+            "computed": {
+              "border-top-color": "rgb(168, 60, 55)"
+            }
+          }
+        },
+        {
+          "id": "FORMS-S2",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "target": "input-name",
+          "expect": {
+            "computed": {
+              "outline-style": "solid",
+              "outline-width": "2px",
+              "outline-offset": "2px",
+              "outline-color": "rgb(62, 86, 63)"
+            }
+          }
+        },
+        {
+          "id": "FORMS-S3",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "disabled",
+          "target": "disabled",
+          "expect": {
+            "computed": {
+              "cursor": "not-allowed",
+              "opacity": "0.6"
+            }
+          }
+        },
+        {
+          "id": "FORMS-S4",
+          "oracle": "ORC-STATE",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "pointer-active",
+          "target": "disabled",
+          "expect": {
+            "computed": {
+              "transform": "none"
+            }
+          },
+          "note": "Disabled controls keep transform: none under :active."
+        },
+        {
+          "id": "FORMS-S5",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "loading",
+          "target": "busy",
+          "expect": {
+            "computed": {
+              "cursor": "not-allowed",
+              "opacity": "0.6"
+            }
+          }
+        },
+        {
+          "id": "FORMS-S6",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "reduced-motion",
+          "target": "spinner",
+          "expect": {
+            "computed": {
+              "animation-duration": "2.4s"
+            }
+          }
+        },
+        {
+          "id": "FORMS-S7",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "increased-contrast",
+          "target": "input-name",
+          "expect": {
+            "computed": {
+              "border-top-color": "rgb(31, 36, 33)"
+            }
+          }
+        },
+        {
+          "id": "FORMS-S8",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "pointer-hover",
+          "target": "submit",
+          "expect": {
+            "computed": {
+              "background-color": "rgb(48, 68, 49)"
+            }
+          }
+        },
+        {
+          "id": "FORMS-S9",
+          "oracle": "ORC-STATE",
+          "case": "negative",
+          "mutation": {
+            "kind": "remove-rule",
+            "file": "reference.css",
+            "selector": ".input:focus-visible"
+          },
+          "mustFail": "FORMS-S2"
+        },
+        {
+          "id": "FORMS-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "expect": {
+            "focusOrder": [
+              "input-name",
+              "input-email",
+              "input-code",
+              "input-notes",
+              "input-file",
+              "input-check",
+              "submit",
+              "busy"
+            ],
+            "focusVisible": true
+          },
+          "note": "The select inside the disabled fieldset and the disabled button are skipped; the aria-disabled busy button stays focusable."
+        },
+        {
+          "id": "FORMS-K2",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "*:focus-visible { outline: none !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "Removing every focus indicator keeps :focus-visible matching; the painted-indicator check must still fail."
+        },
+        {
+          "id": "FORMS-K3",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "*:focus-visible { outline: 3px solid transparent !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "A transparent outline has width but paints nothing; the visible-indicator check must fail."
+        },
+        {
+          "id": "FORMS-K4",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { opacity: 0 !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "The focused element becomes invisible; its disappearance changes ring pixels but paints no indicator."
+        },
+        {
+          "id": "FORMS-K5",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { filter: opacity(0) !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "filter: opacity(0) hides the focused element and its outline."
+        },
+        {
+          "id": "FORMS-K6",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"field-email\"]:focus-within { opacity: 0 !important; } [data-testid=\"input-email\"]:focus-visible { outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "An ancestor with opacity 0 hides the focused element and its outline."
+        },
+        {
+          "id": "FORMS-K7",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { clip-path: inset(50%) !important; outline: 3px solid white !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "clip-path clips the focused element and its white outline; the clipped area changes ring pixels but no indicator paint shows."
+        },
+        {
+          "id": "FORMS-K8",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { mask-image: linear-gradient(transparent, transparent) !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "A transparent mask hides the focused element and its outline."
+        },
+        {
+          "id": "FORMS-K9",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"field-email\"]:focus-within { position: relative !important; } [data-testid=\"field-email\"]:focus-within::after { content: \"\"; position: absolute; inset: -24px; background: white; z-index: 10; } [data-testid=\"input-email\"]:focus-visible { outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "A white overlay covers the focused element and its outline."
+        },
+        {
+          "id": "FORMS-K10",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { transform: scale(0) !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "transform: scale(0) collapses the focused element and its outline."
+        },
+        {
+          "id": "FORMS-K11",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { position: relative !important; left: -10000px !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "The focused element and its outline move off screen."
+        },
+        {
+          "id": "FORMS-K12",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { clip-path: inset(50%) !important; border-width: 10px !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "clip-path hides the outline while a 10px focus border grows the input; suppressing the border must not move the neighbouring text into the count."
+        },
+        {
+          "id": "FORMS-K13",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"input-email\"]:focus-visible { clip-path: inset(50%) !important; border-width: 4px !important; outline: 3px solid blue !important; box-shadow: none !important; }"
+          },
+          "mustFail": "FORMS-K1",
+          "note": "clip-path hides the outline while a 4px focus border grows the input; suppressing the border must not move the neighbouring text into the count."
+        },
+        {
+          "id": "FORMS-A1",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "error",
+          "target": "input-email",
+          "expect": {
+            "role": "textbox",
+            "name": "Email address"
+          }
+        },
+        {
+          "id": "FORMS-A2",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "error",
+          "target": "email-error",
+          "expect": {
+            "contrastMin": 4.5
+          }
+        },
+        {
+          "id": "FORMS-A3",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "high-contrast",
+          "target": "input-email",
+          "expect": {
+            "forcedColorsVisible": true
+          }
+        },
+        {
+          "id": "FORMS-A4",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "check",
+          "expect": {
+            "targetSizeMin": 24
+          }
+        },
+        {
+          "id": "FORMS-A5",
+          "oracle": "ORC-A11Y",
+          "case": "negative",
+          "mutation": {
+            "kind": "replace-value",
+            "file": "reference.css",
+            "selector": ".field-error",
+            "property": "color",
+            "value": "#ffffff"
+          },
+          "mustFail": "FORMS-A2"
+        },
+        {
+          "id": "FORMS-A6",
+          "oracle": "ORC-A11Y",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"email-error\"] { color: rgba(168, 60, 55, 0) !important; }"
+          },
+          "mustFail": "FORMS-A2",
+          "note": "Fully transparent error text keeps its RGB color but paints nothing."
+        },
+        {
+          "id": "FORMS-A7",
+          "oracle": "ORC-A11Y",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"email-error\"] { color: rgba(168, 60, 55, 0.01) !important; }"
+          },
+          "mustFail": "FORMS-A2",
+          "note": "Near-transparent error text is composited almost to the background."
+        },
+        {
+          "id": "FORMS-A8",
+          "oracle": "ORC-A11Y",
+          "case": "negative",
+          "mutation": {
+            "kind": "append-css",
+            "file": "reference.css",
+            "css": "[data-testid=\"field-email\"] { opacity: 0.1 !important; }"
+          },
+          "mustFail": "FORMS-A2",
+          "note": "An ancestor at opacity 0.1 fades the error text into the page."
+        },
+        {
+          "id": "FORMS-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0
+          }
+        }
+      ],
+      "csp": "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    },
+    {
+      "id": "CE-CORPUS-NOTICES-01",
+      "title": "Information and error notices, empty state and loading skeleton",
+      "fixtureClass": "notices-and-empty-states",
+      "profiles": ["web", "desktop-renderer"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-05-track-resource-232px-minmax-0-1fr",
+        "CE-FX-CAP-09-side-width-style-color",
+        "CE-FX-CAP-12-text-align-center-right-end",
+        "CE-FX-CAP-12-white-space-pre-pre-wrap-pre-line",
+        "CE-FX-CAP-12-text-wrap-keyword-targets",
+        "CE-FX-CAP-19-keyframe-registry-typed-reference",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/notices/reference.html",
+          "role": "reference-page",
+          "sha256": "6da2325581b2727b39c1a8770dd98e628d62c01d15aae766bdede55e467256be"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/notices/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "313e942cb93efc57615cf7eb823ef836fe9318ed96a236b22f03fde9233583e0"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1024,
+          "height": 800
+        },
+        {
+          "id": "narrow",
+          "width": 320,
+          "height": 800
+        }
+      ],
+      "states": [
+        "rest",
+        "keyboard-focus",
+        "loading",
+        "error",
+        "high-contrast",
+        "reduced-motion"
+      ],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "icon-sm",
+            "value": "16px"
+          },
+          {
+            "category": "sizes",
+            "name": "icon-md",
+            "value": "18px"
+          },
+          {
+            "category": "sizes",
+            "name": "dismiss",
+            "value": "24px"
+          },
+          {
+            "category": "borderStyles",
+            "name": "dashed",
+            "value": "dashed"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          },
+          {
+            "name": "reducedMotion",
+            "meaning": "@media (prefers-reduced-motion: reduce)"
+          },
+          {
+            "name": "forcedColors",
+            "meaning": "@media (forced-colors: active)"
+          }
+        ],
+        "resources": [
+          {
+            "kind": "grid-tracks",
+            "name": "notice",
+            "value": "16px minmax(0, 1fr) auto"
+          },
+          {
+            "kind": "keyframes",
+            "name": "shimmer"
+          }
+        ]
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/notices/reference.css"
+        ]
+      },
+      "knownLimitations": [],
+      "assertions": [
+        {
+          "id": "NOTICES-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "NOTICES-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css"
+          }
+        },
+        {
+          "id": "NOTICES-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "notice-dismiss",
+          "expect": {
+            "box": {
+              "width": 24,
+              "height": 24
+            }
+          }
+        },
+        {
+          "id": "NOTICES-L2",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "empty-icon",
+          "expect": {
+            "box": {
+              "width": 18,
+              "height": 18
+            }
+          }
+        },
+        {
+          "id": "NOTICES-T1",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "error",
+          "target": "notice-danger",
+          "expect": {
+            "preservesBreaks": {
+              "minLines": 3
+            }
+          }
+        },
+        {
+          "id": "NOTICES-T2",
+          "oracle": "ORC-TEXT",
+          "case": "boundary",
+          "viewport": "narrow",
+          "state": "error",
+          "target": "notice-danger",
+          "expect": {
+            "preservesBreaks": {
+              "minLines": 4
+            },
+            "noOverflow": true
+          },
+          "note": "Author breaks plus wrapping at 320px."
+        },
+        {
+          "id": "NOTICES-T3",
+          "oracle": "ORC-TEXT",
+          "case": "negative",
+          "mutation": {
+            "kind": "replace-value",
+            "file": "reference.css",
+            "selector": ".notice-text",
+            "property": "white-space",
+            "value": "normal"
+          },
+          "mustFail": "NOTICES-T1"
+        },
+        {
+          "id": "NOTICES-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "loading",
+          "target": "skeleton",
+          "expect": {
+            "computed": {
+              "display": "grid"
+            }
+          }
+        },
+        {
+          "id": "NOTICES-S2",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "reduced-motion",
+          "target": "skeleton",
+          "expect": {
+            "animationNone": "descendants"
+          }
+        },
+        {
+          "id": "NOTICES-S3",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "empty",
+          "expect": {
+            "computed": {
+              "text-align": "center",
+              "border-top-style": "dashed"
+            }
+          }
+        },
+        {
+          "id": "NOTICES-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "expect": {
+            "focusOrder": ["notice-dismiss", "empty-action"],
+            "focusVisible": true
+          }
+        },
+        {
+          "id": "NOTICES-A1",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "error",
+          "target": "notice-danger",
+          "expect": {
+            "role": "alert"
+          }
+        },
+        {
+          "id": "NOTICES-A2",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "notice-dismiss",
+          "expect": {
+            "role": "button",
+            "name": "Dismiss",
+            "targetSizeMin": 24
+          }
+        },
+        {
+          "id": "NOTICES-A3",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "empty-text",
+          "expect": {
+            "contrastMin": 4.5
+          }
+        },
+        {
+          "id": "NOTICES-A4",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "high-contrast",
+          "target": "notice-info",
+          "expect": {
+            "forcedColorsVisible": true
+          }
+        },
+        {
+          "id": "NOTICES-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0
+          }
+        }
+      ],
+      "csp": "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    },
+    {
+      "id": "CE-CORPUS-DATA-GRID-01",
+      "title": "Dense table with sticky header and first column, tabular numerals and truncation",
+      "fixtureClass": "dense-data-grid",
+      "profiles": ["data", "desktop-renderer"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-06-sticky-fixed-containing-block",
+        "CE-FX-CAP-06-z-index-tokens-isolation",
+        "CE-FX-CAP-07-overflow-axis-computed-interaction",
+        "CE-FX-CAP-09-collapsed-tables",
+        "CE-FX-CAP-12-ellipsis-overflow-wrap-word-break",
+        "CE-FX-CAP-12-text-align-center-right-end",
+        "CE-FX-CAP-13-font-features-variations",
+        "CE-FX-CAP-25-print-and-input-capability-queries",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/data-grid/reference.html",
+          "role": "reference-page",
+          "sha256": "acd705cca3540fea05efab07c1ec2807a0cf58ffc1c01b515276f24a647b1276"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/data-grid/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "93936bdbd975624b7a233d3d5609457e33eb3863a9c25067096b825418459238"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1024,
+          "height": 600
+        }
+      ],
+      "states": [
+        "rest",
+        "pointer-hover",
+        "keyboard-focus",
+        "keyboard-navigation",
+        "scrolled",
+        "high-contrast",
+        "print"
+      ],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "cell",
+            "value": "120px"
+          },
+          {
+            "category": "sizes",
+            "name": "cell-key",
+            "value": "160px"
+          },
+          {
+            "category": "sizes",
+            "name": "row",
+            "value": "28px"
+          },
+          {
+            "category": "sizes",
+            "name": "grid-viewport",
+            "value": "640px"
+          },
+          {
+            "category": "sizes",
+            "name": "grid-viewport-height",
+            "value": "240px"
+          },
+          {
+            "category": "zIndices",
+            "name": "sticky-column",
+            "value": "1"
+          },
+          {
+            "category": "zIndices",
+            "name": "sticky-header",
+            "value": "2"
+          },
+          {
+            "category": "zIndices",
+            "name": "sticky-corner",
+            "value": "3"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "hover",
+            "meaning": ":hover (row group)"
+          },
+          {
+            "name": "selected",
+            "meaning": "[aria-selected=true] (row group)"
+          },
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          },
+          {
+            "name": "forcedColors",
+            "meaning": "@media (forced-colors: active)"
+          },
+          {
+            "name": "print",
+            "meaning": "@media print"
+          }
+        ],
+        "resources": []
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/data-grid/reference.css"
+        ]
+      },
+      "knownLimitations": [],
+      "assertions": [
+        {
+          "id": "GRID-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "GRID-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css"
+          }
+        },
+        {
+          "id": "GRID-C2",
+          "oracle": "ORC-CSS",
+          "case": "negative",
+          "mutation": {
+            "kind": "remove-emitted-declaration",
+            "selector": ".cell-head",
+            "property": "position"
+          },
+          "mustFail": "GRID-C1"
+        },
+        {
+          "id": "GRID-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "grid-scroll",
+          "expect": {
+            "scrollable": "both",
+            "maxBox": {
+              "width": 640,
+              "height": 240
+            }
+          }
+        },
+        {
+          "id": "GRID-L2",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "scrolled",
+          "target": "head-name",
+          "expect": {
+            "stuckAfterScroll": {
+              "container": "grid-scroll",
+              "offset": 300,
+              "axis": "x",
+              "edge": "left",
+              "value": 0
+            }
+          }
+        },
+        {
+          "id": "GRID-L3",
+          "oracle": "ORC-LAYOUT",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "scrolled",
+          "target": "head-name",
+          "expect": {
+            "topmostAt": {
+              "container": "grid-scroll",
+              "scrollX": 300,
+              "scrollY": 120,
+              "point": "center"
+            }
+          },
+          "note": "The sticky corner cell stays above both sticky axes."
+        },
+        {
+          "id": "GRID-L4",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "cell-1-name",
+          "expect": {
+            "box": {
+              "width": 160
+            }
+          }
+        },
+        {
+          "id": "GRID-T1",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "cell-1-name",
+          "expect": {
+            "lineCount": 1,
+            "truncated": true
+          }
+        },
+        {
+          "id": "GRID-T2",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "cell-1-description",
+          "expect": {
+            "lineCount": 1,
+            "truncated": true
+          }
+        },
+        {
+          "id": "GRID-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "pointer-hover",
+          "target": "row-2",
+          "expect": {
+            "computed": {
+              "background-color": "rgb(244, 246, 240)"
+            },
+            "on": "cells"
+          }
+        },
+        {
+          "id": "GRID-S2",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "cell-1-requests",
+          "expect": {
+            "computed": {
+              "text-align": "end",
+              "font-variant-numeric": "tabular-nums"
+            }
+          }
+        },
+        {
+          "id": "GRID-S3",
+          "oracle": "ORC-STATE",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "print",
+          "target": "grid-scroll",
+          "expect": {
+            "computed": {
+              "overflow-x": "visible",
+              "overflow-y": "visible"
+            }
+          }
+        },
+        {
+          "id": "GRID-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-navigation",
+          "expect": {
+            "focusOrder": ["grid-scroll"],
+            "focusVisible": true,
+            "scrollsWithKeys": {
+              "target": "grid-scroll",
+              "keys": ["ArrowDown", "ArrowRight"]
+            }
+          }
+        },
+        {
+          "id": "GRID-A1",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "grid-scroll",
+          "expect": {
+            "role": "region",
+            "name": "Deployments"
+          }
+        },
+        {
+          "id": "GRID-A2",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "grid",
+          "expect": {
+            "role": "grid"
+          }
+        },
+        {
+          "id": "GRID-A3",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "high-contrast",
+          "target": "row-1",
+          "expect": {
+            "forcedColorsVisible": true
+          }
+        },
+        {
+          "id": "GRID-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0
+          }
+        }
+      ],
+      "csp": "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    },
+    {
+      "id": "CE-CORPUS-CONTENT-01",
+      "title": "Marketing hero and editorial article with columns, lists, quotes, code and print styles",
+      "fixtureClass": "content-and-marketing",
+      "profiles": ["content"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-12-text-align-center-right-end",
+        "CE-FX-CAP-12-white-space-pre-pre-wrap-pre-line",
+        "CE-FX-CAP-12-text-wrap-keyword-targets",
+        "CE-FX-CAP-13-font-features-variations",
+        "CE-FX-CAP-13-text-decoration-longhands",
+        "CE-FX-CAP-13-list-counter-resources",
+        "CE-FX-CAP-14-gradient-resources",
+        "CE-FX-CAP-25-print-and-input-capability-queries",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/content/reference.html",
+          "role": "reference-page",
+          "sha256": "22ef62e8923d76cf3158c8abf111622b0998913bc236d09ef4e48a2cfc45e33c"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/content/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "b95615c9f609894ffa3868922b4ae8e0e92df819c17d6a7cda16c7f191ba81b3"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1280,
+          "height": 900
+        },
+        {
+          "id": "at-650",
+          "width": 650,
+          "height": 900
+        },
+        {
+          "id": "at-651",
+          "width": 651,
+          "height": 900
+        }
+      ],
+      "states": ["rest", "pointer-hover", "keyboard-focus", "print"],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "measure",
+            "value": "62ch"
+          },
+          {
+            "category": "sizes",
+            "name": "title-measure",
+            "value": "24ch"
+          },
+          {
+            "category": "fontSizes",
+            "name": "display",
+            "value": "40px"
+          },
+          {
+            "category": "fontSizes",
+            "name": "display-compact",
+            "value": "28px"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "hover",
+            "meaning": ":hover"
+          },
+          {
+            "name": "visited",
+            "meaning": ":visited"
+          },
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          },
+          {
+            "name": "marker",
+            "meaning": "::marker"
+          },
+          {
+            "name": "compact",
+            "meaning": "@media (max-width: 650px)"
+          },
+          {
+            "name": "print",
+            "meaning": "@media print"
+          }
+        ],
+        "resources": [
+          {
+            "kind": "gradient",
+            "name": "hero",
+            "value": "linear-gradient(180deg, #edf2e8 0%, #ffffff 100%)"
+          },
+          {
+            "kind": "font-feature-set",
+            "name": "text",
+            "value": "'kern' 1, 'liga' 1"
+          }
+        ]
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/content/reference.css"
+        ]
+      },
+      "knownLimitations": [
+        {
+          "subject": "hyphens: auto",
+          "outcome": "unsupported-behavior",
+          "statement": "Automatic hyphenation depends on the engine's language dictionaries; text assertions do not depend on hyphenation points."
+        }
+      ],
+      "assertions": [
+        {
+          "id": "CONTENT-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "CONTENT-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css"
+          }
+        },
+        {
+          "id": "CONTENT-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "columns",
+          "expect": {
+            "columns": 2
+          }
+        },
+        {
+          "id": "CONTENT-L2",
+          "oracle": "ORC-LAYOUT",
+          "case": "boundary",
+          "viewport": "at-650",
+          "state": "rest",
+          "target": "columns",
+          "expect": {
+            "columns": 1
+          }
+        },
+        {
+          "id": "CONTENT-L3",
+          "oracle": "ORC-LAYOUT",
+          "case": "boundary",
+          "viewport": "at-651",
+          "state": "rest",
+          "target": "columns",
+          "expect": {
+            "columns": 2
+          }
+        },
+        {
+          "id": "CONTENT-T1",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "code",
+          "expect": {
+            "preservesBreaks": {
+              "minLines": 3
+            }
+          }
+        },
+        {
+          "id": "CONTENT-T2",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "at-650",
+          "state": "rest",
+          "target": "hero-title",
+          "expect": {
+            "lineCount": {
+              "min": 2
+            },
+            "balancedLines": true
+          }
+        },
+        {
+          "id": "CONTENT-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "pointer-hover",
+          "target": "cta",
+          "expect": {
+            "computed": {
+              "background-color": "rgb(48, 68, 49)"
+            }
+          }
+        },
+        {
+          "id": "CONTENT-S2",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "print",
+          "target": "cta",
+          "expect": {
+            "computed": {
+              "display": "none"
+            }
+          }
+        },
+        {
+          "id": "CONTENT-S3",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "inline-link",
+          "expect": {
+            "computed": {
+              "text-decoration-line": "underline",
+              "text-underline-offset": "3px"
+            }
+          }
+        },
+        {
+          "id": "CONTENT-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "expect": {
+            "focusOrder": ["cta", "inline-link"],
+            "focusVisible": true
+          }
+        },
+        {
+          "id": "CONTENT-A1",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "hero-title",
+          "expect": {
+            "role": "heading"
+          }
+        },
+        {
+          "id": "CONTENT-A2",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "inline-link",
+          "expect": {
+            "contrastMin": 4.5
+          }
+        },
+        {
+          "id": "CONTENT-A3",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "steps",
+          "expect": {
+            "role": "list"
+          }
+        },
+        {
+          "id": "CONTENT-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0
+          }
+        }
+      ],
+      "csp": "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    },
+    {
+      "id": "CE-CORPUS-RTL-VERTICAL-01",
+      "title": "Mirrored right-to-left and left-to-right cards with bidi isolation, and vertical Japanese text",
+      "fixtureClass": "rtl-and-vertical-text",
+      "profiles": ["rtl", "web", "content"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-04-per-property-alignment-domain-writing-direction",
+        "CE-FX-CAP-06-logical-insets-rtl",
+        "CE-FX-CAP-08-logical-physical-spacing",
+        "CE-FX-CAP-13-rtl-vertical-writing",
+        "CE-FX-CAP-23-placeholder-file-backdrop-selection-content",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/rtl-vertical/reference.html",
+          "role": "reference-page",
+          "sha256": "e245eb463e541bbf0c6932c0a159f2f22d3ffe72ae9ab0024f527825a5306e27"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/rtl-vertical/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "692a2c7122cfda7ffa0a80326de9f3d93fa806616c1dc9396bc7d8e2eb4ab624"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1024,
+          "height": 900
+        }
+      ],
+      "states": ["rest", "rtl", "keyboard-focus"],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "card",
+            "value": "360px"
+          },
+          {
+            "category": "sizes",
+            "name": "vertical-block",
+            "value": "280px"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          },
+          {
+            "name": "after",
+            "meaning": "::after"
+          },
+          {
+            "name": "rtl",
+            "meaning": ":dir(rtl)"
+          }
+        ],
+        "resources": [
+          {
+            "kind": "generated-content",
+            "name": "arrow-forward",
+            "value": "'\\2192'"
+          },
+          {
+            "kind": "generated-content",
+            "name": "arrow-forward-rtl",
+            "value": "'\\2190'"
+          }
+        ]
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/rtl-vertical/reference.css"
+        ]
+      },
+      "knownLimitations": [
+        {
+          "subject": "ruby-position and text-combine-upright",
+          "outcome": "unsupported-behavior",
+          "statement": "Ruby placement and tate-chu-yoko rendering differ between engines; only computed values are asserted until CE-06 records target evidence."
+        }
+      ],
+      "assertions": [
+        {
+          "id": "RTL-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "RTL-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css"
+          }
+        },
+        {
+          "id": "RTL-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rtl",
+          "target": "badge-rtl",
+          "expect": {
+            "edgeOffset": {
+              "of": "card-rtl",
+              "edge": "left",
+              "value": 12
+            }
+          }
+        },
+        {
+          "id": "RTL-L2",
+          "oracle": "ORC-LAYOUT",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "badge-ltr",
+          "expect": {
+            "edgeOffset": {
+              "of": "card-ltr",
+              "edge": "right",
+              "value": 12
+            }
+          },
+          "note": "The same declarations mirror inside a dir=ltr subtree of an RTL document."
+        },
+        {
+          "id": "RTL-T1",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rtl",
+          "target": "text-rtl",
+          "expect": {
+            "direction": "rtl"
+          }
+        },
+        {
+          "id": "RTL-T2",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "vertical-text",
+          "expect": {
+            "writingMode": "vertical-rl"
+          }
+        },
+        {
+          "id": "RTL-T3",
+          "oracle": "ORC-TEXT",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "rtl",
+          "target": "bdi",
+          "expect": {
+            "direction": "ltr"
+          },
+          "note": "The isolated file name keeps its own direction inside RTL text."
+        },
+        {
+          "id": "RTL-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rtl",
+          "target": "link-rtl",
+          "expect": {
+            "computed": {
+              "content": "\"←\""
+            },
+            "pseudoElement": "::after"
+          }
+        },
+        {
+          "id": "RTL-S2",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "tcy",
+          "expect": {
+            "computed": {
+              "text-combine-upright": "all"
+            }
+          }
+        },
+        {
+          "id": "RTL-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "expect": {
+            "focusOrder": ["link-rtl", "link-ltr"],
+            "focusVisible": true
+          }
+        },
+        {
+          "id": "RTL-A1",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rtl",
+          "target": "title-rtl",
+          "expect": {
+            "role": "heading"
+          }
+        },
+        {
+          "id": "RTL-A2",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rtl",
+          "target": "badge-rtl",
+          "expect": {
+            "contrastMin": 4.5
+          }
+        },
+        {
+          "id": "RTL-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0
+          }
+        }
+      ],
+      "csp": "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    },
+    {
+      "id": "CE-CORPUS-SVG-MEDIA-01",
+      "title": "SVG icon button, line chart, cover-fitted media, fixed-size code image and a masked surface",
+      "fixtureClass": "svg-and-media",
+      "profiles": ["svg-media", "content"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-14-mask-resources-blend",
+        "CE-FX-CAP-16-object-fit-position",
+        "CE-FX-CAP-16-aspect-ratio-sizes",
+        "CE-FX-CAP-16-responsive-media-without-inline-css",
+        "CE-FX-CAP-17-svg-paint-geometry",
+        "CE-FX-CAP-17-dash-width-vector-effect",
+        "CE-FX-CAP-17-svg-text-presentation",
+        "CE-FX-CAP-30-asset-csp-facts",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/svg-media/reference.html",
+          "role": "reference-page",
+          "sha256": "a34bae99c76f775cbd73b0d7bc18ed8efc5365b8f34f333a9e6b5002a90d415c"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/svg-media/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "0a0d13729ae505ab14c9481915500951b9d468733b3b1d845f581f1b0b08f7f6"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/svg-media/media.svg",
+          "role": "asset",
+          "sha256": "7afd018d9e8419be2899213867c560b93ed2349211d18042c24962e0e52dfc50"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1024,
+          "height": 900
+        }
+      ],
+      "states": ["rest", "pointer-hover", "keyboard-focus", "high-contrast"],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "icon-md",
+            "value": "18px"
+          },
+          {
+            "category": "sizes",
+            "name": "icon-button",
+            "value": "32px"
+          },
+          {
+            "category": "sizes",
+            "name": "qr",
+            "value": "220px"
+          },
+          {
+            "category": "sizes",
+            "name": "media",
+            "value": "320px"
+          },
+          {
+            "category": "aspectRatios",
+            "name": "wide",
+            "value": "16 / 9"
+          },
+          {
+            "category": "strokeWidths",
+            "name": "icon",
+            "value": "2"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "hover",
+            "meaning": ":hover"
+          },
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          },
+          {
+            "name": "forcedColors",
+            "meaning": "@media (forced-colors: active)"
+          }
+        ],
+        "resources": [
+          {
+            "kind": "asset",
+            "name": "media",
+            "path": "media.svg",
+            "csp": "img-src 'self'"
+          },
+          {
+            "kind": "mask",
+            "name": "media-mask",
+            "asset": "media"
+          }
+        ]
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/svg-media/reference.css"
+        ]
+      },
+      "knownLimitations": [],
+      "assertions": [
+        {
+          "id": "MEDIA-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "MEDIA-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css"
+          }
+        },
+        {
+          "id": "MEDIA-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "media-img",
+          "expect": {
+            "box": {
+              "width": 320,
+              "height": 180
+            }
+          }
+        },
+        {
+          "id": "MEDIA-L2",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "qr-img",
+          "expect": {
+            "box": {
+              "width": 220,
+              "height": 220
+            }
+          }
+        },
+        {
+          "id": "MEDIA-L3",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "icon",
+          "expect": {
+            "box": {
+              "width": 18,
+              "height": 18
+            }
+          }
+        },
+        {
+          "id": "MEDIA-L4",
+          "oracle": "ORC-LAYOUT",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "media-img",
+          "expect": {
+            "sameBoxAsReference": true
+          },
+          "note": "The intrinsic 640x480 size and attributes lose to the authored 16:9 ratio."
+        },
+        {
+          "id": "MEDIA-T1",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "media-caption",
+          "expect": {
+            "noOverflow": true
+          }
+        },
+        {
+          "id": "MEDIA-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "pointer-hover",
+          "target": "icon-button",
+          "expect": {
+            "computed": {
+              "background-color": "rgb(237, 242, 232)"
+            }
+          }
+        },
+        {
+          "id": "MEDIA-S2",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "media-img",
+          "expect": {
+            "computed": {
+              "object-fit": "cover",
+              "object-position": "50% 30%"
+            }
+          }
+        },
+        {
+          "id": "MEDIA-S3",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "icon",
+          "expect": {
+            "computed": {
+              "stroke-width": "2px",
+              "stroke-linecap": "round",
+              "fill": "none"
+            }
+          }
+        },
+        {
+          "id": "MEDIA-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "expect": {
+            "focusOrder": ["icon-button"],
+            "focusVisible": true
+          }
+        },
+        {
+          "id": "MEDIA-A1",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "chart",
+          "expect": {
+            "role": "img",
+            "name": "Requests over time"
+          }
+        },
+        {
+          "id": "MEDIA-A2",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "icon-button",
+          "expect": {
+            "role": "button",
+            "name": "Refresh",
+            "targetSizeMin": 24
+          }
+        },
+        {
+          "id": "MEDIA-A3",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "high-contrast",
+          "target": "icon",
+          "expect": {
+            "forcedColorsVisible": true
+          }
+        },
+        {
+          "id": "MEDIA-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0
+          }
+        }
+      ],
+      "csp": "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    },
+    {
+      "id": "CE-CORPUS-SSR-01",
+      "title": "Server-rendered route with complete first-paint CSS and a lazily loaded route stylesheet",
+      "fixtureClass": "ssr-application",
+      "profiles": ["ssr", "web"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-36-no-runtime-css-compilation-or-injection",
+        "CE-FX-CAP-44-ssr-first-paint-hydration",
+        "CE-FX-CAP-44-lazy-route-hmr-stale-rules",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/ssr/reference.html",
+          "role": "reference-page",
+          "sha256": "997f83f5bf1d416951cb0904ee71374438e63a43c6c095e336ec9b2d2a44e760"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/ssr/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "4af52d1413ac4f9a5fd42b85e8a60755be92b491db6e9309f02e2a3af59c174c"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/ssr/route.html",
+          "role": "reference-page",
+          "sha256": "aad15933a1a9377c06468b0c974e7517bb6ca58b6f2b5b2c10e686ff32a4d747"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/ssr/route.css",
+          "role": "reference-stylesheet",
+          "sha256": "1228ffad62c4bffeb9a865204c35a4df0e32eef0bc84cb9f10055b980e12998a"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1024,
+          "height": 768
+        },
+        {
+          "id": "phone",
+          "width": 360,
+          "height": 740
+        }
+      ],
+      "states": ["rest", "hydrated", "keyboard-focus"],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "masthead",
+            "value": "56px"
+          },
+          {
+            "category": "sizes",
+            "name": "panel",
+            "value": "420px"
+          },
+          {
+            "category": "shadows",
+            "name": "card",
+            "value": "0 1px 2px rgba(0, 0, 0, 0.08)"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "currentPage",
+            "meaning": "[aria-current=page]"
+          },
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          }
+        ],
+        "resources": [
+          {
+            "kind": "grid-tracks",
+            "name": "cards",
+            "value": "repeat(auto-fill, minmax(200px, 1fr))"
+          },
+          {
+            "kind": "route-stylesheet",
+            "name": "settings",
+            "path": "route.css"
+          }
+        ]
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/ssr/reference.css",
+          "tests/core-evolution/corpus/fixtures/ssr/route.css"
+        ]
+      },
+      "knownLimitations": [],
+      "assertions": [
+        {
+          "id": "SSR-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "SSR-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css and route.css, the route rules only in the route chunk"
+          }
+        },
+        {
+          "id": "SSR-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "masthead",
+          "expect": {
+            "box": {
+              "height": 56
+            }
+          },
+          "note": "Measured with scripts disabled: the server HTML alone."
+        },
+        {
+          "id": "SSR-L2",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "hydrated",
+          "target": "settings-panel",
+          "expect": {
+            "maxBox": {
+              "width": 420
+            }
+          }
+        },
+        {
+          "id": "SSR-L3",
+          "oracle": "ORC-LAYOUT",
+          "case": "boundary",
+          "viewport": "phone",
+          "state": "hydrated",
+          "target": "card-1",
+          "expect": {
+            "sameBoxAsReference": true
+          },
+          "note": "Hydration changes no box of the server-rendered page."
+        },
+        {
+          "id": "SSR-T1",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "phone",
+          "state": "hydrated",
+          "target": "settings-hint",
+          "expect": {
+            "noOverflow": true
+          }
+        },
+        {
+          "id": "SSR-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "hydrated",
+          "target": "tab-home",
+          "expect": {
+            "computedUnchanged": ["background-color", "font-weight"]
+          }
+        },
+        {
+          "id": "SSR-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "expect": {
+            "focusOrder": ["brand", "tab-home", "tab-settings"],
+            "focusVisible": true
+          }
+        },
+        {
+          "id": "SSR-A1",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "tab-home",
+          "expect": {
+            "role": "link",
+            "name": "Home"
+          }
+        },
+        {
+          "id": "SSR-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0,
+            "completeFirstPaint": true
+          }
+        },
+        {
+          "id": "SSR-P2",
+          "oracle": "ORC-CSP",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "hydrated",
+          "expect": {
+            "violations": 0,
+            "runtimeStyleInsertions": 0
+          },
+          "note": "The lazy route stylesheet arrives as a static 'self' file during client navigation."
+        },
+        {
+          "id": "SSR-P3",
+          "oracle": "ORC-CSP",
+          "case": "negative",
+          "mutation": {
+            "kind": "inject-style-element",
+            "file": "reference.html"
+          },
+          "mustFail": "SSR-P1"
+        }
+      ],
+      "csp": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'"
+    },
+    {
+      "id": "CE-CORPUS-COMPONENT-LIBRARY-01",
+      "title": "Shareable recipes: button and badge variants, a card slot recipe and a nested dark theme",
+      "fixtureClass": "component-library",
+      "profiles": ["reusable-package", "web"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-22-nested-theme-override-reset",
+        "CE-FX-CAP-31-expanded-domain-in-recipes-slots-compounds",
+        "CE-FX-CAP-31-default-slot-conflict-stability",
+        "CE-FX-CAP-35-versioned-definition-imports-namespaces",
+        "CE-FX-CAP-35-package-provenance",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/component-library/reference.html",
+          "role": "reference-page",
+          "sha256": "0fbe22ce67f9e658db2a329e9fa23d1d70cf1b59c8ac3a56cbafc6d5bda86f55"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/component-library/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "aa04d2536e8df46b0851e07351191466a9067c7d359902bcd1748bbe7eefa0b3"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1024,
+          "height": 800
+        }
+      ],
+      "states": ["rest", "pointer-hover", "keyboard-focus"],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "control-md",
+            "value": "36px"
+          },
+          {
+            "category": "sizes",
+            "name": "control-sm",
+            "value": "28px"
+          },
+          {
+            "category": "sizes",
+            "name": "badge",
+            "value": "20px"
+          },
+          {
+            "category": "sizes",
+            "name": "card",
+            "value": "320px"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "hover",
+            "meaning": ":hover"
+          },
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          }
+        ],
+        "resources": [
+          {
+            "kind": "recipe",
+            "name": "button",
+            "axes": {
+              "tone": ["primary", "secondary", "danger"],
+              "size": ["sm", "md"]
+            }
+          },
+          {
+            "kind": "recipe",
+            "name": "badge",
+            "axes": {
+              "tone": ["neutral", "success", "warning"]
+            }
+          },
+          {
+            "kind": "slot-recipe",
+            "name": "card",
+            "slots": ["root", "header", "body", "footer"]
+          },
+          {
+            "kind": "theme",
+            "name": "dark"
+          },
+          {
+            "kind": "grid-tracks",
+            "name": "card-rows",
+            "value": "auto 1fr auto"
+          }
+        ]
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/component-library/reference.css"
+        ]
+      },
+      "knownLimitations": [],
+      "assertions": [
+        {
+          "id": "LIB-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "LIB-V2",
+          "oracle": "ORC-VOCAB",
+          "case": "boundary",
+          "expect": {
+            "rejectedWithout": "recipes.button tone=danger"
+          },
+          "note": "A consumer selecting an undeclared variant value is rejected; the package owns the domain."
+        },
+        {
+          "id": "LIB-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css"
+          }
+        },
+        {
+          "id": "LIB-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "btn-primary-md",
+          "expect": {
+            "minBox": {
+              "height": 36
+            }
+          }
+        },
+        {
+          "id": "LIB-L2",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "btn-primary-sm",
+          "expect": {
+            "minBox": {
+              "height": 28
+            }
+          }
+        },
+        {
+          "id": "LIB-L3",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "badge-success",
+          "expect": {
+            "box": {
+              "height": 20
+            }
+          }
+        },
+        {
+          "id": "LIB-L4",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "card",
+          "expect": {
+            "maxBox": {
+              "width": 320
+            }
+          }
+        },
+        {
+          "id": "LIB-T1",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "badge-warning",
+          "expect": {
+            "lineCount": 1
+          }
+        },
+        {
+          "id": "LIB-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "pointer-hover",
+          "target": "btn-primary-md",
+          "expect": {
+            "computed": {
+              "background-color": "rgb(48, 68, 49)"
+            }
+          }
+        },
+        {
+          "id": "LIB-S2",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "btn-primary-dark",
+          "expect": {
+            "computed": {
+              "background-color": "rgb(156, 197, 159)"
+            }
+          }
+        },
+        {
+          "id": "LIB-S3",
+          "oracle": "ORC-STATE",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "target": "btn-primary-dark",
+          "expect": {
+            "computed": {
+              "outline-color": "rgb(156, 197, 159)"
+            }
+          },
+          "note": "The nested theme overrides the focus ring color only inside its subtree."
+        },
+        {
+          "id": "LIB-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "expect": {
+            "focusOrder": [
+              "btn-primary-md",
+              "btn-secondary-md",
+              "btn-primary-sm",
+              "btn-danger-md"
+            ],
+            "focusVisible": true
+          }
+        },
+        {
+          "id": "LIB-A1",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "btn-danger-md",
+          "expect": {
+            "contrastMin": 4.5
+          }
+        },
+        {
+          "id": "LIB-A2",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "badge-warning",
+          "expect": {
+            "contrastMin": 4.5
+          }
+        },
+        {
+          "id": "LIB-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0
+          }
+        }
+      ],
+      "csp": "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    },
+    {
+      "id": "CE-CORPUS-INTERACTION-STATES-01",
+      "title": "One control in every interaction state, a menu, a switch and selectable text",
+      "fixtureClass": "interaction-states",
+      "profiles": ["web", "desktop-renderer", "forms"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-10-focus-visible-ring-forced-colors",
+        "CE-FX-CAP-10-reduced-motion-contrast-modes",
+        "CE-FX-CAP-11-cursor-pointer-default-not-allowed-text",
+        "CE-FX-CAP-11-user-select-text-touch-action",
+        "CE-FX-CAP-18-transform-none-disabled-reduced-motion",
+        "CE-FX-CAP-23-named-pseudo-aria-data-state-conditions",
+        "CE-FX-CAP-24-group-peer-marker-relations",
+        "CE-FX-CAP-25-print-and-input-capability-queries",
+        "CE-FX-CAP-45-render-behavior-fidelity"
+      ],
+      "inputs": [
+        {
+          "path": "tests/core-evolution/corpus/fixtures/interaction-states/reference.html",
+          "role": "reference-page",
+          "sha256": "fb283b411fea7c3226b6d5682892e33d88dc022190c8cdd41471a0c3ad0ba755"
+        },
+        {
+          "path": "tests/core-evolution/corpus/fixtures/interaction-states/reference.css",
+          "role": "reference-stylesheet",
+          "sha256": "d8c696727aa30cd09dbff537eb622df82c125a56200fc3afcc0544857eeb7db1"
+        }
+      ],
+      "viewports": [
+        {
+          "id": "wide",
+          "width": 1024,
+          "height": 900
+        }
+      ],
+      "states": [
+        "rest",
+        "pointer-hover",
+        "pointer-active",
+        "touch",
+        "keyboard-focus",
+        "keyboard-navigation",
+        "error",
+        "loading",
+        "disabled",
+        "high-contrast",
+        "increased-contrast",
+        "reduced-motion"
+      ],
+      "acceptedVocabulary": {
+        "tokens": [
+          {
+            "category": "sizes",
+            "name": "control",
+            "value": "36px"
+          },
+          {
+            "category": "sizes",
+            "name": "touch-target",
+            "value": "44px"
+          },
+          {
+            "category": "opacities",
+            "name": "disabled",
+            "value": "0.6"
+          }
+        ],
+        "conditions": [
+          {
+            "name": "hover",
+            "meaning": ":hover"
+          },
+          {
+            "name": "active",
+            "meaning": ":active"
+          },
+          {
+            "name": "focusVisible",
+            "meaning": ":focus-visible"
+          },
+          {
+            "name": "invalid",
+            "meaning": "[aria-invalid=true]"
+          },
+          {
+            "name": "busy",
+            "meaning": "[aria-busy=true]"
+          },
+          {
+            "name": "disabled",
+            "meaning": ":disabled, [aria-disabled=true]"
+          },
+          {
+            "name": "peerChecked",
+            "meaning": ":checked + sibling"
+          },
+          {
+            "name": "peerFocusVisible",
+            "meaning": ":focus-visible + sibling"
+          },
+          {
+            "name": "touchOnly",
+            "meaning": "@media (hover: none) and (pointer: coarse)"
+          },
+          {
+            "name": "reducedMotion",
+            "meaning": "@media (prefers-reduced-motion: reduce)"
+          },
+          {
+            "name": "forcedColors",
+            "meaning": "@media (forced-colors: active)"
+          },
+          {
+            "name": "moreContrast",
+            "meaning": "@media (prefers-contrast: more)"
+          }
+        ],
+        "resources": [
+          {
+            "kind": "keyframes",
+            "name": "spin"
+          }
+        ]
+      },
+      "expectedCss": {
+        "oracle": "ORC-CSS",
+        "stylesheets": [
+          "tests/core-evolution/corpus/fixtures/interaction-states/reference.css"
+        ]
+      },
+      "knownLimitations": [],
+      "assertions": [
+        {
+          "id": "STATES-V1",
+          "oracle": "ORC-VOCAB",
+          "case": "positive",
+          "expect": {
+            "accepted": true
+          }
+        },
+        {
+          "id": "STATES-C1",
+          "oracle": "ORC-CSS",
+          "case": "positive",
+          "expect": {
+            "declarationsEquivalent": "reference.css"
+          }
+        },
+        {
+          "id": "STATES-L1",
+          "oracle": "ORC-LAYOUT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "touch",
+          "target": "control-rest",
+          "expect": {
+            "minBox": {
+              "height": 44
+            }
+          }
+        },
+        {
+          "id": "STATES-T1",
+          "oracle": "ORC-TEXT",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "error",
+          "target": "error-text",
+          "expect": {
+            "lineCount": 1,
+            "noOverflow": true
+          }
+        },
+        {
+          "id": "STATES-S1",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "pointer-hover",
+          "target": "control-pointer",
+          "expect": {
+            "computed": {
+              "background-color": "rgb(237, 242, 232)"
+            }
+          }
+        },
+        {
+          "id": "STATES-S2",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "pointer-active",
+          "target": "control-pointer",
+          "expect": {
+            "computed": {
+              "transform": "matrix(1, 0, 0, 1, 0, 1)"
+            }
+          }
+        },
+        {
+          "id": "STATES-S3",
+          "oracle": "ORC-STATE",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "pointer-active",
+          "target": "control-disabled",
+          "expect": {
+            "computed": {
+              "transform": "none"
+            }
+          }
+        },
+        {
+          "id": "STATES-S4",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "target": "control-keyboard",
+          "expect": {
+            "computed": {
+              "outline-style": "solid",
+              "outline-width": "2px",
+              "outline-offset": "2px"
+            }
+          }
+        },
+        {
+          "id": "STATES-S5",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "error",
+          "target": "control-error",
+          "expect": {
+            "computed": {
+              "border-top-color": "rgb(168, 60, 55)",
+              "color": "rgb(168, 60, 55)"
+            }
+          }
+        },
+        {
+          "id": "STATES-S6",
+          "oracle": "ORC-STATE",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "loading",
+          "target": "control-loading",
+          "expect": {
+            "computed": {
+              "cursor": "not-allowed",
+              "opacity": "0.6"
+            }
+          },
+          "note": "aria-busy and aria-disabled together: the later disabled rule wins the cursor."
+        },
+        {
+          "id": "STATES-S7",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "disabled",
+          "target": "control-disabled",
+          "expect": {
+            "computed": {
+              "cursor": "not-allowed",
+              "opacity": "0.6"
+            }
+          }
+        },
+        {
+          "id": "STATES-S8",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "touch",
+          "target": "control-pointer",
+          "expect": {
+            "computed": {
+              "background-color": "rgb(255, 255, 255)"
+            }
+          },
+          "note": "No sticky hover color after a tap."
+        },
+        {
+          "id": "STATES-S9",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "reduced-motion",
+          "target": "control-rest",
+          "expect": {
+            "computed": {
+              "transition-duration": "0s"
+            }
+          }
+        },
+        {
+          "id": "STATES-S10",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "increased-contrast",
+          "target": "control-rest",
+          "expect": {
+            "computed": {
+              "border-top-color": "rgb(31, 36, 33)"
+            }
+          }
+        },
+        {
+          "id": "STATES-S11",
+          "oracle": "ORC-STATE",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "selectable",
+          "expect": {
+            "computed": {
+              "user-select": "text",
+              "cursor": "text"
+            }
+          }
+        },
+        {
+          "id": "STATES-K1",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-focus",
+          "expect": {
+            "focusOrder": [
+              "control-rest",
+              "control-pointer",
+              "control-keyboard",
+              "control-error",
+              "control-loading",
+              "menu-item-1",
+              "switch-input"
+            ],
+            "focusVisible": true
+          }
+        },
+        {
+          "id": "STATES-K2",
+          "oracle": "ORC-KEYBOARD",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "keyboard-navigation",
+          "expect": {
+            "activates": {
+              "target": "switch-input",
+              "keys": ["Space"],
+              "then": {
+                "checked": true,
+                "computedOn": "switch-track",
+                "computed": {
+                  "background-color": "rgb(62, 86, 63)"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "STATES-K3",
+          "oracle": "ORC-KEYBOARD",
+          "case": "negative",
+          "mutation": {
+            "kind": "set-attribute",
+            "file": "reference.html",
+            "target": "control-keyboard",
+            "attribute": "tabindex",
+            "value": "-1"
+          },
+          "mustFail": "STATES-K1"
+        },
+        {
+          "id": "STATES-A1",
+          "oracle": "ORC-A11Y",
+          "case": "boundary",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "switch-input",
+          "expect": {
+            "role": "switch",
+            "name": "Notifications",
+            "visuallyHiddenButExposed": true
+          }
+        },
+        {
+          "id": "STATES-A2",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "error",
+          "target": "error-text",
+          "expect": {
+            "contrastMin": 4.5
+          }
+        },
+        {
+          "id": "STATES-A3",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "high-contrast",
+          "target": "control-keyboard",
+          "expect": {
+            "forcedColorsVisible": true
+          }
+        },
+        {
+          "id": "STATES-A4",
+          "oracle": "ORC-A11Y",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "target": "menu",
+          "expect": {
+            "role": "menu",
+            "name": "Actions"
+          }
+        },
+        {
+          "id": "STATES-P1",
+          "oracle": "ORC-CSP",
+          "case": "positive",
+          "viewport": "wide",
+          "state": "rest",
+          "expect": {
+            "violations": 0,
+            "styleElements": 0,
+            "styleAttributes": 0,
+            "runtimeStyleInsertions": 0,
+            "inlineCustomProperties": 0
+          }
+        }
+      ],
+      "csp": "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    }
+  ],
+  "negativeFixtures": [
+    {
+      "id": "CE-NEG-WRONG-CATEGORY-01",
+      "category": "wrong-category",
+      "title": "A color token used for padding",
+      "profiles": ["web", "forms", "data"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-20-category-grammar-compositional-references"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({ field: { padding: token('colors.text.primary') } });\nexport const field = props(styles.field);\n",
+      "sourceSha256": "9539b6bd185727e65bc0edcc06e18e9c33005e47032bcb3220fb1deb7bb03e46",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected with a structured diagnostic naming the offending value",
+          "sourceInspection": {
+            "code": "PMS_INVALID_TOKEN_CATEGORY",
+            "rule": "category-strict",
+            "site": "packages/compiler/src/engine/lowering/styles.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "policy",
+          "codes": ["PMS_INVALID_TOKEN_CATEGORY"],
+          "rule": "category-strict",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-WRONG-CATEGORY-02",
+      "category": "wrong-category",
+      "title": "A spacing token used for an SVG fill",
+      "profiles": ["svg-media", "content"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-17-svg-paint-geometry",
+        "CE-FX-CAP-20-category-grammar-compositional-references"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({ icon: { fill: token('spacing.md') } });\nexport const icon = props(styles.icon);\n",
+      "sourceSha256": "aaa8e991650dea806733912358e1857faa0a62226050a9a360def5e45460127d",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected with a structured diagnostic naming the offending value",
+          "sourceInspection": {
+            "code": "PMS_INVALID_TOKEN_CATEGORY",
+            "rule": "category-strict",
+            "site": "packages/compiler/src/engine/lowering/styles.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "policy",
+          "codes": ["PMS_INVALID_TOKEN_CATEGORY"],
+          "rule": "category-strict",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-PRIVATE-RESOURCE-01",
+      "category": "private-resource",
+      "title": "A private primitive token selected by a consumer",
+      "profiles": ["reusable-package", "web"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-35-cross-system-runtime-reference-negative"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({ title: { color: token('colors.blue.500') } });\nexport const title = props(styles.title);\n",
+      "sourceSha256": "c0d8577902d4e487c7d98bd366c75e40e0796c6d458ff3544805cfb81a7baeea",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected with a structured diagnostic naming the offending value",
+          "sourceInspection": {
+            "code": "PMS_TOKEN_NOT_PUBLIC",
+            "rule": "visibility.consumer",
+            "site": "packages/compiler/src/engine/lowering/styles.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "policy",
+          "codes": ["PMS_TOKEN_NOT_PUBLIC"],
+          "rule": "visibility.consumer",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-PRIVATE-RESOURCE-02",
+      "category": "private-resource",
+      "title": "An image URL on infrastructure the design system does not own",
+      "profiles": ["content", "svg-media"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-30-asset-url-base-path-hash",
+        "CE-FX-CAP-30-asset-csp-facts"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({ hero: { backgroundImage: 'url(https://assets.internal.example/hero.png)' } });\nexport const hero = props(styles.hero);\n",
+      "sourceSha256": "f0df97831902190d3a0ec1d8974964a50a2921f02e18b27f40826c1a5d001f7b",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected once background images exist: only system-owned asset resources are admitted (CE-09); the diagnostic must name the unowned URL",
+          "sourceInspection": {
+            "code": "PMS_UNSUPPORTED_PROPERTY",
+            "rule": "supported-properties",
+            "site": "packages/compiler/src/engine/lowering/styles.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "policy",
+          "codes": ["PMS_UNSUPPORTED_PROPERTY"],
+          "rule": "supported-properties",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-UNKNOWN-SELECTOR-01",
+      "category": "unknown-selector",
+      "title": "A raw structural selector used as a style key",
+      "profiles": ["web", "forms"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-24-raw-condition-bypass-negative",
+        "CE-FX-CAP-24-owned-selector-grammar"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({\n  item: { '&:nth-child(3)': { color: token('colors.text.primary') } },\n});\nexport const item = props(styles.item);\n",
+      "sourceSha256": "97df211159669c1817a6a615eb39d842f9c883c4c304730e3c5e366322a5bafc",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected: selectors come only from the owned selector grammar and declared conditions (CE-07). Alpha 1 reads the '&:' key as an undeclared condition, so the diagnostic names a condition rather than a raw selector.",
+          "sourceInspection": {
+            "code": "PMS_UNKNOWN_CONDITION",
+            "rule": "conditions.named-only",
+            "site": "packages/compiler/src/engine/lowering/styles.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "policy",
+          "codes": ["PMS_UNKNOWN_CONDITION"],
+          "rule": "conditions.named-only",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-UNKNOWN-SELECTOR-02",
+      "category": "unknown-selector",
+      "title": "An undeclared state condition",
+      "profiles": ["forms", "desktop-renderer"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-23-named-pseudo-aria-data-state-conditions"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({\n  input: { _peerHover: { color: token('colors.text.primary') } },\n});\nexport const input = props(styles.input);\n",
+      "sourceSha256": "d45a750646227cf7ebd893b22c43776e68a62adfe2ce52d8d300dab0a75ba11c",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected with a structured diagnostic naming the offending value",
+          "sourceInspection": {
+            "code": "PMS_UNKNOWN_CONDITION",
+            "rule": "conditions.named-only",
+            "site": "packages/compiler/src/engine/lowering/styles.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "policy",
+          "codes": ["PMS_UNKNOWN_CONDITION"],
+          "rule": "conditions.named-only",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-UNKNOWN-SELECTOR-03",
+      "category": "unknown-selector",
+      "title": "A raw direction selector instead of logical properties or a declared direction condition",
+      "profiles": ["rtl"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-24-raw-condition-bypass-negative",
+        "CE-FX-CAP-06-logical-insets-rtl"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({\n  card: { '[dir=rtl] &': { paddingLeft: token('spacing.md') } },\n});\nexport const card = props(styles.card);\n",
+      "sourceSha256": "d8d61df69b2457fb32b1c708001995802940e715bd37655ec7b2f083b4c0f3f9",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected: direction uses logical properties or a declared direction condition",
+          "sourceInspection": {
+            "code": "PMS_UNSUPPORTED_PROPERTY",
+            "rule": "supported-properties",
+            "site": "packages/compiler/src/engine/lowering/styles.js",
+            "superseded": "The CE-00.2 source-inspection expectation was wrong; execution shows acceptance."
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-accepted",
+          "phase": null,
+          "codes": [],
+          "rule": null,
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1",
+          "emittedCssContains": ["[dir=rtl] &"],
+          "defect": {
+            "scopeFinding": "SF-02",
+            "owner": "CE-07.1",
+            "issue": 54,
+            "statement": "Alpha 1 accepts the raw '[dir=rtl] &' key and emits it verbatim into the stylesheet. This is a raw-selector authority gap, not a supported form. Until CE-07.1 closes it, the rtl profile has no negative fixture that Alpha 1 actually rejects; the rejection stays intended and the fixture fails its intent today."
+          }
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-RAW-STYLE-01",
+      "category": "raw-style",
+      "title": "An inline style attribute",
+      "profiles": ["web", "ssr"],
+      "capabilityFixtureSets": ["CE-FX-CAP-36-no-free-css-value-transport"],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "export function Banner() {\n  return <div style={{ color: 'red' }}>Banner</div>;\n}\n",
+      "sourceSha256": "ae01761e387e202f18038752db34f9e2b977fdc6cf70fb9e3b332d12c8da9b98",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected with a structured diagnostic naming the offending value",
+          "sourceInspection": {
+            "code": "PMS_FORBIDDEN_STYLE_CHANNEL",
+            "rule": "profile.closed.style-channel",
+            "site": "packages/compiler/src/frontend/babel/plugin.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "coverage",
+          "codes": ["PMS_FORBIDDEN_STYLE_CHANNEL"],
+          "rule": "profile.closed.style-channel",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "jsx"
+    },
+    {
+      "id": "CE-NEG-RAW-STYLE-02",
+      "category": "raw-style",
+      "title": "An arbitrary raw length on a category-bound property",
+      "profiles": ["data", "desktop-renderer"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-02-finite-keyword-domain-negative",
+        "CE-FX-CAP-03-unit-aware-validation"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({ row: { gap: '13px' } });\nexport const row = props(styles.row);\n",
+      "sourceSha256": "5ab3a9777efa7b85dc65a077c3f20e6c5566cd9e5b9fc7b2629a203bbd0dbfff",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected with a structured diagnostic naming the offending value",
+          "sourceInspection": {
+            "code": "PMS_FORBIDDEN_VALUE",
+            "rule": "category-strict",
+            "site": "packages/compiler/src/engine/lowering/styles.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "policy",
+          "codes": ["PMS_FORBIDDEN_VALUE"],
+          "rule": "category-strict",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-RAW-STYLE-03",
+      "category": "raw-style",
+      "title": "A raw composite shorthand string",
+      "profiles": ["web"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-28-shorthand-reset-logical-physical-conflicts"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({ box: { border: '1px solid red' } });\nexport const box = props(styles.box);\n",
+      "sourceSha256": "15969cd02318c3d4753e87d399e22aac689c968e24a509a9f3d7c00714d8427b",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected as a raw string even if typed composites are added (CE-02); a typed composite of declared tokens is a different, positive fixture",
+          "sourceInspection": {
+            "code": "PMS_UNSUPPORTED_PROPERTY_FORM",
+            "rule": "supported-properties.composite-forms",
+            "site": "packages/compiler/src/engine/lowering/styles.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "policy",
+          "codes": ["PMS_UNSUPPORTED_PROPERTY_FORM"],
+          "rule": "supported-properties.composite-forms",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-RAW-STYLE-04",
+      "category": "raw-style",
+      "title": "A raw style object passed to props()",
+      "profiles": ["reusable-package", "web"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-36-no-free-css-value-transport",
+        "CE-FX-CAP-46-no-permissive-type-escape"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nexport const box = props({ color: 'red' });\n",
+      "sourceSha256": "79d6b13cb36bc74fe8f3f1738da39cfab2c5a626255e4974412f0989d832f797",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected with a structured diagnostic naming the offending value",
+          "sourceInspection": {
+            "code": "PMS_UNVERIFIED_PROPS_SOURCE",
+            "rule": "provenance.props-argument",
+            "site": "packages/compiler/src/frontend/babel/transform.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "provenance",
+          "codes": ["PMS_UNVERIFIED_PROPS_SOURCE"],
+          "rule": "provenance.props-argument",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-RUNTIME-VALUE-01",
+      "category": "runtime-value",
+      "title": "A value computed from runtime state",
+      "profiles": ["desktop-renderer", "web"],
+      "capabilityFixtureSets": ["CE-FX-CAP-36-finite-runtime-selection"],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nexport function rowStyles(revoked) {\n  const styles = create({ row: { opacity: revoked ? 0.75 : 1 } });\n  return props(styles.row);\n}\n",
+      "sourceSha256": "327c7c2f8eb66dd70b9d66ac7cfc45c887d9618f23568ebdefabf074e19756aa",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected (LIM-01); the supported form is a finite variant selected at runtime",
+          "sourceInspection": {
+            "code": "PMS_NON_STATIC_VALUE",
+            "rule": "static-resolution",
+            "site": "packages/compiler/src/frontend/babel/evaluate.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "evaluation",
+          "codes": ["PMS_NON_STATIC_VALUE"],
+          "rule": "static-resolution",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-RUNTIME-VALUE-02",
+      "category": "runtime-value",
+      "title": "A token path built at runtime",
+      "profiles": ["web"],
+      "capabilityFixtureSets": ["CE-FX-CAP-36-finite-runtime-selection"],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nexport function tone(name) {\n  const styles = create({ text: { color: token(`colors.text.${name}`) } });\n  return props(styles.text);\n}\n",
+      "sourceSha256": "f34685bf1253d1dc1c27d68b029d74cbad5096de9610d1c0131f6d244d1c84bd",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected with a structured diagnostic naming the offending value",
+          "sourceInspection": {
+            "code": "PMS_NON_STATIC_VALUE",
+            "rule": "static-resolution",
+            "site": "packages/compiler/src/frontend/babel/evaluate.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "evaluation",
+          "codes": ["PMS_NON_STATIC_VALUE"],
+          "rule": "static-resolution",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "js"
+    },
+    {
+      "id": "CE-NEG-RUNTIME-VALUE-03",
+      "category": "runtime-value",
+      "title": "A runtime value transported through an inline custom property",
+      "profiles": ["data", "ssr"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-36-no-free-css-value-transport",
+        "CE-FX-CAP-37-typed-variables-defaults-inheritance"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "export function Progress({ ratio }) {\n  return <div style={{ '--progress': `${ratio * 100}%` }} />;\n}\n",
+      "sourceSha256": "cfa3499e80f306a92bb0f66728ae1f04fe8b526651d9327a352c31164323f0dd",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected (LIM-01, LIM-02): custom properties are typed system resources, never a runtime value channel",
+          "sourceInspection": {
+            "code": "PMS_FORBIDDEN_STYLE_CHANNEL",
+            "rule": "profile.closed.style-channel",
+            "site": "packages/compiler/src/frontend/babel/plugin.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "coverage",
+          "codes": ["PMS_FORBIDDEN_STYLE_CHANNEL"],
+          "rule": "profile.closed.style-channel",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "sourceExtension": "jsx"
+    },
+    {
+      "id": "CE-NEG-MIXED-SYSTEM-01",
+      "category": "mixed-design-system",
+      "title": "References from two design systems composed together",
+      "profiles": ["reusable-package", "ssr"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-35-cross-system-runtime-reference-negative"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import * as a from './.pandamstyle/conformance.pandamstyle.js';\nimport * as b from '../vendor/src/.pandamstyle/vendor.pandamstyle.js';\nconst one = a.create({ box: { padding: a.token('spacing.md') } });\nconst two = b.create({ box: { padding: b.token('spacing.md') } });\nexport const box = a.props(one.box, two.box);\n",
+      "sourceSha256": "e22b69398ddc3266de896a8bffd528c756fd39a762205fd9c730571143458571",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected at compile time, and the runtime props() identity check must keep rejecting composed references of two systems; composition across systems needs versioned definition imports under one authority (CE-10)",
+          "sourceInspection": {
+            "code": "PMS_UNVERIFIED_PROPS_SOURCE",
+            "rule": "runtime.props-system-identity",
+            "site": "packages/core/src/props.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "imports",
+          "codes": [
+            "PMS_GENERATED_ARTIFACT_MISMATCH",
+            "PMS_UNVERIFIED_PROPS_SOURCE"
+          ],
+          "rule": "provenance.generated-artifact",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1",
+          "runtimeProbe": {
+            "outcome": "runtime-rejected",
+            "code": "PMS_UNVERIFIED_PROPS_SOURCE",
+            "rule": "runtime.props-system-identity",
+            "phase": "runtime-selection",
+            "procedure": "Compile one box style in each system, import both compiled references and compose them with the runtime props()."
+          }
+        }
+      },
+      "sourceExtension": "js",
+      "secondSystem": {
+        "definition": {
+          "path": "tests/core-evolution/corpus/negative/vendor-system.v1.json",
+          "sha256": "2825e55e10b9ee57dba89d72c5cd62e928fe2152f5d322cd8ca09425df069a3b"
+        },
+        "projectDir": "vendor",
+        "designSystemFile": "vendor.pandamstyle.js"
+      }
+    },
+    {
+      "id": "CE-NEG-UNKNOWN-PROPERTY-01",
+      "category": "unknown-property",
+      "title": "A desktop-only platform extension in a web project",
+      "profiles": ["web", "desktop-renderer"],
+      "capabilityFixtureSets": [
+        "CE-FX-CAP-01-unknown-and-vendor-property-diagnostics",
+        "CE-FX-CAP-11-electron-app-region-drag-no-drag"
+      ],
+      "definition": {
+        "path": "tests/fixtures/design-systems/conformance.js",
+        "sha256": "8f82492d0bb499aacfab2d1e235a08666aec53eb6eb307154f4e61dd2c4b7e93"
+      },
+      "source": "import { create, token, props } from './.pandamstyle/conformance.pandamstyle.js';\nconst styles = create({ titlebar: { WebkitAppRegion: 'drag' } });\nexport const titlebar = props(styles.titlebar);\n",
+      "sourceSha256": "2f7299cd5e4b9c4d23beefb1c7c3b1aa78bd36ed29ec8e9852f30e45e87058d0",
+      "expected": {
+        "intended": {
+          "outcome": "compiler-rejected",
+          "afterEveryLot": "must remain rejected in the web profile; only the desktop-renderer profile may admit it as a scoped platform extension (D-BP-03)",
+          "sourceInspection": {
+            "code": "PMS_UNSUPPORTED_PROPERTY",
+            "rule": "supported-properties",
+            "site": "packages/compiler/src/engine/lowering/styles.js"
+          }
+        },
+        "observedAlpha1": {
+          "outcome": "compiler-rejected",
+          "phase": "policy",
+          "codes": ["PMS_UNSUPPORTED_PROPERTY"],
+          "rule": "supported-properties",
+          "evidence": "E2: executed by tests/core-evolution/run-negatives.mjs against the workspace build of @pandamstyle/compiler 0.1.0-alpha.1"
+        }
+      },
+      "boundary": "Accepted only for the desktop-renderer profile after CE-05; the same source in a web project stays rejected.",
+      "sourceExtension": "js"
+    }
+  ],
+  "calibrationSets": ["W-UTIL-343", "W-MOCKUP-1559"]
+}

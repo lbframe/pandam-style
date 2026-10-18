@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SSR first paint reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <div id="root" data-testid="root">
+      <header class="masthead" data-testid="masthead">
+        <a class="brand" href="/" data-testid="brand">Catalog</a>
+        <nav class="tabs" aria-label="Sections">
+          <a class="tab" href="/" aria-current="page" data-testid="tab-home">Home</a>
+          <a class="tab" href="/settings" data-testid="tab-settings">Settings</a>
+        </nav>
+      </header>
+      <main class="home" data-testid="home">
+        <ul class="cards" data-testid="cards">
+          <li class="card" data-testid="card-1">First</li>
+          <li class="card">Second</li>
+          <li class="card">Third</li>
+          <li class="card">Fourth</li>
+        </ul>
+      </main>
+    </div>
+  </body>
+</html>

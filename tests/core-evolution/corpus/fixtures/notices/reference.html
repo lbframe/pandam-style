@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notices and empty states reference</title>
+    <link rel="stylesheet" href="reference.css" />
+  </head>
+  <body>
+    <main class="page">
+      <div class="notice notice-info" role="status" data-testid="notice-info">
+        <svg class="notice-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" /></svg>
+        <p class="notice-text">A new version is available. It installs the next time the application starts.</p>
+        <button class="notice-dismiss" type="button" aria-label="Dismiss" data-testid="notice-dismiss">×</button>
+      </div>
+      <div class="notice notice-danger" role="alert" data-testid="notice-danger">
+        <svg class="notice-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l7 14H1z" /></svg>
+        <p class="notice-text">The connection was lost.
+Retrying in 10 seconds.
+Changes are kept on this device.</p>
+      </div>
+      <section class="empty" aria-labelledby="empty-title" data-testid="empty">
+        <svg class="empty-icon" viewBox="0 0 16 16" aria-hidden="true" data-testid="empty-icon"><path d="M2 4h12v8H2z" /></svg>
+        <h2 class="empty-title" id="empty-title">Nothing here yet</h2>
+        <p class="empty-text" data-testid="empty-text">Items you create appear in this list. Start with a template or import an existing file.</p>
+        <button class="empty-action" type="button" data-testid="empty-action">Create an item</button>
+      </section>
+      <ul class="skeleton-list" aria-busy="true" aria-label="Loading items" data-testid="skeleton">
+        <li class="skeleton-row"></li>
+        <li class="skeleton-row"></li>
+        <li class="skeleton-row"></li>
+      </ul>
+    </main>
+  </body>
+</html>
