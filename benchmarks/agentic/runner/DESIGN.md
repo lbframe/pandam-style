@@ -294,7 +294,8 @@ derives **normalized counters**. Each derivation states its rule.
   `cache_creation_input_tokens`; the three are additive (provider API
   semantics, unverified here). Thinking tokens
   (`output_tokens_details.thinking_tokens`, `ModelUsage.thinkingTokens`) are
-  treated as a subset of output (unverified; consistency-checked at smoke).
+  treated as a subset of output (unverified; consistent with a subset in
+  the smoke run, §9.4).
 - **Default zeros (observed):** with no credentials, Claude printed an
   assistant message with `model: "<synthetic>"`, all-zero usage and
   `error: "authentication_failed"`, then a result with `total_cost_usd: 0`,
@@ -1287,7 +1288,72 @@ bound check.
   container error halted the whole matrix, so the remaining four attempts
   never ran. It also showed a spurious usage `discrepancy` (output
   snapshots, §2.2) and a channel audit that misidentified the CLI (§4.4).
-  All three are fixed (§11.2 item 20); the full run is to be repeated.
+  All three are fixed (§11.2 item 20). Its records are not kept.
+- **Re-run (2026-10-19, `5e6521d`, matrix `smoke-20261019-r2`), observed.**
+  Self-test of the exact binding passed (51 checks, binding `6af12df3…`);
+  all 6 attempts ran once (14:35:31–14:39:18Z including preflight), none
+  retried, contested or missing. Records, evaluations and the report, leak-scanned, are in
+  [`smoke/2026-10-19/`](smoke/2026-10-19/). Discovery: pass and success for
+  all three models. Composition: oracle verdict pass (haiku, sol) and fail
+  (sonnet: it deleted the untracked `..pandamstyle.pms-state.json`,
+  `generated-untouched`), but **all three are `capability-breach`**, a
+  false positive (finding 1 below). Resolution of the items above:
+  - *Tokens, cost, `costBasis`:* confirmed for Claude (`modelUsage` input,
+    cache read and write, output; `costUSD` with `costBasis: list`; values
+    `estimate`, `cli-stream-unattested`). Codex `turn.completed.usage` has
+    `input_tokens` (cached included), `cached_input_tokens`,
+    `cache_write_input_tokens: 0`, `output_tokens` and
+    `reasoning_output_tokens: 0`; there is **no cost** field (cost
+    `unknown`), and the zero cache-write and reasoning counters stay
+    `unknown` (default-zero rule).
+  - *Claude `init.effort`:* corrected: `init` has no effort value, only
+    `per_turn_effort_active: true`; the effective effort is `unknown` for
+    both CLIs with no effort flag (the baseline must pin it, Q3).
+    `message.model` equals the requested id exactly (fidelity `faithful`).
+  - *Auxiliary model keys:* none observed (`modelUsage` holds only the
+    requested model).
+  - *Codex served model:* not visible in the stream (`servedModels:
+    unknown`, `no-reroute-surfaced`). Error shapes: still unverified (no
+    Codex error occurred).
+  - *Provider hosts:* Claude: only `api.anthropic.com:443` (3 connections
+    per attempt). Codex: `chatgpt.com:443` (17–20 connections, about 35 MB
+    down per attempt) and denied attempts to `ab.chatgpt.com` and six
+    `sdmntpr*.oaiusercontent.com` hosts (12 per attempt), without visible
+    effect on the attempt. `registry.npmjs.org` was denied once whenever an
+    agent ran `npm` (npm's update check; no install command was run). The
+    proxy settings are honoured by both CLIs (every connection went through
+    the proxy; no other route exists, §4.3).
+  - *Mode A / mode B:* mode A works for Claude Code; it is infeasible for
+    Codex ChatGPT logins (§4.6), so Codex ran in mode B: export
+    `unchanged` on both attempts, no refresh, no write-back, no backup;
+    both host credential files byte-identical before and after. Refresh
+    rotation under mode B stays unverified (the token did not need a
+    refresh).
+  - *Tool-result exit status:* Claude `tool_result` carries `is_error`
+    `true`/`false` or omits it (absent counted as unknown); Codex
+    `command_execution` carries `exit_code` and `status`
+    (`completed`/`failed`).
+  - *Token consistency:* Claude input fields are additive (uncached + cache
+    read + cache write = total); thinking counts stayed below output, as a
+    subset would; Codex `cached_input_tokens` is within `input_tokens`.
+    Neither relation is provable from the stream.
+  - *Duplicate usage:* confirmed (up to 24 `assistant` events for 8
+    `message.id`s); the cross-check found no disagreement on any attempt.
+  - *Channel audit:* every attempt `cliNonDumpable: true`,
+    `foreignStreamHolders: 0` (1–4 samples).
+  - *Rate limits:* Claude `rate_limit_event`: `five_hour` allowed,
+    utilization 0.25, overage rejected (`org_level_disabled`); Codex
+    reports none.
+- **Defects found by the re-run (not fixed here; §11.2 item 22):**
+  1. `local-install` is detected from a `node_modules` digest that also
+     covers tool caches: Vite's `npm run build` leaves an empty
+     `node_modules/.vite-temp` directory (reproduced offline, with no
+     agent), so every legitimate build is a breach and success is
+     understated.
+  2. Codex runs commands through `bash -lc`; the login shell's
+     `/etc/profile` resets `PATH` to the Debian default, so `npm` was not
+     found (exit 127) until the agent added `/opt/node/bin` itself. Claude's
+     tool shell keeps the image `PATH`. The environments are not equal.
 - A successful smoke run cannot confirm rate-limit, capacity, quota
   exhaustion, refresh rotation under conflict, cancellation escalation or
   resource-limit behavior. Those stay covered by fixtures and are labelled
@@ -1516,8 +1582,13 @@ Each item was found while implementing, testing or in review round 1
     containers, staging, grading and self-test binding run in the
     credential-free Docker integration tests. The first smoke run executed
     it end to end for Claude (binding of the real store, trusted tree from
-    the real tarballs, CLI identity of the real binaries); Codex attempts
-    run first in the repeated smoke run.
+    the real tarballs, CLI identity of the real binaries); the re-run
+    executed it for all three models (§9.4).
+22. **Open defects from the smoke re-run (§9.4).** The `local-install`
+    filesystem detector counts tool caches under `node_modules` (Vite's
+    `.vite-temp`), and the agent image's login shell drops `/opt/node/bin`
+    from `PATH` for Codex. Neither is fixed yet; the composition outcomes of
+    the re-run are therefore not evidence of a breach.
 
 ### 11.3 Isolation self-test and Docker integration
 

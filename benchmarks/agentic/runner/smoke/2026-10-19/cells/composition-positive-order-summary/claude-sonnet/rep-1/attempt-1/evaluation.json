@@ -1,0 +1,225 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "composition-positive-order-summary",
+  "split": "development",
+  "workflow": "composition",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "fail",
+  "success": {
+    "application": false,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "fail",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "not-applicable",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "unmeasured"
+  },
+  "scope": {
+    "added": [
+      "src/components/OrderSummary.jsx"
+    ],
+    "modified": [
+      "src/pages/ProductPage.jsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [
+          "src/components/OrderSummary.jsx"
+        ],
+        "modified": [
+          "src/pages/ProductPage.jsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 9
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 11
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "fail",
+      "reason": "generated output is not compiler output: missing generation state",
+      "evidence": [
+        "missing generation state"
+      ]
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "summary-card",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x78zum5",
+          "xdt5ytf",
+          "x1x3a5v",
+          "x138jxqx",
+          "x1q3u54m",
+          "xleecmb"
+        ],
+        "text": "Order summary 1 × Mug 2 × Tote Checkout",
+        "styles": {
+          "box-shadow": "var(--xf6f47m)",
+          "background-color": "var(--x1sr72fd)",
+          "border-radius": "var(--xgt2h4b)"
+        }
+      }
+    },
+    {
+      "id": "summary-title",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x15vqsiv",
+          "xdb7zta"
+        ],
+        "text": "Order summary",
+        "styles": {
+          "font-size": "var(--x1kotaoi)",
+          "font-weight": "var(--xn8jr4g)"
+        }
+      }
+    },
+    {
+      "id": "summary-items",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [],
+        "text": "1 × Mug"
+      }
+    },
+    {
+      "id": "checkout-button",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x3nfvp2",
+          "x6s0dn4",
+          "xl56j7k",
+          "x1x3a5v",
+          "x1ia1lxn",
+          "xdb7zta",
+          "xbce6o",
+          "x1pkdvj6",
+          "x1bl2b9q",
+          "x127kycn",
+          "x1kebkhh",
+          "x1k51ob3",
+          "x1wob836",
+          "x1vsf56z",
+          "xu7bhrc",
+          "x1bpl3up",
+          "xh8yej3"
+        ],
+        "text": "Checkout",
+        "styles": {
+          "background-color": "var(--xrhwrwt)",
+          "color": "var(--xg9i5nz)",
+          "width": "100%"
+        }
+      }
+    },
+    {
+      "id": "mounted-on-page",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [],
+        "text": "2 × Canvas tote"
+      }
+    },
+    {
+      "id": "visual-fidelity",
+      "kind": "visual.fidelity",
+      "class": "visual",
+      "required": false,
+      "status": "unmeasured",
+      "reason": "no visual fidelity measurement exists for this epoch; never counted as passed",
+      "evidence": null
+    }
+  ]
+}
