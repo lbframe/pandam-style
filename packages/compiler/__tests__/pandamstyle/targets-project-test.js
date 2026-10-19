@@ -313,6 +313,37 @@ describe('incremental session against the fresh oracle', () => {
   });
 });
 
+describe('target records do not depend on the checkout location', () => {
+  test('the same project in two directories gives the same facts, report section and manifest', () => {
+    // A page-owned failing feature, so page owners enter the facts.
+    const copies = [
+      openWithUnsupportedCondition(),
+      openWithUnsupportedCondition(),
+    ];
+    for (const h of copies) h.reloadDefinition();
+    const records = copies.map((h) => {
+      const result = h.full();
+      const report = JSON.parse(readOut(h, 'build-report.json')).targets;
+      return {
+        report,
+        manifest: readOut(h, 'manifest.json'),
+        warnings: result.targetDiagnostics.map((d) => d.code),
+      };
+    });
+    expect(records[0].report.failingTotal).toBeGreaterThan(0);
+    expect(records[0].warnings).toContain('PMS_TARGET_CAPABILITY_INCOMPATIBLE');
+    expect(records[1].report).toEqual(records[0].report);
+    expect(records[1].manifest).toBe(records[0].manifest);
+  });
+
+  test('facts carry owner counts by role, never file paths', () => {
+    const h = openProject('valid');
+    h.full();
+    const report = JSON.parse(readOut(h, 'build-report.json'));
+    expect(JSON.stringify(report.targets)).not.toContain(h.project);
+  });
+});
+
 describe('generated runtime outputs do not depend on targets', () => {
   test('design module, declarations and CSS bytes are identical with and without targets', () => {
     const read = (targets) => {

@@ -30,7 +30,6 @@ import { Codes, diagnostic } from '../protocol/diagnostics';
 
 export const FACTS_KIND = 'pandamstyle-target-facts';
 export const FACTS_SCHEMA_VERSION = 1;
-const OWNER_SAMPLE = 4;
 // Protocol v1 default candidate bound.
 const CANDIDATE_LIMIT = 32;
 
@@ -87,6 +86,18 @@ function compareStrings(a, b) {
 
 function ownerKey(owner) {
   return `${owner.role}|${owner.file ?? ''}|${owner.line ?? ''}|${owner.column ?? ''}`;
+}
+
+function ownerCounts(owners) {
+  const counts = {};
+  for (const { owner } of owners) {
+    const role =
+      owner.role === 'generated' ? (owner.label ?? 'generated') : owner.role;
+    counts[role] = (counts[role] ?? 0) + 1;
+  }
+  return Object.fromEntries(
+    Object.entries(counts).sort(([a], [b]) => compareStrings(a, b)),
+  );
 }
 
 const outcomeCache = new Map();
@@ -243,7 +254,10 @@ export function evaluateTargets({
       required: policy == null,
       enhancement: policy == null ? null : policy.fallback,
       occurrences: use.occurrences,
-      owners: owners.slice(0, OWNER_SAMPLE).map(({ owner }) => owner),
+      // Owner counts by role, never file paths: the facts and their digest
+      // must not depend on where the project is checked out. Diagnostics keep
+      // the source locations.
+      owners: ownerCounts(owners),
       ownersTotal: owners.length,
       profiles: profiles.map((profile) => ({
         ref: profile.ref,
