@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/runner/schema/product-build.draft.schema.json",
   "title": "DRAFT product build binding (pms-agentic-product-build/v0-draft)",
-  "description": "DRAFT for the AG-00.2 design review; not a stable contract. Binds runs to a PandamStyle product build by artifact digests (runner/DESIGN.md section 4.6). The runner verifies every digest itself before use and never writes to the store.",
+  "description": "DRAFT for the AG-00.2 design review; not a stable contract. Binds runs to a PandamStyle product build by artifact digests (runner/DESIGN.md section 4.8). Binds only the product tarballs, the Node runtime and the source archive (agent docs); never the CE closure or npm cache. Artifacts are read from a verified copy of the store, never from the original. Candidate packing from a commit is future work and not accepted by this draft (F1).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -13,6 +13,7 @@
     "node",
     "agentDocs",
     "provenance",
+    "storeCopy",
     "digest"
   ],
   "properties": {
@@ -24,10 +25,11 @@
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["commit", "tree", "archiveSha256"],
+      "required": ["commit", "tree", "archiveFile", "archiveSha256"],
       "properties": {
         "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
         "tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "archiveFile": { "type": "string" },
         "archiveSha256": { "$ref": "#/$defs/sha256" },
         "version": { "type": "string" }
       }
@@ -44,7 +46,7 @@
           "version": { "type": "string" },
           "file": {
             "type": "string",
-            "description": "Path relative to the store."
+            "description": "Path relative to the verified store copy."
           },
           "sha256": { "$ref": "#/$defs/sha256" },
           "integrity": { "type": "string", "pattern": "^sha512-" }
@@ -75,39 +77,45 @@
       }
     },
     "provenance": {
-      "oneOf": [
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["kind", "manifestSha256", "manifestSource", "store"],
-          "properties": {
-            "kind": { "const": "ce-baseline-manifest" },
-            "manifestSha256": { "$ref": "#/$defs/sha256" },
-            "manifestSource": {
-              "type": "string",
-              "description": "Where the manifest file was read from, e.g. a git ref and path."
-            },
-            "store": {
-              "type": "string",
-              "description": "Store path with the home directory written as ~."
-            },
-            "archiveVerify": {
-              "type": ["object", "null"],
-              "description": "Result of tools/baselines/archive.mjs verify --replay when that tool is available; null otherwise."
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "manifestSha256", "manifestSource"],
+      "properties": {
+        "kind": { "const": "ce-baseline-manifest" },
+        "manifestSha256": { "$ref": "#/$defs/sha256" },
+        "manifestSource": {
+          "type": "string",
+          "description": "Git ref and path the manifest was read from, e.g. main@e2a864b:benchmarks/core-evolution/epochs/alpha1/manifest.v1.json."
+        }
+      }
+    },
+    "storeCopy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "verifiedArtifacts", "archiveVerify"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Verified copy of the store, home directory written as ~. Never the original store."
+        },
+        "verifiedArtifacts": {
+          "type": "array",
+          "description": "Every artifact the runner consumes, with the sha256 it recomputed.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["file", "sha256"],
+            "properties": {
+              "file": { "type": "string" },
+              "sha256": { "$ref": "#/$defs/sha256" }
             }
           }
         },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["kind", "commit"],
-          "properties": {
-            "kind": { "const": "packed-from-commit" },
-            "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
-            "command": { "type": "string" }
-          }
+        "archiveVerify": {
+          "type": ["object", "null"],
+          "description": "Result of tools/baselines/archive.mjs verify --store <copy> [--replay] when run; null otherwise."
         }
-      ]
+      }
     },
     "digest": {
       "$ref": "#/$defs/sha256",

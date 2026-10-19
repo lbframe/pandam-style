@@ -1,873 +1,1167 @@
 # AG-00.2 runner: design note
 
-Status: **design note for review; no runner code exists yet.** This note
-defines how the multi-model evaluation runner of
-[issue #6](https://github.com/lbframe/pandam-style/issues/6) will work. It is
-written before implementation as the
-[delivery protocol](../../../docs/agent-delivery-protocol.md) requires, because
-the runner has a privacy surface (subscription credentials), a security surface
-(it executes agent-written code) and an adversarial surface (the evaluated
-agent can try to influence its own score). Nothing here is a shipped API. The
-drafts in [`schema/`](schema/) are marked `draft` and may change during
-implementation review.
+Status: **design note, round 2 (revision after review r1 of `c930a48`); no
+runner code exists yet.** This note defines how the multi-model evaluation
+runner of [issue #6](https://github.com/lbframe/pandam-style/issues/6) will
+work. It is written before implementation as the
+[delivery protocol](../../../docs/agent-delivery-protocol.md) requires: the
+runner has a privacy surface (the user's subscription credentials), a security
+surface (it executes agent-written code) and an adversarial surface (the
+evaluated agent can try to influence its own score). Nothing here is a shipped
+API. The drafts in [`schema/`](schema/) are marked `draft`.
 
-Inputs this note builds on:
+Inputs: the [corpus README](../README.md) (its runner contract and the
+required isolation precondition), the
+[held-out access policy](../heldout/ACCESS-POLICY.md), lot AG-00 of the
+accepted [plan](../../../docs/architecture/agentic-optimizations-plan.md)
+(unchanged), and the Alpha 1 baseline epoch manifest
+`benchmarks/core-evolution/epochs/alpha1/manifest.v1.json` (on `main` since
+`e2a864b`).
 
-- the [corpus README](../README.md), in particular its runner contract and the
-  **required runner precondition** (isolated execution);
-- the [held-out access policy](../heldout/ACCESS-POLICY.md);
-- lot AG-00 of the accepted
-  [plan](../../../docs/architecture/agentic-optimizations-plan.md) (unchanged);
-- the Alpha 1 baseline epoch manifest of the core-evolution epic
-  (`benchmarks/core-evolution/epochs/alpha1/manifest.v1.json`, draft PR #99,
-  not on `main`).
+## Evidence labels
 
-Every factual claim about the CLIs, the host or the store is labelled:
+Every factual claim about the CLIs, Docker, the host or the store carries one
+of these labels. Appendix A lists every probe and source read.
 
-- **observed**: seen during this design by local inspection (`--help`,
-  `--version`, file listings, `strings` on the installed binaries, Docker
-  metadata). No model call was made. A string in a binary proves that the
-  identifier exists, not how it behaves.
-- **unverified**: inferred or documented elsewhere but not observed here. The
-  implementation must not depend on an unverified behavior without a fixture
-  test for both outcomes, and the authorized smoke run (section 9.3) turns the
-  listed unverified items into observations.
+- **observed**: seen by executing something locally during this design: CLI
+  `--help`/`--version`, offline CLI runs in containers with no network and no
+  credentials (a model call is impossible by construction), Docker probes
+  against a dummy host service, the CE store verifier on a copy. No model call
+  was made and no credential content was read.
+- **source**: read in the pinned upstream source or published typings of the
+  exact versions in use: Codex `rust-v0.163.0`, and the Claude Agent SDK
+  `0.3.303`, whose `package.json` declares `claudeCodeVersion: 2.1.303`. This
+  is the documented contract, not runtime behavior.
+- **unverified**: inferred or documented elsewhere and not observed. The
+  implementation never depends on an unverified behavior without a fixture
+  for both outcomes. The authorized smoke run (§9.4) settles the listed items
+  or the design is corrected.
 
-## 0. Requirement map
+## 0. Round-2 changes and requirement map
+
+### 0.1 Review findings
+
+| Finding | Class (generalized) | Resolution |
+| --- | --- | --- |
+| R1 | a containment claim that depends on Docker defaults or host state | §4.3: per-attempt `internal` network with the **isolated** gateway mode, no IPv6, per-attempt proxy; observed probes; self-test validity bound to network, proxy and host state |
+| R2 | a value the CLI prints is not necessarily a measurement (defaults, overlaps, cumulative totals) | §2.2: raw vs normalized counters, per-CLI default-zero rules from the pinned sources, subset/additive relations, cumulative-snapshot rule; fixtures F3–F9 |
+| R3 | telemetry and failure signals the agent can forge or influence | §4.4: trust classes; execute-only (non-dumpable) CLI binaries, observed to block same-UID `/proc` access; stream captured outside the container; channel audit; `contested` attempts and conservative bounds (§5.3); fixtures F20–F23 |
+| R4 | stored evidence differs from graded evidence | §6: the oracle-relevant set is kept byte for byte with link metadata; replay is `exact` only when that set is complete and unredacted; fixtures F30–F33 |
+| R5 | absence of a detected event read as evidence of absence | §2.4: repair cycles are a labelled lower bound; first-pass success is `unknown` without full coverage; the same rule for compiler attribution; fixtures F24–F27 |
+| R6 | an identity key that includes transient values or omits controlled inputs | §1.4: an exact canonical projection, explicit exclusions and normalizations, and the permitted product-dependent differences; fixtures F34–F35 |
+| R7 | a capability denial asserted without a mechanism that covers every path | §4.5: per-capability enforcement matrix (prevent / detect / refuse), with explicit rules for shell paths and provider-side tools; fixtures F36–F39 |
+| R8 | trusted and untrusted code sharing an authority boundary | §4.2: separate containers per role, UIDs, mounts and result channels; two-pass grading isolating agent-written host builds; fixtures F40–F43 |
+| R9 | a secret lifecycle step ordered after the destruction of its source; redaction sets fixed too early | §4.6: export phase before tmpfs destruction, untrusted-file handling, compare-and-swap of the host file, redaction set completed before any persistence; fixtures F44–F50 |
+| R10 | adapter semantics assumed from strings instead of the output contract | §3.4–3.6: event mappings from the pinned sources and offline observation; free-text errors classified conservatively; Codex reroutes detected; primary-model fidelity separated from auxiliary usage; fixtures F10–F19 |
+| F1 | future scope implemented early | §4.9: held-out refusal is unconditional in AG-00.2; future held-out and candidate-packing paths are declarative only |
+| F2 | unrouted catalog files | the three draft schemas are routed in `tools/agentdoc.yaml` |
+| G (orchestrator) | the grading compiler must be the frozen product, never repository `HEAD` | §4.8: trusted tree built only from the digest-verified Alpha 1 tarballs, ancestor fallback refused, digest recorded and re-checked every attempt; fixtures F51–F53 |
+
+### 0.2 Issue requirements
 
 | Issue item | Covered by |
 | --- | --- |
-| Deliverable 1: model IDs, provider/version, parameters, budgets, repetitions, prompts, task revision, environment | §1 run record, §3 adapters, §4.6 product build |
-| Deliverable 2: success, first-pass success, repair cycles, tool calls, tokens, cost, time, visual fidelity, vocabulary, scope | §2 metrics |
-| Deliverable 3: compiler/tool/agent cost separation; unknown stays unknown; estimates labelled | §2.3, §2.4 |
-| Deliverable 4: raw traces and failures, bounded and redacted; deterministic vs provider-backed | §5 failures, §6 traces, §1.1 `kind` |
-| AC1: replay or compare with exact inputs/configuration identified | §1.3 comparability key, §1.4 replay |
-| AC2: missing telemetry never zero nor an observation | §2.1 measured-value rule, §9 fixtures F3–F6 |
-| AC3: distributions and per-task/model failures incl. policy/scope breaches | §7 report |
+| Deliverable 1: model IDs, provider/version, parameters, budgets, repetitions, prompts, task revision, environment | §1, §3, §4.8 |
+| Deliverable 2: success, first-pass success, repair cycles, tool calls, tokens, cost, time, visual fidelity, vocabulary, scope | §2 |
+| Deliverable 3: compiler/tool/agent cost separation; unknown stays unknown; estimates labelled | §2.1, §2.5, §2.6 |
+| Deliverable 4: raw traces and failures, bounded and redacted; deterministic vs provider-backed | §5, §6, §1.1 `kind` |
+| AC1: replay or compare with exact inputs/configuration identified | §1.4, §1.5, §6 |
+| AC2: missing telemetry never zero nor an observation | §2.1, §2.2 |
+| AC3: distributions and per-task/model failures incl. policy/scope breaches | §7 |
 | AC4: instrumentation isolated, reference comparable | §8 |
-| Targeted verification: adapter fixtures, then bounded authorized smoke run | §9 |
+| Targeted verification | §9 |
+
+### 0.3 Decisions recorded
+
+| # | Decision | Applied in |
+| --- | --- | --- |
+| Q1 | **User decision:** copies of the user's existing login files (`~/.claude/.credentials.json`, `~/.codex/auth.json`), not dedicated logins. The user accepted the risk to their own sessions. The design minimizes it: access-only mode if the CLI supports it, else a controlled export and compare-and-swap. | §4.6 |
+| Q2 | The 3 `network: package-registry` tasks need a read-only local mirror of the pinned closure; until it exists they are reported `unsupported / not run`, never failed or dropped. | §4.5, §7 |
+| Q3 | **User decision:** each CLI's default effort, passed explicitly in argv and recorded ("medium for both today"); unsupported controls recorded honestly. See open question 1: the pinned Codex catalog says otherwise for `gpt-6.1-sol`. | §3.2, §10 |
+| Q4 | Web tools and subagents disabled for both CLIs with effective-configuration evidence, or the task refused. | §3.3, §4.5 |
+| Q5 | First-pass success and repairs from the transcript, no oracle feedback, with the R5 uncertainty rules. | §2.4 |
+| Q6 | Visual fidelity `unmeasured`; the orchestrator opens a follow-up for a visual oracle. | §2.3 |
+| Q7 | Success requires normal completion within budget; the oracle verdict is preserved separately. | §2.3, §5 |
+| Q8 | **User decision:** cadence decided at AG-00.3 launch. Concurrency (default 1 per provider), operator time windows and a matrix wall-clock cap are configuration, recorded in the run config. | §1.2, schema |
+| Q9 | At most 3 attempts per repetition, infrastructure-only retries, every attempt and missing repetition preserved (subject to R3). | §5 |
+| Q10 | Publish leak-scanned records, evaluations and reports; raw artifacts stay local through the baseline review, then are pruned explicitly. | §6 |
+| Q11 | An effective `maxToolCalls` is recorded separately from the corpus `maxTurns` hint; Claude's native turn limit is not described as equivalent. | §3.8 |
 
 ## 1. Run record
 
 ### 1.1 Units and identity
 
-- **Matrix**: one invocation of the runner over tasks × models ×
-  repetitions, for one product build. It has a resolved configuration
-  (`matrix.json`) and a `matrixId`.
+- **Matrix**: one invocation over tasks × models × repetitions for one
+  product build (`matrix.json`, `matrixId`).
 - **Cell**: task × model configuration.
-- **Repetition** `r` in `1..R` (baseline `R = 3`): an independent sample of a
-  cell. Its index is assigned when it is planned, never according to its
-  outcome.
-- **Attempt** `a` in `1..A`: one execution of a repetition. A repetition
-  normally has one attempt; a new attempt starts from scratch only after an
-  infrastructure failure (§5.2). Every attempt is recorded, valid or not.
+- **Repetition** `r` in `1..R` (baseline `R = 3`): an independent sample whose
+  index is fixed when planned, never according to its outcome.
+- **Attempt** `a` in `1..3`: one execution of a repetition. A new attempt
+  starts from scratch only after an infrastructure failure (§5.2). Every
+  attempt is recorded.
 
-Every record carries `kind`:
-
-- `provider-backed`: a real CLI talking to a real provider;
-- `adapter-fixture`: a fake CLI replaying a recorded or synthetic stream
-  (tests, CI).
-
-Reports refuse to aggregate records of different kinds, and fixture records
-are labelled synthetic wherever they appear (deliverable 4).
+`kind` is `provider-backed` (real CLI, real provider) or `adapter-fixture`
+(fake CLI). Reports refuse to aggregate different kinds, and fixture records
+are labelled synthetic wherever they appear.
 
 ### 1.2 Fields
 
-Draft schemas: [`schema/run-config.draft.schema.json`](schema/run-config.draft.schema.json),
-[`schema/run-record.draft.schema.json`](schema/run-record.draft.schema.json),
-[`schema/product-build.draft.schema.json`](schema/product-build.draft.schema.json).
-Each attempt record contains:
+Draft schemas:
+[`run-config.draft.schema.json`](schema/run-config.draft.schema.json),
+[`run-record.draft.schema.json`](schema/run-record.draft.schema.json),
+[`product-build.draft.schema.json`](schema/product-build.draft.schema.json).
 
 | Group | Fields |
 | --- | --- |
-| Identity | `schema`, `kind`, `matrixId`, `cell` (task id, model key), `repetition`, `attempt`, `comparabilityKey` (§1.3) |
-| Task | task id, split (always `development` in this issue), workflow, case type, epoch evaluated, corpus version, `corpus.lock.json` sha256, the lock's task digest (`pms-tree-sha256/v1`) and harness digests (schemas, oracles, report contract, DOM tree) |
-| Prompt | verbatim prompt text as sent (`prompt.md` beside the record) and its sha256; the docs path substituted into it; the delivery channel (argv or stdin) |
-| Model configuration | requested model id (`claude-haiku-5-5`, `claude-sonnet-5-5`, `gpt-6.1-sol`), served model id(s) as reported by the stream (or `unknown`), reasoning effort, max turns, permission mode, tool allowlist and denylist, sandbox flags, every CLI argument verbatim, every environment variable *name* passed to the CLI and the values of the non-secret ones, the CLI configuration files written by the harness (verbatim and sha256) |
-| CLI identity | CLI name, `--version` output inside the image, sha256 of the CLI binary in the image, expected values from `matrix.json` |
-| Provider info | everything the stream reports that identifies the service: session/thread id, served model, service tier, rate-limit state, API retry events. Fields the CLI does not report are `unknown`. |
-| Budgets | task `timeoutSeconds` and `maxTurns`, the effective values, which limit fired (if any), and container resource limits |
-| Product build | product build binding digest and its contents (§4.6): epoch, source commit/tree, package tarball digests, Node digest, agent-docs tree digest, provenance (CE manifest sha256) |
-| Execution environment | image id (sha256) and base image digest; Docker server version; kernel; CPU model and count; memory; 1-minute load average sampled every 5 s during the attempt; container cgroup CPU time, memory peak and pids peak; harness checkout commit and clean/dirty state; runner tree digest |
-| Timestamps | UTC wall-clock start/end of each phase (materialize, install, prepare, agent, events, evaluate) and monotonic durations |
-| Outcome | termination (`completed`, `budget-timeout`, `budget-max-turns`, `resource-limit`, `abnormal-exit`, `infrastructure`, `harness`), failure class and code (§5), retry decision |
-| Metrics | the measured values of §2, each with status and source |
-| Artifacts | relative paths and sha256 of: prompt, bounded raw stream, stderr, normalized transcript, observations, final message, oracle result, baseline and final workspace archives, proxy log, host samples; truncation and redaction markers |
+| Identity | `schema`, `kind`, `matrixId`, cell, repetition, attempt, `comparabilityKey` and its projection (§1.4) |
+| Task | id, split (always `development`), workflow, case type, epoch, corpus version, `corpus.lock.json` sha256, task digest from the lock |
+| Harness identity (§1.3) | repository commit of the runner checkout and its clean state, `corpus.lock.json` sha256 (covers schemas, oracles, report contract, DOM tree), runner tree digest, harness dependency lockfile sha256 |
+| Prompt | verbatim prompt (`prompt.md`), sha256, fixed docs path, delivery channel |
+| Model configuration | requested model, reasoning effort as passed, raw argv and the normalized argv (§1.4), non-secret environment, harness-written CLI config files (verbatim and sha256), effective-configuration evidence (§3.3) |
+| CLI identity | name, `--version` in the image, binary sha256, expected values from `matrix.json` |
+| Provider info | session/thread id, primary-model fidelity and auxiliary models (§3.6), rate-limit state, API retries, reroutes; absent fields are `unknown` |
+| Budgets | corpus `timeoutSeconds` and `maxTurns` hint; effective `timeoutSeconds`, `maxToolCalls` and `cliMaxTurns`; which limit fired |
+| Product build | binding digest (§4.8), epoch, source commit, **trusted grading tree digest** and its `@pandamstyle` subtree digest |
+| Environment | agent, grader and proxy image ids; Docker version; kernel; CPU model and count; memory; 5 s load samples; cgroup CPU, memory peak, pids peak; isolation self-test id |
+| Schedule | concurrency per provider, operator time window and matrix wall-clock cap in force (Q8) |
+| Integrity | stream protection status (§4.4), channel-audit result, anomalies, `contested` flag (§5.3) |
+| Timestamps | UTC start/end and monotonic duration per phase |
+| Outcome | termination, failure class and code (§5), retry decision, grading passes, verdict, task success |
+| Metrics | measured values of §2 |
+| Evidence | artifacts with sha256, size, truncation, redaction and the evidence completeness that decides replay exactness (§6) |
 
-### 1.3 Comparability key
+### 1.3 Harness and product identity
 
-`comparabilityKey` is the sha256 of the canonical JSON of everything that
-defines the experiment **except** the product build binding, the repetition
-and attempt indices, and timestamps: task digest, epoch, prompt sha256, model
-configuration, CLI identity, budgets, container limits, image id, harness
-digests and runner tree digest. Two attempts with equal keys differ only in
-the product build under test (and sampling). `compare` refuses to pair
-attempts whose keys differ and lists the fields that differ. A frozen AG-00.3
-threshold is bound to one key per cell.
+The harness that grades is `benchmarks/agentic/` at the runner's commit. A
+record carries the commit SHA and the clean state, and also content digests:
+the `corpus.lock.json` sha256 (schemas, oracles, report contract, DOM tree) and
+the runner tree digest. Provider-backed matrices refuse a dirty checkout. The
+commit identifies; the digests compare. `main` keeps moving with product work,
+and a new commit that leaves the harness bytes unchanged must not break
+comparability (§1.4).
 
-### 1.4 Replay
+The product under evaluation and the grading compiler are both the frozen
+product build (§4.8), never the repository's working tree or `HEAD`.
 
-"Replay" has two meanings, both supported:
+### 1.4 Comparability key (R6)
 
-1. **Re-evaluation (deterministic).** The attempt persists the scope baseline
-   and the final workspace (excluding `node_modules` and harness-ignored
-   output, §6), the transcript, observations and final message. Re-running
-   `pms-agentic evaluate` with the recorded corpus/harness digests and the
-   recorded trusted install reproduces the oracle result exactly; with a newer
-   oracle version it gives a comparable re-grading, labelled with that
-   version.
-2. **Re-execution (same inputs, new sample).** `matrix.json` plus the product
-   build binding, the image id and the credential *method* (never the secret)
-   identify every input. Re-running a cell with them produces a new sample
-   with an equal `comparabilityKey`. Model outputs are not deterministic, so
-   re-execution is compared statistically (§7), never byte for byte.
+`comparabilityKey = sha256(canonicalJSON(projection))`, where canonical JSON
+means sorted keys, no insignificant whitespace and UTF-8. The projection is,
+exactly:
+
+```text
+pms-agentic-comparability/v1
+task:        id, taskDigest, epoch, corpusVersion, corpusLockSha256
+harness:     runnerTreeDigest, harnessDepsLockSha256
+prompt:      sha256 of the prompt as sent (the docs path is a fixed constant)
+model:       cli, cliVersion, cliSha256, requestedModel, reasoningEffort,
+             normalizedArgv, nonSecretEnv (normalized), cliConfigSha256 (normalized)
+policy:      effectiveToolPolicy, capabilityEnforcementMatrixSha256,
+             egressAllowlistSha256, proxyImageId, networkMode
+budgets:     timeoutSeconds, maxToolCalls, cliMaxTurns
+containers:  agentImageId, graderImageId, cpus, memoryBytes, pidsLimit,
+             tmpfsBytes, workspaceBytesCap
+dependencies: nodeSha256, packageManager {name, version, sha256},
+             fixtureClosureNonProductLockSha256
+```
+
+Normalization (the raw values are kept in the record, outside the key):
+
+- the session id (`--session-id <uuid>`), the attempt directory, container
+  names, temporary paths, ports and timestamps in argv, environment and
+  config files are replaced by fixed placeholders (`<session>`, `<attempt>`);
+- `fixtureClosureNonProductLockSha256` hashes the fixture closure lockfile
+  with every `@pandamstyle/*` entry removed.
+
+**Excluded, recorded only:** repetition and attempt indices, timestamps,
+session ids, host load, repository commit SHA, credential mode, isolation
+self-test id.
+
+**Permitted product-dependent differences** (the axis under comparison):
+product build binding digest, the `@pandamstyle/*` lockfile entries and
+tarballs, the trusted grading tree digest, and the agent-docs tree digest
+(the docs ship with the product).
+
+`compare` pairs attempts only with equal keys. On a mismatch it lists the
+differing projection fields and refuses. A frozen AG-00.3 threshold is bound
+to one key per cell.
+
+### 1.5 Replay
+
+1. **Re-grading.** The evidence archives (§6) are re-evaluated with the
+   recorded harness digests and trusted tree. This is `exact` only if the
+   attempt's evidence completeness is `complete`; otherwise the result is
+   labelled `non-exact` with the reason (§6.3).
+2. **Re-execution.** `matrix.json`, the product build binding, the image ids
+   and the comparability projection identify every input. Re-running gives a
+   new sample with an equal key, compared statistically (§7).
 
 ## 2. Metrics
 
-### 2.1 Measured-value rule (AC2)
-
-Every non-oracle metric is a measured value:
+### 2.1 Measured-value rule (AC2, R2, R3)
 
 ```json
 { "status": "observed | estimate | unknown", "value": 123, "unit": "tokens",
-  "source": "claude.result.usage", "method": null }
+  "source": "claude.result.modelUsage", "integrity": "harness | cli-attested | unprotected",
+  "method": null, "lowerBound": null }
 ```
 
-- `observed`: reported by the named source in this attempt.
-- `estimate`: computed or reported as an approximation; `method` is required
-  and names how (for example `claude-cli-api-equivalent`), and the report
-  prints it as an estimate.
-- `unknown`: `value` is `null`. A missing field, an absent event or an
-  unparseable value is `unknown`, never `0`.
+- `observed`: the named source reported a value whose provenance establishes
+  a measurement (the rules of §2.2), **and** its integrity is `harness` or
+  `cli-attested` (§4.4).
+- `estimate`: an approximation, or a CLI report on an `unprotected` stream.
+  `method` is mandatory, for example `claude-cli-api-equivalent`,
+  `transcript-heuristic/v1` or `cli-report-unauthenticated`.
+- `unknown`: `value` is `null`. Absent, ambiguous (§2.2) or unparseable
+  values are unknown, never `0`.
 
-Aggregation follows the same rule: a sum over components is `unknown` if any
-component is unknown; the known partial sum may be reported only as a
-labelled `lowerBound`. The accounting modules may not contain a default to
-zero (`?? 0`, `|| 0`); a lint test enforces this class (§9.2).
+A sum is unknown if any component is unknown; the known part may appear only
+as `lowerBound`. The accounting modules may not contain a zero default; a lint
+and a property test enforce the class (§9.2).
 
-### 2.2 Metric table
+### 2.2 Token accounting (R2)
 
-Availability per CLI is from local inspection only (§3). "Strings" means the
-field name exists in the installed binary; its presence in a subscription
-session's stream is **unverified** until the smoke run.
+The record keeps the **raw counters** exactly as the CLI printed them, then
+derives **normalized counters**. Each derivation states its rule.
 
-| Metric | Definition | Source | `claude -p` (2.1.303) | `codex exec` (0.163.0) |
+**Codex 0.163.0** (source: `exec_events.rs`,
+`event_processor_with_jsonl_output.rs`, `codex-api/src/sse/responses.rs`):
+
+- `turn.completed.usage` is the thread's **cumulative** total from the last
+  `ThreadTokenUsageUpdated` notification. If no notification arrived it is
+  `Usage::default()`, all zeros. So an all-zero `usage` is `unknown`, not zero.
+- Provider usage parsing defaults `cached_tokens` and `cache_write_tokens` to
+  0 when `input_tokens_details` is absent, and `reasoning_tokens` to 0 when
+  `output_tokens_details` is absent. A zero in `cached_input_tokens`,
+  `cache_write_input_tokens` or `reasoning_output_tokens` is therefore
+  `unknown`. A non-zero value is a measurement.
+- `input_tokens` **includes** cached input and `output_tokens` **includes**
+  reasoning output (OpenAI Responses usage semantics: unverified here, checked
+  at smoke for consistency). Normalized uncached input is `input_tokens −
+  cached_input_tokens` only when the cached count is known.
+- One `codex exec` run is one turn. If several `turn.completed` events
+  appear, the **last** one is the total; they are never summed.
+- `turn.failed` and interrupted turns carry no usage: tokens are `unknown`
+  even though tokens were spent.
+- The JSONL contract has no cost field: cost is `unknown`.
+
+**Claude Code 2.1.303** (source: SDK 0.3.303 `sdk.d.ts`; observed offline):
+
+- `result.modelUsage` (per model, cumulative, covering the main loop,
+  subagents and internal calls such as compaction, but excluding helper calls
+  such as the permission classifier and token-count probes) is "the correct
+  field for token/cost accounting; treat it as an estimate, not a billing
+  statement". `result.usage` covers the **main loop only**. Neither is summed
+  with the other.
+- Anthropic `input_tokens` **excludes** `cache_read_input_tokens` and
+  `cache_creation_input_tokens`; the three are additive (provider API
+  semantics, unverified here). Thinking tokens
+  (`output_tokens_details.thinking_tokens`, `ModelUsage.thinkingTokens`) are
+  treated as a subset of output (unverified; consistency-checked at smoke).
+- **Default zeros (observed):** with no credentials, Claude printed an
+  assistant message with `model: "<synthetic>"`, all-zero usage and
+  `error: "authentication_failed"`, then a result with `total_cost_usd: 0`,
+  all-zero `usage`, `modelUsage: {}` and `is_error: true`. The SDK typings add
+  that "crash/startup-error results may carry zeroed usage". Rule: Claude
+  token counters are `observed` only from `modelUsage` entries of a run with
+  at least one non-synthetic assistant message. Zeros on a result with
+  `is_error`, an empty `modelUsage` or only synthetic messages are `unknown`.
+- Per-message usage of non-synthetic main-loop assistant messages
+  (`parent_tool_use_id: null`), de-duplicated by `message.id`, is a
+  cross-check of `modelUsage[requested]`. A disagreement is recorded as
+  `discrepancy` and never silently resolved.
+
+Normalized token fields: `inputUncached`, `inputCacheRead`, `inputCacheWrite`,
+`inputTotal`, `outputTotal`, `outputReasoning` (subset of `outputTotal`). Each
+has its own status, so `inputTotal` can be observed while `inputCacheRead` is
+unknown.
+
+### 2.3 Metric table
+
+| Metric | Definition | Source | Claude 2.1.303 | Codex 0.163.0 |
 | --- | --- | --- | --- | --- |
-| Task success | oracle `verdict = pass` **and** termination `completed` within budget (Q7) | oracle result + harness | harness | harness |
-| Outcome split | `success.application`, `success.diagnosis`, `success.report` | oracle result | harness | harness |
-| First-pass success | task success with zero repair cycles (Q5) | transcript + oracle | derived | derived |
-| Repair cycles | failed verification command → ≥1 workspace write → later verification command; count of such sequences | normalized transcript (pattern table versioned with the runner) | exit status from tool result (unverified field) | `exit_code` on `command_execution` items (strings) |
-| Tool calls | count by normalized tool kind (`command`, `file-read`, `file-write`, `search`, `other`) | stream | `tool_use` blocks (unverified layout) | `item.*` types `command_execution`, `file_change`, `mcp_tool_call`, `web_search` (strings) |
-| Agent steps | model responses | stream | `num_turns` in result (strings) | not observed; `unknown` |
-| Input tokens | uncached input, cache read and cache write reported separately | stream | `usage`, `cache_read_input_tokens`, `cache_creation_input_tokens`, `modelUsage` (strings) | `turn.completed` usage, `cached_input_tokens` (strings) |
-| Output tokens | output, with reasoning output separate when reported | stream | `usage.output_tokens` (strings) | `output_tokens`, `reasoning_output_tokens` (strings) |
-| Cost | see §2.4 | stream | `total_cost_usd`, `costUSD` (strings): `estimate`, method `claude-cli-api-equivalent` | `cost_usd` exists as a string; its event is not identified: `unknown` unless observed |
-| Elapsed time | harness monotonic duration of the agent phase; CLI-reported durations kept beside it | harness + stream | `duration_ms`, `duration_api_ms` (strings) | not observed; harness only |
-| Visual fidelity | `visual.fidelity` check | oracle | `unmeasured` (no method in corpus 1.4.3; Q6) | same |
-| Vocabulary compliance | all required `static.forbidden`, `definition.diff`, `generated.consistent` checks pass, plus the token assertions of required `render.styles` checks; reported with the per-check breakdown | oracle result | harness | harness |
-| Scope violations | realized: `scope.diff` violations (writes outside writable globs, protected writes, deletions, symlinks); attempted: denied egress (proxy log), read-only filesystem denials, CLI permission denials (`permission_denials`, strings), credential-path access in the transcript (§4.4) | oracle + proxy + stream + transcript scan | all | all except CLI permission denials (none in bypass mode) |
-| Model fidelity | every served model id equals the requested one; no fallback event | stream | `message.model`, `modelUsage` keys, `model_fallback`/`model_refusal_fallback` events (strings) | not observed: `unknown`, reported as such |
-| Infrastructure noise | API retries, rate-limit events, compaction events | stream | `api_retry`, `rate_limit_event`, `compact_boundary` (strings) | `rate_limits`, `stream_disconnected` (strings) |
+| Task success | grading verdict `pass` **and** termination `completed` within budget (Q7); verdict kept separately | grading + harness | harness | harness |
+| Outcome split | `success.application`, `.diagnosis`, `.report` | oracle | harness | harness |
+| First-pass success | §2.4: `true`, `false` or `unknown` | transcript + workspace deltas | derived | derived |
+| Repair cycles | §2.4: `estimate`, lower bound | transcript + workspace deltas | `tool_result.is_error` (exit status form unverified) | `command_execution.exit_code` (source) |
+| Tool calls | by normalized kind | stream | `tool_use` blocks (source) | `item.*` types (source) |
+| Agent steps | model round-trips | stream | `num_turns` (source: "API round-trips") | not reported: `unknown` |
+| Tokens | §2.2 | stream | `modelUsage` | `turn.completed.usage` |
+| Cost | §2.6 | stream | `total_cost_usd` and `modelUsage[*].costUSD`: `estimate`; `costBasis: unknown` makes it `unknown` | `unknown` |
+| Elapsed time | harness monotonic agent phase; CLI durations beside it | harness + stream | `duration_ms`, `duration_api_ms` (source) | harness only |
+| Visual fidelity | `visual.fidelity` | oracle | `unmeasured` (Q6) | same |
+| Vocabulary compliance | required `static.forbidden`, `definition.diff`, `generated.consistent` and the token assertions of required `render.styles` checks, with per-check breakdown | grading | harness | harness |
+| Scope violations | realized: `scope.diff`; attempted: denials and detections of §4.5 | grading + proxy + filesystem + transcript | all | all |
+| Primary-model fidelity | §3.6 | stream | observable | reroutes observable, served model `unknown` |
+| Infrastructure noise | API retries, rate-limit events, reconnects | stream | `api_retry`, `rate_limit_event` (source) | `error` "Reconnecting…" events (observed) |
 
-The oracle verdict is computed outside the agent container (§4) and is the
-only source of success. The agent's own report (`pms-eval-report/v1`) is used
-by the oracles exactly as in AG-00.1 and never as a success signal by the
-runner.
+### 2.4 Repairs, first-pass success and compiler attribution (R5)
 
-### 2.3 Compiler, tool and agent cost (deliverable 3)
+The harness knows a command's text and status, not its effects, and shell
+commands can write files, chain checks or mask failures. So:
 
-Three accounts, never summed into one number:
+- **Command classes** (versioned table `verification-commands/v1`): `verify`
+  is a single simple command matching a known compile, build, typecheck or
+  test invocation (`npm run build`, `vite build`, `next build`,
+  `rsbuild build`, `tsc`, `pms …`); `read-only` is a single command from a
+  read-only allowlist (`ls`, `cat`, `rg`, `git status`, …); `compound` is
+  anything containing shell operators (`;`, `&&`, `||`, `|`, subshells,
+  redirections into files); everything else is `unknown`.
+- **Workspace deltas.** After each tool result the event-runner container
+  (§4.2) records a no-follow tree digest of the workspace, excluding
+  `node_modules`. Shell-mediated writes are then visible even without a
+  file-write event. A concurrent write can race the digest, so this remains a
+  heuristic.
+- **Repair cycle:** a `verify` command with a known non-zero exit status,
+  followed by a workspace delta, followed by a later `verify` command.
+  `repairCycles` is `estimate`, method `transcript-heuristic/v1`, and a lower
+  bound.
+- **Coverage** is `complete` only if every tool call has a known completion
+  status, no `compound` or `unknown` command matches a verification pattern,
+  no item is unfinished or interrupted, and every workspace-delta sample
+  succeeded.
+- **First-pass success:**
+  - `false` if the task did not succeed, or if at least one repair cycle was
+    detected;
+  - `true` only if the task succeeded, zero repairs were detected and
+    coverage is complete;
+  - otherwise `unknown`.
+- **Compiler attribution** uses the same table and coverage. Its counts and
+  times are `estimate` with the coverage flag, and `compound` commands are
+  left unattributed.
 
-- **Agent cost**: model tokens and the CLI cost estimate, per served model.
-  Claude Code makes auxiliary calls with other models (visible as additional
-  `modelUsage` keys, unverified); they are agent cost but reported per model so
-  the evaluated model's own usage stays separable.
-- **Tool cost**: number of tool calls by kind; bytes of tool output returned to
-  the model (context cost, `observed` from the stream; a token count of it is
-  only an `estimate`); tool wall time from harness receive timestamps between
-  a call and its result (`estimate`, method `harness-receive-time`, since
-  provider and parsing latency are included); container CPU time from cgroup
-  (`observed`, includes the CLI process itself, labelled so).
-- **Compiler cost**: (a) agent-invoked compiler and host builds, identified by
-  the versioned verification-command table: count, exit status and
-  harness-observed time (`estimate`, same method); (b) harness-side compile
-  work (`prepare` steps, oracle compilation), timed by the harness and
-  reported in a separate harness section that is never attributed to the
+### 2.5 Compiler, tool and agent cost
+
+Three accounts, never summed:
+
+- **Agent cost:** tokens and the CLI cost estimate per served model. Primary
+  model and auxiliary models are reported separately (§3.6).
+- **Tool cost:** tool calls by kind; bytes of tool output returned to the
+  model (`observed` from the stream; a token count of them is an `estimate`);
+  tool wall time from harness receive times (`estimate`, method
+  `harness-receive-time`); container CPU time (cgroup, `observed`, includes
+  the CLI process).
+- **Compiler cost:** (a) agent-invoked compiler and host builds by §2.4
+  attribution (`estimate`); (b) harness-side compile work in `prepare` and
+  grading, timed by the harness in a separate section never attributed to the
   agent.
 
-### 2.4 Cost under subscription authentication
+### 2.6 Cost under subscription authentication
 
-Runs authenticate with the user's subscriptions, not API keys. Consequently:
+There is no billed cost. Claude's `total_cost_usd` is an `estimate` (method
+`claude-cli-api-equivalent`; source: "an estimate, not a billing statement").
+Its `costBasis` per model is `list`, `managed` or `unknown`, and `unknown`
+("a guess at the default model's rate") makes cost `unknown`. A zero cost on
+an error result is `unknown` (observed default). Codex cost is `unknown`. The
+runner computes no price-table estimate.
 
-- No attempt has a billed cost. The report never prints a cost as billed.
-- Claude's `total_cost_usd` (if present) is recorded as `estimate`, method
-  `claude-cli-api-equivalent` (the CLI's own price computation; unverified
-  whether it is populated under OAuth).
-- Codex cost is `unknown` unless the smoke run shows a reported field; if it
-  appears, it is labelled with its observed meaning.
-- The runner computes no price-table estimate in this issue. A later
-  estimate from tokens must cite a versioned price table (source, date,
-  digest) and is a separate field.
-- Subscription quota consumption is not measurable by the runner; rate-limit
-  events are recorded as reported.
+### 2.7 Time under a busy host
 
-### 2.5 Time under a busy host
-
-The host is shared (16 CPUs, other projects running). Wall-clock latency is
-noisy, so:
-
-- deterministic metrics (verdicts, tool calls, tokens when reported, repair
-  cycles) are primary;
-- every attempt records the 1-minute load series, CPU time and CLI-reported
-  durations when present;
-- the matrix can **interleave** cells across product builds (ABAB order per
-  task × model × repetition) so that latency comparisons are paired; the
-  report gives paired ratios for interleaved pairs and labels every absolute
-  latency `indicative`.
+Deterministic metrics are primary. Each attempt records the load series, CPU
+time and CLI durations. Matrices can **interleave** cells across product
+builds (ABAB per task × model × repetition) for paired latency ratios. Every
+absolute latency is labelled `indicative`.
 
 ## 3. Adapters
 
-Each adapter is a pure module: `buildInvocation(cellConfig) → {argv, env,
-files}` and `parse(stream) → {events, transcript, metrics, termination}`,
-plus a process controller shared by both. The parsers are tested with
-fixtures without Docker (§9).
+### 3.1 Contract sources
 
-### 3.1 Observed CLI surface
-
-`claude` 2.1.303 (`claude --help`, observed):
-
-- `-p/--print`, `--output-format stream-json`, `--verbose`, `--model`,
-  `--effort <low|medium|high|xhigh|max>`, `--permission-mode
-  <acceptEdits|auto|bypassPermissions|manual|dontAsk|plan>`,
-  `--permission-prompts none`, `--tools`, `--allowedTools`,
-  `--disallowedTools`, `--strict-mcp-config`, `--mcp-config`,
-  `--setting-sources`, `--settings`, `--no-session-persistence`,
-  `--session-id`, `--disable-slash-commands`, `--fallback-model`,
-  `--max-budget-usd` ("spend on API calls"), `setup-token` ("long-lived
-  authentication token (requires Claude subscription)").
-- `--bare` reads Anthropic auth only from `ANTHROPIC_API_KEY` or an
-  `apiKeyHelper`; "OAuth and keychain are never read". It is therefore
-  unusable with subscription authentication.
-- In `-p` mode "settings files that fail validation are silently ignored".
-  The runner therefore does not rely on a settings file for any policy.
-- `--max-turns` is **not** in `--help`, but the string `--max-turns` and the
-  result subtype `error_max_turns` are in the binary (hidden flag;
-  behavior unverified).
-- The binary contains `Error: When using --print, --output-format=stream-json
-  requires --verbose` (so `--verbose` is passed).
-- Binary strings (behavior unverified): `CLAUDE_CODE_OAUTH_TOKEN`,
-  `CLAUDE_CONFIG_DIR`, `DISABLE_AUTOUPDATER`,
-  `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`, `DISABLE_TELEMETRY`,
-  `HTTPS_PROXY`, `NODE_EXTRA_CA_CERTS`; hosts `api.anthropic.com`,
-  `platform.claude.com`, `claude.ai/oauth`, `sentry.io`.
-
-`codex` 0.163.0 (`codex exec --help`, observed):
-
-- `--json` (JSONL events on stdout), `-m/--model`, `-c key=value`,
-  `-s/--sandbox <read-only|workspace-write|danger-full-access>`,
-  `--dangerously-bypass-approvals-and-sandbox` ("intended solely for running
-  in environments that are externally sandboxed"), `-C/--cd`,
-  `--skip-git-repo-check`, `--ephemeral`, `--ignore-user-config` ("auth still
-  uses `CODEX_HOME`"), `--ignore-rules`, `--strict-config` (error on unknown
-  `config.toml` fields), `-o/--output-last-message`, prompt from stdin with
-  `-`.
-- No max-turns option exists in `codex exec --help`.
-- `codex login` offers `--with-api-key`, `--with-access-token` (reads
-  `CODEX_ACCESS_TOKEN`-style input from stdin) and `--device-auth`.
-- Binary strings (behavior unverified): `thread.started`, `turn.started`,
-  `turn.completed`, `turn.failed`, `item.started`, `item.updated`,
-  `item.completed`, item types `agent_message`, `reasoning`,
-  `command_execution`, `file_change`, `mcp_tool_call`, `web_search`,
-  `todo_list`; `exit_code`, `aggregated_output`, `cached_input_tokens`,
-  `reasoning_output_tokens`, `rate_limits`, `usage_limit_reached`,
-  `server_overloaded`, `stream_disconnected`, `cost_usd`,
-  `model_reasoning_effort`, `approval_policy`, `check_for_update_on_startup`,
-  `CODEX_HOME`, `HTTPS_PROXY`, `SSL_CERT_FILE`, `CODEX_CA_CERTIFICATE`; hosts
-  `chatgpt.com`, `auth.openai.com`, `api.openai.com`.
+| CLI | Contract read | Offline observation |
+| --- | --- | --- |
+| Claude Code 2.1.303 | Agent SDK `0.3.303` `sdk.d.ts` (tarball sha256 `86dc2947…71fc`, `claudeCodeVersion: 2.1.303`): `SDKSystemMessage` (init), `SDKAssistantMessage` (`error` enum), `SDKResultSuccess`/`SDKResultError`, `ModelUsage`, `SDKAPIRetryMessage`, `SDKRateLimitEvent`, `SDKModelRefusalFallbackMessage`, `TerminalReason` | init, synthetic auth-failure assistant message and error result printed with no network and no credentials (Appendix A, P3) |
+| Codex 0.163.0 | `rust-v0.163.0`: `ThreadEvent`, `ThreadItemDetails`, `Usage`, notification→event mapping, usage parsing, multi-agent and web-search configuration resolution | `debug prompt-input`, `debug models`, `exec --json` with no network and no credentials (P4) |
 
 ### 3.2 Invocations
 
-Claude (inside the agent container, working directory `/workspace`):
+Claude, started by `docker exec` in the agent container (§4.2), working
+directory `/workspace`:
 
 ```sh
-claude -p "<prompt>" \
-  --output-format stream-json --verbose \
-  --model <claude-haiku-5-5|claude-sonnet-5-5> --effort <matrix value> \
-  --max-turns <task maxTurns>            # backstop only, see Q11
-  --permission-mode bypassPermissions \
-  --tools "<allowlist from capabilities>" \
-  --strict-mcp-config --disable-slash-commands \
-  --setting-sources "" --no-session-persistence \
-  --session-id <uuid chosen by the harness>
+claude -p "<prompt>" --output-format stream-json --verbose \
+  --model <claude-haiku-5-5|claude-sonnet-5-5> --effort <explicit, Q3> \
+  --tools "Bash,Edit,Glob,Grep,Read,Write" \
+  --disallowedTools "WebFetch,WebSearch,Agent" \
+  --permission-mode bypassPermissions --strict-mcp-config \
+  --disable-slash-commands --setting-sources "" --no-session-persistence \
+  --max-turns <cliMaxTurns> --session-id <uuid>
 ```
 
-Environment: `HOME` and `CLAUDE_CONFIG_DIR` on tmpfs, credential per §4.3,
-`DISABLE_AUTOUPDATER=1`, `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`,
-`DISABLE_TELEMETRY=1`, `HTTPS_PROXY` to the egress proxy. No
-`--fallback-model`, no `--append-system-prompt`, no hooks, plugins or MCP
-servers. Whether `--setting-sources ""` is accepted is unverified; if not, the
-clean `CLAUDE_CONFIG_DIR` alone guarantees that no user settings exist.
+Environment: `HOME` and `CLAUDE_CONFIG_DIR` on tmpfs, the credential (§4.6),
+`DISABLE_TELEMETRY=1`, `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`,
+`CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`, `DISABLE_AUTOUPDATER=1`, `HTTPS_PROXY`.
+Observed offline: every flag above is accepted, including
+`--setting-sources ""` and `--max-turns`. `init.tools` equals the `--tools`
+list. The environment variables remove the built-in telemetry plugin, set
+`analytics_disabled: true` and remove the auto-memory path.
 
 Codex:
 
 ```sh
 codex exec - --json --strict-config --ephemeral --ignore-rules \
-  --model gpt-6.1-sol -c model_reasoning_effort="<matrix value>" \
-  --dangerously-bypass-approvals-and-sandbox \
-  --skip-git-repo-check -C /workspace -o /run/agent/last-message.txt
+  -m gpt-6.1-sol -c model_reasoning_effort="<explicit, Q3>" \
+  -c web_search="disabled" -c agents.enabled=false \
+  --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check \
+  -C /workspace -o /run/agent/last-message.txt
 ```
 
-with `CODEX_HOME` on tmpfs holding only the credential and a harness-written
-`config.toml` (recorded verbatim). `--strict-config` makes a misspelled key an
-error instead of a silently ignored setting.
+`CODEX_HOME` is on tmpfs and holds only the credential and a harness-written
+`config.toml`. Observed offline: `--strict-config` accepts these keys, and
+`web_search` is validated (variants `disabled|cached|indexed|live`).
 
-Symmetric policy choice: both CLIs run with their own approval layer
-**bypassed** and their own sandbox **off**. Capability enforcement is done
-identically for both by the container (§4.2); a CLI-specific permission layer
-would make the two agents' environments differ. Codex's own Linux sandbox is
-also unlikely to work under Docker's default seccomp profile (unverified).
-Tool availability (not permission) is still restricted per CLI: no web
-fetch/search and no subagents (Q4).
+Both CLIs run with their approval layer bypassed and their own sandbox off.
+Enforcement is the container's (§4.5) and is identical for both.
 
-### 3.3 Effective-configuration check
+### 3.3 Effective-configuration evidence (Q4)
 
-Settings can be silently ignored (observed for Claude settings files), so the
-adapter verifies the effective configuration from the stream before trusting
-an attempt: Claude's `system`/`init` event (model, tool list, permission mode,
-CLI version: field names unverified) and every assistant `message.model`.
-A mismatch, or any fallback event, makes the attempt invalid
-(`harness:config-integrity`) and halts the matrix. For Codex, where no served
-model was observed in the event strings, served model is `unknown` and the
-report states it.
+Requested settings can be silently ignored (Claude's `-p` mode ignores
+invalid settings files, observed in `--help`), so each attempt records
+evidence of what was in force. It refuses the attempt (`harness:
+config-integrity`) when the evidence contradicts the request.
 
-### 3.4 Stream parsing
+| Setting | Claude evidence | Codex evidence |
+| --- | --- | --- |
+| model | `init.model` (observed field) | requested `-m`; the served model is not reported (§3.6) |
+| tools | `init.tools` equals the allowlist (observed) | matrix-start render of `codex debug prompt-input` with the same `-c` overrides, recorded by digest (observed: no model call) |
+| subagents | `Agent` absent from `init.tools` (observed; `init.agents` still lists agent types, which are unusable without the tool) | `agents.enabled=false` removes the `<multi_agent_role>`/`<multi_agent_mode>` instructions from the model-visible input (observed); `--disable multi_agent` alone does **not** (observed); source: `multi_agent_version_override` returns `Disabled`, which takes precedence over the model catalog's `multi_agent_version: v2` |
+| web tools | `WebSearch`/`WebFetch` absent from `init.tools` (observed) | key accepted with strict validation (observed); source: `resolve_web_search_mode` returns the configured value before any feature flag. The tool list is not rendered offline, so there is **no runtime pre-run evidence**: open question 2 |
+| effort | not present in the offline `init` (the typed field is optional; observed absent): requested value recorded, effective value `unknown` until the smoke run | requested value recorded; effective value not observable |
+| user config | clean `CLAUDE_CONFIG_DIR`; `init.skills`, `slash_commands`, `mcp_servers` empty (observed); built-in plugins `cc-plugin-agents-md` and `cc-plugin-plugin-authoring` remain (observed) and are recorded | clean `CODEX_HOME`; the CLI creates its own state there (observed: sqlite logs, memories, goals, `skills/.system`), all ephemeral |
 
-- Lines are parsed as JSONL as they arrive. Unparseable lines, an event
-  before `init`, a second terminal event, or events after the terminal event
-  are **stream-integrity anomalies**; any anomaly makes the attempt
-  `harness:adapter-stream` (not retried, §5).
-- Claude may emit several `assistant` events for one API message; usage is
-  de-duplicated by message id. The result event's totals are recorded as their
-  own source; a disagreement with the per-message sum is recorded as
-  `discrepancy`, never silently resolved (unverified behavior; fixture F5–F6).
-- The normalized transcript (oracle input) contains
-  `{"type":"command","command":…}` for shell commands (as the corpus README
-  requires) and adds `file-write`, `file-read`, `search` and `tool` entries
-  with the tool-call index and harness receive time. The existing
-  `transcript.commands` oracle only reads `type: "command"`.
-- Workspace events (`after-tool-calls`, `after-file-write`, `after-seconds`)
-  are triggered from the parsed stream: after the N-th tool **result**, after a
-  `file-write` matching the glob, or after the given time. The harness applies
-  the event (§4.5) and records `event:<id>` as `applied`, `not-applied` or
-  `not-triggered`, with the tool-call index and time.
+Post-run detection completes the evidence: any `server_tool_use`/web-search
+counter above 0, `Agent` tool use, or Codex `web_search` or
+`collab_tool_call` item is a policy breach (§4.5) and makes the attempt
+non-successful.
 
-### 3.5 Version pinning and drift
+### 3.4 Claude event mapping
 
-- The CLI binaries are copied into the image from a pinned source and
-  identified by sha256 (observed on this host: `claude.exe`
-  `375988f4…191450`, `codex` `399ff69c…4215`); `--version` is checked inside
-  the image at matrix start. `matrix.json` names the expected version and
-  digest; any difference refuses the matrix.
-- Autoupdate is disabled (`DISABLE_AUTOUPDATER=1`; Codex
-  `check_for_update_on_startup=false`, key from strings, unverified) and the
-  root filesystem is read-only, so the CLI cannot change during a matrix.
-- A host-side CLI update (the host install auto-updates) does not affect
-  existing images; adopting it is a new image, hence a new comparability key.
+| Stream element (source / observed) | Adapter meaning |
+| --- | --- |
+| `system/init` | effective configuration (§3.3); exactly one per run |
+| `assistant` with `message.model` not `<synthetic>` and `parent_tool_use_id: null` | main-loop model response; `tool_use` blocks are tool calls; per-message usage cross-check |
+| `assistant` with `error` (enum: `authentication_failed`, `oauth_org_not_allowed`, `account_on_hold`, `verification_required`, `billing_error`, `rate_limit`, `overloaded`, `invalid_request`, `model_not_found`, `server_error`, `unknown`, `max_output_tokens`, `cloud_credential_error`) | failure signal (§5.1) |
+| `user` with `tool_result` | tool completion; `is_error` is the only typed failure flag |
+| `system/api_retry` (`attempt`, `error_status`, `error`) | infrastructure noise; never terminal by itself |
+| `rate_limit_event` (`status`, `resetsAt`, `rateLimitType`) | quota state; `rejected` plus a terminal `rate_limit` error is a rate-limit failure |
+| `system/model_refusal_fallback` (`original_model`, `fallback_model`) | primary-model fidelity violation (§3.6) |
+| `system/compact_boundary` | recorded |
+| `result` | terminal; `is_error`, `terminal_reason`, `api_error_status`, `num_turns`, `modelUsage`, `total_cost_usd`, `permission_denials`, `result_index` |
 
-### 3.6 Timeouts and cancellation
+Observed: an authentication failure ends with `subtype: "success"` **and**
+`is_error: true`, `terminal_reason: "api_error"`, `api_error_status: null`,
+exit code 1. So `subtype` is never used for classification; `is_error`,
+`terminal_reason` and the last assistant `error` are used instead.
 
-- Wall-clock budget = task `timeoutSeconds`, measured by the harness from CLI
-  spawn. At expiry: SIGINT to the CLI, SIGTERM after 15 s, `docker kill`
-  (SIGKILL to the whole container) after 30 s. The partial stream is kept;
-  termination `budget-timeout`.
-- Turn budget = task `maxTurns`, enforced by the harness on normalized tool
-  calls for both CLIs (Codex has no flag); Claude's hidden `--max-turns` is a
-  backstop. Termination `budget-max-turns`, recording which limit fired.
-- The container is the process group: killing it kills every background
-  process the agent started. The final workspace is read only after the
-  container has stopped.
-- Operator cancellation (SIGINT to the runner) kills running containers,
-  writes `harness:cancelled` records, and leaves the matrix resumable:
-  repetitions with a recorded valid attempt are skipped on resume.
+### 3.5 Codex event mapping
 
-## 4. Isolation and credentials
+| Event (source / observed) | Adapter meaning |
+| --- | --- |
+| `thread.started {thread_id}` | session id; no model id |
+| `turn.started` | start |
+| `item.*` `command_execution {command, aggregated_output, exit_code?, status}` | tool call (`command` in the transcript) |
+| `item.*` `file_change {changes[{path, kind}], status}` | file-write tool call |
+| `item.*` `mcp_tool_call`, `web_search`, `collab_tool_call` | tool calls; web search and collab are policy breaches (§3.3) |
+| `item.completed` `error {message}` | **not terminal**. Source: config warnings, warnings, deprecation notices and model reroutes (`"model rerouted: <from> -> <to> (<reason>)"`) all map here. Observed: `"Falling back from WebSockets to HTTPS transport…"` |
+| `error {message}` | **not terminal**. Observed: `"Reconnecting... n/5 (stream disconnected…)"` retry notices; source: the last one becomes the `turn.failed` message if the turn fails |
+| `turn.completed {usage}` | normal terminal; usage per §2.2 |
+| `turn.failed {error: {message}}` | failure terminal; free-text message only |
+| no terminal event (interrupted turn) | from harness signal → budget or cancellation; otherwise `abnormal-exit` |
+
+The Codex contract has **no structured error kind**: terminal errors are
+free-text messages. Classification uses a versioned pattern table
+(`codex-errors/v1`) built from the pinned source's error display strings
+(usage limit, server overloaded, authentication, stream disconnected). A
+message matching no pattern is `unclassified` (§5.1). A reroute item is a
+primary-model fidelity violation.
+
+### 3.6 Primary-model fidelity and auxiliary usage (R10)
+
+- **Claude:** the primary model is faithful if `init.model` equals the
+  requested id, every non-synthetic main-loop assistant `message.model` equals
+  it (exact string; `ModelUsage.canonicalModel` recorded when present), and no
+  `model_refusal_fallback` event appears. `modelUsage` keys other than the
+  requested model are **auxiliary usage**, which is legitimate (internal
+  helper calls). They are reported per model and are never a fidelity
+  violation. `--fallback-model` is never passed.
+- **Codex:** the served model is `unknown` (not in the JSONL contract). A
+  surfaced reroute item is a fidelity violation. The absence of a reroute item
+  is recorded as "no reroute surfaced", not as confirmed fidelity.
+- A fidelity violation makes the attempt invalid (`harness:
+  model-fidelity`). It is not retried; the repetition becomes `missing`, and
+  the matrix halts after 3 such attempts per provider.
+
+### 3.7 Version pinning and drift
+
+The CLI binaries are copied into the agent image from pinned sources,
+identified by sha256 (observed on the host: `claude.exe` `375988f4…`, `codex`
+`399ff69c…`), and installed **execute-only** (`root:root 0711`, §4.4). Both
+run correctly in that mode (observed). `--version` is checked inside the image
+at matrix start against `matrix.json`; any difference refuses the matrix.
+Autoupdate is disabled and the root filesystem is read-only.
+
+### 3.8 Budgets, timeouts and cancellation (Q11)
+
+- Wall clock: corpus `timeoutSeconds`, from CLI start. At expiry the runner
+  sends SIGINT, then SIGTERM after 15 s, then kills every agent-UID process
+  (§4.6 step 2) after 30 s. Termination is `budget-timeout`.
+- `maxToolCalls`: a harness cap on normalized tool calls, the same for both
+  CLIs. Its value is configuration (default: the corpus `maxTurns` hint) and
+  is recorded separately from that hint. Termination is
+  `budget-max-tool-calls`.
+- `cliMaxTurns`: Claude `--max-turns`, documented in the SDK as "agentic turns
+  (API round-trips)", a different unit. It is a backstop (default
+  `2 × maxToolCalls`), and when it fires the record says `cli-max-turns`. It
+  is never described as equivalent to the harness cap. Codex has no native
+  turn limit (observed).
+- The final workspace is read only after every agent-UID process is gone.
+- Operator cancellation runs the same teardown, including the credential
+  export (§4.6), writes `harness:cancelled` records and leaves the matrix
+  resumable.
+
+## 4. Isolation, integrity and credentials
 
 ### 4.1 Threat model
 
-**Assets:** the user's subscription credentials and quota; the host's files
-(home directory, other projects, `~/.claude`, `~/.codex`, the baseline store,
-this repository); the integrity of verdicts and metrics.
+**Assets:** the user's subscription credentials and quota; host files; the
+integrity of verdicts and metrics.
 
-**Adversary:** the evaluated agent, possibly following prompt-injected
-instructions in task material (the corpus deliberately contains such tasks).
-As in AG-00.1, it may cut corners or try known bypasses, and it may run any
-code inside its container. It does not have kernel exploits or knowledge of
-the harness internals.
+**Adversary:** the evaluated agent, possibly following prompt-injected task
+material, running arbitrary code as the agent UID inside its container. It
+has no kernel exploits and no knowledge of harness internals.
 
-**Not trusted:** everything inside the agent container (the CLI process too,
-since the agent's shell runs as the same user and can read or signal it),
-every byte of the workspace after the agent started, and every byte of the
-stream that originates from model or tool output.
+**Untrusted:** everything the agent UID can write or execute; every
+workspace byte after the agent starts; model and tool text in the stream.
 
-**Trusted:** the host-side runner, the evaluator container's harness code,
-the verified product build artifacts, the image built by the runner.
+**Trusted:** the host-side runner; harness code and the trusted tree mounted
+read-only into grader containers; images built by the runner; the CLI binary
+itself (but not the CLI's state, which shares a UID with the agent).
 
-### 4.2 Containers
+### 4.2 Containers and authority boundaries (R8)
 
-Three roles, each a fresh container per attempt (`--rm`):
+Every container is fresh per attempt, has `--cap-drop ALL`,
+`--security-opt no-new-privileges`, the default seccomp and AppArmor profiles,
+a `--read-only` root, cpu/memory/pids limits and **no credentials** except
+the agent container. All harness Node processes use the store's Node 22.22.0
+installed execute-only, so they are non-dumpable (§4.4).
 
-1. **Agent container**: runs the CLI.
-2. **Harness container**: installs dependencies, runs `prepare`, applies
-   workspace events, and runs `pms-agentic evaluate --host-commands`. No
-   credentials, `--network none`.
-3. **Egress proxy**: one per matrix; the agent container's only route.
+| Role | UID | Network | Mounts (owner, mode) | Executes | Result channel |
+| --- | --- | --- | --- | --- | --- |
+| **P** prepare | agent 10001 (no agent code exists yet; files end up owned by the agent UID without `CAP_CHOWN`) | none | fixture closure (ro), product tarballs (ro), fresh workspace dir (rw), trusted-tree build dir (rw, mounted read-only everywhere afterwards) | `materialize`, offline `npm ci --ignore-scripts`, `prepare` (corpus content only, no agent code yet) | stdout → runner |
+| **A** agent | agent 10001 | per-attempt isolated network (§4.3) | workspace (rw; ro parts per §4.5), agent docs (ro), tmpfs `/run/agent` and `/tmp` | supervisor (PID 1, harness UID); CLI and tools as agent UID via `docker exec` | CLI stdout via the `docker exec` stream → runner |
+| **E** event runner | agent 10001 | none | workspace (rw) | `pms-agentic event` steps; workspace-delta digests (no-follow) | stdout → runner |
+| **G1** grade | grader 30001 | none | harness (ro), trusted tree (ro), baseline archive extract (ro), final evidence extract (ro), tmpfs `/scratch` | `pms-agentic evaluate` **without** `--host-commands`: no agent process; agent modules run only inside the AG-00.1 Node-permission sandbox | stdout → runner |
+| **G2** host-build grade | grader 30001 | none | same as G1 | `evaluate --host-commands`: agent-written build scripts run here | stdout → runner, used only for `host.build` and a consistency check |
 
-Agent container settings:
+Invariants by construction:
 
-- image built by the runner from a base image pinned by digest, plus Node
-  22.22.0 from the verified product build store and the pinned CLI binaries;
-  identified by its image id (sha256);
-- `--user` a non-root uid/gid; `--cap-drop ALL`;
-  `--security-opt no-new-privileges`; Docker's default seccomp and AppArmor
-  profiles (observed: `apparmor`, `seccomp builtin`, `cgroupns`);
-- `--read-only` root filesystem; tmpfs for `/tmp` and the agent home
-  (`/run/agent`, mode 0700, size-limited);
-- one bind mount: the attempt's workspace at `/workspace` (read-write, or
-  read-only when `workspace.write` is withheld); the product's agent docs
-  read-only at a fixed path; nothing else from the host. No home directory
-  path, no `~/.claude`, no `~/.codex`, no Docker socket, no repository
-  checkout, no baseline store;
-- `--cpus`, `--memory` = `--memory-swap`, `--pids-limit`, `--ulimit nofile`
-  from `matrix.json`; wall clock per §3.6;
-- network: attached only to an `--internal` Docker network whose only other
-  member is the egress proxy; `--dns` points nowhere, so name resolution
-  happens only at the proxy (closing DNS as a side channel).
+- The baseline and the final evidence are archives written by the runner and
+  extracted into fresh read-only mounts for each grader. The agent's
+  workspace directory is never re-read by host code after the agent stops
+  (only P/E/G containers touch it, without following links).
+- Harness code and the trusted tree are read-only in every grader. Grader
+  results leave only through the container's stdout, read by the runner.
+  There is no result file a build could overwrite.
+- **Two-pass grading.** G1 grades everything except `host.build` with no
+  agent build process. G2 runs the same evaluation with host commands, as a
+  non-dumpable grader process, so the build cannot reach its descriptors or
+  memory (observed, §4.4). The build can still signal the grader (observed:
+  signals are allowed), so:
+  - if G2 completes and every non-`host.build` check equals G1's, G2's
+    verdict is used;
+  - if G2 dies, times out or disagrees with G1, `host.build` is
+    `aborted-by-agent-code` and the verdict cannot be `pass`. This rule is
+    monotone toward non-success, and the runner reimplements no oracle
+    aggregation.
+- Event steps with `compile` (none in corpus 1.4.3) are refused: they would
+  compile with the agent-writable `node_modules`. Tasks with
+  `workspace.services` or `browser: true` (none in 1.4.3) are refused.
 
-Egress proxy: a small CONNECT-only proxy (harness code) that allows `host:443`
-from a per-CLI allowlist and logs every CONNECT (host, allowed/denied, bytes
-each way, times). Initial allowlists from the binaries' strings:
-`api.anthropic.com` (Claude) and `chatgpt.com`, `auth.openai.com` (Codex);
-telemetry and error-reporting hosts are denied. The exact required set is
-unverified and is finalized from the smoke run's proxy log; any change is a new
-comparability key. Both CLIs contain `HTTPS_PROXY` handling (strings); whether
-every request honors it is unverified, which is why the network is internal:
-a request that ignores the proxy has no route at all.
+### 4.3 Network (R1)
 
-What is enforced by construction, per capability:
+Docker's default `internal` network keeps a host-side bridge address that
+containers can reach. On this host a probe of a dummy host service through it
+**timed out**, which shows only that this host's firewall currently drops it.
+That is host state, not a guarantee. The design therefore uses:
 
-| Capability withheld | Enforcement |
-| --- | --- |
-| `workspace.write` (9 read-only tasks) | workspace mounted read-only |
-| `git.write` | `/workspace/.git` additionally bind-mounted read-only |
-| `network.registry`, `package.install` | no route: the proxy allowlist contains provider hosts only; installs fail |
-| `host.build` (read-only tasks) | read-only workspace (build output cannot be written); otherwise detected by oracles and transcript |
-| `design-system.edit` | detected, not prevented: protected paths are inside the writable tree and legitimate builds rewrite generated output; `scope.diff` and `definition.diff` fail the run |
-| `host.dev-server` | not granted by any 1.4.3 task; listening inside the container has no route out; detected in the transcript |
+- a **per-attempt** `--internal` network with
+  `com.docker.network.bridge.gateway_mode_ipv4=isolated` and no IPv6. Observed
+  (Docker 29.2.1): the bridge has no host address, and the gateway address is
+  assigned to the first container. From an agent container, the host service
+  on the docker0 address, the LAN address and the host's global IPv6 address
+  were all `ENETUNREACH`; `1.1.1.1:443` and `8.8.8.8:53` were `ENETUNREACH`;
+  external DNS failed (`EAI_AGAIN`). A network created with `--ipv6` and
+  `gateway_mode_ipv6=isolated` also had no IPv6 route out (observed);
+- a **per-attempt** egress proxy container, the only other member of the
+  attempt network, also attached to an egress network. Observed: an agent
+  reached its own proxy by name and address; an agent on another attempt's
+  network got `ENETUNREACH` to that proxy and to its egress address; the proxy
+  reached `api.anthropic.com`;
+- the proxy is CONNECT-only, allows `host:443` from the per-CLI allowlist and
+  logs each CONNECT (host, decision, bytes, times). The allowlist is finalized
+  from the smoke run's proxy log. Observed: with no ChatGPT login, Codex
+  targeted `wss://api.openai.com/v1/responses`; with a ChatGPT login,
+  `chatgpt.com` is expected (unverified).
 
-Unsupported task features are refused, not approximated: `workspace.services`
-and `environment.browser: true` (no 1.4.3 task uses them), and
-`network: package-registry` until Q2 is decided (the 3 installation tasks).
+**Self-test validity.** The isolation self-test (§9.3) result is bound to the
+digest of: Docker server version, network create options, agent and proxy
+image ids, proxy allowlist, kernel release and the host's global interface
+address set. It expires after 24 h. A provider-backed attempt refuses to start
+without a valid result for its exact binding.
 
-`bubblewrap` (0.9.0, present) is not needed: the CLIs' own sandboxes are off
-and Docker provides the boundary.
+### 4.4 Telemetry and failure-signal integrity (R3)
 
-### 4.3 Credentials
+**Trust classes:**
 
-Rules that hold by construction:
+- `harness`: harness timers, container state and exit codes, cgroup counters,
+  proxy logs, grading results. Trusted.
+- `cli-attested`: the CLI's stdout, captured outside the container through the
+  `docker exec` stream, on an attempt whose stream protection holds (below).
+  Trusted to the extent the CLI itself is (residuals below).
+- `unprotected`: CLI output when the protection could not be established.
+  Never a measurement (`estimate`, method `cli-report-unauthenticated`) and
+  never alone a retry reason (§5.3).
 
-1. The runner never mounts a host home path. It never reads `~/.claude`,
-   `~/.claude.json` or `~/.codex` except to copy the single credential file in
-   the fallback method below, and never writes there.
-2. Credentials live only in a tmpfs inside the agent container, written by
-   the entrypoint from the runner's stdin (not `docker cp`, which does not
-   write into tmpfs, and not `docker run -e`, which would persist the secret in
-   the container configuration). The tmpfs dies with the container.
-3. The harness and proxy containers never receive a credential, so
-   `evaluate --host-commands` (whose host build inherits the process
-   environment: observed in `evaluate.mjs`) and agent-written build scripts
-   cannot read one.
-4. Secret bytes are known to the runner, so every persisted artifact passes an
-   exact-match redaction (raw, JSON-escaped, base64, URL-encoded forms) plus
-   pattern redaction (§6.2) before it is written. A post-write scan of the
-   attempt directory for the secret fails the attempt closed.
-5. The clean agent home contains no user configuration: observed on this
-   host, `~/.codex` holds `AGENTS.md`, `memories/`, `skills/`, `rules/` and
-   profile configs, and `~/.claude` holds `settings.json`, `skills/`,
-   `plugins/` and project history. Copying only a credential keeps those out of
-   the evaluated agent's context (a comparability requirement as much as a
-   privacy one).
+**Protection: execute-only CLI binaries.** Linux makes a process that execs a
+binary it cannot read non-dumpable; its `/proc/<pid>` entries then belong to
+root. Observed in the probe image, as the agent UID with no capabilities:
 
-Methods (Q1):
+| Target process | `/proc/pid/fd/1` open for write | `/proc/pid/environ` | `/proc/pid/fd` list | `/proc/pid/mem` | signal |
+| --- | --- | --- | --- | --- | --- |
+| readable `node` / `claude` / `codex` | allowed | allowed | allowed | denied (Yama `ptrace_scope = 1`) | allowed |
+| execute-only `node` / `claude` / `codex` (`root:root 0711`) | **EACCES** | **EACCES** | **EACCES** | EACCES | allowed |
 
-- **Recommended: dedicated evaluation credentials.** Claude: a long-lived
-  token from `claude setup-token` (observed command), stored by the user in a
-  file outside the repository and outside `~/.config/pandamstyle` (default
-  `~/.local/share/pandamstyle-agentic/credentials/claude.token`, mode 0600),
-  delivered as `CLAUDE_CODE_OAUTH_TOKEN` (string observed; behavior under
-  `-p` unverified). Codex: a separate login made with
-  `CODEX_HOME=<dedicated dir> codex login --device-auth`, whose credential file
-  is copied per attempt. Benefits: revocable independently; no refresh token of
-  the user's interactive sessions ever enters a container; a refresh inside
-  the container cannot invalidate the user's own login.
-- **Fallback: copy of the existing login file** (`~/.claude/.credentials.json`
-  mode 0600, `~/.codex/auth.json` mode 0600; names and modes observed, contents
-  not read). Risk: these files presumably contain refresh tokens (unverified);
-  if a CLI refreshes and the provider rotates refresh tokens, the user's own
-  host login can be invalidated. Not recommended.
+So with execute-only binaries, tool processes of the same UID cannot write
+into the CLI's stdout through `/proc` or read its environment. The remaining
+paths:
 
-For a credential that refreshes (Codex), the runner serializes attempts per
-credential store and, after the container stops, writes back a changed
-credential file to the **dedicated** store only after structural validation
-(never to `~/.codex`, never logging contents). Whether Codex refreshes during
-`exec` is unverified (smoke run item).
+- **Inherited descriptors.** A tool child would hold the stream only if the
+  CLI passed its stdout to it. Both CLIs capture tool output (Codex
+  `aggregated_output`, source), which implies piped stdio; that is
+  inference, not observation. A **channel-audit sidecar** (harness image,
+  `--pid container:<agent>`, `CAP_SYS_PTRACE`, no network, no mounts) samples
+  the descriptor tables of all agent-UID processes. It checks that none holds
+  the CLI's stdout pipe and that the CLI's `/proc` entries are root-owned
+  (non-dumpable confirmed at runtime). Any failure makes the stream
+  `unprotected`. Sampling can miss a short-lived holder: it is an audit, not
+  a proof.
+- **CLI control channels.** Claude listens on `/tmp/cc-socks/<n>.sock`, mode
+  0600, owned by the agent UID (observed). Same-UID processes can connect,
+  and what that protocol allows is unknown. Codex `exec` created no daemon
+  socket in the offline run (observed); its `daemon_auto_start` feature is
+  enabled by default (observed in `features list`). The audit records
+  connections to these sockets; any connection from a non-CLI process makes
+  the stream `unprotected` and is a breach observation. Residual risk:
+  documented, not closed.
+- **Self-inflicted failures.** Agent code can kill the CLI (signals are
+  allowed) or exhaust the quota with the credential it can read (§4.10).
+  Neither forges a stream: a kill without a provider error is
+  `abnormal-exit` (never retried), and quota exhaustion is handled by §5.3.
 
-### 4.4 Residual risks and covering layers
+**Not chosen in this issue:** a TLS-terminating proxy would give
+provider-authenticated usage and status codes independent of the CLI. It
+needs custom CA injection into both CLIs and parsing of the provider
+protocols (Codex uses WebSockets, observed), and is left as a possible
+follow-up.
 
-| Risk | Why it remains | Covering layers |
-| --- | --- | --- |
-| The agent reads the credential (same uid as the CLI) and sends it out through an allowlisted provider host, or uses it for unrelated requests | the CLI must hold a usable credential; TLS hides request content from the proxy | dedicated revocable credentials (Q1); bounded run time; per-host egress byte accounting with an anomaly flag; transcript scan flags any command touching the credential path or variable name (policy breach); exact-match scan of the final message, workspace and stream; revocation procedure on any finding |
-| The agent writes the credential into the workspace or final message | it can read it | the persisted copies are redacted after evaluation; the run is flagged `credential-leak` and the credential is rotated |
-| The agent forges CLI stream events (for example by writing to the CLI's stdout through `/proc/<pid>/fd/1`) to fake an infrastructure error and obtain a re-roll, or to fake usage | same uid, same container | stream-integrity checks (§3.4) turn anomalies into non-retried harness errors; retries are capped and reported per cell (§5.2); the transcript scan flags `/proc/*/fd`, `kill`/`pkill` of the CLI; a crash without a provider error event is `abnormal-exit` and never retried |
-| Container escape through a kernel vulnerability | rootful Docker without user-namespace remapping (observed) | non-root user, no capabilities, `no-new-privileges`, seccomp, AppArmor, read-only root, no Docker socket, short-lived containers |
-| Disk exhaustion through the workspace bind mount | overlay/bind size limits are not available here (unverified) | the runner samples workspace size and kills the attempt at a cap (`resource-limit`); tmpfs mounts are size-limited |
-| Hostile workspace content attacking host-side processing (symlinks to host files, FIFOs, huge files) | the workspace is agent-written | all post-run workspace reads happen in the harness container; host-side archiving uses `lstat`, never follows links, skips non-regular files, and is size-bounded |
-| Quota exhaustion affecting the user's other work | shared subscription | concurrency cap per provider (Q8), backoff on rate limits, halt on repeated limits |
+### 4.5 Capability enforcement matrix (R7)
 
-### 4.5 Order of an attempt
+Rule: a withheld capability must be **prevented** when its exercise could
+change graded evidence, reach outside the container or affect the user's
+credentials. It may be **detected** (exercised, recorded as a breach, attempt
+non-successful) only when its exercise is contained in the container, cannot
+change graded evidence, and is visible to the harness. If neither holds, the
+task is **refused** (`unsupported / not run`). The rule itself is open
+question 2.
 
-1. Verify product build binding (§4.6), image id, CLI digests, corpus lock
-   (`pms-agentic validate`), clean harness checkout, isolation self-test
-   freshness (§9.2), held-out guard (§4.7).
-2. Harness container: `materialize --files-only` into a fresh attempt
-   directory outside the repository; offline install from the verified
-   dependency closure (`--ignore-scripts`); copy the pristine install as the
-   trusted `node_modules`; `prepare`; snapshot the scope baseline.
-3. Start the agent container with the workspace mount and the credential on
-   stdin; stream stdout to the parser; apply triggered events through the
-   harness container (`pms-agentic event`) and the same steps to the scope
-   baseline.
-4. Stop the agent container; destroy its tmpfs; record termination.
-5. Harness container (no network, no credentials, Node 22.22.0 from the
-   store): `pms-agentic evaluate … --trusted-node-modules <pristine>
-   --host-commands`.
-6. Redact, bound and persist artifacts; scan for secrets; write the record.
+| Capability withheld | Mechanism | Class | Evidence |
+| --- | --- | --- | --- |
+| `workspace.write` (9 tasks) | workspace mounted read-only in A | prevent | observed EROFS; writes to `/tmp` cannot affect grading |
+| `git.write` | `/workspace/.git` bind-mounted read-only | prevent | observed: `git status`/`diff` work, `git commit` fails with EROFS |
+| `design-system.edit` | definition sources of the fixture (`project.definition` files or directory) bind-mounted read-only over the writable workspace; generated output stays writable because legitimate builds rewrite it | prevent (definitions) + detect (generated output, via `generated.consistent` and `definition.diff`) | observed: write → EROFS, rename onto or delete → EBUSY |
+| `network.registry` | no route except the proxy, whose allowlist has provider hosts only | prevent | observed probes (§4.3) |
+| `package.install` | network prevention above; a local install (from files already in the container) only changes `node_modules`, which grading never uses (trusted tree, §4.8) | prevent (network) + detect (local: `node_modules` tree digest before/after, computed in E; transcript) | design |
+| `host.build` (9 read-only tasks) | the read-only workspace prevents build output in the workspace; a build to `/tmp` is possible because tools need Node | detect (transcript `verify` class, §2.4) | open question 2 |
+| `host.dev-server` (withheld in every task) | a dev server can listen inside the container; nothing outside can reach it | detect (transcript) | open question 2 |
+| web tools (Q4) | Claude: tools absent from `init.tools`; Codex: `web_search="disabled"` | Claude prevent (observed evidence); Codex prevent by configuration (source evidence) + detect (`web_search` items) | open question 2 |
+| subagents (Q4) | Claude: `Agent` not in tools; Codex: `agents.enabled=false` | prevent (observed evidence for both) + detect (`Agent` tool use, `collab_tool_call` items) | §3.3 |
+| `network: package-registry` tasks (installation, 3) | requires the read-only local mirror (Q2) | refuse until the mirror exists | reported `unsupported / not run` |
 
-### 4.6 Product build binding
+Provider-side tools create no new proxy destination, so the proxy does not
+enforce them. They are enforced only by tool configuration and detected in
+the stream.
 
-A run is bound to a product build by digest, never by a branch name. The
-binding (`pms-agentic-product-build/v0-draft`) records:
+### 4.6 Credentials (R9, Q1)
 
-- epoch (must be an epoch of `corpus.json` whose `product.commits` contains
-  the source commit; otherwise the runner refuses);
-- source commit, tree and source archive sha256;
-- each `@pandamstyle/*` tarball: name, version, file, sha256 and `integrity`
-  (SHA-512, equal to npm `dist.integrity` for Alpha 1);
+The user's existing login files are the source. The runner reads them at run
+time and never logs them; this design read only their names and modes.
+
+**Mode A: access-only (preferred if supported).** The runner derives a reduced
+credential with no refresh token: for Claude, the access token in
+`CLAUDE_CODE_OAUTH_TOKEN`; for Codex, `codex login --with-access-token` inside
+the tmpfs. An attempt starts only if the token's remaining lifetime exceeds
+the attempt budget plus a margin. The user's refresh token never enters a
+container, so the user's own login cannot be rotated by a run. Feasibility is
+**unverified** (smoke item). If it fails, mode B is used and recorded.
+
+**Mode B: refresh-capable copy.** The full file is copied into the agent
+tmpfs. Because the refresh token is shared with the user's own sessions,
+mode B forces concurrency 1 per provider. Teardown order, for completion,
+timeout, cancellation and failures alike:
+
+1. The CLI ends or is stopped (§3.8).
+2. The runner kills every agent-UID process
+   (`docker exec -u 10001 … kill(-1, SIGKILL)`) and verifies none remain.
+   PID 1 is a harness-UID supervisor that reaps orphans. Observed: PID 1
+   survives `kill -9 -1` from the agent UID, and processes not reaped by
+   PID 1 remain as zombies.
+3. **Export, before tmpfs destruction:** an execute-only Node exporter opens
+   the credential path with `O_NOFOLLOW`, requires a regular file of at most
+   64 KiB, and writes it to the exec stream.
+4. The runner validates the export **as untrusted input**: valid JSON with the
+   same key structure and value types as the copied original. If the refresh
+   token is unchanged, nothing is written.
+5. If it changed: **compare-and-swap** on the host file. If the host file's
+   sha256 still equals the pre-copy value, write a backup (`0600`, runner
+   state directory outside the repository, last 3 kept), write a temp file
+   `0600` in the same directory, fsync, rename atomically, fsync the
+   directory. If the host file changed meanwhile (the user's own CLI
+   refreshed), nothing is overwritten, the conflict is recorded and the
+   provider is halted for the user to re-login.
+6. Any export failure (missing file, symlink, FIFO, oversize, invalid JSON,
+   shape mismatch): the host file is untouched, the provider is halted, and
+   the record says `credential-export-failed`. The provider may already have
+   rotated the token server-side; that is the accepted risk.
+7. The redaction set (all secret leaf values of the original **and** the
+   exported credential) is complete **before** any artifact of the attempt is
+   persisted. Until then the stream and stderr are held in runner-private
+   temporary files (`0600`), redacted on persistence and deleted.
+8. Only now is the agent container removed and its tmpfs destroyed.
+
+Crash recovery: at start-up, the runner finds containers carrying its labels
+and runs steps 2–8 for each before anything else. It then deletes leftover
+private temporary files.
+
+Rules in both modes: no host home path is mounted; the credential is
+delivered on the exec stdin into tmpfs (not `docker run -e`, which persists
+it in container configuration); P, E, G1, G2 and the proxy never hold a
+credential. Observed: an execute-only CLI's environment is unreadable by
+other same-UID processes. Tool children inherit the environment and can read
+tmpfs files, so the agent can read the credential: residual risk.
+
+### 4.7 Order of an attempt
+
+1. Preconditions: product build binding and trusted tree digests (§4.8),
+   image ids, CLI digests, `pms-agentic validate`, clean checkout, isolation
+   self-test validity (§4.3), held-out refusal (§4.9), and the capability
+   matrix (refuse unsupported tasks).
+2. P: materialize, offline install from the verified fixture closure, check
+   that the workspace's installed `@pandamstyle/*` equals the tarballs,
+   `prepare`, archive the scope baseline.
+3. A: start the supervisor, deliver the credential, `docker exec` the CLI;
+   parse the stream; E applies triggered events (and the same steps to the
+   baseline archive) and records workspace deltas; the sidecar audits.
+4. Teardown (§4.6) with credential export.
+5. Archive the final workspace evidence from a P-type container (no-follow).
+6. G1, then G2 if the task has a `host.build` check.
+7. Redact, bound and persist; leak scan; write the record.
+
+### 4.8 Product build and grading compiler (invariant G)
+
+**Binding.** A run is bound to the product build by digest
+(`pms-agentic-product-build/v0-draft`):
+
+- epoch, which must be an epoch of `corpus.json` listing the source commit;
+- source commit and tree;
+- the source archive sha256, needed for the agent docs;
+- the five `@pandamstyle/*` registry tarballs (sha256 and SHA-512
+  integrity);
 - the Node runtime archive sha256;
-- the agent-docs tree (`docs/agent-*.md`, `docs/reference/`,
-  `benchmarks/alpha1-reference.json`, extracted from the source archive of the
-  same build) and its tree digest;
-- provenance: for Alpha 1, `kind: ce-baseline-manifest` with the manifest's
-  sha256 and where it was read from; for later candidates,
-  `kind: packed-from-commit` (packing is a later hook, not needed for the
-  AG-00.3 reference);
-- `digest`: sha256 of the canonical binding.
+- the agent-docs tree digest, extracted from the source archive;
+- provenance: the CE manifest sha256 and path;
+- the store-copy verification result.
 
-Alpha 1 (observed): the manifest at
-`origin/core-evolution/ce-00.3-baselines` (head `f4a7106`) has sha256
-`acdefef3…2884`. It lists source commit `415e055` (tree `26928afe`), archive
-sha256 `407f68a6…3764`, five registry tarballs with SHA-512 integrities equal
-to the registry's, Node 22.22.0 (`9aa8e9d2…7c37`) and a store at
-`~/.local/share/pandamstyle-baselines/alpha1`. The runner:
+The runner binds **only** to the product tarballs, Node and the source
+archive. It does not bind to the CE closure or npm cache: the corpus's
+fixtures pin other versions, and the cache inventory is not reproducible by a
+rebuild (core-evolution facts, PR #103). Chromium is not consumed by corpus
+1.4.3 (no browser task), so it is not bound.
 
-- reads a manifest **file** given on the command line (from `git show` of that
-  branch until PR #99 merges, from `main` after) and checks its sha256 against
-  the value pinned in `matrix.json`;
-- opens the store read-only and verifies, itself, the sha256 of every
-  artifact it consumes (it does not depend on `tools/baselines/archive.mjs`
-  being merged; when that tool is available, its `verify --replay` result is
-  recorded as additional evidence);
-- never writes to the store.
+**Store.** Observed: on a copy of the store, `node tools/baselines/archive.mjs
+verify --store <copy> --replay` (from a clone at `e2a864b`; the manifest sha256
+is `acdefef3…2884`, identical on `main`) passed 42/42 checks in 15.8 s. The
+original store contains historical unrecorded writes (core-evolution fact),
+and the replay writes npm-cache metadata. So the runner:
 
-The CE closure cannot serve as the fixture install. Observed: the closure pins
-React 19.3.0, while the fixtures pin React 19.2.0, `@rsbuild/plugin-react`
-2.0.1, `@types/react`, a webpack 5 stack and `clsx`, which the closure lacks.
-So the runner builds a **fixture dependency closure** per fixture × product
-build: one networked resolution in a credential-free container
-(`--ignore-scripts`), with the `@pandamstyle/*` packages taken from the
-verified tarballs, producing a lockfile and an offline package cache, both
-digest-recorded and referenced by every later attempt (README: "Fixture
-`package.json` files pin versions but ship no lockfiles; the runner resolves
-dependencies at install time and must record them"). Attempt installs are
-offline from it. The pristine result is the oracles'
-`--trusted-node-modules`, as the README's runner contract requires; the CE
-closure's `node_modules` (suggested by the manifest's `agReuse` note) would
-render with a different React than the workspace.
+- **only reads from a verified copy**, never from the original store, and
+  never trusts files outside the manifest's inventory;
+- verifies itself the sha256 of every artifact it consumes, and records the
+  `archive.mjs verify` result when available.
 
-Observed but outside this issue: the manifest records the store's
-`npmCache.tree` as 0 files with the empty-input digest, while the store's
-`npm-cache/` directory holds about 445 MB. The runner does not consume that
-cache; the point is reported to the core-evolution orchestrator.
+**Grading compiler.** `evaluate` resolves `@pandamstyle/compiler` through
+`findPackage`, which walks **ancestors** of the scratch workspace and falls
+back to any `node_modules` above it (observed in `project-worker.mjs`; the
+default scratch root is `os.tmpdir()`). The repository's own `node_modules`
+links the workspace packages built from `HEAD`. Therefore, for every
+provider-backed attempt:
 
-### 4.7 Held-out tasks
+1. The trusted tree is built in P by an offline install from the verified
+   fixture closure. Every installed `@pandamstyle/*` package directory is
+   compared file by file (sha256, nested `node_modules` excluded) with the
+   `package/` entries of the corresponding digest-verified Alpha 1 tarball.
+   Any difference refuses the attempt.
+2. The record carries `trustedTree.digest` (`pms-tree-sha256/v1`, no-follow,
+   links as targets) and `trustedTree.pandamstyleDigest`. Before each grading
+   pass the runner recomputes the digest and **refuses** (`harness:
+   trusted-tree`) if the tree is missing or differs.
+3. `evaluate` is always called with `--trusted-node-modules /trusted/…` and
+   `--scratch /scratch`. Inside the grader image `/scratch`, `/` and every
+   ancestor have no `node_modules`; the image build and the self-test assert
+   it. Missing `--trusted-node-modules` is a hard error in provider-backed
+   mode. The ancestor fallback is allowed only in `adapter-fixture`/dev mode,
+   which is labelled and never aggregated with provider-backed records.
+4. `prepare` compile steps resolve the compiler from the workspace's own
+   install, which item 1's check covers, and whose ancestors have no
+   `node_modules` in P.
 
-- The runner's task resolver loads development tasks only. Any id listed in
-  `heldout/MANIFEST.json` (16 observed), any task with `split: heldout`, and any
-  use of `--heldout-dir` is refused unless the matrix purpose is
-  `ag-12.2-final-qualification` **and** `PMS_HELDOUT_PURPOSE` has that value.
-  The other purposes of the access policy (`seal-verification`,
-  `pre-freeze-revision`) are not run purposes and are always refused.
-- The runner never calls `heldout unseal` and never reads the passphrase
-  variable. In this issue no held-out path is executed; the refusal is tested
-  for every manifest id.
-- For the future AG-12.2 run, held-out attempts write to a separate run root
-  whose raw artifacts are never published (they contain held-out prompts and
-  workspaces); only verdicts and metrics per task id may leave it.
+The harness's own dependencies (`@babel/*`, jsdom in `dom/`) come from the
+runner commit's lockfiles and are part of the harness identity (§1.3), not of
+the product.
 
-## 5. Failure taxonomy
+### 4.9 Held-out tasks (F1)
+
+In AG-00.2 the refusal is **unconditional**: every id in
+`heldout/MANIFEST.json` (16, observed), any task with `split: heldout`, and
+any `--heldout-dir` argument are refused before materialization, whatever the
+environment says. The runner has no unseal path and never reads the
+passphrase variable. AG-12.2 final qualification will need a separate,
+reviewed change. Held-out artifacts must then stay unpublished. That path is
+declarative here, as is candidate packing from a commit.
+
+### 4.10 Residual risks
+
+| Risk | Covering layers |
+| --- | --- |
+| The agent reads the credential and uses it (exfiltration through allowlisted hosts, quota misuse, induced rate limits) | bounded attempt time; proxy byte and connection accounting with anomaly flags; transcript scan for credential paths and variable names; exact-match scans of stream, final message and workspace; `contested` handling of infrastructure failures (§5.3); mode A when feasible |
+| Same-UID control of the CLI through its sockets | channel audit; `unprotected` status; breach observation |
+| Kernel escape (rootful Docker, no user-namespace remap) | non-root, no capabilities, `no-new-privileges`, seccomp, AppArmor, read-only root, no Docker socket, short-lived containers |
+| Disk exhaustion through the workspace mount | size sampling with a kill cap (`resource-limit`); size-limited tmpfs |
+| Hostile workspace content (links, FIFOs, huge files) | host code never reads the live workspace; containers archive without following links or reading special files; size bounds |
+
+## 5. Failure taxonomy and retries
 
 ### 5.1 Classes
 
-Classification is a pure function of: CLI exit status and signal, structured
-CLI events (terminal result or failure events, API error events with status),
-container state (`OOMKilled`, exit code), harness timers and harness errors.
-**Its inputs never include the oracle verdict, the workspace, or free text
-from model or tool output** (an agent printing "rate limit exceeded" changes
-nothing).
+Classification is a pure function of: exit status and signal; structured CLI
+fields (Claude `is_error`, `terminal_reason`, assistant `error` enum,
+`api_error_status`, rate-limit status; Codex terminal event type and
+pattern-matched terminal message); container state; harness timers and
+harness errors. It never sees the verdict, the workspace or model/tool text.
 
-| Class | Codes | Counted in success rate | Retried |
+| Class | Codes | In success statistics | Retried |
 | --- | --- | --- | --- |
-| `agent` | `completed` (then graded), `budget-timeout`, `budget-max-turns` | yes (a budget code is a non-success) | never |
-| `agent-resource` | `resource-limit` (container OOM, pids, workspace size cap) | yes, as non-success; reported separately | never |
-| `agent-abnormal` | `abnormal-exit`: the CLI died without a provider error event (crash, killed from inside) | yes, as non-success; reported separately | never |
-| `infrastructure` | `rate-limit`, `capacity` (overloaded), `provider-error` (5xx, disconnect after the CLI's own retries), `auth` (expired, revoked), `container` (daemon or image error before the agent started), `proxy` | no: excluded from the denominator and reported | `rate-limit`, `capacity`, `provider-error`, `container`, `proxy`: yes; `auth`: no, halts the provider |
-| `harness` | `adapter-stream`, `config-integrity` (model or tool mismatch, fallback), `drift`, `install`, `prepare`, `evaluate-error` (oracle verdict `error`), `redaction`, `cancelled` | no: the attempt is invalid | never automatically; systematic codes (`drift`, `config-integrity`, `redaction`) halt the matrix |
+| `agent` | `completed`, `budget-timeout`, `budget-max-tool-calls`, `cli-max-turns`, `context-exhausted` (Claude `prompt_too_long`) | yes (budget codes are non-success) | never |
+| `agent-resource` | `resource-limit` | yes, non-success | never |
+| `agent-abnormal` | `abnormal-exit` (CLI gone without a provider error), `aborted-by-agent-code` (G2) | yes, non-success | never |
+| `policy` | `tool-policy-breach` (web/subagent use), `credential-leak` | yes, non-success | never |
+| `infrastructure` | `rate-limit` (Claude `rate_limit`, `rejected` rate-limit status; Codex usage-limit pattern), `capacity` (`overloaded`; server-overloaded pattern), `provider-error` (`server_error`; stream disconnected after the CLI's own retries), `auth` (`authentication_failed`, `oauth_org_not_allowed`, `account_on_hold`, `verification_required`, `billing_error`, `cloud_credential_error`; auth pattern), `container`, `proxy` | no: excluded and reported | yes, except `auth` (halts the provider) |
+| `unclassified` | terminal error matching no structured value or pattern (Claude `unknown`, unmatched Codex message, unknown `terminal_reason`) | no: excluded and reported, and counted in the conservative bound (§5.3) | never |
+| `harness` | `adapter-stream`, `config-integrity`, `model-fidelity`, `drift`, `install`, `prepare`, `trusted-tree`, `evaluate-error`, `redaction`, `credential-export-failed`, `cancelled` | no: invalid | never; systematic codes halt the matrix |
 
-Precedence when several apply: `harness` > `infrastructure` > `agent-*`. A
-provider error that terminated the CLI makes the attempt infrastructure even
-if the agent had already written files; those files are still archived for
-audit but never graded into the statistics.
+Precedence: `harness` > `policy` > `infrastructure`/`unclassified` >
+`agent-*`. `invalid_request` and `model_not_found` are `config-integrity`.
+`max_output_tokens` is an agent outcome.
 
-### 5.2 Retry policy (no success bias)
+### 5.2 Retry policy
 
-- Only `infrastructure` attempts are retried, from scratch (new workspace,
-  new container, new session). Retrying never depends on the verdict, so it
-  cannot re-roll a failure.
-- At most `A = 3` attempts per repetition (Q9). Backoff: reset time when the
-  stream reports one, otherwise 60 s × 2^k capped at 30 min.
-- A repetition without a valid attempt after `A` attempts is `missing`: shown
-  in the cell as missing, never as fail and never dropped. A cell with a
-  missing repetition is `incomplete`; AG-00.3 cannot freeze a threshold on an
-  incomplete cell without an explicit decision.
-- Every attempt (valid or not) is in the record and in the report's attempt
-  counts, so a cell whose infrastructure failure rate differs from others is
-  visible. Long tasks are more exposed to mid-run rate limits; that exposure
-  is reported per cell rather than hidden.
+- Only `infrastructure` attempts are retried, from scratch, up to 3 attempts
+  per repetition. Backoff uses `resetsAt` when reported, otherwise
+  60 s × 2^k, capped at 30 min, inside the operator time window (Q8).
+- A repetition with no valid attempt is `missing` and its cell
+  `incomplete`; AG-00.3 cannot freeze a threshold on an incomplete cell
+  without an explicit decision.
+- `unsupported / not run` tasks (§4.5) are listed per cell, never failed or
+  dropped.
 
-## 6. Raw traces
+### 5.3 Contested attempts (R3)
 
-### 6.1 Storage and retention
+An infrastructure failure is a retry reason only on a `cli-attested` stream.
+Even then the agent can provoke real provider failures with the credential
+it can read. So a retried repetition is **contested** if its failed attempt:
 
-- Default run root: `~/.local/share/pandamstyle-agentic-runs/` (override
-  `--runs-root`). The runner refuses a run root inside the repository except
-  the gitignored `.pms-bench/` (fixture runs only).
-- Layout: `<matrixId>/matrix.json`, `product-build.json`, `image.json`,
-  `cells/<task>/<model>/rep-<r>/attempt-<a>/{record.json, prompt.md,
-  stream.jsonl.gz, stderr.log, transcript.jsonl, observations.json,
-  final-message.txt, evaluation.json, baseline.tar.gz, workspace.tar.gz,
-  proxy.log, host-samples.jsonl}`, then `report.json` and `report.md`.
-- Retention: kept until pruned explicitly (`prune --older-than`); no automatic
-  deletion. Default publication rule (Q10): `matrix.json`,
-  `product-build.json`, `image.json`, every `record.json` and
-  `evaluation.json`, and the report may be committed by AG-00.3 after a leak
-  scan; raw streams, stderr, workspace archives and proxy logs stay local.
-  Held-out artifacts are never committed.
+- had an `unprotected` stream, or
+- shows proxy anomalies (provider connections beyond the CLI's pattern), or
+- has any breach observation.
 
-### 6.2 Bounds and redaction
+The report gives each cell's success as a point estimate (contested failed
+attempts excluded, the retry counted) **and** as a conservative lower bound
+(every contested or `unclassified` repetition counted as non-success). A
+retry decision therefore never silently improves a result.
 
-- Metrics are computed from the complete stream while it is read; the
-  persisted copy is bounded (default 64 MiB per stream; beyond it, the first
-  and last 8 MiB plus a marker with the total byte and event counts). stderr
-  is bounded at 1 MiB. Workspace archives exclude `node_modules` and the
-  task's harness-ignored outputs, skip links and special files, and are
-  bounded (default 64 MiB; overflow is `harness:archive-limit`, recorded).
-- Redaction before any write: the exact secret bytes (§4.3); token patterns
-  (Anthropic/OpenAI key and OAuth token prefixes, JWT-shaped strings, `Bearer`
-  headers); the host user's home path and user name replaced by `~` and
-  `<user>`. Identifying account fields found in the stream (for example in
-  Claude's `init` event: unverified) are added to an explicit field redaction
-  list after the smoke run inspects one real `init` event.
-- A post-write scan of each attempt directory for the secret and the patterns
-  is part of the attempt; a hit deletes the artifact and records
-  `harness:redaction`.
+## 6. Evidence and raw traces (R4)
+
+### 6.1 Oracle-relevant set
+
+The oracle-relevant set of a workspace is every path **except** the oracles'
+own `ALWAYS_IGNORED` globs (`node_modules/**`, `**/node_modules/**`,
+`.git/**`; read from the locked harness, not duplicated). Harness-ignored
+output such as `.pandamstyle/**` and the state file **is** in the set, because
+`generated.consistent` reads it.
+
+Evidence archives (baseline and final) are tar archives written inside a
+container without following links:
+
+- regular files with their bytes;
+- symbolic links as link entries with their target text;
+- directories, including empty ones;
+- special files as metadata only;
+- `node_modules` excluded, its tree digest recorded instead;
+- `.git` archived separately for audit, bounded, outside the set.
+
+### 6.2 Graded bytes vs stored bytes
+
+Grading reads the unredacted evidence extract. The stored archive is the same
+bytes unless redaction or a size bound changed something:
+
+- a secret found in an oracle-relevant file is replaced by a same-length
+  marker in the stored copy, the attempt is flagged `credential-leak`, and
+  the evidence becomes `redacted`;
+- a transcript, final message or observation whose redacted copy differs from
+  the graded copy makes the evidence `redacted`;
+- an archive over its bound (default 64 MiB, `node_modules` excluded) is not
+  stored (`incomplete`).
+
+### 6.3 Replay exactness
+
+`evidence.completeness` is `complete`, `redacted` or `incomplete`. Re-grading
+is labelled `exact` only for `complete`. For the others the runner refuses
+the label and reports `non-exact` with the affected paths.
+
+### 6.4 Storage, bounds and retention
+
+- Run root `~/.local/share/pandamstyle-agentic-runs/` by default. Refused
+  inside the repository except gitignored `.pms-bench/` for fixture runs.
+- Raw stream bounded at 64 MiB per attempt (head and tail kept with a
+  marker); metrics are computed from the complete stream before truncation;
+  stderr bounded at 1 MiB. Truncation never affects the oracle-relevant set
+  or the normalized transcript. An oversized transcript makes the evidence
+  `incomplete`.
+- Redaction (before any write, §4.6 step 7): exact secret values in raw,
+  JSON-escaped, base64 and URL-encoded forms; token patterns; the host user's
+  home path and user name. A post-write scan failing deletes the artifact
+  (`harness:redaction`).
+- Q10: leak-scanned `matrix.json`, `product-build.json`, records,
+  evaluations and reports may be committed by AG-00.3. Raw artifacts stay
+  local through the baseline review and are pruned explicitly
+  (`prune --older-than`).
 
 ## 7. Report
 
-`report.json` (`pms-agentic-run-report/v0-draft`) and a Markdown rendering:
+`report.json` (`pms-agentic-run-report/v0-draft`) and Markdown:
 
-- **Per cell (task × model):** every repetition's verdict, termination,
-  failure class and attempts; the full list of values of each metric
-  (tool calls, steps, tokens by kind, cost with status, durations, repair
-  cycles), with min/median/max beside the values, never a mean alone.
-  Unknown values are shown as unknown and excluded from statistics, with the
-  count of unknowns.
-- **Per-task × model failures:** failing required check ids and their oracle
-  reasons, grouped by class (scope, integrity, static, rendered, report).
-- **Policy and scope breaches:** a dedicated section listing every attempt
-  with realized scope violations, vocabulary/integrity failures, static
-  bypasses, denied egress, read-only denials, credential-path access, stream
-  anomalies or model mismatches, whatever the verdict.
-- **Per model across tasks:** `k/n` success per workflow and case type, with
-  `n_valid` / `n_planned` and missing counts; outcome split (application,
-  diagnosis, report) kept apart; no pooled average that hides a failing task.
-- **Infrastructure:** attempts, retries, rate-limit and capacity events per
-  provider; excluded attempts listed.
-- **Environment:** comparability key per cell, product build digest, image
-  id, CLI digests, host load summary.
+- **Per cell:** every repetition's verdict, termination, class, attempts,
+  contested flag and evidence completeness; every metric's full list of
+  values with min/median/max, never a mean alone. Unknowns are counted and
+  excluded from statistics.
+- **Per-task × model failures:** failing required checks with oracle reasons,
+  by class.
+- **Policy and scope breaches:** every attempt with realized scope
+  violations, integrity or static failures, denials and detections from §4.5,
+  credential-path access, stream anomalies, `unprotected` streams, model
+  fidelity violations, whatever the verdict.
+- **Per model:** `k/n` success per workflow and case type, with `n_valid`,
+  `n_planned`, missing, `unsupported / not run`, and the point estimate with
+  its conservative bound (§5.3).
+- **Infrastructure:** attempts, retries and events per provider.
+- **Environment:** comparability keys, product build digest, trusted tree
+  digests, image ids, CLI digests, load summary.
 
-AG-00.3 consumes `report.json` and the records: its frozen thresholds will be
-expressed against these fields and bound to the comparability keys, so a later
-candidate is compared only with a reference produced under the same key.
+AG-00.3 consumes `report.json` and the records; its thresholds are bound to
+comparability keys.
 
 ## 8. Comparability and instrumentation isolation (AC4)
 
-- The product under test is never modified: Alpha 1 is installed from its
-  verified registry tarballs; no shim, patch, logger or wrapper is added to
-  `packages/*`, to the installed packages or to the workspace.
-- The evaluated agent receives exactly the corpus prompt
-  (`pms-agentic prompt`, which already appends the report contract and the
-  docs path) and the product's own agent docs. The runner adds no system
-  prompt, hooks, MCP servers, skills or memory; user-level configuration is
-  absent by construction (§4.3).
-- Telemetry is passive: the CLI's own output stream, cgroup counters, the
-  proxy log and harness timers. Nothing is injected into the agent's context or
-  tools to measure it.
-- The only intentional interventions are the corpus's own workspace events,
-  applied as the task specifies.
-- The same runner, image, CLI configuration and budgets apply to the
-  reference and to candidates; only the product build binding differs, and
-  the comparability key (§1.3) enforces it.
-- The runner lives in `benchmarks/agentic/runner/`, outside the digest-locked
-  `src/` and `schema/` of the corpus (observed in `computeLock`), so adding it
-  changes neither `corpus.lock.json` nor any oracle. Its own tree digest is
-  part of the record. For the same reason the draft schemas are in
-  `runner/schema/`, not `schema/`.
+- The product is never modified. Alpha 1 is installed from its verified
+  tarballs, and the grading compiler is the same artifact (§4.8).
+- The agent receives exactly the corpus prompt and the product's own agent
+  docs. The runner adds no system prompt, hooks, MCP servers, skills or
+  memory. The CLIs' built-in context (Claude's built-in plugins, Codex's
+  bundled system skills) is recorded as effective configuration.
+- Telemetry is passive: CLI output, cgroup, proxy log, harness timers, and
+  workspace digests taken from outside the agent's processes.
+- The only interventions are the corpus's own events.
+- The same runner, images, CLI configuration and budgets apply to every
+  product build, and the comparability key enforces it (§1.4).
+- The runner and its drafts live in `runner/`, outside the digest-locked
+  `src/` and `schema/`, so the corpus lock is unchanged.
 
 ## 9. Test plan
 
-### 9.1 Adapter-fixture matrix (CI, deterministic, no provider, no Docker)
+### 9.1 Adapter fixtures (CI; deterministic; no provider; no Docker)
 
-Fake `claude` and `codex` executables (Node scripts) replay recorded or
-synthetic JSONL streams and behaviors. Fixture streams are written from the
-field names observed in §3.1 and replaced with recorded real streams after the
-smoke run.
+Fake `claude` and `codex` executables replay streams written from the pinned
+contracts (§3.4–3.5) and the observed offline outputs.
 
 | Id | Fixture | Proves |
 | --- | --- | --- |
-| F1 | Claude success with tool calls, per-message usage, result totals, cost | parsing, normalized transcript, tool counts, cost labelled `estimate` (D1, D2, D3) |
-| F2 | Codex success with `turn.completed` usage, no cost | tokens observed, cost `unknown` (AC2) |
-| F3 | no usage anywhere | every token/cost metric `unknown`, never 0 (AC2) |
-| F4 | usage on some messages only | total `unknown`, partial sum only as `lowerBound` (AC2) |
-| F5 | duplicated assistant events for one message id | de-duplication |
-| F6 | result totals disagree with per-message sum | discrepancy recorded, both sources kept |
-| F7 | rate-limit events (Claude API error 429 / rejected rate limit; Codex `usage_limit_reached`) | `infrastructure:rate-limit`, retry scheduled with backoff, attempts recorded |
-| F8 | overloaded / `server_overloaded` | `infrastructure:capacity` |
-| F9 | 401 / auth expired | `infrastructure:auth`, provider halted, no retry |
-| F10 | CLI never exits | SIGINT → SIGTERM → kill escalation, `budget-timeout`, partial stream kept |
-| F11 | `error_max_turns`; Codex exceeding the tool-call budget | `budget-max-turns`, which limit fired |
-| F12 | malformed and truncated lines, events after the terminal event, duplicate terminal events | `harness:adapter-stream`, not retried |
-| F13 | exit by signal without a provider error event | `agent-abnormal:abnormal-exit`, not retried |
-| F14 | served model differs; fallback event | `harness:config-integrity`, matrix halt |
-| F15 | assistant text and tool output containing "rate limit", "overloaded", forged JSON | classification unchanged (classification ignores free text) |
-| F16 | fake secret echoed in stream, stderr, final message and workspace files | no persisted artifact contains it in any encoding; `credential-leak` flagged |
-| F17 | stream above the size cap | truncation marker, metrics from the full stream |
-| F18 | `after-tool-calls` event reached / not reached | `applied` / `not-triggered` observations; baseline receives the same steps |
-| F19 | every held-out manifest id; `--heldout-dir` without purpose; other access-policy purposes | refused before any materialization |
-| F20 | CLI version or binary digest differs from `matrix.json` | refused (drift) |
-| F21 | operator cancellation mid-matrix, then resume | `harness:cancelled` records; resume skips valid repetitions only |
-| F22 | final workspace with symlinks to host paths, FIFOs, oversized files | archiving does not follow, block or exceed bounds |
-| F23 | report over synthetic records with fails, unknowns, missing repetitions and breaches | distributions kept, failures and breaches listed, unknowns not summed, missing shown (AC3) |
-| F24 | two records differing in one configuration field | `compare` refuses and names the field; equal keys pair (AC1) |
-| F25 | schema validation of every produced record, config and report | record completeness (D1) |
+| F1 | Claude success: init, tool calls, `modelUsage`, cost | parsing, transcript, tool counts, cost `estimate` |
+| F2 | Codex success with non-zero usage | tokens observed; cost `unknown` |
+| F3 | Codex `turn.completed` with all-zero usage (no usage notification upstream) | `unknown`, never 0 (AC2) |
+| F4 | Codex non-zero input/output, zero cached and reasoning counters | details `unknown`, totals `observed` |
+| F5 | Codex several `turn.completed` with growing cumulative usage | last value used, no sum |
+| F6 | Claude error result with zero usage, `modelUsage: {}`, synthetic message (the observed shape) | all tokens and cost `unknown` |
+| F7 | Claude duplicate assistant events per `message.id`; `modelUsage` vs per-message disagreement | de-duplication; `discrepancy` recorded |
+| F8 | Claude cache read/creation and thinking counters | additive and subset rules; normalized fields |
+| F9 | `costBasis: unknown` | cost `unknown` |
+| F10 | Claude `rate_limit` error with `rejected` rate-limit event; Codex usage-limit message | `infrastructure:rate-limit`, backoff from `resetsAt` |
+| F11 | `overloaded`; Codex server-overloaded message | `capacity` |
+| F12 | `authentication_failed` (observed shape: `subtype: success`, `is_error: true`); Codex auth message | `auth`, provider halted |
+| F13 | Codex `error` "Reconnecting…" events followed by `turn.completed` | not terminal; noise counted |
+| F14 | Codex unmatched `turn.failed` message; Claude `unknown` error; unknown `terminal_reason` | `unclassified`, not retried, conservative bound |
+| F15 | Codex `item.completed` error "model rerouted: a -> b (…)" | `model-fidelity` |
+| F16 | Claude `model_refusal_fallback`; a main-loop `message.model` ≠ requested | `model-fidelity` |
+| F17 | Claude legitimate auxiliary model in `modelUsage` | auxiliary usage reported; no violation |
+| F18 | Claude `init.tools` containing `WebSearch`; Codex `web_search` and `collab_tool_call` items | `config-integrity` / `tool-policy-breach` |
+| F19 | interrupted Codex turn without terminal event, with and without a harness signal | budget/cancel vs `abnormal-exit` |
+| F20 | stream integrity: events before init, two terminal events, events after the terminal one, invalid JSON | `adapter-stream` |
+| F21 | a fake execute-only CLI whose fake tool child tries `/proc/<ppid>/fd/1` injection and environment reads | blocked (EACCES); stream stays `cli-attested` (needs Docker: §9.3) |
+| F22 | a fake CLI that leaks its stdout into a child, which writes a valid, complete replacement stream | audit detects; stream `unprotected`; usage `estimate`; retry `contested` |
+| F23 | text in tool output and model messages mimicking errors and JSON events | classification unchanged |
+| F24 | shell-mediated write (`sed -i`) between a failed and a passing build | repair detected through the workspace delta |
+| F25 | `npm run build \|\| true`; `build && test` | `compound` → coverage incomplete → first-pass `unknown` |
+| F26 | missing exit status; interrupted item | coverage incomplete |
+| F27 | custom verification script name | `unknown` class → coverage incomplete; compiler time unattributed |
+| F28 | timeouts: SIGINT/SIGTERM/kill escalation | `budget-timeout`, partial stream kept |
+| F29 | `maxToolCalls` reached; Claude `error_max_turns` | distinct codes |
+| F30 | round trip: modified generated file + added symlink → archive → re-grade | identical check statuses (the reviewer's probe) |
+| F31 | secret inside an oracle-relevant file | `redacted` evidence; replay `non-exact`; `credential-leak` |
+| F32 | oversized workspace / transcript | `incomplete`; replay `non-exact` |
+| F33 | FIFO, hard link and dangling link in the final workspace | archived as metadata; no hang; scope check unchanged |
+| F34 | two attempts differing only in session id, attempt dir, timestamps, host load or commit SHA (same harness bytes) | equal keys |
+| F35 | one mutation per projection field; a product-only change | unequal key naming the field; equal key for the product-only change |
+| F36 | Codex/Claude streams with web or subagent tool use | breach, non-success |
+| F37 | read-only task in which the agent builds into `/tmp` | `host.build` detection recorded |
+| F38 | local `npm install` into `node_modules` | detected through the `node_modules` digest |
+| F39 | task with a `package-registry` network, services, browser or compile events | refused, `unsupported / not run` |
+| F40 | G2 build script that kills the grader | `aborted-by-agent-code`; verdict not `pass` |
+| F41 | G2 build script that tries to write harness, trusted tree or evidence mounts | EROFS; consistency with G1 holds |
+| F42 | G2 build script that prints a forged `evaluate` result to its own stdout | ignored (captured by `spawnSync`, not the grader's stdout) |
+| F43 | G1/G2 disagreement on a non-host check | not `pass`; flagged |
+| F44 | mode B: refreshed token, valid shape, host unchanged | host replaced atomically; backup kept; both tokens in the redaction set |
+| F45 | mode B: no refresh | host untouched |
+| F46 | export is a symlink / FIFO / oversized / invalid JSON / wrong shape / missing | host untouched; provider halted |
+| F47 | host file changed during the attempt | no overwrite; conflict; halt |
+| F48 | cancellation during the agent phase and during export | export completed or safely abandoned; cleanup |
+| F49 | runner crash with a live container | recovery export and cleanup at next start |
+| F50 | refreshed token printed in the stream before export | not persisted unredacted |
+| F51 | provider-backed evaluate without `--trusted-node-modules` | hard error before grading |
+| F52 | trusted tree digest mismatch; a `@pandamstyle/*` file differing from the tarball | refused (`harness:trusted-tree`) |
+| F53 | a `node_modules` directory placed in an ancestor of the scratch path | refused by the ancestor check |
+| F54 | every held-out manifest id; `--heldout-dir`; any purpose variable | refused before materialization |
+| F55 | CLI version or binary digest drift | refused |
+| F56 | report over synthetic records: fails, unknowns, missing, unsupported, contested | distributions, breaches, bounds (AC3) |
+| F57 | schema validation of every record, config and report | completeness |
 
-### 9.2 Class-level checks (self-review)
+### 9.2 Class-level checks
 
-- **Unknown-as-zero:** lint over the accounting modules forbidding
-  zero-defaults, plus a property test that removes random usage fields from
-  F1/F2 streams and asserts that no affected aggregate is `observed`.
-- **Classification independence:** the classifier's signature has no verdict
-  or workspace input; a test runs it over all fixture terminations with
-  randomized free text.
-- **Redaction:** the F16 secret is injected in every artifact channel and
-  every encoding listed in §4.3.
-- **Isolation self-test** (local, needs Docker; not in CI): with a test image
-  and no credential, assert that the agent container cannot resolve names,
-  cannot reach a non-allowlisted host, cannot reach an allowlisted host
-  without the proxy, cannot write the read-only workspace or `.git`, has no
-  capabilities, runs as non-root, sees no host path but its mounts, and is
-  killed at its pids/memory limits. Provider-backed matrices refuse to start
-  unless the self-test passed for the current image id.
-- **Mutations:** for each row of the capability table (§4.2), disabling the
-  enforcement makes the self-test fail.
+- Unknown-as-zero: a lint over the accounting modules, plus a property test
+  that removes or zeroes random usage fields and asserts no affected value
+  becomes `observed` without its provenance rule.
+- Classification independence: the classifier's signature has no verdict,
+  workspace or free-text input. Exception: the Codex terminal message, which
+  is matched only against the pinned pattern table; tested with randomized
+  text.
+- Redaction: secrets injected in every channel and encoding.
+- Key projection: the F35 mutation table is generated from the projection
+  definition, so a field added to the projection without a test fails.
 
-### 9.3 Authorized smoke run (only after the orchestrator's explicit go)
+### 9.3 Isolation self-test (local, Docker; required before provider-backed runs)
 
-- Tasks: `discovery-positive-card-vocabulary` (read-only, 600 s / 30 turns)
-  and `composition-positive-order-summary` (application with host build,
-  900 s / 60 turns). Models: `claude-haiku-5-5`, `claude-sonnet-5-5`,
-  `gpt-6.1-sol`. One repetition each: **6 provider-backed attempts**.
-- Task budgets are unchanged, so the records are well-formed but are not the
-  baseline. Concurrency 1; at most one infrastructure retry per repetition;
-  stop at the first `harness` or `auth` failure; hard stop at 2 h wall clock.
-- Prerequisites: the user's cost/quota check, a heads-up to the
-  core-evolution orchestrator, the isolation self-test, and the credential
-  method decided (Q1).
-- It must record, in addition to the normal artifacts, a **telemetry
-  availability table** per CLI under subscription auth (tokens by kind, cost
-  field and meaning, served model, durations, rate-limit state, `init` fields,
-  exit statuses of tool results), the proxy's list of contacted hosts, whether
-  Codex refreshed its credential, whether `--setting-sources ""`, hidden
-  `--max-turns` and `CLAUDE_CODE_OAUTH_TOKEN` behave as assumed, and the
-  redaction scan result. Each unverified item of this note is then either
-  confirmed in the note or the design is corrected before AG-00.3.
+Run with test images and no credential:
+
+- **Network:** from an agent container, assert:
+  - connection failure to a dummy host service on every host address (each
+    bridge gateway, LAN, IPv6 global);
+  - connection failure to external addresses, and no external DNS;
+  - no reach into another attempt's network;
+  - its own proxy reachable, and only allowlisted CONNECT targets accepted.
+- **Process and filesystem:**
+  - same-UID access to an execute-only process's `/proc/<pid>/fd`,
+    `environ` and `mem` is denied;
+  - read-only workspace, `.git` and definition mounts deny writes, renames
+    and deletes;
+  - no capabilities, non-root, no host path but the declared mounts;
+  - pids and memory limits are enforced;
+  - PID 1 survives `kill -1` from the agent UID.
+- **Grader:** no `node_modules` above `/scratch`; trusted tree read-only; G2
+  build-script tampering cases.
+- **Mutations:** removing each mechanism (isolated gateway mode,
+  execute-only mode, a read-only mount) makes the self-test fail.
+
+Every network and process item above was observed once during this design
+with ad hoc probes (Appendix A). The self-test turns them into a repeatable,
+bound check.
+
+### 9.4 Authorized smoke run (only after the orchestrator's explicit go)
+
+- `discovery-positive-card-vocabulary` and
+  `composition-positive-order-summary` × `claude-haiku-5-5`,
+  `claude-sonnet-5-5`, `gpt-6.1-sol` × 1 repetition = **6 attempts**;
+  concurrency 1; at most one infrastructure retry; stop at the first
+  `harness`, `auth` or credential-export problem; hard stop at 2 h.
+- Prerequisites: user cost/quota check, heads-up to the core-evolution
+  orchestrator, valid self-test, effort values decided (open question 1).
+- It records, beyond the normal artifacts, a telemetry availability table
+  per CLI under subscription auth, which settles these unverified items:
+  - presence and semantics of tokens, cost and `costBasis`;
+  - Claude `init.effort` and `message.model` exactness;
+  - auxiliary model keys;
+  - Codex served-model visibility and error shapes;
+  - the provider hosts contacted;
+  - whether mode A (access-only) works for each CLI and whether mode B
+    refreshes;
+  - tool-result exit-status forms;
+  - additive/subset token consistency;
+  - channel-audit results.
+- A successful smoke run cannot confirm rate-limit, capacity, quota
+  exhaustion, refresh rotation under conflict, cancellation escalation or
+  resource-limit behavior. Those stay covered by fixtures and are labelled
+  unverified against real providers.
 
 ## 10. Open questions for the orchestrator
 
-1. **Credentials (Q1).** Dedicated evaluation credentials (Claude
-   `setup-token`, separate Codex login in a dedicated `CODEX_HOME`),
-   recommended, or copies of the user's existing login files (risk to the
-   user's own sessions through refresh rotation)? Either way the user performs
-   the login.
-2. **Installation tasks (Q2).** The 3 `network: package-registry` tasks need a
-   registry: a local read-only mirror of the pinned closure (reproducible,
-   recommended), proxied live npm (realistic, not reproducible), or excluded
-   from the AG-00.3 reference and reported as not run?
-3. **Reasoning effort (Q3).** Which explicit value per model (Claude
-   `--effort`, Codex `model_reasoning_effort`)? It becomes part of the model
-   configuration and the comparability key.
-4. **Tool surface (Q4).** Disable web search/fetch and subagents for both CLIs
-   (recommended: tasks grant no web access and subagents change the measured
-   unit)?
-5. **First-pass success (Q5).** Transcript-derived (no oracle feedback to the
-   agent; recommended), or a multi-attempt protocol where the harness returns
-   oracle failures (leaks oracle information, changes the task protocol)?
-6. **Visual fidelity (Q6).** Corpus 1.4.3 has no measurement method;
-   AG-00.2 reports it `unmeasured`. Accept, or open a follow-up for a visual
-   oracle (a corpus change, outside this issue)?
-7. **Timeout semantics (Q7).** Success requires normal termination within
-   budget (recommended), or the oracle verdict alone?
-8. **Quota and concurrency (Q8).** The reference is 47 × 3 × 3 = 423 attempts
-   (fewer if Q2 excludes tasks). With concurrency 1 per provider and 10–20
-   minutes per attempt, it takes days. Which concurrency and time windows are
-   acceptable for the user's shared subscriptions?
-9. **Retry cap (Q9).** `A = 3` attempts per repetition and the halt rules of
-   §5.2: acceptable?
-10. **Publication and retention (Q10).** Commit records, oracle results and
-    reports but keep raw streams and workspaces local (recommended)? Any
-    retention limit?
-11. **Turn budget (Q11).** Enforce `maxTurns` as a cap on normalized tool calls
-    for both CLIs (recommended, since Codex reports no per-response boundary),
-    with Claude's hidden `--max-turns` as backstop?
+1. **Effort values (Q3 conflict).** The decision says "each CLI's default,
+   set explicitly (medium for both today)". Observed: Codex 0.163.0's bundled
+   catalog (`codex debug models`, offline) lists `gpt-6.1-sol` with
+   `default_reasoning_level: low` (supported: low, medium, high, xhigh, max,
+   ultra). The authenticated remote catalog may differ (unverified). Claude's
+   default is not observable offline. Pass `medium` to both as stated, or
+   `low` for Codex as its pinned default?
+2. **Detection-only denials (R7 rule, §4.5).** Accept detect-and-fail for
+   contained capabilities:
+   - `host.build` in the 9 read-only tasks;
+   - `host.dev-server`, withheld everywhere;
+   - local `package.install`;
+   - Codex web search, which has source and configuration evidence but no
+     runtime pre-run evidence.
 
-No oracle API change is required by this design: the runner uses `evaluate`
-with its existing transcript, observations and `--trusted-node-modules`
-inputs, and runs it with a credential-free environment.
+   The alternative is refusing those tasks (the 9 read-only tasks, and all
+   tasks for `host.dev-server`), or refusing Codex for web search.
+
+No oracle API change is required: two-pass grading uses `evaluate` as it is.
+
+## Appendix A: probes and sources
+
+All probes ran without network access for the CLI and without credentials;
+none could reach a model.
+
+| Id | What | Result |
+| --- | --- | --- |
+| P1 | Docker 29.2.1 networks: default `internal`, `internal` + `gateway_mode_ipv4=isolated`, the same with `--ipv6` + `gateway_mode_ipv6=isolated`; dummy host HTTP service on all addresses; Node TCP/DNS probe as UID 10001 without capabilities | default internal: gateway → TIMEOUT (dropped by this host's current firewall state); isolated: no host address on the bridge, docker0/LAN/IPv6-global host addresses and external addresses `ENETUNREACH`, external DNS `EAI_AGAIN`; per-attempt proxy reachable by name and address; another attempt's network `ENETUNREACH`; proxy egress to `api.anthropic.com` OK |
+| P2 | probe image (`node:22-bookworm-slim@sha256:c3de60bf…`) with `claude`, `codex` and `node` copied `root:root 0711`; same-UID access from a second process | execute-only binaries run (`2.1.303`, `0.163.0`); non-dumpable: `fd/1` write, `environ`, `fd` list → EACCES; readable copies allow them; signals allowed; Yama `ptrace_scope = 1` |
+| P3 | `claude -p` with the §3.2 flags, no network, no credentials | `init` fields as in §3.3; the env variables remove the telemetry plugin and auto-memory; `/tmp/cc-socks/<n>.sock` 0600 agent-owned; auth failure: `<synthetic>` message with `error: authentication_failed`, result `subtype: success`, `is_error: true`, `terminal_reason: api_error`, zero usage and cost, `modelUsage: {}`, exit 1 |
+| P4 | `codex features list`, `debug prompt-input`, `debug models`, `exec --json` with the §3.2 flags, no network, no credentials | `agents.enabled=false` removes the multi-agent instructions, `--disable multi_agent` does not; `web_search` variants validated; strict config accepts the §3.2 keys; `error` "Reconnecting… n/5" events and an `item.completed` error item, no terminal event within 60 s; `CODEX_HOME` state files, no daemon socket; target `wss://api.openai.com/v1/responses`; catalog: `gpt-6.1-sol` default effort `low` |
+| P5 | PID 1 (Node) container; `kill -9 -1` from the agent UID | PID 1 survives; killed children remain zombies (no reaping) |
+| P6 | read-only `.git` and read-only file bind mounts in a writable workspace | `git status`/`diff` OK, `git commit` EROFS; file write EROFS; rename onto and delete EBUSY |
+| P7 | `archive.mjs verify --store <copy> --replay` from a clone at `e2a864b` | 42/42 passed, 15.8 s; manifest sha256 `acdefef3…2884` |
+| S1 | Codex `rust-v0.163.0`: `exec/src/exec_events.rs`, `exec/src/event_processor_with_jsonl_output.rs`, `codex-api/src/sse/responses.rs`, `core/src/config/mod.rs` | §2.2, §3.3, §3.5 |
+| S2 | Claude Agent SDK `0.3.303` `sdk.d.ts` (tarball sha256 `86dc2947…71fc`, `claudeCodeVersion: 2.1.303`) | §2.2, §3.4, §3.6 |
+| S3 | `benchmarks/agentic/src/oracles/project-worker.mjs` (`findPackage`), `evaluate.mjs` (`ALWAYS_IGNORED`, default scratch, `host.build` environment) | §4.8, §6.1 |

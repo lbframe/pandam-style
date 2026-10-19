@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/runner/schema/run-config.draft.schema.json",
   "title": "DRAFT evaluation matrix configuration (pms-agentic-matrix/v0-draft)",
-  "description": "DRAFT for the AG-00.2 design review; not a stable contract. The resolved matrix.json of runner/DESIGN.md section 1. Tasks never name models; this file does.",
+  "description": "DRAFT for the AG-00.2 design review; not a stable contract. The resolved matrix.json of runner/DESIGN.md. Tasks never name models; this file does. Held-out tasks are refused unconditionally in AG-00.2 (F1); no purpose value unlocks them.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -15,19 +15,17 @@
     "repetitions",
     "maxAttempts",
     "productBuild",
-    "image",
+    "images",
     "container",
-    "egress",
-    "credentialMethod",
+    "network",
+    "budgets",
+    "credentials",
     "schedule"
   ],
   "properties": {
     "schema": { "const": "pms-agentic-matrix/v0-draft" },
     "kind": { "enum": ["provider-backed", "adapter-fixture"] },
-    "purpose": {
-      "enum": ["development", "smoke", "reference", "ag-12.2-final-qualification"],
-      "description": "Held-out tasks are refused unless purpose is ag-12.2-final-qualification and PMS_HELDOUT_PURPOSE agrees."
-    },
+    "purpose": { "enum": ["development", "smoke", "reference"] },
     "epoch": { "type": "string" },
     "tasks": {
       "type": "array",
@@ -44,6 +42,7 @@
     "maxAttempts": {
       "type": "integer",
       "minimum": 1,
+      "maximum": 3,
       "description": "Attempts per repetition; only infrastructure failures start a new attempt."
     },
     "productBuild": {
@@ -55,13 +54,15 @@
         "manifestSha256": { "$ref": "#/$defs/sha256" }
       }
     },
-    "image": {
+    "images": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "baseDigest"],
+      "required": ["agent", "grader", "proxy", "baseDigest"],
       "properties": {
-        "id": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
-        "baseDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+        "agent": { "$ref": "#/$defs/imageId" },
+        "grader": { "$ref": "#/$defs/imageId" },
+        "proxy": { "$ref": "#/$defs/imageId" },
+        "baseDigest": { "$ref": "#/$defs/imageId" }
       }
     },
     "container": {
@@ -76,11 +77,16 @@
         "workspaceBytesCap": { "type": "integer", "minimum": 1 }
       }
     },
-    "egress": {
+    "network": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["allow"],
+      "required": ["mode", "ipv6", "allow"],
       "properties": {
+        "mode": {
+          "const": "per-attempt-internal-isolated-gateway",
+          "description": "Per-attempt --internal network with com.docker.network.bridge.gateway_mode_ipv4=isolated and a per-attempt CONNECT proxy."
+        },
+        "ipv6": { "const": false },
         "allow": {
           "type": "object",
           "description": "Per CLI, the host:port pairs the CONNECT proxy allows.",
@@ -91,30 +97,51 @@
         }
       }
     },
-    "credentialMethod": {
+    "budgets": {
       "type": "object",
-      "description": "Method only; never a secret or a secret's location inside a home configuration directory.",
+      "additionalProperties": false,
+      "required": ["maxToolCalls", "cliMaxTurns"],
+      "properties": {
+        "maxToolCalls": {
+          "type": "string",
+          "description": "'corpus-maxTurns-hint' or an integer as a string; the harness cap on normalized tool calls, recorded separately from the corpus hint."
+        },
+        "cliMaxTurns": {
+          "type": "string",
+          "description": "Claude --max-turns backstop (API round-trips), e.g. '2x-maxToolCalls'. Not equivalent to maxToolCalls."
+        }
+      }
+    },
+    "credentials": {
+      "type": "object",
+      "description": "Per provider: mode only, never a secret. access-only = no refresh token enters a container; refresh-capable-copy = full copy with export and compare-and-swap (forces concurrency 1 for that provider).",
       "additionalProperties": {
-        "enum": ["dedicated-token", "dedicated-login-copy", "existing-login-copy", "none"]
+        "enum": ["access-only", "refresh-capable-copy", "none"]
       }
     },
     "schedule": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["order", "concurrencyPerProvider"],
+      "required": ["order", "concurrencyPerProvider", "timeWindows", "wallClockCapSeconds"],
       "properties": {
         "order": { "enum": ["sequential", "interleaved"] },
         "concurrencyPerProvider": { "type": "integer", "minimum": 1 },
+        "timeWindows": {
+          "type": "array",
+          "description": "Operator time windows in which attempts may start (Q8); empty means unrestricted.",
+          "items": { "type": "string" }
+        },
         "wallClockCapSeconds": { "type": ["integer", "null"], "minimum": 1 }
       }
     }
   },
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "imageId": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "modelConfig": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["key", "cli", "cliVersion", "cliSha256", "model", "reasoningEffort", "tools"],
+      "required": ["key", "cli", "cliVersion", "cliSha256", "model", "reasoningEffort", "toolPolicy"],
       "properties": {
         "key": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9.]+)*$" },
         "cli": { "enum": ["claude", "codex"] },
@@ -123,15 +150,15 @@
         "model": { "type": "string", "minLength": 1 },
         "reasoningEffort": {
           "type": "string",
-          "description": "Explicit value passed to the CLI; never left to a CLI default."
+          "description": "Explicit value passed in argv (Q3); never left to a CLI default."
         },
-        "tools": {
+        "toolPolicy": {
           "type": "object",
           "additionalProperties": false,
           "required": ["web", "subagents"],
           "properties": {
-            "web": { "type": "boolean" },
-            "subagents": { "type": "boolean" }
+            "web": { "const": false },
+            "subagents": { "const": false }
           }
         }
       }
