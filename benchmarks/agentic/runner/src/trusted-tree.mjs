@@ -193,6 +193,15 @@ export function nonProductLockDigest(lockPath) {
   });
 }
 
+/** Declared identity of a fixture closure, from its lockfile. */
+export function closureIdentity(closureDir) {
+  const lock = path.join(closureDir, 'package-lock.json');
+  return {
+    closureLockSha256: fileSha256(lock),
+    nonProductLockSha256: nonProductLockDigest(lock),
+  };
+}
+
 /**
  * Installs a fixture closure into a workspace before the agent starts and
  * verifies it (sections 4.7 and 4.8): an exact offline `npm ci` of the

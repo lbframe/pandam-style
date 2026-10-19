@@ -337,24 +337,32 @@ unknown.
 The harness knows a command's text and status, not its effects, and shell
 commands can write files, chain checks or mask failures. So:
 
-- **Command classes** (versioned table `command-classes/v2`, closed):
+- **Command classes** (versioned table `command-classes/v3`, closed):
   - `transparent`: a single simple command on the closed allowlist of
     transparent single-purpose commands that execute no code, load no
     project code and write no file, each with its audited options excluded:
     `ls`, `cat`, `head`, `tail`, `wc`, `grep`, `stat`, `pwd`, `echo`; `rg`
     without `--pre*`, `-z`/`--search-zip`, `--hostname-bin`; `find` without
     `-exec*`, `-ok*`, `-delete`, `-fprint*`, `-fls`; `file` without
-    `-z`/`-Z`/`-C`; `tree` without `-o`; `sed` only as
+    `-z`/`-Z`/`-C`; `tree` without `-o`/`--output`; and `sed` only as
     `sed -n '<address>p' <files>` (GNU sed's `e`, `w`, `s///e`, `r` and `-f`
-    execute, write or load scripts); and read-only git subcommands
-    (`status`, `diff`, `log`, `show`, `ls-files`, `rev-parse`) without global
-    options, `--ext-diff`, `--textconv` or `--output`, **only** when the
-    repository configuration cannot be agent-written (read-only `.git` in an
-    isolated run: hooks, fsmonitor and diff drivers execute code). Words are
+    execute, write or load scripts). Options are matched conservatively: a
+    short-option token containing a forbidden letter anywhere (combined
+    flags, attached values: `-zm1`, `-o/tmp/x`), and any prefix of a
+    forbidden long option (getopt abbreviations), make the command opaque.
+    **git is never transparent**: its system, global, XDG, include and
+    `GIT_CONFIG_*` configuration can define diff drivers, textconv filters,
+    pagers, aliases and hooks, and some of those sources are agent-writable
+    in every run. Words are
     split as a POSIX shell would; `$` anywhere, escapes, a quote adjacent to
     other characters and an unquoted word starting with a glob character
     (whose expansion can inject options from agent-controlled names) make
     the command opaque;
+  - configuration the transparent programs read (shell startup files,
+    `~/.gitconfig`, `~/.magic`, tool configuration) can only be written
+    without an opaque command through a file-write tool call outside the
+    workspace; such a write makes coverage incomplete
+    (`write-outside-workspace`);
   - `opaque`: everything else, in particular package scripts
     (`npm|yarn|pnpm run …`, `npm test`, `yarn <script>`), `npx`,
     `pnpm dlx`, `yarn dlx`, shell scripts (`sh x.sh`, `./x`), `make`, `node`,
@@ -1251,9 +1259,9 @@ Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 | --- | --- | --- |
 | §1.1–1.3 units, record, identity | `matrix.mjs`, `attempt.mjs`, `identity.mjs`, `schema/run-record.v1.schema.json` | every fixture run validates its records and report (F57, `helpers.mjs`) |
 | §1.4 comparability | `comparability.mjs`, `matrix.mjs` `projectionFor` (per-cell closure) | `evidence.test.mjs` F34, F35; `measurement.test.mjs` B11 |
-| §1.5 replay, resume | `regrade.mjs` (integrity and identity first), `matrix.mjs` `matrixIdentity`, `repetitionState` | `evidence.test.mjs` F30; `measurement.test.mjs` B10, B12 |
+| §1.5 replay, resume | `regrade.mjs` (integrity and identity first), `matrix.mjs` `matrixIdentity`, `repetitionState` | `evidence.test.mjs` F30; `measurement.test.mjs` B10, B12; `review-r2.test.mjs` B10, B12 |
 | §2.1–2.2 measured values, tokens | `measured.mjs`, `adapters/*.mjs` | `adapters.test.mjs` F1–F9; `metrics.test.mjs` lint and property test |
-| §2.4 repairs, first pass, attribution | `commands.mjs` (`command-classes/v2`) | `metrics.test.mjs` F24–F27, F58; `measurement.test.mjs` B8 |
+| §2.4 repairs, first pass, attribution | `commands.mjs` (`command-classes/v3`) | `metrics.test.mjs` F24–F27, F58; `measurement.test.mjs` B8; `review-r2.test.mjs` B8 |
 | §3 adapters, budgets | `adapters/*.mjs`, `attempt.mjs` `agentPhase` | `adapters.test.mjs` F10–F20, F23, F28, F29 |
 | §3.2 container-visible paths | executors' `visiblePaths` | `docker.test.mjs` B6 |
 | §3.7 version pinning | `docker.mjs` identity checks, `provider.mjs` | `product-build.test.mjs` F55 |
@@ -1261,7 +1269,7 @@ Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 | §4.3 network, proxy | `docker.mjs`, `container/connect-proxy.mjs`, `selftest.mjs` | `isolation-units.test.mjs`; `docker.test.mjs` B5 |
 | §4.4 stream integrity | `measured.mjs`, `container/channel-audit.mjs`, `docker.mjs` `summarizeAudits` | `adapters.test.mjs` F20, F22, F23; self-test (F21) |
 | §4.5 capability matrix | `capabilities.mjs` | `adapters.test.mjs` F18, F36–F38; `policy-report.test.mjs` F39 |
-| §4.6 credentials, source policy, recovery, refusals | `credentials.mjs`, `recovery.mjs`, `refusals.mjs`, `container/*` | `credentials.test.mjs` F31, F44–F50, F59; `confinement.test.mjs` B3, B4 |
+| §4.6 credentials, source policy, recovery, refusals | `credentials.mjs`, `recovery.mjs`, `refusals.mjs`, `container/*` | `credentials.test.mjs` F31, F44–F50, F59; `confinement.test.mjs` B3, B4; `review-r2.test.mjs` B2, B4; `docker.test.mjs` B4 |
 | §4.8 product build, trusted tree, closures | `store.mjs`, `trusted-tree.mjs` `installFixtureClosure`, `provider.mjs` | `product-build.test.mjs` G, F51–F53; `measurement.test.mjs` B11 |
 | §4.9 held-out | `capabilities.mjs` `heldoutRefusal`, CLI | `policy-report.test.mjs` F54 |
 | §5 failures, retries, contested | `classify.mjs`, `matrix.mjs` | `adapters.test.mjs` F10–F16, F22; `measurement.test.mjs` B10 |
@@ -1356,7 +1364,37 @@ Each item was found while implementing, testing or in review round 1
     reads the stream defeats the sample (repairs stay a lower bound). The
     fake CLI pauses after each tool result, as a real CLI waits for the
     model.
-15. **Provider-backed path never executed.** Its preflight refusals are
+15. **Review round 2 (B2, B4, B8, B10, B12).**
+    - B2: an attempt's redaction set forwards every secret to the matrix's
+      set the moment it is learned, so text persisted on any exit path
+      (exceptions before or after resource creation, teardown and export
+      errors, refusals, `outcomes.json`, the outcomes the CLI prints) is
+      redacted; refusal reasons are redacted too.
+    - B4: `DockerExecutor.start` records every resource name before
+      creating anything and, if a later step fails, removes what it created
+      and verifies the removal; `runAttempt` also removes registered
+      resources without a handle (`cleanupResources`), and anything it cannot
+      verify (or a throwing teardown) keeps the recovery state and records a
+      durable refusal. The matrix removes `.private` only when empty, so
+      retained state survives its exit and is recovered at the next start.
+      A teardown runs once; a second call rethrows the first error.
+    - B8: command table v3 (option grammar, git never transparent,
+      writes outside the workspace).
+    - B10: the matrix identity binds the selected inputs before any reuse:
+      each planned task's fixture closure as declared by its installer
+      (`installer.identity`, the lock digests; provider runs declare them
+      from the setup's closures) and the grading dependencies (mode, trusted
+      tree digests). Every planned repetition is checked before anything
+      runs; a record whose install differs from the declared closure, or
+      whose installer declares nothing, refuses the resume before any
+      mutation; an install that differs from its declaration is refused.
+    - B12: the record binds each evidence manifest's bytes
+      (`evidence.manifests`), so `stored`, `storedSha256`, `mode` and
+      `completeness` cannot change; the completeness the entries imply must
+      match the manifest's and the record's; and the extraction is checked
+      against the manifest (every entry, original bytes, links, modes,
+      nothing extra) before grading. Any failure refuses the regrade.
+16. **Provider-backed path never executed.** Its preflight refusals are
     tested; the containers, staging, grading and self-test binding run in the
     credential-free Docker integration tests; the remaining steps (binding
     of the real store, trusted tree from the real tarballs, CLI identity of
@@ -1370,8 +1408,10 @@ that configuration and checks that preflight's `requireValidSelfTest`
 accepts it and refuses another configuration, then runs real attempts (agent
 container, per-attempt proxy and network, fake Codex and Claude, grading in
 the grader container with a test-only trusted tree). Local result (Docker
-29.2.1, kernel 6.8.0-146-generic): passed (B5, B6, B7). The CI job
-`agentic-runner-docker` runs the same tests.
+29.2.1, kernel 6.8.0-146-generic): passed (B5, B6, B7, and B4: a failure
+injected after each resource-creation step over real Docker, the invalid CPU
+limit case, and an unverifiable cleanup retained, refused and recovered).
+The `agentic-corpus` CI job runs the same tests as extra steps.
 
 ## Appendix A: probes and sources
 

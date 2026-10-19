@@ -286,3 +286,155 @@ test(
     ]);
   },
 );
+
+// Review round 2, B4: partial startup over real Docker. A failure injected
+// after each resource-creation step (and the reviewer's invalid CPU limit)
+// must leave nothing behind; a cleanup that cannot be verified keeps the
+// recovery state, refuses the provider durably, and the next start recovers.
+
+function startFailureExecutor({
+  failStep = null,
+  failRemoval = false,
+  limits,
+} = {}) {
+  const config = dockerConfig();
+  const scenario = writeScenario(tmpDir('b4scn'), 's', {
+    steps: [claudeInit(), claudeResult()],
+  });
+  let creations = 0;
+  const run = (args, opts) => {
+    const creating =
+      (args[0] === 'network' &&
+        (args[1] === 'create' || args[1] === 'connect') &&
+        !args.includes('pms-agentic-egress=1')) ||
+      (args[0] === 'run' && args[1] === '-d');
+    if (creating) {
+      creations += 1;
+      if (creations === failStep)
+        return {
+          status: 1,
+          stdout: '',
+          stderr: `injected failure at creation step ${failStep}`,
+        };
+    }
+    if (
+      failRemoval &&
+      (args[0] === 'rm' || (args[0] === 'network' && args[1] === 'rm'))
+    )
+      return { status: 1, stdout: '', stderr: 'injected removal failure' };
+    return docker(args, opts);
+  };
+  const resources = [];
+  const ex = new DockerExecutor({
+    images: { agent: config.images.agent, harness: config.images.proxy },
+    limits: limits ?? config.container,
+    allow: config.network.allow,
+    cliBinary: { claude: '/opt/cli/claude', codex: '/opt/cli/codex' },
+    fixtureScenario: scenario,
+    run,
+  });
+  const start = ex.start.bind(ex);
+  ex.start = (args) =>
+    start({
+      ...args,
+      onResources: (r) => {
+        resources.push(r);
+        args.onResources(r);
+      },
+    });
+  return { ex, resources, config };
+}
+
+const exists = (r) => ({
+  container: docker(['container', 'inspect', r.container]).status === 0,
+  proxy: docker(['container', 'inspect', r.proxy]).status === 0,
+  network: docker(['network', 'inspect', r.network]).status === 0,
+});
+
+async function runStartFailure(opts) {
+  const { ex, resources, config } = startFailureExecutor(opts);
+  const root = tmpDir('b4runs');
+  const stateDir = path.join(root, '.state');
+  const out = await runMatrix({
+    config,
+    runsRoot: root,
+    stateDir,
+    identity: fixtureIdentity(),
+    executorFor: () => ex,
+    grading: { mode: 'dev-ancestor', hostCommands: false },
+  });
+  return { out, resources, root, stateDir };
+}
+
+test(
+  'B4 partial startup over real Docker: a failure after each creation step leaves nothing behind',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const { activeRefusals } = await import('../src/refusals.mjs');
+    for (const failStep of [1, 2, 3, 4]) {
+      const { out, resources, stateDir } = await runStartFailure({ failStep });
+      assert.match(
+        out.outcomes[0].reason,
+        new RegExp(`injected failure at creation step ${failStep}`),
+      );
+      assert.deepEqual(
+        exists(resources[0]),
+        { container: false, proxy: false, network: false },
+        `step ${failStep}`,
+      );
+      assert.equal(
+        fs.existsSync(path.join(out.matrixDir, '.private')),
+        false,
+        `step ${failStep}`,
+      );
+      assert.deepEqual(activeRefusals(stateDir), {}, `step ${failStep}`);
+    }
+    // The reviewer's case: an invalid CPU limit makes the agent container fail.
+    const cpu = await runStartFailure({
+      limits: { ...dockerConfig().container, cpus: -1 },
+    });
+    assert.match(cpu.out.outcomes[0].reason, /agent container/);
+    assert.deepEqual(exists(cpu.resources[0]), {
+      container: false,
+      proxy: false,
+      network: false,
+    });
+  },
+);
+
+test(
+  'B4 an unverifiable cleanup over real Docker is retained, refused and recovered at the next start',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const { activeRefusals } = await import('../src/refusals.mjs');
+    const { recoverStale } = await import('../src/recovery.mjs');
+    const { out, resources, root, stateDir } = await runStartFailure({
+      failStep: 4,
+      failRemoval: true,
+    });
+    try {
+      assert.equal(
+        exists(resources[0]).proxy,
+        true,
+        'the injected removal failure left the proxy',
+      );
+      const kept = fs.readdirSync(path.join(out.matrixDir, '.private'));
+      assert.equal(kept.length, 1);
+      assert.match(
+        activeRefusals(stateDir).claude.events[0].reason,
+        /partial startup not cleaned up/,
+      );
+      const report = recoverStale(root, { stateDir });
+      assert.equal(report[0].cleanup, 'verified');
+      assert.deepEqual(exists(resources[0]), {
+        container: false,
+        proxy: false,
+        network: false,
+      });
+      assert.equal(fs.existsSync(path.join(out.matrixDir, '.private')), false);
+    } finally {
+      docker(['rm', '-f', resources[0].proxy, resources[0].container]);
+      docker(['network', 'rm', resources[0].network]);
+    }
+  },
+);

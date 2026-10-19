@@ -39,6 +39,7 @@ import { bindProductBuild } from './store.mjs';
 import {
   buildTrustedTree,
   checkTrustedTree,
+  closureIdentity,
   installFixtureClosure,
   trustedTreeDigests,
   verifyProductPackages,
@@ -303,10 +304,11 @@ export async function providerBackedRun({
     executorFor: () => executor,
     effectiveConfigFor: (m) =>
       m.cli === 'codex' ? codexEvidence.get(m.key) : null,
-    installFor: ({ task }) => {
+    installFor: ({ task, taskId }) => {
+      task ??= findTask(loaded, taskId).task;
       if (task.environment.install !== 'before-agent') return null;
       const closure = setup.closures[task.workspace.fixture];
-      return ({ workspace }) =>
+      const installer = ({ workspace }) =>
         installFixtureClosure({
           closureDir: path.resolve(closure.dir),
           cacheDir: closure.cache ? path.resolve(closure.cache) : null,
@@ -314,6 +316,9 @@ export async function providerBackedRun({
           binding,
           storeCopy: path.resolve(setup.storeCopy),
         });
+      // Declared before any attempt: binds the matrix identity (resume).
+      installer.identity = closureIdentity(path.resolve(closure.dir));
+      return installer;
     },
     sweepLabels: true,
     ...(matrixId ? { matrixId } : {}),

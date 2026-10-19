@@ -33,7 +33,22 @@ function coded(code, message) {
   return e;
 }
 
-/** Integrity of the stored attempt; returns the list of problems. */
+/** Completeness implied by a manifest's entries (section 6.3). */
+export function manifestCompleteness(manifest) {
+  const files = manifest.entries.filter((e) => e.type === 'file');
+  if (files.some((e) => e.stored !== true)) return 'incomplete';
+  if (files.some((e) => e.storedSha256 != null)) return 'redacted';
+  return 'complete';
+}
+
+/**
+ * Integrity of the stored attempt; returns the list of problems. Every
+ * artifact and blob hash is checked, and each evidence manifest's bytes are
+ * bound to the record (`evidence.manifests`), so extraction-driving
+ * metadata (stored, storedSha256, mode, completeness) cannot change; the
+ * completeness the entries imply must match both the manifest's and, for
+ * the final tree, the record's.
+ */
 export function verifyAttemptIntegrity(attemptDir, record) {
   const problems = [];
   const purged = new Set(record.evidence.purged ?? []);
@@ -50,26 +65,105 @@ export function verifyAttemptIntegrity(attemptDir, record) {
     ['baseline', record.evidence.baselineSetDigest],
   ]) {
     const dir = path.join(attemptDir, 'evidence', name);
-    if (!fs.existsSync(path.join(dir, 'manifest.json'))) {
+    const file = path.join(dir, 'manifest.json');
+    if (!fs.existsSync(file)) {
       problems.push(`evidence ${name} manifest missing`);
       continue;
     }
-    const manifest = readJson(path.join(dir, 'manifest.json'));
+    const recorded = record.evidence.manifests?.[name];
+    if (recorded == null)
+      problems.push(`evidence ${name} manifest digest not recorded`);
+    else if (fileSha256(file) !== recorded)
+      problems.push(`evidence ${name} manifest differs from the record`);
+    const manifest = readJson(file);
     if (expected != null && setDigest(manifest.entries) !== expected)
       problems.push(`evidence ${name} set digest differs from the record`);
     if (expected != null && manifest.setDigest !== expected)
       problems.push(`evidence ${name} manifest digest differs from the record`);
+    const implied = manifestCompleteness(manifest);
+    if (implied !== manifest.completeness)
+      problems.push(
+        `evidence ${name} entries imply ${implied}, manifest says ${manifest.completeness}`,
+      );
+    if (
+      name === 'final' &&
+      record.evidence.completeness === 'complete' &&
+      implied !== 'complete'
+    )
+      problems.push(
+        `evidence final entries imply ${implied}, the record says complete`,
+      );
     for (const e of manifest.entries)
       if (e.type === 'file' && e.stored) {
-        const blob = path.join(dir, 'blobs', e.storedSha256 ?? e.sha256);
+        const ref = e.storedSha256 ?? e.sha256;
+        const blob = path.join(dir, 'blobs', String(ref));
         if (
+          !/^[0-9a-f]{64}$/.test(String(ref)) ||
           !fs.existsSync(blob) ||
-          fileSha256(blob) !== (e.storedSha256 ?? e.sha256)
+          fileSha256(blob) !== ref
         )
           problems.push(`evidence ${name} blob of ${e.path} differs`);
       }
   }
   return problems;
+}
+
+/**
+ * Verifies that an extraction reproduces its manifest exactly: every entry
+ * present with its type, bytes (original bytes for unredacted entries), link
+ * target and file mode; unstored and special entries absent; nothing else.
+ */
+export function verifyExtraction(dest, manifest) {
+  const problems = [];
+  const seen = new Set();
+  const walk = (rel) => {
+    for (const name of fs.readdirSync(path.join(dest, rel))) {
+      const r = rel ? `${rel}/${name}` : name;
+      seen.add(r);
+      if (fs.lstatSync(path.join(dest, r)).isDirectory()) walk(r);
+    }
+  };
+  walk('');
+  const expected = new Set();
+  for (const e of manifest.entries) {
+    const abs = path.join(dest, e.path);
+    const st = fs.existsSync(abs) || isLink(abs) ? fs.lstatSync(abs) : null;
+    const present =
+      (e.type === 'file' && e.stored) ||
+      e.type === 'dir' ||
+      e.type === 'symlink';
+    if (present) expected.add(e.path);
+    if (!present) {
+      if (st != null) problems.push(`${e.path}: present but not reproducible`);
+      continue;
+    }
+    if (st == null) problems.push(`${e.path}: missing from the extraction`);
+    else if (e.type === 'dir' && !st.isDirectory())
+      problems.push(`${e.path}: not a directory`);
+    else if (
+      e.type === 'symlink' &&
+      (!st.isSymbolicLink() || fs.readlinkSync(abs) !== e.target)
+    )
+      problems.push(`${e.path}: link differs`);
+    else if (e.type === 'file') {
+      if (!st.isFile()) problems.push(`${e.path}: not a file`);
+      else if (fileSha256(abs) !== (e.storedSha256 ?? e.sha256))
+        problems.push(`${e.path}: bytes differ`);
+      else if ((st.mode & 0o777) !== e.mode)
+        problems.push(`${e.path}: mode differs`);
+    }
+  }
+  for (const r of seen)
+    if (!expected.has(r)) problems.push(`${r}: not in the manifest`);
+  return problems;
+}
+
+function isLink(p) {
+  try {
+    return fs.lstatSync(p).isSymbolicLink();
+  } catch {
+    return false;
+  }
 }
 
 /** Harness identity differences between the record and this checkout. */
@@ -137,6 +231,22 @@ export function regradeAttempt({
       archive: path.join(attemptDir, 'evidence/final'),
       dest: workspace,
     });
+    // The extraction must reproduce each manifest exactly before grading.
+    const rebuilt = [
+      ...verifyExtraction(
+        baseline,
+        readJson(path.join(attemptDir, 'evidence/baseline/manifest.json')),
+      ).map((x) => `baseline ${x}`),
+      ...verifyExtraction(
+        workspace,
+        readJson(path.join(attemptDir, 'evidence/final/manifest.json')),
+      ).map((x) => `final ${x}`),
+    ];
+    if (rebuilt.length > 0)
+      throw coded(
+        'integrity',
+        `regrade refused: extraction differs: ${rebuilt.slice(0, 8).join('; ')}`,
+      );
     fs.mkdirSync(path.join(work, 'scratch'));
     if (trusted) assertNoAncestorNodeModules(path.join(work, 'scratch', 'x'));
     const args = [

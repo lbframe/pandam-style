@@ -195,24 +195,9 @@ test('B8 every code-executing, script-loading or writing form is opaque (class f
     'cat ?',
     'sed -n 1p -i',
   ];
-  for (const c of opaque)
-    assert.equal(
-      classifyCommand(c, { gitConfigTrusted: true }).class,
-      'opaque',
-      c,
-    );
-  for (const c of ['git status', 'git diff', 'git log --oneline']) {
-    assert.equal(
-      classifyCommand(c, { gitConfigTrusted: false }).class,
-      'opaque',
-      c,
-    );
-    assert.equal(
-      classifyCommand(c, { gitConfigTrusted: true }).class,
-      'transparent',
-      c,
-    );
-  }
+  for (const c of opaque) assert.equal(classifyCommand(c).class, 'opaque', c);
+  for (const c of ['git status', 'git diff', 'git log --oneline'])
+    assert.equal(classifyCommand(c).class, 'opaque', c);
   // Conservative: any `$`, even single-quoted, is shell syntax here.
   assert.equal(classifyCommand("sed -n '$p' a.txt").class, 'opaque');
   for (const c of [

@@ -24,6 +24,26 @@ export class LocalFixtureExecutor {
     this.extraEnv = extraEnv;
   }
 
+  /** Verified removal of a registered process group (partial startup). */
+  cleanupResources(resources) {
+    if (resources?.pgid == null) return [];
+    try {
+      process.kill(-resources.pgid, 'SIGKILL');
+    } catch {
+      // Already gone.
+    }
+    const pause = new Int32Array(new SharedArrayBuffer(4));
+    for (let i = 0; i < 40; i += 1) {
+      try {
+        process.kill(-resources.pgid, 0);
+      } catch (error) {
+        if (error.code === 'ESRCH') return [];
+      }
+      Atomics.wait(pause, 0, 0, 50);
+    }
+    return [`process group ${resources.pgid}`];
+  }
+
   /** The CLI sees the host paths (no container). */
   visiblePaths({ workspace, agentHome }) {
     return { workspace, home: agentHome };

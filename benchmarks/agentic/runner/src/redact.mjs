@@ -54,15 +54,33 @@ export function encodings(secret) {
 }
 
 export class RedactionSet {
-  constructor({ home = os.homedir(), user = os.userInfo().username } = {}) {
+  /**
+   * `parent`: a longer-lived set (the matrix's) that receives every secret
+   * the moment it is learned, so that any later persistence, including
+   * error messages on exceptional exits, is redacted with it (section 4.6).
+   */
+  constructor({
+    home = os.homedir(),
+    user = os.userInfo().username,
+    parent = null,
+  } = {}) {
     this.secrets = new Set();
     this.home = home;
     this.user = user;
+    this.parent = parent;
     this.sealed = false;
   }
 
   addSecret(value) {
     if (this.sealed) throw new Error('redaction set already sealed');
+    if (typeof value === 'string' && value.length >= 8) {
+      for (const form of encodings(value)) this.secrets.add(form);
+      this.parent?.addKnown(value);
+    }
+  }
+
+  /** Adds a secret learned elsewhere; never sealed (matrix-level sets). */
+  addKnown(value) {
     if (typeof value === 'string' && value.length >= 8)
       for (const form of encodings(value)) this.secrets.add(form);
   }

@@ -1221,7 +1221,8 @@
         "purged",
         "artifacts",
         "baselineSetDigest",
-        "stagedBytes"
+        "stagedBytes",
+        "manifests"
       ],
       "properties": {
         "completeness": {
@@ -1304,6 +1305,23 @@
             },
             "baseline": {
               "type": "integer"
+            }
+          }
+        },
+        "manifests": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "final",
+            "baseline"
+          ],
+          "description": "sha256 of each evidence manifest's bytes: binds stored/storedSha256/mode/completeness metadata (regrade).",
+          "properties": {
+            "final": {
+              "$ref": "#/$defs/sha256"
+            },
+            "baseline": {
+              "$ref": "#/$defs/sha256"
             }
           }
         }

@@ -62,6 +62,7 @@ import {
 } from './trusted-tree.mjs';
 import {
   CORPUS_ROOT,
+  fileSha256,
   monotonicMs,
   nowIso,
   sha256,
@@ -346,8 +347,21 @@ function prepareCredential({ credential, redaction, budgets }) {
  * every exit path; a failure is a durable refusal for the provider.
  */
 function teardown(ctx) {
-  if (ctx.tornDown || ctx.handle == null) return ctx.teardownResult;
+  // Once only: a later call reports the first outcome or rethrows its error.
+  if (ctx.tornDown || ctx.handle == null) {
+    if (ctx.teardownError) throw ctx.teardownError;
+    return ctx.teardownResult;
+  }
   ctx.tornDown = true;
+  try {
+    return teardownOnce(ctx);
+  } catch (error) {
+    ctx.teardownError = error;
+    throw error;
+  }
+}
+
+function teardownOnce(ctx) {
   const { handle, cred, credential, redaction } = ctx;
   const out = {
     export: 'not-applicable',
@@ -362,8 +376,15 @@ function teardown(ctx) {
       const exported = handle.exportCredential(
         PROVIDERS[credential.provider].containerFile,
       );
-      if (exported.bytes != null && !redaction.sealed)
-        redaction.addCredentialDocument(exported.bytes.toString('utf8'));
+      if (exported.bytes != null) {
+        if (!redaction.sealed)
+          redaction.addCredentialDocument(exported.bytes.toString('utf8'));
+        // Also on late teardown (exceptional exits): the matrix set learns it.
+        else
+          redaction.parent?.addCredentialDocument(
+            exported.bytes.toString('utf8'),
+          );
+      }
       const decision = decideWriteBack({
         provider: credential.provider,
         original: cred.original,
@@ -382,6 +403,7 @@ function teardown(ctx) {
   }
   if (out.haltProvider || out.cleanup === 'failed')
     recordRefusal(ctx.stateDir, credential?.provider ?? ctx.cli, {
+      redaction: ctx.redaction,
       reason:
         out.cleanup === 'failed'
           ? 'container cleanup not verified'
@@ -692,8 +714,28 @@ export async function runAttempt(opts) {
     // teardown could not be verified.
     try {
       if (ctx.handle != null) keepState = teardown(ctx).cleanup === 'failed';
-    } catch {
+      else if (ctx.state?.resources != null) {
+        // Startup failed after registering resources (no handle): remove
+        // them, verified, whatever the executor already rolled back.
+        const remaining = opts.executor.cleanupResources?.(
+          ctx.state.resources,
+        ) ?? ['resources of an executor without cleanup'];
+        if (remaining.length > 0) {
+          keepState = true;
+          recordRefusal(opts.stateDir, ctx.provider ?? ctx.cli, {
+            reason: `partial startup not cleaned up: ${remaining.join(', ')}`,
+            attempt: ctx.attemptLabel,
+            redaction: ctx.redaction,
+          });
+        }
+      }
+    } catch (error) {
       keepState = true;
+      recordRefusal(opts.stateDir, ctx.provider ?? ctx.cli, {
+        reason: `teardown failed: ${error.code ?? ''} ${error.message}`,
+        attempt: ctx.attemptLabel,
+        redaction: ctx.redaction,
+      });
     }
     removeOwned(opts.paths.workRoot);
     if (keepState) {
@@ -751,7 +793,20 @@ async function attemptBody(opts, plan, ctx) {
   let install = null;
   phase('prepare', () => {
     materializeFiles({ taskEntry, fixture, dest: ws });
-    if (opts.install) install = opts.install({ workspace: ws, task });
+    if (opts.install) {
+      install = opts.install({ workspace: ws, task });
+      // The consumed closure must be the declared (matrix-identity) one.
+      const declared = opts.install.identity;
+      if (
+        declared != null &&
+        (install?.closureLockSha256 !== declared.closureLockSha256 ||
+          install?.nonProductLockSha256 !== declared.nonProductLockSha256)
+      )
+        throw Object.assign(
+          new Error('installed fixture closure differs from the declared one'),
+          { code: 'install' },
+        );
+    }
     prepareWorkspace({ taskEntry, fixture, dest: ws });
     copyTree(ws, baseline, {
       includeEmptyDirs: true,
@@ -781,7 +836,12 @@ async function attemptBody(opts, plan, ctx) {
     lastMessagePath: `${visible.home}/last-message.txt`,
   });
 
-  const redaction = new RedactionSet(opts.redactionIdentity ?? {});
+  // Every secret reaches the matrix's set as soon as it is known, before
+  // any path (exception, refusal, outcome) can persist text.
+  const redaction = new RedactionSet({
+    ...(opts.redactionIdentity ?? {}),
+    parent: opts.matrixRedaction ?? null,
+  });
   ctx.redaction = redaction;
   ctx.credential = credential;
   const cred = prepareCredential({ credential, redaction, budgets });
@@ -810,6 +870,8 @@ async function attemptBody(opts, plan, ctx) {
         ? recoveryState(credential.provider, cred.original)
         : null,
   };
+  ctx.state = state;
+  ctx.provider = state.provider;
   const saveState = () =>
     writeFileAtomic(stateFile, `${JSON.stringify(state)}\n`, { mode: 0o600 });
   saveState();
@@ -854,7 +916,6 @@ async function attemptBody(opts, plan, ctx) {
 
   const down = teardown(ctx);
   redaction.seal();
-  for (const x of redaction.list()) opts.matrixRedaction?.addSecret(x);
   const s = run.summary;
   const secrets = redaction.list();
 
@@ -998,7 +1059,7 @@ async function attemptBody(opts, plan, ctx) {
     toolCalls: s.toolCalls,
     deltas: s.toolCalls.map((_, i) => run.deltas[i] ?? null),
     taskSuccess,
-    gitConfigTrusted: plan.mounts.gitReadOnly && executor.isolated === true,
+    workspaceRoot: visible.workspace,
   });
   const countKinds = [
     'command',
@@ -1351,6 +1412,15 @@ async function attemptBody(opts, plan, ctx) {
       affectedPaths: affected,
       gradedSetDigest: finalManifest.setDigest,
       baselineSetDigest: baselineManifest.setDigest,
+      // Manifest bytes, binding every extraction-driving field (section 6.3).
+      manifests: {
+        final: fileSha256(
+          path.join(attemptDir, 'evidence/final/manifest.json'),
+        ),
+        baseline: fileSha256(
+          path.join(attemptDir, 'evidence/baseline/manifest.json'),
+        ),
+      },
       stagedBytes: {
         final: staged.final.bytes,
         baseline: staged.baseline.bytes,

@@ -13,11 +13,16 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { RedactionSet } from './redact.mjs';
 import { nowIso, writeFileAtomic } from './util.mjs';
 
 const dirOf = (stateDir) => path.join(stateDir, 'refusals');
 
-export function recordRefusal(stateDir, provider, { reason, attempt = null }) {
+export function recordRefusal(
+  stateDir,
+  provider,
+  { reason, attempt = null, redaction = null },
+) {
   if (stateDir == null)
     throw new Error('a state directory is required to record a refusal');
   fs.mkdirSync(dirOf(stateDir), { recursive: true, mode: 0o700 });
@@ -25,7 +30,13 @@ export function recordRefusal(stateDir, provider, { reason, attempt = null }) {
   const prior = fs.existsSync(file)
     ? JSON.parse(fs.readFileSync(file, 'utf8'))
     : { provider, events: [] };
-  prior.events.push({ at: nowIso(), reason, attempt });
+  // Reasons can carry exception text: redacted like every persisted file.
+  const red = redaction ?? new RedactionSet();
+  prior.events.push({
+    at: nowIso(),
+    reason: red.redactText(String(reason)),
+    attempt,
+  });
   writeFileAtomic(file, `${JSON.stringify(prior, null, 2)}\n`, { mode: 0o600 });
 }
 

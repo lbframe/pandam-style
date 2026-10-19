@@ -83,27 +83,10 @@ jobs:
       - run: yarn build
       - run: yarn bench:agentic:validate
       - run: yarn bench:agentic:test
-      # AG-00.2 runner: adapter fixtures only (fake CLIs, no provider, no
-      # Docker). The Docker isolation self-test is local-only.
+      # AG-00.2 runner: adapter fixtures (fake CLIs, no provider, no Docker),
+      # then the credential-free Docker integration tests (fake CLI image,
+      # real agent, proxy and grader containers, isolation self-test).
       - run: yarn bench:agentic:runner:test
-
-  # AG-00.2 runner: credential-free Docker integration (fake CLI image, real
-  # agent, proxy and grader containers, isolation self-test). No provider.
-  agentic-runner-docker:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22.x'
-          cache: 'yarn'
-          cache-dependency-path: |
-            yarn.lock
-            benchmarks/agentic/dom/yarn.lock
-      - run: corepack prepare yarn@1.22.22 --activate
-      - run: yarn install --frozen-lockfile
-      - run: yarn bench:agentic:install
-      - run: yarn build
       - run: docker version
       - run: yarn bench:agentic:runner:docker-test
 

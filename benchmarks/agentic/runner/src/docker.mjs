@@ -255,6 +255,7 @@ export class DockerExecutor {
     cliBinary,
     auditIntervalMs = 10000,
     fixtureScenario = null,
+    run = null,
   }) {
     this.name = 'docker';
     this.isolated = true;
@@ -267,6 +268,8 @@ export class DockerExecutor {
     this.auditIntervalMs = auditIntervalMs;
     // Adapter fixtures only: the fake CLI's scenario, mounted read-only.
     this.fixtureScenario = fixtureScenario;
+    // Injectable for tests (failure injection over real Docker calls).
+    this.run = run ?? docker;
   }
 
   /** Paths as the CLI sees them inside the agent container (section 3.2). */
@@ -274,18 +277,15 @@ export class DockerExecutor {
     return { workspace: '/workspace', home: '/run/agent' };
   }
 
-  start({
-    kind,
-    cli,
-    argv,
-    env,
-    stdinText,
-    workspace,
-    credential,
-    mounts,
-    onResources = () => {},
-  }) {
-    if (this.fixtureScenario != null && kind !== 'adapter-fixture')
+  /**
+   * Starts an attempt's containers and the CLI. Every resource name is
+   * recorded (`onResources`) before anything is created; if any later step
+   * fails, everything already created is removed and the removal verified
+   * before the error propagates (`error.cleanupRemaining` lists what could
+   * not be removed).
+   */
+  start(args) {
+    if (this.fixtureScenario != null && args.kind !== 'adapter-fixture')
       throw new Error(
         'a fixture scenario is only allowed in adapter-fixture attempts',
       );
@@ -295,13 +295,30 @@ export class DockerExecutor {
       proxy: `pms-proxy-${id}`,
       container: `pms-agent-${id}`,
     };
-    // Every name is recorded before anything is created (crash recovery).
-    onResources(resources);
+    (args.onResources ?? (() => {}))(resources);
+    try {
+      return this.startResources(args, resources);
+    } catch (error) {
+      error.cleanupRemaining = removeVerified(resources, this.run);
+      throw error;
+    }
+  }
+
+  /** Verified removal of an attempt's resources (partial startup, recovery). */
+  cleanupResources(resources) {
+    return removeVerified(resources, this.run);
+  }
+
+  startResources(
+    { cli, argv, env, stdinText, workspace, credential, mounts },
+    resources,
+  ) {
+    const run = this.run;
     const { network, proxy } = resources;
     const agent = resources.container;
-    if (docker(['network', 'inspect', this.egressNetwork]).status !== 0)
+    if (run(['network', 'inspect', this.egressNetwork]).status !== 0)
       must(
-        docker([
+        run([
           'network',
           'create',
           '--label',
@@ -310,9 +327,9 @@ export class DockerExecutor {
         ]),
         'egress network',
       );
-    must(docker(networkCreateArgs(network)), 'attempt network');
+    must(run(networkCreateArgs(network)), 'attempt network');
     must(
-      docker(
+      run(
         proxyRunArgs({
           name: proxy,
           network,
@@ -323,7 +340,7 @@ export class DockerExecutor {
       'proxy',
     );
     must(
-      docker(['network', 'connect', this.egressNetwork, proxy]),
+      run(['network', 'connect', this.egressNetwork, proxy]),
       'proxy egress',
     );
     const runArgs = agentRunArgs({
@@ -342,7 +359,7 @@ export class DockerExecutor {
         '-v',
         `${this.fixtureScenario}:/opt/fixture/scenario.json:ro`,
       );
-    const containerId = must(docker(runArgs), 'agent container');
+    const containerId = must(run(runArgs), 'agent container');
     const home = '/run/agent';
     const cliEnv = {
       HOME: home,
@@ -365,7 +382,7 @@ export class DockerExecutor {
     // Credential delivery on the exec stdin, into the tmpfs.
     for (const f of credential?.files ?? []) {
       must(
-        docker(
+        run(
           execArgs({
             container: agent,
             interactive: true,
@@ -379,7 +396,7 @@ export class DockerExecutor {
     const runCli = [NODE, `${HARNESS_DIR}/run-cli.mjs`];
     if (credential && Object.keys(credential.env ?? {}).length > 0) {
       must(
-        docker(
+        run(
           execArgs({
             container: agent,
             interactive: true,
@@ -393,7 +410,7 @@ export class DockerExecutor {
     }
     if (credential?.login) {
       must(
-        docker(
+        run(
           execArgs({
             container: agent,
             interactive: true,
@@ -425,7 +442,7 @@ export class DockerExecutor {
     );
     const audits = [];
     const audit = () => {
-      const r = docker(
+      const r = run(
         auditRunArgs({
           container: agent,
           image: this.images.harness,
@@ -443,7 +460,7 @@ export class DockerExecutor {
     const auditTimer = setInterval(audit, this.auditIntervalMs);
     const firstAudit = setTimeout(audit, 1000);
     const signalCli = (sig) =>
-      docker(
+      run(
         execArgs({
           container: agent,
           command: [
@@ -467,7 +484,7 @@ export class DockerExecutor {
         clearInterval(auditTimer);
         clearTimeout(firstAudit);
         cgroup ??= readCgroup(containerId);
-        docker(
+        run(
           execArgs({
             container: agent,
             command: [NODE, `${HARNESS_DIR}/signal-cli.mjs`, 'SIGKILL', 'all'],
@@ -475,7 +492,7 @@ export class DockerExecutor {
         );
       },
       exportCredential: (rel) => {
-        const r = docker(
+        const r = run(
           execArgs({
             container: agent,
             command: [
@@ -494,7 +511,7 @@ export class DockerExecutor {
       destroy: () => {
         clearInterval(auditTimer);
         clearTimeout(firstAudit);
-        const remaining = removeVerified(resources);
+        const remaining = removeVerified(resources, run);
         return remaining.length === 0;
       },
       cgroup: () =>
@@ -520,12 +537,12 @@ export class DockerExecutor {
                   },
             },
       resourceLimit: () => {
-        const r = docker(['inspect', '-f', '{{.State.OOMKilled}}', agent]);
+        const r = run(['inspect', '-f', '{{.State.OOMKilled}}', agent]);
         return r.stdout.trim() === 'true';
       },
       channelAudit: () => summarizeAudits(audits),
       proxyLog: () => {
-        const r = docker(['logs', proxy]);
+        const r = run(['logs', proxy]);
         return r.status === 0 ? r.stdout : null;
       },
     };

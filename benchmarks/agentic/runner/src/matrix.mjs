@@ -132,8 +132,47 @@ export function backoffSeconds({ attempt, rateLimit, retry }) {
 }
 
 /** Identity a resumed matrix must match exactly (section 1.5). */
-export function matrixIdentity(config, identity) {
+/**
+ * Identity of the selected external inputs, known before any attempt:
+ * the fixture closure each planned task installs (as declared by its
+ * installer: `installer.identity`) and the grading dependencies (mode and
+ * trusted tree digests). An installer without a declared identity is
+ * recorded as `undeclared` (its records can never be reused, see
+ * repetitionState).
+ */
+export function inputIdentity({ config, grading, installFor, loaded = null }) {
+  const closures = {};
+  for (const taskId of config.tasks ?? []) {
+    let installer = null;
+    try {
+      const task = loaded ? (findTask(loaded, taskId)?.task ?? null) : null;
+      installer = installFor({ model: config.models?.[0], task, taskId });
+    } catch {
+      installer = undefined;
+    }
+    closures[taskId] =
+      installer == null ? null : (installer.identity ?? 'undeclared');
+  }
   return {
+    closures,
+    grading: {
+      mode: grading?.mode ?? null,
+      hostCommands: grading?.hostCommands === true,
+      trusted:
+        grading?.mode === 'trusted'
+          ? {
+              digest: grading.trustedExpected?.digest ?? null,
+              pandamstyleDigest:
+                grading.trustedExpected?.pandamstyleDigest ?? null,
+            }
+          : null,
+    },
+  };
+}
+
+export function matrixIdentity(config, identity, inputs = null) {
+  return {
+    inputs,
     configDigest: digestJson(config),
     kind: config.kind,
     harness: {
@@ -157,7 +196,14 @@ function attemptIndex(name) {
  * attempt directory without a record (a crash) counts as a used, contested
  * attempt; a cancelled attempt does not count.
  */
-export function repetitionState({ cellDir, matrixId, taskId, model, kind }) {
+export function repetitionState({
+  cellDir,
+  matrixId,
+  taskId,
+  model,
+  kind,
+  expectedInstall = null,
+}) {
   const dirs = fs.existsSync(cellDir)
     ? fs
         .readdirSync(cellDir)
@@ -181,6 +227,19 @@ export function repetitionState({ cellDir, matrixId, taskId, model, kind }) {
       mismatch.push('cell');
     if (r.modelConfig?.requestedModel !== model.model) mismatch.push('model');
     if (r.cli?.name !== model.cli) mismatch.push('cli');
+    // The closure the record was installed from must be the one selected now,
+    // provably: an undeclared installer cannot vouch for reuse.
+    if (r.install != null || expectedInstall != null) {
+      const declared =
+        expectedInstall === 'undeclared' ? null : expectedInstall;
+      if (
+        declared == null ||
+        r.install == null ||
+        r.install.closureLockSha256 !== declared.closureLockSha256 ||
+        r.install.nonProductLockSha256 !== declared.nonProductLockSha256
+      )
+        mismatch.push('fixture closure');
+    }
     if (mismatch.length > 0)
       throw Object.assign(
         new Error(`resume refused: ${f} differs (${mismatch.join(', ')})`),
@@ -275,7 +334,8 @@ export async function runMatrix({
   };
   // Resume (section 1.5): only with the exact same configuration, harness,
   // product build and dependencies; never by overwriting matrix.json.
-  const ident = matrixIdentity(config, identity);
+  const inputs = inputIdentity({ config, grading, installFor, loaded });
+  const ident = matrixIdentity(config, identity, inputs);
   const identityDigest = digestJson(ident);
   const matrixFile = path.join(matrixDir, 'matrix.json');
   if (fs.existsSync(matrixFile)) {
@@ -316,6 +376,20 @@ export async function runMatrix({
   const fidelityFailures = new Map();
   const outcomes = [];
 
+  // Resume check of every planned repetition before anything runs: a
+  // record that cannot be reused refuses the matrix before any mutation.
+  for (const taskId of config.tasks)
+    for (const model of config.models)
+      for (let r = 1; r <= config.repetitions; r += 1)
+        repetitionState({
+          cellDir: path.join(matrixDir, 'cells', taskId, model.key, `rep-${r}`),
+          matrixId,
+          taskId,
+          model,
+          kind: config.kind,
+          expectedInstall: inputs.closures[taskId] ?? null,
+        });
+
   for (const taskId of config.tasks) {
     const entry = findTask(loaded, taskId);
     if (entry == null || entry.task.split !== 'development') {
@@ -346,6 +420,7 @@ export async function runMatrix({
           taskId,
           model,
           kind: config.kind,
+          expectedInstall: inputs.closures[taskId] ?? null,
         });
         if (prior.done) {
           outcomes.push({
@@ -571,7 +646,9 @@ export async function runMatrix({
       }
     }
   }
-  removeOwned(path.join(matrixDir, '.private'));
+  // Retained recovery state (unverified cleanup) survives the matrix: it is
+  // recovered at the next start; only empty roots are removed.
+  removeIfEmpty(path.join(matrixDir, '.private'));
   removeOwned(path.join(matrixDir, '.work'));
   writeRedacted(path.join(matrixDir, 'outcomes.json'), {
     matrixId,
@@ -583,7 +660,16 @@ export async function runMatrix({
       providers: Object.fromEntries(halted.providers),
     },
   });
-  return { matrixId, matrixDir, outcomes };
+  // Returned (and printed by the CLI) through the same redaction.
+  return {
+    matrixId,
+    matrixDir,
+    outcomes: JSON.parse(matrixRedaction.redactText(JSON.stringify(outcomes))),
+  };
+}
+
+function removeIfEmpty(dir) {
+  if (fs.existsSync(dir) && fs.readdirSync(dir).length === 0) fs.rmdirSync(dir);
 }
 
 function privateDirOf(dir) {

@@ -10,6 +10,7 @@
 // commands is closed: anything not on it is opaque, and any opaque command
 // makes first-pass success unknown.
 
+import path from 'node:path';
 import { STREAM_METHOD, estimate, unknown } from './measured.mjs';
 
 // Transcript-derived values come from the CLI stream, which is not attested
@@ -17,19 +18,32 @@ import { STREAM_METHOD, estimate, unknown } from './measured.mjs';
 const METHOD = `${STREAM_METHOD}+transcript-heuristic/v1`;
 const UNATTESTED = { integrity: 'cli-unattested' };
 
-export const COMMAND_TABLE_VERSION = 'command-classes/v2';
+export const COMMAND_TABLE_VERSION = 'command-classes/v3';
 
 // Shell operators, substitutions and redirections make a command opaque.
 const SHELL_SYNTAX = /[;&|<>`$(){}\n\\]/;
 
-/** Options given as `--name`, `--name=…`, or a short flag inside a cluster. */
+/**
+ * Whether any argument names a forbidden option, conservatively:
+ * - a long option (`--name`, `--name=v`) that is a forbidden name **or any
+ *   prefix of one** (getopt_long accepts unambiguous abbreviations);
+ * - a short-option token (`-x…`, not `--`) containing a forbidden letter
+ *   **anywhere**: options combine (`-zm1`) and take attached values
+ *   (`-o/tmp/out`), and a letter inside an attached value only makes the
+ *   command opaque, never transparent;
+ * - an exact match of a single-dash long option.
+ */
 function hasOption(args, longs = [], shorts = '') {
   return args.some((a) => {
-    if (a.startsWith('--'))
-      return longs.some((l) => a === l || a.startsWith(`${l}=`));
-    if (/^-[A-Za-z]+$/.test(a))
-      return [...a.slice(1)].some((c) => shorts.includes(c));
-    return longs.some((l) => a === l);
+    if (a.startsWith('--')) {
+      const name = a.split('=')[0];
+      return name.length > 2 && longs.some((l) => l.startsWith(name));
+    }
+    if (a.startsWith('-') && a.length > 1)
+      return (
+        [...a.slice(1)].some((c) => shorts.includes(c)) || longs.includes(a)
+      );
+    return false;
   });
 }
 
@@ -40,15 +54,18 @@ function hasOption(args, longs = [], shorts = '') {
 // - rg: --pre/--pre-glob run a preprocessor, -z/--search-zip run
 //   decompressors, --hostname-bin runs a program.
 // - find: -exec/-execdir/-ok/-okdir run programs; -delete, -fprint*, -fls
-//   write.
+//   write (find takes no abbreviations or combined options).
 // - file: -z/-Z/--uncompress run decompressors; -C/--compile writes.
-// - tree: -o writes a file; --fromfile reads a listing (not code, kept).
+// - tree: -o/--output writes a file.
 // - sed: only `-n '<address>p'` (GNU sed's e, w, s///e, r and -f execute,
 //   write or load scripts).
-// - git: read-only subcommands, no global options (-c alias.x=!cmd,
-//   --exec-path, -C, --git-dir…), no --ext-diff/--textconv/--output; and
-//   only when the repository configuration cannot be agent-written (hooks,
-//   fsmonitor, diff drivers): `gitConfigTrusted`.
+// - git is never transparent: its configuration (system, global, XDG,
+//   includes, GIT_CONFIG_* environment, repository) can define external
+//   diff drivers, textconv filters, pagers, aliases and hooks, and some of
+//   those sources are agent-writable in every run.
+// Configuration files the remaining programs read are only reachable
+// through a write outside the workspace, which makes coverage incomplete
+// (analyzeTimeline).
 const TRANSPARENT = {
   ls: () => true,
   cat: () => true,
@@ -85,22 +102,12 @@ const TRANSPARENT = {
       ['--uncompress', '--uncompress-noreport', '--compile'],
       'zZC',
     ),
-  tree: (args) => !hasOption(args, [], 'o'),
+  tree: (args) => !hasOption(args, ['--output'], 'o'),
   sed: (args) =>
     args.length >= 2 &&
     args[0] === '-n' &&
     /^(\d+|\$)(,(\d+|\$))?p$/.test(args[1]) &&
     args.slice(2).every((f) => !f.startsWith('-')),
-  git: (args, { gitConfigTrusted }) =>
-    gitConfigTrusted === true &&
-    ['status', 'diff', 'log', 'show', 'ls-files', 'rev-parse'].includes(
-      args[0],
-    ) &&
-    !hasOption(
-      args,
-      ['--ext-diff', '--textconv', '--output', '--exec-path', '--config-env'],
-      'o',
-    ),
 };
 
 // Verification commands: compile, build, typecheck or test invocations.
@@ -147,7 +154,7 @@ export function simpleWords(command) {
   return words;
 }
 
-export function classifyCommand(command, { gitConfigTrusted = false } = {}) {
+export function classifyCommand(command) {
   const text = String(command ?? '').trim();
   const verify = VERIFY.some((re) => re.test(text));
   const words = simpleWords(text);
@@ -157,13 +164,21 @@ export function classifyCommand(command, { gitConfigTrusted = false } = {}) {
   const check = Object.hasOwn(TRANSPARENT, program)
     ? TRANSPARENT[program]
     : null;
-  if (
-    check != null &&
-    words[0] === program &&
-    check(words.slice(1), { gitConfigTrusted })
-  )
+  if (check != null && words[0] === program && check(words.slice(1)))
     return { class: 'transparent', verify, reason: null };
   return { class: 'opaque', verify, reason: `program ${program}` };
+}
+
+/**
+ * Whether a file-tool path stays inside the workspace: relative paths
+ * resolve against it; an absolute path must lie beneath it. An unknown
+ * workspace root or path is outside (conservative).
+ */
+export function insideWorkspace(p, workspaceRoot) {
+  if (typeof p !== 'string' || p === '' || workspaceRoot == null) return false;
+  const root = path.posix.resolve(workspaceRoot);
+  const abs = path.posix.resolve(root, p);
+  return abs === root || abs.startsWith(`${root}/`);
 }
 
 /**
@@ -179,7 +194,7 @@ export function analyzeTimeline({
   toolCalls,
   deltas,
   taskSuccess,
-  gitConfigTrusted = false,
+  workspaceRoot = null,
 }) {
   const reasons = [];
   let opaque = 0;
@@ -196,12 +211,22 @@ export function analyzeTimeline({
     if (call.status === 'unfinished' || call.status === 'in-progress')
       reasons.push(`unfinished:${i}`);
     if (call.status === 'unknown') reasons.push(`unknown-status:${i}`);
+    // A file written outside the workspace can configure the programs the
+    // transparent class trusts (shell startup files, ~/.gitconfig, ~/.magic,
+    // tool configuration): coverage is incomplete (section 2.4).
+    if (
+      call.kind === 'file-write' &&
+      (!Array.isArray(call.paths) ||
+        call.paths.length === 0 ||
+        call.paths.some((p) => !insideWorkspace(p, workspaceRoot)))
+    )
+      reasons.push(`write-outside-workspace:${i}`);
     const changedByThis =
       (digest != null && previousDigest != null && digest !== previousDigest) ||
       (call.kind === 'file-write' && call.status === 'completed');
     let isVerify = false;
     if (call.kind === 'command') {
-      const c = classifyCommand(call.command, { gitConfigTrusted });
+      const c = classifyCommand(call.command);
       call.commandClass = c.class;
       call.verify = c.verify;
       if (c.class === 'opaque') {

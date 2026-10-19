@@ -211,8 +211,6 @@ test('command table: closed allowlist, everything else opaque', () => {
     'grep -rn foo src',
     'find src -name "*.js"',
     'sed -n 1,10p a',
-    'git diff',
-    'git log --oneline',
     'echo hi',
     'rg foo',
   ];
@@ -239,13 +237,11 @@ test('command table: closed allowlist, everything else opaque', () => {
     'ls | wc',
     '/bin/ls',
     'git diff --output=x',
+    'git diff',
+    'git log --oneline',
   ];
   for (const c of transparent)
-    assert.equal(
-      classifyCommand(c, { gitConfigTrusted: true }).class,
-      'transparent',
-      c,
-    );
+    assert.equal(classifyCommand(c).class, 'transparent', c);
   for (const c of opaque) assert.equal(classifyCommand(c).class, 'opaque', c);
   assert.equal(classifyCommand('npm run build').verify, true);
   assert.equal(classifyCommand('npx pandamstyle build').verify, true);
