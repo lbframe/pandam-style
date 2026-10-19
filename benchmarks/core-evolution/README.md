@@ -159,12 +159,33 @@ Deterministic outputs must be identical across samples; they are never averaged.
 
 ## Results
 
-`results/<label>/raw.json` holds every sample. It also records the environment
-(CPU, cores, memory, governor, kernel, OS, filesystem, Node binary digest), the
-harness file digests, the epoch identities and the load records.
-`results/<label>/summary.json` is derived from it. The frozen baseline uses two
-`final` batches, `alpha1-final-1` and `alpha1-final-2`, each measuring `alpha1`
-and `alpha1-replay`.
+`results/<label>/raw.json` holds every sample. It also records:
+
+- the environment: CPU, cores, memory, governor, kernel, OS, filesystem and Node
+  binary digest;
+- the harness file digests and the epoch identities;
+- the per-sample and per-batch load records.
+
+`results/<label>/summary.json` is derived from it. Paths under the home
+directory are written as `~`. Process names and command lines are never
+recorded.
+
+| Run                      | Epochs                        | Samples       | Load                                                                                 |
+| ------------------------ | ----------------------------- | ------------- | ------------------------------------------------------------------------------------ |
+| `alpha1-final-1`         | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 12.26; mean whole-machine CPU per sample 18.7% (max 52.5%) |
+| `alpha1-final-2`         | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 5.63; mean CPU per sample 11.5% (max 38.7%)                |
+| `gate-injected-slowdown` | `alpha1`, `injected-slowdown` | 190, 0 failed | max 1-minute load average 2.88; mean CPU per sample 10.0% (max 17.1%)                |
+
+- The two `alpha1-final` runs are the frozen baseline.
+  [`gate-null-alpha1-replay.json`](results/gate-null-alpha1-replay.json) is the
+  gate on both runs with the identical artifact as candidate: `pass`, 110 of 110
+  budgets.
+- `gate-injected-slowdown` checks the gate itself. Its candidate, built by
+  [`make-candidate.mjs`](results/gate-injected-slowdown/make-candidate.mjs), is
+  `alpha1` with every compiler session call slowed by 30%. The fixture, CE-00.2
+  corpus and c1000 workloads ran interleaved with the `alpha1` control.
+  [`gate.json`](results/gate-injected-slowdown/gate.json) is `fail`: 28 timing
+  budgets fail with median paired ratios of 1.13–1.31, against limits of 1.10.
 
 ## Budgets
 
