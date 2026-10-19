@@ -229,7 +229,10 @@ test('a global token edit updates CSS and reloads without clearing the Vite grap
   await server.listen();
   await server.transformRequest('/semantic/page.js');
   await server.transformRequest('/semantic/unrelated.js');
-  await server.watcher.unwatch(root);
+  // The test drives the definition update through handleHotUpdate itself.
+  // The plugin also watches the definition file, so a live watcher event
+  // would apply the same edit a second time, racing the manual call.
+  await server.watcher.unwatch([root, definitionFile]);
 
   const graph = server.environments.client.moduleGraph;
   const unrelated = await graph.ensureEntryFromUrl('/semantic/unrelated.js');
