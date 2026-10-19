@@ -12,12 +12,16 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # One install for every static check (4 CI runner slots in total). Each check
+  # One install for every static check (one dedicated runner). Each check
   # still runs and reports when an earlier one fails.
   static:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, lbframe-ci, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    # Fork PRs never run on the self-hosted runner (this repository is public).
+    if: >-
+      github.event_name != 'pull_request' ||
+      (!github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -45,11 +49,15 @@ jobs:
           config: .github/workflows/typos.toml
 
   pandamstyle:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, lbframe-ci, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    # Fork PRs never run on the self-hosted runner (this repository is public).
+    if: >-
+      github.event_name != 'pull_request' ||
+      (!github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     env:
-      # On this runner, `chromium` aborts creating its sandbox under the
+      # On Ubuntu runners, `chromium` aborts creating its sandbox under the
       # AppArmor user-namespace restriction; its Google Chrome runs the same
       # sandboxed launches.
       PMS_CHROMIUM: /opt/google/chrome/chrome
@@ -66,9 +74,13 @@ jobs:
       - run: ./verify-pms.sh
 
   agentic-corpus:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, lbframe-ci, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    # Fork PRs never run on the self-hosted runner (this repository is public).
+    if: >-
+      github.event_name != 'pull_request' ||
+      (!github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
