@@ -56,6 +56,34 @@ Reference paths are dot-separated strings such as `spacing.md` and
 `colors.text.primary`. A reference must resolve, stay in the expected category,
 and avoid cycles. Do not infer a token from a raw CSS value.
 
+An optional `enhancements` list (CE-01.1) names emitted features the
+design-system author declares as optional progressive enhancements, each with a
+fallback policy. Every other emitted feature is required by the application's
+browser targets. Only the definition can declare a policy; page source cannot.
+
+```js
+enhancements: [
+  { feature: 'value:text-wrap/pretty', fallback: { kind: 'degrade' } },
+  { feature: 'selector::has', fallback: { kind: 'degrade', note: 'static layout' } },
+],
+```
+
+- `feature` is a feature key of emitted CSS, such as `property:<name>`,
+  `value:<property>/<keyword>`, `function:<name>`, `selector::<pseudo>`,
+  `at-rule:<name>[/<kind>]` or `media:<feature>`. An unknown key is
+  `PMS_INVALID_ENHANCEMENT_POLICY`.
+- `fallback.kind: 'degrade'` accepts that an engine ignores the construct. The
+  outcome stays as computed and is reported as degraded
+  (`PMS_TARGET_ENHANCEMENT_DEGRADED`, a warning), never as equivalent.
+- `fallback.kind: 'alternative-value'` is reserved: its CSS emission belongs to
+  CE-01.2, and it is refused until then.
+- A policy for a feature native on every announced profile has no effect and
+  produces `PMS_TARGET_ENHANCEMENT_INEFFECTIVE` (info).
+
+Declared enhancements enter the registry digest; a definition without the
+field keeps the digest it had before. Declaring an enhancement changes what the
+system promises, so it is a design-system decision, not a repair for page code.
+
 ## Conditions
 
 `conditions` maps a finite name to selector or at-rule text. Consumers use the

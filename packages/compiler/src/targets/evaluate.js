@@ -31,6 +31,8 @@ import { Codes, diagnostic } from '../protocol/diagnostics';
 export const FACTS_KIND = 'pandamstyle-target-facts';
 export const FACTS_SCHEMA_VERSION = 1;
 const OWNER_SAMPLE = 4;
+// Protocol v1 default candidate bound.
+const CANDIDATE_LIMIT = 32;
 
 function sha256(text) {
   return 'sha256:' + crypto.createHash('sha256').update(text).digest('hex');
@@ -409,9 +411,10 @@ export function evaluateTargets({
             profile: profile.ref,
           },
           candidates: candidates
-            .slice(0, 32)
+            .slice(0, CANDIDATE_LIMIT)
             .map((candidate) => ({ value: candidate })),
           candidatesTotal: candidates.length,
+          candidatesTruncated: candidates.length > CANDIDATE_LIMIT,
           repair,
         });
       }

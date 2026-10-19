@@ -112,6 +112,8 @@ describe('advisory mode (no targets)', () => {
       expect.arrayContaining(['wide', 'reducedMotion']),
     );
     expect(warning.candidates.map((c) => c.value)).not.toContain('stuck');
+    expect(warning.candidatesTotal).toBe(warning.candidates.length);
+    expect(warning.candidatesTruncated).toBe(false);
   });
 
   test('the full build agrees and its report records the profile as failing', () => {

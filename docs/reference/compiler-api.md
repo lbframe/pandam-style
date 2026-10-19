@@ -70,6 +70,19 @@ Examples of current error codes include `PMS_UNKNOWN_TOKEN`,
 `PMS_INVALID_PATTERN_PARAMETER`, `PMS_NON_STATIC_VALUE`,
 `PMS_COVERAGE_GAP`, and `PMS_ABI_MISMATCH`. This list is not exhaustive.
 
+Browser targets (CE-01.1) add phase `targets` codes: `PMS_INVALID_TARGET_CONFIG`,
+`PMS_INCOMPATIBLE_TARGET_ENGINE`, `PMS_TARGET_CAPABILITY_INCOMPATIBLE`,
+`PMS_TARGET_CAPABILITY_UNKNOWN`, `PMS_TARGET_ENHANCEMENT_DEGRADED` (warning),
+`PMS_TARGET_ENHANCEMENT_INEFFECTIVE` (info) and
+`PMS_INVALID_ENHANCEMENT_POLICY`. Without a `targets` configuration the
+default profile `pandamstyle:default@1` is resolved and its capability findings
+are warnings (`context.enforcement: "advisory"`); with explicit `targets` a
+required `incompatible` or `unknown` capability is an error and the revision
+does not publish. In both modes the build report records each profile as
+`passing` or `failing`. A design-system `enhancements` policy turns a covered
+finding into a `PMS_TARGET_ENHANCEMENT_DEGRADED` warning. See
+[browser targets](../architecture/ce-01.1-browser-targets.md).
+
 ## Generated artifacts
 
 The compiler produces generated JavaScript, types, manifest, CSS and artifact
