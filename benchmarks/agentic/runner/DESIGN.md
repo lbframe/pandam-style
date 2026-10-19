@@ -1043,7 +1043,9 @@ the label and reports `non-exact` with the affected paths.
   `incomplete`.
 - Redaction (before any write, §4.6 step 7): exact secret values in raw,
   JSON-escaped, base64 and URL-encoded forms; token patterns; the host user's
-  home path and user name. A post-write scan failing deletes the artifact
+  home path, and the user name in home-directory paths (`/home/<user>`,
+  `/Users/<user>`), not every word equal to it (a CI user is called
+  `runner`). A post-write scan failing deletes the artifact
   (`harness:redaction`).
 - Q10: leak-scanned `matrix.json`, `product-build.json`, records,
   evaluations and reports may be committed by AG-00.3. Raw artifacts stay
