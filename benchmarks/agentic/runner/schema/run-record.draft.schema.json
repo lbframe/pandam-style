@@ -287,7 +287,7 @@
       "additionalProperties": false,
       "required": ["stream", "channelAudit", "anomalies", "contested"],
       "properties": {
-        "stream": { "enum": ["cli-attested", "unprotected"] },
+        "stream": { "enum": ["cli-attested", "cli-unattested"] },
         "channelAudit": {
           "type": "object",
           "additionalProperties": false,
@@ -505,7 +505,7 @@
         "value": { "type": ["number", "null"] },
         "unit": { "type": "string" },
         "source": { "type": ["string", "null"] },
-        "integrity": { "enum": ["harness", "cli-attested", "unprotected", null] },
+        "integrity": { "enum": ["harness", "cli-attested", "cli-unattested", null] },
         "method": { "type": ["string", "null"] },
         "lowerBound": { "type": ["number", "null"] },
         "discrepancy": { "type": ["object", "null"] }

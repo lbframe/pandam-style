@@ -1,7 +1,9 @@
 # AG-00.2 runner: design note
 
-Status: **design note, round 2 (revision after review r1 of `c930a48`); no
-runner code exists yet.** This note defines how the multi-model evaluation
+Status: **design note, round 2 plus the conservative amendment of §0.4
+(user decision after the bounded verification of `772422c`).** The runner is
+implemented as described here; §11 maps each section to its code and tests.
+This note defines how the multi-model evaluation
 runner of [issue #6](https://github.com/lbframe/pandam-style/issues/6) will
 work. It is written before implementation as the
 [delivery protocol](../../../docs/agent-delivery-protocol.md) requires: the
@@ -77,15 +79,42 @@ of these labels. Appendix A lists every probe and source read.
 | --- | --- | --- |
 | Q1 | **User decision:** copies of the user's existing login files (`~/.claude/.credentials.json`, `~/.codex/auth.json`), not dedicated logins. The user accepted the risk to their own sessions. The design minimizes it: access-only mode if the CLI supports it, else a controlled export and compare-and-swap. | §4.6 |
 | Q2 | The 3 `network: package-registry` tasks need a read-only local mirror of the pinned closure; until it exists they are reported `unsupported / not run`, never failed or dropped. | §4.5, §7 |
-| Q3 | **User decision:** each CLI's default effort, passed explicitly in argv and recorded ("medium for both today"); unsupported controls recorded honestly. See open question 1: the pinned Codex catalog says otherwise for `gpt-6.1-sol`. | §3.2, §10 |
-| Q4 | Web tools and subagents disabled for both CLIs with effective-configuration evidence, or the task refused. | §3.3, §4.5 |
+| Q3 | **User decision (final):** the smoke run passes **no** effort flag and observes each CLI's effective effort; the baseline then pins that observed value explicitly in argv and records it. A CLI that does not report its effective effort records `unknown`, and the pinned value is the CLI's documented default for the pinned version (Codex 0.163.0 bundled catalog: `low` for `gpt-6.1-sol`, observed), labelled as such. | §3.2, §9.4 |
+| Q4 | Web tools and subagents disabled for both CLIs with effective-configuration evidence, or the task refused. Codex web search, which has configuration and source evidence but no runtime pre-run evidence, is **detect-and-fail** (Q12). | §3.3, §4.5 |
 | Q5 | First-pass success and repairs from the transcript, no oracle feedback, with the R5 uncertainty rules. | §2.4 |
-| Q6 | Visual fidelity `unmeasured`; the orchestrator opens a follow-up for a visual oracle. | §2.3 |
+| Q6 | Visual fidelity `unmeasured`; follow-up issue #102 owns a visual oracle. | §2.3 |
 | Q7 | Success requires normal completion within budget; the oracle verdict is preserved separately. | §2.3, §5 |
 | Q8 | **User decision:** cadence decided at AG-00.3 launch. Concurrency (default 1 per provider), operator time windows and a matrix wall-clock cap are configuration, recorded in the run config. | §1.2, schema |
 | Q9 | At most 3 attempts per repetition, infrastructure-only retries, every attempt and missing repetition preserved (subject to R3). | §5 |
 | Q10 | Publish leak-scanned records, evaluations and reports; raw artifacts stay local through the baseline review, then are pruned explicitly. | §6 |
 | Q11 | An effective `maxToolCalls` is recorded separately from the corpus `maxTurns` hint; Claude's native turn limit is not described as equivalent. | §3.8 |
+| Q12 | **User decision:** withheld capabilities that can only be detected (`host.build` in the 9 read-only tasks, `host.dev-server`, local installs into `node_modules`, Codex web search) are **detect-and-fail**: a policy breach, counted as non-success and listed in the breach section. Installation tasks stay refused until the local mirror exists (Q2). | §4.5, §5.1, §7 |
+
+### 0.4 Conservative amendment (user decision after the bounded verification)
+
+The bounded verification of `772422c` resolved R1, R2, R4, R6–R10, F1, F2 and
+G, and found R3 and R5 partially resolved. The user chose these conservative
+rules instead of another design round. They take precedence over any looser
+wording elsewhere in this note.
+
+- **R3, stream attestation.** A sampled absence of tampering is not a
+  demonstrated boundary. Unless a test **demonstrates** a protection boundary
+  for the CLI event stream (every same-UID path to it closed, not merely
+  unobserved), every stream-derived token, usage and cost value is at most an
+  `estimate` with method `cli-stream-unattested`, never `observed`.
+  `cli-attested` exists only for a demonstrated boundary; none is
+  demonstrated today (§4.4), so the implementation never emits it. Every
+  repetition that consumed an infrastructure retry decided from the stream is
+  `contested`, and reports show the point estimate **and** a lower bound
+  counting every contested repetition as non-success. No stream event alone
+  establishes that a retry is unbiased.
+- **R5, opaque commands.** `firstPassSuccess` is `unknown` whenever any
+  **opaque** command ran: package scripts (`npm|yarn|pnpm run …`, `npm test`,
+  `yarn <script>`), `npx`/`pnpm dlx`/`yarn dlx`, shell scripts, `make`, and
+  any command not on the closed allowlist of transparent single-purpose
+  commands (§2.4). Repair cycles stay a heuristic lower bound. Compiler-command
+  attribution carries the same uncertainty. Fixture F58: a script performing
+  fail → repair → pass and exiting 0 makes `firstPassSuccess` `unknown`.
 
 ## 1. Run record
 
@@ -202,16 +231,20 @@ to one key per cell.
 
 ```json
 { "status": "observed | estimate | unknown", "value": 123, "unit": "tokens",
-  "source": "claude.result.modelUsage", "integrity": "harness | cli-attested | unprotected",
-  "method": null, "lowerBound": null }
+  "source": "claude.result.modelUsage", "integrity": "harness | cli-attested | cli-unattested",
+  "method": "cli-stream-unattested", "lowerBound": null }
 ```
 
 - `observed`: the named source reported a value whose provenance establishes
-  a measurement (the rules of §2.2), **and** its integrity is `harness` or
-  `cli-attested` (§4.4).
-- `estimate`: an approximation, or a CLI report on an `unprotected` stream.
-  `method` is mandatory, for example `claude-cli-api-equivalent`,
-  `transcript-heuristic/v1` or `cli-report-unauthenticated`.
+  a measurement (the rules of §2.2), **and** its integrity is `harness`, or
+  `cli-attested` for a stream behind a **demonstrated** boundary (§0.4,
+  §4.4). No such boundary is demonstrated today, so stream-derived values are
+  never `observed`.
+- `estimate`: an approximation, or a value read from a `cli-unattested`
+  stream. `method` is mandatory: `cli-stream-unattested` for every
+  stream-derived token, usage and cost value (combined with the provenance
+  rule of §2.2, e.g. `cli-stream-unattested+claude-cli-api-equivalent`),
+  `transcript-heuristic/v1`, `harness-receive-time`.
 - `unknown`: `value` is `null`. Absent, ambiguous (§2.2) or unparseable
   values are unknown, never `0`.
 
@@ -300,13 +333,23 @@ unknown.
 The harness knows a command's text and status, not its effects, and shell
 commands can write files, chain checks or mask failures. So:
 
-- **Command classes** (versioned table `verification-commands/v1`): `verify`
-  is a single simple command matching a known compile, build, typecheck or
-  test invocation (`npm run build`, `vite build`, `next build`,
-  `rsbuild build`, `tsc`, `pms …`); `read-only` is a single command from a
-  read-only allowlist (`ls`, `cat`, `rg`, `git status`, …); `compound` is
-  anything containing shell operators (`;`, `&&`, `||`, `|`, subshells,
-  redirections into files); everything else is `unknown`.
+- **Command classes** (versioned table `command-classes/v1`, closed):
+  - `transparent`: a single simple command on the closed allowlist of
+    transparent single-purpose commands that execute no project code: file
+    inspection (`ls`, `cat`, `head`, `tail`, `wc`, `grep`, `rg`, `find`
+    without `-exec`/`-delete`, `stat`, `file`, `tree`, `pwd`, `echo`,
+    `sed -n`), and read-only git (`git status`, `git diff`, `git log`,
+    `git show`, `git ls-files`, `git rev-parse`);
+  - `opaque`: everything else, in particular package scripts
+    (`npm|yarn|pnpm run …`, `npm test`, `yarn <script>`), `npx`,
+    `pnpm dlx`, `yarn dlx`, shell scripts (`sh x.sh`, `./x`), `make`, `node`,
+    host build tools and the PandamStyle CLI (they load project code such as
+    host or design-system configuration), and any command with shell operators
+    (`;`, `&&`, `||`, `|`, subshells, redirections, substitutions);
+  - `verify` is an orthogonal tag: a command whose text matches a known
+    compile, build, typecheck or test pattern (`npm run build`, `vite build`,
+    `next build`, `rsbuild build`, `tsc`, `pandamstyle …`). A `verify` command
+    is usually also `opaque`.
 - **Workspace deltas.** After each tool result the event-runner container
   (§4.2) records a no-follow tree digest of the workspace, excluding
   `node_modules`. Shell-mediated writes are then visible even without a
@@ -315,20 +358,20 @@ commands can write files, chain checks or mask failures. So:
 - **Repair cycle:** a `verify` command with a known non-zero exit status,
   followed by a workspace delta, followed by a later `verify` command.
   `repairCycles` is `estimate`, method `transcript-heuristic/v1`, and a lower
-  bound.
-- **Coverage** is `complete` only if every tool call has a known completion
-  status, no `compound` or `unknown` command matches a verification pattern,
-  no item is unfinished or interrupted, and every workspace-delta sample
-  succeeded.
+  bound (an opaque command can repair internally, as F58 shows).
+- **Coverage** is `complete` only if no `opaque` command ran (§0.4), every
+  tool call has a known completion status, no item is unfinished or
+  interrupted, and every workspace-delta sample succeeded.
 - **First-pass success:**
   - `false` if the task did not succeed, or if at least one repair cycle was
     detected;
   - `true` only if the task succeeded, zero repairs were detected and
     coverage is complete;
-  - otherwise `unknown`.
+  - otherwise `unknown`. In practice any package script or build makes it
+    `unknown`; that is the intended conservative outcome.
 - **Compiler attribution** uses the same table and coverage. Its counts and
-  times are `estimate` with the coverage flag, and `compound` commands are
-  left unattributed.
+  times are `estimate` with the coverage flag; opaque commands are counted as
+  `opaque` and never attributed to the compiler.
 
 ### 2.5 Compiler, tool and agent cost
 
@@ -378,7 +421,7 @@ directory `/workspace`:
 
 ```sh
 claude -p "<prompt>" --output-format stream-json --verbose \
-  --model <claude-haiku-5-5|claude-sonnet-5-5> --effort <explicit, Q3> \
+  --model <claude-haiku-5-5|claude-sonnet-5-5> [--effort <pinned, Q3>] \
   --tools "Bash,Edit,Glob,Grep,Read,Write" \
   --disallowedTools "WebFetch,WebSearch,Agent" \
   --permission-mode bypassPermissions --strict-mcp-config \
@@ -398,7 +441,7 @@ Codex:
 
 ```sh
 codex exec - --json --strict-config --ephemeral --ignore-rules \
-  -m gpt-6.1-sol -c model_reasoning_effort="<explicit, Q3>" \
+  -m gpt-6.1-sol [-c model_reasoning_effort="<pinned, Q3>"] \
   -c web_search="disabled" -c agents.enabled=false \
   --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check \
   -C /workspace -o /run/agent/last-message.txt
@@ -423,7 +466,7 @@ config-integrity`) when the evidence contradicts the request.
 | model | `init.model` (observed field) | requested `-m`; the served model is not reported (§3.6) |
 | tools | `init.tools` equals the allowlist (observed) | matrix-start render of `codex debug prompt-input` with the same `-c` overrides, recorded by digest (observed: no model call) |
 | subagents | `Agent` absent from `init.tools` (observed; `init.agents` still lists agent types, which are unusable without the tool) | `agents.enabled=false` removes the `<multi_agent_role>`/`<multi_agent_mode>` instructions from the model-visible input (observed); `--disable multi_agent` alone does **not** (observed); source: `multi_agent_version_override` returns `Disabled`, which takes precedence over the model catalog's `multi_agent_version: v2` |
-| web tools | `WebSearch`/`WebFetch` absent from `init.tools` (observed) | key accepted with strict validation (observed); source: `resolve_web_search_mode` returns the configured value before any feature flag. The tool list is not rendered offline, so there is **no runtime pre-run evidence**: open question 2 |
+| web tools | `WebSearch`/`WebFetch` absent from `init.tools` (observed) | key accepted with strict validation (observed); source: `resolve_web_search_mode` returns the configured value before any feature flag. The tool list is not rendered offline, so there is **no runtime pre-run evidence**: detect-and-fail (Q12) |
 | effort | not present in the offline `init` (the typed field is optional; observed absent): requested value recorded, effective value `unknown` until the smoke run | requested value recorded; effective value not observable |
 | user config | clean `CLAUDE_CONFIG_DIR`; `init.skills`, `slash_commands`, `mcp_servers` empty (observed); built-in plugins `cc-plugin-agents-md` and `cc-plugin-plugin-authoring` remain (observed) and are recorded | clean `CODEX_HOME`; the CLI creates its own state there (observed: sqlite logs, memories, goals, `skills/.system`), all ephemeral |
 
@@ -613,12 +656,16 @@ without a valid result for its exact binding.
 
 - `harness`: harness timers, container state and exit codes, cgroup counters,
   proxy logs, grading results. Trusted.
-- `cli-attested`: the CLI's stdout, captured outside the container through the
-  `docker exec` stream, on an attempt whose stream protection holds (below).
-  Trusted to the extent the CLI itself is (residuals below).
-- `unprotected`: CLI output when the protection could not be established.
-  Never a measurement (`estimate`, method `cli-report-unauthenticated`) and
-  never alone a retry reason (§5.3).
+- `cli-attested`: reserved for a CLI stream behind a protection boundary
+  **demonstrated by a test** (§0.4): every same-UID path to the stream closed,
+  not merely unobserved. No such boundary is demonstrated today: the paths
+  below are partly closed (execute-only binaries) and partly only sampled
+  (inherited descriptors, control sockets). The implementation therefore
+  never emits `cli-attested`.
+- `cli-unattested`: every CLI stream today. Stream-derived token, usage and
+  cost values are at most `estimate`, method `cli-stream-unattested`; stream
+  events still drive classification and retries, but every retried
+  repetition is `contested` (§5.3).
 
 **Protection: execute-only CLI binaries.** Linux makes a process that execs a
 binary it cannot read non-dumpable; its `/proc/<pid>` entries then belong to
@@ -640,17 +687,16 @@ paths:
   `--pid container:<agent>`, `CAP_SYS_PTRACE`, no network, no mounts) samples
   the descriptor tables of all agent-UID processes. It checks that none holds
   the CLI's stdout pipe and that the CLI's `/proc` entries are root-owned
-  (non-dumpable confirmed at runtime). Any failure makes the stream
-  `unprotected`. Sampling can miss a short-lived holder: it is an audit, not
-  a proof.
+  (non-dumpable confirmed at runtime). A finding is a breach observation.
+  Sampling can miss a short-lived holder: it is an audit, never a
+  demonstration, so a clean audit does not make a stream `cli-attested`.
 - **CLI control channels.** Claude listens on `/tmp/cc-socks/<n>.sock`, mode
   0600, owned by the agent UID (observed). Same-UID processes can connect,
   and what that protocol allows is unknown. Codex `exec` created no daemon
   socket in the offline run (observed); its `daemon_auto_start` feature is
   enabled by default (observed in `features list`). The audit records
-  connections to these sockets; any connection from a non-CLI process makes
-  the stream `unprotected` and is a breach observation. Residual risk:
-  documented, not closed.
+  connections to these sockets; any connection from a non-CLI process is a
+  breach observation. Residual risk: documented, not closed.
 - **Self-inflicted failures.** Agent code can kill the CLI (signals are
   allowed) or exhaust the quota with the credential it can read (§4.10).
   Neither forges a stream: a kill without a provider error is
@@ -679,9 +725,9 @@ question 2.
 | `design-system.edit` | definition sources of the fixture (`project.definition` files or directory) bind-mounted read-only over the writable workspace; generated output stays writable because legitimate builds rewrite it | prevent (definitions) + detect (generated output, via `generated.consistent` and `definition.diff`) | observed: write → EROFS, rename onto or delete → EBUSY |
 | `network.registry` | no route except the proxy, whose allowlist has provider hosts only | prevent | observed probes (§4.3) |
 | `package.install` | network prevention above; a local install (from files already in the container) only changes `node_modules`, which grading never uses (trusted tree, §4.8) | prevent (network) + detect (local: `node_modules` tree digest before/after, computed in E; transcript) | design |
-| `host.build` (9 read-only tasks) | the read-only workspace prevents build output in the workspace; a build to `/tmp` is possible because tools need Node | detect (transcript `verify` class, §2.4) | open question 2 |
-| `host.dev-server` (withheld in every task) | a dev server can listen inside the container; nothing outside can reach it | detect (transcript) | open question 2 |
-| web tools (Q4) | Claude: tools absent from `init.tools`; Codex: `web_search="disabled"` | Claude prevent (observed evidence); Codex prevent by configuration (source evidence) + detect (`web_search` items) | open question 2 |
+| `host.build` (9 read-only tasks) | the read-only workspace prevents build output in the workspace; a build to `/tmp` is possible because tools need Node | detect-and-fail (transcript `verify` class, §2.4) | Q12 |
+| `host.dev-server` (withheld in every task) | a dev server can listen inside the container; nothing outside can reach it | detect-and-fail (transcript) | Q12 |
+| web tools (Q4) | Claude: tools absent from `init.tools`; Codex: `web_search="disabled"` | Claude prevent (observed evidence); Codex prevent by configuration (source evidence) + detect-and-fail (`web_search` items) | Q12 |
 | subagents (Q4) | Claude: `Agent` not in tools; Codex: `agents.enabled=false` | prevent (observed evidence for both) + detect (`Agent` tool use, `collab_tool_call` items) | §3.3 |
 | `network: package-registry` tasks (installation, 3) | requires the read-only local mirror (Q2) | refuse until the mirror exists | reported `unsupported / not run` |
 
@@ -841,7 +887,7 @@ declarative here, as is candidate packing from a commit.
 | Risk | Covering layers |
 | --- | --- |
 | The agent reads the credential and uses it (exfiltration through allowlisted hosts, quota misuse, induced rate limits) | bounded attempt time; proxy byte and connection accounting with anomaly flags; transcript scan for credential paths and variable names; exact-match scans of stream, final message and workspace; `contested` handling of infrastructure failures (§5.3); mode A when feasible |
-| Same-UID control of the CLI through its sockets | channel audit; `unprotected` status; breach observation |
+| Same-UID control of the CLI through its sockets | channel audit; streams are `cli-unattested`; breach observation |
 | Kernel escape (rootful Docker, no user-namespace remap) | non-root, no capabilities, `no-new-privileges`, seccomp, AppArmor, read-only root, no Docker socket, short-lived containers |
 | Disk exhaustion through the workspace mount | size sampling with a kill cap (`resource-limit`); size-limited tmpfs |
 | Hostile workspace content (links, FIFOs, huge files) | host code never reads the live workspace; containers archive without following links or reading special files; size bounds |
@@ -883,18 +929,18 @@ Precedence: `harness` > `policy` > `infrastructure`/`unclassified` >
 
 ### 5.3 Contested attempts (R3)
 
-An infrastructure failure is a retry reason only on a `cli-attested` stream.
-Even then the agent can provoke real provider failures with the credential
-it can read. So a retried repetition is **contested** if its failed attempt:
+Infrastructure failures are classified from the CLI stream, which is
+`cli-unattested` (§4.4), and the agent can also provoke real provider
+failures with the credential it can read. So (§0.4) **every repetition that
+consumed an infrastructure retry is `contested`**, whatever its stream,
+proxy log or breach observations show; those observations are recorded as
+supporting detail.
 
-- had an `unprotected` stream, or
-- shows proxy anomalies (provider connections beyond the CLI's pattern), or
-- has any breach observation.
-
-The report gives each cell's success as a point estimate (contested failed
-attempts excluded, the retry counted) **and** as a conservative lower bound
+The report gives each cell's success as a point estimate (the failed attempt
+excluded, the retry's outcome counted) **and** as a conservative lower bound
 (every contested or `unclassified` repetition counted as non-success). A
-retry decision therefore never silently improves a result.
+retry decision therefore never silently improves a result, and no stream
+event alone establishes that a retry was unbiased.
 
 ## 6. Evidence and raw traces (R4)
 
@@ -965,7 +1011,7 @@ the label and reports `non-exact` with the affected paths.
   by class.
 - **Policy and scope breaches:** every attempt with realized scope
   violations, integrity or static failures, denials and detections from §4.5,
-  credential-path access, stream anomalies, `unprotected` streams, model
+  credential-path access, stream anomalies, channel-audit findings, model
   fidelity violations, whatever the verdict.
 - **Per model:** `k/n` success per workflow and case type, with `n_valid`,
   `n_planned`, missing, `unsupported / not run`, and the point estimate with
@@ -1023,7 +1069,7 @@ contracts (§3.4–3.5) and the observed offline outputs.
 | F19 | interrupted Codex turn without terminal event, with and without a harness signal | budget/cancel vs `abnormal-exit` |
 | F20 | stream integrity: events before init, two terminal events, events after the terminal one, invalid JSON | `adapter-stream` |
 | F21 | a fake execute-only CLI whose fake tool child tries `/proc/<ppid>/fd/1` injection and environment reads | blocked (EACCES); stream stays `cli-attested` (needs Docker: §9.3) |
-| F22 | a fake CLI that leaks its stdout into a child, which writes a valid, complete replacement stream | audit detects; stream `unprotected`; usage `estimate`; retry `contested` |
+| F22 | a fake CLI that leaks its stdout into a child, which writes a valid, complete replacement stream | usage stays `estimate` (`cli-stream-unattested`); a retry it causes is `contested`; the replaced stream is never `observed` |
 | F23 | text in tool output and model messages mimicking errors and JSON events | classification unchanged |
 | F24 | shell-mediated write (`sed -i`) between a failed and a passing build | repair detected through the workspace delta |
 | F25 | `npm run build \|\| true`; `build && test` | `compound` → coverage incomplete → first-pass `unknown` |
@@ -1059,6 +1105,7 @@ contracts (§3.4–3.5) and the observed offline outputs.
 | F55 | CLI version or binary digest drift | refused |
 | F56 | report over synthetic records: fails, unknowns, missing, unsupported, contested | distributions, breaches, bounds (AC3) |
 | F57 | schema validation of every record, config and report | completeness |
+| F58 | a shell script performing fail → repair → pass and exiting 0, run through `npm run verify` | no repair detected (lower bound 0); `firstPassSuccess` `unknown` because an opaque command ran (§0.4) |
 
 ### 9.2 Class-level checks
 
@@ -1108,7 +1155,9 @@ bound check.
   concurrency 1; at most one infrastructure retry; stop at the first
   `harness`, `auth` or credential-export problem; hard stop at 2 h.
 - Prerequisites: user cost/quota check, heads-up to the core-evolution
-  orchestrator, valid self-test, effort values decided (open question 1).
+  orchestrator, valid self-test. **No effort flag** is passed in the smoke
+  run: it observes each CLI's effective effort, which the baseline then pins
+  (Q3).
 - It records, beyond the normal artifacts, a telemetry availability table
   per CLI under subscription auth, which settles these unverified items:
   - presence and semantics of tokens, cost and `costBasis`;
@@ -1128,23 +1177,8 @@ bound check.
 
 ## 10. Open questions for the orchestrator
 
-1. **Effort values (Q3 conflict).** The decision says "each CLI's default,
-   set explicitly (medium for both today)". Observed: Codex 0.163.0's bundled
-   catalog (`codex debug models`, offline) lists `gpt-6.1-sol` with
-   `default_reasoning_level: low` (supported: low, medium, high, xhigh, max,
-   ultra). The authenticated remote catalog may differ (unverified). Claude's
-   default is not observable offline. Pass `medium` to both as stated, or
-   `low` for Codex as its pinned default?
-2. **Detection-only denials (R7 rule, §4.5).** Accept detect-and-fail for
-   contained capabilities:
-   - `host.build` in the 9 read-only tasks;
-   - `host.dev-server`, withheld everywhere;
-   - local `package.install`;
-   - Codex web search, which has source and configuration evidence but no
-     runtime pre-run evidence.
-
-   The alternative is refusing those tasks (the 9 read-only tasks, and all
-   tasks for `host.dev-server`), or refusing Codex for web search.
+None. The effort values (Q3) and the detection-only denials (Q12) were decided
+by the user (§0.3); R3 and R5 follow the conservative amendment (§0.4).
 
 No oracle API change is required: two-pass grading uses `evaluate` as it is.
 
