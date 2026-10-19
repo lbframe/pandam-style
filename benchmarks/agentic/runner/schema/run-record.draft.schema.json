@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/runner/schema/run-record.draft.schema.json",
+  "title": "DRAFT attempt record (pms-agentic-run-record/v0-draft)",
+  "description": "DRAFT for the AG-00.2 design review; not a stable contract. One attempt of one repetition of one task x model cell (runner/DESIGN.md sections 1, 2 and 5). Missing telemetry is status unknown with value null, never 0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "matrixId",
+    "cell",
+    "repetition",
+    "attempt",
+    "comparabilityKey",
+    "task",
+    "prompt",
+    "modelConfig",
+    "cli",
+    "provider",
+    "budgets",
+    "productBuild",
+    "environment",
+    "timestamps",
+    "outcome",
+    "metrics",
+    "artifacts"
+  ],
+  "properties": {
+    "schema": { "const": "pms-agentic-run-record/v0-draft" },
+    "kind": { "enum": ["provider-backed", "adapter-fixture"] },
+    "matrixId": { "type": "string", "minLength": 1 },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskId", "modelKey"],
+      "properties": {
+        "taskId": { "type": "string" },
+        "modelKey": { "type": "string" }
+      }
+    },
+    "repetition": { "type": "integer", "minimum": 1 },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "comparabilityKey": { "$ref": "#/$defs/sha256" },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "split", "workflow", "caseType", "epoch", "corpusVersion", "corpusLockSha256", "taskDigest", "harnessDigests"],
+      "properties": {
+        "id": { "type": "string" },
+        "split": { "const": "development" },
+        "workflow": { "type": "string" },
+        "caseType": { "type": "string" },
+        "epoch": { "type": "string" },
+        "corpusVersion": { "type": "string" },
+        "corpusLockSha256": { "$ref": "#/$defs/sha256" },
+        "taskDigest": { "type": "string" },
+        "harnessDigests": { "type": "object" }
+      }
+    },
+    "prompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "sha256", "docsPath", "channel"],
+      "properties": {
+        "file": { "const": "prompt.md" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "docsPath": { "type": "string" },
+        "channel": { "enum": ["argv", "stdin"] }
+      }
+    },
+    "modelConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestedModel", "servedModels", "reasoningEffort", "argv", "env", "configFiles"],
+      "properties": {
+        "requestedModel": { "type": "string" },
+        "servedModels": {
+          "description": "Model ids reported by the stream, or unknown when the CLI reports none.",
+          "oneOf": [
+            { "type": "array", "items": { "type": "string" } },
+            { "const": "unknown" }
+          ]
+        },
+        "reasoningEffort": { "type": "string" },
+        "argv": { "type": "array", "items": { "type": "string" } },
+        "env": {
+          "type": "object",
+          "description": "Variable names passed to the CLI; values only for non-secret variables, otherwise the string <secret>.",
+          "additionalProperties": { "type": "string" }
+        },
+        "configFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": { "type": "string" },
+              "sha256": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        }
+      }
+    },
+    "cli": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "sha256"],
+      "properties": {
+        "name": { "enum": ["claude", "codex"] },
+        "version": { "type": "string" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "description": "Whatever the stream reports about the service (session id, service tier, rate-limit state, API retries); absent fields are unknown.",
+      "additionalProperties": true
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timeoutSeconds", "maxTurns", "limitFired"],
+      "properties": {
+        "timeoutSeconds": { "type": "integer" },
+        "maxTurns": { "type": "integer" },
+        "limitFired": { "enum": [null, "timeout", "harness-tool-calls", "cli-max-turns", "memory", "pids", "workspace-size"] }
+      }
+    },
+    "productBuild": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest", "epoch", "sourceCommit"],
+      "properties": {
+        "digest": { "$ref": "#/$defs/sha256" },
+        "epoch": { "type": "string" },
+        "sourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["imageId", "dockerVersion", "kernel", "cpuModel", "cpus", "memoryBytes", "load", "cgroup", "harnessCommit", "harnessClean", "runnerTreeDigest"],
+      "properties": {
+        "imageId": { "type": "string" },
+        "dockerVersion": { "type": "string" },
+        "kernel": { "type": "string" },
+        "cpuModel": { "type": "string" },
+        "cpus": { "type": "integer" },
+        "memoryBytes": { "type": "integer" },
+        "load": {
+          "type": "object",
+          "description": "Summary of the 1-minute load samples (host-samples.jsonl).",
+          "additionalProperties": false,
+          "required": ["samples", "min", "max", "median"],
+          "properties": {
+            "samples": { "type": "integer" },
+            "min": { "type": ["number", "null"] },
+            "max": { "type": ["number", "null"] },
+            "median": { "type": ["number", "null"] }
+          }
+        },
+        "cgroup": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cpuUsageUsec", "memoryPeakBytes", "pidsPeak"],
+          "properties": {
+            "cpuUsageUsec": { "$ref": "#/$defs/measured" },
+            "memoryPeakBytes": { "$ref": "#/$defs/measured" },
+            "pidsPeak": { "$ref": "#/$defs/measured" }
+          }
+        },
+        "harnessCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "harnessClean": { "type": "boolean" },
+        "runnerTreeDigest": { "type": "string" }
+      }
+    },
+    "timestamps": {
+      "type": "object",
+      "description": "Per phase: startedAt/endedAt (UTC ISO 8601) and monotonic durationMs.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["startedAt", "endedAt", "durationMs"],
+        "properties": {
+          "startedAt": { "type": "string" },
+          "endedAt": { "type": ["string", "null"] },
+          "durationMs": { "type": ["number", "null"] }
+        }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["termination", "class", "code", "valid", "retry", "verdict"],
+      "properties": {
+        "termination": {
+          "enum": ["completed", "budget-timeout", "budget-max-turns", "resource-limit", "abnormal-exit", "infrastructure", "harness"]
+        },
+        "class": { "enum": ["agent", "agent-resource", "agent-abnormal", "infrastructure", "harness"] },
+        "code": { "type": "string" },
+        "valid": {
+          "type": "boolean",
+          "description": "False for infrastructure and harness classes: excluded from success statistics, still reported."
+        },
+        "retry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scheduled"],
+          "properties": {
+            "scheduled": { "type": "boolean" },
+            "backoffSeconds": { "type": ["number", "null"] }
+          }
+        },
+        "verdict": {
+          "enum": ["pass", "fail", "unmeasured", "error", "not-evaluable", "not-graded"],
+          "description": "Oracle verdict from evaluation.json; not-graded when the attempt was not evaluated."
+        },
+        "taskSuccess": { "type": ["boolean", "null"] },
+        "anomalies": { "type": "array", "items": { "type": "string" } },
+        "breaches": {
+          "type": "array",
+          "description": "Policy and scope breaches observed whatever the verdict.",
+          "items": {
+            "type": "object",
+            "required": ["kind", "source"],
+            "properties": {
+              "kind": { "type": "string" },
+              "source": { "enum": ["oracle", "proxy", "stream", "transcript", "filesystem", "redaction"] },
+              "detail": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["toolCalls", "agentSteps", "repairCycles", "firstPassSuccess", "tokens", "cost", "elapsed", "toolCost", "compilerCost", "visualFidelity", "vocabularyCompliance", "scopeViolations"],
+      "properties": {
+        "toolCalls": {
+          "type": "object",
+          "description": "Counts per normalized tool kind and total.",
+          "additionalProperties": { "$ref": "#/$defs/measured" }
+        },
+        "agentSteps": { "$ref": "#/$defs/measured" },
+        "repairCycles": { "$ref": "#/$defs/measured" },
+        "firstPassSuccess": { "type": ["boolean", "null"] },
+        "tokens": {
+          "type": "object",
+          "description": "Per served model and total: input, cacheRead, cacheWrite, output, reasoningOutput.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/$defs/measured" }
+          }
+        },
+        "cost": { "$ref": "#/$defs/measured" },
+        "elapsed": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/measured" }
+        },
+        "toolCost": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/measured" }
+        },
+        "compilerCost": {
+          "type": "object",
+          "description": "agent-invoked compiler/host builds and harness-side compile work, kept apart.",
+          "additionalProperties": { "$ref": "#/$defs/measured" }
+        },
+        "visualFidelity": { "enum": ["pass", "fail", "unmeasured"] },
+        "vocabularyCompliance": { "enum": ["pass", "fail", "unmeasured", "not-graded"] },
+        "scopeViolations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["realized", "attempted"],
+          "properties": {
+            "realized": { "type": "array", "items": { "type": "string" } },
+            "attempted": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "sha256", "bytes", "truncated", "redacted"],
+        "properties": {
+          "file": { "type": "string" },
+          "sha256": { "$ref": "#/$defs/sha256" },
+          "bytes": { "type": "integer", "minimum": 0 },
+          "truncated": { "type": "boolean" },
+          "originalBytes": { "type": ["integer", "null"] },
+          "redacted": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "measured": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "value", "source"],
+      "properties": {
+        "status": { "enum": ["observed", "estimate", "unknown"] },
+        "value": { "type": ["number", "null"] },
+        "unit": { "type": "string" },
+        "source": { "type": ["string", "null"] },
+        "method": { "type": ["string", "null"] },
+        "lowerBound": { "type": ["number", "null"] },
+        "discrepancy": { "type": ["object", "null"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "unknown" } }, "required": ["status"] },
+          "then": { "properties": { "value": { "const": null } } }
+        },
+        {
+          "if": { "properties": { "status": { "enum": ["observed", "estimate"] } }, "required": ["status"] },
+          "then": { "properties": { "value": { "type": "number" } } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "estimate" } }, "required": ["status"] },
+          "then": { "required": ["method"], "properties": { "method": { "type": "string", "minLength": 1 } } }
+        }
+      ]
+    }
+  }
+}
