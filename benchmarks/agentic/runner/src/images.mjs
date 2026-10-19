@@ -91,8 +91,11 @@ export function buildAgentImage({
     'RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*',
     'COPY claude /opt/cli/claude',
     'COPY codex /opt/cli/codex-dist',
-    'RUN cp /opt/cli/codex-dist/bin/codex /opt/cli/codex \\',
-    ' && chown -R root:root /opt/cli && chmod 0711 /opt/cli/claude /opt/cli/codex \\',
+    // Codex runs from its vendor tree, which holds the helpers it finds
+    // relative to its own executable (codex-code-mode-host, codex-path/rg,
+    // codex-resources/bwrap); a lone copy of bin/codex loses them.
+    'RUN ln -s /opt/cli/codex-dist/bin/codex /opt/cli/codex \\',
+    ' && chown -R root:root /opt/cli && chmod 0711 /opt/cli/claude \\',
     ' && find /opt/cli/codex-dist -type f -perm -u+x -exec chmod 0711 {} +',
     'ENV COREPACK_HOME=/opt/corepack',
     'RUN /opt/node/bin/corepack enable --install-directory /opt/node/bin && /opt/node/bin/corepack prepare yarn@1.22.22 pnpm@9.15.4 --activate && chmod -R a+rX /opt/corepack',

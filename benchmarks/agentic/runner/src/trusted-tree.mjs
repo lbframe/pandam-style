@@ -74,12 +74,36 @@ function listPackageFiles(dir, rel = '') {
  * Compares every installed @pandamstyle/* package directory with the
  * `package/` entries of its product tarball. Returns the list of problems.
  */
-export function verifyProductPackages({ nodeModules, binding, storeCopy }) {
+/**
+ * `required`: the @pandamstyle/* package names that must be installed (all
+ * of the binding when omitted, e.g. the trusted grading tree); a package of
+ * the binding that is not required may be absent (a fixture installs only
+ * what its package.json declares). Every installed @pandamstyle/* package
+ * must be one of the binding's and equal its tarball (section 4.7).
+ */
+export function verifyProductPackages({
+  nodeModules,
+  binding,
+  storeCopy,
+  required = null,
+}) {
   const problems = [];
+  const names = new Set(binding.packages.map((p) => p.name));
+  const scope = path.join(nodeModules, '@pandamstyle');
+  if (fs.existsSync(scope))
+    for (const entry of fs.readdirSync(scope))
+      if (!names.has(`@pandamstyle/${entry}`))
+        problems.push(
+          `@pandamstyle/${entry}: installed but not in the product build`,
+        );
+  for (const name of required ?? [])
+    if (!names.has(name))
+      problems.push(`${name}: required but not in the product build`);
   for (const pkg of binding.packages) {
     const installed = path.join(nodeModules, ...pkg.name.split('/'));
     if (!fs.existsSync(installed)) {
-      problems.push(`${pkg.name}: not installed`);
+      if (required == null || required.includes(pkg.name))
+        problems.push(`${pkg.name}: not installed`);
       continue;
     }
     const tarball = path.join(storeCopy, pkg.file);
@@ -229,10 +253,22 @@ export function installFixtureClosure({
     cacheDir,
     npm,
   });
+  // Required: the @pandamstyle/* packages the closure's package.json declares.
+  const manifest = JSON.parse(
+    fs.readFileSync(path.join(closureDir, 'package.json'), 'utf8'),
+  );
+  const required = [
+    ...new Set(
+      Object.keys({
+        ...manifest.dependencies,
+        ...manifest.devDependencies,
+      }).filter((n) => n.startsWith('@pandamstyle/')),
+    ),
+  ];
   const problems =
     binding == null
       ? []
-      : verifyProductPackages({ nodeModules, binding, storeCopy });
+      : verifyProductPackages({ nodeModules, binding, storeCopy, required });
   if (problems.length > 0)
     throw coded(
       'install',
