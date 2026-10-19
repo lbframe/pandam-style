@@ -218,7 +218,7 @@ function alternativeNamePath(root, name) {
   if (alternativeNames == null) {
     alternativeNames = new Map();
     const data = compatData();
-    for (const [path, entry] of Object.entries(data.paths)) {
+    for (const [path, entry] of data.alternativeNameEntries()) {
       const parts = path.split('.');
       const topLevel =
         (parts[1] === 'properties' || parts[1] === 'selectors') &&
@@ -353,8 +353,18 @@ function keywordFeature(property, keyword) {
   // A prefixed or renamed keyword (`-webkit-fill-available`) is recorded as
   // an alternative name or prefix on one of the property's keyword entries.
   const data = compatData();
+  const prefixed = keyword.startsWith('-');
+  const named = `"n":${JSON.stringify(keyword)}`;
   for (const child of data.childrenOf(owner.base)) {
     const path = `${owner.base}.${child}`;
+    // Only an entry naming the keyword, or recording a prefix for a prefixed
+    // keyword, can match: skip the others without parsing them.
+    if (
+      !data.mentions(path, named) &&
+      !(prefixed && keyword.endsWith(child) && data.mentions(path, '"x":'))
+    ) {
+      continue;
+    }
     const entry = data.entry(path);
     for (const statements of Object.values(entry?.e ?? {})) {
       for (const statement of statements) {

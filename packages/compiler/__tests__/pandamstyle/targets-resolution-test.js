@@ -408,3 +408,49 @@ describe('invalid configurations', () => {
     ]);
   });
 });
+
+describe('precomputed built-in resolutions', () => {
+  test('every precomputed list equals a live Browserslist resolution with the pinned data', () => {
+    const { packages } = targets.dataPackages();
+    expect(targets.BUILTIN_RESOLUTIONS.data).toEqual(packages);
+    for (const ref of targets.BUILTIN_PROFILE_REFS) {
+      const { query } = targets.BUILTIN_PROFILES[ref];
+      expect(targets.precomputedBrowsers(ref, query)).toEqual(
+        targets.liveBrowsers(query),
+      );
+    }
+  });
+
+  test('a different data identity or query never reads a precomputed list', () => {
+    const { packages } = targets.dataPackages();
+    const ref = 'pandamstyle:default@1';
+    const { query } = targets.BUILTIN_PROFILES[ref];
+    for (const name of Object.keys(packages)) {
+      for (const field of ['version', 'digest']) {
+        const changed = {
+          ...packages,
+          [name]: { ...packages[name], [field]: 'other' },
+        };
+        expect(targets.precomputedBrowsers(ref, query, changed)).toBeNull();
+      }
+    }
+    expect(targets.precomputedBrowsers(ref, 'chrome >= 99')).toBeNull();
+    expect(targets.precomputedBrowsers('project:app', query)).toBeNull();
+  });
+
+  test('built-in profiles resolve without loading Browserslist; a project query loads it', () => {
+    const script = `
+      const { targets } = require(${JSON.stringify(INSPECTION)});
+      const loaded = () => Object.keys(require.cache).some((k) => /[\\\\/]browserslist[\\\\/]index\\.js$/.test(k));
+      targets.resolveTargets({ profiles: [...targets.BUILTIN_PROFILE_REFS] });
+      const afterBuiltin = loaded();
+      targets.resolveTargets({ profiles: ['project:a'], define: { a: { query: 'chrome 120' } } });
+      process.stdout.write(JSON.stringify([afterBuiltin, loaded()]));
+    `;
+    const child = spawnSync(process.execPath, ['-e', script], {
+      encoding: 'utf8',
+    });
+    expect(child.stderr).toBe('');
+    expect(JSON.parse(child.stdout)).toEqual([false, true]);
+  });
+});

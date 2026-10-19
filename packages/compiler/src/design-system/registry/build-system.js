@@ -14,7 +14,7 @@
 import { props as coreProps } from '@pandamstyle/core';
 
 import { buildRegistry } from './index';
-import { createCanonicalDesignSystemSnapshot } from './snapshot';
+import { createCanonicalDesignSystemSnapshot, deepFreeze } from './snapshot';
 import {
   compileTokens,
   compileStyles,
@@ -28,7 +28,7 @@ import {
   structuralDomain,
   supportedProperties,
 } from '../policy/properties';
-import { evaluateTargets } from '../../targets/evaluate';
+import { evaluateTargets, unitSummary } from '../../targets/evaluate';
 import { PmsError } from '../../protocol/diagnostics';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, phase as perfPhase } from '../../observability/metrics';
@@ -129,7 +129,14 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
           () =>
             evaluateTargets({
               resolution: targets,
-              sources: designSystemTargetSources(injected),
+              units: [
+                [
+                  'design-system',
+                  unitSummary(injected, () =>
+                    designSystemTargetSources(injected),
+                  ),
+                ],
+              ],
               enhancements: registry.enhancements,
               conditions: conditionDefinitions(registry),
               domainOf: structuralDomainOfCss,
@@ -146,8 +153,7 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
       cssRules: injected,
       supportedProperties: supportedProperties(),
       targets,
-      targetFacts:
-        targetFacts == null ? null : { ...targetFacts, scope: 'design-system' },
+      targetFacts: targetFacts == null ? null : designSystemFacts(targetFacts),
     }),
   );
   const manifest = perfPhase('ds_manifest_ms', () => snapshot.tooling.manifest);
@@ -206,4 +212,20 @@ export function structuralDomainOfCss(cssProperty) {
     c.toUpperCase(),
   );
   return propertyKind(key) === 'structural-set' ? structuralDomain(key) : null;
+}
+
+const designSystemFactsCache = new WeakMap();
+
+/**
+ * The design-system scope of evaluated facts, deep-frozen once per facts
+ * object: unchanged facts (a token value edit) keep the same frozen record,
+ * which the snapshot does not walk again.
+ */
+function designSystemFacts(facts) {
+  let scoped = designSystemFactsCache.get(facts);
+  if (scoped == null) {
+    scoped = deepFreeze({ ...facts, scope: 'design-system' });
+    designSystemFactsCache.set(facts, scoped);
+  }
+  return scoped;
 }

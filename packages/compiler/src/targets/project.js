@@ -25,8 +25,7 @@ import {
 } from '../design-system/registry/build-system';
 import crypto from 'crypto';
 
-import { evaluateTargets } from './evaluate';
-import { stableJson } from './resolve';
+import { evaluateTargets, stableJsonCached, unitSummary } from './evaluate';
 
 export function enforcementOf(resolution) {
   return resolution.provenance.origin === 'default' ? 'advisory' : 'enforced';
@@ -64,6 +63,10 @@ export function pageTargetSources(file, rules, ruleOrigins = []) {
  * Evaluates a revision. `designSystemRules` are the design system's own rule
  * entries for the revision; `pages` are `{ file, rules, ruleOrigins }`.
  * Returns `{ facts, errors, warnings }` with enforcement already applied.
+ *
+ * Each page's summary is cached on its rule list and the design system's on
+ * its `injected` rules, so an `accumulator` (the session's) re-reads only what
+ * changed; without one the evaluation is a one-shot pure function.
  */
 export function evaluateProjectTargets({
   resolution,
@@ -73,27 +76,70 @@ export function evaluateProjectTargets({
   pages,
   useCSSLayers = false,
   engineOptions = {},
+  accumulator = null,
 }) {
   const enforcement = enforcementOf(resolution);
-  const injected = Object.fromEntries(
-    designSystemRules.map(([key, rule]) => [key, rule]),
-  );
-  const sources = [
-    ...designSystemTargetSources(injected),
-    ...pages.flatMap(({ file, rules, ruleOrigins }) =>
-      pageTargetSources(file, rules, ruleOrigins),
-    ),
+  const injected =
+    designSystem.injected ??
+    Object.fromEntries(designSystemRules.map(([key, rule]) => [key, rule]));
+  const units = [
+    [
+      'design-system',
+      unitSummary(injected, () => designSystemTargetSources(injected)),
+    ],
   ];
+  for (const { file, rules, ruleOrigins } of pages) {
+    units.push([
+      file,
+      unitSummary(rules, () => pageTargetSources(file, rules, ruleOrigins)),
+    ]);
+  }
   const result = evaluateTargets({
     resolution,
-    sources,
+    units,
     enhancements: designSystem.registry.enhancements ?? [],
     conditions: conditionDefinitions(designSystem.registry),
     intrinsic: { useCSSLayers, engineOptions },
     domainOf: structuralDomainOfCss,
+    accumulator,
   });
+  // The projected facts depend only on the evaluated facts and enforcement,
+  // so unchanged facts keep their object and digest.
+  let byEnforcement = projectedFacts.get(result.facts);
+  if (byEnforcement == null) {
+    byEnforcement = new Map();
+    projectedFacts.set(result.facts, byEnforcement);
+  }
+  let facts = byEnforcement.get(enforcement);
+  if (facts == null) {
+    facts = projectFacts(result.facts, resolution, enforcement);
+    byEnforcement.set(enforcement, facts);
+  }
+  const advisory =
+    enforcement === 'enforced'
+      ? []
+      : result.errors.map((d) => ({
+          ...d,
+          severity: 'warning',
+          context: { ...d.context, enforcement: 'advisory' },
+        }));
+  return {
+    facts,
+    errors: enforcement === 'enforced' ? result.errors : [],
+    warnings: [
+      ...resolutionDiagnostics,
+      ...advisory,
+      ...result.warnings,
+      ...result.infos,
+    ],
+  };
+}
+
+const projectedFacts = new WeakMap();
+
+function projectFacts(evaluated, resolution, enforcement) {
   const failingProfiles = new Set();
-  for (const feature of result.facts.features) {
+  for (const feature of evaluated.features) {
     if (!feature.required) continue;
     for (const profile of feature.profiles) {
       if (profile.state === 'incompatible' || profile.state === 'unknown') {
@@ -101,7 +147,7 @@ export function evaluateProjectTargets({
       }
     }
   }
-  const { digest: _evaluationDigest, ...body } = result.facts;
+  const { digest: _evaluationDigest, ...body } = evaluated;
   const factsBody = {
     ...body,
     enforcement,
@@ -110,32 +156,14 @@ export function evaluateProjectTargets({
       status: failingProfiles.has(profile.ref) ? 'failing' : 'passing',
     })),
   };
-  const facts = {
+  return {
     ...factsBody,
     digest:
       'sha256:' +
-      crypto.createHash('sha256').update(stableJson(factsBody)).digest('hex'),
-  };
-  const findings =
-    enforcement === 'enforced'
-      ? { errors: result.errors, advisory: [] }
-      : {
-          errors: [],
-          advisory: result.errors.map((d) => ({
-            ...d,
-            severity: 'warning',
-            context: { ...d.context, enforcement: 'advisory' },
-          })),
-        };
-  return {
-    facts,
-    errors: findings.errors,
-    warnings: [
-      ...resolutionDiagnostics,
-      ...findings.advisory,
-      ...result.warnings,
-      ...result.infos,
-    ],
+      crypto
+        .createHash('sha256')
+        .update(stableJsonCached(factsBody))
+        .digest('hex'),
   };
 }
 

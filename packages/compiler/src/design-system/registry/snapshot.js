@@ -252,49 +252,58 @@ export function createCanonicalDesignSystemSnapshot({
     patterns: { ids: [...PATTERN_IDS], byPattern: PATTERN_CATALOG },
   };
 
-  return deepFreeze({
-    documentKind: 'pandamstyle-canonical-design-system',
-    identity,
-    capabilities,
-    // CE-01.1, additive: the target resolution record of the project and the
-    // target facts of the design system's own emitted CSS. Each carries its own
-    // schemaVersion. Null when the snapshot is built without targets.
-    targets,
-    targetFacts,
-    registry,
-    vocabulary: {
-      tokens,
-      publicTokenPaths: publicTokens.map((token) => token.tokenId),
-      tokenCategories,
-      tokenPathsByCategory,
-      semanticTokens,
-      conditions,
-      conditionNames,
-      themes: themeIds,
-      themeDetails,
-      publicRecipeIds,
-      recipes: recipesCatalog,
-      patterns: PATTERN_CATALOG,
-    },
-    compiled: {
-      varsByToken: { ...varsByToken },
-      themeClasses: { ...themeClasses },
-      themes: { ...themes },
-      recipes: { ...recipes },
-      cssRules: cloneRules(cssRules),
-    },
-    tooling: {
-      manifest,
-      candidateDomains,
-      repairDomains: {
-        tokensByCategory: tokenPathsByCategory,
-        recipeAxes: candidateDomains.recipes.byRecipe,
-        themes: candidateDomains.themes,
-        conditions: candidateDomains.conditions,
-        patterns: candidateDomains.patterns,
+  // The target members arrive deep-frozen from their producers (resolution
+  // and evaluation); the snapshot freeze does not walk them again.
+  const frozenMembers = new WeakSet();
+  for (const member of [targets, targetFacts]) {
+    if (member != null && Object.isFrozen(member)) frozenMembers.add(member);
+  }
+  return deepFreeze(
+    {
+      documentKind: 'pandamstyle-canonical-design-system',
+      identity,
+      capabilities,
+      // CE-01.1, additive: the target resolution record of the project and the
+      // target facts of the design system's own emitted CSS. Each carries its own
+      // schemaVersion. Null when the snapshot is built without targets.
+      targets,
+      targetFacts,
+      registry,
+      vocabulary: {
+        tokens,
+        publicTokenPaths: publicTokens.map((token) => token.tokenId),
+        tokenCategories,
+        tokenPathsByCategory,
+        semanticTokens,
+        conditions,
+        conditionNames,
+        themes: themeIds,
+        themeDetails,
+        publicRecipeIds,
+        recipes: recipesCatalog,
+        patterns: PATTERN_CATALOG,
+      },
+      compiled: {
+        varsByToken: { ...varsByToken },
+        themeClasses: { ...themeClasses },
+        themes: { ...themes },
+        recipes: { ...recipes },
+        cssRules: cloneRules(cssRules),
+      },
+      tooling: {
+        manifest,
+        candidateDomains,
+        repairDomains: {
+          tokensByCategory: tokenPathsByCategory,
+          recipeAxes: candidateDomains.recipes.byRecipe,
+          themes: candidateDomains.themes,
+          conditions: candidateDomains.conditions,
+          patterns: candidateDomains.patterns,
+        },
       },
     },
-  });
+    frozenMembers,
+  );
 }
 
 /**

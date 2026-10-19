@@ -102,6 +102,7 @@ import {
   evaluateProjectTargets,
   targetReportSection,
 } from '../../targets/project';
+import { createTargetAccumulator } from '../../targets/evaluate';
 import { PATTERN_CATALOG } from '../../design-system/patterns/compile';
 import { isTokenRef, tokenRefPath } from '../../design-system/tokens/ref';
 import { generateDesignSystemModule } from '../../artifacts/javascript/design-module';
@@ -662,6 +663,7 @@ export function createProjectSession(config) {
       ),
     );
     state.targetResolution = targetResolution;
+    state.targetAccumulator ??= createTargetAccumulator();
     const designSystemSource = phase('ds_module_codegen_ms', () =>
       generateDesignSystemModule({ designSystem }),
     );
@@ -2585,6 +2587,9 @@ export function createProjectSession(config) {
             })),
           useCSSLayers: cfg.useCSSLayers,
           engineOptions: cfg.engineOptions,
+          // Re-reads only the units (page contributions, design system) that
+          // changed since the previous revision.
+          accumulator: state.targetAccumulator,
         }),
       );
       active.targetFacts = targetEvaluation.facts;

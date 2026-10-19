@@ -67,8 +67,9 @@ jobs:
       - run: yarn lint:report
 
   targets-data:
-    # CE-01.1: the bundled compat data and the frozen default profile are
-    # generated; both must re-derive byte for byte from their pinned inputs.
+    # CE-01.1: the bundled compat data, the frozen default profile and the
+    # built-in profile resolutions are generated; each must re-derive byte for
+    # byte from its pinned inputs.
     # The target class tests run with the compiler suite in verify-pms.sh.
     runs-on: ubuntu-latest
     steps:
@@ -87,6 +88,7 @@ jobs:
       - run: yarn build
       - run: node tools/targets/build-compat-data.mjs --check
       - run: node tools/targets/measure-floor.mjs --check
+      - run: node tools/targets/build-builtin-resolutions.mjs --check
       - run: >-
           node_modules/.bin/jest --config jest.config.js --ci --runInBand
           packages/compiler/__tests__/pandamstyle/targets-

@@ -357,3 +357,29 @@ describe('executed claims of the closures', () => {
     ]);
   });
 });
+
+describe('lazily parsed compat data', () => {
+  test('every entry, child list and the digest equal a whole-file parse', () => {
+    const text = fs.readFileSync(
+      path.join(TARGETS_SRC, 'data/compat-data.v1.json'),
+      'utf8',
+    );
+    for (const variant of [text, JSON.stringify(JSON.parse(text), null, 2)]) {
+      const lazy = targets.compatDataFromText(variant);
+      const raw = JSON.parse(variant);
+      for (const [key, value] of Object.entries(raw.paths)) {
+        expect(lazy.entry(key)).toEqual(value);
+      }
+      expect(lazy.has('css.properties.not-a-property')).toBe(false);
+      expect(lazy.childrenOf('css.properties.text-wrap').sort()).toEqual(
+        Object.keys(raw.paths)
+          .filter((k) => /^css\.properties\.text-wrap\.[^.]+$/.test(k))
+          .map((k) => k.split('.').at(-1))
+          .sort(),
+      );
+    }
+    expect(targets.compatData().digest).toBe(
+      targets.compatDataFromText(text).digest,
+    );
+  });
+});

@@ -476,3 +476,81 @@ describe('executed evidence (schema only; records come from #81)', () => {
     ).toBe(false);
   });
 });
+
+describe('incremental accumulation equals a fresh evaluation', () => {
+  const page = (file, css) =>
+    targets.summarizeSources([
+      { owner: { role: 'page', file, line: 1, column: 1 }, css },
+    ]);
+  const canonical = ({ uses }) =>
+    JSON.stringify(
+      [...uses.entries()]
+        .sort(([a], [b]) => (a < b ? -1 : 1))
+        .map(([key, use]) => [
+          key,
+          use.occurrences,
+          [...use.owners.keys()].sort(),
+          Object.entries(use.roles)
+            .filter(([, n]) => n > 0)
+            .sort(),
+        ]),
+    );
+
+  test('after adds, changes and removals the sums equal a fresh accumulator', () => {
+    const a = page('/a.js', '.a{color:red;text-wrap:pretty}');
+    const b1 = page('/b.js', '.b{display:inline flex}');
+    const b2 = page('/b.js', '.b{display:flex;color:blue}');
+    const c = page('/c.js', '.c{text-wrap:balance}');
+    const steps = [
+      [
+        ['/a.js', a],
+        ['/b.js', b1],
+      ],
+      [
+        ['/a.js', a],
+        ['/b.js', b2],
+        ['/c.js', c],
+      ],
+      [
+        ['/b.js', b2],
+        ['/c.js', c],
+      ],
+      [
+        ['/c.js', c],
+        ['/a.js', a],
+      ],
+      [],
+    ];
+    const incremental = targets.createTargetAccumulator();
+    let previous = -1;
+    for (const step of steps) {
+      const result = incremental.sync(step);
+      expect(result.version).toBeGreaterThan(previous);
+      previous = result.version;
+      expect(canonical(result)).toBe(
+        canonical(targets.createTargetAccumulator().sync(step)),
+      );
+    }
+    // An identical revision costs nothing and keeps the version.
+    expect(incremental.sync([]).version).toBe(previous);
+  });
+
+  test('the session evaluation reuses its previous result when nothing changed', () => {
+    const accumulator = targets.createTargetAccumulator();
+    const units = [['/a.js', page('/a.js', '.a{text-wrap:pretty}')]];
+    const first = targets.evaluateTargets({
+      resolution: DEFAULT,
+      units,
+      accumulator,
+    });
+    const second = targets.evaluateTargets({
+      resolution: DEFAULT,
+      units,
+      accumulator,
+    });
+    expect(second).toBe(first);
+    const fresh = targets.evaluateTargets({ resolution: DEFAULT, units });
+    expect(fresh.facts).toEqual(first.facts);
+    expect(fresh.errors).toEqual(first.errors);
+  });
+});

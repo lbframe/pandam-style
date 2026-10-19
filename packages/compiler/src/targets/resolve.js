@@ -21,7 +21,6 @@
  * those alone.
  */
 
-import browserslist from 'browserslist';
 import crypto from 'crypto';
 import fs from 'fs';
 import { createRequire } from 'module';
@@ -31,7 +30,18 @@ import { caveatCatalog } from './catalog';
 import { compatData } from './data';
 import { compareVersions } from './versions';
 import defaultProfile from './profiles/default.v1.json';
+import builtinResolutions from './profiles/builtin-resolutions.v1.json';
 import { Codes, PmsError, diagnostic } from '../protocol/diagnostics';
+
+// Browserslist is loaded on the first live resolution only: built-in profiles
+// resolve from their precomputed lists (below), so a project that uses them
+// never loads it.
+let browserslistModule = null;
+
+function browserslistLib() {
+  browserslistModule ??= createRequire(import.meta.url)('browserslist');
+  return browserslistModule;
+}
 
 export const RESOLUTION_KIND = 'pandamstyle-target-resolution';
 export const RESOLUTION_SCHEMA_VERSION = 1;
@@ -219,7 +229,7 @@ export function dataPackages() {
  */
 function dataYear() {
   let latest = 0;
-  for (const agent of Object.values(browserslist.data)) {
+  for (const agent of Object.values(browserslistLib().data)) {
     for (const time of Object.values(agent.releaseDate ?? {})) {
       if (time != null && time > latest) latest = time;
     }
@@ -253,7 +263,7 @@ function withoutOldDataWarning(run) {
 export function refusedTerms(query) {
   let nodes;
   try {
-    nodes = browserslist.parse(query, {});
+    nodes = browserslistLib().parse(query, {});
   } catch (error) {
     return [
       targetDiagnostic(
@@ -344,7 +354,55 @@ function enginesOf(list, platform) {
   return { engines, excluded };
 }
 
-function resolveQuery(ref, query, platform, errors, warnings) {
+/**
+ * Built-in profiles' browser lists, precomputed by
+ * `tools/targets/build-builtin-resolutions.mjs` with the pinned packages and
+ * checked byte for byte in CI. A list is used only when the profile's query
+ * and the identities (version and digest) of every loaded data package equal
+ * the recorded ones; anything else resolves live, so a consumer override of a
+ * data package never reads a stale list.
+ */
+export function precomputedBrowsers(
+  ref,
+  query,
+  packages = dataPackages().packages,
+) {
+  const entry = builtinResolutions.profiles[ref];
+  if (entry == null || entry.query !== query) return null;
+  for (const [name, identity] of Object.entries(builtinResolutions.data)) {
+    const loaded = packages[name];
+    if (
+      loaded == null ||
+      loaded.version !== identity.version ||
+      loaded.digest !== identity.digest
+    ) {
+      return null;
+    }
+  }
+  return entry.browsers;
+}
+
+/** A query resolved with the loaded Browserslist and the fixed options. */
+export function liveBrowsers(query) {
+  return withoutOldDataWarning(() =>
+    browserslistLib()(query, { ...BROWSERSLIST_OPTIONS, stats: {} }),
+  );
+}
+
+export const BUILTIN_RESOLUTIONS = builtinResolutions;
+
+function resolveQuery(ref, query, platform, errors, warnings, builtin) {
+  const precomputed = builtin ? precomputedBrowsers(ref, query) : null;
+  if (precomputed != null) {
+    return resolvedList(
+      ref,
+      query,
+      [...precomputed],
+      platform,
+      errors,
+      warnings,
+    );
+  }
   const refused = refusedTerms(query);
   if (refused.length > 0) {
     errors.push(
@@ -358,7 +416,7 @@ function resolveQuery(ref, query, platform, errors, warnings) {
   let list;
   try {
     list = withoutOldDataWarning(() =>
-      browserslist(query, { ...BROWSERSLIST_OPTIONS, stats: {} }),
+      browserslistLib()(query, { ...BROWSERSLIST_OPTIONS, stats: {} }),
     );
   } catch (error) {
     errors.push(
@@ -371,6 +429,11 @@ function resolveQuery(ref, query, platform, errors, warnings) {
     );
     return null;
   }
+  return resolvedList(ref, query, list, platform, errors, warnings);
+}
+
+/** Splits a resolved list into engines and exclusions, with their findings. */
+function resolvedList(ref, query, list, platform, errors, warnings) {
   const { engines, excluded } = enginesOf(list, platform);
   if (excluded.length > 0) {
     warnings.push(
@@ -406,6 +469,21 @@ function resolveQuery(ref, query, platform, errors, warnings) {
  * resolution warnings. Throws `PmsError` when the configuration is refused.
  */
 export function resolveTargets(input) {
+  // A pure function of the input and the pinned data: memoized by the input's
+  // canonical form, so a design-system rebuild does not resolve again.
+  const key = stableJson(input ?? null);
+  let resolved = resolutionCache.get(key);
+  if (resolved == null) {
+    resolved = resolveUncached(input);
+    if (resolutionCache.size > 64) resolutionCache.clear();
+    resolutionCache.set(key, resolved);
+  }
+  return { record: resolved.record, diagnostics: [...resolved.diagnostics] };
+}
+
+const resolutionCache = new Map();
+
+function resolveUncached(input) {
   const errors = [];
   const warnings = [];
   const origin = input == null ? 'default' : 'project-config';
@@ -518,6 +596,7 @@ export function resolveTargets(input) {
       platform,
       errors,
       warnings,
+      profileOrigin === 'builtin',
     );
     if (resolved == null) continue;
     profiles.push({
