@@ -187,10 +187,16 @@ test('F58 fail -> repair -> pass inside `npm run verify` exiting 0: no repair se
 
 test('first pass true needs success, no repair and complete coverage', async () => {
   const r = await run(
-    [claudeInit(), { run: 'ls' }, { run: 'git status' }, ...end],
+    [claudeInit(), { run: 'ls' }, { run: 'cat README.md' }, ...end],
     { task: 'discovery-positive-card-vocabulary' },
   );
   assert.equal(r.metrics.firstPassSuccess, true);
+  // git is transparent only with a trusted (read-only, isolated) repository
+  // configuration, which the local fixture executor does not provide.
+  const git = await run([claudeInit(), { run: 'git status' }, ...end], {
+    task: 'discovery-positive-card-vocabulary',
+  });
+  assert.equal(git.metrics.firstPassSuccess, 'unknown');
   const failed = await run([claudeInit(), { run: 'ls' }, ...end], {
     task: 'discovery-positive-card-vocabulary',
     verdict: 'fail',
@@ -235,7 +241,11 @@ test('command table: closed allowlist, everything else opaque', () => {
     'git diff --output=x',
   ];
   for (const c of transparent)
-    assert.equal(classifyCommand(c).class, 'transparent', c);
+    assert.equal(
+      classifyCommand(c, { gitConfigTrusted: true }).class,
+      'transparent',
+      c,
+    );
   for (const c of opaque) assert.equal(classifyCommand(c).class, 'opaque', c);
   assert.equal(classifyCommand('npm run build').verify, true);
   assert.equal(classifyCommand('npx pandamstyle build').verify, true);

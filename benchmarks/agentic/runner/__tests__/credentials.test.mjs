@@ -74,6 +74,7 @@ async function runWith({
       claude: {
         mode,
         ...(fallback ? { fallback } : {}),
+        synthetic: true,
         source: { configDir: cred.dir, account: 'synthetic-team' },
       },
       codex: { mode: 'none', source: null },
@@ -200,6 +201,7 @@ test('source: a missing credential file refuses the matrix before any attempt', 
     credentials: {
       claude: {
         mode: 'refresh-capable-copy',
+        synthetic: true,
         source: { configDir: dir, account: 'synthetic' },
       },
       codex: { mode: 'none', source: null },
@@ -223,6 +225,7 @@ test('F44 mode B: refreshed token, valid shape, host unchanged -> replaced atomi
     configDir: tildePath(r.cred.dir),
     file: '.credentials.json',
     account: 'synthetic-team',
+    synthetic: true,
   });
   const now = JSON.parse(fs.readFileSync(r.cred.file, 'utf8'));
   assert.equal(now.claudeAiOauth.refreshToken, NEW_REFRESH);
@@ -328,15 +331,18 @@ test('F49 crash with a live attempt: recovery exports, writes back and cleans at
   fs.writeFileSync(
     path.join(attempt, 'state.json'),
     JSON.stringify({
+      kind: 'adapter-fixture',
       cli: 'claude',
+      provider: 'claude',
       agentHome,
-      container: null,
+      resources: null,
+      synthetic: true,
       hostPath: assertSyntheticPath(cred.file),
       backupDir: path.join(runs, 'backups'),
       credential: recoveryState('claude', original),
     }),
   );
-  const report = recoverStale(runs);
+  const report = recoverStale(runs, { stateDir: path.join(runs, '.state') });
   assert.deepEqual(
     report.map((x) => x.credential),
     ['host-replaced'],

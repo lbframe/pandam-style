@@ -24,11 +24,26 @@ export class LocalFixtureExecutor {
     this.extraEnv = extraEnv;
   }
 
+  /** The CLI sees the host paths (no container). */
+  visiblePaths({ workspace, agentHome }) {
+    return { workspace, home: agentHome };
+  }
+
   /**
    * Starts the CLI. `credential` is `{ files: [{ rel, bytes }], env }` written
    * into the simulated tmpfs (`agentHome`).
    */
-  start({ kind, cli, argv, env, stdinText, workspace, agentHome, credential }) {
+  start({
+    kind,
+    cli,
+    argv,
+    env,
+    stdinText,
+    workspace,
+    agentHome,
+    credential,
+    onResources = () => {},
+  }) {
     if (kind !== 'adapter-fixture')
       throw new Error('the local executor runs adapter fixtures only');
     fs.mkdirSync(agentHome, { recursive: true, mode: 0o700 });
@@ -58,6 +73,10 @@ export class LocalFixtureExecutor {
         ...this.extraEnv,
       },
     });
+    // A CLI may exit before reading its prompt: EPIPE is not a runner error.
+    child.stdin.on('error', () => {});
+    // The process group is the resource crash recovery kills.
+    onResources({ pgid: child.pid });
     if (stdinText != null) child.stdin.end(stdinText);
     else child.stdin.end();
     const exited = new Promise((resolve) =>
@@ -77,7 +96,21 @@ export class LocalFixtureExecutor {
           return { error: error.code ?? 'export-failed' };
         }
       },
-      destroy: () => fs.rmSync(agentHome, { recursive: true, force: true }),
+      destroy: () => {
+        signalGroup(child, 'SIGKILL');
+        fs.rmSync(agentHome, { recursive: true, force: true });
+        // Verified: the whole group is gone (reaping can take a moment).
+        const pause = new Int32Array(new SharedArrayBuffer(4));
+        for (let i = 0; i < 40; i += 1) {
+          try {
+            process.kill(-child.pid, 0);
+          } catch (error) {
+            if (error.code === 'ESRCH') return true;
+          }
+          Atomics.wait(pause, 0, 0, 50);
+        }
+        return false;
+      },
       cgroup: () => null,
     };
   }

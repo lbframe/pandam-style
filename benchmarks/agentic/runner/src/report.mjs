@@ -13,7 +13,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { median, readJson } from './util.mjs';
+import { loadCorpus, findTask } from '../../src/corpus.mjs';
+import { CORPUS_ROOT, median, readJson } from './util.mjs';
 
 export const REPORT_SCHEMA = 'pms-agentic-run-report/v1';
 
@@ -36,7 +37,14 @@ export function loadMatrix(matrixDir) {
             const f = path.join(cellsDir, task, model, rep, att, 'record.json');
             if (fs.existsSync(f)) records.push(readJson(f));
           }
-  return { matrix, outcomes, records };
+  const loaded = loadCorpus(CORPUS_ROOT);
+  const taskMeta = {};
+  for (const t of matrix.tasks ?? []) {
+    const e = findTask(loaded, t);
+    if (e != null)
+      taskMeta[t] = { workflow: e.task.workflow, caseType: e.task.caseType };
+  }
+  return { matrix, outcomes, records, taskMeta };
 }
 
 function stat(measures) {
@@ -56,25 +64,40 @@ function stat(measures) {
   };
 }
 
-export function buildReport({ matrix, outcomes, records }) {
+export function buildReport({ matrix, outcomes, records, taskMeta = {} }) {
   const kinds = new Set(records.map((r) => r.kind));
   if (kinds.size > 1)
     throw new Error('refusing to aggregate records of different kinds');
   const kind = [...kinds][0] ?? matrix.kind;
+  // Seeded from the planned matrix (section 7): every task x model cell and
+  // every repetition is reported, with or without records.
   const cells = new Map();
   const key = (t, m) => `${t}\0${m}`;
-  for (const r of records) {
-    const k = key(r.cell.taskId, r.cell.modelKey);
-    if (!cells.has(k))
-      cells.set(k, {
-        taskId: r.cell.taskId,
-        modelKey: r.cell.modelKey,
+  for (const taskId of matrix.tasks ?? [])
+    for (const model of matrix.models ?? [])
+      cells.set(key(taskId, model.key), {
+        taskId,
+        modelKey: model.key,
         reps: new Map(),
       });
-    const c = cells.get(k);
+  for (const r of records) {
+    const c = cells.get(key(r.cell.taskId, r.cell.modelKey));
+    if (c == null)
+      throw new Error(
+        `record of an unplanned cell ${r.cell.taskId}/${r.cell.modelKey}`,
+      );
+    if (!(r.repetition >= 1 && r.repetition <= matrix.repetitions))
+      throw new Error(`record of an unplanned repetition ${r.repetition}`);
     if (!c.reps.has(r.repetition)) c.reps.set(r.repetition, []);
     c.reps.get(r.repetition).push(r);
   }
+  const outcomeFor = (t, m, rep) =>
+    outcomes.outcomes.find(
+      (o) =>
+        o.taskId === t &&
+        o.model === m &&
+        (o.repetition === rep || o.status === 'unsupported'),
+    ) ?? null;
   const unsupported = outcomes.outcomes.filter(
     (o) => o.status === 'unsupported',
   );
@@ -89,9 +112,35 @@ export function buildReport({ matrix, outcomes, records }) {
     key(a.taskId, a.modelKey).localeCompare(key(b.taskId, b.modelKey)),
   )) {
     const reps = [];
-    for (const [rep, attempts] of [...c.reps.entries()].sort(
-      (a, b) => a[0] - b[0],
-    )) {
+    const cellUnsupported =
+      outcomes.outcomes.find(
+        (o) =>
+          o.taskId === c.taskId &&
+          o.model === c.modelKey &&
+          o.status === 'unsupported',
+      ) ?? null;
+    for (let rep = 1; rep <= matrix.repetitions; rep += 1) {
+      const attempts = c.reps.get(rep) ?? [];
+      if (attempts.length === 0) {
+        const o = outcomeFor(c.taskId, c.modelKey, rep);
+        reps.push({
+          repetition: rep,
+          attempts: [],
+          valid: false,
+          contested: o?.contested === true,
+          status: cellUnsupported ? 'unsupported' : 'missing',
+          reason: cellUnsupported
+            ? cellUnsupported.reasons.join('; ')
+            : (o?.reason ?? 'not run'),
+          verdict: null,
+          taskSuccess: null,
+          firstPassSuccess: null,
+          evidence: null,
+          failingChecks: [],
+          record: null,
+        });
+        continue;
+      }
       attempts.sort((a, b) => a.attempt - b.attempt);
       const final = attempts.at(-1);
       const contested =
@@ -137,6 +186,10 @@ export function buildReport({ matrix, outcomes, records }) {
           retryScheduled: a.outcome.retry.scheduled,
         })),
         valid: final.outcome.valid,
+        status: final.outcome.valid ? 'valid' : 'missing',
+        reason: final.outcome.valid
+          ? null
+          : `invalid: ${final.outcome.class} ${final.outcome.code}`,
         contested,
         verdict: final.grading.verdict,
         taskSuccess: final.outcome.valid ? final.outcome.taskSuccess : null,
@@ -148,6 +201,9 @@ export function buildReport({ matrix, outcomes, records }) {
     }
     const valid = reps.filter((r) => r.valid);
     const planned = matrix.repetitions;
+    const unsupportedReps = reps.filter(
+      (r) => r.status === 'unsupported',
+    ).length;
     const successes = valid.filter((r) => r.taskSuccess === true);
     const uncontested = successes.filter((r) => !r.contested);
     const metric = (f) => stat(valid.map((r) => f(r.record)));
@@ -156,12 +212,18 @@ export function buildReport({ matrix, outcomes, records }) {
       modelKey: c.modelKey,
       planned,
       valid: valid.length,
-      missing: planned - valid.length,
+      missing: planned - unsupportedReps - valid.length,
+      unsupported: unsupportedReps,
       success: {
         k: successes.length,
         n: valid.length,
         pointEstimate: valid.length ? successes.length / valid.length : null,
-        lowerBound: planned ? uncontested.length / planned : null,
+        // Over the runnable planned repetitions: missing, invalid and
+        // contested ones count as non-success.
+        lowerBound:
+          planned - unsupportedReps > 0
+            ? uncontested.length / (planned - unsupportedReps)
+            : null,
         lowerBoundK: uncontested.length,
         contested: reps.filter((r) => r.contested).length,
       },
@@ -187,38 +249,52 @@ export function buildReport({ matrix, outcomes, records }) {
       latencyLabel: 'indicative',
       repetitions: reps.map(({ record, ...rest }) => ({
         ...rest,
-        comparabilityKey: record.comparability.key,
+        comparabilityKey: record?.comparability?.key ?? null,
       })),
     });
   }
 
   const perModel = {};
   for (const cr of cellReports) {
-    const rec = [...cells.values()].find(
-      (c) => c.taskId === cr.taskId && c.modelKey === cr.modelKey,
-    );
-    const anyRecord = [...rec.reps.values()][0][0];
+    const meta = taskMeta[cr.taskId] ?? {};
     const pm = (perModel[cr.modelKey] ??= {
       byWorkflow: {},
       byCaseType: {},
       k: 0,
       nValid: 0,
       nPlanned: 0,
+      nUnsupported: 0,
+      nMissing: 0,
       lowerBoundK: 0,
     });
     for (const [bucket, name] of [
-      [pm.byWorkflow, anyRecord.task.workflow],
-      [pm.byCaseType, anyRecord.task.caseType],
+      [pm.byWorkflow, meta.workflow ?? 'unknown'],
+      [pm.byCaseType, meta.caseType ?? 'unknown'],
     ]) {
-      bucket[name] ??= { k: 0, nValid: 0, nPlanned: 0 };
+      bucket[name] ??= {
+        k: 0,
+        nValid: 0,
+        nPlanned: 0,
+        nUnsupported: 0,
+        nMissing: 0,
+      };
       bucket[name].k += cr.success.k;
       bucket[name].nValid += cr.success.n;
       bucket[name].nPlanned += cr.planned;
+      bucket[name].nUnsupported += cr.unsupported;
+      bucket[name].nMissing += cr.missing;
     }
     pm.k += cr.success.k;
     pm.nValid += cr.success.n;
     pm.nPlanned += cr.planned;
+    pm.nUnsupported += cr.unsupported;
+    pm.nMissing += cr.missing;
     pm.lowerBoundK += cr.success.lowerBoundK;
+  }
+  for (const pm of Object.values(perModel)) {
+    const runnable = pm.nPlanned - pm.nUnsupported;
+    pm.pointEstimate = pm.nValid ? pm.k / pm.nValid : null;
+    pm.lowerBound = runnable > 0 ? pm.lowerBoundK / runnable : null;
   }
 
   return {

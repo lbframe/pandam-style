@@ -66,11 +66,29 @@ export function tildePath(p, home = os.homedir()) {
 }
 
 /**
+ * Source policy (section 4.6, user rule): the only credential sources a run
+ * may use. Claude models authenticate with the claude-team-2 account
+ * directory; Codex with ~/.codex. Paths are relative to the home directory
+ * and must resolve without any symbolic link. Synthetic sources (adapter
+ * fixtures only, `synthetic: true`) are exempt and can never be enabled in a
+ * provider-backed matrix.
+ */
+export const SOURCE_POLICY = {
+  claude: { configDir: '.claude-t3/team-2', account: 'claude-team-2' },
+  codex: { configDir: '.codex', account: null },
+};
+
+/**
  * Validates the `credentials` entry of one provider (section 4.6). Returns
  * a list of errors; an absent or incomplete source is an error, never a
- * default.
+ * default, and a source outside the policy is refused before anything reads
+ * it.
  */
-export function credentialConfigErrors(provider, entry, { kind }) {
+export function credentialConfigErrors(
+  provider,
+  entry,
+  { kind, home = os.homedir() },
+) {
   const errors = [];
   if (PROVIDERS[provider] == null)
     return [`credentials: unknown provider ${provider}`];
@@ -86,6 +104,12 @@ export function credentialConfigErrors(provider, entry, { kind }) {
     errors.push(
       `credentials.${provider}: provider-backed matrices need a credential`,
     );
+  if (entry.synthetic != null && entry.synthetic !== true)
+    errors.push(`credentials.${provider}.synthetic is only true`);
+  if (entry.synthetic === true && kind !== 'adapter-fixture')
+    errors.push(
+      `credentials.${provider}.synthetic is allowed in adapter-fixture matrices only`,
+    );
   if (
     entry.fallback != null &&
     !(entry.mode === 'access-only' && entry.fallback === 'refresh-capable-copy')
@@ -99,29 +123,88 @@ export function credentialConfigErrors(provider, entry, { kind }) {
     return errors;
   }
   const src = entry.source;
-  if (src == null || typeof src !== 'object')
+  if (src == null || typeof src !== 'object') {
     errors.push(
       `credentials.${provider}.source is required: { configDir, account } (no default directory)`,
     );
-  else {
-    if (
-      typeof src.configDir !== 'string' ||
-      !(src.configDir.startsWith('/') || src.configDir.startsWith('~/'))
-    )
-      errors.push(
-        `credentials.${provider}.source.configDir must be an absolute or ~/ path`,
-      );
-    if (typeof src.account !== 'string' || src.account.length === 0)
-      errors.push(
-        `credentials.${provider}.source.account must name the account`,
-      );
+    return errors;
   }
+  if (
+    typeof src.configDir !== 'string' ||
+    !(src.configDir.startsWith('/') || src.configDir.startsWith('~/'))
+  )
+    errors.push(
+      `credentials.${provider}.source.configDir must be an absolute or ~/ path`,
+    );
+  if (typeof src.account !== 'string' || src.account.length === 0)
+    errors.push(`credentials.${provider}.source.account must name the account`);
+  if (errors.length === 0 && entry.synthetic !== true)
+    errors.push(...policyErrors(provider, src, home));
+  return errors;
+}
+
+/** Lexical policy check: exact directory under home and exact account. */
+function policyErrors(provider, src, home) {
+  const policy = SOURCE_POLICY[provider];
+  const expected = path.join(home, policy.configDir);
+  const errors = [];
+  if (path.resolve(expandHome(src.configDir, home)) !== expected)
+    errors.push(
+      `credentials.${provider}.source.configDir must be ~/${policy.configDir} (user rule; got ${src.configDir})`,
+    );
+  if (policy.account != null && src.account !== policy.account)
+    errors.push(
+      `credentials.${provider}.source.account must be ${policy.account} (user rule; got ${src.account})`,
+    );
   return errors;
 }
 
 /**
+ * Filesystem policy check, before any read: every component of the source
+ * directory below home is a real directory (no alias, no symbolic link),
+ * and the directory's real path is the policy directory's real path.
+ */
+export function checkSourcePolicy(credential, { home = os.homedir() } = {}) {
+  if (credential.synthetic) return;
+  const policy = SOURCE_POLICY[credential.provider];
+  const expected = path.join(home, policy.configDir);
+  const dir = path.dirname(credential.hostPath);
+  if (dir !== expected)
+    throw coded(
+      'credential-policy',
+      `credential source of ${credential.provider} is not ~/${policy.configDir}`,
+    );
+  let cur = home;
+  for (const part of policy.configDir.split('/')) {
+    cur = path.join(cur, part);
+    let st;
+    try {
+      st = fs.lstatSync(cur);
+    } catch (error) {
+      throw coded(
+        'credential-source',
+        `credential source of ${credential.provider} missing: ${tildePath(cur, home)} (${error.code})`,
+      );
+    }
+    if (!st.isDirectory())
+      throw coded(
+        'credential-policy',
+        `${tildePath(cur, home)} is not a real directory (link or alias refused)`,
+      );
+  }
+  if (
+    fs.realpathSync(dir) !== path.join(fs.realpathSync(home), policy.configDir)
+  )
+    throw coded(
+      'credential-policy',
+      `credential source of ${credential.provider} resolves outside ~/${policy.configDir}`,
+    );
+}
+
+/**
  * Resolves the credential of one provider from the run configuration. Returns
- * null for mode `none`. Throws when the entry is missing or incomplete.
+ * null for mode `none`. Throws when the entry is missing, incomplete or
+ * outside the source policy.
  */
 export function credentialFromConfig(
   config,
@@ -129,7 +212,10 @@ export function credentialFromConfig(
   { stateDir, home = os.homedir() } = {},
 ) {
   const entry = config.credentials?.[provider];
-  const errors = credentialConfigErrors(provider, entry, { kind: config.kind });
+  const errors = credentialConfigErrors(provider, entry, {
+    kind: config.kind,
+    home,
+  });
   if (errors.length > 0) throw coded('credential-config', errors.join('; '));
   if (entry.mode === 'none') return null;
   const configDir = path.resolve(expandHome(entry.source.configDir, home));
@@ -137,6 +223,7 @@ export function credentialFromConfig(
     provider,
     mode: entry.mode,
     fallback: entry.fallback ?? null,
+    synthetic: entry.synthetic === true,
     hostPath: path.join(configDir, PROVIDERS[provider].sourceFile),
     backupDir: path.join(
       stateDir ?? path.join(home, '.local/state/pandamstyle-agentic'),
@@ -147,15 +234,21 @@ export function credentialFromConfig(
       configDir: tildePath(configDir, home),
       file: PROVIDERS[provider].sourceFile,
       account: entry.source.account,
+      ...(entry.synthetic === true ? { synthetic: true } : {}),
     },
   };
 }
 
 /**
- * Matrix-start check of a credential source: the file must exist and be a
- * regular file (lstat only: names and modes, never contents).
+ * Matrix-start check of a credential source: the policy (section 4.6), then
+ * the file must exist and be a regular file (lstat only: names and modes,
+ * never contents).
  */
-export function checkCredentialSource(credential) {
+export function checkCredentialSource(
+  credential,
+  { home = os.homedir() } = {},
+) {
+  checkSourcePolicy(credential, { home });
   let st;
   try {
     st = fs.lstatSync(credential.hostPath);

@@ -103,3 +103,37 @@ export function buildAgentImage({
     codex: codexDir,
   });
 }
+
+/**
+ * Adapter-fixture agent image (credential-free integration tests only): the
+ * harness image plus the fake CLI behind /opt/cli/claude and /opt/cli/codex.
+ * The fake CLIs are readable scripts, so the execute-only CLI check of the
+ * self-test is skipped for adapter-fixture configurations.
+ */
+export function buildFixtureAgentImage({
+  tag = 'pms-agentic-fixture-agent:test',
+  harnessTag,
+}) {
+  const wrapper = (cli) =>
+    `#!/bin/sh\nPMS_FAKE_CLI=${cli} exec /opt/node/bin/node /opt/cli/fake-cli.mjs "$@"\n`;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-fixture-cli-'));
+  try {
+    fs.writeFileSync(path.join(dir, 'claude'), wrapper('claude'));
+    fs.writeFileSync(path.join(dir, 'codex'), wrapper('codex'));
+    const dockerfile = [
+      `FROM ${harnessTag}`,
+      'USER root',
+      'COPY fake-cli.mjs /opt/cli/fake-cli.mjs',
+      'COPY claude /opt/cli/claude',
+      'COPY codex /opt/cli/codex',
+      'RUN chmod 0755 /opt/cli/claude /opt/cli/codex && chmod 0644 /opt/cli/fake-cli.mjs',
+    ].join('\n');
+    return build(tag, `${dockerfile}\n`, {
+      'fake-cli.mjs': path.join(RUNNER_ROOT, 'fixtures/bin/fake-cli.mjs'),
+      claude: path.join(dir, 'claude'),
+      codex: path.join(dir, 'codex'),
+    });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}

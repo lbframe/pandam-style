@@ -497,12 +497,23 @@ test('provider-backed preflight: authorization, CI, clean checkout, setup and cr
     },
   });
   const identity = (clean) => ({ harness: { clean } });
+  // B11: every runnable task's fixture needs a closure (package.json and
+  // package-lock.json).
+  const closureDir = tmpDir('closure');
+  for (const f of ['package.json', 'package-lock.json'])
+    fs.writeFileSync(path.join(closureDir, f), '{}');
+  const discoveryFixture = readJson(
+    path.join(
+      CORPUS_ROOT,
+      'tasks/discovery-positive-card-vocabulary/task.json',
+    ),
+  ).workspace.fixture;
   const setup = {
     schema: 'pms-agentic-provider-setup/v1',
     storeCopy: '/x',
     manifest: '/m',
     trustedClosure: '/c',
-    closures: {},
+    closures: { [discoveryFixture]: { dir: closureDir } },
   };
   const ci = process.env.CI;
   delete process.env.CI;
@@ -517,6 +528,61 @@ test('provider-backed preflight: authorization, CI, clean checkout, setup and cr
       [],
     );
     providerPreflight({ config: authorized, identity: identity(true), setup });
+    assert.throws(
+      () =>
+        providerPreflight({
+          config: authorized,
+          identity: identity(true),
+          setup: { ...setup, closures: {} },
+        }),
+      /setup\.closures\..* is required by discovery-positive-card-vocabulary/,
+    );
+    // A refused task (installation: no local mirror) needs no closure.
+    providerPreflight({
+      config: {
+        ...authorized,
+        tasks: [
+          'discovery-positive-card-vocabulary',
+          'installation-positive-vite',
+        ],
+      },
+      identity: identity(true),
+      setup,
+    });
+    // B3: the team-2 rule is enforced for provider-backed matrices.
+    assert.throws(
+      () =>
+        providerPreflight({
+          config: {
+            ...authorized,
+            credentials: {
+              ...authorized.credentials,
+              claude: {
+                mode: 'access-only',
+                source: { configDir: '~/.claude', account: 'claude-team-2' },
+              },
+            },
+          },
+          identity: identity(true),
+          setup,
+        }),
+      /must be ~\/\.claude-t3\/team-2/,
+    );
+    assert.throws(
+      () =>
+        providerPreflight({
+          config: {
+            ...authorized,
+            credentials: {
+              ...authorized.credentials,
+              claude: { ...authorized.credentials.claude, synthetic: true },
+            },
+          },
+          identity: identity(true),
+          setup,
+        }),
+      /synthetic is allowed in adapter-fixture matrices only/,
+    );
     assert.throws(
       () =>
         providerPreflight({

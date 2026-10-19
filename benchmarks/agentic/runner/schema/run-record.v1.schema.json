@@ -30,7 +30,9 @@
     "metrics",
     "credential",
     "evidence",
-    "classificationDetail"
+    "classificationDetail",
+    "install",
+    "eventErrors"
   ],
   "allOf": [
     {
@@ -107,7 +109,7 @@
     "attempt": {
       "type": "integer",
       "minimum": 1,
-      "maximum": 3
+      "description": "Attempt index within the repetition. Cancelled and crashed attempts keep their index, so it can exceed maxAttempts; the budget counts attempts used (section 5.2)."
     },
     "comparability": {
       "type": "object",
@@ -488,7 +490,8 @@
         "timeoutSeconds",
         "maxToolCalls",
         "cliMaxTurns",
-        "limitFired"
+        "limitFired",
+        "workspaceBytesCap"
       ],
       "properties": {
         "corpusTimeoutSeconds": {
@@ -514,8 +517,14 @@
             null,
             "timeout",
             "max-tool-calls",
-            "cli-max-turns"
+            "cli-max-turns",
+            "workspace-bytes"
           ]
+        },
+        "workspaceBytesCap": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Whole-workspace byte cap enforced at every tool result (resource-limit)."
         }
       }
     },
@@ -986,7 +995,8 @@
         "compilerCost",
         "visualFidelity",
         "vocabularyCompliance",
-        "scopeViolations"
+        "scopeViolations",
+        "peakWorkspaceBytes"
       ],
       "properties": {
         "toolCalls": {
@@ -1129,6 +1139,9 @@
               }
             }
           }
+        },
+        "peakWorkspaceBytes": {
+          "$ref": "#/$defs/measured"
         }
       }
     },
@@ -1186,6 +1199,9 @@
                 },
                 "account": {
                   "type": "string"
+                },
+                "synthetic": {
+                  "const": true
                 }
               }
             }
@@ -1203,7 +1219,9 @@
         "affectedPaths",
         "gradedSetDigest",
         "purged",
-        "artifacts"
+        "artifacts",
+        "baselineSetDigest",
+        "stagedBytes"
       ],
       "properties": {
         "completeness": {
@@ -1269,6 +1287,25 @@
               }
             }
           }
+        },
+        "baselineSetDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "stagedBytes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "final",
+            "baseline"
+          ],
+          "properties": {
+            "final": {
+              "type": "integer"
+            },
+            "baseline": {
+              "type": "integer"
+            }
+          }
         }
       }
     },
@@ -1290,6 +1327,45 @@
         "retry": {
           "type": "boolean"
         }
+      }
+    },
+    "install": {
+      "description": "Fixture closure installed before the agent (section 4.8); null when none was installed (adapter fixtures).",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "closureLockSha256",
+            "nonProductLockSha256",
+            "nodeModulesDigest",
+            "productPackagesVerified"
+          ],
+          "properties": {
+            "closureLockSha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "nonProductLockSha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "nodeModulesDigest": {
+              "$ref": "#/$defs/sha256"
+            },
+            "productPackagesVerified": {
+              "type": "boolean"
+            }
+          }
+        }
+      ]
+    },
+    "eventErrors": {
+      "type": "object",
+      "description": "Corpus events not applied because a target was unsafe (link, special file).",
+      "additionalProperties": {
+        "type": "string"
       }
     }
   },

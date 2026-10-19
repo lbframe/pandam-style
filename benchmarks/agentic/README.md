@@ -494,14 +494,18 @@ node $R validate-config matrix.json
 node $R run matrix.json                          # adapter-fixture matrices: fake CLIs, under .pms-bench/
 node $R report <matrix dir> --out report.json --markdown report.md
 node $R compare <record a> <record b>            # refuses unequal comparability keys
-node $R selftest                                 # Docker isolation self-test (local only)
+node $R selftest --matrix matrix.json            # Docker isolation self-test of that configuration
+node $R refusals                                 # durable provider refusals (resolve-refusal <provider>)
+yarn bench:agentic:runner:docker-test            # credential-free Docker integration (fake CLI image)
 ```
 
 - `matrix.json` (`pms-agentic-matrix/v1`) names tasks, models, repetitions,
   budgets and, **per provider, the credential mode and source** (a
-  configuration directory and an account label; no default). Claude runs use
-  the claude-team-2 account directory (`~/.claude-t3/team-2`), never
-  `~/.claude`.
+  configuration directory and an account label; no default). The source
+  policy is enforced in code: Claude runs use only the claude-team-2 account
+  directory (`~/.claude-t3/team-2`, account `claude-team-2`), never
+  `~/.claude`; Codex uses `~/.codex`; symbolic links are refused. Adapter
+  fixtures mark synthetic sources `"synthetic": true`.
 - Provider-backed matrices need `"authorization": "orchestrator-go"`, a clean
   checkout, a run root outside the repository, `--setup` (verified store copy
   and closures), a valid isolation self-test, and never run in CI. Held-out

@@ -17,13 +17,38 @@ import { STREAM_METHOD, estimate, unknown } from './measured.mjs';
 const METHOD = `${STREAM_METHOD}+transcript-heuristic/v1`;
 const UNATTESTED = { integrity: 'cli-unattested' };
 
-export const COMMAND_TABLE_VERSION = 'command-classes/v1';
+export const COMMAND_TABLE_VERSION = 'command-classes/v2';
 
 // Shell operators, substitutions and redirections make a command opaque.
-const SHELL_SYNTAX = /[;&|<>`$(){}\n]|\\$/;
+const SHELL_SYNTAX = /[;&|<>`$(){}\n\\]/;
 
-// Single-purpose commands that execute no project code. Each entry checks
-// the argv after the program name.
+/** Options given as `--name`, `--name=…`, or a short flag inside a cluster. */
+function hasOption(args, longs = [], shorts = '') {
+  return args.some((a) => {
+    if (a.startsWith('--'))
+      return longs.some((l) => a === l || a.startsWith(`${l}=`));
+    if (/^-[A-Za-z]+$/.test(a))
+      return [...a.slice(1)].some((c) => shorts.includes(c));
+    return longs.some((l) => a === l);
+  });
+}
+
+// The closed allowlist (section 2.4): single-purpose programs that execute
+// no code and load no project code, each with the options that would
+// execute or load code, or write files, excluded. Audited per program:
+// - ls, cat, head, tail, wc, grep, stat, pwd, echo: no option executes code.
+// - rg: --pre/--pre-glob run a preprocessor, -z/--search-zip run
+//   decompressors, --hostname-bin runs a program.
+// - find: -exec/-execdir/-ok/-okdir run programs; -delete, -fprint*, -fls
+//   write.
+// - file: -z/-Z/--uncompress run decompressors; -C/--compile writes.
+// - tree: -o writes a file; --fromfile reads a listing (not code, kept).
+// - sed: only `-n '<address>p'` (GNU sed's e, w, s///e, r and -f execute,
+//   write or load scripts).
+// - git: read-only subcommands, no global options (-c alias.x=!cmd,
+//   --exec-path, -C, --git-dir…), no --ext-diff/--textconv/--output; and
+//   only when the repository configuration cannot be agent-written (hooks,
+//   fsmonitor, diff drivers): `gitConfigTrusted`.
 const TRANSPARENT = {
   ls: () => true,
   cat: () => true,
@@ -31,23 +56,51 @@ const TRANSPARENT = {
   tail: () => true,
   wc: () => true,
   grep: () => true,
-  rg: (args) => !args.some((a) => a === '--pre' || a.startsWith('--pre=')),
-  find: (args) =>
-    !args.some((a) =>
-      ['-exec', '-execdir', '-ok', '-okdir', '-delete', '-fprint'].includes(a),
-    ),
   stat: () => true,
-  file: () => true,
-  tree: () => true,
   pwd: () => true,
   echo: () => true,
+  rg: (args) =>
+    !hasOption(
+      args,
+      ['--pre', '--pre-glob', '--search-zip', '--hostname-bin'],
+      'z',
+    ),
+  find: (args) =>
+    !args.some((a) =>
+      [
+        '-exec',
+        '-execdir',
+        '-ok',
+        '-okdir',
+        '-delete',
+        '-fprint',
+        '-fprint0',
+        '-fprintf',
+        '-fls',
+      ].includes(a),
+    ),
+  file: (args) =>
+    !hasOption(
+      args,
+      ['--uncompress', '--uncompress-noreport', '--compile'],
+      'zZC',
+    ),
+  tree: (args) => !hasOption(args, [], 'o'),
   sed: (args) =>
-    args.includes('-n') &&
-    !args.some((a) => a === '-i' || a.startsWith('-i') || a.includes('w ')),
-  git: (args) =>
+    args.length >= 2 &&
+    args[0] === '-n' &&
+    /^(\d+|\$)(,(\d+|\$))?p$/.test(args[1]) &&
+    args.slice(2).every((f) => !f.startsWith('-')),
+  git: (args, { gitConfigTrusted }) =>
+    gitConfigTrusted === true &&
     ['status', 'diff', 'log', 'show', 'ls-files', 'rev-parse'].includes(
-      args.find((a) => !a.startsWith('-')),
-    ) && !args.some((a) => a.startsWith('--output') || a === '-o'),
+      args[0],
+    ) &&
+    !hasOption(
+      args,
+      ['--ext-diff', '--textconv', '--output', '--exec-path', '--config-env'],
+      'o',
+    ),
 };
 
 // Verification commands: compile, build, typecheck or test invocations.
@@ -58,26 +111,57 @@ const VERIFY = [
   /^node_modules\/\.bin\/(vite|next|rsbuild|webpack|tsc|pandamstyle)\b/,
 ];
 
-/** Splits a simple command line into words; returns null when not simple. */
+/**
+ * Splits a simple command line into words as a POSIX shell would, or returns
+ * null when it is not simple: shell syntax, escapes, a quote adjacent to
+ * other characters (the shell would join them), or an unquoted word starting
+ * with a glob character (its expansion can inject options from
+ * agent-controlled file names).
+ */
 export function simpleWords(command) {
   const text = String(command ?? '').trim();
   if (text === '' || SHELL_SYNTAX.test(text)) return null;
   const words = [];
-  const re = /'([^']*)'|"([^"\\]*)"|(\S+)/g;
-  let m;
-  while ((m = re.exec(text)) != null) words.push(m[1] ?? m[2] ?? m[3]);
+  let i = 0;
+  while (i < text.length) {
+    if (/\s/.test(text[i])) {
+      i += 1;
+      continue;
+    }
+    const q = text[i];
+    if (q === "'" || q === '"') {
+      const end = text.indexOf(q, i + 1);
+      if (end === -1) return null;
+      if (end + 1 < text.length && !/\s/.test(text[end + 1])) return null;
+      words.push(text.slice(i + 1, end));
+      i = end + 1;
+    } else {
+      let j = i;
+      while (j < text.length && !/\s/.test(text[j])) j += 1;
+      const w = text.slice(i, j);
+      if (/['"]/.test(w) || /^[*?[~]/.test(w)) return null;
+      words.push(w);
+      i = j;
+    }
+  }
   return words;
 }
 
-export function classifyCommand(command) {
+export function classifyCommand(command, { gitConfigTrusted = false } = {}) {
   const text = String(command ?? '').trim();
   const verify = VERIFY.some((re) => re.test(text));
   const words = simpleWords(text);
   if (words == null || words.length === 0)
-    return { class: 'opaque', verify, reason: 'shell syntax' };
+    return { class: 'opaque', verify, reason: 'not a simple command' };
   const program = words[0].split('/').pop();
-  const check = TRANSPARENT[program];
-  if (check != null && words[0] === program && check(words.slice(1)))
+  const check = Object.hasOwn(TRANSPARENT, program)
+    ? TRANSPARENT[program]
+    : null;
+  if (
+    check != null &&
+    words[0] === program &&
+    check(words.slice(1), { gitConfigTrusted })
+  )
     return { class: 'transparent', verify, reason: null };
   return { class: 'opaque', verify, reason: `program ${program}` };
 }
@@ -91,7 +175,12 @@ export function classifyCommand(command) {
  *   tool result (same index as toolCalls); null when the sample failed
  * @param {boolean|null} taskSuccess
  */
-export function analyzeTimeline({ toolCalls, deltas, taskSuccess }) {
+export function analyzeTimeline({
+  toolCalls,
+  deltas,
+  taskSuccess,
+  gitConfigTrusted = false,
+}) {
   const reasons = [];
   let opaque = 0;
   let repairCycles = 0;
@@ -112,7 +201,7 @@ export function analyzeTimeline({ toolCalls, deltas, taskSuccess }) {
       (call.kind === 'file-write' && call.status === 'completed');
     let isVerify = false;
     if (call.kind === 'command') {
-      const c = classifyCommand(call.command);
+      const c = classifyCommand(call.command, { gitConfigTrusted });
       call.commandClass = c.class;
       call.verify = c.verify;
       if (c.class === 'opaque') {

@@ -11,11 +11,10 @@
 // never read special files; links are stored with their target text.
 // Re-grading is `exact` only when the stored set equals the graded set.
 
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { compileGlobs } from '../../src/glob.mjs';
-import { treeDigest, toPosix } from '../../src/fs-tree.mjs';
+import { toPosix } from '../../src/fs-tree.mjs';
 import { CORPUS_ROOT, sha256, writeJson } from './util.mjs';
 
 export const EVIDENCE_VERSION = 'pms-agentic-evidence/v1';
@@ -67,6 +66,7 @@ export function archiveTree({
   exclude = oracleIgnoredGlobs(),
   maxBytes = DEFAULT_MAX_BYTES,
   secrets = [],
+  extraEntries = [],
 }) {
   const excluded = compileGlobs(exclude);
   const entries = [];
@@ -101,6 +101,23 @@ export function archiveTree({
     }
     entries.push(entry);
   });
+  // Entries of the original tree a staging copy does not reproduce: special
+  // files (metadata only) and files beyond the staging bound (unstored).
+  for (const e of extraEntries) {
+    if (e.type === 'special')
+      entries.push({ path: e.path, type: 'special', mode: e.mode });
+    else if (e.type === 'file') {
+      entries.push({
+        path: e.path,
+        type: 'file',
+        mode: e.mode,
+        size: e.size,
+        stored: false,
+      });
+      overflow = true;
+    }
+  }
+  entries.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
   const completeness = overflow
     ? 'incomplete'
     : affected.length > 0
@@ -194,79 +211,7 @@ export function replayExactness(manifest) {
       };
 }
 
-/**
- * Workspace-delta digest (section 2.4), taken while the agent may be writing
- * the tree. Files are opened with O_NOFOLLOW | O_NONBLOCK and checked with
- * fstat, so a file swapped for a link or a FIFO after the directory listing
- * cannot redirect or block the read; the walk is bounded in entries and
- * bytes. Any surprise returns null: the sample failed and coverage is
- * incomplete (never a clean digest).
- */
-export function deltaDigest(
-  root,
-  harnessIgnored = [],
-  { maxEntries = 200000, maxBytes = 512 * 1024 * 1024 } = {},
-) {
-  try {
-    const excluded = compileGlobs([...oracleIgnoredGlobs(), ...harnessIgnored]);
-    const hash = crypto.createHash('sha256');
-    let entries = 0;
-    let bytes = 0;
-    const rec = (rel) => {
-      const abs = rel === '' ? root : path.join(root, rel);
-      for (const d of fs
-        .readdirSync(abs, { withFileTypes: true })
-        .sort((a, b) => (a.name < b.name ? -1 : 1))) {
-        entries += 1;
-        if (entries > maxEntries) throw new Error('too many entries');
-        const childRel = rel === '' ? d.name : `${rel}/${d.name}`;
-        if (excluded.match(childRel) != null) continue;
-        const st = fs.lstatSync(path.join(root, childRel));
-        if (st.isDirectory()) {
-          if (excluded.match(`${childRel}/`) != null) continue;
-          hash.update(`${childRel}\0dir\n`);
-          rec(childRel);
-        } else if (st.isSymbolicLink())
-          hash.update(
-            `${childRel}\0symlink\0${fs.readlinkSync(path.join(root, childRel))}\n`,
-          );
-        else if (st.isFile()) {
-          const fd = fs.openSync(
-            path.join(root, childRel),
-            fs.constants.O_RDONLY |
-              fs.constants.O_NOFOLLOW |
-              fs.constants.O_NONBLOCK,
-          );
-          try {
-            if (!fs.fstatSync(fd).isFile()) throw new Error('swapped');
-            const file = crypto.createHash('sha256');
-            const buf = Buffer.alloc(1 << 16);
-            for (;;) {
-              const n = fs.readSync(fd, buf, 0, buf.length, null);
-              if (n === 0) break;
-              bytes += n;
-              if (bytes > maxBytes) throw new Error('too many bytes');
-              file.update(buf.subarray(0, n));
-            }
-            hash.update(`${childRel}\0file\0${file.digest('hex')}\n`);
-          } finally {
-            fs.closeSync(fd);
-          }
-        } else hash.update(`${childRel}\0special\n`);
-      }
-    };
-    rec('');
-    return hash.digest('hex');
-  } catch {
-    return null;
-  }
-}
-
-/** node_modules tree digest, for local-install detection (section 4.5). */
-export function nodeModulesDigest(root) {
-  const nm = path.join(root, 'node_modules');
-  if (!fs.existsSync(nm)) return null;
-  return treeDigest(nm);
-}
+// The live-workspace operations (delta samples, node_modules state,
+// staging) are in workspace.mjs, confined beneath a directory handle.
 
 export { toPosix };

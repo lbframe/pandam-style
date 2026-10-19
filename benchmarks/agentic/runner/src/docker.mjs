@@ -19,16 +19,19 @@ import { spawn, spawnSync } from 'node:child_process';
 import { sha256 } from './util.mjs';
 
 export const HARNESS_UID = 20001;
-export const GRADER_UID = 30001;
 // The agent runs as the runner's own host UID so the bind-mounted workspace
 // is writable without CAP_CHOWN (implementation finding, DESIGN.md 11.2).
 export const agentUid = () => process.getuid();
+// Graders run as the same UID, so they can read the runner-private (0700)
+// staging they get as read-only mounts; nothing else of the host is
+// mounted, and no agent process exists any more when they run (11.2).
+export const graderUid = () => process.getuid();
 
 export const NODE = '/opt/node/bin/node';
 export const HARNESS_DIR = '/opt/harness';
 export const DOCS_MOUNT = '/opt/pandamstyle-agent-docs';
 
-export function networkCreateArgs(name) {
+export function networkCreateArgs(name, label = 'attempt') {
   return [
     'network',
     'create',
@@ -36,7 +39,7 @@ export function networkCreateArgs(name) {
     '-o',
     'com.docker.network.bridge.gateway_mode_ipv4=isolated',
     '--label',
-    'pms-agentic=attempt',
+    `pms-agentic=${label}`,
     name,
   ];
 }
@@ -155,7 +158,7 @@ export function graderRunArgs({
     '--rm',
     '--network',
     'none',
-    ...hardening(GRADER_UID),
+    ...hardening(graderUid()),
     '--tmpfs',
     `/scratch:rw,exec,size=${tmpfsBytes},mode=1777`,
     '--tmpfs',
@@ -251,6 +254,7 @@ export class DockerExecutor {
     egressNetwork = 'pms-agentic-egress',
     cliBinary,
     auditIntervalMs = 10000,
+    fixtureScenario = null,
   }) {
     this.name = 'docker';
     this.isolated = true;
@@ -261,20 +265,47 @@ export class DockerExecutor {
     this.egressNetwork = egressNetwork;
     this.cliBinary = cliBinary;
     this.auditIntervalMs = auditIntervalMs;
+    // Adapter fixtures only: the fake CLI's scenario, mounted read-only.
+    this.fixtureScenario = fixtureScenario;
   }
 
-  start({ cli, argv, env, stdinText, workspace, credential, mounts }) {
+  /** Paths as the CLI sees them inside the agent container (section 3.2). */
+  visiblePaths() {
+    return { workspace: '/workspace', home: '/run/agent' };
+  }
+
+  start({
+    kind,
+    cli,
+    argv,
+    env,
+    stdinText,
+    workspace,
+    credential,
+    mounts,
+    onResources = () => {},
+  }) {
+    if (this.fixtureScenario != null && kind !== 'adapter-fixture')
+      throw new Error(
+        'a fixture scenario is only allowed in adapter-fixture attempts',
+      );
     const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
-    const network = `pms-att-${id}`;
-    const proxy = `pms-proxy-${id}`;
-    const agent = `pms-agent-${id}`;
+    const resources = {
+      network: `pms-att-${id}`,
+      proxy: `pms-proxy-${id}`,
+      container: `pms-agent-${id}`,
+    };
+    // Every name is recorded before anything is created (crash recovery).
+    onResources(resources);
+    const { network, proxy } = resources;
+    const agent = resources.container;
     if (docker(['network', 'inspect', this.egressNetwork]).status !== 0)
       must(
         docker([
           'network',
           'create',
           '--label',
-          'pms-agentic=egress',
+          'pms-agentic-egress=1',
           this.egressNetwork,
         ]),
         'egress network',
@@ -295,20 +326,23 @@ export class DockerExecutor {
       docker(['network', 'connect', this.egressNetwork, proxy]),
       'proxy egress',
     );
-    const containerId = must(
-      docker(
-        agentRunArgs({
-          name: agent,
-          network,
-          image: this.images.agent,
-          limits: this.limits,
-          mounts,
-          workspace,
-          docsDir: this.docsDir,
-        }),
-      ),
-      'agent container',
-    );
+    const runArgs = agentRunArgs({
+      name: agent,
+      network,
+      image: this.images.agent,
+      limits: this.limits,
+      mounts,
+      workspace,
+      docsDir: this.docsDir,
+    });
+    if (this.fixtureScenario != null)
+      runArgs.splice(
+        runArgs.indexOf(this.images.agent),
+        0,
+        '-v',
+        `${this.fixtureScenario}:/opt/fixture/scenario.json:ro`,
+      );
+    const containerId = must(docker(runArgs), 'agent container');
     const home = '/run/agent';
     const cliEnv = {
       HOME: home,
@@ -318,20 +352,24 @@ export class DockerExecutor {
       HTTPS_PROXY: `http://${proxy}:3128`,
       HTTP_PROXY: `http://${proxy}:3128`,
       PATH: '/opt/node/bin:/opt/cli:/usr/local/bin:/usr/bin:/bin',
+      ...(this.fixtureScenario != null
+        ? {
+            PMS_FAKE_SCENARIO: '/opt/fixture/scenario.json',
+            PMS_FAKE_CLI: cli,
+            PMS_FAKE_CREDENTIAL_DIR:
+              cli === 'claude' ? `${home}/.claude` : home,
+          }
+        : {}),
       ...env,
     };
     // Credential delivery on the exec stdin, into the tmpfs.
     for (const f of credential?.files ?? []) {
-      const target =
-        cli === 'claude'
-          ? `${home}/${f.rel}`
-          : `${home}/${path.basename(f.rel)}`;
       must(
         docker(
           execArgs({
             container: agent,
             interactive: true,
-            command: [NODE, `${HARNESS_DIR}/deliver.mjs`, target],
+            command: [NODE, `${HARNESS_DIR}/deliver.mjs`, `${home}/${f.rel}`],
           }),
           { input: f.bytes },
         ),
@@ -378,6 +416,8 @@ export class DockerExecutor {
       }),
       { stdio: ['pipe', 'pipe', 'pipe'] },
     );
+    // A CLI may exit before reading its prompt: EPIPE is not a runner error.
+    child.stdin.on('error', () => {});
     if (stdinText != null) child.stdin.end(stdinText);
     else child.stdin.end();
     const exited = new Promise((resolve) =>
@@ -401,7 +441,7 @@ export class DockerExecutor {
       }
     };
     const auditTimer = setInterval(audit, this.auditIntervalMs);
-    setTimeout(audit, 1000);
+    const firstAudit = setTimeout(audit, 1000);
     const signalCli = (sig) =>
       docker(
         execArgs({
@@ -425,7 +465,8 @@ export class DockerExecutor {
       terminate: () => signalCli('SIGTERM'),
       killAll: () => {
         clearInterval(auditTimer);
-        cgroup = readCgroup(containerId);
+        clearTimeout(firstAudit);
+        cgroup ??= readCgroup(containerId);
         docker(
           execArgs({
             container: agent,
@@ -434,43 +475,86 @@ export class DockerExecutor {
         );
       },
       exportCredential: (rel) => {
-        const target =
-          cli === 'claude' ? `${home}/${rel}` : `${home}/${path.basename(rel)}`;
         const r = docker(
           execArgs({
             container: agent,
-            command: [NODE, `${HARNESS_DIR}/export-credential.mjs`, target],
+            command: [
+              NODE,
+              `${HARNESS_DIR}/export-credential.mjs`,
+              `${home}/${rel}`,
+            ],
           }),
         );
         if (r.status !== 0)
           return { error: (r.stderr || 'export-failed').trim().slice(0, 40) };
         return { bytes: Buffer.from(r.stdout.trim(), 'base64') };
       },
+      // Removes the agent container, the proxy and the network; returns
+      // whether their removal was verified.
       destroy: () => {
-        docker(['rm', '-f', agent, proxy]);
-        docker(['network', 'rm', network]);
+        clearInterval(auditTimer);
+        clearTimeout(firstAudit);
+        const remaining = removeVerified(resources);
+        return remaining.length === 0;
       },
       cgroup: () =>
         cgroup == null
           ? null
           : {
-              cpuUsageUsec: {
-                status: 'observed',
-                value: cgroup.cpuUsageUsec,
-                source: 'cgroup cpu.stat',
-                integrity: 'harness',
-                method: null,
-                unit: 'usec',
-              },
+              cpuUsageUsec: Number.isFinite(cgroup.cpuUsageUsec)
+                ? {
+                    status: 'observed',
+                    value: cgroup.cpuUsageUsec,
+                    source: 'cgroup cpu.stat',
+                    integrity: 'harness',
+                    method: null,
+                    unit: 'usec',
+                  }
+                : {
+                    status: 'unknown',
+                    value: null,
+                    source: 'cgroup cpu.stat',
+                    integrity: null,
+                    method: null,
+                    unit: 'usec',
+                  },
             },
       resourceLimit: () => {
         const r = docker(['inspect', '-f', '{{.State.OOMKilled}}', agent]);
         return r.stdout.trim() === 'true';
       },
       channelAudit: () => summarizeAudits(audits),
-      proxyLog: () => docker(['logs', proxy]).stdout,
+      proxyLog: () => {
+        const r = docker(['logs', proxy]);
+        return r.status === 0 ? r.stdout : null;
+      },
     };
   }
+}
+
+/** Removes containers and a network, then lists what still exists. */
+export function removeVerified(resources, run = docker) {
+  const containers = [resources.container, resources.proxy].filter(Boolean);
+  if (containers.length > 0) run(['rm', '-f', ...containers]);
+  if (resources.network) run(['network', 'rm', resources.network]);
+  const remaining = containers.filter(
+    (c) => run(['container', 'inspect', c]).status === 0,
+  );
+  if (
+    resources.network &&
+    run(['network', 'inspect', resources.network]).status === 0
+  )
+    remaining.push(resources.network);
+  return remaining;
+}
+
+let dockerAvailable = null;
+export function hasDockerSync() {
+  dockerAvailable ??=
+    spawnSync('docker', ['version', '--format', '{{.Server.Version}}'], {
+      encoding: 'utf8',
+    }).status === 0;
+  return dockerAvailable;
 }
 
 /**
@@ -492,22 +576,23 @@ export function summarizeAudits(audits) {
   };
 }
 
-/** Removes containers and networks left by a crashed runner (section 4.6). */
-export function staleResources() {
-  const containers = docker(['ps', '-aq', '--filter', 'label=pms-agentic'])
-    .stdout.trim()
-    .split('\n')
-    .filter(Boolean);
-  const networks = docker([
+/**
+ * Containers and networks of attempts (labels `pms-agentic=agent|proxy|
+ * attempt`), for the crash-recovery sweep. The self-test uses its own label.
+ */
+export function staleResources(run = docker) {
+  const list = (args) => run(args).stdout.trim().split('\n').filter(Boolean);
+  const containers = [
+    ...list(['ps', '-aq', '--filter', 'label=pms-agentic=agent']),
+    ...list(['ps', '-aq', '--filter', 'label=pms-agentic=proxy']),
+  ];
+  const networks = list([
     'network',
     'ls',
     '-q',
     '--filter',
     'label=pms-agentic=attempt',
-  ])
-    .stdout.trim()
-    .split('\n')
-    .filter(Boolean);
+  ]);
   return { containers, networks };
 }
 

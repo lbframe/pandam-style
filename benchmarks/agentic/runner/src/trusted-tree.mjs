@@ -192,3 +192,47 @@ export function nonProductLockDigest(lockPath) {
     dependencies: strip(lock.dependencies),
   });
 }
+
+/**
+ * Installs a fixture closure into a workspace before the agent starts and
+ * verifies it (sections 4.7 and 4.8): an exact offline `npm ci` of the
+ * closure's lockfile, every @pandamstyle/* package equal to the product
+ * tarballs, and the identity of what was installed. The lock digests enter
+ * that cell's comparability projection.
+ */
+export function installFixtureClosure({
+  closureDir,
+  cacheDir = null,
+  workspace,
+  binding,
+  storeCopy,
+  npm = 'npm',
+}) {
+  const lock = path.join(closureDir, 'package-lock.json');
+  if (!fs.existsSync(lock))
+    throw coded(
+      'install',
+      `fixture closure without package-lock.json: ${closureDir}`,
+    );
+  const nodeModules = installClosure({
+    closureDir,
+    dest: workspace,
+    cacheDir,
+    npm,
+  });
+  const problems =
+    binding == null
+      ? []
+      : verifyProductPackages({ nodeModules, binding, storeCopy });
+  if (problems.length > 0)
+    throw coded(
+      'install',
+      `workspace @pandamstyle packages differ from the product build: ${problems.slice(0, 5).join('; ')}`,
+    );
+  return {
+    closureLockSha256: fileSha256(lock),
+    nonProductLockSha256: nonProductLockDigest(lock),
+    nodeModulesDigest: treeDigest(nodeModules),
+    productPackagesVerified: binding != null,
+  };
+}

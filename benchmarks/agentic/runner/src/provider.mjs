@@ -16,7 +16,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadCorpus } from '../../src/corpus.mjs';
+import { findTask, loadCorpus } from '../../src/corpus.mjs';
 import { effectiveConfigFromPromptInput } from './adapters/codex.mjs';
 import * as codex from './adapters/codex.mjs';
 import {
@@ -33,17 +33,17 @@ import {
   startLoadSampler,
 } from './identity.mjs';
 import { runMatrix, validateMatrixConfig } from './matrix.mjs';
-import { requireValidSelfTest, selftestBinding } from './selftest.mjs';
+import { requireValidSelfTest } from './selftest.mjs';
+import { enforcementPlan } from './capabilities.mjs';
 import { bindProductBuild } from './store.mjs';
 import {
   buildTrustedTree,
   checkTrustedTree,
-  installClosure,
-  nonProductLockDigest,
+  installFixtureClosure,
   trustedTreeDigests,
   verifyProductPackages,
 } from './trusted-tree.mjs';
-import { CORPUS_ROOT, REPO_ROOT, fileSha256, readJson } from './util.mjs';
+import { CORPUS_ROOT, REPO_ROOT, readJson } from './util.mjs';
 
 export const SETUP_SCHEMA = 'pms-agentic-provider-setup/v1';
 export const CLI_PATHS = { claude: '/opt/cli/claude', codex: '/opt/cli/codex' };
@@ -69,14 +69,53 @@ export function checkSetup(setup) {
   return errors;
 }
 
+/**
+ * Fixture closures (section 4.8): every runnable task installed before the
+ * agent needs its fixture's closure (package.json + package-lock.json); a
+ * missing one refuses the matrix instead of running without dependencies.
+ */
+export function closureErrors({ config, setup, loaded }) {
+  const errors = [];
+  for (const taskId of config.tasks ?? []) {
+    const entry = findTask(loaded, taskId);
+    if (entry == null) continue;
+    const fixture = loaded.fixtures.get(entry.task.workspace.fixture);
+    if (enforcementPlan(entry.task, fixture?.meta).refusals.length > 0)
+      continue;
+    if (entry.task.environment.install !== 'before-agent') continue;
+    const closure = setup?.closures?.[entry.task.workspace.fixture];
+    if (closure == null || typeof closure.dir !== 'string') {
+      errors.push(
+        `setup.closures.${entry.task.workspace.fixture} is required by ${taskId}`,
+      );
+      continue;
+    }
+    for (const f of ['package.json', 'package-lock.json'])
+      if (!fs.existsSync(path.join(path.resolve(closure.dir), f)))
+        errors.push(
+          `setup.closures.${entry.task.workspace.fixture}: ${f} missing`,
+        );
+  }
+  return errors;
+}
+
 /** Preconditions that need no Docker; the tests exercise every refusal. */
-export function providerPreflight({ config, identity, setup }) {
-  const errors = validateMatrixConfig(config);
+export function providerPreflight({
+  config,
+  identity,
+  setup,
+  loaded = loadCorpus(CORPUS_ROOT),
+  home,
+}) {
+  const errors = validateMatrixConfig(config, home ? { home } : {});
   if (config.kind !== 'provider-backed')
     errors.push('not a provider-backed matrix');
   if (!identity.harness.clean)
     errors.push('provider-backed matrices refuse a dirty checkout');
-  errors.push(...checkSetup(setup));
+  const setupErrors = checkSetup(setup);
+  errors.push(...setupErrors);
+  if (setupErrors.length === 0)
+    errors.push(...closureErrors({ config, setup, loaded }));
   if (errors.length > 0)
     throw refuse(
       'preflight',
@@ -185,12 +224,9 @@ export async function providerBackedRun({
     });
   checkTrustedTree({ nodeModules: trusted.nodeModules, expected: trusted });
 
-  // Isolation self-test bound to the exact images, allowlist and host.
-  const images = { harness: config.images.proxy };
-  const selftest = requireValidSelfTest({
-    stateDir,
-    binding: selftestBinding({ images, allow: config.network.allow }),
-  });
+  // Isolation self-test for exactly this configuration and host: the same
+  // binding function the self-test used (section 4.3).
+  const selftest = requireValidSelfTest({ stateDir, config });
 
   // CLI identity inside the agent image (section 3.7).
   for (const m of config.models)
@@ -234,9 +270,8 @@ export async function providerBackedRun({
         version: setup.npmVersion ?? null,
         sha256: setup.npmSha256 ?? null,
       },
-      fixtureClosureNonProductLockSha256: nonProductLockDigest(
-        path.join(path.resolve(setup.trustedClosure), 'package-lock.json'),
-      ),
+      // Per cell, from the closure each workspace was installed from.
+      fixtureClosureNonProductLockSha256: null,
     },
     startLoadSampler,
   };
@@ -269,31 +304,18 @@ export async function providerBackedRun({
     effectiveConfigFor: (m) =>
       m.cli === 'codex' ? codexEvidence.get(m.key) : null,
     installFor: ({ task }) => {
+      if (task.environment.install !== 'before-agent') return null;
       const closure = setup.closures[task.workspace.fixture];
-      if (closure == null) return null;
-      return ({ workspace }) => {
-        installClosure({
+      return ({ workspace }) =>
+        installFixtureClosure({
           closureDir: path.resolve(closure.dir),
-          dest: workspace,
           cacheDir: closure.cache ? path.resolve(closure.cache) : null,
-        });
-        const problems = verifyProductPackages({
-          nodeModules: path.join(workspace, 'node_modules'),
+          workspace,
           binding,
           storeCopy: path.resolve(setup.storeCopy),
         });
-        if (problems.length > 0)
-          throw refuse(
-            'install',
-            `workspace @pandamstyle packages differ from the product build: ${problems.slice(0, 5).join('; ')}`,
-          );
-        return {
-          lockSha256: fileSha256(
-            path.join(path.resolve(closure.dir), 'package-lock.json'),
-          ),
-        };
-      };
     },
+    sweepLabels: true,
     ...(matrixId ? { matrixId } : {}),
   });
 }

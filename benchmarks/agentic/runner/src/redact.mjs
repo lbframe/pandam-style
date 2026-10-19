@@ -121,11 +121,42 @@ function escapeRe(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// Patterns need at most this many bytes of context across a chunk border.
+const PATTERN_OVERLAP = 4096;
+
+/** Scans one file in bounded chunks; returns whether anything was found. */
+export function scanFile(file, redaction, { patterns = true } = {}) {
+  const secrets = redaction.list().map((x) => Buffer.from(x));
+  const overlap = Math.max(PATTERN_OVERLAP, ...secrets.map((b) => b.length));
+  const fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+  try {
+    const buf = Buffer.alloc(1 << 20);
+    let tail = Buffer.alloc(0);
+    for (;;) {
+      const n = fs.readSync(fd, buf, 0, buf.length, null);
+      if (n === 0) return false;
+      const window = Buffer.concat([tail, buf.subarray(0, n)]);
+      if (secrets.some((b) => window.includes(b))) return true;
+      if (patterns) {
+        const text = window.toString('latin1');
+        for (const re of PATTERNS) {
+          re.lastIndex = 0;
+          if (re.test(text)) return true;
+        }
+      }
+      tail = window.subarray(Math.max(0, window.length - overlap));
+    }
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
 /**
  * Post-write scan of an attempt directory: any artifact still containing a
  * secret or a token pattern is deleted and reported. Evidence blobs are
  * workspace bytes: only exact secrets are searched there, since a pattern
- * match in project content is not a credential.
+ * match in project content is not a credential. Files are read in bounded
+ * chunks.
  */
 export function scanAndPurge(dir, redaction) {
   const removed = [];
@@ -134,9 +165,8 @@ export function scanAndPurge(dir, redaction) {
       const abs = path.join(d, entry.name);
       if (entry.isDirectory()) rec(abs);
       else if (entry.isFile()) {
-        const text = fs.readFileSync(abs).toString('latin1');
         const evidenceBlob = abs.split(path.sep).includes('blobs');
-        if (redaction.scanText(text, { patterns: !evidenceBlob }).length > 0) {
+        if (scanFile(abs, redaction, { patterns: !evidenceBlob })) {
           fs.rmSync(abs);
           removed.push(path.relative(dir, abs));
         }

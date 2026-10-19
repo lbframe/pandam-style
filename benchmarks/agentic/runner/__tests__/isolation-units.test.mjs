@@ -27,7 +27,7 @@ import {
   networkCreateArgs,
   summarizeAudits,
 } from '../src/docker.mjs';
-import { deltaDigest } from '../src/evidence.mjs';
+import { sampleWorkspace } from '../src/workspace.mjs';
 
 const listen = (server) =>
   new Promise((r) =>
@@ -140,22 +140,26 @@ test('channel audit: a sample without the CLI or a count is unknown, never clean
   );
 });
 
-test('live delta digest: links not followed, FIFOs not opened, bounded, changes visible', () => {
+test('live delta sample: links not followed, FIFOs not opened, bounded, changes visible', () => {
   const root = tmpDir('delta');
+  const d = (opts) => sampleWorkspace(root, opts).digest;
   fs.writeFileSync(path.join(root, 'a.txt'), '1');
-  const d1 = deltaDigest(root);
+  const d1 = d();
   assert.match(d1, /^[0-9a-f]{64}$/);
   spawnSync('mkfifo', [path.join(root, 'pipe')]);
   fs.symlinkSync('/etc/passwd', path.join(root, 'link'));
   const t0 = Date.now();
-  const d2 = deltaDigest(root);
-  assert.ok(Date.now() - t0 < 2000, 'a FIFO never blocks the digest');
+  const d2 = d();
+  assert.ok(Date.now() - t0 < 2000, 'a FIFO never blocks the sample');
   assert.notEqual(d2, d1);
   fs.writeFileSync(path.join(root, 'a.txt'), '2');
-  assert.notEqual(deltaDigest(root), d2);
-  assert.equal(deltaDigest(root, [], { maxEntries: 1 }), null);
-  assert.equal(deltaDigest(root, [], { maxBytes: 0 }), null);
-  assert.equal(deltaDigest(path.join(root, 'missing')), null);
+  assert.notEqual(d(), d2);
+  assert.equal(d({ maxEntries: 1 }), null);
+  assert.equal(d({ maxDigestBytes: 0 }), null);
+  assert.equal(sampleWorkspace(path.join(root, 'missing')).digest, null);
+  const capped = sampleWorkspace(root, { capBytes: 0 });
+  assert.equal(capped.overCap, true);
+  assert.equal(capped.digest, null);
 });
 
 test('docker argv: isolated internal network, hardening, read-only mounts, credential-free grader', () => {

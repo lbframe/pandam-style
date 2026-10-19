@@ -14,9 +14,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import test from 'node:test';
-import { tmpDir } from './helpers.mjs';
+import { STORE_CORPUS, closureFor, fixtureStore, tmpDir } from './helpers.mjs';
 import { grade } from '../src/attempt.mjs';
 import { checkCliIdentity } from '../src/docker.mjs';
 import {
@@ -31,121 +30,10 @@ import {
   nonProductLockDigest,
   verifyProductPackages,
 } from '../src/trusted-tree.mjs';
-import { fileSha256, sha256 } from '../src/util.mjs';
+import { sha256 } from '../src/util.mjs';
 import { treeDigest } from '../../src/fs-tree.mjs';
 
-const COMMIT = '415e05539fcb5d36a78226112b5cf488b200b1aa';
-const CORPUS = { epochs: { alpha1: { product: { commits: [COMMIT] } } } };
-
-function tar(dir, out, top) {
-  const r = spawnSync('tar', ['-czf', out, '-C', dir, top], {
-    encoding: 'utf8',
-  });
-  assert.equal(r.status, 0, r.stderr);
-}
-
-/** A store with two product tarballs, a Node archive and a source archive. */
-function fixtureStore() {
-  const root = tmpDir('store');
-  const original = path.join(root, 'original');
-  const build = path.join(root, 'build');
-  for (const d of ['packages/registry', 'node', 'source'])
-    fs.mkdirSync(path.join(original, d), { recursive: true });
-  const packages = [];
-  for (const name of ['core', 'compiler']) {
-    const pkg = path.join(build, name, 'package');
-    fs.mkdirSync(path.join(pkg, 'lib'), { recursive: true });
-    fs.writeFileSync(
-      path.join(pkg, 'package.json'),
-      JSON.stringify({
-        name: `@pandamstyle/${name}`,
-        version: '0.1.0-test',
-        main: 'lib/index.js',
-      }),
-    );
-    fs.writeFileSync(
-      path.join(pkg, 'lib/index.js'),
-      `module.exports = '${name}';\n`,
-    );
-    const file = `packages/registry/pandamstyle-${name}-0.1.0-test.tgz`;
-    tar(path.join(build, name), path.join(original, file), 'package');
-    packages.push({
-      name: `@pandamstyle/${name}`,
-      version: '0.1.0-test',
-      registry: {
-        file,
-        sha256: fileSha256(path.join(original, file)),
-        integrity: 'sha512-test',
-      },
-    });
-  }
-  fs.writeFileSync(
-    path.join(original, 'node/node.tar.xz'),
-    'node runtime bytes',
-  );
-  const src = path.join(build, 'src', 'pandamstyle-415e055');
-  fs.mkdirSync(path.join(src, 'docs/reference'), { recursive: true });
-  fs.writeFileSync(path.join(src, 'docs/agent-guide.md'), '# guide\n');
-  fs.writeFileSync(path.join(src, 'docs/reference/api.md'), '# api\n');
-  fs.writeFileSync(path.join(src, 'docs/internal.md'), '# not for agents\n');
-  tar(
-    path.join(build, 'src'),
-    path.join(original, 'source/src.tar.gz'),
-    'pandamstyle-415e055',
-  );
-  const manifest = {
-    epoch: 'alpha1',
-    source: {
-      commit: COMMIT,
-      tree: 't',
-      archive: {
-        file: 'source/src.tar.gz',
-        sha256: fileSha256(path.join(original, 'source/src.tar.gz')),
-      },
-    },
-    packages,
-    node: [
-      {
-        version: '22.22.0',
-        file: 'node/node.tar.xz',
-        sha256: fileSha256(path.join(original, 'node/node.tar.xz')),
-      },
-    ],
-    measurementNode: { version: '22.22.0' },
-  };
-  const manifestPath = path.join(root, 'manifest.v1.json');
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest));
-  return { root, original, manifestPath, manifest };
-}
-
-function closureFor(store, copy) {
-  const dir = path.join(store.root, 'closure');
-  fs.mkdirSync(dir, { recursive: true });
-  const deps = Object.fromEntries(
-    store.manifest.packages.map((p) => [
-      p.name,
-      `file:${path.join(copy, p.registry.file)}`,
-    ]),
-  );
-  fs.writeFileSync(
-    path.join(dir, 'package.json'),
-    JSON.stringify({ name: 'trusted', version: '1.0.0', dependencies: deps }),
-  );
-  const r = spawnSync(
-    'npm',
-    [
-      'install',
-      '--package-lock-only',
-      '--offline',
-      '--ignore-scripts',
-      '--no-audit',
-      '--no-fund',
-    ],
-    { cwd: dir, encoding: 'utf8' },
-  );
-  assert.equal(r.status, 0, r.stderr);
-  return dir;
-}
+const CORPUS = STORE_CORPUS;
 
 function digestOf(dir) {
   return treeDigest(dir);

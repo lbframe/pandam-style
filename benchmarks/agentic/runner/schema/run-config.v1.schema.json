@@ -204,7 +204,7 @@
     },
     "credentials": {
       "type": "object",
-      "description": "Per provider of the matrix (required, no default): the mode and the credential source, never a secret. access-only = no refresh token enters a container; refresh-capable-copy = full copy with export and compare-and-swap (forces concurrency 1 for that provider). The source is a configuration directory (Claude: the CLAUDE_CONFIG_DIR of the account, holding .credentials.json; Codex: the CODEX_HOME, holding auth.json) and an account label; both are recorded in every attempt. The runner never defaults to ~/.claude.",
+      "description": "Per provider of the matrix (required, no default): the mode and the credential source, never a secret. access-only = no refresh token enters a container; refresh-capable-copy = full copy with export and compare-and-swap (forces concurrency 1 for that provider). The source is a configuration directory (Claude: the CLAUDE_CONFIG_DIR of the account, holding .credentials.json; Codex: the CODEX_HOME, holding auth.json) and an account label; both are recorded in every attempt. The runner never defaults to ~/.claude. Source policy (enforced in code before any read): Claude ~/.claude-t3/team-2 with account claude-team-2; Codex ~/.codex; no symbolic link in either path.",
       "propertyNames": {
         "enum": [
           "claude",
@@ -405,6 +405,10 @@
               "$ref": "#/$defs/credentialSource"
             }
           ]
+        },
+        "synthetic": {
+          "const": true,
+          "description": "Adapter-fixture matrices only: a synthetic credential source exempt from the source policy (section 4.6)."
         }
       },
       "allOf": [
@@ -494,6 +498,15 @@
             "properties": {
               "mode": {
                 "const": "per-attempt-internal-isolated-gateway"
+              }
+            }
+          },
+          "credentials": {
+            "additionalProperties": {
+              "not": {
+                "required": [
+                  "synthetic"
+                ]
               }
             }
           }

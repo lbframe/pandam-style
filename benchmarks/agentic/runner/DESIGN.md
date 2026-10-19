@@ -337,13 +337,24 @@ unknown.
 The harness knows a command's text and status, not its effects, and shell
 commands can write files, chain checks or mask failures. So:
 
-- **Command classes** (versioned table `command-classes/v1`, closed):
+- **Command classes** (versioned table `command-classes/v2`, closed):
   - `transparent`: a single simple command on the closed allowlist of
-    transparent single-purpose commands that execute no project code: file
-    inspection (`ls`, `cat`, `head`, `tail`, `wc`, `grep`, `rg`, `find`
-    without `-exec`/`-delete`, `stat`, `file`, `tree`, `pwd`, `echo`,
-    `sed -n`), and read-only git (`git status`, `git diff`, `git log`,
-    `git show`, `git ls-files`, `git rev-parse`);
+    transparent single-purpose commands that execute no code, load no
+    project code and write no file, each with its audited options excluded:
+    `ls`, `cat`, `head`, `tail`, `wc`, `grep`, `stat`, `pwd`, `echo`; `rg`
+    without `--pre*`, `-z`/`--search-zip`, `--hostname-bin`; `find` without
+    `-exec*`, `-ok*`, `-delete`, `-fprint*`, `-fls`; `file` without
+    `-z`/`-Z`/`-C`; `tree` without `-o`; `sed` only as
+    `sed -n '<address>p' <files>` (GNU sed's `e`, `w`, `s///e`, `r` and `-f`
+    execute, write or load scripts); and read-only git subcommands
+    (`status`, `diff`, `log`, `show`, `ls-files`, `rev-parse`) without global
+    options, `--ext-diff`, `--textconv` or `--output`, **only** when the
+    repository configuration cannot be agent-written (read-only `.git` in an
+    isolated run: hooks, fsmonitor and diff drivers execute code). Words are
+    split as a POSIX shell would; `$` anywhere, escapes, a quote adjacent to
+    other characters and an unquoted word starting with a glob character
+    (whose expansion can inject options from agent-controlled names) make
+    the command opaque;
   - `opaque`: everything else, in particular package scripts
     (`npm|yarn|pnpm run …`, `npm test`, `yarn <script>`), `npx`,
     `pnpm dlx`, `yarn dlx`, shell scripts (`sh x.sh`, `./x`), `make`, `node`,
@@ -753,7 +764,14 @@ inside that directory: `.credentials.json` for Claude (the account's
 default directory**: a missing entry, a missing source, a relative path or a
 missing or non-regular credential file refuses the matrix before any attempt
 (an `lstat`, names and modes only). In particular the runner never falls back
-to `~/.claude`. Under the user's subscription rule, Claude models under
+to `~/.claude`. **The user rule is enforced in code** (`SOURCE_POLICY`): a
+Claude source must be exactly `~/.claude-t3/team-2` with account
+`claude-team-2`, a Codex source exactly `~/.codex`; every component below
+home must be a real directory (no symbolic link, no alias) and its real path
+the policy path. The check runs before any read, again before each attempt
+reads the file, and again in crash recovery before any write-back. Synthetic
+sources (`synthetic: true`) are exempt and allowed only in adapter-fixture
+matrices. Under the user's subscription rule, Claude models under
 evaluation authenticate with the **claude-team-2** account
 (`configDir: "~/.claude-t3/team-2"`, `account: "claude-team-2"`); Codex may use
 `~/.codex`. The matrix record (`credentialSources`) and every attempt record
@@ -806,9 +824,18 @@ timeout, cancellation and failures alike:
    temporary files (`0600`), redacted on persistence and deleted.
 8. Only now is the agent container removed and its tmpfs destroyed.
 
-Crash recovery: at start-up, the runner finds containers carrying its labels
-and runs steps 2–8 for each before anything else. It then deletes leftover
-private temporary files.
+Crash recovery: every resource of an attempt (agent container, proxy,
+network, or the local fixture executor's process group) is recorded in the
+attempt's private state **before** it is created. At start-up, the runner
+recovers every stale attempt whatever its credential mode: kills the agent
+processes, exports and writes back (mode B, policy re-checked), removes the
+containers and network and **verifies** their removal, then deletes every
+private file and working copy. Provider-backed starts also sweep resources
+carrying the attempt labels. A credential export failure, a write-back
+conflict, an unverified cleanup or a failed recovery is a **durable refusal**
+of the provider (`<state>/refusals/<provider>.json`): later matrices do not
+run that provider until the operator resolves it
+(`pms-agentic-runner resolve-refusal <provider>`).
 
 Rules in both modes: no host home path is mounted; the credential is
 delivered on the exec stdin into tmpfs (not `docker run -e`, which persists
@@ -1213,108 +1240,136 @@ No oracle API change is required: two-pass grading uses `evaluate` as it is.
 
 Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 (`validate-config`, `run`, `report`, `compare`, `regrade`, `copy-store`,
-`bind`, `trusted-tree`, `selftest`, `recover`, `prune`). Tests:
-`yarn bench:agentic:runner:test` (adapter fixtures, CI) and
-`node benchmarks/agentic/runner/bin/pms-agentic-runner.mjs selftest` (Docker,
-local).
+`bind`, `trusted-tree`, `selftest --matrix`, `recover`, `refusals`,
+`resolve-refusal`, `prune`). Tests: `yarn bench:agentic:runner:test`
+(adapter fixtures, no Docker) and `yarn bench:agentic:runner:docker-test`
+(credential-free Docker integration with a fake CLI image; §11.3).
 
 | Section | Code (`src/` unless noted) | Tests (`__tests__/`) |
 | --- | --- | --- |
 | §1.1–1.3 units, record, identity | `matrix.mjs`, `attempt.mjs`, `identity.mjs`, `schema/run-record.v1.schema.json` | every fixture run validates its records and report (F57, `helpers.mjs`) |
-| §1.4 comparability | `comparability.mjs`, `matrix.mjs` `projectionFor` | `evidence.test.mjs` F34, F35 |
-| §1.5 replay | `regrade.mjs`, `evidence.mjs` | `evidence.test.mjs` F30 |
-| §2.1–2.2 measured values, tokens | `measured.mjs`, `adapters/claude.mjs`, `adapters/codex.mjs` | `adapters.test.mjs` F1–F9; `metrics.test.mjs` lint and property test |
-| §2.4 repairs, first pass, attribution | `commands.mjs` | `metrics.test.mjs` F24–F27, F58 |
-| §2.5–2.7 cost accounts, time | `attempt.mjs`, `identity.mjs` | `adapters.test.mjs` F1, F2 |
+| §1.4 comparability | `comparability.mjs`, `matrix.mjs` `projectionFor` (per-cell closure) | `evidence.test.mjs` F34, F35; `measurement.test.mjs` B11 |
+| §1.5 replay, resume | `regrade.mjs` (integrity and identity first), `matrix.mjs` `matrixIdentity`, `repetitionState` | `evidence.test.mjs` F30; `measurement.test.mjs` B10, B12 |
+| §2.1–2.2 measured values, tokens | `measured.mjs`, `adapters/*.mjs` | `adapters.test.mjs` F1–F9; `metrics.test.mjs` lint and property test |
+| §2.4 repairs, first pass, attribution | `commands.mjs` (`command-classes/v2`) | `metrics.test.mjs` F24–F27, F58; `measurement.test.mjs` B8 |
 | §3 adapters, budgets | `adapters/*.mjs`, `attempt.mjs` `agentPhase` | `adapters.test.mjs` F10–F20, F23, F28, F29 |
-| §3.7 version pinning | `docker.mjs` `observeCliIdentity`, `checkCliIdentity`; `provider.mjs` | `product-build.test.mjs` F55 |
-| §4.2 roles, two-pass grading | `docker.mjs`, `attempt.mjs` `grade`, `executors/local.mjs` | `policy-report.test.mjs` F40, F43; `isolation-units.test.mjs` argv |
-| §4.3 network, proxy | `docker.mjs`, `container/connect-proxy.mjs`, `selftest.mjs` | `isolation-units.test.mjs` proxy; self-test |
-| §4.4 stream integrity | `measured.mjs`, `container/channel-audit.mjs`, `docker.mjs` `summarizeAudits` | `adapters.test.mjs` F20, F22, F23; `isolation-units.test.mjs`; self-test (F21) |
+| §3.2 container-visible paths | executors' `visiblePaths` | `docker.test.mjs` B6 |
+| §3.7 version pinning | `docker.mjs` identity checks, `provider.mjs` | `product-build.test.mjs` F55 |
+| §4.2 roles, confinement, grading | `safefs.mjs`, `workspace.mjs`, `docker.mjs`, `attempt.mjs` `grade` | `confinement.test.mjs` B1; `policy-report.test.mjs` F40, F43; `docker.test.mjs` B7 |
+| §4.3 network, proxy | `docker.mjs`, `container/connect-proxy.mjs`, `selftest.mjs` | `isolation-units.test.mjs`; `docker.test.mjs` B5 |
+| §4.4 stream integrity | `measured.mjs`, `container/channel-audit.mjs`, `docker.mjs` `summarizeAudits` | `adapters.test.mjs` F20, F22, F23; self-test (F21) |
 | §4.5 capability matrix | `capabilities.mjs` | `adapters.test.mjs` F18, F36–F38; `policy-report.test.mjs` F39 |
-| §4.6 credentials and source | `credentials.mjs`, `recovery.mjs`, `container/deliver.mjs`, `container/export-credential.mjs` | `credentials.test.mjs` F31, F44–F50, F59, mode A |
-| §4.7 attempt order | `attempt.mjs` `runAttempt`, `provider.mjs` | the fixture suites |
-| §4.8 product build, trusted tree | `store.mjs`, `trusted-tree.mjs`, `provider.mjs` | `product-build.test.mjs` G, F51–F53 (synthetic fixture store) |
-| §4.9 held-out | `capabilities.mjs` `heldoutRefusal`, `bin/pms-agentic-runner.mjs` | `policy-report.test.mjs` F54 |
-| §5 failures, retries, contested | `classify.mjs`, `matrix.mjs` | `adapters.test.mjs` F10–F16, F22; `metrics.test.mjs` classifier independence |
-| §6 evidence | `evidence.mjs`, `redact.mjs`, `attempt.mjs` `evidenceCompleteness` | `evidence.test.mjs` F30–F33; `credentials.test.mjs` F31, F50, redaction |
-| §7 report | `report.mjs`, `schema/report.v1.schema.json` | `policy-report.test.mjs` F56, F57, CLI |
-| §9.3 isolation self-test | `selftest.mjs`, `container/probe-*.mjs` | run locally (§11.3) |
+| §4.6 credentials, source policy, recovery, refusals | `credentials.mjs`, `recovery.mjs`, `refusals.mjs`, `container/*` | `credentials.test.mjs` F31, F44–F50, F59; `confinement.test.mjs` B3, B4 |
+| §4.8 product build, trusted tree, closures | `store.mjs`, `trusted-tree.mjs` `installFixtureClosure`, `provider.mjs` | `product-build.test.mjs` G, F51–F53; `measurement.test.mjs` B11 |
+| §4.9 held-out | `capabilities.mjs` `heldoutRefusal`, CLI | `policy-report.test.mjs` F54 |
+| §5 failures, retries, contested | `classify.mjs`, `matrix.mjs` | `adapters.test.mjs` F10–F16, F22; `measurement.test.mjs` B10 |
+| §6 evidence, redaction, bounds | `workspace.mjs` staging, `evidence.mjs`, `redact.mjs` (chunked scans), `stream.mjs` (bounded splitter and sink), `attempt.mjs` `writeRecord` | `evidence.test.mjs` F30–F33; `confinement.test.mjs` B2; `measurement.test.mjs` B13 |
+| §7 report | `report.mjs` (seeded from the planned matrix), CLI `writeReport` | `policy-report.test.mjs` F56, F57; `measurement.test.mjs` B9 |
+| §9.3 isolation self-test | `selftest.mjs`, `container/probe-*.mjs` | `docker.test.mjs` B5; §11.3 |
 
 ### 11.2 Where the implementation differs from or completes this note
 
-Each item was found while implementing or testing, and the note above was
-corrected where it stated something false.
+Each item was found while implementing, testing or in review round 1
+(B1–B13), and the note above was corrected where it stated something false.
 
-1. **Agent UID.** The agent runs as the runner's own host UID (not 10001), so
-   the bind-mounted workspace is writable without `CAP_CHOWN`. The self-test
-   checks non-root, no capabilities and `no-new-privileges`.
-2. **P and E run in the runner process, not in containers.** Materialization,
-   the offline install and `prepare` (no agent code exists yet), corpus
-   events and workspace-delta samples run on the host against the
-   bind-mounted workspace. Delta samples during the agent phase use a bounded
-   walker that never follows links, opens files `O_NOFOLLOW | O_NONBLOCK` and
-   checks them with `fstat`, so a swapped link or FIFO fails the sample
-   (coverage incomplete) instead of redirecting or blocking the host.
-   Archives, leak scans and the `node_modules` digest run only after every
-   agent process is killed and the agent container removed.
-3. **Two-pass grading is not reached by corpus 1.4.3.** Only the three
+1. **Agent and grader UID.** The agent runs as the runner's own host UID (not
+   10001), so the bind-mounted workspace is writable without `CAP_CHOWN`.
+   Graders run as the same UID (not 30001), so they can read the
+   runner-private (0700) staging they get as read-only mounts; nothing else
+   of the host is mounted and no agent process exists when they run (B7).
+   The self-test checks non-root, no capabilities and `no-new-privileges`.
+2. **P and E in the runner process, confined (B1).** Materialization, the
+   offline install and `prepare` run before any agent code exists. While the
+   agent runs, and afterwards, every host operation on the workspace goes
+   through `safefs`: each path component is resolved beneath an open
+   directory handle (`/proc/self/fd/<fd>/<name>`, `O_NOFOLLOW`), so a link
+   anywhere in a path, a directory swapped after it was opened, a root link
+   (`node_modules` itself a link) or a file swapped for a FIFO is refused,
+   never followed or blocking. Corpus events (every step kind), delta and
+   size samples, the `node_modules` state, the post-run staging copy and leak
+   scans use it. Grading and archives read only the staging copy.
+3. **Private working copies (B2).** `.private` and `.work` are 0700; the
+   unredacted workspace, baseline, staging, oracle inputs and raw streams
+   are removed on every exit path (including exceptions) and by crash
+   recovery. `record.json`, `matrix.json`, `outcomes.json` and reports are
+   redacted and scanned like the other artifacts.
+4. **Incremental bounds (B13).** Raw stdout and stderr are stored by a
+   line-aligned head/tail sink while streaming; the parser never buffers a
+   line beyond 8 MiB (`line-too-long` anomaly); leak scans read in bounded
+   chunks; the whole-workspace byte cap (`workspaceBytesCap`) is checked at
+   every tool result and stops the agent as `resource-limit`; staging stops
+   at the evidence bound, which makes the evidence `incomplete` (unstaged
+   files are listed as unstored) and the attempt `harness: evidence-bound`,
+   never graded on partial bytes. A truncated stream, transcript or final
+   message makes the evidence `incomplete`.
+5. **Two-pass grading is not reached by corpus 1.4.3.** Only the three
    installation tasks have a `host.build` check, and they are refused until
-   the local mirror exists (Q2). G2 is therefore tested at the `grade` level
-   (F40, F43). F41 and F42 (tampering by a G2 build script) have no
-   automated test yet.
-4. **Codex duplicate terminal events.** §2.2 (last cumulative usage, never a
-   sum) and F20 (two terminals are an anomaly) both hold: the parser keeps
-   the last `turn.completed` usage and the attempt is invalid
-   (`adapter-stream`), F5.
-5. **Missing audit and proxy data are unknown.** Without a channel audit
-   (local fixture executor) or with a sample lacking a count, the audit
-   fields are `null`, never `0`. Proxy accounting (`integrity.proxy`:
-   connections, denials, bytes per target) is read before the proxy is
-   removed; no proxy is `null`; an unparseable log line makes the counts
-   unknown. Anomaly thresholds on these counts are not implemented.
-6. **Control-socket audit not implemented.** `controlSocketConnections` is
-   always `null` (§4.4 residual risk).
-7. **Truncated grader inputs.** A truncated transcript or final message makes
-   the evidence `incomplete` (§6.4), not only an oversized archive.
-8. **Refusals per cell.** An unsupported task is listed once per task × model
-   cell with its planned repetitions; a repetition whose last attempt is
-   invalid is `missing` with its reason (`attempts exhausted` or the invalid
-   class and code).
-9. **Credential source** (§4.6, user rule of this round): required per
-   provider, recorded, no default; F59.
-10. **Fixture closures are an input, not built.** A provider-backed `run`
-    needs `--setup` (`pms-agentic-provider-setup/v1`): the verified store
-    copy, the CE manifest, the trusted closure and one closure per fixture
-    (`package.json`, `package-lock.json`, offline cache). Producing those
-    closures (with network, once, then verified) is not implemented. Every
-    closure is installed with `npm ci --offline --ignore-scripts`, whatever
-    the fixture's package manager.
-11. **Self-test scope.** It covers §9.3 except: the memory limit, IPv6
-    link-local host addresses (recorded as skipped: they need an interface
-    scope and are not on the attempt link), the G2 tampering cases, and the
-    "mutations" item, which is covered by controls (a readable binary exposes
-    its descriptors, a same-network peer and the host service are reachable)
-    rather than by removing each mechanism. Only routing and timeout errors
-    count as unreachable; a probe error never passes.
-12. **Provider-backed path never executed.** Its preflight refusals are
-    tested (authorization, CI, dirty checkout, setup, credential source,
-    fixture-only inputs); everything after them (binding, trusted tree,
-    self-test binding, CLI identity, Docker executor, container grading) runs
-    for the first time in the authorized smoke run.
+   the local mirror exists (Q2). G2 is tested at the `grade` level (F40,
+   F43); F41 and F42 have no automated test (review follow-up F2).
+6. **Codex duplicate terminal events.** §2.2 (last cumulative usage) and F20
+   (an anomaly) both hold, F5.
+7. **Missing audit and proxy data are unknown.** No audit sample (local
+   executor, or an attempt shorter than the first sample) gives `null`
+   fields; proxy accounting (`integrity.proxy`) is read before the proxy is
+   removed. Anomaly thresholds and the control-socket audit are not
+   implemented (review follow-up F1).
+8. **Planned matrix in reports (B9).** Reports are seeded from the planned
+   task × model × repetition matrix: a cell or repetition without records is
+   listed with its reason and stays in every denominator; unsupported cells
+   are listed per cell and excluded from runnable denominators.
+9. **Resume (B10).** A matrix resumes only with the identical configuration,
+   harness, product build and dependencies (`identityDigest`); records of
+   another matrix, cell, model or kind refuse the resume; duplicate model
+   keys or tasks are invalid; crashed attempts (a directory without a record)
+   count as used and contested; cancelled attempts do not count; a
+   non-retryable invalid final attempt stays `missing`. Attempt indices can
+   therefore exceed `maxAttempts`. The load sampler now covers the attempt
+   itself (review follow-up F3, trivial).
+10. **Credential source** (§4.6): required, recorded, enforced (B3), with
+    durable refusals and resource-tracked recovery (B4).
+11. **Fixture closures (B11).** A provider-backed `run` needs `--setup`
+    (`pms-agentic-provider-setup/v1`) with a closure (`package.json`,
+    `package-lock.json`, optional offline cache) for the fixture of every
+    runnable task; a missing one refuses preflight. Each workspace is
+    installed with `npm ci --offline --ignore-scripts`, its `@pandamstyle/*`
+    packages verified against the tarballs before the agent starts, and the
+    closure's lock digests are recorded (`install`) and enter that cell's
+    comparability projection. Producing the closures is not implemented.
+12. **Regrade (B12).** Artifacts, evidence blobs, set digests, harness
+    identity and (for trusted-tree records) the supplied trusted tree are
+    verified first; integrity failures refuse; identity differences or
+    incomplete evidence give `non-exact`; provider-backed records never use
+    the ancestor fallback.
+13. **Self-test (B5).** It takes the run configuration (agent, proxy and
+    grader images, per-provider allowlists, container limits), probes with
+    those images and the runner's own argv builders, and writes a result
+    bound to `selftestBinding(config, facts)`, the function preflight uses;
+    it never builds or re-tags images. Not covered: the memory limit and the
+    G2 tampering cases (follow-up F2); IPv6 link-local host addresses are
+    recorded as skipped; the allowlisted CONNECT is checked from the proxy's
+    decision log (the upstream answer is not part of the property, but the
+    proxy does open a TCP connection to the first allowlisted host).
+14. **Workspace deltas race a fast CLI.** Samples are taken when the harness
+    receives a tool result; a CLI that runs its next tool before the harness
+    reads the stream defeats the sample (repairs stay a lower bound). The
+    fake CLI pauses after each tool result, as a real CLI waits for the
+    model.
+15. **Provider-backed path never executed.** Its preflight refusals are
+    tested; the containers, staging, grading and self-test binding run in the
+    credential-free Docker integration tests; the remaining steps (binding
+    of the real store, trusted tree from the real tarballs, CLI identity of
+    the real binaries) run first in the authorized smoke run.
 
-### 11.3 Isolation self-test result (local)
+### 11.3 Isolation self-test and Docker integration
 
-Docker 29.2.1, kernel 6.8.0-146-generic, harness image from the pinned
-`node:22-bookworm-slim` base, no credentials, no model call: **passed**, 39
-checks (every host IPv4 and global IPv6 address, bridge gateways, external
-addresses and DNS, another attempt's network, the proxy's reachability and
-denial, execute-only `/proc` denials with their readable-binary control,
-read-only workspace parts, privileges, no ancestor `node_modules`, PID 1
-survival, the pids limit); 35 IPv6 link-local addresses skipped. It is not
-run in CI: it needs a local Docker daemon with the isolated gateway mode
-(Docker 28 or later), a host service on every interface and minutes of
-image builds.
+`yarn bench:agentic:runner:docker-test` builds a harness image and a fixture
+agent image (fake CLIs; tags `pms-agentic-test-*`), runs the self-test for
+that configuration and checks that preflight's `requireValidSelfTest`
+accepts it and refuses another configuration, then runs real attempts (agent
+container, per-attempt proxy and network, fake Codex and Claude, grading in
+the grader container with a test-only trusted tree). Local result (Docker
+29.2.1, kernel 6.8.0-146-generic): passed (B5, B6, B7). The CI job
+`agentic-runner-docker` runs the same tests.
 
 ## Appendix A: probes and sources
 

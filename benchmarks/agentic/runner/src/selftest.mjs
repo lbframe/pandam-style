@@ -6,10 +6,15 @@
  */
 
 // Isolation self-test (DESIGN.md sections 4.3 and 9.3). Local, Docker, no
-// credentials, no model calls. Every check has a control probe that must
-// observe the opposite outcome, so the test proves it can fail. The result is
-// bound to the Docker version, network options, image ids, proxy allowlist,
-// kernel and host address set, and expires after 24 hours.
+// credentials, no model calls. It takes the run configuration it will
+// vouch for: its agent, harness (proxy) and grader images, its per-provider
+// egress allowlists and container limits, and runs every probe with those
+// images and the runner's own container argv builders. Its result is bound
+// to `selftestBinding(config, facts)`, the same function provider-backed
+// preflight calls, so a result for another configuration, image, allowlist,
+// mechanism, Docker version, kernel or host address set is never accepted.
+// Every check has a control probe that must observe the opposite outcome.
+// Results expire after 24 hours. Images are never built or re-tagged here.
 
 import fs from 'node:fs';
 import http from 'node:http';
@@ -20,30 +25,90 @@ import {
   HARNESS_DIR,
   NODE,
   agentRunArgs,
+  auditRunArgs,
   docker,
   execArgs,
+  graderRunArgs,
   hostAddresses,
   networkCreateArgs,
   proxyRunArgs,
 } from './docker.mjs';
-import { buildHarnessImage } from './images.mjs';
 import { digestJson, nowIso, writeJson } from './util.mjs';
 
 export const SELFTEST_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+export const SELFTEST_SCHEMA = 'pms-agentic-selftest/v2';
 
-export function selftestBinding({ images, allow }) {
-  const v = docker([
-    'version',
-    '--format',
-    '{{.Server.Version}}',
-  ]).stdout.trim();
+/** Digest of the container mechanisms the runner applies (argv builders). */
+export function mechanismsDigest() {
+  const limits = { tmpfsBytes: 1, cpus: 1, memoryBytes: 1, pidsLimit: 1 };
+  return digestJson({
+    network: networkCreateArgs('<network>'),
+    proxy: proxyRunArgs({
+      name: '<proxy>',
+      network: '<network>',
+      image: '<image>',
+      allow: ['<allow>'],
+    }),
+    agent: agentRunArgs({
+      name: '<agent>',
+      network: '<network>',
+      image: '<image>',
+      limits,
+      mounts: {
+        workspaceReadOnly: true,
+        gitReadOnly: false,
+        readOnlyPaths: [],
+      },
+      workspace: '/nonexistent-workspace',
+      uid: 0,
+    }),
+    grader: graderRunArgs({
+      image: '<image>',
+      harnessDir: '<h>',
+      trustedDir: '<t>',
+      baselineDir: '<b>',
+      finalDir: '<f>',
+      inputsDir: '<i>',
+      tmpfsBytes: 1,
+      evaluateArgs: [],
+    }).map((a) => a.replace(/^\d+:\d+$/, '<uid>')),
+    audit: auditRunArgs({
+      container: '<agent>',
+      image: '<image>',
+      cliName: '<cli>',
+      uid: 0,
+    }),
+  });
+}
+
+export function currentFacts() {
   return {
-    dockerVersion: v,
-    networkOptions: networkCreateArgs('<name>'),
-    images,
-    allow,
+    dockerVersion: docker([
+      'version',
+      '--format',
+      '{{.Server.Version}}',
+    ]).stdout.trim(),
     kernel: os.release(),
     hostAddresses: hostAddresses(),
+  };
+}
+
+/** The binding a self-test result vouches for; preflight computes the same. */
+export function selftestBinding(config, facts) {
+  return {
+    schema: SELFTEST_SCHEMA,
+    images: {
+      agent: config.images?.agent ?? null,
+      harness: config.images?.proxy ?? null,
+      grader: config.images?.grader ?? null,
+    },
+    allow: config.network?.allow ?? null,
+    networkMode: config.network?.mode ?? null,
+    container: config.container ?? null,
+    mechanisms: mechanismsDigest(),
+    dockerVersion: facts.dockerVersion,
+    kernel: facts.kernel,
+    hostAddresses: facts.hostAddresses,
   };
 }
 
@@ -75,14 +140,21 @@ function json(r) {
   }
 }
 
-/** Runs the self-test; returns the result (also written under stateDir). */
-export async function runSelfTest({
-  stateDir,
-  allow = { probe: ['example.invalid:443'] },
-}) {
-  const harness = buildHarnessImage({ tag: 'pms-agentic-selftest:local' });
-  const images = { harness };
-  const binding = selftestBinding({ images, allow });
+/**
+ * Runs the self-test for `config` (images must exist locally). Returns the
+ * result and writes it under `stateDir` as `selftest-<binding digest>.json`.
+ */
+export async function runSelfTest({ stateDir, config }) {
+  for (const k of ['agent', 'proxy', 'grader'])
+    if (!config.images?.[k])
+      throw new Error(
+        `self-test: config.images.${k} is required (build the images first)`,
+      );
+  const facts = currentFacts();
+  const binding = selftestBinding(config, facts);
+  const agentImage = config.images.agent;
+  const harness = config.images.proxy;
+  const grader = config.images.grader;
   const checks = [];
   const skipped = [];
   // A check passes only on an actual observation: a missing value (probe
@@ -95,8 +167,7 @@ export async function runSelfTest({
       expected,
     });
   // Only a routing or timeout failure is an isolation observation; a probe
-  // error such as EINVAL (malformed target) or ECONNREFUSED (host reached,
-  // port closed) is not.
+  // error such as EINVAL or ECONNREFUSED (host reached, port closed) is not.
   const unreachable = (v) =>
     ['ENETUNREACH', 'EHOSTUNREACH', 'TIMEOUT', 'ETIMEDOUT'].includes(v);
   const id = Math.random().toString(36).slice(2, 8);
@@ -104,17 +175,26 @@ export async function runSelfTest({
     netA: `pms-st-a-${id}`,
     netB: `pms-st-b-${id}`,
     egress: `pms-st-e-${id}`,
-    proxy: `pms-st-proxy-${id}`,
     agent: `pms-st-agent-${id}`,
     peer: `pms-st-peer-${id}`,
+    ag: `pms-st-ag-${id}`,
   };
+  const proxies = [];
   const server = http.createServer((q, s) => s.end('host'));
   await new Promise((r) => server.listen(0, '::', r));
   const port = server.address().port;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-selftest-'));
+  const limits = {
+    tmpfsBytes: 64 * 1024 * 1024,
+    cpus: 1,
+    memoryBytes: 512 * 1024 * 1024,
+    pidsLimit: 64,
+    ...(config.container ?? {}),
+  };
   try {
-    // Network (section 4.3).
-    for (const n of [names.netA, names.netB]) docker(networkCreateArgs(n));
+    // Network (section 4.3), with the runner's own network argv.
+    for (const n of [names.netA, names.netB])
+      docker(networkCreateArgs(n, 'selftest'));
     docker([
       'network',
       'create',
@@ -122,20 +202,13 @@ export async function runSelfTest({
       'pms-agentic=selftest',
       names.egress,
     ]);
-    docker(
-      proxyRunArgs({
-        name: names.proxy,
-        network: names.netA,
-        image: harness,
-        allow: allow.probe,
-      }),
-    );
-    docker(['network', 'connect', names.egress, names.proxy]);
     docker([
       'run',
       '-d',
       '--name',
       names.peer,
+      '--label',
+      'pms-agentic=selftest',
       '--network',
       names.netB,
       '--user',
@@ -154,9 +227,11 @@ export async function runSelfTest({
       `{{(index .NetworkSettings.Networks "${names.netB}").IPAddress}}`,
       names.peer,
     ]).stdout.trim();
+    const addresses = [
+      ...new Set([...facts.hostAddresses, ...bridgeGateways()]),
+    ];
     // IPv6 link-local addresses need an interface scope and are not on the
     // attempt's link; they are recorded as skipped, not as passed.
-    const addresses = [...new Set([...hostAddresses(), ...bridgeGateways()])];
     const linkLocal = addresses.filter((a) => /^fe80:/i.test(a));
     const hostTargets = addresses
       .filter((a) => !linkLocal.includes(a))
@@ -167,19 +242,31 @@ export async function runSelfTest({
         reason: 'IPv6 link-local: needs a scope, not on the attempt link',
       })),
     );
+    // One proxy per provider allowlist, as attempts run them.
+    for (const [cli, allow] of Object.entries(config.network.allow)) {
+      const name = `pms-st-proxy-${cli}-${id}`;
+      proxies.push(name);
+      docker(
+        proxyRunArgs({ name, network: names.netA, image: harness, allow }),
+      );
+      docker(['network', 'connect', names.egress, name]);
+    }
+    const connect = [];
+    for (const [cli, allow] of Object.entries(config.network.allow)) {
+      const proxy = `pms-st-proxy-${cli}-${id}:3128`;
+      connect.push({ proxy, target: 'not-allowlisted.invalid:443' });
+      if (allow.length > 0) connect.push({ proxy, target: allow[0] });
+    }
     const spec = {
       tcp: [
         ...hostTargets,
         '1.1.1.1:443',
         '8.8.8.8:53',
         `${peerIp}:4000`,
-        `${names.proxy}:3128`,
+        ...proxies.map((p) => `${p}:3128`),
       ],
       dns: ['example.com', 'api.anthropic.com'],
-      connect: [
-        { proxy: `${names.proxy}:3128`, target: 'example.com:443' },
-        { proxy: `${names.proxy}:3128`, target: allow.probe[0] },
-      ],
+      connect,
     };
     const net = json(
       docker([
@@ -192,7 +279,7 @@ export async function runSelfTest({
         '--cap-drop',
         'ALL',
         '--read-only',
-        harness,
+        agentImage,
         NODE,
         `${HARNESS_DIR}/probe-net.mjs`,
         JSON.stringify(spec),
@@ -209,25 +296,20 @@ export async function runSelfTest({
         `net.host ${t}`,
         unreachable(net.tcp?.[t]),
         net.tcp?.[t],
-        'not CONNECTED',
+        'ENETUNREACH or timeout',
       );
-    check(
-      'net.external 1.1.1.1:443',
-      unreachable(net.tcp?.['1.1.1.1:443']),
-      net.tcp?.['1.1.1.1:443'],
-      'not CONNECTED',
-    );
-    check(
-      'net.external 8.8.8.8:53',
-      unreachable(net.tcp?.['8.8.8.8:53']),
-      net.tcp?.['8.8.8.8:53'],
-      'not CONNECTED',
-    );
+    for (const t of ['1.1.1.1:443', '8.8.8.8:53'])
+      check(
+        `net.external ${t}`,
+        unreachable(net.tcp?.[t]),
+        net.tcp?.[t],
+        'ENETUNREACH or timeout',
+      );
     check(
       'net.other-attempt',
       unreachable(net.tcp?.[`${peerIp}:4000`]),
       net.tcp?.[`${peerIp}:4000`],
-      'not CONNECTED',
+      'ENETUNREACH or timeout',
     );
     check(
       'net.dns.external',
@@ -236,22 +318,48 @@ export async function runSelfTest({
       net.dns?.['example.com'],
       'no resolution',
     );
-    check(
-      'net.proxy.reachable',
-      net.tcp?.[`${names.proxy}:3128`] === 'CONNECTED',
-      net.tcp?.[`${names.proxy}:3128`],
-      'CONNECTED',
-    );
-    check(
-      'net.proxy.denies',
-      /403/.test(String(net.connect?.[`${names.proxy}:3128->example.com:443`])),
-      net.connect?.[`${names.proxy}:3128->example.com:443`],
-      '403',
-    );
-    // Controls: the probe detects a reachable peer on its own network, and
-    // the host service is listening (seen from the host network namespace),
-    // so the unreachability checks above can fail. A host firewall that
-    // already drops bridge traffic does not make these controls pass.
+    for (const p of proxies)
+      check(
+        `net.proxy.reachable ${p}`,
+        net.tcp?.[`${p}:3128`] === 'CONNECTED',
+        net.tcp?.[`${p}:3128`],
+        'CONNECTED',
+      );
+    for (const [cli, allow] of Object.entries(config.network.allow)) {
+      const proxy = `pms-st-proxy-${cli}-${id}`;
+      const denied =
+        net.connect?.[`${proxy}:3128->not-allowlisted.invalid:443`];
+      check(
+        `net.proxy.denies ${cli}`,
+        /403/.test(String(denied)),
+        denied,
+        '403',
+      );
+      // The allowlisted decision is read from the proxy's own log; whether
+      // the upstream answers is not part of the isolation property.
+      const log = docker(['logs', proxy])
+        .stdout.trim()
+        .split('\n')
+        .filter(Boolean)
+        .map((l) => {
+          try {
+            return JSON.parse(l);
+          } catch {
+            return null;
+          }
+        });
+      if (allow.length > 0) {
+        const entry = log.find((e) => e?.target === allow[0]);
+        check(
+          `net.proxy.allows ${cli} ${allow[0]}`,
+          entry?.decision === 'allowed',
+          entry?.decision,
+          'allowed',
+        );
+      }
+    }
+    // Controls: the probe sees a peer on its own network, and the host
+    // service is listening, so the unreachability checks above can fail.
     const peerControl = json(
       docker([
         'run',
@@ -260,7 +368,7 @@ export async function runSelfTest({
         names.netB,
         '--user',
         '20001:20001',
-        harness,
+        agentImage,
         NODE,
         `${HARNESS_DIR}/probe-net.mjs`,
         JSON.stringify({ tcp: [`${peerIp}:4000`] }),
@@ -280,7 +388,7 @@ export async function runSelfTest({
         'host',
         '--user',
         '20001:20001',
-        harness,
+        agentImage,
         NODE,
         `${HARNESS_DIR}/probe-net.mjs`,
         JSON.stringify({ tcp: [`127.0.0.1:${port}`] }),
@@ -293,7 +401,7 @@ export async function runSelfTest({
       'CONNECTED',
     );
 
-    // Process (section 4.4).
+    // Process (section 4.4): the agent image's execute-only Node.
     const proc = json(
       docker([
         'run',
@@ -309,20 +417,20 @@ export async function runSelfTest({
         '--read-only',
         '--tmpfs',
         '/tmp:rw,mode=1777',
-        harness,
+        agentImage,
         NODE,
         `${HARNESS_DIR}/probe-proc.mjs`,
         NODE,
       ]),
     );
-    for (const k of ['fd1Write', 'environ', 'fdList', 'mem'])
-      check(`proc.execute-only.${k}`, proc[k] === 'EACCES', proc[k], 'EACCES');
     check(
       'proc.probe-output',
       proc.error === undefined,
       proc.error ?? 'parsed',
       'parsed',
     );
+    for (const k of ['fd1Write', 'environ', 'fdList', 'mem'])
+      check(`proc.execute-only.${k}`, proc[k] === 'EACCES', proc[k], 'EACCES');
     check(
       'proc.signal-allowed (documented residual)',
       proc.signal === 'allowed',
@@ -339,7 +447,7 @@ export async function runSelfTest({
         '0:0',
         '--entrypoint',
         'sh',
-        harness,
+        agentImage,
         '-c',
         `cp ${NODE} /tmp/node && chmod 0755 /tmp/node && exec setpriv --reuid=20001 --regid=20001 --clear-groups /tmp/node ${HARNESS_DIR}/probe-proc.mjs /tmp/node`,
       ]),
@@ -350,34 +458,52 @@ export async function runSelfTest({
       readable.fd1Write,
       'allowed',
     );
+    const cliModes = json(
+      docker([
+        'run',
+        '--rm',
+        '--network',
+        'none',
+        '--user',
+        '0:0',
+        agentImage,
+        NODE,
+        `${HARNESS_DIR}/probe-fs.mjs`,
+        JSON.stringify({ modes: ['/opt/cli/claude', '/opt/cli/codex', NODE] }),
+      ]),
+    );
+    if (config.kind === 'provider-backed')
+      for (const p of ['/opt/cli/claude', '/opt/cli/codex'])
+        check(
+          `cli.execute-only ${p}`,
+          cliModes.modes?.[p] === '711:0',
+          cliModes.modes?.[p],
+          '711:0',
+        );
+    else
+      skipped.push({
+        id: 'cli.execute-only',
+        reason: `adapter-fixture images carry fake CLIs (${JSON.stringify(cliModes.modes ?? null)})`,
+      });
+    check(
+      'node.execute-only',
+      cliModes.modes?.[NODE] === '711:0',
+      cliModes.modes?.[NODE],
+      '711:0',
+    );
 
-    // Filesystem, privileges and PID 1 (sections 4.2, 4.5, 4.6).
+    // Filesystem, privileges, limits and PID 1 (sections 4.2, 4.5, 4.6),
+    // with the runner's agent argv and the configured limits.
     const ws = path.join(tmp, 'ws');
     fs.mkdirSync(path.join(ws, '.git'), { recursive: true });
     fs.writeFileSync(path.join(ws, 'def.js'), 'export default {};\n');
     fs.writeFileSync(path.join(ws, 'src.js'), '1;\n');
-    fs.chmodSync(ws, 0o777);
-    for (const f of ['def.js', 'src.js']) fs.chmodSync(path.join(ws, f), 0o666);
-    fs.chmodSync(path.join(ws, '.git'), 0o777);
-    const limits = {
-      tmpfsBytes: 64 * 1024 * 1024,
-      cpus: 1,
-      memoryBytes: 256 * 1024 * 1024,
-      pidsLimit: 64,
-    };
-    docker([
-      'network',
-      'create',
-      '--internal',
-      '-o',
-      'com.docker.network.bridge.gateway_mode_ipv4=isolated',
-      `${names.netA}-ag`,
-    ]);
+    docker(networkCreateArgs(names.ag, 'selftest'));
     docker(
       agentRunArgs({
         name: names.agent,
-        network: `${names.netA}-ag`,
-        image: harness,
+        network: names.ag,
+        image: agentImage,
         limits,
         workspace: ws,
         mounts: {
@@ -403,7 +529,7 @@ export async function runSelfTest({
               ],
               rename: [['/workspace/tmp.js', '/workspace/def.js']],
               remove: ['/workspace/def.js'],
-              exists: ['/node_modules', '/scratch/node_modules'],
+              exists: ['/node_modules'],
             }),
           ],
         }),
@@ -445,7 +571,12 @@ export async function runSelfTest({
       fsr.write?.['/etc/x'],
       'EROFS',
     );
-    check('priv.non-root', fsr.uid !== 0, fsr.uid, 'non-zero uid');
+    check(
+      'priv.non-root',
+      Number.isInteger(fsr.uid) && fsr.uid !== 0,
+      fsr.uid,
+      'non-zero uid',
+    );
     check(
       'priv.no-capabilities',
       /^0+$/.test(String(fsr.capEff)),
@@ -453,12 +584,6 @@ export async function runSelfTest({
       '0',
     );
     check('priv.no-new-privs', fsr.noNewPrivs === '1', fsr.noNewPrivs, '1');
-    check(
-      'grader.no-ancestor-node_modules',
-      fsr.exists?.['/node_modules'] === false,
-      fsr.exists,
-      'false',
-    );
     docker(
       execArgs({
         container: names.agent,
@@ -472,13 +597,15 @@ export async function runSelfTest({
       names.agent,
     ]).stdout.trim();
     check('pid1.survives-agent-kill-all', alive === 'true', alive, 'true');
+    // More processes than the configured limit must be refused.
+    const over = limits.pidsLimit + 64;
     const fork = docker(
       execArgs({
         container: names.agent,
         command: [
           NODE,
           '-e',
-          "const {spawn}=require('child_process');let n=0,e=null;for(let i=0;i<200;i++){try{spawn('sleep',['5']).on('error',x=>{e=x.code});n++}catch(x){e=x.code;break}}setTimeout(()=>console.log(JSON.stringify({n,e})),1500)",
+          `const {spawn}=require('child_process');let n=0,e=null;for(let i=0;i<${over};i++){try{spawn('sleep',['5']).on('error',x=>{e=x.code});n++}catch(x){e=x.code;break}}setTimeout(()=>console.log(JSON.stringify({n,e})),1500)`,
         ],
       }),
     );
@@ -488,17 +615,62 @@ export async function runSelfTest({
       (fork.stdout + fork.stderr).slice(-200),
       'spawn refused at the pids limit',
     );
+
+    // Grader image: no node_modules above /scratch, harness and inputs
+    // read-only, as the runner's grader argv mounts them.
+    const g = graderRunArgs({
+      image: grader,
+      harnessDir: tmp,
+      trustedDir: tmp,
+      baselineDir: tmp,
+      finalDir: tmp,
+      inputsDir: tmp,
+      tmpfsBytes: 64 * 1024 * 1024,
+      evaluateArgs: [],
+    });
+    const gi = g.indexOf(grader);
+    const gfs = json(
+      docker([
+        ...g.slice(0, gi + 1),
+        NODE,
+        `${HARNESS_DIR}/probe-fs.mjs`,
+        JSON.stringify({
+          write: ['/harness/x', '/trusted/x', '/final/x', '/scratch/x'],
+          exists: ['/node_modules', '/scratch/node_modules'],
+        }),
+      ]),
+    );
+    check(
+      'grader.no-ancestor-node_modules',
+      gfs.exists?.['/node_modules'] === false &&
+        gfs.exists?.['/scratch/node_modules'] === false,
+      gfs.exists,
+      'false',
+    );
+    for (const p of ['/harness/x', '/trusted/x', '/final/x'])
+      check(
+        `grader.read-only ${p}`,
+        gfs.write?.[p] === 'EROFS',
+        gfs.write?.[p],
+        'EROFS',
+      );
+    check(
+      'control.grader.scratch-writable',
+      gfs.write?.['/scratch/x'] === 'allowed',
+      gfs.write?.['/scratch/x'],
+      'allowed',
+    );
   } finally {
     server.close();
-    docker(['rm', '-f', names.proxy, names.agent, names.peer]);
-    for (const n of [names.netA, names.netB, `${names.netA}-ag`, names.egress])
+    docker(['rm', '-f', ...proxies, names.agent, names.peer]);
+    for (const n of [names.netA, names.netB, names.ag, names.egress])
       docker(['network', 'rm', n]);
     fs.rmSync(tmp, { recursive: true, force: true });
   }
   const result = {
-    schema: 'pms-agentic-selftest/v1',
+    schema: SELFTEST_SCHEMA,
     at: nowIso(),
-    passed: checks.every((c) => c.pass),
+    passed: checks.length > 0 && checks.every((c) => c.pass),
     checks,
     skipped,
     binding,
@@ -512,17 +684,42 @@ export async function runSelfTest({
   return result;
 }
 
-/** Provider-backed matrices refuse to start without a valid self-test. */
-export function requireValidSelfTest({ stateDir, binding, now = Date.now() }) {
+/**
+ * Preflight: a passing, fresh self-test for exactly this configuration and
+ * host (the same binding function as the self-test).
+ */
+export function requireValidSelfTest({
+  stateDir,
+  config,
+  facts = currentFacts(),
+  now = Date.now(),
+}) {
+  const binding = selftestBinding(config, facts);
   const digest = digestJson(binding);
   const file = path.join(stateDir, `selftest-${digest}.json`);
   if (!fs.existsSync(file))
-    throw new Error(`no isolation self-test for binding ${digest}`);
+    throw Object.assign(
+      new Error(
+        `no isolation self-test for this configuration and host (binding ${digest}); run: pms-agentic-runner selftest --matrix <matrix.json>`,
+      ),
+      { code: 'selftest' },
+    );
   const r = JSON.parse(fs.readFileSync(file, 'utf8'));
+  if (r.bindingDigest !== digest || digestJson(r.binding) !== digest)
+    throw Object.assign(
+      new Error('the self-test result does not match its binding'),
+      { code: 'selftest' },
+    );
   if (!r.passed)
-    throw new Error('the isolation self-test for this binding failed');
+    throw Object.assign(
+      new Error('the isolation self-test for this binding failed'),
+      { code: 'selftest' },
+    );
   if (now - Date.parse(r.at) > SELFTEST_MAX_AGE_MS)
-    throw new Error('the isolation self-test is older than 24 hours');
+    throw Object.assign(
+      new Error('the isolation self-test is older than 24 hours'),
+      { code: 'selftest' },
+    );
   return r;
 }
 

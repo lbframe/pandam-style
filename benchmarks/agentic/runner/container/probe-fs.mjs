@@ -42,4 +42,13 @@ for (const p of spec.remove ?? []) {
   }
 }
 for (const p of spec.exists ?? []) out.exists[p] = fs.existsSync(p);
+out.modes = {};
+for (const p of spec.modes ?? []) {
+  try {
+    const st = fs.statSync(p);
+    out.modes[p] = `${(st.mode & 0o777).toString(8)}:${st.uid}`;
+  } catch (e) {
+    out.modes[p] = e.code;
+  }
+}
 process.stdout.write(`${JSON.stringify(out)}\n`);

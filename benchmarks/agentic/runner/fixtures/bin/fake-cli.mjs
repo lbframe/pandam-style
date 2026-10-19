@@ -32,6 +32,19 @@ const session = argv.includes('--session-id')
   : '01a152b3-0000-7000-8000-000000000000';
 const credentialDir = process.env.PMS_FAKE_CREDENTIAL_DIR ?? null;
 
+// Like the real Codex, `-C <dir>` changes directory and fails if the
+// directory is not visible to the CLI (DESIGN.md 3.2).
+if (cli === 'codex' && argv.includes('-C')) {
+  try {
+    process.chdir(argv[argv.indexOf('-C') + 1]);
+  } catch (error) {
+    process.stderr.write(
+      `Error: ${error.code}: cannot change to ${argv[argv.indexOf('-C') + 1]}\n`,
+    );
+    process.exit(2);
+  }
+}
+
 if (scenario.ignoreSignals) {
   process.on('SIGINT', () => {});
   process.on('SIGTERM', () => {});
@@ -196,77 +209,88 @@ function emitWrite(file, content) {
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// After each tool result the fake waits, as a real CLI waits for the model,
+// so the runner's receive-time workspace sample sees this step's effects
+// before the next step runs (deterministic fixtures, DESIGN.md 2.4).
+const TOOL_PAUSE_MS = scenario.toolPauseMs ?? 150;
 
 async function main() {
   for (const step of scenario.steps) {
-    if (step.emit) emit(step.emit);
-    else if (step.emitRaw != null) process.stdout.write(step.emitRaw);
-    else if (step.run != null)
-      // `as`: the command text the stream shows while `run` really executes
-      // (an opaque wrapper such as `npm run verify` around a script).
-      emitCommand(step.as ?? step.run, () => {
-        const r = spawnSync('sh', ['-c', step.run], {
-          cwd: process.cwd(),
-          encoding: 'utf8',
-        });
-        return { status: r.status ?? 1, output: `${r.stdout}${r.stderr}` };
-      });
-    else if (step.fakeRun != null)
-      // A command event without execution: the command text, status and
-      // output are synthetic (for commands a test must not really run).
-      emitCommand(step.fakeRun.command, () => ({
-        status: step.fakeRun.exitCode ?? 0,
-        output: step.fakeRun.output ?? '',
-      }));
-    else if (step.write) emitWrite(step.write.path, step.write.content);
-    else if (step.touchHostCredential) {
-      // Test-only: the user's own CLI refreshing the host file meanwhile.
-      fs.writeFileSync(
-        process.env.PMS_FAKE_HOST_CREDENTIAL,
-        step.touchHostCredential,
-      );
-    } else if (step.sleep) await sleep(step.sleep);
-    else if (step.refreshCredential) {
-      // Simulates a CLI refreshing its login inside the tmpfs.
-      const file = path.join(credentialDir, step.refreshCredential.file);
-      const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
-      let node = doc;
-      const keys = step.refreshCredential.path;
-      for (const k of keys.slice(0, -1)) node = node[k];
-      node[keys.at(-1)] = step.refreshCredential.value;
-      fs.writeFileSync(file, JSON.stringify(doc));
-    } else if (step.tamperCredential) {
-      const file = path.join(credentialDir, step.tamperCredential.file);
-      fs.rmSync(file, { force: true });
-      if (step.tamperCredential.kind === 'symlink')
-        fs.symlinkSync('/etc/hostname', file);
-      else if (step.tamperCredential.kind === 'fifo')
-        spawnSync('mkfifo', [file]);
-      else if (step.tamperCredential.kind === 'oversize')
-        fs.writeFileSync(file, 'x'.repeat(200 * 1024));
-      else if (step.tamperCredential.kind === 'invalid-json')
-        fs.writeFileSync(file, '{not json');
-      else if (step.tamperCredential.kind === 'shape')
-        fs.writeFileSync(file, '{"unexpected":true}');
-    } else if (step.printCredential) {
-      // A misbehaving agent echoing its credential into its final message.
-      const file = path.join(credentialDir, step.printCredential.file);
-      emit({ type: 'note', leaked: fs.readFileSync(file, 'utf8') });
-    } else if (step.leakChild) {
-      // A child process holding this process's stdout writes a replacement
-      // stream (fixture F22): inherited descriptors are not a boundary.
-      const child = spawn(
-        process.execPath,
-        ['-e', `process.stdout.write(${JSON.stringify(step.leakChild.text)})`],
-        { stdio: ['ignore', 'inherit', 'inherit'] },
-      );
-      await new Promise((r) => child.on('exit', r));
-    } else if (step.waitForever)
-      // A timer keeps the event loop alive; a bare pending promise does not.
-      await new Promise(() => setInterval(() => {}, 1 << 30));
-    else if (step.selfKill) process.kill(process.pid, step.selfKill);
-    else if (step.exit != null) process.exit(step.exit);
+    await runStep(step);
+    if (step.run != null || step.fakeRun != null || step.write)
+      await sleep(TOOL_PAUSE_MS);
   }
 }
 
-main().then(() => process.exit(scenario.exitCode ?? 0));
+async function runStep(step) {
+  if (step.emit) emit(step.emit);
+  else if (step.emitRaw != null) process.stdout.write(step.emitRaw);
+  else if (step.run != null)
+    // `as`: the command text the stream shows while `run` really executes
+    // (an opaque wrapper such as `npm run verify` around a script).
+    emitCommand(step.as ?? step.run, () => {
+      const r = spawnSync('sh', ['-c', step.run], {
+        cwd: process.cwd(),
+        encoding: 'utf8',
+      });
+      return { status: r.status ?? 1, output: `${r.stdout}${r.stderr}` };
+    });
+  else if (step.fakeRun != null)
+    // A command event without execution: the command text, status and
+    // output are synthetic (for commands a test must not really run).
+    emitCommand(step.fakeRun.command, () => ({
+      status: step.fakeRun.exitCode ?? 0,
+      output: step.fakeRun.output ?? '',
+    }));
+  else if (step.write) emitWrite(step.write.path, step.write.content);
+  else if (step.touchHostCredential) {
+    // Test-only: the user's own CLI refreshing the host file meanwhile.
+    fs.writeFileSync(
+      process.env.PMS_FAKE_HOST_CREDENTIAL,
+      step.touchHostCredential,
+    );
+  } else if (step.sleep) await sleep(step.sleep);
+  else if (step.refreshCredential) {
+    // Simulates a CLI refreshing its login inside the tmpfs.
+    const file = path.join(credentialDir, step.refreshCredential.file);
+    const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
+    let node = doc;
+    const keys = step.refreshCredential.path;
+    for (const k of keys.slice(0, -1)) node = node[k];
+    node[keys.at(-1)] = step.refreshCredential.value;
+    fs.writeFileSync(file, JSON.stringify(doc));
+  } else if (step.tamperCredential) {
+    const file = path.join(credentialDir, step.tamperCredential.file);
+    fs.rmSync(file, { force: true });
+    if (step.tamperCredential.kind === 'symlink')
+      fs.symlinkSync('/etc/hostname', file);
+    else if (step.tamperCredential.kind === 'fifo') spawnSync('mkfifo', [file]);
+    else if (step.tamperCredential.kind === 'oversize')
+      fs.writeFileSync(file, 'x'.repeat(200 * 1024));
+    else if (step.tamperCredential.kind === 'invalid-json')
+      fs.writeFileSync(file, '{not json');
+    else if (step.tamperCredential.kind === 'shape')
+      fs.writeFileSync(file, '{"unexpected":true}');
+  } else if (step.printCredential) {
+    // A misbehaving agent echoing its credential into its final message.
+    const file = path.join(credentialDir, step.printCredential.file);
+    emit({ type: 'note', leaked: fs.readFileSync(file, 'utf8') });
+  } else if (step.leakChild) {
+    // A child process holding this process's stdout writes a replacement
+    // stream (fixture F22): inherited descriptors are not a boundary.
+    const child = spawn(
+      process.execPath,
+      ['-e', `process.stdout.write(${JSON.stringify(step.leakChild.text)})`],
+      { stdio: ['ignore', 'inherit', 'inherit'] },
+    );
+    await new Promise((r) => child.on('exit', r));
+  } else if (step.waitForever)
+    // A timer keeps the event loop alive; a bare pending promise does not.
+    await new Promise(() => setInterval(() => {}, 1 << 30));
+  else if (step.selfKill) process.kill(process.pid, step.selfKill);
+  else if (step.exit != null) process.exit(step.exit);
+}
+
+main().then(() =>
+  process.stdout.write('', () => process.exit(scenario.exitCode ?? 0)),
+);

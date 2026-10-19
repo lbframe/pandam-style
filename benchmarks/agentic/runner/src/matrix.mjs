@@ -11,9 +11,10 @@
 // contested. Refused tasks are recorded as `unsupported / not run`.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { loadCorpus, findTask } from '../../src/corpus.mjs';
-import { runAttempt } from './attempt.mjs';
+import { BOUNDS, runAttempt, writeRecord } from './attempt.mjs';
 import { heldoutRefusal } from './capabilities.mjs';
 import {
   buildProjection,
@@ -27,6 +28,10 @@ import {
   credentialFromConfig,
 } from './credentials.mjs';
 import { corpusInfo } from './identity.mjs';
+import { recoverStale } from './recovery.mjs';
+import { RedactionSet, scanFile } from './redact.mjs';
+import { activeRefusals } from './refusals.mjs';
+import { removeOwned } from './safefs.mjs';
 import {
   CORPUS_ROOT,
   digestJson,
@@ -34,13 +39,19 @@ import {
   nowIso,
   readJson,
   sha256,
-  writeJson,
+  writeFileAtomic,
 } from './util.mjs';
 
 export const MATRIX_SCHEMA = 'pms-agentic-matrix/v1';
 
-export function validateMatrixConfig(config) {
+export function validateMatrixConfig(config, { home } = {}) {
   const errors = [];
+  const keys = (config.models ?? []).map((m) => m.key);
+  for (const k of new Set(keys.filter((k, i) => keys.indexOf(k) !== i)))
+    errors.push(`duplicate model key ${k}`);
+  const tasks = config.tasks ?? [];
+  for (const t of new Set(tasks.filter((t, i) => tasks.indexOf(t) !== i)))
+    errors.push(`duplicate task ${t}`);
   if (config.schema !== MATRIX_SCHEMA)
     errors.push(`schema must be ${MATRIX_SCHEMA}`);
   if (!['provider-backed', 'adapter-fixture'].includes(config.kind))
@@ -73,6 +84,7 @@ export function validateMatrixConfig(config) {
     errors.push(
       ...credentialConfigErrors(cli, config.credentials?.[cli], {
         kind: config.kind,
+        ...(home ? { home } : {}),
       }),
     );
   for (const t of config.tasks ?? []) {
@@ -119,6 +131,84 @@ export function backoffSeconds({ attempt, rateLimit, retry }) {
   return Math.min(base * 2 ** (attempt - 1), cap);
 }
 
+/** Identity a resumed matrix must match exactly (section 1.5). */
+export function matrixIdentity(config, identity) {
+  return {
+    configDigest: digestJson(config),
+    kind: config.kind,
+    harness: {
+      runnerTreeDigest: identity.harness.runnerTreeDigest,
+      harnessDepsLockSha256: identity.harness.harnessDepsLockSha256,
+      corpusLockSha256: identity.harness.corpusLockSha256,
+    },
+    productBuild: identity.productBuild?.digest ?? null,
+    dependencies: identity.dependencies ?? null,
+  };
+}
+
+function attemptIndex(name) {
+  const m = /^attempt-(\d+)$/.exec(name);
+  return m ? Number(m[1]) : null;
+}
+
+/**
+ * State of one planned repetition from its attempt directories (resume).
+ * Records of another matrix, cell, model or kind refuse the resume; an
+ * attempt directory without a record (a crash) counts as a used, contested
+ * attempt; a cancelled attempt does not count.
+ */
+export function repetitionState({ cellDir, matrixId, taskId, model, kind }) {
+  const dirs = fs.existsSync(cellDir)
+    ? fs
+        .readdirSync(cellDir)
+        .map((d) => [d, attemptIndex(d)])
+        .filter(([, i]) => i != null)
+        .sort((x, y) => x[1] - y[1])
+    : [];
+  const records = [];
+  let crashed = 0;
+  for (const [d] of dirs) {
+    const f = path.join(cellDir, d, 'record.json');
+    if (!fs.existsSync(f)) {
+      crashed += 1;
+      continue;
+    }
+    const r = readJson(f);
+    const mismatch = [];
+    if (r.matrixId !== matrixId) mismatch.push('matrixId');
+    if (r.kind !== kind) mismatch.push('kind');
+    if (r.cell?.taskId !== taskId || r.cell?.modelKey !== model.key)
+      mismatch.push('cell');
+    if (r.modelConfig?.requestedModel !== model.model) mismatch.push('model');
+    if (r.cli?.name !== model.cli) mismatch.push('cli');
+    if (mismatch.length > 0)
+      throw Object.assign(
+        new Error(`resume refused: ${f} differs (${mismatch.join(', ')})`),
+        { code: 'resume' },
+      );
+    records.push(r);
+  }
+  const last = records.at(-1) ?? null;
+  return {
+    nextIndex: (dirs.at(-1)?.[1] ?? 0) + 1,
+    used:
+      dirs.length -
+      records.filter((r) => r.outcome.code === 'cancelled').length,
+    done: records.some((r) => r.outcome.valid),
+    contested:
+      crashed > 0 || records.some((r) => r.outcome.class === 'infrastructure'),
+    finalInvalid:
+      last != null &&
+      crashed === 0 &&
+      !last.outcome.valid &&
+      last.outcome.code !== 'cancelled' &&
+      last.classificationDetail?.retry !== true
+        ? last
+        : null,
+    records,
+  };
+}
+
 /**
  * Runs a matrix. `executorFor({ model, task, repetition, attempt })` returns
  * the executor (and, for adapter fixtures, the scenario).
@@ -133,6 +223,9 @@ export async function runMatrix({
   credentialFor = null,
   stateDir = null,
   installFor = () => null,
+  home = undefined,
+  bounds = {},
+  sweepLabels = false,
   signal = null,
   clock = {
     now: () => new Date(),
@@ -140,7 +233,7 @@ export async function runMatrix({
   },
   matrixId = `m-${new Date().toISOString().replace(/[:.]/g, '-')}`,
 }) {
-  const errors = validateMatrixConfig(config);
+  const errors = validateMatrixConfig(config, { home });
   if (errors.length > 0)
     throw new Error(`invalid matrix: ${errors.join('; ')}`);
   if (config.kind === 'provider-backed') {
@@ -151,14 +244,14 @@ export async function runMatrix({
         'provider-backed run roots must be outside the repository',
       );
   }
-  // Credential sources are resolved and checked (names and modes only)
-  // before anything runs; a missing source refuses the matrix.
+  stateDir ??= path.join(os.homedir(), '.local/state/pandamstyle-agentic');
+  // Crash recovery runs before anything else (section 4.6).
+  const recovered = recoverStale(runsRoot, { stateDir, sweepLabels });
+  // Credential sources: policy, then names and modes, before anything runs.
   const credentials = new Map();
   for (const cli of new Set(config.models.map((m) => m.cli))) {
-    const c = credentialFromConfig(config, cli, {
-      stateDir: stateDir ?? undefined,
-    });
-    if (c != null) checkCredentialSource(c);
+    const c = credentialFromConfig(config, cli, { stateDir, home });
+    if (c != null) checkCredentialSource(c, { home });
     credentials.set(cli, c);
   }
   credentialFor ??= (model) => credentials.get(model.cli);
@@ -166,29 +259,74 @@ export async function runMatrix({
   const info = corpusInfo(loaded, config.epoch);
   const matrixDir = path.join(runsRoot, matrixId);
   fs.mkdirSync(matrixDir, { recursive: true });
-  writeJson(path.join(matrixDir, 'matrix.json'), {
-    ...config,
-    matrixId,
-    configDigest: digestJson(config),
-    credentialSources: Object.fromEntries(
-      [...credentials].map(([cli, c]) => [cli, c?.source ?? null]),
-    ),
-    startedAt: nowIso(),
-  });
+  const matrixRedaction = new RedactionSet();
+  const writeRedacted = (file, value) => {
+    writeFileAtomic(
+      file,
+      matrixRedaction.redactText(`${JSON.stringify(value, null, 2)}\n`),
+    );
+    if (scanFile(file, matrixRedaction)) {
+      fs.rmSync(file, { force: true });
+      throw Object.assign(
+        new Error(`${path.basename(file)} still contained a secret`),
+        { code: 'redaction' },
+      );
+    }
+  };
+  // Resume (section 1.5): only with the exact same configuration, harness,
+  // product build and dependencies; never by overwriting matrix.json.
+  const ident = matrixIdentity(config, identity);
+  const identityDigest = digestJson(ident);
+  const matrixFile = path.join(matrixDir, 'matrix.json');
+  if (fs.existsSync(matrixFile)) {
+    const stored = readJson(matrixFile);
+    if (stored.identityDigest !== identityDigest) {
+      const differs = Object.keys(ident).filter(
+        (k) =>
+          digestJson(stored.identity?.[k] ?? null) !== digestJson(ident[k]),
+      );
+      throw Object.assign(
+        new Error(
+          `resume refused: matrix ${matrixId} was started with a different ${differs.join(', ') || 'identity'}`,
+        ),
+        { code: 'resume' },
+      );
+    }
+  } else
+    writeRedacted(matrixFile, {
+      ...config,
+      matrixId,
+      identity: ident,
+      identityDigest,
+      credentialSources: Object.fromEntries(
+        [...credentials].map(([cli, c]) => [cli, c?.source ?? null]),
+      ),
+      startedAt: nowIso(),
+    });
+  for (const d of ['.private', '.work']) privateDirOf(path.join(matrixDir, d));
 
   const startedMs = clock.now().getTime();
   const halted = { matrix: null, providers: new Map() };
+  for (const [provider, r] of Object.entries(activeRefusals(stateDir))) {
+    const reason = `durable refusal: ${r.events.at(-1)?.reason ?? 'unresolved'} (resolve-refusal ${provider})`;
+    if (provider === 'docker' && config.kind === 'provider-backed')
+      halted.matrix = reason;
+    else halted.providers.set(provider, reason);
+  }
   const fidelityFailures = new Map();
   const outcomes = [];
 
   for (const taskId of config.tasks) {
     const entry = findTask(loaded, taskId);
     if (entry == null || entry.task.split !== 'development') {
-      outcomes.push({
-        taskId,
-        status: 'unsupported',
-        reasons: [`unknown development task ${taskId}`],
-      });
+      for (const model of config.models)
+        outcomes.push({
+          taskId,
+          model: model.key,
+          status: 'unsupported',
+          repetitions: config.repetitions,
+          reasons: [`unknown development task ${taskId}`],
+        });
       continue;
     }
     const fixture = loaded.fixtures.get(entry.task.workspace.fixture);
@@ -202,30 +340,39 @@ export async function runMatrix({
           model.key,
           `rep-${r}`,
         );
-        const prior = fs.existsSync(cellDir)
-          ? fs
-              .readdirSync(cellDir)
-              .filter((d) => d.startsWith('attempt-'))
-              .sort()
-          : [];
-        const priorRecords = prior
-          .map((d) => path.join(cellDir, d, 'record.json'))
-          .filter((f) => fs.existsSync(f))
-          .map(readJson);
-        if (priorRecords.some((x) => x.outcome.valid)) {
+        const prior = repetitionState({
+          cellDir,
+          matrixId,
+          taskId,
+          model,
+          kind: config.kind,
+        });
+        if (prior.done) {
           outcomes.push({
             taskId,
             model: model.key,
             repetition: r,
             status: 'resumed',
-            attempts: priorRecords.length,
+            attempts: prior.records.length,
           });
           continue;
         }
-        let attempt = priorRecords.length + 1;
-        let contested = priorRecords.some(
-          (x) => x.outcome.class === 'infrastructure',
-        );
+        if (prior.finalInvalid) {
+          outcomes.push({
+            taskId,
+            model: model.key,
+            repetition: r,
+            status: 'missing',
+            attempts: prior.used,
+            contested: prior.contested,
+            code: prior.finalInvalid.outcome.code,
+            reason: `invalid: ${prior.finalInvalid.outcome.class} ${prior.finalInvalid.outcome.code}`,
+          });
+          continue;
+        }
+        let attempt = prior.nextIndex;
+        let used = prior.used;
+        let contested = prior.contested;
         let done = false;
         while (!done) {
           if (signal?.aborted) {
@@ -263,7 +410,7 @@ export async function runMatrix({
           }
           while (!inWindow(clock.now(), config.schedule?.timeWindows))
             await clock.sleep(60 * 1000);
-          if (attempt > config.maxAttempts) {
+          if (used >= config.maxAttempts) {
             outcomes.push({
               taskId,
               model: model.key,
@@ -288,8 +435,11 @@ export async function runMatrix({
                 : null,
             graceInterruptMs: config.budgets?.graceInterruptMs ?? 15000,
             graceTerminateMs: config.budgets?.graceTerminateMs ?? 15000,
+            workspaceBytesCap:
+              config.container?.workspaceBytesCap ?? BOUNDS.workspace,
+            bounds: { ...BOUNDS, ...bounds },
           };
-          const loadSampler = identity.startLoadSampler?.();
+          const label = `${taskId}--${model.key}--${r}--${attempt}`;
           let out;
           try {
             out = await runAttempt({
@@ -305,50 +455,27 @@ export async function runMatrix({
               executor: ex,
               paths: {
                 attemptDir,
-                privateDir: path.join(
-                  matrixDir,
-                  '.private',
-                  `${taskId}--${model.key}--${r}--${attempt}`,
-                ),
-                workRoot: path.join(
-                  matrixDir,
-                  '.work',
-                  `${taskId}--${model.key}--${r}--${attempt}`,
-                ),
+                privateDir: path.join(matrixDir, '.private', label),
+                workRoot: path.join(matrixDir, '.work', label),
               },
               budgets,
+              stateDir,
               credential: credentialFor(model),
-              identity: {
-                ...identity,
-                environment: {
-                  ...identity.environment,
-                  load: loadSampler?.stop() ?? {
-                    samples: 0,
-                    min: null,
-                    max: null,
-                    median: null,
-                  },
-                },
-              },
+              identity,
+              loadSampler: identity.startLoadSampler?.() ?? null,
               grading,
               effectiveConfigEvidence: effectiveConfigFor(model),
-              install: installFor({ model, task: entry.task }),
+              install: installFor({ model, task: entry.task, taskId }),
               signal,
               contested,
+              matrixRedaction,
               projectionFor: (p) =>
-                projectionFor({
-                  ...p,
-                  config,
-                  identity,
-                  info,
-                  budgets,
-                  workRoot: path.join(matrixDir, '.work'),
-                }),
+                projectionFor({ ...p, config, identity, info, budgets }),
             });
           } catch (error) {
             // A harness failure outside the classified paths (a credential
-            // source that vanished, a trusted-tree refusal, a container
-            // error) is systematic: the matrix halts, nothing is retried.
+            // source that vanished, a trusted-tree refusal, a failed install,
+            // a container error) is systematic: the matrix halts.
             halted.matrix = `matrix halted: harness ${error.code ?? 'error'}: ${String(error.message).slice(0, 300)}`;
             outcomes.push({
               taskId,
@@ -384,23 +511,40 @@ export async function runMatrix({
           }
           const rec = out.record;
           const detail = rec.classificationDetail;
+          if (rec.outcome.code !== 'cancelled') used += 1;
           if (rec.outcome.code === 'model-fidelity') {
             const n = (fidelityFailures.get(model.cli) ?? 0) + 1;
             fidelityFailures.set(model.cli, n);
             if (n >= 3) halted.providers.set(model.cli, 'model-fidelity x3');
           }
           if (detail.haltProvider)
-            halted.providers.set(model.cli, rec.outcome.code);
+            halted.providers.set(
+              model.cli,
+              rec.outcome.code === 'completed'
+                ? `credential ${rec.credential.export}`
+                : rec.outcome.code,
+            );
           if (detail.haltMatrix)
             halted.matrix = `matrix halted: ${rec.outcome.code}`;
-          if (detail.retry && attempt < config.maxAttempts) {
+          if (rec.outcome.code === 'cancelled') {
+            outcomes.push({
+              taskId,
+              model: model.key,
+              repetition: r,
+              status: 'missing',
+              reason: 'cancelled',
+              attempts: used,
+            });
+            break;
+          }
+          if (detail.retry && used < config.maxAttempts) {
             const wait = backoffSeconds({
-              attempt,
+              attempt: used,
               rateLimit: rec.provider.rateLimit,
               retry: config.retry,
             });
             rec.outcome.retry = { scheduled: true, backoffSeconds: wait };
-            writeJson(path.join(attemptDir, 'record.json'), rec);
+            writeRecord(attemptDir, rec, matrixRedaction);
             contested = true;
             attempt += 1;
             if (wait > 0) await clock.sleep(wait * 1000);
@@ -411,7 +555,7 @@ export async function runMatrix({
             model: model.key,
             repetition: r,
             status: rec.outcome.valid ? 'done' : 'missing',
-            attempts: attempt,
+            attempts: used,
             contested,
             code: rec.outcome.code,
             ...(rec.outcome.valid
@@ -427,10 +571,12 @@ export async function runMatrix({
       }
     }
   }
-  fs.rmSync(path.join(matrixDir, '.private'), { recursive: true, force: true });
-  writeJson(path.join(matrixDir, 'outcomes.json'), {
+  removeOwned(path.join(matrixDir, '.private'));
+  removeOwned(path.join(matrixDir, '.work'));
+  writeRedacted(path.join(matrixDir, 'outcomes.json'), {
     matrixId,
     finishedAt: nowIso(),
+    recovered,
     outcomes,
     halted: {
       matrix: halted.matrix,
@@ -440,6 +586,11 @@ export async function runMatrix({
   return { matrixId, matrixDir, outcomes };
 }
 
+function privateDirOf(dir) {
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  fs.chmodSync(dir, 0o700);
+}
+
 /** Comparability projection of an attempt (section 1.4). */
 export function projectionFor({
   task,
@@ -447,13 +598,13 @@ export function projectionFor({
   invocation,
   prompt,
   modelConfig,
+  install = null,
   config,
   identity,
   info,
   budgets,
-  workRoot,
+  transients = [],
 }) {
-  const transients = [workRoot];
   const argv = invocation.argv.map((a) => (a === prompt ? '<prompt>' : a));
   const projection = buildProjection({
     task: {
@@ -499,10 +650,12 @@ export function projectionFor({
       tmpfsBytes: config.container?.tmpfsBytes ?? null,
       workspaceBytesCap: config.container?.workspaceBytesCap ?? null,
     },
-    dependencies: identity.dependencies ?? {
-      nodeSha256: null,
-      packageManager: null,
-      fixtureClosureNonProductLockSha256: null,
+    // The closure this cell's workspace was installed from (section 1.4),
+    // never the trusted grading closure.
+    dependencies: {
+      nodeSha256: identity.dependencies?.nodeSha256 ?? null,
+      packageManager: identity.dependencies?.packageManager ?? null,
+      fixtureClosureNonProductLockSha256: install?.nonProductLockSha256 ?? null,
     },
   });
   return {

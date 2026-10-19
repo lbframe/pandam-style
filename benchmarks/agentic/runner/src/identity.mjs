@@ -69,20 +69,23 @@ export function dockerVersion() {
 /** Samples the 1-minute load average every `intervalMs` until stopped. */
 export function startLoadSampler(intervalMs = 5000) {
   const samples = [];
+  let stopped = null;
   const take = () => samples.push(os.loadavg()[0]);
   take();
   const timer = setInterval(take, intervalMs);
   return {
     stop() {
+      if (stopped != null) return stopped;
       clearInterval(timer);
       take();
       const s = [...samples].sort((a, b) => a - b);
-      return {
+      stopped = {
         samples: samples.length,
         min: s[0] ?? null,
         max: s.at(-1) ?? null,
         median: s.length ? s[Math.floor(s.length / 2)] : null,
       };
+      return stopped;
     },
   };
 }

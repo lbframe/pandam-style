@@ -18,8 +18,9 @@
 //   pms-agentic-runner copy-store --dest d [--original d]
 //   pms-agentic-runner bind --store-copy d [--manifest f] [--out f]
 //   pms-agentic-runner trusted-tree --closure d --binding f --store-copy d --dest d [--cache d]
-//   pms-agentic-runner selftest [--state-dir d]
-//   pms-agentic-runner recover [--runs-root d]
+//   pms-agentic-runner selftest --matrix <matrix.json> [--state-dir d]
+//   pms-agentic-runner recover [--runs-root d] [--state-dir d]
+//   pms-agentic-runner refusals | resolve-refusal <provider> [--state-dir d]
 //   pms-agentic-runner prune --older-than <days> [--runs-root d]
 //
 // Adapter-fixture matrices run fake CLIs locally (no provider, no isolation).
@@ -44,6 +45,8 @@ import {
 } from '../src/identity.mjs';
 import { runMatrix, validateMatrixConfig } from '../src/matrix.mjs';
 import { recoverStale } from '../src/recovery.mjs';
+import { RedactionSet, scanFile } from '../src/redact.mjs';
+import { activeRefusals, resolveRefusal } from '../src/refusals.mjs';
 import { regradeAttempt } from '../src/regrade.mjs';
 import { buildReport, loadMatrix, renderMarkdown } from '../src/report.mjs';
 import { bindProductBuild, copyStore } from '../src/store.mjs';
@@ -175,10 +178,7 @@ async function runCommand(positional, flags) {
     throw new Error(`invalid matrix:\n- ${errors.join('\n- ')}`);
   const runsRoot = resolveRunsRoot(config, flags['runs-root']);
   const stateDir = path.resolve(flags['state-dir'] ?? DEFAULT_STATE_DIR);
-  // Crash recovery runs before anything else (section 4.6).
-  const recovered = recoverStale(runsRoot);
-  if (recovered.length > 0)
-    process.stderr.write(`recovered ${recovered.length} stale attempt(s)\n`);
+  // Crash recovery runs first, inside runMatrix (section 4.6).
   let out;
   if (config.kind === 'adapter-fixture') {
     out = await runMatrix({
@@ -207,14 +207,34 @@ async function runCommand(positional, flags) {
       matrixId: flags['matrix-id'],
     });
   }
-  const loaded = loadMatrix(out.matrixDir);
-  const report = buildReport(loaded);
-  writeJson(path.join(out.matrixDir, 'report.json'), report);
-  fs.writeFileSync(
-    path.join(out.matrixDir, 'report.md'),
-    renderMarkdown(report),
-  );
+  const report = buildReport(loadMatrix(out.matrixDir));
+  writeReport(report, {
+    json: path.join(out.matrixDir, 'report.json'),
+    markdown: path.join(out.matrixDir, 'report.md'),
+  });
   return { matrixDir: out.matrixDir, outcomes: out.outcomes };
+}
+
+/**
+ * Derived reports are redacted (token patterns, home path, user name) and
+ * scanned like attempt artifacts (section 6.4); a file failing the scan is
+ * deleted and the command fails.
+ */
+export function writeReport(report, { json = null, markdown = null }) {
+  const errors = validate(loadSchema('report.v1.schema.json'), report);
+  if (errors.length > 0) throw new Error(`report schema: ${errors.join('; ')}`);
+  const redaction = new RedactionSet();
+  for (const [file, text] of [
+    [json, `${JSON.stringify(report, null, 2)}\n`],
+    [markdown, renderMarkdown(report)],
+  ]) {
+    if (file == null) continue;
+    fs.writeFileSync(file, redaction.redactText(text));
+    if (scanFile(file, redaction)) {
+      fs.rmSync(file, { force: true });
+      throw new Error(`${file} failed the leak scan`);
+    }
+  }
 }
 
 export async function main(argv) {
@@ -232,13 +252,13 @@ export async function main(argv) {
       return runCommand(positional, flags);
     case 'report': {
       const report = buildReport(loadMatrix(positional[0]));
-      const errors = validate(loadSchema('report.v1.schema.json'), report);
-      if (errors.length > 0)
-        throw new Error(`report schema: ${errors.join('; ')}`);
-      if (flags.out) writeJson(flags.out, report);
-      if (flags.markdown)
-        fs.writeFileSync(flags.markdown, renderMarkdown(report));
-      return flags.out ? { written: flags.out } : report;
+      writeReport(report, {
+        json: flags.out ?? null,
+        markdown: flags.markdown ?? null,
+      });
+      return flags.out
+        ? { written: flags.out }
+        : JSON.parse(new RedactionSet().redactText(JSON.stringify(report)));
     }
     case 'compare':
       return compareRecords(readJson(positional[0]), readJson(positional[1]));
@@ -280,14 +300,32 @@ export async function main(argv) {
         storeCopy: path.resolve(flags['store-copy']),
       });
     case 'selftest': {
+      // Vouches for one run configuration: its images, allowlists, limits.
+      if (!flags.matrix)
+        throw new Error('selftest: --matrix <matrix.json> is required');
       const { runSelfTest } = await import('../src/selftest.mjs');
       return runSelfTest({
         stateDir: path.resolve(flags['state-dir'] ?? DEFAULT_STATE_DIR),
+        config: readJson(flags.matrix),
       });
     }
     case 'recover':
       return recoverStale(
         path.resolve(flags['runs-root'] ?? DEFAULT_PROVIDER_RUNS_ROOT),
+        {
+          stateDir: path.resolve(flags['state-dir'] ?? DEFAULT_STATE_DIR),
+          sweepLabels: true,
+        },
+      );
+    case 'refusals':
+      return activeRefusals(
+        path.resolve(flags['state-dir'] ?? DEFAULT_STATE_DIR),
+      );
+    case 'resolve-refusal':
+      // After the operator checked the login and removed leftovers.
+      return resolveRefusal(
+        path.resolve(flags['state-dir'] ?? DEFAULT_STATE_DIR),
+        positional[0],
       );
     case 'prune': {
       const days = Number(flags['older-than']);
