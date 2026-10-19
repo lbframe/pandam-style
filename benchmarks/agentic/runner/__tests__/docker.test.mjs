@@ -128,6 +128,43 @@ test(
       requireValidSelfTest({ stateDir, config }).bindingDigest,
       result.bindingDigest,
     );
+    // Docker churn between the self-test and preflight (a new bridge and a
+    // container's veth, then their removal) keeps the binding: only stable
+    // routable host addresses are bound (no timing assumption).
+    const churn = `pms-st-churn-${Date.now().toString(36)}`;
+    try {
+      assert.equal(
+        docker(['network', 'create', '--label', 'pms-agentic=selftest', churn])
+          .status,
+        0,
+      );
+      assert.equal(
+        docker([
+          'run',
+          '-d',
+          '--name',
+          churn,
+          '--network',
+          churn,
+          config.images.proxy,
+          '/opt/node/bin/node',
+          '-e',
+          'setInterval(() => {}, 1e9)',
+        ]).status,
+        0,
+      );
+      assert.equal(
+        requireValidSelfTest({ stateDir, config }).bindingDigest,
+        result.bindingDigest,
+      );
+    } finally {
+      docker(['rm', '-f', churn]);
+      docker(['network', 'rm', churn]);
+    }
+    assert.equal(
+      requireValidSelfTest({ stateDir, config }).bindingDigest,
+      result.bindingDigest,
+    );
     assert.throws(
       () =>
         requireValidSelfTest({
