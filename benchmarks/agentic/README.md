@@ -9,10 +9,10 @@ no product behavior depends on it.
 
 Status:
 
-- **Present:** corpus `1.4.3`, reference epoch `alpha1`. It has 47 development
+- **Present:** corpus `1.4.5`, reference epoch `alpha1`. It has 47 development
   tasks and 16 held-out tasks (encrypted in the repository; see
   [held-out policy](heldout/ACCESS-POLICY.md)), 8 project shapes on 5 hosts, the
-  oracles, and 193 development oracle fixtures (known-good and known-bad
+  oracles, and 201 development oracle fixtures (known-good and known-bad
   solutions, including the independent reviews' probes).
 - **Present (AG-00.2, #6):** the evaluation runner and its Claude Code and
   Codex adapters in [`runner/`](runner/), tested with adapter fixtures (fake
@@ -222,7 +222,10 @@ structure:
   during render always fail.
 - Style channels outside PandamStyle fail render checks and `no-bypass`,
   wherever they appear in the document, after rendering, each interaction and
-  the sweep: `<style>`/`<link>` elements, `style` attributes, raw markup
+  the sweep: `<style>` elements, style sheet `<link>`s (a `rel` with the
+  `stylesheet` or `import` token, or `as="style"`; other links, such as
+  canonical, icon or image preloads, are not style channels), `style`
+  attributes, raw markup
   (`dangerouslySetInnerHTML`, also reported statically) and legacy
   presentational HTML. The presentational list is in
   `src/oracles/style-channels.mjs`: the elements `basefont`, `big`, `blink`,
@@ -315,8 +318,9 @@ sandbox for hostile native code.
      loads it. Older jsdom releases are not an option: their selector engine
      compiles selectors from strings, which the sandbox forbids.
    - **Instrumented DOM:** any write to a style channel (CSSOM, inline style
-     objects, `style` attributes, adopted style sheets, creating
-     `<style>`/`<link>`) is a violation whoever makes it. Any other DOM write
+     objects, `style` attributes, adopted style sheets, creating `<style>`,
+     any write that makes a created `<link>` a style sheet link) is a
+     violation whoever makes it. Any other DOM write
      is a violation unless React itself makes it. A `MutationObserver`
      catches writes that go around the wrapped APIs.
    - **Committed-tree consistency:** after rendering, after each interaction
@@ -324,7 +328,10 @@ sandbox for hostile native code.
      tree says: the same nodes in the same order, the same text, and the
      attributes React's own serializer derives from the committed props
      (portal nodes inside a node React renders count among that node's
-     children); the rest of the document is unchanged apart from React-placed nodes, and no
+     children; hoisted `<title>`, `<meta>` and non-resource `<link>`
+     instances are compared like the others, while resources (identified by
+     React's memoized resource state, such as async scripts and style sheets
+     with a precedence) and singletons are `unmeasured`); the rest of the document is unchanged apart from React-placed nodes, and no
      own property or replaced prototype shadows a DOM interface member. This catches writes with no
      agent stack frame, such as a bound DOM method handed to React as a ref or
      handler.
@@ -333,7 +340,8 @@ sandbox for hostile native code.
      still runs under observation. Any violation fails the render checks and
      `no-bypass`.
 4. **Static analysis (second layer, fail closed).**
-   - It reports the direct forms (style objects, CSSOM, `<style>`/`<link>`,
+   - It reports the direct forms (style objects, CSSOM, `<style>`, a `<link>`
+     whose props do not prove a constant non-style-sheet `rel` and `as`,
      DOM globals, Node built-ins).
    - It treats code outside an analyzable subset as `dynamic-code`:
      string-built code (`eval`, `Function` references, `.constructor`,

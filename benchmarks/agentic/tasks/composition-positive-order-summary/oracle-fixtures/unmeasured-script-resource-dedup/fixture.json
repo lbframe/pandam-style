@@ -1,0 +1,13 @@
+{
+  "description": "Review control (PR #113): two async <script> resources with one src and different ids. React deduplicates them into one node; resources are unmeasured, never a false divergence.",
+  "epoch": "alpha1",
+  "expectedVerdict": "unmeasured",
+  "expectedStatuses": {
+    "scope": "pass",
+    "compile": "pass",
+    "no-bypass": "pass",
+    "summary-card": "unmeasured",
+    "checkout-button": "unmeasured",
+    "visual-fidelity": "unmeasured"
+  }
+}

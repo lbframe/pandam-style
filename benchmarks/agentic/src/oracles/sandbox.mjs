@@ -26,8 +26,9 @@
 // DOM (jsdom), so refs, effects, cloneElement, props and events have their
 // real semantics. The DOM is instrumented before agent code runs:
 //   - every write to a style channel (CSSStyleDeclaration, CSSOM, adopted
-//     style sheets, `style` attributes, creating <style>/<link>) is a
-//     violation, whoever the caller is;
+//     style sheets, `style` attributes, creating <style>, any write that
+//     makes a created <link> a style sheet link) is a violation, whoever the
+//     caller is;
 //   - every other DOM mutation is a violation unless its immediate caller is
 //     React itself (React commits are the only legitimate DOM writers);
 //   - a MutationObserver catches mutations that bypass the wrapped APIs.
@@ -334,7 +335,27 @@ function callerOf() {
   return harnessDepth > 0 ? 'harness' : 'unknown code';
 }
 
-function guarded(iface, member, args, call) {
+// <link> elements created while observing, with the reader of their window.
+// Every instrumented write to one is followed by a check of what it became.
+const createdLinks = new WeakMap();
+
+function trackLink(el) {
+  if (sink == null) return;
+  createdLinks.set(el, harnessDom.get(currentWindow)?.read ?? null);
+}
+
+function linkWrite(target, how) {
+  const read = createdLinks.get(target);
+  let channel;
+  try {
+    channel = linkChannel(read, target);
+  } catch {
+    channel = 'unreadable <link>';
+  }
+  if (channel != null) violation(`style channel ${channel}: ${how}`);
+}
+
+function guarded(iface, member, args, call, target = null) {
   if (sink == null) return call();
   const observer = sink.observer;
   if (observer != null) sink.unattributed.push(...observer.takeRecords());
@@ -360,6 +381,8 @@ function guarded(iface, member, args, call) {
     return call();
   } finally {
     if (observer != null) observer.takeRecords();
+    if (target != null && createdLinks.has(target))
+      linkWrite(target, `${iface}.${member} by ${caller}`);
   }
 }
 
@@ -388,7 +411,13 @@ function instrument(win) {
         Object.defineProperty(proto, key, {
           get: d.get,
           set(value) {
-            return guarded(name, key, [value], () => set.call(this, value));
+            return guarded(
+              name,
+              key,
+              [value],
+              () => set.call(this, value),
+              this,
+            );
           },
           enumerable: d.enumerable,
           configurable: false,
@@ -402,7 +431,7 @@ function instrument(win) {
         const fn = d.value;
         Object.defineProperty(proto, key, {
           value(...args) {
-            return guarded(name, key, args, () => fn.apply(this, args));
+            return guarded(name, key, args, () => fn.apply(this, args), this);
           },
           writable: false,
           enumerable: d.enumerable,
@@ -453,15 +482,18 @@ function instrument(win) {
   }
   const createElement = win.Document.prototype.createElement;
   const createElementNS = win.Document.prototype.createElementNS;
-  const styleTag = (tag) =>
-    typeof tag !== 'string' || /^(style|link)$/i.test(tag);
+  // A <link> is judged by what it becomes (`linkWrite`), not at creation.
+  const styleTag = (tag) => typeof tag !== 'string' || /^style$/i.test(tag);
+  const linkTag = (tag) => typeof tag === 'string' && /^link$/i.test(tag);
   Object.defineProperty(win.Document.prototype, 'createElement', {
     value(tag, ...rest) {
       if (sink != null && styleTag(tag))
         violation(
           `style channel Document.createElement(${tag}) by ${callerOf()}`,
         );
-      return createElement.call(this, tag, ...rest);
+      const el = createElement.call(this, tag, ...rest);
+      if (linkTag(tag)) trackLink(el);
+      return el;
     },
     writable: false,
     configurable: false,
@@ -472,7 +504,9 @@ function instrument(win) {
         violation(
           `style channel Document.createElementNS(${tag}) by ${callerOf()}`,
         );
-      return createElementNS.call(this, ns, tag, ...rest);
+      const el = createElementNS.call(this, ns, tag, ...rest);
+      if (linkTag(tag)) trackLink(el);
+      return el;
     },
     writable: false,
     configurable: false,
@@ -1210,7 +1244,11 @@ function hostChildren(fiber, acc = { nodes: [], portals: [], elsewhere: [] }) {
   return acc;
 }
 
-// The attributes React's serializer derives from the committed props.
+// The attributes React's serializer derives from the committed props. The
+// serializer may emit resources before the element itself (an eager <img
+// src> is preceded by its <link rel="preload" as="image">): the element is the
+// last top-level one with the fiber's tag, or the last one when the HTML
+// parser renamed it (a top-level SVG <image> parses as <img>).
 function expectedAttributes(fiber, parse) {
   const props = {};
   for (const key of Object.keys(fiber.memoizedProps ?? {})) {
@@ -1219,7 +1257,11 @@ function expectedAttributes(fiber, parse) {
   }
   const t = parserDocument.createElement('template');
   t.innerHTML = renderToStaticMarkup(React.createElement(fiber.type, props));
-  const el = t.content.firstElementChild;
+  const tag = ('' + fiber.type).toLowerCase();
+  let el = null;
+  for (const child of t.content.children)
+    if (child.localName === tag) el = child;
+  el ??= t.content.lastElementChild;
   if (el == null) throw new ErrorRef('no element');
   return parse(el);
 }
@@ -1379,8 +1421,22 @@ function checkTree(read, container, fiberRoot, phase) {
   const descend = (acc) => {
     for (const f of acc.nodes) visit(f);
     for (const f of acc.elsewhere) {
-      known.add(f.stateNode);
-      unmeasured.push('hoisted or singleton React element is not measured');
+      // A hoisted instance (<title>, <meta>, a non-resource <link>) is
+      // React's own element in the head: compared like any other. A resource
+      // (async <script>, style sheet with precedence, ...) is identified by
+      // its memoized state, never by its node: React shares one node between
+      // deduplicated fibers and does not commit later prop changes to it, so
+      // resources, like singletons, are not measured.
+      if (
+        f.tag === HOST_HOISTABLE &&
+        f.memoizedState == null &&
+        f.stateNode != null
+      )
+        visit(f);
+      else {
+        known.add(f.stateNode);
+        unmeasured.push('hoisted or singleton React element is not measured');
+      }
     }
     for (const portal of acc.portals) {
       const inner = hostChildren(portal);
@@ -1405,12 +1461,32 @@ const STYLE_CHANNELS = request.styleChannels ?? {
   dimensioned: [],
 };
 
+// The style channel a <link> is (`styleSheetLink` in style-channels.mjs,
+// from the parent's lists), or null; every link without the lists.
+function linkChannel(read, el) {
+  const links = STYLE_CHANNELS.links;
+  if (links == null || read == null) return '<link> element';
+  const attrs = read.attributes(el);
+  const rel = ('' + (attrs.get('rel') ?? ''))
+    .toLowerCase()
+    .split(/[\t\n\f\r ]+/);
+  if (rel.some((token) => links.rel.includes(token)))
+    return 'style sheet <link> (rel)';
+  if (links.as.includes(('' + (attrs.get('as') ?? '')).trim().toLowerCase()))
+    return 'style sheet <link> (as="style")';
+  return null;
+}
+
 function documentStyleChannels(read, doc) {
   const out = [];
   const visit = (el, inSvg) => {
     const tag = read.tag(el);
     const svg = inSvg || tag === 'svg';
-    if (tag === 'style' || tag === 'link') out.push(`<${tag}> element`);
+    if (tag === 'style') out.push('<style> element');
+    if (tag === 'link') {
+      const link = linkChannel(read, el);
+      if (link != null) out.push(link);
+    }
     if (!svg && STYLE_CHANNELS.elements.includes(tag))
       out.push(`presentational <${tag}> element`);
     for (const name of read.attributes(el).keys()) {

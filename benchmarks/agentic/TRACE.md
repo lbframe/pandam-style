@@ -69,8 +69,10 @@ not repeated below unless they are the discriminating evidence.
     - `bad-hidden-item-text`, `bad-template-item-text` and
       `bad-hidden-title-text`: concealed text is not presented text.
     - `bad-spread-style-variable` (compiler).
-    - `bad-generated-delete`, `-rename`, `-add` and
-      `bad-generation-state-tamper`: inventory of record.
+    - `bad-generated-delete`, `-rename`, `-add`,
+      `bad-generation-state-tamper` and `bad-generation-state-delete` (1.4.4:
+      the state file a rebuild leaves, deleted; the fixtures gitignore it, so
+      `git status` no longer lists it): inventory of record.
     - `bad-clipped-summary`: clipping is undecidable statically, so the verdict
       is `unmeasured`, never `pass`.
   - Third-review probes, against the real React client and DOM:
@@ -127,6 +129,18 @@ not repeated below unless they are the discriminating evidence.
       element into `current` through a destructuring pattern or a for-of head
       also ends the exemption. Controls: `good-container-ref-reset` and
       `good-container-ref-shadowed`.
+    - 1.4.4 (#98): only a style sheet `<link>` is a style channel.
+      `bad-link-stylesheet` (`rel="Alternate StyleSheet"`),
+      `bad-link-preload-style` (`as="style"`) and `bad-link-preinit-style`
+      (React DOM's `preinit`, seen only by the sandbox) fail. Controls:
+      `good-link-canonical` (a hoisted canonical link, compared with React's
+      props) and `good-img-fetch-priority` (an eager `<img src>`, which React's
+      serializer precedes with an image preload).
+    - 1.4.5 (PR #113 review): React resources are never compared as hoisted
+      instances. `bad-script-resource-style` (an async script whose source
+      would restyle the card) and `unmeasured-script-resource-dedup` (two
+      deduplicated async scripts) are `unmeasured`, never `pass` and never a
+      false divergence.
   - Good controls: `good-idiomatic-indexing` (array indexing and lookup maps),
     `good-handler-map` (`handlers[e.key]?.()`), `good-focus-ref`,
     `good-memo-hooks` and `good-regenerated` (complete fresh generation).

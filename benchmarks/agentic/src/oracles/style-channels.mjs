@@ -7,8 +7,9 @@
 
 // Legacy presentational HTML: elements and attributes that style content
 // outside PandamStyle. They are a forbidden style channel, like `style`
-// attributes and style sheets, in source (static rules), in the committed
-// DOM (evaluator) and anywhere in the document (sandbox).
+// attributes and style sheets (`<style>`, style sheet `<link>`s), in source
+// (static rules), in the committed DOM (evaluator) and anywhere in the
+// document (sandbox).
 //
 // Inside SVG, attributes are SVG's own; SVG content is not measured.
 // Custom elements (names with a hyphen) define their own attributes; their
@@ -103,8 +104,32 @@ export function presentationalChannel(tag, attribute = null) {
   return null;
 }
 
+// A <link> is a style channel when it can bring a style sheet into the
+// document: a `rel` with the `stylesheet` token (`alternate stylesheet`
+// included) or the obsolete `import` token (an HTML import carries its own
+// style sheets), or a fetch typed as a style sheet (`as="style"`: preloads,
+// prefetches and the onload swap to `rel="stylesheet"`). Other links
+// (canonical, icon, manifest, alternate, preconnect, image, font and script
+// preloads, modulepreload) name or fetch a resource that applies no style.
+export const STYLE_LINK = { rel: ['stylesheet', 'import'], as: ['style'] };
+
+/**
+ * The style channel a <link> is, or null. `get(name)` returns the value of
+ * the lowercase attribute `name`, or null when it is absent. Tokens and the
+ * destination are ASCII case-insensitive.
+ */
+export function styleSheetLink(get) {
+  const rel = ('' + (get('rel') ?? '')).toLowerCase().split(/[\t\n\f\r ]+/);
+  if (rel.some((token) => STYLE_LINK.rel.includes(token)))
+    return 'style sheet <link> (rel)';
+  if (STYLE_LINK.as.includes(('' + (get('as') ?? '')).trim().toLowerCase()))
+    return 'style sheet <link> (as="style")';
+  return null;
+}
+
 export const STYLE_CHANNELS = {
   elements: PRESENTATIONAL_ELEMENTS,
   attributes: PRESENTATIONAL_ATTRIBUTES,
   dimensioned: DIMENSIONED_ELEMENTS,
+  links: STYLE_LINK,
 };

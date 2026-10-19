@@ -88,6 +88,23 @@ Other custody events:
   compound, update, delete) as a store; corrected in the oracles only. Only
   the manifest's `corpusVersion` was updated; the archive, its digest and
   every task digest are unchanged.
+- 2026-10-19, corpus 1.4.4 (#98, before the AG-00.3 freeze): no unseal and no
+  revision. Two oracle false rejects were corrected in the oracles (only a
+  style sheet `<link>` is a style channel, with hoisted instances compared
+  against React's props; an eager `<img src>` is compared with the element
+  React's serializer emits after its image preload). The five fixtures with a
+  PandamStyle project now gitignore the compiler's generation state file, as
+  they already ignored its output directory. Held-out tasks name repository
+  fixtures by ID (`MANIFEST.json`) and the archive holds only `tasks/`, so
+  that fixture change reaches them without touching held-out content; this was
+  checked without the passphrase. Only the manifest's `corpusVersion` was
+  updated; the archive, its digest and every task digest are unchanged.
+- 2026-10-19, corpus 1.4.5 (review of 1.4.4, PR #113): no unseal and no
+  revision. 1.4.4 compared React resources (async scripts, style sheets with a
+  precedence) as hoisted instances; the oracles now identify resources by
+  React's memoized resource state and leave them `unmeasured`, as before 1.4.4.
+  Oracle-only change; only the manifest's `corpusVersion` was updated; the
+  archive, its digest and every task digest are unchanged.
 
 ## Rotation and changes
 

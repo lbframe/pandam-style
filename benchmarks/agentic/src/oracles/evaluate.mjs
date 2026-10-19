@@ -38,7 +38,7 @@ import {
   runSandbox,
 } from './run-sandbox.mjs';
 import { flattenDefinition } from './vocabulary.mjs';
-import { presentationalChannel } from './style-channels.mjs';
+import { presentationalChannel, styleSheetLink } from './style-channels.mjs';
 import {
   countByRule,
   findConstructs,
@@ -1606,8 +1606,14 @@ function committedDomViolations(snapshot, knownClasses) {
   for (const el of elements(tree)) {
     if (Object.hasOwn(el.attributes, 'style'))
       out.push(`committed <${el.tag}> carries a style attribute`);
-    if (el.tag === 'style' || el.tag === 'link')
-      out.push(`committed <${el.tag}> element`);
+    if (el.tag === 'style') out.push('committed <style> element');
+    const link =
+      el.tag === 'link'
+        ? styleSheetLink((name) =>
+            Object.hasOwn(el.attributes, name) ? el.attributes[name] : null,
+          )
+        : null;
+    if (link != null) out.push(`committed ${link}`);
     // Legacy presentational HTML is a style channel outside PandamStyle.
     if (!inSvg(el)) {
       for (const channel of [
