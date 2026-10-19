@@ -210,6 +210,45 @@ export function dataPackages() {
 
 // ------------------------------------------------------------- resolution --
 
+/**
+ * The year of the newest browser release in the pinned data. A dated Baseline
+ * term after it is refused: baseline-browser-mapping rejects a year later than
+ * the wall clock's, so such a term would fail today and resolve later. Up to
+ * this year the term never depends on the clock, because the data's newest
+ * release is never in the future.
+ */
+function dataYear() {
+  let latest = 0;
+  for (const agent of Object.values(browserslist.data)) {
+    for (const time of Object.values(agent.releaseDate ?? {})) {
+      if (time != null && time > latest) latest = time;
+    }
+  }
+  return new Date(latest * 1000).getUTCFullYear();
+}
+
+function beyondData(node) {
+  const year = Number(node.year ?? String(node.date ?? '').slice(0, 4));
+  return Number.isFinite(year) && year > dataYear();
+}
+
+/**
+ * Browserslist warns on stderr once its data is six months old, telling the
+ * reader to update it. The data is an exact pin here, so that advice would
+ * break the recorded identity; the check is skipped for this synchronous call
+ * and the variable restored.
+ */
+function withoutOldDataWarning(run) {
+  const previous = process.env.BROWSERSLIST_IGNORE_OLD_DATA;
+  process.env.BROWSERSLIST_IGNORE_OLD_DATA = '1';
+  try {
+    return run();
+  } finally {
+    if (previous === undefined) delete process.env.BROWSERSLIST_IGNORE_OLD_DATA;
+    else process.env.BROWSERSLIST_IGNORE_OLD_DATA = previous;
+  }
+}
+
 /** Query types refused in `query`, as diagnostics; Browserslist parse errors too. */
 export function refusedTerms(query) {
   let nodes;
@@ -229,7 +268,8 @@ export function refusedTerms(query) {
   for (const node of nodes) {
     const why =
       REFUSED_QUERY_TYPES[node.type] ??
-      (node.type === 'baseline' && node.year == null && node.date == null
+      (node.type === 'baseline' &&
+      ((node.year == null && node.date == null) || beyondData(node))
         ? 'clock'
         : null);
     if (why == null) continue;
@@ -317,7 +357,9 @@ function resolveQuery(ref, query, platform, errors, warnings) {
   }
   let list;
   try {
-    list = browserslist(query, { ...BROWSERSLIST_OPTIONS, stats: {} });
+    list = withoutOldDataWarning(() =>
+      browserslist(query, { ...BROWSERSLIST_OPTIONS, stats: {} }),
+    );
   } catch (error) {
     errors.push(
       targetDiagnostic(
