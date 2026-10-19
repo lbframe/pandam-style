@@ -162,3 +162,5 @@ export {
 export { evaluateStaticExpression } from '../../packages/compiler/src/frontend/babel/static-evaluator.js';
 export { createPassState } from '../../packages/compiler/src/frontend/babel/pass-state.js';
 export { conformanceDefinition } from '../fixtures/design-systems/conformance.js';
+// CE-01.1 targets: pure resolution, catalog, outcome and evaluation functions.
+export * as targets from '../../packages/compiler/src/targets/index.js';

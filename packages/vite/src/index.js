@@ -977,6 +977,7 @@ export function pandamstyle(options = {}) {
         useCSSLayers: userOptions.useCSSLayers,
         engineOptions: userOptions.engineOptions,
         auditPolicy: userOptions.auditPolicy,
+        targets: userOptions.targets,
       });
       host = createHostBridge(project);
       const initialized = await project.initialize();

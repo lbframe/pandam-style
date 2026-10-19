@@ -97,6 +97,11 @@ import {
 } from '../mutations/transaction';
 import { createFilesystemWatcher } from '../../hosts/watcher/index';
 import { buildDesignSystem } from '../../design-system/registry/build-system';
+import { resolveTargets } from '../../targets/resolve';
+import {
+  evaluateProjectTargets,
+  targetReportSection,
+} from '../../targets/project';
 import { PATTERN_CATALOG } from '../../design-system/patterns/compile';
 import { isTokenRef, tokenRefPath } from '../../design-system/tokens/ref';
 import { generateDesignSystemModule } from '../../artifacts/javascript/design-module';
@@ -112,6 +117,7 @@ import {
 } from '../../artifacts/metadata/artifact-set';
 import {
   candidateDomainOf,
+  manifestDocumentOf,
   repairDomainOf,
 } from '../../design-system/registry/snapshot';
 import { PmsError, Codes, diagnostic } from '../../protocol/diagnostics';
@@ -177,6 +183,9 @@ const SEMANTIC_CONFIG_KEYS = [
   'designSystemFile',
   'engineOptions',
   'useCSSLayers',
+  // CE-01.1: target facts and their enforcement are part of what a revision
+  // means, so a target change is a counted full fallback.
+  'targets',
 ];
 
 function sameArray(a, b) {
@@ -246,6 +255,9 @@ function normalizeConfig(input) {
     designSystemFile: input.designSystemFile ?? 'design.pandamstyle.js',
     engineOptions: input.engineOptions ?? {},
     useCSSLayers: input.useCSSLayers === true,
+    // CE-01.1: the project's browser targets, or null for the default profile
+    // in advisory mode. Resolved once per semantic epoch.
+    targets: input.targets ?? null,
     // Spike 3. Which publication strategy this session uses. It is a config
     // field and NOT a semantic one: it changes how the same result is written
     // to disk, never what the result is, so it is deliberately absent from
@@ -639,9 +651,17 @@ export function createProjectSession(config) {
     // output dependencies are represented by semantic units below.
     state.dsv.designSystemEpoch += 1;
 
-    const designSystem = phase('boundary_ms', () =>
-      buildDesignSystem(cfg.definition, { ...cfg.engineOptions }),
+    const targetResolution = phase('targets_resolve_ms', () =>
+      resolveTargets(cfg.targets),
     );
+    const designSystem = phase('boundary_ms', () =>
+      buildDesignSystem(
+        cfg.definition,
+        { ...cfg.engineOptions },
+        { targets: targetResolution.record },
+      ),
+    );
+    state.targetResolution = targetResolution;
     const designSystemSource = phase('ds_module_codegen_ms', () =>
       generateDesignSystemModule({ designSystem }),
     );
@@ -2547,6 +2567,35 @@ export function createProjectSession(config) {
         );
       }
 
+      // CE-01.1: browser target outcomes of everything this revision emits.
+      const cfg = state.config;
+      const targetEvaluation = phase('targets_evaluate_ms', () =>
+        evaluateProjectTargets({
+          resolution: state.targetResolution.record,
+          resolutionDiagnostics: state.targetResolution.diagnostics,
+          designSystem: state.designSystem,
+          designSystemRules: analysis.designSystemRules,
+          pages: analysis.coveredFiles
+            .map((file) => [file, state.fileStates.get(file)?.contribution])
+            .filter(([, contribution]) => contribution != null)
+            .map(([file, contribution]) => ({
+              file,
+              rules: contribution.rules,
+              ruleOrigins: contribution.ruleOrigins,
+            })),
+          useCSSLayers: cfg.useCSSLayers,
+          engineOptions: cfg.engineOptions,
+        }),
+      );
+      active.targetFacts = targetEvaluation.facts;
+      if (targetEvaluation.errors.length > 0) {
+        throw new PmsError([
+          ...targetEvaluation.errors,
+          ...targetEvaluation.warnings,
+        ]);
+      }
+      active.diagnostics = targetEvaluation.warnings;
+
       active.coverage = analysis.coverage;
       active.outputs = analysis.outputs;
       active.analysed = analysis.analysed;
@@ -3267,6 +3316,10 @@ export function createProjectSession(config) {
                 coverageConsistency: coverageConsistencyOf(),
                 externalRequests: externalRequestsOf(),
                 relayEdges: relayEdgesOf(),
+                // CE-01.1, additive: the revision's target facts.
+                ...(active.targetFacts == null
+                  ? {}
+                  : { targets: targetReportSection(active.targetFacts) }),
                 // The generation describes the WHOLE current revision, reused
                 // files included. This block exists so a reader can see how
                 // much of it was recomputed without inferring it from a
@@ -3318,7 +3371,7 @@ export function createProjectSession(config) {
           };
         }
 
-        const manifestWithDigest = designSystem.snapshot.tooling.manifest;
+        const manifestWithDigest = manifestDocumentOf(designSystem.snapshot);
         const manifestText = phase(
           'ds_manifest_codegen_ms',
           () => JSON.stringify(manifestWithDigest, null, 2) + '\n',
@@ -4272,7 +4325,7 @@ export function createProjectSession(config) {
         snapshot.identity,
       );
       const manifest =
-        JSON.stringify(snapshot.tooling.manifest, null, 2) + '\n';
+        JSON.stringify(manifestDocumentOf(snapshot), null, 2) + '\n';
       const artifactSet = createArtifactSet(snapshot, {
         designModuleFile: state.config.designSystemFile,
         declarationsFile: state.designDeclarationsFile,
@@ -4366,7 +4419,7 @@ export function createProjectSession(config) {
         declarationsFile: state.designDeclarationsFile,
         designModule: state.designSystemSource,
         declarations: state.designDeclarationsSource,
-        manifest: JSON.stringify(snapshot.tooling.manifest, null, 2) + '\n',
+        manifest: JSON.stringify(manifestDocumentOf(snapshot), null, 2) + '\n',
         css,
       });
       return sha256(

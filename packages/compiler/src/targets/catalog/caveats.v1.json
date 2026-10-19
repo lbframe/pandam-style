@@ -1,0 +1,1084 @@
+{
+  "kind": "pandamstyle-caveat-reviews",
+  "schemaVersion": 1,
+  "policy": [
+    "A review is keyed by BCD path, engine and the digest of the note text; a changed note is unreviewed again.",
+    "Full statements: irrelevant means the note does not limit the emitted use; restricts means native for the emitted use with the restriction recorded in every record; blocking means incompatible.",
+    "Partial statements (partial: true): native only with a review that names the missing sub-behavior (missing) and states why the usage the compiler emits does not depend on it (rationale). Without such a review a partial statement is unknown.",
+    "effectiveFrom: the review applies only to floors at or above that release; below it the note is unreviewed and the outcome is unknown.",
+    "properties: a property-scoped review accepts only records scoped to one of these properties; any other property is refused on that engine.",
+    "Notes on statements that never apply to an announceable floor are left unreviewed and therefore fail closed if they ever apply."
+  ],
+  "reviews": [
+    {
+      "path": "css.at-rules.media.hover",
+      "engines": [
+        "chrome_android",
+        "webview_android"
+      ],
+      "note": "a0df4657b9004bbd",
+      "disposition": "restricts",
+      "rationale": "Device-specific matching bug on some Android hardware; the media feature itself is supported. Recorded as a restriction."
+    },
+    {
+      "path": "css.at-rules.media.hover",
+      "engines": [
+        "chrome"
+      ],
+      "note": "1855675fd44d468a",
+      "disposition": "irrelevant",
+      "effectiveFrom": "41",
+      "rationale": "Historical: the pre-41 hover implementation bug; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.accent-color",
+      "engines": [
+        "chrome_android",
+        "webview_android"
+      ],
+      "note": "0fc4be8b0743bfa4",
+      "partial": true,
+      "disposition": "restricts",
+      "missing": "The engine does not adjust the tinted control to keep a minimum contrast for legibility.",
+      "rationale": "accent-color is emitted with a design-system color token; the engine applies that accent to checkboxes, radios, ranges and progress. Only automatic contrast correction is missing, and choosing a legible accent is the design-system author's responsibility in every engine. Recorded restriction."
+    },
+    {
+      "path": "css.properties.accent-color",
+      "engines": [
+        "safari_ios"
+      ],
+      "note": "abc4d1b328c62d61",
+      "partial": true,
+      "disposition": "restricts",
+      "missing": "The engine does not adjust the tinted control to keep a minimum contrast for legibility.",
+      "rationale": "accent-color is emitted with a design-system color token; the engine applies that accent to checkboxes, radios, ranges and progress. Only automatic contrast correction is missing, and choosing a legible accent is the design-system author's responsibility in every engine. Recorded restriction."
+    },
+    {
+      "path": "css.properties.accent-color",
+      "engines": [
+        "safari"
+      ],
+      "note": "254f494cf22fd6e1",
+      "partial": true,
+      "disposition": "restricts",
+      "missing": "The engine does not adjust the tinted control to keep a minimum contrast for legibility.",
+      "rationale": "accent-color is emitted with a design-system color token; the engine applies that accent to checkboxes, radios, ranges and progress. Only automatic contrast correction is missing, and choosing a legible accent is the design-system author's responsibility in every engine. Recorded restriction."
+    },
+    {
+      "path": "css.properties.background-image",
+      "engines": [
+        "firefox",
+        "firefox_android"
+      ],
+      "note": "6b62ee97300e7fb7",
+      "disposition": "irrelevant",
+      "rationale": "Depends on a user preference that disables document colors; not an engine support limitation."
+    },
+    {
+      "path": "css.properties.border-bottom-style",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "b4c230e3d034ccdb",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles rendered as solid; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.border-bottom-style",
+      "engines": [
+        "firefox"
+      ],
+      "note": "52e047118ef31a09",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles rendered as solid; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.border-radius",
+      "engines": [
+        "chrome"
+      ],
+      "note": "e09c89e15ef014a7",
+      "disposition": "restricts",
+      "rationale": "Not applied to <select> unless appearance is overridden; recorded restriction for form controls."
+    },
+    {
+      "path": "css.properties.border-radius",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "d4b4e35377702926",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles rendered as solid; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.border-radius",
+      "engines": [
+        "firefox"
+      ],
+      "note": "17ec6260faf104e5",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles and Firefox 4 percentage handling; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.border-radius",
+      "engines": [
+        "safari",
+        "safari_ios"
+      ],
+      "note": "e17886248270b1b1",
+      "disposition": "restricts",
+      "rationale": "Not applied to <select> unless appearance is overridden; recorded restriction for form controls."
+    },
+    {
+      "path": "css.properties.border-style",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "5229dd369546fa25",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles rendered as solid; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.border-style",
+      "engines": [
+        "firefox"
+      ],
+      "note": "6e5e7748fa152faf",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles rendered as solid; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.border-top-left-radius",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "5229dd369546fa25",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles rendered as solid; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.border-top-left-radius",
+      "engines": [
+        "firefox"
+      ],
+      "note": "6e5e7748fa152faf",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles rendered as solid; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.border-top-right-radius",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "5229dd369546fa25",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles rendered as solid; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.border-top-right-radius",
+      "engines": [
+        "firefox"
+      ],
+      "note": "6e5e7748fa152faf",
+      "disposition": "irrelevant",
+      "effectiveFrom": "50",
+      "rationale": "Historical: rounded-corner border styles rendered as solid; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.box-shadow",
+      "engines": [
+        "chrome",
+        "chrome_android",
+        "firefox",
+        "firefox_android",
+        "safari",
+        "safari_ios",
+        "webview_android"
+      ],
+      "note": "7e29bd655b3c40d9",
+      "disposition": "restricts",
+      "rationale": "Shadows can contribute scrollable overflow; recorded as a layout restriction."
+    },
+    {
+      "path": "css.properties.box-sizing",
+      "engines": [
+        "chrome",
+        "chrome_android",
+        "webview_android"
+      ],
+      "note": "dcf8a26e5265595e",
+      "disposition": "irrelevant",
+      "rationale": "Concerns window.getComputedStyle() reporting, not the rendered CSS."
+    },
+    {
+      "path": "css.properties.clip",
+      "engines": [
+        "safari_ios"
+      ],
+      "note": "8480b3cc8d2787ec",
+      "disposition": "restricts",
+      "rationale": "clip:auto is interpreted as rect(auto, auto, auto, auto); recorded restriction."
+    },
+    {
+      "path": "css.properties.clip",
+      "engines": [
+        "safari"
+      ],
+      "note": "848d4fc982682be1",
+      "disposition": "restricts",
+      "rationale": "clip:auto is interpreted as rect(auto, auto, auto, auto); recorded restriction."
+    },
+    {
+      "path": "css.properties.cursor",
+      "engines": [
+        "firefox"
+      ],
+      "note": "84f79e422ac6b695",
+      "disposition": "restricts",
+      "rationale": "Custom url() cursors are limited to 32x32 pixels; keyword cursors are unaffected."
+    },
+    {
+      "path": "css.properties.cursor",
+      "engines": [
+        "safari_ios"
+      ],
+      "note": "9d4c3e3b2b5dd1a3",
+      "disposition": "restricts",
+      "rationale": "Only effective on iPads with a pointing device; unsupported values fall back to the default pointer. Recorded restriction."
+    },
+    {
+      "path": "css.properties.display.flex",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "a35d086d0b25b5e7",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.display.flex",
+      "engines": [
+        "firefox"
+      ],
+      "note": "b29caaa21d163092",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.display.inline-flex",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "a35d086d0b25b5e7",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.display.inline-flex",
+      "engines": [
+        "firefox"
+      ],
+      "note": "b29caaa21d163092",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.display.none",
+      "engines": [
+        "chrome_android"
+      ],
+      "note": "2409165b4528c290",
+      "disposition": "irrelevant",
+      "rationale": "Internal layout-object creation inside hidden iframes; display:none behaves as specified."
+    },
+    {
+      "path": "css.properties.display.none",
+      "engines": [
+        "chrome"
+      ],
+      "note": "0857485c01e46270",
+      "disposition": "irrelevant",
+      "rationale": "Internal layout-object creation inside hidden iframes; display:none behaves as specified."
+    },
+    {
+      "path": "css.properties.display.none",
+      "engines": [
+        "webview_android"
+      ],
+      "note": "9b15dbf2d74f1c5d",
+      "disposition": "irrelevant",
+      "rationale": "Internal layout-object creation inside hidden iframes; display:none behaves as specified."
+    },
+    {
+      "path": "css.properties.flex-direction",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "946eda11aa20a913",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.flex-direction",
+      "engines": [
+        "firefox"
+      ],
+      "note": "75948f819f4e1252",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.flex-grow",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "946eda11aa20a913",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.flex-grow",
+      "engines": [
+        "firefox"
+      ],
+      "note": "75948f819f4e1252",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.flex-shrink",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "43200065a29362a5",
+      "disposition": "irrelevant",
+      "effectiveFrom": "32",
+      "rationale": "Historical: flexbox multi-line before 28 and animation from/to 0 before 32; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.flex-shrink",
+      "engines": [
+        "firefox"
+      ],
+      "note": "def56c70e3f51a32",
+      "disposition": "irrelevant",
+      "effectiveFrom": "32",
+      "rationale": "Historical: flexbox multi-line before 28 and animation from/to 0 before 32; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.flex",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "56ec1931dc2e0497",
+      "disposition": "irrelevant",
+      "effectiveFrom": "61",
+      "rationale": "Historical: flexbox multi-line, animation and content sizing differences before 61; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.flex",
+      "engines": [
+        "firefox"
+      ],
+      "note": "77e3e04cab5f244e",
+      "disposition": "irrelevant",
+      "effectiveFrom": "61",
+      "rationale": "Historical: flexbox multi-line, animation and content sizing differences before 61; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.font-family",
+      "engines": [
+        "firefox"
+      ],
+      "note": "9fe73a7c22d014fc",
+      "disposition": "restricts",
+      "rationale": "Not applied to <option> elements; recorded restriction for form controls."
+    },
+    {
+      "path": "css.properties.font-family",
+      "engines": [
+        "safari",
+        "safari_ios"
+      ],
+      "note": "6328313f7a8d384f",
+      "disposition": "restricts",
+      "rationale": "font-family: initial behaves like inherit; recorded restriction for the global keyword."
+    },
+    {
+      "path": "css.properties.font-feature-settings",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "07d8dbffebfb8a03",
+      "disposition": "irrelevant",
+      "rationale": "Describes automatic MathML font features; not a limitation of the property."
+    },
+    {
+      "path": "css.properties.font-feature-settings",
+      "engines": [
+        "firefox"
+      ],
+      "note": "94a7c9c070bef4fa",
+      "disposition": "irrelevant",
+      "rationale": "Describes automatic MathML font features; not a limitation of the property."
+    },
+    {
+      "path": "css.properties.font-smooth",
+      "engines": [
+        "firefox"
+      ],
+      "note": "d61ddba3041dfe87",
+      "disposition": "restricts",
+      "rationale": "-moz-osx-font-smoothing only has an effect on macOS; elsewhere it is ignored. Recorded restriction (a rendering hint, no layout effect)."
+    },
+    {
+      "path": "css.properties.font-style",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "b27bbe8a96d44174",
+      "disposition": "irrelevant",
+      "effectiveFrom": "44",
+      "rationale": "Historical: oblique not distinguished from italic before 44; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.font-style",
+      "engines": [
+        "firefox"
+      ],
+      "note": "ee35ed4090c38ebb",
+      "disposition": "irrelevant",
+      "effectiveFrom": "44",
+      "rationale": "Historical: oblique not distinguished from italic before 44; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.font-variation-settings",
+      "engines": [
+        "safari_ios"
+      ],
+      "note": "e26e79471cb9e4fa",
+      "disposition": "irrelevant",
+      "rationale": "States the operating-system requirement of the Safari release that introduced it."
+    },
+    {
+      "path": "css.properties.font-variation-settings",
+      "engines": [
+        "safari"
+      ],
+      "note": "5696ccfa2b242d10",
+      "disposition": "irrelevant",
+      "rationale": "States the operating-system requirement of the Safari release that introduced it."
+    },
+    {
+      "path": "css.properties.margin-left.auto",
+      "engines": [
+        "edge"
+      ],
+      "note": "b8f150d0ae842184",
+      "disposition": "restricts",
+      "rationale": "auto margins unsupported in quirks mode only; recorded restriction (documents must be in standards mode)."
+    },
+    {
+      "path": "css.properties.margin-top.auto",
+      "engines": [
+        "edge"
+      ],
+      "note": "b8f150d0ae842184",
+      "disposition": "restricts",
+      "rationale": "auto margins unsupported in quirks mode only; recorded restriction (documents must be in standards mode)."
+    },
+    {
+      "path": "css.properties.margin.auto",
+      "engines": [
+        "edge"
+      ],
+      "note": "b8f150d0ae842184",
+      "disposition": "restricts",
+      "rationale": "auto margins unsupported in quirks mode only; recorded restriction (documents must be in standards mode)."
+    },
+    {
+      "path": "css.properties.max-height",
+      "engines": [
+        "firefox"
+      ],
+      "note": "66a5060d8fc10e18",
+      "disposition": "irrelevant",
+      "rationale": "Describes an extension (applying to tables) beyond CSS 2.1, not a limitation."
+    },
+    {
+      "path": "css.properties.max-width",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "84c426116c6411b6",
+      "disposition": "irrelevant",
+      "rationale": "Describes an extension (applying to tables) beyond CSS 2.1, not a limitation."
+    },
+    {
+      "path": "css.properties.max-width",
+      "engines": [
+        "firefox"
+      ],
+      "note": "835b1952a0e5b8d5",
+      "disposition": "irrelevant",
+      "rationale": "Describes an extension (applying to tables) beyond CSS 2.1, not a limitation."
+    },
+    {
+      "path": "css.properties.min-height",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "584f99fdb7f707ee",
+      "disposition": "irrelevant",
+      "rationale": "Describes an extension (applying to tables) beyond CSS 2.1, not a limitation."
+    },
+    {
+      "path": "css.properties.min-height",
+      "engines": [
+        "firefox"
+      ],
+      "note": "2da7a0dcb874fbb1",
+      "disposition": "irrelevant",
+      "rationale": "Describes an extension (applying to tables) beyond CSS 2.1, not a limitation."
+    },
+    {
+      "path": "css.properties.min-width",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "11c16eb74e282fbb",
+      "disposition": "irrelevant",
+      "rationale": "Describes an extension (applying to tables) beyond CSS 2.1, not a limitation."
+    },
+    {
+      "path": "css.properties.min-width",
+      "engines": [
+        "firefox"
+      ],
+      "note": "42a6d2d11478b5b6",
+      "disposition": "irrelevant",
+      "rationale": "Describes an extension (applying to tables) beyond CSS 2.1, not a limitation."
+    },
+    {
+      "path": "css.properties.order",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "946eda11aa20a913",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.order",
+      "engines": [
+        "firefox"
+      ],
+      "note": "75948f819f4e1252",
+      "disposition": "irrelevant",
+      "effectiveFrom": "28",
+      "rationale": "Historical: single-line flexbox before 28; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.outline-offset",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "e5f35bfb9afd7755",
+      "disposition": "irrelevant",
+      "effectiveFrom": "88",
+      "rationale": "Historical: outline not following border-radius before 88; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.outline-offset",
+      "engines": [
+        "firefox"
+      ],
+      "note": "dd1feb5e8964d144",
+      "disposition": "irrelevant",
+      "effectiveFrom": "88",
+      "rationale": "Historical: outline not following border-radius before 88; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.outline-style",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "e5f35bfb9afd7755",
+      "disposition": "irrelevant",
+      "effectiveFrom": "88",
+      "rationale": "Historical: outline not following border-radius before 88; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.outline-style",
+      "engines": [
+        "firefox"
+      ],
+      "note": "dd1feb5e8964d144",
+      "disposition": "irrelevant",
+      "effectiveFrom": "88",
+      "rationale": "Historical: outline not following border-radius before 88; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.outline-width",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "e5f35bfb9afd7755",
+      "disposition": "irrelevant",
+      "effectiveFrom": "88",
+      "rationale": "Historical: outline not following border-radius before 88; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.outline-width",
+      "engines": [
+        "firefox"
+      ],
+      "note": "dd1feb5e8964d144",
+      "disposition": "irrelevant",
+      "effectiveFrom": "88",
+      "rationale": "Historical: outline not following border-radius before 88; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.overflow",
+      "engines": [
+        "firefox"
+      ],
+      "note": "1e1f186ad2933ead",
+      "disposition": "irrelevant",
+      "rationale": "Historical (before Firefox 3.6) table-group behavior."
+    },
+    {
+      "path": "css.properties.overscroll-behavior",
+      "engines": [
+        "chrome",
+        "chrome_android",
+        "firefox",
+        "firefox_android",
+        "safari",
+        "safari_ios",
+        "webview_android"
+      ],
+      "note": "4b3b6521f27b5e0e",
+      "partial": true,
+      "disposition": "restricts",
+      "missing": "No effect on a scroll container that has no scrollable overflow: such a container does not contain scroll chaining.",
+      "rationale": "The emitted declaration sets overscroll-behavior on a scroll container; every accepted use (CE-00.2 .grid-scroll and .sidebar, both overflow:auto) contains scroll chaining for a container whose content overflows, which partial engines do. Containment of a container without scrollable overflow (for example a scroll lock on a non-scrolling overlay) is not an emitted pattern of the accepted corpus and stays a recorded restriction."
+    },
+    {
+      "path": "css.properties.position.absolute",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "0e7dae7f0af83480",
+      "disposition": "irrelevant",
+      "effectiveFrom": "57",
+      "rationale": "Historical: absolute positioning inside collapsed-border tables before 57; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.position.absolute",
+      "engines": [
+        "firefox"
+      ],
+      "note": "9a7d7638137756cd",
+      "disposition": "irrelevant",
+      "effectiveFrom": "57",
+      "rationale": "Historical: absolute positioning inside collapsed-border tables before 57; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.position.fixed",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "aad38c0ea1b968a4",
+      "disposition": "irrelevant",
+      "effectiveFrom": "44",
+      "rationale": "Historical: position: fixed stacking context before 44; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.position.fixed",
+      "engines": [
+        "firefox"
+      ],
+      "note": "497e7531401a3a2f",
+      "disposition": "irrelevant",
+      "effectiveFrom": "44",
+      "rationale": "Historical: position: fixed stacking context before 44; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.text-combine-upright",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "645b450b6c11d491",
+      "disposition": "irrelevant",
+      "rationale": "Concerns animatability before 81, not support."
+    },
+    {
+      "path": "css.properties.text-combine-upright",
+      "engines": [
+        "firefox"
+      ],
+      "note": "5133b4da3250d331",
+      "disposition": "irrelevant",
+      "rationale": "Concerns animatability before 81, not support."
+    },
+    {
+      "path": "css.properties.text-overflow.ellipsis",
+      "engines": [
+        "chrome",
+        "chrome_android",
+        "webview_android"
+      ],
+      "note": "41759eaa24ff0d4e",
+      "disposition": "restricts",
+      "rationale": "Ellipsis behaves as clip in <textarea> and focused text inputs; recorded restriction for form controls."
+    },
+    {
+      "path": "css.properties.text-overflow.ellipsis",
+      "engines": [
+        "firefox",
+        "firefox_android"
+      ],
+      "note": "cf84373aa4ec95f2",
+      "disposition": "restricts",
+      "rationale": "Ellipsis behaves as clip in text inputs, <textarea> and focused contenteditable; recorded restriction."
+    },
+    {
+      "path": "css.properties.text-overflow.ellipsis",
+      "engines": [
+        "safari",
+        "safari_ios"
+      ],
+      "note": "3bf4e97bb49ef0dd",
+      "disposition": "restricts",
+      "rationale": "Ellipsis behaves as clip in <textarea> and focused text inputs; recorded restriction for form controls."
+    },
+    {
+      "path": "css.properties.text-overflow",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "191804433c749e35",
+      "disposition": "irrelevant",
+      "effectiveFrom": "10",
+      "rationale": "Historical: two-sided ellipsis handling before 10; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.text-overflow",
+      "engines": [
+        "firefox"
+      ],
+      "note": "f080eeaf94f308b4",
+      "disposition": "irrelevant",
+      "effectiveFrom": "10",
+      "rationale": "Historical: two-sided ellipsis handling before 10; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.text-rendering",
+      "engines": [
+        "chrome",
+        "chrome_android",
+        "edge"
+      ],
+      "note": "e64f464112414f18",
+      "disposition": "restricts",
+      "rationale": "Rendering hint only effective on Windows and Linux builds; elsewhere it is ignored. Recorded restriction (a hint, no layout effect)."
+    },
+    {
+      "path": "css.properties.text-rendering",
+      "engines": [
+        "firefox"
+      ],
+      "note": "33c48590c0092a96",
+      "disposition": "restricts",
+      "rationale": "Rendering hint only effective on Windows and Linux builds; elsewhere it is ignored. Recorded restriction (a hint, no layout effect)."
+    },
+    {
+      "path": "css.properties.text-rendering",
+      "engines": [
+        "webview_android"
+      ],
+      "note": "3597bb39a2eef880",
+      "disposition": "irrelevant",
+      "effectiveFrom": "4.4",
+      "rationale": "Historical: web fonts not rendering with optimizeLegibility before 4.4; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.text-transform",
+      "engines": [
+        "chrome",
+        "chrome_android",
+        "webview_android"
+      ],
+      "note": "a277d69a292122f3",
+      "disposition": "restricts",
+      "rationale": "Not applied inside ::first-line; recorded restriction."
+    },
+    {
+      "path": "css.properties.text-transform",
+      "engines": [
+        "safari",
+        "safari_ios"
+      ],
+      "note": "46a130055ef966b9",
+      "disposition": "restricts",
+      "rationale": "Not applied inside ::first-line; recorded restriction."
+    },
+    {
+      "path": "css.properties.touch-action.manipulation",
+      "engines": [
+        "firefox"
+      ],
+      "note": "18f12d3fb85ea9fb",
+      "disposition": "irrelevant",
+      "rationale": "Only states that platforms without pointer or touch input have nothing to apply."
+    },
+    {
+      "path": "css.properties.touch-action",
+      "engines": [
+        "firefox"
+      ],
+      "note": "18f12d3fb85ea9fb",
+      "disposition": "irrelevant",
+      "rationale": "Only states that platforms without pointer or touch input have nothing to apply."
+    },
+    {
+      "path": "css.properties.transition",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "e0f5cbfc7798ebd9",
+      "disposition": "irrelevant",
+      "effectiveFrom": "57",
+      "rationale": "Historical: transition edge cases fixed in 57; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.transition",
+      "engines": [
+        "firefox"
+      ],
+      "note": "8ce4e79ddb3b6a9b",
+      "disposition": "irrelevant",
+      "effectiveFrom": "57",
+      "rationale": "Historical: transition edge cases fixed in 57; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.writing-mode",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "a895c15baf3026ec",
+      "disposition": "irrelevant",
+      "effectiveFrom": "42",
+      "rationale": "Historical: bidi and RTL in vertical modes before 42; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.properties.writing-mode",
+      "engines": [
+        "firefox"
+      ],
+      "note": "bebf3977f112d9c1",
+      "disposition": "irrelevant",
+      "effectiveFrom": "42",
+      "rationale": "Historical: bidi and RTL in vertical modes before 42; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.selectors.after",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "d040af6051372af8",
+      "disposition": "irrelevant",
+      "effectiveFrom": "57",
+      "rationale": "Historical: ::after generated with content normal/none before 57; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.selectors.after",
+      "engines": [
+        "firefox"
+      ],
+      "note": "02c21479f976e546",
+      "disposition": "irrelevant",
+      "effectiveFrom": "57",
+      "rationale": "Historical: ::after generated with content normal/none before 57; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.selectors.before",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "bde92db1691a1cf2",
+      "disposition": "irrelevant",
+      "effectiveFrom": "57",
+      "rationale": "Historical: ::before generated with content normal/none before 57; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.selectors.before",
+      "engines": [
+        "firefox"
+      ],
+      "note": "469e806e19eb32c1",
+      "disposition": "irrelevant",
+      "effectiveFrom": "57",
+      "rationale": "Historical: ::before generated with content normal/none before 57; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.selectors.checked",
+      "engines": [
+        "chrome",
+        "edge"
+      ],
+      "note": "eefa76832d3d9fd1",
+      "disposition": "restricts",
+      "rationale": "Styling <option> through :checked has no effect on macOS; recorded restriction for form controls."
+    },
+    {
+      "path": "css.selectors.checked",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "f5ab09ccf82af832",
+      "disposition": "restricts",
+      "rationale": "<option> elements cannot be styled; recorded restriction for form controls."
+    },
+    {
+      "path": "css.selectors.checked",
+      "engines": [
+        "firefox"
+      ],
+      "note": "f67eb5a4ce4c1fc8",
+      "disposition": "restricts",
+      "rationale": "<option> elements cannot be styled; recorded restriction for form controls."
+    },
+    {
+      "path": "css.selectors.checked",
+      "engines": [
+        "safari",
+        "safari_ios"
+      ],
+      "note": "757fec7cdeec0aba",
+      "disposition": "restricts",
+      "rationale": "Styling <option> elements has no effect; recorded restriction for form controls."
+    },
+    {
+      "path": "css.selectors.disabled",
+      "engines": [
+        "edge"
+      ],
+      "note": "a5872943448b8dfb",
+      "disposition": "irrelevant",
+      "rationale": "Concerns EdgeHTML before 79, which PandamStyle never announces."
+    },
+    {
+      "path": "css.selectors.hover",
+      "engines": [
+        "safari_ios"
+      ],
+      "note": "80080d7089980a2d",
+      "disposition": "restricts",
+      "rationale": "Tap enters :hover and stays until another element is hovered; recorded restriction for touch input."
+    },
+    {
+      "path": "css.selectors.marker",
+      "engines": [
+        "safari_ios"
+      ],
+      "note": "789dc18c21e79dfe",
+      "partial": true,
+      "disposition": "restricts",
+      "missing": "Inside ::marker only color and font-size are applied; every other property (font-weight, content, font-family, ...) is ignored.",
+      "rationale": "The selector itself matches and applies color and font-size, so a ::marker rule that declares only those properties renders as specified. Each other declared property is evaluated as its own combination (combination:selector:::marker+property:<p>) and refused on this engine.",
+      "properties": [
+        "color",
+        "font-size"
+      ]
+    },
+    {
+      "path": "css.selectors.marker",
+      "engines": [
+        "safari"
+      ],
+      "note": "86037327eb3522cd",
+      "partial": true,
+      "disposition": "restricts",
+      "missing": "Inside ::marker only color and font-size are applied; every other property (font-weight, content, font-family, ...) is ignored.",
+      "rationale": "The selector itself matches and applies color and font-size, so a ::marker rule that declares only those properties renders as specified. Each other declared property is evaluated as its own combination (combination:selector:::marker+property:<p>) and refused on this engine.",
+      "properties": [
+        "color",
+        "font-size"
+      ]
+    },
+    {
+      "path": "css.types.calc",
+      "engines": [
+        "firefox_android"
+      ],
+      "note": "5de349d823d6d476",
+      "disposition": "irrelevant",
+      "effectiveFrom": "59",
+      "rationale": "Historical: calc() limits in color functions and parsing before 59; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.types.calc",
+      "engines": [
+        "firefox"
+      ],
+      "note": "25cfb7c803b3b492",
+      "disposition": "irrelevant",
+      "effectiveFrom": "59",
+      "rationale": "Historical: calc() limits in color functions and parsing before 59; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.types.length.ch",
+      "engines": [
+        "firefox"
+      ],
+      "note": "dea9a11e0c21ba78",
+      "disposition": "irrelevant",
+      "effectiveFrom": "4",
+      "rationale": "Historical: ch semantics in Firefox 1 to 3; fixed in the version named by the note, so the review applies only to floors from that version."
+    },
+    {
+      "path": "css.types.length.vh",
+      "engines": [
+        "firefox",
+        "firefox_android"
+      ],
+      "note": "818f6a329a730c5b",
+      "disposition": "irrelevant",
+      "rationale": "Only invalid inside @page, which the compiler does not emit."
+    },
+    {
+      "path": "css.types.length.vw",
+      "engines": [
+        "firefox",
+        "firefox_android"
+      ],
+      "note": "818f6a329a730c5b",
+      "disposition": "irrelevant",
+      "rationale": "Only invalid inside @page, which the compiler does not emit."
+    }
+  ],
+  "compatData": {
+    "bcdVersion": "8.1.6",
+    "publishedDataDigest": "sha256:0bf3c9df85330628083f6f9f248b44f5a124431c0af056c78ed1c13e9617ce71"
+  }
+}

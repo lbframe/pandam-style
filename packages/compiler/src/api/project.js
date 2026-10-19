@@ -104,6 +104,9 @@ function resolveConfig(config = {}) {
     roots,
     definition: snapshotInput(config.definition),
     engineOptions: snapshotInput(config.engineOptions ?? {}),
+    // CE-01.1: browser targets, plain data; absent means the default profile
+    // in advisory mode.
+    targets: config.targets == null ? null : snapshotInput(config.targets),
   };
 }
 
@@ -178,6 +181,12 @@ function resolveConfigChanges(changes, normalized) {
     ...(changes.engineOptions === undefined
       ? {}
       : { engineOptions: snapshotInput(changes.engineOptions) }),
+    ...(changes.targets === undefined
+      ? {}
+      : {
+          targets:
+            changes.targets == null ? null : snapshotInput(changes.targets),
+        }),
   };
 }
 

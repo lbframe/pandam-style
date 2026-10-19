@@ -1,0 +1,315 @@
+{
+  "kind": "pandamstyle-default-profile",
+  "schemaVersion": 1,
+  "ref": "pandamstyle:default@1",
+  "status": "frozen",
+  "decision": "CE-01.1 floor checkpoint, orchestrator decision of 2026-10-19",
+  "query": "chrome >= 120, edge >= 120, firefox >= 121, and_chr >= 120, and_ff >= 121, safari >= 18.2, ios_saf >= 18.2",
+  "iosQuery": "ios_saf >= 18.2",
+  "androidWebViewQuery": "android >= 120",
+  "measurement": {
+    "method": "Floor = max over the floor set of the earliest Browserslist release whose outcome is native or equivalent-fallback; features never acceptable on some default engine set no floor (tools/targets/measure-floor.mjs).",
+    "variant": "designed",
+    "groups": [
+      "ce-00.2-corpus",
+      "compiler-emitted",
+      "intrinsic-default"
+    ],
+    "featureCount": 314,
+    "floors": {
+      "chrome": {
+        "floor": "120",
+        "binding": [
+          "property:mask-image",
+          "property:mask-repeat",
+          "property:mask-size",
+          "selector::dir"
+        ]
+      },
+      "chrome_android": {
+        "floor": "120",
+        "binding": [
+          "property:mask-image",
+          "property:mask-repeat",
+          "property:mask-size",
+          "selector::dir"
+        ]
+      },
+      "edge": {
+        "floor": "120",
+        "binding": [
+          "property:mask-image",
+          "property:mask-repeat",
+          "property:mask-size",
+          "selector::dir"
+        ]
+      },
+      "firefox": {
+        "floor": "121",
+        "binding": [
+          "property:text-wrap",
+          "value:text-wrap/balance"
+        ]
+      },
+      "firefox_android": {
+        "floor": "121",
+        "binding": [
+          "property:text-wrap",
+          "value:text-wrap/balance"
+        ]
+      },
+      "safari": {
+        "floor": "18.2",
+        "binding": [
+          "property:ruby-position",
+          "property:scrollbar-gutter",
+          "value:ruby-position/over",
+          "value:scrollbar-gutter/stable"
+        ]
+      },
+      "safari_ios": {
+        "floor": "18.2",
+        "binding": [
+          "property:ruby-position",
+          "property:scrollbar-gutter",
+          "value:ruby-position/over",
+          "value:scrollbar-gutter/stable"
+        ]
+      },
+      "webview_android": {
+        "floor": "120",
+        "binding": [
+          "property:mask-image",
+          "property:mask-repeat",
+          "property:mask-size",
+          "selector::dir"
+        ]
+      }
+    },
+    "exceptions": {
+      "chrome": [
+        {
+          "feature": "platform:electron/-webkit-app-region",
+          "state": "incompatible",
+          "reason": "platform-scoped"
+        },
+        {
+          "feature": "value:font-family/ui-monospace",
+          "state": "incompatible",
+          "reason": "no-support"
+        }
+      ],
+      "chrome_android": [
+        {
+          "feature": "platform:electron/-webkit-app-region",
+          "state": "incompatible",
+          "reason": "platform-scoped"
+        },
+        {
+          "feature": "value:font-family/ui-monospace",
+          "state": "incompatible",
+          "reason": "no-support"
+        }
+      ],
+      "edge": [
+        {
+          "feature": "platform:electron/-webkit-app-region",
+          "state": "incompatible",
+          "reason": "platform-scoped"
+        },
+        {
+          "feature": "value:font-family/ui-monospace",
+          "state": "incompatible",
+          "reason": "no-support"
+        }
+      ],
+      "firefox": [
+        {
+          "feature": "platform:electron/-webkit-app-region",
+          "state": "incompatible",
+          "reason": "platform-scoped"
+        },
+        {
+          "feature": "value:break-after/avoid",
+          "state": "incompatible",
+          "reason": "no-support"
+        },
+        {
+          "feature": "value:font-family/ui-monospace",
+          "state": "incompatible",
+          "reason": "no-support"
+        },
+        {
+          "feature": "value:text-wrap/pretty",
+          "state": "incompatible",
+          "reason": "no-support"
+        }
+      ],
+      "firefox_android": [
+        {
+          "feature": "platform:electron/-webkit-app-region",
+          "state": "incompatible",
+          "reason": "platform-scoped"
+        },
+        {
+          "feature": "value:break-after/avoid",
+          "state": "incompatible",
+          "reason": "no-support"
+        },
+        {
+          "feature": "value:font-family/ui-monospace",
+          "state": "incompatible",
+          "reason": "no-support"
+        },
+        {
+          "feature": "value:text-wrap/pretty",
+          "state": "incompatible",
+          "reason": "no-support"
+        }
+      ],
+      "safari": [
+        {
+          "feature": "combination:selector:::marker+property:font-weight",
+          "state": "incompatible",
+          "reason": "blocking-caveat"
+        },
+        {
+          "feature": "platform:electron/-webkit-app-region",
+          "state": "incompatible",
+          "reason": "platform-scoped"
+        },
+        {
+          "feature": "property:user-select",
+          "state": "incompatible",
+          "reason": "prefixed-only"
+        },
+        {
+          "feature": "value:break-after/avoid",
+          "state": "incompatible",
+          "reason": "no-support"
+        }
+      ],
+      "safari_ios": [
+        {
+          "feature": "combination:selector:::marker+property:font-weight",
+          "state": "incompatible",
+          "reason": "blocking-caveat"
+        },
+        {
+          "feature": "platform:electron/-webkit-app-region",
+          "state": "incompatible",
+          "reason": "platform-scoped"
+        },
+        {
+          "feature": "property:user-select",
+          "state": "incompatible",
+          "reason": "prefixed-only"
+        },
+        {
+          "feature": "value:break-after/avoid",
+          "state": "incompatible",
+          "reason": "no-support"
+        }
+      ],
+      "webview_android": [
+        {
+          "feature": "platform:electron/-webkit-app-region",
+          "state": "incompatible",
+          "reason": "platform-scoped"
+        },
+        {
+          "feature": "value:font-family/ui-monospace",
+          "state": "incompatible",
+          "reason": "no-support"
+        }
+      ]
+    },
+    "nonBinding": [
+      "combination:selector:::marker+property:font-weight",
+      "platform:electron/-webkit-app-region",
+      "property:user-select",
+      "value:break-after/avoid",
+      "value:font-family/ui-monospace",
+      "value:text-wrap/pretty"
+    ],
+    "notAdopted": {
+      "variant": "with-wacando",
+      "floors": {
+        "chrome": {
+          "floor": "120",
+          "binding": [
+            "property:mask-image",
+            "property:mask-repeat",
+            "property:mask-size",
+            "selector::dir"
+          ]
+        },
+        "chrome_android": {
+          "floor": "120",
+          "binding": [
+            "property:mask-image",
+            "property:mask-repeat",
+            "property:mask-size",
+            "selector::dir"
+          ]
+        },
+        "edge": {
+          "floor": "120",
+          "binding": [
+            "property:mask-image",
+            "property:mask-repeat",
+            "property:mask-size",
+            "selector::dir"
+          ]
+        },
+        "firefox": {
+          "floor": "121",
+          "binding": [
+            "property:text-wrap",
+            "selector::has",
+            "value:text-wrap/balance"
+          ]
+        },
+        "firefox_android": {
+          "floor": "121",
+          "binding": [
+            "property:text-wrap",
+            "selector::has",
+            "value:text-wrap/balance"
+          ]
+        },
+        "safari": {
+          "floor": "26.2",
+          "binding": [
+            "value:text-decoration/dotted"
+          ]
+        },
+        "safari_ios": {
+          "floor": "26.2",
+          "binding": [
+            "value:text-decoration/dotted"
+          ]
+        },
+        "webview_android": {
+          "floor": "120",
+          "binding": [
+            "property:mask-image",
+            "property:mask-repeat",
+            "property:mask-size",
+            "selector::dir"
+          ]
+        }
+      },
+      "reason": "The floor is derived from the accepted CE-00.2 corpus; one consumer declaration (W-UTIL-343 text-decoration: underline dotted, Safari 26.2) does not raise every project floor."
+    }
+  },
+  "inputs": {
+    "compatData": "sha256:7242c205c92fd19d70d5e5342dd0f4efb396f58dd3e81439474983edec1b7fbc",
+    "caveatReviews": "sha256:8a89757ac3a9097e0e4e23e4c51ff9e001da380c7a9764e1d49db54de478cc00",
+    "inapplicableReviews": "sha256:12e6c418f44fe4911ff4cd0fef0446e2ca91ef9f711dcd75b447fd947d82bab1",
+    "corpusAccounting": "sha256:fa1bcbbe9d57f4a69c38a85e1e6e27c3785dc48c437e33223af66a18dd220b1c",
+    "workloads": "sha256:cb61b4d5c28e2df0aec962236c7c4550dc3599634fbe061da2105ac196468b8e",
+    "browserslist": "4.28.0",
+    "caniuseLite": "1.0.30001799"
+  }
+}

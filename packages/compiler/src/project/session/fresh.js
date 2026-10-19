@@ -34,6 +34,12 @@ import {
   coverageSummary,
 } from '../../protocol/diagnostics-result';
 import { buildDesignSystem } from '../../design-system/registry/build-system';
+import { manifestDocumentOf } from '../../design-system/registry/snapshot';
+import { resolveTargets } from '../../targets/resolve';
+import {
+  evaluateProjectTargets,
+  targetReportSection,
+} from '../../targets/project';
 import { generateDesignSystemModule } from '../../artifacts/javascript/design-module';
 import { generateDesignSystemDeclarations } from '../../artifacts/types/design-declarations';
 import {
@@ -323,11 +329,17 @@ function createCompilerSessionInContext(config, graphContext) {
     useCSSLayers = false,
     role = 'page',
     generation = null,
+    targets = null,
   } = config;
 
   clearModuleCache();
+  const targetResolution = resolveTargets(targets);
   const designSystem = phase('boundary_ms', () =>
-    buildDesignSystem(definition, { ...engineOptions }),
+    buildDesignSystem(
+      definition,
+      { ...engineOptions },
+      { targets: targetResolution.record },
+    ),
   );
   const designSystemSource = phase('ds_module_codegen_ms', () =>
     generateDesignSystemModule({ designSystem }),
@@ -370,6 +382,7 @@ function createCompilerSessionInContext(config, graphContext) {
 
   return {
     designSystem,
+    targetResolution,
     roots,
     role,
     useCSSLayers,
@@ -465,6 +478,7 @@ function buildProjectInContext(config) {
     engineOptions = {},
     useCSSLayers = false,
     onStage = null,
+    targets = null,
   } = config;
 
   const absOut = path.resolve(outDir);
@@ -484,6 +498,7 @@ function buildProjectInContext(config) {
           engineOptions,
           useCSSLayers,
           generation: gen,
+          targets,
         });
         const designSystem = session.designSystem;
         const registryDigest = session.registryDigest;
@@ -556,6 +571,8 @@ function buildProjectInContext(config) {
         const failures = [];
         const outputs = [];
         const analysed = [];
+        const designSystemRulesForBuild = [...allRules];
+        const targetPages = [];
 
         for (const [file, origin] of covered) {
           if (file === designSystemPath) {
@@ -600,6 +617,11 @@ function buildProjectInContext(config) {
           }
           const rules = result.metadata.pandamstyle ?? [];
           for (const rule of rules) allRules.push(rule);
+          targetPages.push({
+            file,
+            rules,
+            ruleOrigins: result.metadata.pandamstyleRuleOrigins ?? [],
+          });
           const coverageEntry = result.metadata.pandamstyleCoverage ?? {};
           coverage.push({
             file: relativeToCwd(file),
@@ -642,6 +664,23 @@ function buildProjectInContext(config) {
         // A failing generation must not publish artifacts as current (ARC-14).
         if (failures.length > 0) {
           throw new PmsError(failures);
+        }
+
+        // CE-01.1: the same target evaluation as the project session.
+        const targetEvaluation = evaluateProjectTargets({
+          resolution: session.targetResolution.record,
+          resolutionDiagnostics: session.targetResolution.diagnostics,
+          designSystem,
+          designSystemRules: designSystemRulesForBuild,
+          pages: targetPages,
+          useCSSLayers,
+          engineOptions,
+        });
+        if (targetEvaluation.errors.length > 0) {
+          throw new PmsError([
+            ...targetEvaluation.errors,
+            ...targetEvaluation.warnings,
+          ]);
         }
 
         // Single CSS circuit: the fork's own rule processor.
@@ -697,6 +736,8 @@ function buildProjectInContext(config) {
             to: relativeToCwd(e.to),
             form: e.form,
           })),
+          // CE-01.1, additive: the revision's target facts.
+          targets: targetReportSection(targetEvaluation.facts),
         };
 
         // A one-shot build has no agent waiting on a compact result, so it has
@@ -714,7 +755,7 @@ function buildProjectInContext(config) {
           entries: coverage,
         });
 
-        const manifestWithDigest = designSystem.snapshot.tooling.manifest;
+        const manifestWithDigest = manifestDocumentOf(designSystem.snapshot);
         const manifestText = phase(
           'ds_manifest_codegen_ms',
           () => JSON.stringify(manifestWithDigest, null, 2) + '\n',
@@ -753,6 +794,7 @@ function buildProjectInContext(config) {
           css,
           manifest: manifestWithDigest,
           buildReport,
+          targetDiagnostics: targetEvaluation.warnings,
           coverageReport: coverageDoc,
           designSystem,
           designSystemPath,

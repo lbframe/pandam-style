@@ -120,6 +120,11 @@ export function validateArtifactSet(metadata, contents) {
       mismatch('manifest', `identity field ${key} differs`);
     }
   }
+  // CE-01.1, additive: the target digest binds the artifact set to the target
+  // resolution recorded in the manifest.
+  if ((manifest.targets?.digest ?? null) !== (metadata.targetsDigest ?? null)) {
+    mismatch('artifacts.json', 'targetsDigest differs from the manifest');
+  }
   const markerMatch = contents.designModule.match(
     /export const __pandamstyle = (\{[\s\S]*?\n\});/,
   );
@@ -191,6 +196,7 @@ export function createArtifactSet(
     ...identity,
     artifactSetDigest: artifactSetDigest(identity, artifacts),
     artifacts,
+    ...(snapshot.targets == null ? {} : { targetsDigest: snapshot.targets.digest }),
   };
   validateArtifactSet(metadata, contents);
   const text = `${JSON.stringify(metadata, null, 2)}\n`;

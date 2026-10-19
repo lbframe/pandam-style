@@ -23,12 +23,22 @@ import {
 import { defineRecipe } from '../recipes/compile';
 import { toRuntimeRefs, toThemeRefs } from '../../artifacts/javascript/refs';
 import { token } from '../tokens/ref';
-import { supportedProperties } from '../policy/properties';
+import {
+  propertyKind,
+  structuralDomain,
+  supportedProperties,
+} from '../policy/properties';
+import { evaluateTargets } from '../../targets/evaluate';
 import { PmsError } from '../../protocol/diagnostics';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, phase as perfPhase } from '../../observability/metrics';
 
-export function buildDesignSystem(definition, options = {}) {
+/**
+ * `context.targets` is the project's target resolution record (CE-01.1). When
+ * present, the snapshot records it and the target facts of the design
+ * system's own emitted rules.
+ */
+export function buildDesignSystem(definition, options = {}, context = {}) {
   count('design_system_builds');
   const registry = perfPhase('ds_build_registry_ms', () =>
     buildRegistry(definition),
@@ -110,6 +120,20 @@ export function buildDesignSystem(definition, options = {}) {
       }),
     );
 
+  const targets = context.targets ?? null;
+  const targetFacts =
+    targets == null
+      ? null
+      : perfPhase('ds_target_facts_ms', () =>
+          evaluateTargets({
+            resolution: targets,
+            sources: designSystemTargetSources(injected),
+            enhancements: registry.enhancements,
+            conditions: conditionDefinitions(registry),
+            domainOf: structuralDomainOfCss,
+          }).facts,
+        );
+
   const snapshot = perfPhase('ds_snapshot_build_ms', () =>
     createCanonicalDesignSystemSnapshot({
       registry,
@@ -119,6 +143,8 @@ export function buildDesignSystem(definition, options = {}) {
       recipes,
       cssRules: injected,
       supportedProperties: supportedProperties(),
+      targets,
+      targetFacts: targetFacts == null ? null : { ...targetFacts, scope: 'design-system' },
     }),
   );
   const manifest = perfPhase('ds_manifest_ms', () => snapshot.tooling.manifest);
@@ -137,4 +163,37 @@ export function buildDesignSystem(definition, options = {}) {
     renderCss: () => renderCss(injected),
     injected,
   };
+}
+
+/** The design system's own rules as target-evaluation sources. */
+export function designSystemTargetSources(injected) {
+  const sources = [];
+  for (const key of Object.keys(injected)) {
+    const { ltr, rtl } = injected[key];
+    const owner = { role: 'design-system', file: null, line: null, column: null, label: 'design-system' };
+    if (typeof ltr === 'string') sources.push({ owner, css: ltr });
+    if (typeof rtl === 'string') sources.push({ owner, css: rtl });
+  }
+  return sources;
+}
+
+/** Registry conditions as `{ name, definition }`, for diagnostics context. */
+export function conditionDefinitions(registry) {
+  return (registry.conditionOrder ?? []).map((name) => {
+    const condition = registry.conditions[name];
+    const definition =
+      typeof condition === 'string'
+        ? condition
+        : (condition?.selector ?? condition?.atRule ?? condition?.definition ?? null);
+    return { name, definition };
+  });
+}
+
+/**
+ * Admitted structural values of a CSS (kebab-case) property, or null. Used for
+ * structured repair candidates of target diagnostics.
+ */
+export function structuralDomainOfCss(cssProperty) {
+  const key = String(cssProperty).replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+  return propertyKind(key) === 'structural-set' ? structuralDomain(key) : null;
 }

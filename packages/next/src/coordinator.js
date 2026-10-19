@@ -545,6 +545,7 @@ export async function createCoordinator(
       useCSSLayers: options.useCSSLayers,
       engineOptions: options.engineOptions,
       auditPolicy: options.auditPolicy,
+      targets: options.targets,
       acceptedSnapshotRetention: retention,
     });
     host = createHostBridge(project);
