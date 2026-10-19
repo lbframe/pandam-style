@@ -16,7 +16,8 @@ classifier, which needs the repository install.
 | `sample.mjs`           | One fresh-process sample: `compile`, `consistency`, `runtime` or `vite`                                                                                                                    |
 | `measure.mjs`          | Interleaved, load-recording batches with an optional quiet-machine gate; writes `raw.json` and `summary.json`                                                                              |
 | `summarize.mjs`        | Metric definitions and summaries; pools runs and compares epochs                                                                                                                           |
-| `budgets.mjs`          | `freeze` (policy + baseline runs → budgets) and `gate` (candidate against `alpha1`, same run) with policy-chain checks                                                                     |
+| `budgets.mjs`          | `freeze` (policy + baseline runs → budgets) and `gate` (candidate against `alpha1`, same run), with budgets provenance, control identity and observation validation                        |
+| `gate-regression.mjs`  | Class-level regression matrix of the gate's input validation                                                                                                                               |
 
 ## Commands
 
@@ -37,8 +38,11 @@ node tools/baselines/measure.mjs --plan final --label <label> \
 # Budgets: freeze (only for a new policy version), then gate a candidate.
 node tools/baselines/budgets.mjs freeze --policy <budget-policy.vN.json> \
   --results <raw.json> --results <raw.json> --out <budgets.vN.json>
-node tools/baselines/budgets.mjs gate --budgets <budgets.vN.json> \
+node tools/baselines/budgets.mjs gate [--rev <revision>] \
   --results <raw.json> --candidate <name>
+
+# Gate input-validation regression matrix.
+node tools/baselines/gate-regression.mjs
 ```
 
 With `--require-quiet`, `measure.mjs` exits with status 3 and writes
@@ -51,7 +55,9 @@ with `npm install --ignore-scripts`. Measure it in the same run as `alpha1`. The
 gate rejects results without both epochs.
 
 Rerunning `budgets.mjs freeze` with the committed policy and the committed
-baseline results must reproduce `budgets.v1.json` byte for byte. `gate` fails
-when the budgets file differs from the version of the commit that added it, or
-when a later version breaks the policy chain (see the
-[benchmark README](../../benchmarks/core-evolution/README.md#budgets)).
+baseline results must reproduce `budgets.v1.json` byte for byte. `gate` reads
+the budgets in force from Git at `--rev` and verifies them back to version 1;
+`--budgets <file>` only selects them when the file is byte-identical, and is
+otherwise evaluated in `not-release` mode, which never passes. See the
+[benchmark README](../../benchmarks/core-evolution/README.md#budgets) for the
+validated inputs and verdicts.

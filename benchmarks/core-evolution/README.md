@@ -212,6 +212,10 @@ freeze command must reproduce it byte for byte.
   A cell whose baseline CV is at most 5% gets an absolute limit on the candidate
   median, baseline median × max(1.10, 1 + 3 CV), rounded up to 0.05. Any other
   cell is a paired ratio.
+  - Limited sensitivity: c10000 peak RSS is bimodal (about 1.05 GB or about 2.3
+    GB, in both epochs of the identical artifact), so its two cells fell back to
+    paired ratios with limits of 2.15 and 2.30 and noise ceilings of 1.9 and
+    2.2. They detect only a gross memory regression at that scale.
 - **Deterministic outputs:** absolute limits on the frozen `alpha1` values.
   - 5% for CSS bytes, rule and declaration counts and host bundle bytes.
   - 10% for generated modules.
@@ -220,27 +224,65 @@ freeze command must reproduce it byte for byte.
 - **Unknown:** metrics with no baseline stay `unknown` with an owning lot. They
   are listed by every gate report and never count as passing.
 - **Gate verdicts:**
-  - `pass`: every budget passes;
-  - `fail`: any failing budget, workload mismatch, changed `alpha1` tarball, or
-    policy-chain problem;
-  - `inconclusive`: no interleaved `alpha1` control, too few pairs, a noise
-    ceiling exceeded, or an interval straddling a limit;
-  - `incomplete`: a budgeted metric was not run.
+  - `pass`: every budget passes and every input is validated;
+  - `fail`: a failing budget or failed candidate sample, an `alpha1` control or
+    environment that is not the pinned one, a changed workloads record, or
+    budgets and policy provenance that do not verify;
+  - `inconclusive`: missing, failed, invalid, duplicated, unplanned or
+    non-adjacent observations, too few pairs, a noise ceiling exceeded, an
+    interval straddling a limit, an uncommitted or different harness or plan, an
+    unidentified candidate, or the same run given twice;
+  - `incomplete`: a budgeted workload was not run;
+  - `not-release`: budgets that are not the committed version in force.
   - Only `pass` passes.
+
+**Gate input validation.** A verdict is computed from run files, budgets,
+policy, manifest and workloads records. Every input it depends on is validated,
+and anything that cannot be validated fails closed.
+
+- **Provenance:** in release mode, the budgets, policy, manifest, workloads
+  record and harness come from Git at the evaluated revision (`--rev`, default
+  `HEAD`). The gate uses the highest committed `budgets.vN.json` and verifies it
+  back to version 1:
+
+  - unchanged since first committed;
+  - its `budget-policy.vN.json`, the manifest, the workloads record and every
+    baseline evidence file are committed with matching digests;
+  - it re-derives byte for byte from them;
+  - it is a valid successor of its predecessor.
+
+  A `--budgets` file that is not byte-identical to that committed version is
+  evaluated in `not-release` mode.
+
+- **Control and environment:** the `alpha1` control must be one epoch whose
+  recorded package integrities, installed `@pandamstyle` tree digest, closure
+  lockfile digest and host versions equal the manifest's. The Node version and
+  binary digest must equal the frozen pins. The candidate's identity must be
+  recorded, and is reported.
+- **Observations:** every planned round of every budgeted workload is accounted
+  for on both sides. A failed candidate sample fails the budget. Any other
+  missing, failed, null, non-finite, non-positive (for ratios), duplicated,
+  unplanned or non-adjacent observation makes the budget `inconclusive`. Each
+  result reports its observation counts.
+
+`node tools/baselines/gate-regression.mjs` runs the class-level regression
+matrix of these rules on the committed runs and on temporary clones with altered
+history.
 
 ```sh
 node tools/baselines/measure.mjs --plan final --label <label> \
   --epoch alpha1=<store>/closure --epoch <candidate>=<candidate closure> \
   --node <store>/node/node-v22.22.0-linux-x64/bin/node
-node tools/baselines/budgets.mjs gate --budgets benchmarks/core-evolution/budgets.v1.json \
+node tools/baselines/budgets.mjs gate --rev <evaluated revision> \
   --results benchmarks/core-evolution/results/<label>/raw.json --candidate <candidate>
 ```
 
 **No retrospective weakening.**
 
 - Committed policy, budget, workload, derivation, manifest, closure and result
-  files are frozen. The gate compares the budgets file with the version of the
-  commit that added it and fails on any difference.
+  files are frozen. The release gate verifies the budgets in force at the
+  evaluated revision, and their evidence and predecessors, from Git, and fails
+  on any difference.
 - A new budgets version needs:
   - a `budget-policy.vN.json` with a justification;
   - the exact predecessor, by path and SHA-256;
