@@ -672,9 +672,17 @@ That is host state, not a guarantee. The design therefore uses:
 
 **Self-test validity.** The isolation self-test (§9.3) result is bound to the
 digest of: Docker server version, network create options, agent and proxy
-image ids, proxy allowlist, kernel release and the host's global interface
-address set. It expires after 24 h. A provider-backed attempt refuses to start
-without a valid result for its exact binding.
+image ids, proxy allowlist, kernel release and the host's **stable routable
+address set**: every non-loopback address except link-local ones
+(`169.254.0.0/16`, `fe80::/10`), addresses of Docker interfaces (`docker*`,
+`br-*`, `veth*`) and any address inside a Docker network's subnet. Docker
+networks, bridges and container veths created or removed between the
+self-test and preflight (by the self-test itself, by attempts or by other
+projects on the host) therefore leave the binding unchanged, while a change
+of a genuine routable address still invalidates it. The self-test (at its
+start) and preflight compute these facts with the same function. It expires
+after 24 h. A provider-backed attempt refuses to start without a valid
+result for its exact binding.
 
 ### 4.4 Telemetry and failure-signal integrity (R3)
 
@@ -1276,7 +1284,7 @@ Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 | §5 failures, retries, contested | `classify.mjs`, `matrix.mjs` | `adapters.test.mjs` F10–F16, F22; `measurement.test.mjs` B10 |
 | §6 evidence, redaction, bounds | `workspace.mjs` staging, `evidence.mjs`, `redact.mjs` (chunked scans), `stream.mjs` (bounded splitter and sink), `attempt.mjs` `writeRecord` | `evidence.test.mjs` F30–F33; `confinement.test.mjs` B2; `measurement.test.mjs` B13 |
 | §7 report | `report.mjs` (seeded from the planned matrix), CLI `writeReport` | `policy-report.test.mjs` F56, F57; `measurement.test.mjs` B9 |
-| §9.3 isolation self-test | `selftest.mjs`, `container/probe-*.mjs` | `docker.test.mjs` B5; §11.3 |
+| §9.3 isolation self-test | `selftest.mjs`, `container/probe-*.mjs`, `docker.mjs` `stableHostAddresses` | `selftest-binding.test.mjs`; `docker.test.mjs` B5; §11.3 |
 
 ### 11.2 Where the implementation differs from or completes this note
 
@@ -1418,7 +1426,16 @@ Each item was found while implementing, testing or in review round 1
     together with its manifests and digests can make a forged attempt look
     consistent (review classes B10 and B12). Only the operator can do this;
     the evaluated agent never has access to these files.
-18. **Provider-backed path never executed.** Its preflight refusals are
+18. **Stable self-test host binding (after merge, main CI).** The binding
+    first included every non-loopback host address, so Docker bridges,
+    container veths and IPv6 link-local addresses created or removed
+    between the self-test and preflight (the self-test's own networks, CI
+    runners, restarting containers of other projects) changed it and
+    preflight refused a self-test that had passed. It now binds the stable
+    routable set of §4.3 (`stableHostAddresses`), computed by the same
+    `currentFacts` in both places. The probes still target every host
+    address and bridge gateway.
+19. **Provider-backed path never executed.** Its preflight refusals are
     tested; the containers, staging, grading and self-test binding run in the
     credential-free Docker integration tests; the remaining steps (binding
     of the real store, trusted tree from the real tarballs, CLI identity of
