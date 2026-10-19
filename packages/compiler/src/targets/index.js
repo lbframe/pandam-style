@@ -12,7 +12,8 @@
 
 export { compatData, compatDataFromText } from './data';
 export { compareVersions, isReleaseString, parseVersion } from './versions';
-export { extractConstructs } from './extract';
+export { constructKey, extractConstructs } from './extract';
+export { tokenizeEmitted } from './tokens';
 export {
   CATALOG_KIND,
   CATALOG_SCHEMA_VERSION,
@@ -22,8 +23,11 @@ export {
   caveatDisposition,
   featureByKey,
   featuresOf,
+  failClosedSubfeatures,
   inapplicability,
   inapplicableCatalog,
+  subfeatureCatalog,
+  subfeaturePath,
 } from './catalog';
 export {
   BASES,
@@ -47,6 +51,8 @@ export {
   dataPackages,
   liveBrowsers,
   precomputedBrowsers,
+  QUERY_TYPES,
+  queryRefusal,
   refusedTerms,
   resolveTargets,
   stableJson,
@@ -57,8 +63,13 @@ export {
   evaluateRequirements,
   cachedUnit,
   createTargetAccumulator,
+  designSystemTargetFacts,
   evaluateTargets,
-  stableJsonCached,
+  extractionCacheSizes,
+  entryJson,
+  featuresJson,
+  stableJsonSpliced,
+  summarizePage,
   summarizeSources,
   unitSummary,
   featuresOfCss,

@@ -251,6 +251,13 @@ describe('refused query terms', () => {
       'targets.query.ambient',
       'popularity_in_config_stats',
     ],
+    ['cover 90% in my stats', 'targets.query.ambient', 'cover_in'],
+    ['cover 90% in My  Stats', 'targets.query.ambient', 'cover_in'],
+    [
+      'cover 90% in browserslist-config-acme stats',
+      'targets.query.ambient',
+      'cover_config',
+    ],
     // A combined query is refused for its refused term.
     ['defaults, last 2 years', 'targets.query.clock', 'last_years'],
     ['chrome >= 120 and not since 2020', 'targets.query.clock', 'since_y'],
@@ -291,10 +298,47 @@ describe('refused query terms', () => {
       'last 2 versions',
       'firefox esr',
       'baseline 2024',
+      '> 1% in US',
+      'cover 90% in US',
+      'cover 90% in alt-as',
     ]) {
       const { record } = targets.resolveTargets(project(query));
       expect(record.profiles[0].engines.length).toBeGreaterThan(0);
     }
+  });
+
+  test('every query type of the pinned Browserslist is classified', () => {
+    // The type list comes from Browserslist's own query table, so a type
+    // added upstream fails here until it is classified.
+    const entry = require.resolve('browserslist', {
+      paths: [path.resolve(__dirname, '../..')],
+    });
+    const pkg = JSON.parse(
+      fs.readFileSync(path.join(path.dirname(entry), 'package.json'), 'utf8'),
+    );
+    expect(pkg.version).toBe(targets.DATA_PINS.browserslist);
+    const source = fs.readFileSync(entry, 'utf8');
+    const start = source.indexOf('\nvar QUERIES = {\n');
+    expect(start).toBeGreaterThan(-1);
+    const table = source.slice(start, source.indexOf('\n}\n', start));
+    const upstream = [...table.matchAll(/^ {2}(\w+): \{$/gm)].map((m) => m[1]);
+    expect(upstream.length).toBeGreaterThan(40);
+    expect(Object.keys(targets.QUERY_TYPES).sort()).toEqual(upstream.sort());
+    for (const kind of Object.values(targets.QUERY_TYPES)) {
+      expect(['pinned', 'clock', 'ambient', 'by-argument']).toContain(kind);
+    }
+  });
+
+  test('a query type outside the classification is refused', () => {
+    expect(targets.queryRefusal({ type: 'future_type', query: 'x' })).toBe(
+      'unclassified',
+    );
+    expect(targets.queryRefusal({ type: 'toString', query: 'x' })).toBe(
+      'unclassified',
+    );
+    expect(targets.queryRefusal({ type: 'defaults', query: 'defaults' })).toBe(
+      null,
+    );
   });
 });
 

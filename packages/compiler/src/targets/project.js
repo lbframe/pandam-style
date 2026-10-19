@@ -28,8 +28,9 @@ import crypto from 'crypto';
 import {
   cachedUnit,
   evaluateTargets,
-  stableJsonCached,
-  summarizeSources,
+  featuresJson,
+  stableJsonSpliced,
+  summarizePage,
   unitSummary,
 } from './evaluate';
 
@@ -88,16 +89,25 @@ export function evaluateProjectTargets({
   const injected =
     designSystem.injected ??
     Object.fromEntries(designSystemRules.map(([key, rule]) => [key, rule]));
+  const designSystemSummary = unitSummary(injected, () =>
+    designSystemTargetSources(injected),
+  );
   const units = [
     [
       'design-system',
-      unitSummary(injected, () => designSystemTargetSources(injected)),
+      accumulator == null
+        ? designSystemSummary
+        : accumulator.reuseStructure('design-system', designSystemSummary),
     ],
   ];
   for (const { file, rules, ruleOrigins } of pages) {
     units.push([
       file,
-      cachedUnit(rules, () => pageSummary(file, rules, ruleOrigins)),
+      cachedUnit(
+        rules,
+        () => pageSummary(file, rules, ruleOrigins, accumulator),
+        [file, ruleOrigins],
+      ),
     ]);
   }
   const result = evaluateTargets({
@@ -141,32 +151,43 @@ export function evaluateProjectTargets({
   };
 }
 
-// The latest summary of each page file with the content it was computed
-// from. A recompiled page whose emitted rules and locations are unchanged
-// (a theme or token edit recompiles its consumers) keeps the same summary
-// object, which the accumulator then skips. One entry per file.
-const latestPageSummary = new Map();
-
-function pageSummary(file, rules, ruleOrigins = []) {
+/**
+ * The content key of a page's emitted rules and their locations: a digest
+ * streamed over the rule texts, so no copy of the CSS is kept.
+ */
+function pageContentKey(rules, ruleOrigins) {
   const origins = new Map(
     ruleOrigins.map((origin) => [origin.className, origin]),
   );
-  const content = JSON.stringify(
-    rules.map(([className, rule]) => {
-      const origin = origins.get(className);
-      return [
-        rule?.ltr ?? null,
-        rule?.rtl ?? null,
-        origin?.line,
-        origin?.column,
-      ];
-    }),
-  );
-  const latest = latestPageSummary.get(file);
-  if (latest != null && latest.content === content) return latest.summary;
-  const summary = summarizeSources(pageTargetSources(file, rules, ruleOrigins));
-  latestPageSummary.set(file, { content, summary });
-  return summary;
+  const hash = crypto.createHash('sha256');
+  for (const [className, rule] of rules) {
+    const origin = origins.get(className);
+    hash.update(rule?.ltr ?? '\u0001');
+    hash.update('\u0000');
+    hash.update(rule?.rtl ?? '\u0001');
+    hash.update(
+      `\u0000${origin?.line ?? ''}\u0000${origin?.column ?? ''}\u0000`,
+    );
+  }
+  return hash.digest('base64');
+}
+
+/**
+ * A page's summary. With the session's accumulator, a recompiled page whose
+ * emitted rules and locations are unchanged (a theme or token edit recompiles
+ * its consumers) keeps its previous summary, which the accumulator then
+ * skips; the accumulator drops the entry with the file.
+ */
+function pageSummary(file, rules, ruleOrigins = [], accumulator = null) {
+  const sourcesOf = () => pageTargetSources(file, rules, ruleOrigins);
+  return accumulator == null
+    ? summarizePage(sourcesOf)
+    : accumulator.reuse(
+        file,
+        pageContentKey(rules, ruleOrigins),
+        () => summarizePage(sourcesOf),
+        (previous) => previous.withSources(sourcesOf),
+      );
 }
 
 const projectedFacts = new WeakMap();
@@ -196,7 +217,14 @@ function projectFacts(evaluated, resolution, enforcement) {
       'sha256:' +
       crypto
         .createHash('sha256')
-        .update(stableJsonCached(factsBody))
+        .update(
+          // The evaluation serialized each feature entry already.
+          stableJsonSpliced(
+            factsBody,
+            evaluated.features,
+            featuresJson(evaluated.features),
+          ),
+        )
         .digest('hex'),
   };
 }

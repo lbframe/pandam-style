@@ -14,6 +14,7 @@
  * here rather than trusted.
  */
 
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { loadCompiler } = require('./session-helpers');
@@ -381,5 +382,53 @@ describe('lazily parsed compat data', () => {
     expect(targets.compatData().digest).toBe(
       targets.compatDataFromText(text).digest,
     );
+  });
+
+  test('the byte form decodes every entry as the text form does', () => {
+    const bytes = fs.readFileSync(
+      path.join(TARGETS_SRC, 'data/compat-data.v1.json'),
+    );
+    const fromBytes = targets.compatDataFromText(bytes);
+    const fromText = targets.compatDataFromText(bytes.toString('utf8'));
+    const raw = JSON.parse(bytes.toString('utf8'));
+    // The data holds non-ASCII text (`≤`), which the byte form must decode.
+    expect(bytes.toString('utf8')).toMatch(/[\u0080-\uffff]/);
+    expect(fromBytes.digest).toBe(fromText.digest);
+    for (const [key, value] of Object.entries(raw.paths)) {
+      expect(fromBytes.entry(key)).toEqual(value);
+      // Needle search reads the bytes; it must agree with the text,
+      // including a non-ASCII needle and a needle beyond the entry's end.
+      for (const needle of ['"n":', '"x":', '"p":1', '≤', '"css.']) {
+        expect([key, needle, fromBytes.mentions(key, needle)]).toEqual([
+          key,
+          needle,
+          fromText.mentions(key, needle),
+        ]);
+      }
+    }
+    expect(fromBytes.alternativeNameEntries()).toEqual(
+      fromText.alternativeNameEntries(),
+    );
+  });
+
+  test('the digest built into each public bundle is the shipped file digest', () => {
+    const lib = path.join(REPO, 'packages/compiler/lib');
+    const shipped = fs.readFileSync(path.join(lib, 'compat-data.v1.json'));
+    const digest = `sha256:${crypto
+      .createHash('sha256')
+      .update(shipped)
+      .digest('hex')}`;
+    expect(digest).toBe(targets.compatData().digest);
+    const bundles = fs
+      .readdirSync(lib)
+      .filter((file) => file.endsWith('.mjs'))
+      .map((file) => fs.readFileSync(path.join(lib, file), 'utf8'))
+      .filter((source) => source.includes('compatDataDigest ='));
+    expect(bundles.length).toBeGreaterThan(0);
+    for (const source of bundles) {
+      expect(
+        source.match(/compatDataDigest = "(sha256:[0-9a-f]{64})"/)[1],
+      ).toBe(digest);
+    }
   });
 });

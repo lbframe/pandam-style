@@ -15,7 +15,7 @@
       "compiler-emitted",
       "intrinsic-default"
     ],
-    "featureCount": 314,
+    "featureCount": 323,
     "floors": {
       "chrome": {
         "floor": "120",
@@ -184,6 +184,16 @@
           "reason": "prefixed-only"
         },
         {
+          "feature": "value:--xb5a8fl/mark",
+          "state": "incompatible",
+          "reason": "no-support"
+        },
+        {
+          "feature": "value:border-color/mark",
+          "state": "incompatible",
+          "reason": "no-support"
+        },
+        {
           "feature": "value:break-after/avoid",
           "state": "incompatible",
           "reason": "no-support"
@@ -204,6 +214,16 @@
           "feature": "property:user-select",
           "state": "incompatible",
           "reason": "prefixed-only"
+        },
+        {
+          "feature": "value:--xb5a8fl/mark",
+          "state": "incompatible",
+          "reason": "no-support"
+        },
+        {
+          "feature": "value:border-color/mark",
+          "state": "incompatible",
+          "reason": "no-support"
         },
         {
           "feature": "value:break-after/avoid",
@@ -228,6 +248,8 @@
       "combination:selector:::marker+property:font-weight",
       "platform:electron/-webkit-app-region",
       "property:user-select",
+      "value:--xb5a8fl/mark",
+      "value:border-color/mark",
       "value:break-after/avoid",
       "value:font-family/ui-monospace",
       "value:text-wrap/pretty"
@@ -236,30 +258,21 @@
       "variant": "with-wacando",
       "floors": {
         "chrome": {
-          "floor": "120",
+          "floor": "122",
           "binding": [
-            "property:mask-image",
-            "property:mask-repeat",
-            "property:mask-size",
-            "selector::dir"
+            "selector:::backdrop/inherit-from-originating-element"
           ]
         },
         "chrome_android": {
-          "floor": "120",
+          "floor": "122",
           "binding": [
-            "property:mask-image",
-            "property:mask-repeat",
-            "property:mask-size",
-            "selector::dir"
+            "selector:::backdrop/inherit-from-originating-element"
           ]
         },
         "edge": {
-          "floor": "120",
+          "floor": "122",
           "binding": [
-            "property:mask-image",
-            "property:mask-repeat",
-            "property:mask-size",
-            "selector::dir"
+            "selector:::backdrop/inherit-from-originating-element"
           ]
         },
         "firefox": {
@@ -281,22 +294,21 @@
         "safari": {
           "floor": "26.2",
           "binding": [
+            "property:text-decoration/includes-color-and-style",
             "value:text-decoration/dotted"
           ]
         },
         "safari_ios": {
           "floor": "26.2",
           "binding": [
+            "property:text-decoration/includes-color-and-style",
             "value:text-decoration/dotted"
           ]
         },
         "webview_android": {
-          "floor": "120",
+          "floor": "122",
           "binding": [
-            "property:mask-image",
-            "property:mask-repeat",
-            "property:mask-size",
-            "selector::dir"
+            "selector:::backdrop/inherit-from-originating-element"
           ]
         }
       },

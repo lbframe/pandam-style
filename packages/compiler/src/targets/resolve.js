@@ -66,19 +66,79 @@ export const DATA_PINS = Object.freeze({
   'baseline-browser-mapping': '2.11.23',
 });
 
-// Query types refused before resolution, and why.
-const REFUSED_QUERY_TYPES = Object.freeze({
+// Every query type of the pinned Browserslist, classified. `pinned` terms
+// resolve from the pinned data packages alone; `clock` terms depend on the
+// current date and `ambient` terms read files, packages, statistics or the
+// environment, so both are refused before resolution. Two types depend on
+// their arguments: a dated `baseline` term is pinned only up to the data's
+// newest release year, and `cover ... in my stats` reads a statistics file
+// while a region cover is pinned. A type missing here (a Browserslist upgrade)
+// is refused as `unclassified` until it is classified; a test derives the
+// type list from the pinned Browserslist's own query table.
+export const QUERY_TYPES = Object.freeze({
+  last_major_versions: 'pinned',
+  last_versions: 'pinned',
+  last_electron_major_versions: 'pinned',
+  last_node_major_versions: 'pinned',
+  last_browser_major_versions: 'pinned',
+  last_electron_versions: 'pinned',
+  last_node_versions: 'pinned',
+  last_browser_versions: 'pinned',
+  unreleased_versions: 'pinned',
+  unreleased_electron_versions: 'pinned',
+  unreleased_browser_versions: 'pinned',
   last_years: 'clock',
   since_y: 'clock',
   since_y_m: 'clock',
   since_y_m_d: 'clock',
-  maintained_node: 'clock',
-  current_node: 'ambient',
-  browserslist_config: 'ambient',
-  extends: 'ambient',
+  baseline: 'by-argument',
+  popularity: 'pinned',
   popularity_in_my_stats: 'ambient',
   popularity_in_config_stats: 'ambient',
+  popularity_in_place: 'pinned',
+  cover: 'pinned',
+  cover_in: 'by-argument',
+  cover_config: 'ambient',
+  supports: 'pinned',
+  electron_range: 'pinned',
+  node_range: 'pinned',
+  browser_range: 'pinned',
+  electron_ray: 'pinned',
+  node_ray: 'pinned',
+  browser_ray: 'pinned',
+  firefox_esr: 'pinned',
+  opera_mini_all: 'pinned',
+  electron_version: 'pinned',
+  node_major_version: 'pinned',
+  node_minor_version: 'pinned',
+  node_patch_version: 'pinned',
+  current_node: 'ambient',
+  maintained_node: 'clock',
+  phantomjs_1_9: 'pinned',
+  phantomjs_2_1: 'pinned',
+  browser_version: 'pinned',
+  browserslist_config: 'ambient',
+  extends: 'ambient',
+  defaults: 'pinned',
+  dead: 'pinned',
+  unknown: 'pinned',
 });
+
+/** Why a parsed query term is refused, or null when it is pinned. */
+export function queryRefusal(node) {
+  const kind = Object.hasOwn(QUERY_TYPES, node.type)
+    ? QUERY_TYPES[node.type]
+    : 'unclassified';
+  if (kind === 'pinned') return null;
+  if (kind !== 'by-argument') return kind;
+  if (node.type === 'baseline') {
+    return (node.year == null && node.date == null) || beyondData(node)
+      ? 'clock'
+      : null;
+  }
+  // cover_in: `my stats` reads a statistics file; a region is pinned data.
+  return /^my\s+stats$/i.test(String(node.place)) ? 'ambient' : null;
+}
 
 // Browserslist browser names PandamStyle can announce, with the BCD browser
 // whose statements apply to them.
@@ -259,6 +319,15 @@ function withoutOldDataWarning(run) {
   }
 }
 
+const REFUSAL_MESSAGES = Object.freeze({
+  clock: (term) =>
+    `Target query term "${term}" depends on the current date, so the same configuration would resolve differently over time. Use explicit versions, usage or "last N versions" terms instead.`,
+  ambient: (term) =>
+    `Target query term "${term}" reads files, packages or the environment outside this configuration. Write the query explicitly instead.`,
+  unclassified: (term) =>
+    `Target query term "${term}" has a Browserslist query type PandamStyle has not classified as deterministic. Write the query with another term.`,
+});
+
 /** Query types refused in `query`, as diagnostics; Browserslist parse errors too. */
 export function refusedTerms(query) {
   let nodes;
@@ -276,20 +345,13 @@ export function refusedTerms(query) {
   }
   const out = [];
   for (const node of nodes) {
-    const why =
-      REFUSED_QUERY_TYPES[node.type] ??
-      (node.type === 'baseline' &&
-      ((node.year == null && node.date == null) || beyondData(node))
-        ? 'clock'
-        : null);
+    const why = queryRefusal(node);
     if (why == null) continue;
     out.push(
       targetDiagnostic(
         Codes.INVALID_TARGET_CONFIG,
-        why === 'clock' ? 'targets.query.clock' : 'targets.query.ambient',
-        why === 'clock'
-          ? `Target query term "${node.query}" depends on the current date, so the same configuration would resolve differently over time. Use explicit versions, usage or "last N versions" terms instead.`
-          : `Target query term "${node.query}" reads files, packages or the environment outside this configuration. Write the query explicitly instead.`,
+        `targets.query.${why}`,
+        REFUSAL_MESSAGES[why](node.query),
         { query, term: node.query, type: node.type, reason: why },
       ),
     );

@@ -30,6 +30,12 @@ const { differential, openProject } = require('./session-helpers');
 
 const ENFORCED = { profiles: ['pandamstyle:default@1'] };
 const NOT_NATIVE = 'at-rule:container/scroll-state';
+// The queried feature is a subfeature with its own BCD statement.
+const NOT_NATIVE_FORM = 'at-rule:container/scroll-state/stuck';
+const TWO_INCOMPATIBLE = [
+  'PMS_TARGET_CAPABILITY_INCOMPATIBLE',
+  'PMS_TARGET_CAPABILITY_INCOMPATIBLE',
+];
 
 /**
  * The valid fixture with one condition the default profile does not support
@@ -91,8 +97,10 @@ describe('advisory mode (no targets)', () => {
 
   test('the finding is a warning and the revision is ok', () => {
     expect(validation.ok).toBe(true);
-    expect(codes(validation.diagnostics)).toEqual([
-      'PMS_TARGET_CAPABILITY_INCOMPATIBLE',
+    expect(codes(validation.diagnostics)).toEqual(TWO_INCOMPATIBLE);
+    expect(validation.diagnostics.map((d) => d.context.feature)).toEqual([
+      NOT_NATIVE,
+      NOT_NATIVE_FORM,
     ]);
     const [warning] = validation.diagnostics;
     expect(warning).toMatchObject({
@@ -118,25 +126,21 @@ describe('advisory mode (no targets)', () => {
 
   test('the full build agrees and its report records the profile as failing', () => {
     const result = h.full();
-    expect(codes(result.targetDiagnostics)).toEqual([
-      'PMS_TARGET_CAPABILITY_INCOMPATIBLE',
-    ]);
+    expect(codes(result.targetDiagnostics)).toEqual(TWO_INCOMPATIBLE);
     const report = JSON.parse(readOut(h, 'build-report.json')).targets;
     expect(report).toMatchObject({
       kind: 'pandamstyle-target-report',
       schemaVersion: 1,
       enforcement: 'advisory',
       profiles: [{ ref: 'pandamstyle:default@1', status: 'failing' }],
-      failing: [
-        {
-          feature: NOT_NATIVE,
-          profiles: [{ ref: 'pandamstyle:default@1', state: 'incompatible' }],
-        },
-      ],
-      failingTotal: 1,
+      failing: [NOT_NATIVE, NOT_NATIVE_FORM].map((feature) => ({
+        feature,
+        profiles: [{ ref: 'pandamstyle:default@1', state: 'incompatible' }],
+      })),
+      failingTotal: 2,
       failingTruncated: false,
     });
-    expect(report.counts.failingRequired).toBe(1);
+    expect(report.counts.failingRequired).toBe(2);
   });
 });
 
@@ -145,9 +149,7 @@ describe('enforced mode (explicit targets)', () => {
     const h = prepared(openWithUnsupportedCondition(), ENFORCED);
     const validation = h.session.validate();
     expect(validation.ok).toBe(false);
-    expect(codes(validation.diagnostics)).toEqual([
-      'PMS_TARGET_CAPABILITY_INCOMPATIBLE',
-    ]);
+    expect(codes(validation.diagnostics)).toEqual(TWO_INCOMPATIBLE);
     expect(validation.diagnostics[0]).toMatchObject({
       severity: 'error',
       rule: 'targets.capability.required',
@@ -162,9 +164,7 @@ describe('enforced mode (explicit targets)', () => {
     } catch (e) {
       error = e;
     }
-    expect(codes(error.diagnostics)).toEqual([
-      'PMS_TARGET_CAPABILITY_INCOMPATIBLE',
-    ]);
+    expect(codes(error.diagnostics)).toEqual(TWO_INCOMPATIBLE);
     expect(fs.existsSync(path.join(h.outDir, 'manifest.json'))).toBe(false);
   });
 
@@ -175,8 +175,14 @@ describe('enforced mode (explicit targets)', () => {
     );
     const validation = h.session.validate();
     expect(validation.ok).toBe(true);
+    // The policy of the construct covers its subfeature form.
     expect(codes(validation.diagnostics)).toEqual([
       'PMS_TARGET_ENHANCEMENT_DEGRADED',
+      'PMS_TARGET_ENHANCEMENT_DEGRADED',
+    ]);
+    expect(validation.diagnostics.map((d) => d.context.feature)).toEqual([
+      NOT_NATIVE,
+      NOT_NATIVE_FORM,
     ]);
     expect(validation.diagnostics[0]).toMatchObject({
       severity: 'warning',
@@ -192,7 +198,7 @@ describe('enforced mode (explicit targets)', () => {
     expect(report.profiles).toEqual([
       { ref: 'pandamstyle:default@1', status: 'passing' },
     ]);
-    expect(report.counts.enhancements).toBe(1);
+    expect(report.counts.enhancements).toBe(2);
   });
 });
 
@@ -292,9 +298,7 @@ describe('incremental session against the fresh oracle', () => {
     const h = prepared(openWithUnsupportedCondition());
     const result = differential(h, 'advisory warning');
     expect(result.validation.ok).toBe(true);
-    expect(codes(result.validation.diagnostics)).toEqual([
-      'PMS_TARGET_CAPABILITY_INCOMPATIBLE',
-    ]);
+    expect(codes(result.validation.diagnostics)).toEqual(TWO_INCOMPATIBLE);
     expect(result.findings).toEqual([]);
   });
 

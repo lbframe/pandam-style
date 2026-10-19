@@ -28,7 +28,7 @@ import {
   structuralDomain,
   supportedProperties,
 } from '../policy/properties';
-import { evaluateTargets, unitSummary } from '../../targets/evaluate';
+import { designSystemTargetFacts, unitSummary } from '../../targets/evaluate';
 import { PmsError } from '../../protocol/diagnostics';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, phase as perfPhase } from '../../observability/metrics';
@@ -124,23 +124,14 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
   const targetFacts =
     targets == null
       ? null
-      : perfPhase(
-          'ds_target_facts_ms',
-          () =>
-            evaluateTargets({
-              resolution: targets,
-              units: [
-                [
-                  'design-system',
-                  unitSummary(injected, () =>
-                    designSystemTargetSources(injected),
-                  ),
-                ],
-              ],
-              enhancements: registry.enhancements,
-              conditions: conditionDefinitions(registry),
-              domainOf: structuralDomainOfCss,
-            }).facts,
+      : perfPhase('ds_target_facts_ms', () =>
+          designSystemTargetFacts({
+            resolution: targets,
+            summary: unitSummary(injected, () =>
+              designSystemTargetSources(injected),
+            ),
+            enhancements: registry.enhancements,
+          }),
         );
 
   const snapshot = perfPhase('ds_snapshot_build_ms', () =>

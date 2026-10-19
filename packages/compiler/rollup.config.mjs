@@ -15,6 +15,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { babel } from '@rollup/plugin-babel';
+import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
@@ -82,20 +83,31 @@ function compatData({ inline }) {
     },
     load(id) {
       if (id !== `\0${COMPAT_DATA_ID}`) return null;
-      const text = fs.readFileSync(COMPAT_DATA_SOURCE, 'utf8');
+      const bytes = fs.readFileSync(COMPAT_DATA_SOURCE);
+      const text = bytes.toString('utf8');
       if (inline) {
-        return `export default function compatDataText() { return ${JSON.stringify(text)}; }`;
+        return [
+          `export default function compatDataText() { return ${JSON.stringify(text)}; }`,
+          // The test bundle hashes its inlined text at run time.
+          'export const compatDataDigest = null;',
+        ].join('\n');
       }
       this.emitFile({
         type: 'asset',
         fileName: COMPAT_DATA_FILE,
-        source: text,
+        source: bytes,
       });
+      // The digest of exactly the bytes emitted next to the bundle, so the
+      // first evaluation does not hash 0.6 MB; a test checks it against the
+      // shipped file.
+      const digest =
+        'sha256:' + crypto.createHash('sha256').update(bytes).digest('hex');
       return [
         "import { readFileSync } from 'node:fs';",
         'export default function compatDataText() {',
-        `  return readFileSync(new URL('./${COMPAT_DATA_FILE}', import.meta.url), 'utf8');`,
+        `  return readFileSync(new URL('./${COMPAT_DATA_FILE}', import.meta.url));`,
         '}',
+        `export const compatDataDigest = ${JSON.stringify(digest)};`,
       ].join('\n');
     },
   };

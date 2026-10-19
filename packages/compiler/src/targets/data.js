@@ -17,8 +17,9 @@
 
 import crypto from 'crypto';
 // Resolved by the compiler build: the generated JSON travels as one shared
-// asset next to the bundles and this import returns its text.
-import compatDataText from 'pandamstyle:compat-data';
+// asset next to the bundles and this import returns its bytes (the private
+// test bundle inlines the text).
+import compatDataText, { compatDataDigest } from 'pandamstyle:compat-data';
 
 let cache = null;
 
@@ -126,19 +127,53 @@ function scanPaths(text) {
 }
 
 /**
- * The data, parsed lazily: an evaluation reads the few paths its emitted CSS
- * uses, so entries are located once and each is parsed on first use. The
- * digest is still taken over the exact bytes.
+ * Reading primitives over the file's bytes or its text. Bytes stay in their
+ * Buffer, which lives outside the V8 heap: a 0.9 MB string kept for the
+ * session would raise the heap the garbage collector sizes itself from. They
+ * are scanned once through a Latin-1 string (one byte per byte, so string
+ * offsets are byte offsets) that is dropped after the scan; entries decode
+ * from the Buffer as UTF-8 (the data holds `≤`).
  */
-function load(text) {
-  const scanned = scanPaths(text);
+function sourceOf(input) {
+  if (typeof input === 'string') {
+    return {
+      scanText: input,
+      read: (start, end) => input.slice(start, end),
+      contains: (start, end, needle) =>
+        input.slice(start, end).includes(needle),
+    };
+  }
+  const bytes = input;
+  return {
+    scanText: bytes.toString('latin1'),
+    read: (start, end) => bytes.toString('utf8', start, end),
+    contains: (start, end, needle) =>
+      bytes.subarray(start, end).indexOf(needle, 0, 'utf8') !== -1,
+  };
+}
+
+/**
+ * The data, parsed lazily: an evaluation reads the few paths its emitted CSS
+ * uses, so entries are located once and each is parsed on first use. `input`
+ * is the file's bytes (a Buffer) or its text; the digest is taken over the
+ * exact bytes either way.
+ */
+function load(input, knownDigest = null) {
+  const digest =
+    knownDigest ??
+    'sha256:' + crypto.createHash('sha256').update(input).digest('hex');
+  const source = sourceOf(input);
+  const length = typeof input === 'string' ? input.length : input.byteLength;
+  const scanned = scanPaths(source.scanText);
+  // Only the scan reads the whole text.
+  source.scanText = null;
   const raw =
     scanned == null
-      ? JSON.parse(text)
+      ? JSON.parse(source.read(0, length))
       : JSON.parse(
-          text.slice(0, scanned.objectStart) +
+          source.read(0, scanned.objectStart) +
             '{}' +
-            text.slice(scanned.objectEnd),
+            source.read(scanned.objectEnd, length),
         );
   if (
     raw.kind !== 'pandamstyle-compat-data' ||
@@ -160,15 +195,21 @@ function load(text) {
       value =
         span == null
           ? raw.paths[bcdPath]
-          : JSON.parse(text.slice(span[0], span[1]));
+          : JSON.parse(source.read(span[0], span[1]));
       parsed.set(bcdPath, value);
     }
     return value;
   };
+  const contains = (bcdPath, needle) => {
+    const span = offsets.get(bcdPath);
+    return span == null
+      ? JSON.stringify(raw.paths[bcdPath]).includes(needle)
+      : source.contains(span[0], span[1], needle);
+  };
   let children = null;
   return Object.freeze({
     sources: raw.sources,
-    digest: 'sha256:' + crypto.createHash('sha256').update(text).digest('hex'),
+    digest,
     has: (bcdPath) => offsets.has(bcdPath),
     entry,
     childrenOf: (bcdPath) => {
@@ -179,22 +220,13 @@ function load(text) {
      * Whether the entry's raw text contains `needle`, without parsing it. A
      * cheap pre-check for scans that look for one name among many entries.
      */
-    mentions: (bcdPath, needle) => {
-      if (!offsets.has(bcdPath)) return false;
-      const span = offsets.get(bcdPath);
-      return span == null
-        ? JSON.stringify(raw.paths[bcdPath]).includes(needle)
-        : text.slice(span[0], span[1]).includes(needle);
-    },
+    mentions: (bcdPath, needle) =>
+      offsets.has(bcdPath) && contains(bcdPath, needle),
     /** [path, entry] in file order for entries recording an alternative name. */
     alternativeNameEntries: () => {
       const out = [];
-      for (const [path, span] of offsets) {
-        const recordsName =
-          span == null
-            ? JSON.stringify(raw.paths[path]).includes('"n":')
-            : text.slice(span[0], span[1]).includes('"n":');
-        if (recordsName) out.push([path, entry(path)]);
+      for (const path of offsets.keys()) {
+        if (contains(path, '"n":')) out.push([path, entry(path)]);
       }
       return out;
     },
@@ -203,7 +235,7 @@ function load(text) {
 
 /** The bundled data. */
 export function compatData() {
-  if (cache == null) cache = load(compatDataText());
+  if (cache == null) cache = load(compatDataText(), compatDataDigest);
   return cache;
 }
 

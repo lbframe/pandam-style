@@ -482,16 +482,21 @@ describe('incremental accumulation equals a fresh evaluation', () => {
     targets.summarizeSources([
       { owner: { role: 'page', file, line: 1, column: 1 }, css },
     ]);
-  const canonical = ({ uses }) =>
+  // Totals and the owner groups a diagnostic reads, per feature.
+  const canonical = (accumulator, { uses }) =>
     JSON.stringify(
       [...uses.entries()]
         .sort(([a], [b]) => (a < b ? -1 : 1))
         .map(([key, use]) => [
           key,
           use.occurrences,
-          [...use.owners.keys()].sort(),
+          use.ownersTotal,
           Object.entries(use.roles)
             .filter(([, n]) => n > 0)
+            .sort(),
+          accumulator
+            .groupsOf(key)
+            .map((g) => [g.owner.file, g.owner.line, g.count, g.context.value])
             .sort(),
         ]),
     );
@@ -527,8 +532,9 @@ describe('incremental accumulation equals a fresh evaluation', () => {
       const result = incremental.sync(step);
       expect(result.version).toBeGreaterThan(previous);
       previous = result.version;
-      expect(canonical(result)).toBe(
-        canonical(targets.createTargetAccumulator().sync(step)),
+      const fresh = targets.createTargetAccumulator();
+      expect(canonical(incremental, result)).toBe(
+        canonical(fresh, fresh.sync(step)),
       );
     }
     // An identical revision costs nothing and keeps the version.

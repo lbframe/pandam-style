@@ -25,6 +25,7 @@
 import { compatData } from './data';
 import caveatReviews from './catalog/caveats.v1.json';
 import inapplicableReviews from './catalog/inapplicable.v1.json';
+import subfeatureReviews from './catalog/subfeatures.v1.json';
 
 export const CATALOG_KIND = 'pandamstyle-feature-catalog';
 export const CATALOG_SCHEMA_VERSION = 1;
@@ -109,7 +110,6 @@ const UNIT_PATHS = Object.freeze({
 // Type families are only searched for properties whose grammar uses them, so
 // `clip: rect()` can never borrow the basic-shape `rect()` statement.
 const FUNCTION_FAMILIES = Object.freeze([
-  ['css.types', null],
   ['css.types.color', null],
   ['css.types.gradient', null],
   ['css.types.image', null],
@@ -128,6 +128,9 @@ const FUNCTION_FAMILIES = Object.freeze([
     ],
   ],
   ['css.types.basic-shape', ['clip-path', 'shape-outside', 'offset-path']],
+  // Last: a value type of the same name (`css.types.color` for `color()`) is
+  // not the function.
+  ['css.types', null],
 ]);
 // Functions that belong to a property's or descriptor's own base grammar
 // (BCD records no separate statement for them).
@@ -146,11 +149,71 @@ const FUNCTION_ALIASES = Object.freeze({
 function childPath(parent, name) {
   const direct = `${parent}.${name}`;
   if (has(direct)) return direct;
-  const lower = name.toLowerCase();
-  const child = compatData()
-    .childrenOf(parent)
-    .find((candidate) => candidate.toLowerCase() === lower);
+  const child = lowerChildren(parent).get(name.toLowerCase());
   return child == null ? null : `${parent}.${child}`;
+}
+
+const lowerIndexes = new WeakMap();
+
+/** Children of `parent` by lowercased name (the first child of each name). */
+function lowerChildren(parent) {
+  const data = compatData();
+  let byParent = lowerIndexes.get(data);
+  if (byParent == null) {
+    byParent = new Map();
+    lowerIndexes.set(data, byParent);
+  }
+  let children = byParent.get(parent);
+  if (children == null) {
+    children = new Map();
+    for (const child of data.childrenOf(parent)) {
+      const lower = child.toLowerCase();
+      if (!children.has(lower)) children.set(lower, child);
+    }
+    byParent.set(parent, children);
+  }
+  return children;
+}
+
+const keywordIndexes = new WeakMap();
+
+/**
+ * Prefixed and renamed keywords of a property's BCD node: `keyword ->
+ * { path, match }` for each statement naming an alternative name or a prefix,
+ * in the order the children and statements are listed (the first wins).
+ */
+function keywordIndex(base) {
+  const data = compatData();
+  let byBase = keywordIndexes.get(data);
+  if (byBase == null) {
+    byBase = new Map();
+    keywordIndexes.set(data, byBase);
+  }
+  let index = byBase.get(base);
+  if (index != null) return index;
+  index = new Map();
+  for (const child of data.childrenOf(base)) {
+    const path = `${base}.${child}`;
+    // Only an entry recording a name or a prefix can match: the others are
+    // skipped without being parsed.
+    if (!data.mentions(path, '"n":') && !data.mentions(path, '"x":')) continue;
+    for (const statements of Object.values(data.entry(path)?.e ?? {})) {
+      for (const statement of statements) {
+        if (statement.n != null && !index.has(statement.n)) {
+          index.set(statement.n, {
+            path,
+            match: { alternativeName: statement.n },
+          });
+        }
+        const prefixed = statement.x == null ? null : `${statement.x}${child}`;
+        if (prefixed != null && !index.has(prefixed)) {
+          index.set(prefixed, { path, match: { prefix: statement.x } });
+        }
+      }
+    }
+  }
+  byBase.set(base, index);
+  return index;
 }
 
 function functionPath(property, name) {
@@ -336,14 +399,22 @@ function propertyFeature(name) {
   return unrecognized(`property:${name}`, 'property', { name });
 }
 
+// Value types whose keywords BCD records one by one (`AccentColor`): a
+// keyword of the type is the same keyword in every property that takes it.
+const KEYWORD_TYPES = Object.freeze([
+  'css.types.color.named-color',
+  'css.types.color.system-color',
+]);
+
 function keywordFeature(property, keyword) {
   if (property.startsWith('@')) return null;
   const owner = propertyFeature(property);
   if (owner.base == null || owner.feature === 'property:custom-property') {
-    return null;
+    return typeKeywordFeature(property, keyword);
   }
-  const direct = `${owner.base}.${keyword}`;
-  if (has(direct)) {
+  // CSS keywords are ASCII case-insensitive (`currentColor`).
+  const direct = childPath(owner.base, keyword);
+  if (direct != null) {
     // The property key already checks the emitted (possibly prefixed or
     // renamed) property name; the keyword key checks the keyword itself.
     return record(`value:${property}/${keyword}`, 'value', owner.feature, [
@@ -352,45 +423,34 @@ function keywordFeature(property, keyword) {
   }
   // A prefixed or renamed keyword (`-webkit-fill-available`) is recorded as
   // an alternative name or prefix on one of the property's keyword entries.
-  const data = compatData();
-  const prefixed = keyword.startsWith('-');
-  const named = `"n":${JSON.stringify(keyword)}`;
-  for (const child of data.childrenOf(owner.base)) {
-    const path = `${owner.base}.${child}`;
-    // Only an entry naming the keyword, or recording a prefix for a prefixed
-    // keyword, can match: skip the others without parsing them.
-    if (
-      !data.mentions(path, named) &&
-      !(prefixed && keyword.endsWith(child) && data.mentions(path, '"x":'))
-    ) {
-      continue;
-    }
-    const entry = data.entry(path);
-    for (const statements of Object.values(entry?.e ?? {})) {
-      for (const statement of statements) {
-        if (
-          statement.n === keyword ||
-          (statement.x != null && `${statement.x}${child}` === keyword)
-        ) {
-          const match =
-            statement.n === keyword
-              ? { alternativeName: keyword }
-              : { prefix: statement.x };
-          return record(
-            `value:${property}/${keyword}`,
-            'value',
-            owner.feature,
-            [bcd(path, match)],
-          );
-        }
-      }
-    }
+  const named = keywordIndex(owner.base).get(keyword);
+  if (named != null) {
+    return record(`value:${property}/${keyword}`, 'value', owner.feature, [
+      bcd(named.path, named.match),
+    ]);
   }
   if (prefixOf(keyword) != null) {
     return unrecognized(`value:${property}/${keyword}`, 'value', {
       property,
       keyword,
     });
+  }
+  return typeKeywordFeature(property, keyword);
+}
+
+function typeKeywordFeature(property, keyword) {
+  for (const type of KEYWORD_TYPES) {
+    const path = childPath(type, keyword);
+    if (path != null) {
+      return record(
+        `value:${property}/${keyword}`,
+        'value',
+        property.startsWith('--')
+          ? 'property:custom-property'
+          : `property:${property}`,
+        [bcd(path)],
+      );
+    }
   }
   return null;
 }
@@ -469,9 +529,141 @@ function mediaFeature(name) {
   return unrecognized(`media:${name}`, 'media-feature', { name });
 }
 
+// --------------------------------------------------------- syntax forms ---
+
+// Form suffixes whose BCD subfeature name is not derived from the suffix.
+const FORM_CHILDREN = Object.freeze({
+  animated: 'is_animatable',
+  'ident-value': 'IDENT_value',
+  'font-width-keyword-values': 'font-width_keyword_values',
+  'alt-text-counters': 'alt_text.counters',
+});
+// Forms recorded on a shared node rather than under the construct's own.
+const ABSOLUTE_FORMS = Object.freeze({
+  'from-currentcolor': 'css.types.color.from_currentcolor',
+});
+// Keyword arguments whose BCD subfeature is named after the syntax.
+const ARGUMENT_CHILDREN = Object.freeze({
+  'css.types.easing-function.steps': {
+    'jump-start': 'jump',
+    'jump-end': 'jump',
+    'jump-none': 'jump',
+    'jump-both': 'jump',
+  },
+  'css.types.color.color': {
+    'display-p3-linear': 'colorSpace_parameter_accepts_display-p3-linear_value',
+  },
+  'css.types.random': { by: 'step' },
+  'css.types.ray': {
+    at: 'position',
+    'closest-side': 'size',
+    'closest-corner': 'size',
+    'farthest-side': 'size',
+    'farthest-corner': 'size',
+    sides: 'size',
+  },
+  'css.selectors.scroll-button': { '*': 'star' },
+});
+
+/**
+ * The BCD subfeature of `parentPath` that form `suffix` names, or null. A
+ * suffix is a keyword (`none`, case-insensitive) or a form name whose BCD key
+ * spells its words with underscores (`space-separated-parameters`,
+ * `nested-scroll-marker` → `nested_scroll-marker`).
+ */
+export function subfeaturePath(parentPath, suffix) {
+  if (Object.hasOwn(ABSOLUTE_FORMS, suffix)) {
+    return has(ABSOLUTE_FORMS[suffix]) ? ABSOLUTE_FORMS[suffix] : null;
+  }
+  const alias = ARGUMENT_CHILDREN[parentPath]?.[suffix];
+  if (alias != null) return childPath(parentPath, alias);
+  if (Object.hasOwn(FORM_CHILDREN, suffix)) {
+    const path = `${parentPath}.${FORM_CHILDREN[suffix]}`;
+    return has(path) ? path : null;
+  }
+  if (suffix.endsWith('()')) {
+    const name = suffix.slice(0, -2);
+    return (
+      childPath(parentPath, name) ?? childPath(parentPath, `${name}_function`)
+    );
+  }
+  if (suffix.startsWith('in-')) {
+    const scoped = childPath(parentPath, suffix.slice(3));
+    if (scoped != null) return scoped;
+  }
+  const first = suffix.indexOf('-');
+  const last = suffix.lastIndexOf('-');
+  for (const candidate of new Set([
+    suffix,
+    suffix.replace(/-/g, '_'),
+    first === -1
+      ? suffix
+      : `${suffix.slice(0, first)}_${suffix.slice(first + 1)}`,
+    last === -1 ? suffix : `${suffix.slice(0, last)}_${suffix.slice(last + 1)}`,
+  ])) {
+    const path = childPath(parentPath, candidate);
+    if (path != null) return path;
+  }
+  return null;
+}
+
+/** The record of form `suffix` of `parent`, or null (no BCD subfeature). */
+function subfeature(parent, suffix) {
+  if (parent == null || !parent.recognized || parent.bcd.length !== 1) {
+    return null;
+  }
+  const path = subfeaturePath(parent.bcd[0].path, suffix);
+  if (path == null) return null;
+  const kind =
+    parent.kind === 'property' || parent.kind === 'platform'
+      ? 'value'
+      : parent.kind;
+  return record(`${parent.feature}/${suffix}`, kind, parent.feature, [
+    bcd(path),
+  ]);
+}
+
+/** The record of the construct a form qualifies. */
+function formParent(construct) {
+  switch (construct.of) {
+    case 'function':
+      return (
+        functionFeature(construct.property, construct.name, false)[0] ?? null
+      );
+    case 'property':
+      return propertyFeature(construct.name);
+    case 'selector':
+      return selectorFeature(construct.name, construct.element);
+    case 'attribute-selector':
+      return featuresOf({ kind: 'attribute-selector' })[0];
+    case 'media':
+      return mediaFeature(construct.name);
+    case 'container':
+      return featuresOf({ kind: 'container-query', name: construct.name })[0];
+    case 'supports':
+      return featuresOf({ kind: 'supports-function', name: construct.name })[0];
+    case 'at-rule':
+      return atRuleFeature(construct.name, 'block');
+    case 'descriptor':
+      return (
+        featuresOf({
+          kind: 'descriptor',
+          atRule: construct.atRule,
+          name: construct.name,
+        })[0] ?? null
+      );
+    default:
+      return null;
+  }
+}
+
 /** Feature records for one construct (a construct can imply two keys). */
 export function featuresOf(construct) {
   switch (construct.kind) {
+    case 'form': {
+      const feature = subfeature(formParent(construct), construct.suffix);
+      return feature == null ? [] : [feature];
+    }
     case 'property':
       return [propertyFeature(construct.name)];
     case 'value-keyword': {
@@ -682,12 +874,50 @@ export function inapplicableCatalog() {
   return inapplicableReviews;
 }
 
+// ------------------------------------------------------------ subfeatures ---
+
+let failClosedIndex = null;
+
+/**
+ * Reviewed `fail-closed` subfeatures of a BCD path: syntax forms the extractor
+ * does not detect. The construct evaluated on `path` is `unknown` on an engine
+ * where one of them is not native (outcome.js).
+ */
+export function failClosedSubfeatures(path) {
+  if (failClosedIndex == null) {
+    failClosedIndex = new Map();
+    for (const review of subfeatureReviews.reviews) {
+      if (review.disposition !== 'fail-closed') continue;
+      for (const child of review.paths) {
+        const parent = child.slice(0, child.lastIndexOf('.'));
+        if (!failClosedIndex.has(parent)) failClosedIndex.set(parent, []);
+        failClosedIndex.get(parent).push(child);
+      }
+    }
+  }
+  return failClosedIndex.get(path) ?? [];
+}
+
+export function subfeatureCatalog() {
+  return subfeatureReviews;
+}
+
 /**
  * The record of a feature key, or null when the key is not a catalog key.
  * Used where a key is authored (enhancement policies) or published (package
  * requirements) instead of extracted from emitted CSS.
  */
 export function featureByKey(key) {
+  const direct = catalogKey(key);
+  if (direct != null || typeof key !== 'string') return direct;
+  // A form key: `<parent key>/<suffix>`.
+  const cut = key.lastIndexOf('/');
+  if (cut <= 0) return null;
+  const form = subfeature(featureByKey(key.slice(0, cut)), key.slice(cut + 1));
+  return form != null && form.feature === key ? form : null;
+}
+
+function catalogKey(key) {
   if (typeof key !== 'string') return null;
   const colon = key.indexOf(':');
   if (colon === -1) return null;
