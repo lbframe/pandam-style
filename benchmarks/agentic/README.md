@@ -17,6 +17,8 @@ Status:
 - **Present (AG-00.2, #6):** the evaluation runner and its Claude Code and
   Codex adapters in [`runner/`](runner/), tested with adapter fixtures (fake
   CLIs) only. See [Runner](#runner-ag-002).
+- **Draft (AG-00.3, #7):** the [baseline and gate policy](baseline/POLICY.md),
+  under review before the baseline run. Nothing in it is frozen.
 - **Not present:** the frozen baseline and the thresholds (AG-00.3, #7). No
   LLM run has been executed against this corpus; the first provider-backed run
   is the authorized smoke run of the runner's design note (section 9.4).
@@ -40,6 +42,7 @@ Status:
 | `bin/pms-agentic.mjs` | Command-line entry point. |
 | `__tests__/` | `node:test` suites. |
 | [`TRACE.md`](TRACE.md) | One task per workflow traced to its expected evidence. |
+| [`baseline/`](baseline/POLICY.md) | AG-00.3 baseline and qualification gate policy (draft); the baseline records once run. |
 
 ## Task model
 
