@@ -104,15 +104,21 @@ export async function emittedCss(workloadId) {
   const { findWorkload, materialize } = await import(
     pathToFileURL(path.join(REPO, 'tools/baselines/workloads.mjs')).href
   );
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `pms-targets-${workloadId}-`));
+  const dir = fs.mkdtempSync(
+    path.join(os.tmpdir(), `pms-targets-${workloadId}-`),
+  );
   try {
     materialize(findWorkload(workloadId), dir);
-    fs.symlinkSync(path.join(REPO, 'node_modules'), path.join(dir, 'node_modules'));
+    fs.symlinkSync(
+      path.join(REPO, 'node_modules'),
+      path.join(dir, 'node_modules'),
+    );
     const compiler = await import(
       pathToFileURL(path.join(REPO, 'packages/compiler/lib/index.mjs')).href
     );
-    const definition = (await import(pathToFileURL(path.join(dir, 'design.mjs')).href))
-      .default;
+    const definition = (
+      await import(pathToFileURL(path.join(dir, 'design.mjs')).href)
+    ).default;
     const outDir = path.join(dir, 'generated');
     const session = compiler.createProjectSession({
       rootDir: dir,
@@ -178,7 +184,11 @@ export async function collectFeatureUses({ includeEmitted = true } = {}) {
         }),
       );
     }
-    sources.push({ id: `corpus-declarations:${sheet.path}`, group: 'ce-00.2-corpus', uses });
+    sources.push({
+      id: `corpus-declarations:${sheet.path}`,
+      group: 'ce-00.2-corpus',
+      uses,
+    });
   }
 
   for (const file of WACANDO_SETS) {
@@ -192,7 +202,11 @@ export async function collectFeatureUses({ includeEmitted = true } = {}) {
         }),
       );
     }
-    sources.push({ id: `wacando:${set.inputId}`, group: `wacando:${set.inputId}`, uses });
+    sources.push({
+      id: `wacando:${set.inputId}`,
+      group: `wacando:${set.inputId}`,
+      uses,
+    });
   }
 
   if (includeEmitted) {

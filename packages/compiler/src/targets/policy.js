@@ -45,53 +45,85 @@ export function normalizeEnhancements(value) {
   const diagnostics = [];
   if (value == null) return { enhancements: [], diagnostics };
   if (!Array.isArray(value)) {
-    diagnostics.push(policyError('`enhancements` must be a list of policies.', { index: null }));
+    diagnostics.push(
+      policyError('`enhancements` must be a list of policies.', {
+        index: null,
+      }),
+    );
     return { enhancements: [], diagnostics };
   }
   const out = [];
   const seen = new Set();
   value.forEach((policy, index) => {
     if (policy == null || typeof policy !== 'object' || Array.isArray(policy)) {
-      diagnostics.push(policyError('An enhancement policy is an object `{ feature, fallback }`.', { index }));
+      diagnostics.push(
+        policyError(
+          'An enhancement policy is an object `{ feature, fallback }`.',
+          { index },
+        ),
+      );
       return;
     }
     const unknown = Object.keys(policy).filter((key) => !POLICY_KEYS.has(key));
     if (unknown.length > 0) {
       diagnostics.push(
-        policyError(`Unknown enhancement policy field(s): ${unknown.join(', ')}.`, { index, fields: unknown }),
+        policyError(
+          `Unknown enhancement policy field(s): ${unknown.join(', ')}.`,
+          { index, fields: unknown },
+        ),
       );
       return;
     }
     const record = featureByKey(policy.feature);
     if (record == null) {
       diagnostics.push(
-        policyError(`"${String(policy.feature)}" is not a feature key of the PandamStyle catalog.`, {
-          index,
-          feature: policy.feature ?? null,
-        }),
+        policyError(
+          `"${String(policy.feature)}" is not a feature key of the PandamStyle catalog.`,
+          {
+            index,
+            feature: policy.feature ?? null,
+          },
+        ),
       );
       return;
     }
     if (seen.has(policy.feature)) {
-      diagnostics.push(policyError(`Feature ${policy.feature} has two enhancement policies.`, { index, feature: policy.feature }));
-      return;
-    }
-    const fallback = policy.fallback;
-    if (fallback == null || typeof fallback !== 'object' || Array.isArray(fallback)) {
       diagnostics.push(
-        policyError(`Enhancement ${policy.feature} must declare a fallback policy.`, { index, feature: policy.feature }),
+        policyError(`Feature ${policy.feature} has two enhancement policies.`, {
+          index,
+          feature: policy.feature,
+        }),
       );
       return;
     }
-    const unknownFallback = Object.keys(fallback).filter((key) => !FALLBACK_KEYS.has(key));
+    const fallback = policy.fallback;
+    if (
+      fallback == null ||
+      typeof fallback !== 'object' ||
+      Array.isArray(fallback)
+    ) {
+      diagnostics.push(
+        policyError(
+          `Enhancement ${policy.feature} must declare a fallback policy.`,
+          { index, feature: policy.feature },
+        ),
+      );
+      return;
+    }
+    const unknownFallback = Object.keys(fallback).filter(
+      (key) => !FALLBACK_KEYS.has(key),
+    );
     if (!FALLBACK_KINDS.includes(fallback.kind) || unknownFallback.length > 0) {
       diagnostics.push(
-        policyError(`Fallback of ${policy.feature} must be one of ${FALLBACK_KINDS.join(', ')} with no other field.`, {
-          index,
-          feature: policy.feature,
-          fallback,
-          accepted: [...FALLBACK_KINDS],
-        }),
+        policyError(
+          `Fallback of ${policy.feature} must be one of ${FALLBACK_KINDS.join(', ')} with no other field.`,
+          {
+            index,
+            feature: policy.feature,
+            fallback,
+            accepted: [...FALLBACK_KINDS],
+          },
+        ),
       );
       return;
     }
@@ -105,15 +137,25 @@ export function normalizeEnhancements(value) {
       return;
     }
     if (fallback.note != null && typeof fallback.note !== 'string') {
-      diagnostics.push(policyError(`Fallback note of ${policy.feature} must be a string.`, { index, feature: policy.feature }));
+      diagnostics.push(
+        policyError(`Fallback note of ${policy.feature} must be a string.`, {
+          index,
+          feature: policy.feature,
+        }),
+      );
       return;
     }
     seen.add(policy.feature);
     out.push({
       feature: policy.feature,
-      fallback: { kind: 'degrade', ...(fallback.note == null ? {} : { note: fallback.note }) },
+      fallback: {
+        kind: 'degrade',
+        ...(fallback.note == null ? {} : { note: fallback.note }),
+      },
     });
   });
-  out.sort((a, b) => (a.feature < b.feature ? -1 : a.feature > b.feature ? 1 : 0));
+  out.sort((a, b) =>
+    a.feature < b.feature ? -1 : a.feature > b.feature ? 1 : 0,
+  );
   return { enhancements: out, diagnostics };
 }

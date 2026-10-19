@@ -82,7 +82,10 @@ function applicableReview(review, floor, scope = null) {
   if (review == null) return null;
   if (
     review.effectiveFrom != null &&
-    compareVersions(floor, String(review.effectiveFrom).split('.').map(Number)) < 0
+    compareVersions(
+      floor,
+      String(review.effectiveFrom).split('.').map(Number),
+    ) < 0
   ) {
     return null;
   }
@@ -92,6 +95,18 @@ function applicableReview(review, floor, scope = null) {
     }
   }
   return review;
+}
+
+/** A review that can make a partial statement native. */
+function isPartialReview(review) {
+  return (
+    review != null &&
+    review.partial === true &&
+    typeof review.missing === 'string' &&
+    review.missing.trim() !== '' &&
+    typeof review.rationale === 'string' &&
+    review.rationale.trim() !== ''
+  );
 }
 
 export function worseState(a, b) {
@@ -144,7 +159,12 @@ export function statementOutcome({
 }) {
   const basis = 'compat-data';
   if (statements == null) {
-    return { state: 'unknown', reason: 'engine-not-in-data', basis, caveats: [] };
+    return {
+      state: 'unknown',
+      reason: 'engine-not-in-data',
+      basis,
+      caveats: [],
+    };
   }
   const floor = String(range.floor).split('.').map(Number);
   const named = statements.filter((s) => matchesName(s, match));
@@ -154,16 +174,26 @@ export function statementOutcome({
   if (fullAtFloor != null) {
     if (fullAtFloor.r != null) {
       const removed = parseVersion(fullAtFloor.r);
-      const limit = range.upTo == null ? null : String(range.upTo).split('.').map(Number);
+      const limit =
+        range.upTo == null ? null : String(range.upTo).split('.').map(Number);
       if (
         removed.kind === 'release' &&
         (limit == null || compareVersions(removed.parts, limit) <= 0)
       ) {
-        return { state: 'incompatible', reason: 'removed-before-latest', basis, caveats: [] };
+        return {
+          state: 'incompatible',
+          reason: 'removed-before-latest',
+          basis,
+          caveats: [],
+        };
       }
     }
     if (fullAtFloor.t != null) {
-      const review = applicableReview(reviews(path, engine, fullAtFloor.t), floor, scope);
+      const review = applicableReview(
+        reviews(path, engine, fullAtFloor.t),
+        floor,
+        scope,
+      );
       const caveat = {
         path,
         engine,
@@ -171,40 +201,76 @@ export function statementOutcome({
         disposition: review?.disposition ?? 'unreviewed',
       };
       if (review == null) {
-        return { state: 'unknown', reason: 'unreviewed-caveat', basis, caveats: [caveat] };
+        return {
+          state: 'unknown',
+          reason: 'unreviewed-caveat',
+          basis,
+          caveats: [caveat],
+        };
       }
       if (review.disposition === 'blocking') {
-        return { state: 'incompatible', reason: 'blocking-caveat', basis, caveats: [caveat] };
+        return {
+          state: 'incompatible',
+          reason: 'blocking-caveat',
+          basis,
+          caveats: [caveat],
+        };
       }
-      return { state: 'native', reason: 'full-support-at-floor', basis, caveats: [caveat] };
+      return {
+        state: 'native',
+        reason: 'full-support-at-floor',
+        basis,
+        caveats: [caveat],
+      };
     }
-    return { state: 'native', reason: 'full-support-at-floor', basis, caveats: [] };
+    return {
+      state: 'native',
+      reason: 'full-support-at-floor',
+      basis,
+      caveats: [],
+    };
   }
 
-  // A partial implementation is native only with a committed review that
-  // names the missing sub-behavior (`missing`) and why the emitted use does not
-  // depend on it. Unreviewed, it is `unknown`; a blocking review refuses it.
+  // A partial implementation is native only with a committed partial review
+  // (`partial: true`) that names the missing sub-behavior (`missing`) and why
+  // the emitted use does not depend on it (`rationale`). Otherwise, including
+  // under a plain note review, it is `unknown`; a blocking review refuses it.
   const partialAtFloor = named.find(
     (s) => s.p != null && s.f == null && appliesAt(s, floor),
   );
   if (partialAtFloor != null) {
-    const review =
+    const candidate =
       partialAtFloor.t == null
         ? null
-        : applicableReview(reviews(path, engine, partialAtFloor.t), floor, scope);
+        : applicableReview(
+            reviews(path, engine, partialAtFloor.t),
+            floor,
+            scope,
+          );
+    const review = isPartialReview(candidate) ? candidate : null;
     const caveat = {
       path,
       engine,
       note: partialAtFloor.t ?? null,
       partial: true,
-      disposition: review?.missing == null ? 'unreviewed' : review.disposition,
-      ...(review?.missing == null ? {} : { missing: review.missing }),
+      disposition: review == null ? 'unreviewed' : review.disposition,
+      ...(review == null ? {} : { missing: review.missing }),
     };
-    if (review == null || review.missing == null) {
-      return { state: 'unknown', reason: 'partial-implementation', basis, caveats: [caveat] };
+    if (review == null) {
+      return {
+        state: 'unknown',
+        reason: 'partial-implementation',
+        basis,
+        caveats: [caveat],
+      };
     }
     if (review.disposition === 'blocking') {
-      return { state: 'incompatible', reason: 'blocking-caveat', basis, caveats: [caveat] };
+      return {
+        state: 'incompatible',
+        reason: 'blocking-caveat',
+        basis,
+        caveats: [caveat],
+      };
     }
     if (partialAtFloor.r != null) {
       // Support has to continue: a full statement must take over no later
@@ -219,10 +285,20 @@ export function statementOutcome({
         );
       });
       if (!continued) {
-        return { state: 'incompatible', reason: 'removed-before-latest', basis, caveats: [caveat] };
+        return {
+          state: 'incompatible',
+          reason: 'removed-before-latest',
+          basis,
+          caveats: [caveat],
+        };
       }
     }
-    return { state: 'native', reason: 'reviewed-partial', basis, caveats: [caveat] };
+    return {
+      state: 'native',
+      reason: 'reviewed-partial',
+      basis,
+      caveats: [caveat],
+    };
   }
 
   // Not native at the floor. Name the most specific reason.
@@ -231,23 +307,43 @@ export function statementOutcome({
     return added.kind === 'release' && compareVersions(added.parts, floor) > 0;
   });
   if (fullLater) {
-    return { state: 'incompatible', reason: 'support-after-floor', basis, caveats: [] };
+    return {
+      state: 'incompatible',
+      reason: 'support-after-floor',
+      basis,
+      caveats: [],
+    };
   }
   const fullRanged = full.some((s) => parseVersion(s.a).kind === 'ranged');
   if (fullRanged) {
     return { state: 'unknown', reason: 'ranged-data', basis, caveats: [] };
   }
   if (named.some((s) => s.f != null && appliesAt(s, floor))) {
-    return { state: 'incompatible', reason: 'flagged-only', basis, caveats: [] };
+    return {
+      state: 'incompatible',
+      reason: 'flagged-only',
+      basis,
+      caveats: [],
+    };
   }
   const applicableOther = statements.filter(
     (s) => !matchesName(s, match) && appliesAt(s, floor),
   );
   if (applicableOther.some((s) => s.x != null)) {
-    return { state: 'incompatible', reason: 'prefixed-only', basis, caveats: [] };
+    return {
+      state: 'incompatible',
+      reason: 'prefixed-only',
+      basis,
+      caveats: [],
+    };
   }
   if (applicableOther.some((s) => s.n != null)) {
-    return { state: 'incompatible', reason: 'alternative-name-only', basis, caveats: [] };
+    return {
+      state: 'incompatible',
+      reason: 'alternative-name-only',
+      basis,
+      caveats: [],
+    };
   }
   if (named.some((s) => s.a === 'preview')) {
     return { state: 'unknown', reason: 'preview-only', basis, caveats: [] };
@@ -277,7 +373,11 @@ export function statementOutcome({
  * resolution record; `dataEngine` is the BCD browser whose statements apply
  * (`chrome` for an Electron-derived target).
  */
-export function featureOutcome(record, target, { data = compatData(), reviews } = {}) {
+export function featureOutcome(
+  record,
+  target,
+  { data = compatData(), reviews } = {},
+) {
   const base = {
     feature: record.feature,
     engine: target.engine,
@@ -286,13 +386,23 @@ export function featureOutcome(record, target, { data = compatData(), reviews } 
     caveats: [],
   };
   if (!record.recognized) {
-    return { ...base, state: 'unknown', reason: 'unrecognized-construct', basis: 'catalog' };
+    return {
+      ...base,
+      state: 'unknown',
+      reason: 'unrecognized-construct',
+      basis: 'catalog',
+    };
   }
   if (record.fixed != null) {
     return { ...base, ...record.fixed, basis: 'catalog' };
   }
   if (record.kind === 'platform' && target.platform !== record.platform) {
-    return { ...base, state: 'incompatible', reason: 'platform-scoped', basis: 'catalog' };
+    return {
+      ...base,
+      state: 'incompatible',
+      reason: 'platform-scoped',
+      basis: 'catalog',
+    };
   }
   if (record.kind === 'combination' && record.bcd.length === 0) {
     // Never better than any component; the components are evaluated where
@@ -321,7 +431,10 @@ export function featureOutcome(record, target, { data = compatData(), reviews } 
       scope: record.scope ?? null,
       reviews,
     });
-    if (target.basis === 'derived-from-electron' && outcome.basis === 'compat-data') {
+    if (
+      target.basis === 'derived-from-electron' &&
+      outcome.basis === 'compat-data'
+    ) {
       outcome.basis = 'derived-from-electron';
     }
     if (worst == null || SEVERITY[outcome.state] > SEVERITY[worst.state]) {
@@ -341,7 +454,11 @@ export function featureOutcome(record, target, { data = compatData(), reviews } 
         state: 'equivalent-fallback',
         reason: 'platform-inapplicable',
         basis: 'catalog',
-        equivalent: { kind: 'no-effect', review: entry.reason, data: { state: worst.state, reason: worst.reason } },
+        equivalent: {
+          kind: 'no-effect',
+          review: entry.reason,
+          data: { state: worst.state, reason: worst.reason },
+        },
       };
     }
   }

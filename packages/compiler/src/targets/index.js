@@ -11,7 +11,7 @@
  */
 
 export { compatData, compatDataFromText } from './data';
-export { compareVersions, parseVersion } from './versions';
+export { compareVersions, isReleaseString, parseVersion } from './versions';
 export { extractConstructs } from './extract';
 export {
   CATALOG_KIND,
@@ -22,6 +22,8 @@ export {
   caveatDisposition,
   featureByKey,
   featuresOf,
+  inapplicability,
+  inapplicableCatalog,
 } from './catalog';
 export {
   BASES,
@@ -56,6 +58,12 @@ export {
   profileOutcomes,
 } from './evaluate';
 export { FALLBACK_KINDS, normalizeEnhancements } from './policy';
+export {
+  enforcementOf,
+  evaluateProjectTargets,
+  pageTargetSources,
+  targetReportSection,
+} from './project';
 export {
   DEVICES,
   EVIDENCE_CLASSES,

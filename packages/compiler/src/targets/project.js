@@ -43,7 +43,9 @@ function ruleSources(rules, owner) {
 
 /** Page contributions as target sources, located at their `create()` call. */
 export function pageTargetSources(file, rules, ruleOrigins = []) {
-  const origins = new Map(ruleOrigins.map((origin) => [origin.className, origin]));
+  const origins = new Map(
+    ruleOrigins.map((origin) => [origin.className, origin]),
+  );
   const sources = [];
   for (const [className, rule] of rules) {
     const origin = origins.get(className);
@@ -151,7 +153,9 @@ export function targetReportSection(facts) {
     .filter(
       (feature) =>
         feature.required &&
-        feature.profiles.some((p) => p.state === 'incompatible' || p.state === 'unknown'),
+        feature.profiles.some(
+          (p) => p.state === 'incompatible' || p.state === 'unknown',
+        ),
     )
     .map((feature) => ({
       feature: feature.feature,

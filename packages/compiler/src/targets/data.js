@@ -48,8 +48,7 @@ function load(text) {
   return Object.freeze({
     sources: raw.sources,
     paths: raw.paths,
-    digest:
-      'sha256:' + crypto.createHash('sha256').update(text).digest('hex'),
+    digest: 'sha256:' + crypto.createHash('sha256').update(text).digest('hex'),
     has: (bcdPath) => Object.hasOwn(raw.paths, bcdPath),
     entry: (bcdPath) => raw.paths[bcdPath] ?? null,
     childrenOf: (bcdPath) => children.get(bcdPath) ?? [],

@@ -62,7 +62,7 @@ const inspectionExternal = external.filter(
 // The owned engine retains Flow annotations; no donor tree enters this build.
 const includeGlobs = ['src/**/*'];
 
-// CE-01.1 target data. The generated compat data is ~1.5 MB of JSON; every
+// CE-01.1 target data. The generated compat data is ~0.6 MB of JSON; every
 // public entry reads ONE shared copy emitted next to the bundles instead of
 // inlining it into each of them. The private CommonJS test bundle has no
 // `import.meta.url`, so it inlines the text. Either way the bytes are the
@@ -86,7 +86,11 @@ function compatData({ inline }) {
       if (inline) {
         return `export default function compatDataText() { return ${JSON.stringify(text)}; }`;
       }
-      this.emitFile({ type: 'asset', fileName: COMPAT_DATA_FILE, source: text });
+      this.emitFile({
+        type: 'asset',
+        fileName: COMPAT_DATA_FILE,
+        source: text,
+      });
       return [
         "import { readFileSync } from 'node:fs';",
         'export default function compatDataText() {',

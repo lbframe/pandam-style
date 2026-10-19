@@ -63,7 +63,10 @@ export function featuresOfCss(cssText) {
  * the cascade-layer wrappers or the `:not(#\#)` specificity ladder that
  * stands in for them, and the logical-float custom properties.
  */
-export function intrinsicCss({ useCSSLayers = false, engineOptions = {} } = {}) {
+export function intrinsicCss({
+  useCSSLayers = false,
+  engineOptions = {},
+} = {}) {
   const parts = [];
   parts.push(
     useCSSLayers
@@ -121,7 +124,9 @@ function conditionsUsing(context, conditions) {
         (fragment) =>
           typeof definition === 'string' &&
           definition.length > 0 &&
-          fragment.replace(/\s+/g, '').includes(definition.replace(/^&/, '').replace(/\s+/g, '')),
+          fragment
+            .replace(/\s+/g, '')
+            .includes(definition.replace(/^&/, '').replace(/\s+/g, '')),
       ),
     )
     .map(({ name }) => name)
@@ -178,7 +183,9 @@ export function evaluateTargets({
   // A use backed by a fallback written in the value is tracked apart from a
   // required use of the same feature.
   const useKey = (rec) =>
-    rec.fallback == null ? rec.feature : `${rec.feature}\u0000${rec.fallback.kind}`;
+    rec.fallback == null
+      ? rec.feature
+      : `${rec.feature}\u0000${rec.fallback.kind}`;
   const record = (entry, owner) => {
     const key = useKey(entry.record);
     let use = uses.get(key);
@@ -196,10 +203,18 @@ export function evaluateTargets({
     for (const entry of featuresOfCss(css)) record(entry, owner);
   }
   for (const entry of featuresOfCss(intrinsicCss(intrinsic))) {
-    record(entry, { role: 'generated', file: null, line: null, column: null, label: 'compiler-intrinsic' });
+    record(entry, {
+      role: 'generated',
+      file: null,
+      line: null,
+      column: null,
+      label: 'compiler-intrinsic',
+    });
   }
 
-  const policies = new Map(enhancements.map((policy) => [policy.feature, policy]));
+  const policies = new Map(
+    enhancements.map((policy) => [policy.feature, policy]),
+  );
   const errors = [];
   const warnings = [];
   const infos = [];
@@ -239,14 +254,17 @@ export function evaluateTargets({
           basis: outcome.basis,
           ...(outcome.path == null ? {} : { path: outcome.path }),
           ...(outcome.caveats.length === 0 ? {} : { caveats: outcome.caveats }),
-          ...(outcome.restriction == null ? {} : { restriction: outcome.restriction }),
+          ...(outcome.restriction == null
+            ? {}
+            : { restriction: outcome.restriction }),
         })),
       })),
     });
 
     for (const profile of profiles) {
       const failing = profile.engines.filter(
-        (outcome) => outcome.state === 'incompatible' || outcome.state === 'unknown',
+        (outcome) =>
+          outcome.state === 'incompatible' || outcome.state === 'unknown',
       );
       if (failing.length === 0) continue;
       const engines = failing.map((outcome) => ({
@@ -289,14 +307,27 @@ export function evaluateTargets({
         const usedConditions = conditionsUsing(context, conditions);
         let candidates = [];
         let repair;
-        if (owner.role === 'page' && use.record.kind === 'value' && context.property != null) {
+        if (
+          owner.role === 'page' &&
+          use.record.kind === 'value' &&
+          context.property != null
+        ) {
           candidates = valueCandidates(context.property, domainOf, resolution);
           repair = {
             kind: 'replace-with-value',
             applicable: candidates.length > 0,
             target: { property: context.property },
-            expected: { states: ['native', 'transformed-with-proof', 'equivalent-fallback'] },
-            reason: candidates.length > 0 ? null : 'no admitted value of this property is native on every announced profile',
+            expected: {
+              states: [
+                'native',
+                'transformed-with-proof',
+                'equivalent-fallback',
+              ],
+            },
+            reason:
+              candidates.length > 0
+                ? null
+                : 'no admitted value of this property is native on every announced profile',
           };
         } else if (owner.role === 'page' && usedConditions.length > 0) {
           candidates = conditionCandidates(conditions, resolution);
@@ -304,15 +335,30 @@ export function evaluateTargets({
             kind: 'replace-condition',
             applicable: candidates.length > 0,
             target: { conditions: usedConditions },
-            expected: { states: ['native', 'transformed-with-proof', 'equivalent-fallback'] },
-            reason: candidates.length > 0 ? null : 'no declared condition is native on every announced profile',
+            expected: {
+              states: [
+                'native',
+                'transformed-with-proof',
+                'equivalent-fallback',
+              ],
+            },
+            reason:
+              candidates.length > 0
+                ? null
+                : 'no declared condition is native on every announced profile',
           };
         } else {
           repair = {
             kind: owner.role === 'page' ? 'unknown' : 'declare-enhancement',
             applicable: false,
             target: { feature: key },
-            expected: { states: ['native', 'transformed-with-proof', 'equivalent-fallback'] },
+            expected: {
+              states: [
+                'native',
+                'transformed-with-proof',
+                'equivalent-fallback',
+              ],
+            },
             reason:
               owner.role === 'page'
                 ? 'the construct is required by the emitted CSS and has no structured replacement'
@@ -338,14 +384,18 @@ export function evaluateTargets({
                     column: owner.column ?? null,
                     role: owner.role,
                   },
-            rule: unknownOnly ? 'targets.capability.evidence' : 'targets.capability.required',
+            rule: unknownOnly
+              ? 'targets.capability.evidence'
+              : 'targets.capability.required',
             context: {
               feature: key,
               owner: owner.label ?? owner.role,
               property: context.property ?? null,
               value: context.value ?? null,
               selector: context.selector ?? null,
-              atRules: (context.atRules ?? []).map((a) => `@${a.name} ${a.prelude}`.trim()),
+              atRules: (context.atRules ?? []).map((a) =>
+                `@${a.name} ${a.prelude}`.trim(),
+              ),
               conditions: usedConditions,
               profile: profile.ref,
               state,
@@ -358,7 +408,9 @@ export function evaluateTargets({
             states: ['native', 'transformed-with-proof', 'equivalent-fallback'],
             profile: profile.ref,
           },
-          candidates: candidates.slice(0, 32).map((candidate) => ({ value: candidate })),
+          candidates: candidates
+            .slice(0, 32)
+            .map((candidate) => ({ value: candidate })),
           candidatesTotal: candidates.length,
           repair,
         });
@@ -379,7 +431,10 @@ export function evaluateTargets({
           message: `Enhancement policy for ${policy.feature} has no effect: it is native on every announced profile.`,
           source: null,
           rule: 'targets.enhancement.ineffective',
-          context: { feature: policy.feature, profiles: profiles.map((p) => p.ref) },
+          context: {
+            feature: policy.feature,
+            profiles: profiles.map((p) => p.ref),
+          },
         }),
       );
     }
@@ -396,7 +451,11 @@ export function evaluateTargets({
       required: features.filter((f) => f.required).length,
       enhancements: features.filter((f) => !f.required).length,
       failingRequired: features.filter(
-        (f) => f.required && f.profiles.some((p) => p.state === 'incompatible' || p.state === 'unknown'),
+        (f) =>
+          f.required &&
+          f.profiles.some(
+            (p) => p.state === 'incompatible' || p.state === 'unknown',
+          ),
       ).length,
     },
   };
@@ -415,11 +474,18 @@ export function evaluateRequirements(requirements, resolution, recordOf) {
     const record = recordOf(feature);
     const profiles =
       record == null
-        ? resolution.profiles.map((profile) => ({ ref: profile.ref, state: 'unknown' }))
+        ? resolution.profiles.map((profile) => ({
+            ref: profile.ref,
+            state: 'unknown',
+          }))
         : profileOutcomes(record, resolution);
     const state = profiles.reduce((s, p) => worseState(s, p.state), 'native');
     if (state === 'incompatible' || state === 'unknown') {
-      failing.push({ feature, state, profiles: profiles.map((p) => ({ ref: p.ref, state: p.state })) });
+      failing.push({
+        feature,
+        state,
+        profiles: profiles.map((p) => ({ ref: p.ref, state: p.state })),
+      });
     }
   }
   return { ok: failing.length === 0, failing };

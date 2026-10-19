@@ -85,14 +85,19 @@ export const ANNOUNCEABLE = Object.freeze({
 
 export const BUILTIN_PROFILES = Object.freeze({
   'pandamstyle:default@1': { query: defaultProfile.query, platform: null },
-  'pandamstyle:ios-safari@1': { query: defaultProfile.iosQuery, platform: null },
+  'pandamstyle:ios-safari@1': {
+    query: defaultProfile.iosQuery,
+    platform: null,
+  },
   'pandamstyle:electron@1': { query: 'electron 44.7', platform: 'electron' },
   'pandamstyle:android-webview@1': {
     query: defaultProfile.androidWebViewQuery,
     platform: null,
   },
 });
-export const BUILTIN_PROFILE_REFS = Object.freeze(Object.keys(BUILTIN_PROFILES));
+export const BUILTIN_PROFILE_REFS = Object.freeze(
+  Object.keys(BUILTIN_PROFILES),
+);
 export const DEFAULT_PROFILE_REF = 'pandamstyle:default@1';
 
 const CONFIG_KEYS = new Set(['profiles', 'define']);
@@ -113,7 +118,15 @@ export function stableJson(value) {
 }
 
 function targetDiagnostic(code, rule, message, context, severity = 'error') {
-  return diagnostic({ code, severity, phase: 'targets', message, source: null, rule, context });
+  return diagnostic({
+    code,
+    severity,
+    phase: 'targets',
+    message,
+    source: null,
+    rule,
+    context,
+  });
 }
 
 // ----------------------------------------------------------- data identity --
@@ -142,7 +155,11 @@ function packageIdentity(requireFrom, name, entry, files) {
     hash.update(fs.readFileSync(path.join(root.dir, file)));
     hash.update('\0');
   }
-  return { version: root.version, digest: `sha256:${hash.digest('hex')}`, dir: root.dir };
+  return {
+    version: root.version,
+    digest: `sha256:${hash.digest('hex')}`,
+    dir: root.dir,
+  };
 }
 
 let identityCache = null;
@@ -159,11 +176,12 @@ export function dataPackages() {
   const fromList = createRequire(path.join(list.dir, 'index.js'));
   const packages = {
     browserslist: { version: list.version, digest: list.digest },
-    'caniuse-lite': packageIdentity(fromList, 'caniuse-lite', 'caniuse-lite/dist/unpacker/agents', [
-      'data/agents.js',
-      'data/browsers.js',
-      'data/browserVersions.js',
-    ]),
+    'caniuse-lite': packageIdentity(
+      fromList,
+      'caniuse-lite',
+      'caniuse-lite/dist/unpacker/agents',
+      ['data/agents.js', 'data/browsers.js', 'data/browserVersions.js'],
+    ),
     'electron-to-chromium': packageIdentity(
       fromList,
       'electron-to-chromium',
@@ -256,9 +274,16 @@ function enginesOf(list, platform) {
       });
       continue;
     }
-    const engine = platform === 'electron' && name === 'chrome' ? 'electron' : ANNOUNCEABLE[name];
+    const engine =
+      platform === 'electron' && name === 'chrome'
+        ? 'electron'
+        : ANNOUNCEABLE[name];
     if (!byEngine.has(engine)) {
-      byEngine.set(engine, { engine, dataEngine: ANNOUNCEABLE[name], versions: [] });
+      byEngine.set(engine, {
+        engine,
+        dataEngine: ANNOUNCEABLE[name],
+        versions: [],
+      });
     }
     byEngine.get(engine).versions.push(lowerBound(version));
   }
@@ -270,7 +295,8 @@ function enginesOf(list, platform) {
         dataEngine: target.dataEngine,
         floor: versions[0],
         upTo: versions.at(-1),
-        basis: target.engine === 'electron' ? 'derived-from-electron' : 'declared',
+        basis:
+          target.engine === 'electron' ? 'derived-from-electron' : 'declared',
         versions,
       };
     })
@@ -281,7 +307,12 @@ function enginesOf(list, platform) {
 function resolveQuery(ref, query, platform, errors, warnings) {
   const refused = refusedTerms(query);
   if (refused.length > 0) {
-    errors.push(...refused.map((d) => ({ ...d, context: { ...d.context, profile: ref } })));
+    errors.push(
+      ...refused.map((d) => ({
+        ...d,
+        context: { ...d.context, profile: ref },
+      })),
+    );
     return null;
   }
   let list;
@@ -339,24 +370,39 @@ export function resolveTargets(input) {
   const config = input ?? { profiles: [DEFAULT_PROFILE_REF] };
   if (config == null || typeof config !== 'object' || Array.isArray(config)) {
     throw new PmsError([
-      targetDiagnostic(Codes.INVALID_TARGET_CONFIG, 'targets.config', '`targets` must be an object with a `profiles` list.', {}),
+      targetDiagnostic(
+        Codes.INVALID_TARGET_CONFIG,
+        'targets.config',
+        '`targets` must be an object with a `profiles` list.',
+        {},
+      ),
     ]);
   }
   const unknown = Object.keys(config).filter((key) => !CONFIG_KEYS.has(key));
   if (unknown.length > 0) {
     errors.push(
-      targetDiagnostic(Codes.INVALID_TARGET_CONFIG, 'targets.config', `Unknown \`targets\` field(s): ${unknown.join(', ')}.`, {
-        fields: unknown,
-        accepted: [...CONFIG_KEYS],
-      }),
+      targetDiagnostic(
+        Codes.INVALID_TARGET_CONFIG,
+        'targets.config',
+        `Unknown \`targets\` field(s): ${unknown.join(', ')}.`,
+        {
+          fields: unknown,
+          accepted: [...CONFIG_KEYS],
+        },
+      ),
     );
   }
   const refs = config.profiles;
   if (!Array.isArray(refs) || refs.length === 0) {
     errors.push(
-      targetDiagnostic(Codes.INVALID_TARGET_CONFIG, 'targets.config', '`targets.profiles` must be a non-empty list of profile references.', {
-        candidates: [...BUILTIN_PROFILE_REFS],
-      }),
+      targetDiagnostic(
+        Codes.INVALID_TARGET_CONFIG,
+        'targets.config',
+        '`targets.profiles` must be a non-empty list of profile references.',
+        {
+          candidates: [...BUILTIN_PROFILE_REFS],
+        },
+      ),
     );
   }
   const defined = config.define ?? {};
@@ -364,7 +410,14 @@ export function resolveTargets(input) {
   const seen = new Set();
   for (const ref of Array.isArray(refs) ? refs : []) {
     if (seen.has(ref)) {
-      errors.push(targetDiagnostic(Codes.INVALID_TARGET_CONFIG, 'targets.config', `Profile ${ref} is listed twice.`, { ref }));
+      errors.push(
+        targetDiagnostic(
+          Codes.INVALID_TARGET_CONFIG,
+          'targets.config',
+          `Profile ${ref} is listed twice.`,
+          { ref },
+        ),
+      );
       continue;
     }
     seen.add(ref);
@@ -380,7 +433,9 @@ export function resolveTargets(input) {
       definition = defined[ref.slice(8)];
       profileOrigin = 'project';
       const fields =
-        definition != null && typeof definition === 'object' ? Object.keys(definition) : [];
+        definition != null && typeof definition === 'object'
+          ? Object.keys(definition)
+          : [];
       const bad = fields.filter((key) => !DEFINE_KEYS.has(key));
       if (
         bad.length > 0 ||
@@ -399,25 +454,38 @@ export function resolveTargets(input) {
       }
     } else {
       errors.push(
-        targetDiagnostic(Codes.INVALID_TARGET_CONFIG, 'targets.profile.unknown', `Unknown target profile "${String(ref)}".`, {
-          ref: ref ?? null,
-          candidates: [
-            ...BUILTIN_PROFILE_REFS,
-            ...Object.keys(defined).map((name) => `project:${name}`),
-          ],
-        }),
+        targetDiagnostic(
+          Codes.INVALID_TARGET_CONFIG,
+          'targets.profile.unknown',
+          `Unknown target profile "${String(ref)}".`,
+          {
+            ref: ref ?? null,
+            candidates: [
+              ...BUILTIN_PROFILE_REFS,
+              ...Object.keys(defined).map((name) => `project:${name}`),
+            ],
+          },
+        ),
       );
       continue;
     }
     const platform = definition.platform ?? null;
-    const resolved = resolveQuery(ref, definition.query, platform, errors, warnings);
+    const resolved = resolveQuery(
+      ref,
+      definition.query,
+      platform,
+      errors,
+      warnings,
+    );
     if (resolved == null) continue;
     profiles.push({
       ref,
       origin: profileOrigin,
       query: definition.query,
       platform,
-      definitionDigest: sha256(stableJson({ query: definition.query, platform })),
+      definitionDigest: sha256(
+        stableJson({ query: definition.query, platform }),
+      ),
       browsers: resolved.browsers,
       engines: resolved.engines,
       excluded: resolved.excluded,

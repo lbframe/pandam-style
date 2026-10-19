@@ -128,7 +128,7 @@ function analyseValue(tokens, start, end, property, out, context) {
     ? splitTop(tokens, start, end, 'comma-token').at(-1)[0]
     : start;
   let depth = 0;
-  let functionStack = [];
+  const functionStack = [];
   for (let i = start; i < end; i += 1) {
     const token = tokens[i];
     const t = type(token);
@@ -165,7 +165,12 @@ function analyseValue(tokens, start, end, property, out, context) {
       } else if (ident !== 'from') {
         out.add(
           i < lastEntryStart
-            ? { kind: 'value-keyword', property, keyword: ident, listFallback: true }
+            ? {
+                kind: 'value-keyword',
+                property,
+                keyword: ident,
+                listFallback: true,
+              }
             : { kind: 'value-keyword', property, keyword: ident },
           context,
         );
@@ -173,7 +178,10 @@ function analyseValue(tokens, start, end, property, out, context) {
       continue;
     }
     if (t === 'dimension-token') {
-      out.add({ kind: 'unit', unit: String(token[4].unit).toLowerCase() }, context);
+      out.add(
+        { kind: 'unit', unit: String(token[4].unit).toLowerCase() },
+        context,
+      );
       continue;
     }
     if (t === 'hash-token' && depth === 0) {
@@ -251,7 +259,14 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
       );
       // Descriptor values still use functions and units (`src: url() format()`
       // is covered by the at-rule; `initial-value` can hold any value).
-      analyseValue(tokens, colon + 1, valueEnd, `@${descriptorOf}/${name}`, out, declarationContext);
+      analyseValue(
+        tokens,
+        colon + 1,
+        valueEnd,
+        `@${descriptorOf}/${name}`,
+        out,
+        declarationContext,
+      );
       continue;
     }
     out.add({ kind: 'property', name }, declarationContext);
@@ -289,7 +304,10 @@ function analyseSelector(tokens, start, end, out, context, enclosing = []) {
       const name = String(value(token)).toLowerCase();
       out.add({ kind: 'selector', name, element }, context);
       if (enclosing.includes('has') && name === 'has') {
-        out.add({ kind: 'combination', key: 'selector:has+selector:has' }, context);
+        out.add(
+          { kind: 'combination', key: 'selector:has+selector:has' },
+          context,
+        );
       }
       if (enclosing.includes('has') && element) {
         out.add(
@@ -300,8 +318,24 @@ function analyseSelector(tokens, start, end, out, context, enclosing = []) {
       if (type(token) === 'function-token') {
         const close = matching(tokens, at);
         // Functional pseudo-classes taking a selector list.
-        if (['has', 'is', 'where', 'not', 'host', 'host-context', 'slotted', 'part', 'nth-child', 'nth-last-child'].includes(name)) {
-          analyseSelector(tokens, at + 1, close, out, context, [...enclosing, name]);
+        if (
+          [
+            'has',
+            'is',
+            'where',
+            'not',
+            'host',
+            'host-context',
+            'slotted',
+            'part',
+            'nth-child',
+            'nth-last-child',
+          ].includes(name)
+        ) {
+          analyseSelector(tokens, at + 1, close, out, context, [
+            ...enclosing,
+            name,
+          ]);
         }
         i = close;
       } else {
@@ -318,7 +352,10 @@ function analyseSelector(tokens, start, end, out, context, enclosing = []) {
 function analyseMediaQuery(tokens, start, end, out, context) {
   for (let i = start; i < end; i += 1) {
     const t = type(tokens[i]);
-    if (t === 'ident-token' && String(value(tokens[i])).toLowerCase() === 'or') {
+    if (
+      t === 'ident-token' &&
+      String(value(tokens[i])).toLowerCase() === 'or'
+    ) {
       out.add({ kind: 'media-syntax', name: 'or_syntax' }, context);
     }
     if (t === 'function-token') {
@@ -359,7 +396,10 @@ function analyseMediaQuery(tokens, start, end, out, context) {
           out.add({ kind: 'media-feature', name }, context);
         }
       } else if (type(token) === 'dimension-token') {
-        out.add({ kind: 'unit', unit: String(token[4].unit).toLowerCase() }, context);
+        out.add(
+          { kind: 'unit', unit: String(token[4].unit).toLowerCase() },
+          context,
+        );
       }
     }
     if (range) out.add({ kind: 'media-syntax', name: 'range_syntax' }, context);
@@ -377,7 +417,10 @@ function analyseContainerQuery(tokens, start, end, out, context) {
       continue;
     }
     if (t === 'dimension-token') {
-      out.add({ kind: 'unit', unit: String(tokens[i][4].unit).toLowerCase() }, context);
+      out.add(
+        { kind: 'unit', unit: String(tokens[i][4].unit).toLowerCase() },
+        context,
+      );
     }
   }
 }
@@ -454,8 +497,7 @@ function analyseRules(tokens, start, end, out, context) {
           k = frameClose + 1;
         }
       } else if (DECLARATION_BLOCK_AT_RULES.has(name)) {
-        const descriptorOf =
-          name === 'position-try' ? null : name;
+        const descriptorOf = name === 'position-try' ? null : name;
         analyseDeclarations(tokens, j + 1, close, out, atContext, descriptorOf);
       } else {
         out.add({ kind: 'unclassified', where: 'at-rule-block' }, atContext);

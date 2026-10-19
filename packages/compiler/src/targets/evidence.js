@@ -47,7 +47,8 @@ const WEBKIT_PORTS = /playwright|webkitgtk|wpe|minibrowser/i;
 /** Problems with one evidence record; an empty list means it is admissible. */
 export function evidenceProblems(evidence) {
   const problems = [];
-  if (evidence == null || typeof evidence !== 'object') return ['not-an-object'];
+  if (evidence == null || typeof evidence !== 'object')
+    return ['not-an-object'];
   if (!EVIDENCE_CLASSES.includes(evidence.class)) problems.push('class');
   if (typeof evidence.fixtureId !== 'string' || evidence.fixtureId === '') {
     problems.push('fixture-id');
@@ -86,7 +87,9 @@ export function evidenceProblems(evidence) {
 /** The outcome basis an admissible record supports, or null. */
 export function evidenceBasis(evidence) {
   if (evidenceProblems(evidence).length > 0) return null;
-  return evidence.engine.device === 'simulator' ? 'executed-simulator' : 'executed';
+  return evidence.engine.device === 'simulator'
+    ? 'executed-simulator'
+    : 'executed';
 }
 
 /**

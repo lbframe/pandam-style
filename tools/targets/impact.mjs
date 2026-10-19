@@ -80,7 +80,10 @@ export async function impact({ targets = null } = {}) {
           const entry = bucket.get(key);
           entry.engines.add(outcome.engine);
           entry.groups.add(source.group);
-          if (entry.examples.length < 3 && !entry.examples.some((e) => e.unit === unit)) {
+          if (
+            entry.examples.length < 3 &&
+            !entry.examples.some((e) => e.unit === unit)
+          ) {
             entry.examples.push({
               unit,
               denominator: use.attribution.denominator ?? null,
@@ -96,8 +99,14 @@ export async function impact({ targets = null } = {}) {
   }
   const listOf = (bucket) =>
     [...bucket.values()]
-      .map((e) => ({ ...e, engines: [...e.engines].sort(), groups: [...e.groups].sort() }))
-      .sort((a, b) => (a.feature < b.feature ? -1 : a.feature > b.feature ? 1 : 0));
+      .map((e) => ({
+        ...e,
+        engines: [...e.engines].sort(),
+        groups: [...e.groups].sort(),
+      }))
+      .sort((a, b) =>
+        a.feature < b.feature ? -1 : a.feature > b.feature ? 1 : 0,
+      );
   return {
     kind: 'pandamstyle-target-impact',
     schemaVersion: 1,
@@ -129,7 +138,7 @@ export async function impact({ targets = null } = {}) {
   };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+async function main() {
   const argv = process.argv.slice(2);
   const pIndex = argv.indexOf('--profiles');
   const targets = pIndex === -1 ? null : JSON.parse(argv[pIndex + 1]);
@@ -145,10 +154,23 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   }
   process.stdout.write(`unknown features: ${result.unknowns.length}\n`);
   for (const u of result.unknowns) {
-    process.stdout.write(`  ${u.feature} ${u.reason} [${u.engines.join(',')}] ${u.groups.join(',')}\n`);
+    process.stdout.write(
+      `  ${u.feature} ${u.reason} [${u.engines.join(',')}] ${u.groups.join(',')}\n`,
+    );
   }
-  process.stdout.write(`incompatible features: ${result.incompatibles.length}\n`);
+  process.stdout.write(
+    `incompatible features: ${result.incompatibles.length}\n`,
+  );
   for (const u of result.incompatibles) {
-    process.stdout.write(`  ${u.feature} ${u.reason} [${u.engines.join(',')}] ${u.groups.join(',')}\n`);
+    process.stdout.write(
+      `  ${u.feature} ${u.reason} [${u.engines.join(',')}] ${u.groups.join(',')}\n`,
+    );
   }
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    process.stderr.write(`${error.stack ?? error}\n`);
+    process.exitCode = 1;
+  });
 }

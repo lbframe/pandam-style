@@ -196,7 +196,9 @@ export function createArtifactSet(
     ...identity,
     artifactSetDigest: artifactSetDigest(identity, artifacts),
     artifacts,
-    ...(snapshot.targets == null ? {} : { targetsDigest: snapshot.targets.digest }),
+    ...(snapshot.targets == null
+      ? {}
+      : { targetsDigest: snapshot.targets.digest }),
   };
   validateArtifactSet(metadata, contents);
   const text = `${JSON.stringify(metadata, null, 2)}\n`;

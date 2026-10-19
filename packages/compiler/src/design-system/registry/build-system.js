@@ -124,14 +124,16 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
   const targetFacts =
     targets == null
       ? null
-      : perfPhase('ds_target_facts_ms', () =>
-          evaluateTargets({
-            resolution: targets,
-            sources: designSystemTargetSources(injected),
-            enhancements: registry.enhancements,
-            conditions: conditionDefinitions(registry),
-            domainOf: structuralDomainOfCss,
-          }).facts,
+      : perfPhase(
+          'ds_target_facts_ms',
+          () =>
+            evaluateTargets({
+              resolution: targets,
+              sources: designSystemTargetSources(injected),
+              enhancements: registry.enhancements,
+              conditions: conditionDefinitions(registry),
+              domainOf: structuralDomainOfCss,
+            }).facts,
         );
 
   const snapshot = perfPhase('ds_snapshot_build_ms', () =>
@@ -144,7 +146,8 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
       cssRules: injected,
       supportedProperties: supportedProperties(),
       targets,
-      targetFacts: targetFacts == null ? null : { ...targetFacts, scope: 'design-system' },
+      targetFacts:
+        targetFacts == null ? null : { ...targetFacts, scope: 'design-system' },
     }),
   );
   const manifest = perfPhase('ds_manifest_ms', () => snapshot.tooling.manifest);
@@ -170,23 +173,28 @@ export function designSystemTargetSources(injected) {
   const sources = [];
   for (const key of Object.keys(injected)) {
     const { ltr, rtl } = injected[key];
-    const owner = { role: 'design-system', file: null, line: null, column: null, label: 'design-system' };
+    const owner = {
+      role: 'design-system',
+      file: null,
+      line: null,
+      column: null,
+      label: 'design-system',
+    };
     if (typeof ltr === 'string') sources.push({ owner, css: ltr });
     if (typeof rtl === 'string') sources.push({ owner, css: rtl });
   }
   return sources;
 }
 
-/** Registry conditions as `{ name, definition }`, for diagnostics context. */
+/**
+ * Registry conditions as `{ name, definition }` (the registry stores
+ * `{ name, definition, kind }`), for diagnostics context.
+ */
 export function conditionDefinitions(registry) {
-  return (registry.conditionOrder ?? []).map((name) => {
-    const condition = registry.conditions[name];
-    const definition =
-      typeof condition === 'string'
-        ? condition
-        : (condition?.selector ?? condition?.atRule ?? condition?.definition ?? null);
-    return { name, definition };
-  });
+  return (registry.conditionOrder ?? []).map((name) => ({
+    name,
+    definition: registry.conditions[name]?.definition ?? null,
+  }));
 }
 
 /**
@@ -194,6 +202,8 @@ export function conditionDefinitions(registry) {
  * structured repair candidates of target diagnostics.
  */
 export function structuralDomainOfCss(cssProperty) {
-  const key = String(cssProperty).replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+  const key = String(cssProperty).replace(/-([a-z])/g, (_, c) =>
+    c.toUpperCase(),
+  );
   return propertyKind(key) === 'structural-set' ? structuralDomain(key) : null;
 }

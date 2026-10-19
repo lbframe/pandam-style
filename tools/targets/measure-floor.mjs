@@ -29,7 +29,9 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { REPO, collectFeatureUses } from './corpus-features.mjs';
 
-const require = createRequire(path.join(REPO, 'packages/compiler/package.json'));
+const require = createRequire(
+  path.join(REPO, 'packages/compiler/package.json'),
+);
 const browserslist = require('browserslist');
 // BCD browser id -> Browserslist name, for release lists only.
 export const BROWSERSLIST_NAMES = {
@@ -71,7 +73,11 @@ function bcdNoteText(bcd, bcdPath, engine, digest) {
   for (const statement of statements) {
     if (statement.notes == null) continue;
     const text = [].concat(statement.notes).join('\n');
-    const d = crypto.createHash('sha256').update(text).digest('hex').slice(0, 16);
+    const d = crypto
+      .createHash('sha256')
+      .update(text)
+      .digest('hex')
+      .slice(0, 16);
     if (d === digest) return text;
   }
   return null;
@@ -86,8 +92,10 @@ export async function measure() {
   const releases = Object.fromEntries(
     [...DEFAULT_ENGINES, ...OPTIONAL_ENGINES].map((engine) => {
       const name = BROWSERSLIST_NAMES[engine];
-      const list = browserslist(`${name} > 0`, { mobileToDesktop: true, stats: {} })
-        .map((entry) => entry.split(' ')[1].split('-')[0]);
+      const list = browserslist(`${name} > 0`, {
+        mobileToDesktop: true,
+        stats: {},
+      }).map((entry) => entry.split(' ')[1].split('-')[0]);
       return [engine, [...new Set(list)].sort(t.compareVersions)];
     }),
   );
@@ -130,12 +138,17 @@ export async function measure() {
         if (caveat.disposition === 'unreviewed') {
           caveats.set(`${caveat.path}|${caveat.engine}|${caveat.note}`, {
             ...caveat,
-            features: [...(caveats.get(`${caveat.path}|${caveat.engine}|${caveat.note}`)?.features ?? []), feature],
+            features: [
+              ...(caveats.get(`${caveat.path}|${caveat.engine}|${caveat.note}`)
+                ?.features ?? []),
+              feature,
+            ],
           });
         }
       }
       let found = null;
-      const acceptable = (state) => state === 'native' || state === 'equivalent-fallback';
+      const acceptable = (state) =>
+        state === 'native' || state === 'equivalent-fallback';
       if (acceptable(latest.state)) {
         for (const version of releases[engine]) {
           if (acceptable(t.featureOutcome(record, target(version)).state)) {
@@ -151,7 +164,9 @@ export async function measure() {
   const variants = {};
   for (const [name, groups] of Object.entries(VARIANTS)) {
     const features = [...records.keys()]
-      .filter((feature) => [...groupsOf.get(feature)].some((g) => groups.includes(g)))
+      .filter((feature) =>
+        [...groupsOf.get(feature)].some((g) => groups.includes(g)),
+      )
       .sort();
     // A feature never acceptable on some default engine is a per-feature
     // outcome there; it sets no floor on any engine, because raising other
@@ -200,7 +215,8 @@ export async function measure() {
         for (const statement of entry?.e?.[engine] ?? []) {
           if (statement.t == null || statement.f != null) continue;
           if ((statement.x ?? null) !== (match?.prefix ?? null)) continue;
-          if ((statement.n ?? null) !== (match?.alternativeName ?? null)) continue;
+          if ((statement.n ?? null) !== (match?.alternativeName ?? null))
+            continue;
           const key = `${bcdPath}|${engine}|${statement.t}`;
           const previous = reviewable.get(key);
           reviewable.set(key, {
@@ -210,7 +226,9 @@ export async function measure() {
             partial: statement.p != null,
             added: statement.a,
             removed: statement.r ?? null,
-            features: [...new Set([...(previous?.features ?? []), feature])].sort(),
+            features: [
+              ...new Set([...(previous?.features ?? []), feature]),
+            ].sort(),
           });
         }
       }
@@ -220,7 +238,10 @@ export async function measure() {
   let caveatList = [...caveats.values()];
   if (caveatList.length > 0) {
     const bcd = JSON.parse(
-      fs.readFileSync(path.join(REPO, 'node_modules/@mdn/browser-compat-data/data.json'), 'utf8'),
+      fs.readFileSync(
+        path.join(REPO, 'node_modules/@mdn/browser-compat-data/data.json'),
+        'utf8',
+      ),
     );
     caveatList = caveatList
       .map((caveat) => ({
@@ -228,7 +249,9 @@ export async function measure() {
         features: [...new Set(caveat.features)].sort(),
         text: bcdNoteText(bcd, caveat.path, caveat.engine, caveat.note),
       }))
-      .sort((a, b) => (`${a.path}|${a.engine}` < `${b.path}|${b.engine}` ? -1 : 1));
+      .sort((a, b) =>
+        `${a.path}|${a.engine}` < `${b.path}|${b.engine}` ? -1 : 1,
+      );
   }
 
   return {
@@ -240,25 +263,28 @@ export async function measure() {
     minimum,
     atCurrent,
     groups: Object.fromEntries(
-      [...groupsOf].map(([feature, groups]) => [feature, [...groups].sort()]).sort(),
+      [...groupsOf]
+        .map(([feature, groups]) => [feature, [...groups].sort()])
+        .sort(),
     ),
     unreviewedCaveats: caveatList,
     reviewable: [...reviewable.values()].sort((a, b) =>
-      `${a.path}|${a.engine}|${a.note}` < `${b.path}|${b.engine}|${b.note}` ? -1 : 1,
+      `${a.path}|${a.engine}|${a.note}` < `${b.path}|${b.engine}|${b.note}`
+        ? -1
+        : 1,
     ),
   };
 }
 
-if (
-  import.meta.url === `file://${process.argv[1]}` &&
-  !process.argv.includes('--freeze') &&
-  !process.argv.includes('--check')
-) {
+async function printMeasurement() {
   const argv = process.argv.slice(2);
   const result = await measure();
   const outIndex = argv.indexOf('--out');
   if (outIndex !== -1) {
-    fs.writeFileSync(argv[outIndex + 1], JSON.stringify(result, null, 2) + '\n');
+    fs.writeFileSync(
+      argv[outIndex + 1],
+      JSON.stringify(result, null, 2) + '\n',
+    );
   }
   if (argv.includes('--caveats')) {
     for (const caveat of result.unreviewedCaveats) {
@@ -266,7 +292,9 @@ if (
         `${caveat.path} | ${caveat.engine} | ${caveat.note} | ${caveat.features.join(',')}\n    ${String(caveat.text).replace(/\n/g, '\n    ')}\n`,
       );
     }
-    process.stdout.write(`${result.unreviewedCaveats.length} unreviewed caveats\n`);
+    process.stdout.write(
+      `${result.unreviewedCaveats.length} unreviewed caveats\n`,
+    );
   }
   for (const [name, variant] of Object.entries(result.variants)) {
     process.stdout.write(`\n== ${name} (${variant.featureCount} features)\n`);
@@ -276,6 +304,17 @@ if (
       );
     }
   }
+}
+
+if (
+  import.meta.url === `file://${process.argv[1]}` &&
+  !process.argv.includes('--freeze') &&
+  !process.argv.includes('--check')
+) {
+  printMeasurement().catch((error) => {
+    process.stderr.write(`${error.stack ?? error}\n`);
+    process.exitCode = 1;
+  });
 }
 
 // ------------------------------------------------------------------ freeze --
@@ -296,7 +335,10 @@ export const FROZEN = {
 function fileDigest(relative) {
   return (
     'sha256:' +
-    crypto.createHash('sha256').update(fs.readFileSync(path.join(REPO, relative))).digest('hex')
+    crypto
+      .createHash('sha256')
+      .update(fs.readFileSync(path.join(REPO, relative)))
+      .digest('hex')
   );
 }
 
@@ -328,7 +370,11 @@ export function profileRecord(result) {
       exceptions: Object.fromEntries(
         Object.entries(designed.floors).map(([engine, row]) => [
           engine,
-          row.exceptions.map((e) => ({ feature: e.feature, state: e.state, reason: e.reason })),
+          row.exceptions.map((e) => ({
+            feature: e.feature,
+            state: e.state,
+            reason: e.reason,
+          })),
         ]),
       ),
       nonBinding: designed.nonBinding,
@@ -346,9 +392,15 @@ export function profileRecord(result) {
     },
     inputs: {
       compatData: result.compatDataDigest,
-      caveatReviews: fileDigest('packages/compiler/src/targets/catalog/caveats.v1.json'),
-      inapplicableReviews: fileDigest('packages/compiler/src/targets/catalog/inapplicable.v1.json'),
-      corpusAccounting: fileDigest('tests/core-evolution/corpus/accounting.v1.json'),
+      caveatReviews: fileDigest(
+        'packages/compiler/src/targets/catalog/caveats.v1.json',
+      ),
+      inapplicableReviews: fileDigest(
+        'packages/compiler/src/targets/catalog/inapplicable.v1.json',
+      ),
+      corpusAccounting: fileDigest(
+        'tests/core-evolution/corpus/accounting.v1.json',
+      ),
       workloads: fileDigest('benchmarks/core-evolution/workloads.v1.json'),
       browserslist: require('browserslist/package.json').version,
       caniuseLite: require('caniuse-lite/package.json').version,
@@ -359,7 +411,15 @@ export function profileRecord(result) {
 /** Problems between the frozen query and the measured floors. */
 export function queryProblems(record) {
   const problems = [];
-  const names = { chrome: 'chrome', edge: 'edge', firefox: 'firefox', chrome_android: 'and_chr', firefox_android: 'and_ff', safari: 'safari', safari_ios: 'ios_saf' };
+  const names = {
+    chrome: 'chrome',
+    edge: 'edge',
+    firefox: 'firefox',
+    chrome_android: 'and_chr',
+    firefox_android: 'and_ff',
+    safari: 'safari',
+    safari_ios: 'ios_saf',
+  };
   for (const [engine, name] of Object.entries(names)) {
     const floor = record.measurement.floors[engine]?.floor;
     if (!record.query.includes(`${name} >= ${floor}`)) {
@@ -369,24 +429,33 @@ export function queryProblems(record) {
   return problems;
 }
 
+async function freezeOrCheck(argv) {
+  const record = profileRecord(await measure());
+  const problems = queryProblems(record);
+  const text = JSON.stringify(record, null, 2) + '\n';
+  if (argv.includes('--freeze')) {
+    if (problems.length > 0) throw new Error(problems.join('\n'));
+    fs.writeFileSync(PROFILE_FILE, text);
+    process.stdout.write(`froze ${path.relative(REPO, PROFILE_FILE)}\n`);
+  } else {
+    const committed = fs.readFileSync(PROFILE_FILE, 'utf8');
+    if (committed !== text || problems.length > 0) {
+      process.stderr.write(
+        `default profile does not re-derive:\n${problems.join('\n')}\n`,
+      );
+      process.exitCode = 1;
+    } else {
+      process.stdout.write('default profile re-derives byte for byte\n');
+    }
+  }
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const argv = process.argv.slice(2);
   if (argv.includes('--freeze') || argv.includes('--check')) {
-    const record = profileRecord(await measure());
-    const problems = queryProblems(record);
-    const text = JSON.stringify(record, null, 2) + '\n';
-    if (argv.includes('--freeze')) {
-      if (problems.length > 0) throw new Error(problems.join('\n'));
-      fs.writeFileSync(PROFILE_FILE, text);
-      process.stdout.write(`froze ${path.relative(REPO, PROFILE_FILE)}\n`);
-    } else {
-      const committed = fs.readFileSync(PROFILE_FILE, 'utf8');
-      if (committed !== text || problems.length > 0) {
-        process.stderr.write(`default profile does not re-derive:\n${problems.join('\n')}\n`);
-        process.exitCode = 1;
-      } else {
-        process.stdout.write('default profile re-derives byte for byte\n');
-      }
-    }
+    freezeOrCheck(argv).catch((error) => {
+      process.stderr.write(`${error.stack ?? error}\n`);
+      process.exitCode = 1;
+    });
   }
 }

@@ -38,8 +38,14 @@ export const OUT = path.join(
   'packages/compiler/src/targets/data/compat-data.v1.json',
 );
 const EVIDENCE = path.join(REPO, 'docs/research/core-evolution-evidence.json');
-const REGISTRY = path.join(REPO, 'docs/research/core-evolution-registry.v1.json');
-const ACCOUNTING = path.join(REPO, 'tests/core-evolution/corpus/accounting.v1.json');
+const REGISTRY = path.join(
+  REPO,
+  'docs/research/core-evolution-registry.v1.json',
+);
+const ACCOUNTING = path.join(
+  REPO,
+  'tests/core-evolution/corpus/accounting.v1.json',
+);
 const WACANDO = [
   'tests/core-evolution/corpus/calibration/w-mockup-1559.declarations.v1.json',
   'tests/core-evolution/corpus/calibration/w-util-343.declarations.v1.json',
@@ -119,7 +125,9 @@ export function includedProperties(bcdProperties = null) {
       add(entry.name);
     }
   }
-  for (const name of Object.keys(readJson(ACCOUNTING).totals.registryEntriesExercised)) {
+  for (const name of Object.keys(
+    readJson(ACCOUNTING).totals.registryEntriesExercised,
+  )) {
     add(name);
   }
   for (const file of WACANDO) {
@@ -146,7 +154,8 @@ export function buildCompatData({ bcdData = DEFAULT_BCD } = {}) {
       const e = {};
       for (const engine of ENGINES) {
         const support = node.__compat.support[engine];
-        if (support !== undefined) e[engine] = [].concat(support).map(compactStatement);
+        if (support !== undefined)
+          e[engine] = [].concat(support).map(compactStatement);
       }
       paths[pathName] = { e };
     }
@@ -189,7 +198,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const argv = process.argv.slice(2);
   const index = argv.indexOf('--bcd-data');
   const text = serializeCompatData(
-    buildCompatData(index === -1 ? {} : { bcdData: path.resolve(argv[index + 1]) }),
+    buildCompatData(
+      index === -1 ? {} : { bcdData: path.resolve(argv[index + 1]) },
+    ),
   );
   if (argv.includes('--check')) {
     const committed = fs.readFileSync(OUT, 'utf8');

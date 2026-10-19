@@ -113,7 +113,10 @@ const FUNCTION_FAMILIES = Object.freeze([
   ['css.types.color', null],
   ['css.types.gradient', null],
   ['css.types.image', null],
-  ['css.types.transform-function', ['transform', 'translate', 'rotate', 'scale']],
+  [
+    'css.types.transform-function',
+    ['transform', 'translate', 'rotate', 'scale'],
+  ],
   ['css.types.filter-function', ['filter', 'backdrop-filter']],
   [
     'css.types.easing-function',
@@ -165,7 +168,8 @@ function functionPath(property, name) {
     if (own != null) return own;
   }
   for (const [family, properties] of FUNCTION_FAMILIES) {
-    if (properties != null && !custom && !properties.includes(property)) continue;
+    if (properties != null && !custom && !properties.includes(property))
+      continue;
     const path = childPath(family, name);
     if (path != null) return path;
   }
@@ -307,10 +311,16 @@ function propertyFeature(name) {
     if (has(base)) {
       // The emitted name is the prefixed one: the statements that count are
       // the ones recording exactly that prefix.
-      return record(`property:${name}`, 'property', null, [bcd(base, { prefix })], {
-        base,
-        match: { prefix },
-      });
+      return record(
+        `property:${name}`,
+        'property',
+        null,
+        [bcd(base, { prefix })],
+        {
+          base,
+          match: { prefix },
+        },
+      );
     }
   }
   const alternative = alternativeNamePath('css.properties', name);
@@ -336,12 +346,9 @@ function keywordFeature(property, keyword) {
   if (has(direct)) {
     // The property key already checks the emitted (possibly prefixed or
     // renamed) property name; the keyword key checks the keyword itself.
-    return record(
-      `value:${property}/${keyword}`,
-      'value',
-      owner.feature,
-      [bcd(direct)],
-    );
+    return record(`value:${property}/${keyword}`, 'value', owner.feature, [
+      bcd(direct),
+    ]);
   }
   // A prefixed or renamed keyword (`-webkit-fill-available`) is recorded as
   // an alternative name or prefix on one of the property's keyword entries.
@@ -359,9 +366,12 @@ function keywordFeature(property, keyword) {
             statement.n === keyword
               ? { alternativeName: keyword }
               : { prefix: statement.x };
-          return record(`value:${property}/${keyword}`, 'value', owner.feature, [
-            bcd(path, match),
-          ]);
+          return record(
+            `value:${property}/${keyword}`,
+            'value',
+            owner.feature,
+            [bcd(path, match)],
+          );
         }
       }
     }
@@ -389,17 +399,18 @@ function functionFeature(property, name, relative) {
     ? `value:${property.replace(/^@/, '@')}/${name}()`
     : `function:${name}`;
   const out = [
-    record(key, scoped ? 'value' : 'function', scoped ? `property:${property}` : null, [
-      bcd(path),
-    ]),
+    record(
+      key,
+      scoped ? 'value' : 'function',
+      scoped ? `property:${property}` : null,
+      [bcd(path)],
+    ),
   ];
   if (relative) {
     const relativePath = `${path}.relative_syntax`;
     out.push(
       has(relativePath)
-        ? record(`${key}/relative`, 'function', key, [
-            bcd(relativePath),
-          ])
+        ? record(`${key}/relative`, 'function', key, [bcd(relativePath)])
         : unrecognized(`${key}/relative`, 'function', { name }),
     );
   }
@@ -434,7 +445,9 @@ function atRuleFeature(name, form) {
 function mediaFeature(name) {
   const direct = `css.at-rules.media.${name}`;
   if (has(direct)) {
-    return record(`media:${name}`, 'media-feature', 'at-rule:media', [bcd(direct)]);
+    return record(`media:${name}`, 'media-feature', 'at-rule:media', [
+      bcd(direct),
+    ]);
   }
   const stripped = name.replace(/^(min|max)-/, '');
   const base = `css.at-rules.media.${stripped}`;
@@ -474,27 +487,42 @@ export function featuresOf(construct) {
       const path = `css.types.global_keywords.${construct.keyword}`;
       return [
         has(path)
-          ? record(`value:global/${construct.keyword}`, 'value', null, [bcd(path)])
+          ? record(`value:global/${construct.keyword}`, 'value', null, [
+              bcd(path),
+            ])
           : unrecognized(`value:global/${construct.keyword}`, 'value', {}),
       ];
     }
     case 'alpha-hex-color': {
-      const path = 'css.types.color.rgb_hexadecimal_notation.alpha_hexadecimal_notation';
+      const path =
+        'css.types.color.rgb_hexadecimal_notation.alpha_hexadecimal_notation';
       return [record('value:color/alpha-hex', 'value', null, [bcd(path)])];
     }
     case 'function':
-      return functionFeature(construct.property, construct.name, construct.relative);
+      return functionFeature(
+        construct.property,
+        construct.name,
+        construct.relative,
+      );
     case 'unit': {
       const path = UNIT_PATHS[construct.unit];
       if (path == null) {
-        return [unrecognized(`unit:${construct.unit}`, 'unit', { unit: construct.unit })];
+        return [
+          unrecognized(`unit:${construct.unit}`, 'unit', {
+            unit: construct.unit,
+          }),
+        ];
       }
       return [record(`unit:${construct.unit}`, 'unit', null, [bcd(path)])];
     }
     case 'selector':
       return [selectorFeature(construct.name, construct.element)];
     case 'attribute-selector':
-      return [record('selector:attribute', 'selector', null, [bcd('css.selectors.attribute')])];
+      return [
+        record('selector:attribute', 'selector', null, [
+          bcd('css.selectors.attribute'),
+        ]),
+      ];
     case 'at-rule':
       return [atRuleFeature(construct.name, construct.form)];
     case 'media-feature':
@@ -510,18 +538,24 @@ export function featuresOf(construct) {
       return [
         path == null
           ? unrecognized(`at-rule:container/${construct.name}`, 'at-rule', {})
-          : record(`at-rule:container/${construct.name}`, 'at-rule', 'at-rule:container', [
-              bcd(path),
-            ]),
+          : record(
+              `at-rule:container/${construct.name}`,
+              'at-rule',
+              'at-rule:container',
+              [bcd(path)],
+            ),
       ];
     }
     case 'supports-function': {
       const path = `css.at-rules.supports.${construct.name}`;
       return [
         has(path)
-          ? record(`at-rule:supports/${construct.name}`, 'at-rule', 'at-rule:supports', [
-              bcd(path),
-            ])
+          ? record(
+              `at-rule:supports/${construct.name}`,
+              'at-rule',
+              'at-rule:supports',
+              [bcd(path)],
+            )
           : unrecognized(`at-rule:supports/${construct.name}`, 'at-rule', {}),
       ];
     }
@@ -541,7 +575,13 @@ export function featuresOf(construct) {
       // grammar, exactly like a value keyword.
       return has(`css.at-rules.${construct.atRule}`)
         ? []
-        : [unrecognized(`descriptor:${construct.atRule}/${construct.name}`, 'descriptor', {})];
+        : [
+            unrecognized(
+              `descriptor:${construct.atRule}/${construct.name}`,
+              'descriptor',
+              {},
+            ),
+          ];
     }
     case 'marker-property': {
       // Evaluated on the `::marker` statements, scoped to the property: a
@@ -555,7 +595,10 @@ export function featuresOf(construct) {
           'combination',
           'selector:::marker',
           [bcd('css.selectors.marker')],
-          { scope: { property }, components: ['selector:::marker', `property:${property}`] },
+          {
+            scope: { property },
+            components: ['selector:::marker', `property:${property}`],
+          },
         ),
       ];
     }
@@ -646,7 +689,9 @@ export function featureByKey(key) {
   };
   switch (kind) {
     case 'property':
-      return recognizedOrNull([propertyFeature(rest === 'custom-property' ? '--x' : rest)]);
+      return recognizedOrNull([
+        propertyFeature(rest === 'custom-property' ? '--x' : rest),
+      ]);
     case 'platform': {
       const [, name] = rest.split('/');
       return recognizedOrNull([propertyFeature(name ?? '')]);
@@ -657,19 +702,27 @@ export function featureByKey(key) {
       const property = rest.slice(0, slash);
       const keyword = rest.slice(slash + 1);
       if (property === 'display' && keyword === 'multi-keyword') {
-        return recognizedOrNull(featuresOf({ kind: 'value-multi-keyword', property }));
+        return recognizedOrNull(
+          featuresOf({ kind: 'value-multi-keyword', property }),
+        );
       }
       if (property === 'global') {
-        return recognizedOrNull(featuresOf({ kind: 'global-keyword', keyword }));
+        return recognizedOrNull(
+          featuresOf({ kind: 'global-keyword', keyword }),
+        );
       }
       if (property === 'color' && keyword === 'alpha-hex') {
         return recognizedOrNull(featuresOf({ kind: 'alpha-hex-color' }));
       }
       if (keyword.endsWith('()')) {
-        return recognizedOrNull(functionFeature(property, keyword.slice(0, -2), false));
+        return recognizedOrNull(
+          functionFeature(property, keyword.slice(0, -2), false),
+        );
       }
       const record = keywordFeature(property, keyword);
-      return record != null && record.feature === key && record.recognized ? record : null;
+      return record != null && record.feature === key && record.recognized
+        ? record
+        : null;
     }
     case 'function': {
       const [name, variant] = rest.split('/');
@@ -689,14 +742,21 @@ export function featureByKey(key) {
     }
     case 'at-rule': {
       const [name, sub] = rest.split('/');
-      if (name === 'layer') return recognizedOrNull([atRuleFeature('layer', sub ?? '')]);
+      if (name === 'layer')
+        return recognizedOrNull([atRuleFeature('layer', sub ?? '')]);
       if (name === 'container' && sub != null) {
-        return recognizedOrNull(featuresOf({ kind: 'container-query', name: sub }));
+        return recognizedOrNull(
+          featuresOf({ kind: 'container-query', name: sub }),
+        );
       }
       if (name === 'supports' && sub != null) {
-        return recognizedOrNull(featuresOf({ kind: 'supports-function', name: sub }));
+        return recognizedOrNull(
+          featuresOf({ kind: 'supports-function', name: sub }),
+        );
       }
-      return sub == null ? recognizedOrNull([atRuleFeature(name, 'block')]) : null;
+      return sub == null
+        ? recognizedOrNull([atRuleFeature(name, 'block')])
+        : null;
     }
     case 'media':
       return recognizedOrNull(
