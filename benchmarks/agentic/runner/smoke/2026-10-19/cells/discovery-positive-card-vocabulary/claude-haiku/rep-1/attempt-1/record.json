@@ -1,7 +1,7 @@
 {
   "schema": "pms-agentic-run-record/v1",
   "kind": "provider-backed",
-  "matrixId": "smoke-20261019-r2",
+  "matrixId": "smoke-20261019-r3",
   "cell": {
     "taskId": "discovery-positive-card-vocabulary",
     "modelKey": "claude-haiku"
@@ -9,7 +9,7 @@
   "repetition": 1,
   "attempt": 1,
   "comparability": {
-    "key": "eaeec2dda671a29ebbfa64c5066fccb86c5bc513301eee0b65986abb2e1e4043",
+    "key": "a8ffd89ec49513176ef376d494f9ede3de7ee08bf3e8229d2611f972a558f56c",
     "projectionVersion": "pms-agentic-comparability/v1",
     "projection": {
       "version": "pms-agentic-comparability/v1",
@@ -21,7 +21,7 @@
         "corpusLockSha256": "4698cbdea6288e5bf51de2aac1a32af08270e81e97084de3ddcec628ef00e05b"
       },
       "harness": {
-        "runnerTreeDigest": "328228952db6eaf94aec5a732a8993a3120aa353f8f37c3db2c19ee302b94050",
+        "runnerTreeDigest": "2300641c5c72b992807b8327d9a37cb229e82bde76f14ee21c3b67c65119260e",
         "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970"
       },
       "prompt": {
@@ -73,7 +73,7 @@
         },
         "capabilityEnforcementMatrixSha256": "613946b04dffb6e34c54d8b9902d329671098c2f796443f646970af873a3fe57",
         "egressAllowlistSha256": "9d55abf902f7e8b5c07c24d26378522783913b217f99241ee9243d205bff41fc",
-        "proxyImageId": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
+        "proxyImageId": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
         "networkMode": "per-attempt-internal-isolated-gateway"
       },
       "budgets": {
@@ -82,8 +82,8 @@
         "cliMaxTurns": 60
       },
       "containers": {
-        "agentImageId": "sha256:82b2e75967d427ba593d81d0504abbde4ea447da08509b12f6a42fcde1d96a7b",
-        "graderImageId": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
+        "agentImageId": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+        "graderImageId": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
         "cpus": 2,
         "memoryBytes": 4294967296,
         "pidsLimit": 1024,
@@ -112,10 +112,10 @@
     "taskDigest": "e7834e557fe10dc7723a50b04becb8825a90a1fbee1c54bdd71456c8b0c72664"
   },
   "harness": {
-    "commit": "5e6521d07b413edbf939fe13e826cb29c1f6791b",
+    "commit": "69e1f79978dcf388dc4da2324f2983f77892ea31",
     "clean": true,
     "corpusLockSha256": "4698cbdea6288e5bf51de2aac1a32af08270e81e97084de3ddcec628ef00e05b",
-    "runnerTreeDigest": "328228952db6eaf94aec5a732a8993a3120aa353f8f37c3db2c19ee302b94050",
+    "runnerTreeDigest": "2300641c5c72b992807b8327d9a37cb229e82bde76f14ee21c3b67c65119260e",
     "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970"
   },
   "prompt": {
@@ -153,7 +153,7 @@
       "--max-turns",
       "60",
       "--session-id",
-      "408e4d04-45cd-4ad8-bf22-616d68b7b46d"
+      "3fa98174-60b8-49c6-89c0-390a838563db"
     ],
     "normalizedArgv": [
       "claude",
@@ -216,7 +216,7 @@
     "executeOnly": true
   },
   "provider": {
-    "sessionId": "408e4d04-45cd-4ad8-bf22-616d68b7b46d",
+    "sessionId": "3fa98174-60b8-49c6-89c0-390a838563db",
     "primaryModelFidelity": "faithful",
     "servedModels": [
       "claude-haiku-5-5"
@@ -234,7 +234,7 @@
       "isUsingOverage": false,
       "unifiedWindows": {
         "five_hour": {
-          "utilization": 0.25,
+          "utilization": 0.3,
           "resetsAt": 1792424400
         }
       }
@@ -269,9 +269,9 @@
   },
   "environment": {
     "images": {
-      "agent": "sha256:82b2e75967d427ba593d81d0504abbde4ea447da08509b12f6a42fcde1d96a7b",
-      "grader": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
-      "proxy": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63"
+      "agent": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+      "grader": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+      "proxy": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b"
     },
     "dockerVersion": "29.2.1",
     "kernel": "6.8.0-146-generic",
@@ -279,18 +279,18 @@
     "cpus": 16,
     "memoryBytes": 33555574784,
     "cgroup": null,
-    "isolationSelfTest": "6af12df3a1ca14bad80971f729032abce3c81c85baf10d19eb3d453002b324d2",
+    "isolationSelfTest": "078997ab046ae7a81cc6af581593c6fbe62b147dbde8f18828109fd89f7f764c",
     "load": {
-      "samples": 5,
-      "min": 7.01,
-      "max": 7.42,
-      "median": 7.29
+      "samples": 4,
+      "min": 2.1,
+      "max": 2.22,
+      "median": 2.2
     }
   },
   "integrity": {
     "stream": "cli-unattested",
     "channelAudit": {
-      "samples": 2,
+      "samples": 1,
       "cliNonDumpable": true,
       "foreignStreamHolders": 0,
       "controlSocketConnections": null
@@ -299,8 +299,8 @@
     "proxy": {
       "connections": 3,
       "denied": 0,
-      "bytesUp": 144653,
-      "bytesDown": 35961,
+      "bytesUp": 133787,
+      "bytesDown": 35045,
       "targets": {
         "api.anthropic.com:443": 3
       },
@@ -310,34 +310,34 @@
   },
   "timestamps": {
     "prepare": {
-      "startedAt": "2026-10-19T14:36:06.134Z",
-      "endedAt": "2026-10-19T14:36:07.374Z",
-      "durationMs": 1240
+      "startedAt": "2026-10-19T15:00:04.579Z",
+      "endedAt": "2026-10-19T15:00:05.511Z",
+      "durationMs": 932
     },
     "agent": {
-      "startedAt": "2026-10-19T14:36:07.560Z",
-      "endedAt": "2026-10-19T14:36:23.213Z",
-      "durationMs": 15653
+      "startedAt": "2026-10-19T15:00:05.709Z",
+      "endedAt": "2026-10-19T15:00:18.717Z",
+      "durationMs": 13006
     },
     "stage": {
-      "startedAt": "2026-10-19T14:36:24.097Z",
-      "endedAt": "2026-10-19T14:36:24.101Z",
+      "startedAt": "2026-10-19T15:00:19.425Z",
+      "endedAt": "2026-10-19T15:00:19.429Z",
       "durationMs": 4
     },
     "archive-baseline": {
-      "startedAt": "2026-10-19T14:36:24.324Z",
-      "endedAt": "2026-10-19T14:36:24.359Z",
-      "durationMs": 35
+      "startedAt": "2026-10-19T15:00:19.655Z",
+      "endedAt": "2026-10-19T15:00:19.675Z",
+      "durationMs": 20
     },
     "archive-final": {
-      "startedAt": "2026-10-19T14:36:24.359Z",
-      "endedAt": "2026-10-19T14:36:24.374Z",
-      "durationMs": 15
+      "startedAt": "2026-10-19T15:00:19.675Z",
+      "endedAt": "2026-10-19T15:00:19.687Z",
+      "durationMs": 12
     },
     "grading": {
-      "startedAt": "2026-10-19T14:36:24.374Z",
-      "endedAt": "2026-10-19T14:36:30.125Z",
-      "durationMs": 5751
+      "startedAt": "2026-10-19T15:00:19.687Z",
+      "endedAt": "2026-10-19T15:00:21.449Z",
+      "durationMs": 1762
     }
   },
   "outcome": {
@@ -359,7 +359,7 @@
         "pass": "G1",
         "status": "completed",
         "verdict": "pass",
-        "resultSha256": "9463d5fce63aca8d69c364266503dfb3b29004fb7186160a8362bd3e6c9e4f29"
+        "resultSha256": "f313e28333c3ee3a4dba2704d9d02d4edfe3a56b6f26cc0350ac9ba5804143ab"
       }
     ],
     "failingRequiredChecks": []
@@ -368,7 +368,7 @@
     "toolCalls": {
       "total": {
         "status": "estimate",
-        "value": 5,
+        "value": 3,
         "source": "claude.stream tool calls",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -376,7 +376,7 @@
       },
       "command": {
         "status": "estimate",
-        "value": 5,
+        "value": 3,
         "source": "claude.stream tool calls",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -441,7 +441,7 @@
     },
     "agentSteps": {
       "status": "estimate",
-      "value": 6,
+      "value": 4,
       "source": "claude.result.num_turns",
       "integrity": "cli-unattested",
       "method": "cli-stream-unattested",
@@ -462,20 +462,18 @@
       "reasons": [
         "opaque:0",
         "opaque:1",
-        "opaque:2",
-        "opaque:3",
-        "opaque:4"
+        "opaque:2"
       ]
     },
     "tokens": {
       "raw": {
         "resultUsage": {
           "input_tokens": 8,
-          "cache_creation_input_tokens": 11670,
-          "cache_read_input_tokens": 35059,
-          "output_tokens": 1927,
+          "cache_creation_input_tokens": 6765,
+          "cache_read_input_tokens": 36033,
+          "output_tokens": 1832,
           "output_tokens_details": {
-            "thinking_tokens": 658
+            "thinking_tokens": 575
           },
           "server_tool_use": {
             "web_search_requests": 0,
@@ -483,7 +481,7 @@
           },
           "service_tier": "standard",
           "cache_creation": {
-            "ephemeral_1h_input_tokens": 11670,
+            "ephemeral_1h_input_tokens": 6765,
             "ephemeral_5m_input_tokens": 0
           },
           "inference_geo": "global",
@@ -494,14 +492,14 @@
         "modelUsage": {
           "claude-haiku-5-5": {
             "inputTokens": 8,
-            "outputTokens": 1927,
-            "cacheReadInputTokens": 35059,
-            "cacheCreationInputTokens": 11670,
+            "outputTokens": 1832,
+            "cacheReadInputTokens": 36033,
+            "cacheCreationInputTokens": 6765,
             "webSearchRequests": 0,
-            "costUSD": 0.00364889,
+            "costUSD": 0.00263013,
             "contextWindow": 1000000,
             "maxOutputTokens": 128000,
-            "thinkingTokens": 658,
+            "thinkingTokens": 575,
             "canonicalModel": "claude-haiku-5-5",
             "provider": "firstParty",
             "costBasis": "list"
@@ -521,7 +519,7 @@
           },
           "inputCacheRead": {
             "status": "estimate",
-            "value": 35059,
+            "value": 36033,
             "source": "claude.result.modelUsage[*].inputCacheRead",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -529,7 +527,7 @@
           },
           "inputCacheWrite": {
             "status": "estimate",
-            "value": 11670,
+            "value": 6765,
             "source": "claude.result.modelUsage[*].inputCacheWrite",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -537,7 +535,7 @@
           },
           "inputTotal": {
             "status": "estimate",
-            "value": 46737,
+            "value": 42806,
             "source": "claude.result.modelUsage[*].inputTotal",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -545,7 +543,7 @@
           },
           "outputTotal": {
             "status": "estimate",
-            "value": 1927,
+            "value": 1832,
             "source": "claude.result.modelUsage[*].outputTotal",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -553,7 +551,7 @@
           },
           "outputReasoning": {
             "status": "estimate",
-            "value": 658,
+            "value": 575,
             "source": "claude.result.modelUsage[*].outputReasoning",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -572,7 +570,7 @@
             },
             "inputCacheRead": {
               "status": "estimate",
-              "value": 35059,
+              "value": 36033,
               "source": "claude.result.modelUsage[claude-haiku-5-5].cacheReadInputTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -580,7 +578,7 @@
             },
             "inputCacheWrite": {
               "status": "estimate",
-              "value": 11670,
+              "value": 6765,
               "source": "claude.result.modelUsage[claude-haiku-5-5].cacheCreationInputTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -588,7 +586,7 @@
             },
             "inputTotal": {
               "status": "estimate",
-              "value": 46737,
+              "value": 42806,
               "source": "claude.result.modelUsage[claude-haiku-5-5].input*",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -596,7 +594,7 @@
             },
             "outputTotal": {
               "status": "estimate",
-              "value": 1927,
+              "value": 1832,
               "source": "claude.result.modelUsage[claude-haiku-5-5].outputTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -604,7 +602,7 @@
             },
             "outputReasoning": {
               "status": "estimate",
-              "value": 658,
+              "value": 575,
               "source": "claude.result.modelUsage[claude-haiku-5-5].thinkingTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -617,7 +615,7 @@
     },
     "cost": {
       "status": "estimate",
-      "value": 0.00364889,
+      "value": 0.00263013,
       "source": "claude.result.total_cost_usd",
       "integrity": "cli-unattested",
       "method": "cli-stream-unattested+claude-cli-api-equivalent",
@@ -626,7 +624,7 @@
     "elapsed": {
       "agentPhaseMs": {
         "status": "observed",
-        "value": 15653,
+        "value": 13006,
         "source": "harness monotonic clock",
         "integrity": "harness",
         "method": null,
@@ -634,7 +632,7 @@
       },
       "cliDurationMs": {
         "status": "estimate",
-        "value": 11056,
+        "value": 9423,
         "source": "claude.result.duration_ms",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -642,7 +640,7 @@
       },
       "cliApiDurationMs": {
         "status": "estimate",
-        "value": 10919,
+        "value": 9332,
         "source": "claude.result.duration_api_ms",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -652,7 +650,7 @@
     "toolCost": {
       "outputBytes": {
         "status": "estimate",
-        "value": 19740,
+        "value": 16288,
         "source": "claude.stream tool output",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -660,7 +658,7 @@
       },
       "wallMs": {
         "status": "estimate",
-        "value": 279,
+        "value": 47,
         "source": "harness receive times of stream tool events",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested+harness-receive-time",
@@ -668,7 +666,7 @@
       },
       "containerCpuUsec": {
         "status": "observed",
-        "value": 925034,
+        "value": 839680,
         "source": "cgroup cpu.stat",
         "integrity": "harness",
         "method": null,
@@ -695,7 +693,7 @@
       },
       "harnessPrepareMs": {
         "status": "observed",
-        "value": 1240,
+        "value": 932,
         "source": "harness monotonic clock",
         "integrity": "harness",
         "method": null,
@@ -703,7 +701,7 @@
       },
       "harnessGradingMs": {
         "status": "observed",
-        "value": 5751,
+        "value": 1762,
         "source": "harness monotonic clock",
         "integrity": "harness",
         "method": null,
@@ -762,10 +760,10 @@
       },
       {
         "file": "stream.jsonl",
-        "sha256": "7ce5aa470da29f8b1002bb26527893ac101468cf353153ec25e9837125fdc3c5",
-        "bytes": 63370,
+        "sha256": "179d2b6f7043b1a070045420808237ea585d7a7af27c6159b4bac7aa55649fe1",
+        "bytes": 51660,
         "truncated": false,
-        "originalBytes": 63370,
+        "originalBytes": 51660,
         "redacted": false
       },
       {
@@ -778,18 +776,18 @@
       },
       {
         "file": "transcript.jsonl",
-        "sha256": "79a5952add408d0dc2f01f0f58ed03a50a7f9d0d834b1f90f1c2730107760658",
-        "bytes": 604,
+        "sha256": "6e4e9a2e4c8a1185ddd35a2eec6c382a83f604faf6bc6108366faa117e650214",
+        "bytes": 527,
         "truncated": false,
-        "originalBytes": 604,
+        "originalBytes": 527,
         "redacted": false
       },
       {
         "file": "final-message.txt",
-        "sha256": "53a120cf852ebd84d4df58b5668dfe8c21108b4c9041faaa24452e8d5768fed2",
-        "bytes": 1682,
+        "sha256": "7d09c9d392ae63d366aea3ca4319ea09ed08d11ad7d38df870b3110cc7bad132",
+        "bytes": 2122,
         "truncated": false,
-        "originalBytes": 1682,
+        "originalBytes": 2122,
         "redacted": false
       },
       {
@@ -802,7 +800,7 @@
       },
       {
         "file": "proxy.jsonl",
-        "sha256": "ed2a6731b0f34352e4e081af8a76c7c280c0c6f3a7731333307d5bd0ad3abff2",
+        "sha256": "70ad7716e0715c0a39ca8741263781cbb83a430409cf3c2f05917f5b6064284b",
         "bytes": 333,
         "truncated": false,
         "originalBytes": 333,
@@ -810,10 +808,10 @@
       },
       {
         "file": "evaluation.json",
-        "sha256": "f9fdc9ef9cb651ab97d95039ac69ca19fbceeec51457a285db5f6fa3cf6b5e53",
-        "bytes": 1738,
+        "sha256": "e5d3a0e2118cd12a4ddad77592d6592affb677fd17844d170d3a09c0301c4f16",
+        "bytes": 2160,
         "truncated": false,
-        "originalBytes": 1738,
+        "originalBytes": 2160,
         "redacted": false
       }
     ]

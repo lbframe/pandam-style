@@ -39,7 +39,13 @@
   "report": {
     "present": true,
     "outcome": "completed",
-    "gaps": []
+    "gaps": [
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "card recipe featured variant",
+        "detail": "The card recipe only has elevation (flat, raised) and density (comfortable, compact) axes. Nothing marks a card as featured, so a compact featured card needs either a new design-system variant (a design-system change that requires explicit authorization) or a consumer-side decision."
+      }
+    ]
   },
   "checks": [
     {

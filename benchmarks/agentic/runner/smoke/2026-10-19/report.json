@@ -2,7 +2,7 @@
   "schema": "pms-agentic-run-report/v1",
   "kind": "provider-backed",
   "synthetic": false,
-  "matrixId": "smoke-20261019-r2",
+  "matrixId": "smoke-20261019-r3",
   "productBuild": {
     "digest": "4ecb0a02d0367ede6052449a1c920f52b42535a258d371667580cf8c196517f9",
     "epoch": "alpha1",
@@ -16,12 +16,12 @@
     "checkedBeforeGrading": true
   },
   "comparabilityKeys": [
-    "47c2674c6a79ba2c5663139e269252237362f0453606a90b369029b714d18286",
-    "e122700d4d840cdec9d2cf717febc6136362f8dcbcc851beafc630a68ed7f2d1",
-    "9f1226d9b1dc62a7fd9cd8249bc5b4b0fe72b435472b58ec28a8cbb62c0343e7",
-    "eaeec2dda671a29ebbfa64c5066fccb86c5bc513301eee0b65986abb2e1e4043",
-    "9908ef190c890e4daf65430fffb4a5c5faedd4e74f94914ea3800e4e401a87b4",
-    "03fbfad2a6e23cb2d57fd51bcc51515c4732452a7da7805544bfba9025d776d8"
+    "f04bac3e5c8cef25804f74f39714ae5ed15aeb44d6bce6be692f38899df9e8d1",
+    "5023be57d5ac764328d4b64a2dc96ab9acfd37d7a118710b4ac137451d6b927a",
+    "751d6e6e242ced66cf656ce7a4f580f393afceeb05f6c2b7d6c3006700d44bc6",
+    "a8ffd89ec49513176ef376d494f9ede3de7ee08bf3e8229d2611f972a558f56c",
+    "9bf78987ec6cb0ec3b3386d91893b2f170271ef2a8115e3e41ed8b791299ccdd",
+    "d5179e5f09135833290845584d854e34f66ef0ab4fc34965eae31f32c97a2a14"
   ],
   "cells": [
     {
@@ -32,20 +32,35 @@
       "missing": 0,
       "unsupported": 0,
       "success": {
-        "k": 0,
+        "k": 1,
         "n": 1,
-        "pointEstimate": 0,
-        "lowerBound": 0,
-        "lowerBoundK": 0,
+        "pointEstimate": 1,
+        "lowerBound": 1,
+        "lowerBoundK": 1,
         "contested": 0
       },
       "firstPass": {
         "true": 0,
-        "false": 1,
-        "unknown": 0
+        "false": 0,
+        "unknown": 1
       },
       "metrics": {
         "toolCalls": {
+          "values": [
+            11
+          ],
+          "unknown": 0,
+          "statuses": [
+            "estimate"
+          ],
+          "methods": [
+            "cli-stream-unattested"
+          ],
+          "min": 11,
+          "median": 11,
+          "max": 11
+        },
+        "agentSteps": {
           "values": [
             12
           ],
@@ -59,21 +74,6 @@
           "min": 12,
           "median": 12,
           "max": 12
-        },
-        "agentSteps": {
-          "values": [
-            13
-          ],
-          "unknown": 0,
-          "statuses": [
-            "estimate"
-          ],
-          "methods": [
-            "cli-stream-unattested"
-          ],
-          "min": 13,
-          "median": 13,
-          "max": 13
         },
         "repairCycles": {
           "values": [
@@ -92,7 +92,7 @@
         },
         "inputTokens": {
           "values": [
-            130634
+            126167
           ],
           "unknown": 0,
           "statuses": [
@@ -101,13 +101,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 130634,
-          "median": 130634,
-          "max": 130634
+          "min": 126167,
+          "median": 126167,
+          "max": 126167
         },
         "outputTokens": {
           "values": [
-            4449
+            4488
           ],
           "unknown": 0,
           "statuses": [
@@ -116,13 +116,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 4449,
-          "median": 4449,
-          "max": 4449
+          "min": 4488,
+          "median": 4488,
+          "max": 4488
         },
         "cost": {
           "values": [
-            0.006519080000000001
+            0.00596704
           ],
           "unknown": 0,
           "statuses": [
@@ -131,26 +131,26 @@
           "methods": [
             "cli-stream-unattested+claude-cli-api-equivalent"
           ],
-          "min": 0.006519080000000001,
-          "median": 0.006519080000000001,
-          "max": 0.006519080000000001
+          "min": 0.00596704,
+          "median": 0.00596704,
+          "max": 0.00596704
         },
         "agentPhaseMs": {
           "values": [
-            40530
+            26292
           ],
           "unknown": 0,
           "statuses": [
             "observed"
           ],
           "methods": [],
-          "min": 40530,
-          "median": 40530,
-          "max": 40530
+          "min": 26292,
+          "median": 26292,
+          "max": 26292
         },
         "toolOutputBytes": {
           "values": [
-            26876
+            23287
           ],
           "unknown": 0,
           "statuses": [
@@ -159,9 +159,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 26876,
-          "median": 26876,
-          "max": 26876
+          "min": 23287,
+          "median": 23287,
+          "max": 23287
         }
       },
       "latencyLabel": "indicative",
@@ -171,9 +171,9 @@
           "attempts": [
             {
               "attempt": 1,
-              "class": "policy",
-              "code": "capability-breach",
-              "termination": "policy",
+              "class": "agent",
+              "code": "completed",
+              "termination": "completed",
               "verdict": "pass",
               "retryScheduled": false
             }
@@ -183,11 +183,11 @@
           "reason": null,
           "contested": false,
           "verdict": "pass",
-          "taskSuccess": false,
-          "firstPassSuccess": false,
+          "taskSuccess": true,
+          "firstPassSuccess": "unknown",
           "evidence": "complete",
           "failingChecks": [],
-          "comparabilityKey": "47c2674c6a79ba2c5663139e269252237362f0453606a90b369029b714d18286"
+          "comparabilityKey": "f04bac3e5c8cef25804f74f39714ae5ed15aeb44d6bce6be692f38899df9e8d1"
         }
       ]
     },
@@ -199,17 +199,17 @@
       "missing": 0,
       "unsupported": 0,
       "success": {
-        "k": 0,
+        "k": 1,
         "n": 1,
-        "pointEstimate": 0,
-        "lowerBound": 0,
-        "lowerBoundK": 0,
+        "pointEstimate": 1,
+        "lowerBound": 1,
+        "lowerBoundK": 1,
         "contested": 0
       },
       "firstPass": {
         "true": 0,
-        "false": 1,
-        "unknown": 0
+        "false": 0,
+        "unknown": 1
       },
       "metrics": {
         "toolCalls": {
@@ -259,7 +259,7 @@
         },
         "inputTokens": {
           "values": [
-            66732
+            66793
           ],
           "unknown": 0,
           "statuses": [
@@ -268,13 +268,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 66732,
-          "median": 66732,
-          "max": 66732
+          "min": 66793,
+          "median": 66793,
+          "max": 66793
         },
         "outputTokens": {
           "values": [
-            1851
+            1862
           ],
           "unknown": 0,
           "statuses": [
@@ -283,13 +283,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 1851,
-          "median": 1851,
-          "max": 1851
+          "min": 1862,
+          "median": 1862,
+          "max": 1862
         },
         "cost": {
           "values": [
-            0.0572211
+            0.051062100000000006
           ],
           "unknown": 0,
           "statuses": [
@@ -298,26 +298,26 @@
           "methods": [
             "cli-stream-unattested+claude-cli-api-equivalent"
           ],
-          "min": 0.0572211,
-          "median": 0.0572211,
-          "max": 0.0572211
+          "min": 0.051062100000000006,
+          "median": 0.051062100000000006,
+          "max": 0.051062100000000006
         },
         "agentPhaseMs": {
           "values": [
-            23277
+            20502
           ],
           "unknown": 0,
           "statuses": [
             "observed"
           ],
           "methods": [],
-          "min": 23277,
-          "median": 23277,
-          "max": 23277
+          "min": 20502,
+          "median": 20502,
+          "max": 20502
         },
         "toolOutputBytes": {
           "values": [
-            12359
+            12497
           ],
           "unknown": 0,
           "statuses": [
@@ -326,9 +326,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 12359,
-          "median": 12359,
-          "max": 12359
+          "min": 12497,
+          "median": 12497,
+          "max": 12497
         }
       },
       "latencyLabel": "indicative",
@@ -338,10 +338,10 @@
           "attempts": [
             {
               "attempt": 1,
-              "class": "policy",
-              "code": "capability-breach",
-              "termination": "policy",
-              "verdict": "fail",
+              "class": "agent",
+              "code": "completed",
+              "termination": "completed",
+              "verdict": "pass",
               "retryScheduled": false
             }
           ],
@@ -349,20 +349,12 @@
           "status": "valid",
           "reason": null,
           "contested": false,
-          "verdict": "fail",
-          "taskSuccess": false,
-          "firstPassSuccess": false,
+          "verdict": "pass",
+          "taskSuccess": true,
+          "firstPassSuccess": "unknown",
           "evidence": "complete",
-          "failingChecks": [
-            {
-              "id": "generated-untouched",
-              "kind": "generated.consistent",
-              "class": "integrity",
-              "status": "fail",
-              "reason": "generated output is not compiler output: missing generation state"
-            }
-          ],
-          "comparabilityKey": "e122700d4d840cdec9d2cf717febc6136362f8dcbcc851beafc630a68ed7f2d1"
+          "failingChecks": [],
+          "comparabilityKey": "5023be57d5ac764328d4b64a2dc96ab9acfd37d7a118710b4ac137451d6b927a"
         }
       ]
     },
@@ -389,7 +381,7 @@
       "metrics": {
         "toolCalls": {
           "values": [
-            8
+            9
           ],
           "unknown": 0,
           "statuses": [
@@ -398,9 +390,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 8,
-          "median": 8,
-          "max": 8
+          "min": 9,
+          "median": 9,
+          "max": 9
         },
         "agentSteps": {
           "values": [
@@ -430,7 +422,7 @@
         },
         "inputTokens": {
           "values": [
-            126724
+            136650
           ],
           "unknown": 0,
           "statuses": [
@@ -439,13 +431,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 126724,
-          "median": 126724,
-          "max": 126724
+          "min": 136650,
+          "median": 136650,
+          "max": 136650
         },
         "outputTokens": {
           "values": [
-            991
+            1082
           ],
           "unknown": 0,
           "statuses": [
@@ -454,9 +446,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 991,
-          "median": 991,
-          "max": 991
+          "min": 1082,
+          "median": 1082,
+          "max": 1082
         },
         "cost": {
           "values": [
@@ -471,20 +463,20 @@
         },
         "agentPhaseMs": {
           "values": [
-            37858
+            38306
           ],
           "unknown": 0,
           "statuses": [
             "observed"
           ],
           "methods": [],
-          "min": 37858,
-          "median": 37858,
-          "max": 37858
+          "min": 38306,
+          "median": 38306,
+          "max": 38306
         },
         "toolOutputBytes": {
           "values": [
-            37625
+            32956
           ],
           "unknown": 0,
           "statuses": [
@@ -493,9 +485,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 37625,
-          "median": 37625,
-          "max": 37625
+          "min": 32956,
+          "median": 32956,
+          "max": 32956
         }
       },
       "latencyLabel": "indicative",
@@ -505,10 +497,10 @@
           "attempts": [
             {
               "attempt": 1,
-              "class": "policy",
-              "code": "capability-breach",
-              "termination": "policy",
-              "verdict": "pass",
+              "class": "agent",
+              "code": "completed",
+              "termination": "completed",
+              "verdict": "fail",
               "retryScheduled": false
             }
           ],
@@ -516,12 +508,20 @@
           "status": "valid",
           "reason": null,
           "contested": false,
-          "verdict": "pass",
+          "verdict": "fail",
           "taskSuccess": false,
           "firstPassSuccess": false,
           "evidence": "complete",
-          "failingChecks": [],
-          "comparabilityKey": "9f1226d9b1dc62a7fd9cd8249bc5b4b0fe72b435472b58ec28a8cbb62c0343e7"
+          "failingChecks": [
+            {
+              "id": "generated-untouched",
+              "kind": "generated.consistent",
+              "class": "integrity",
+              "status": "fail",
+              "reason": "generated output is not compiler output: missing generation state"
+            }
+          ],
+          "comparabilityKey": "751d6e6e242ced66cf656ce7a4f580f393afceeb05f6c2b7d6c3006700d44bc6"
         }
       ]
     },
@@ -548,7 +548,7 @@
       "metrics": {
         "toolCalls": {
           "values": [
-            5
+            3
           ],
           "unknown": 0,
           "statuses": [
@@ -557,13 +557,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 5,
-          "median": 5,
-          "max": 5
+          "min": 3,
+          "median": 3,
+          "max": 3
         },
         "agentSteps": {
           "values": [
-            6
+            4
           ],
           "unknown": 0,
           "statuses": [
@@ -572,9 +572,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 6,
-          "median": 6,
-          "max": 6
+          "min": 4,
+          "median": 4,
+          "max": 4
         },
         "repairCycles": {
           "values": [
@@ -593,7 +593,7 @@
         },
         "inputTokens": {
           "values": [
-            46737
+            42806
           ],
           "unknown": 0,
           "statuses": [
@@ -602,13 +602,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 46737,
-          "median": 46737,
-          "max": 46737
+          "min": 42806,
+          "median": 42806,
+          "max": 42806
         },
         "outputTokens": {
           "values": [
-            1927
+            1832
           ],
           "unknown": 0,
           "statuses": [
@@ -617,13 +617,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 1927,
-          "median": 1927,
-          "max": 1927
+          "min": 1832,
+          "median": 1832,
+          "max": 1832
         },
         "cost": {
           "values": [
-            0.00364889
+            0.00263013
           ],
           "unknown": 0,
           "statuses": [
@@ -632,26 +632,26 @@
           "methods": [
             "cli-stream-unattested+claude-cli-api-equivalent"
           ],
-          "min": 0.00364889,
-          "median": 0.00364889,
-          "max": 0.00364889
+          "min": 0.00263013,
+          "median": 0.00263013,
+          "max": 0.00263013
         },
         "agentPhaseMs": {
           "values": [
-            15653
+            13006
           ],
           "unknown": 0,
           "statuses": [
             "observed"
           ],
           "methods": [],
-          "min": 15653,
-          "median": 15653,
-          "max": 15653
+          "min": 13006,
+          "median": 13006,
+          "max": 13006
         },
         "toolOutputBytes": {
           "values": [
-            19740
+            16288
           ],
           "unknown": 0,
           "statuses": [
@@ -660,9 +660,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 19740,
-          "median": 19740,
-          "max": 19740
+          "min": 16288,
+          "median": 16288,
+          "max": 16288
         }
       },
       "latencyLabel": "indicative",
@@ -688,7 +688,7 @@
           "firstPassSuccess": "unknown",
           "evidence": "complete",
           "failingChecks": [],
-          "comparabilityKey": "eaeec2dda671a29ebbfa64c5066fccb86c5bc513301eee0b65986abb2e1e4043"
+          "comparabilityKey": "a8ffd89ec49513176ef376d494f9ede3de7ee08bf3e8229d2611f972a558f56c"
         }
       ]
     },
@@ -760,7 +760,7 @@
         },
         "inputTokens": {
           "values": [
-            25389
+            25573
           ],
           "unknown": 0,
           "statuses": [
@@ -769,13 +769,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 25389,
-          "median": 25389,
-          "max": 25389
+          "min": 25573,
+          "median": 25573,
+          "max": 25573
         },
         "outputTokens": {
           "values": [
-            694
+            845
           ],
           "unknown": 0,
           "statuses": [
@@ -784,13 +784,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 694,
-          "median": 694,
-          "max": 694
+          "min": 845,
+          "median": 845,
+          "max": 845
         },
         "cost": {
           "values": [
-            0.0339823
+            0.0278589
           ],
           "unknown": 0,
           "statuses": [
@@ -799,26 +799,26 @@
           "methods": [
             "cli-stream-unattested+claude-cli-api-equivalent"
           ],
-          "min": 0.0339823,
-          "median": 0.0339823,
-          "max": 0.0339823
+          "min": 0.0278589,
+          "median": 0.0278589,
+          "max": 0.0278589
         },
         "agentPhaseMs": {
           "values": [
-            10309
+            13360
           ],
           "unknown": 0,
           "statuses": [
             "observed"
           ],
           "methods": [],
-          "min": 10309,
-          "median": 10309,
-          "max": 10309
+          "min": 13360,
+          "median": 13360,
+          "max": 13360
         },
         "toolOutputBytes": {
           "values": [
-            9819
+            10201
           ],
           "unknown": 0,
           "statuses": [
@@ -827,9 +827,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 9819,
-          "median": 9819,
-          "max": 9819
+          "min": 10201,
+          "median": 10201,
+          "max": 10201
         }
       },
       "latencyLabel": "indicative",
@@ -855,7 +855,7 @@
           "firstPassSuccess": "unknown",
           "evidence": "complete",
           "failingChecks": [],
-          "comparabilityKey": "9908ef190c890e4daf65430fffb4a5c5faedd4e74f94914ea3800e4e401a87b4"
+          "comparabilityKey": "9bf78987ec6cb0ec3b3386d91893b2f170271ef2a8115e3e41ed8b791299ccdd"
         }
       ]
     },
@@ -882,7 +882,7 @@
       "metrics": {
         "toolCalls": {
           "values": [
-            5
+            3
           ],
           "unknown": 0,
           "statuses": [
@@ -891,9 +891,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 5,
-          "median": 5,
-          "max": 5
+          "min": 3,
+          "median": 3,
+          "max": 3
         },
         "agentSteps": {
           "values": [
@@ -923,7 +923,7 @@
         },
         "inputTokens": {
           "values": [
-            72084
+            51612
           ],
           "unknown": 0,
           "statuses": [
@@ -932,13 +932,13 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 72084,
-          "median": 72084,
-          "max": 72084
+          "min": 51612,
+          "median": 51612,
+          "max": 51612
         },
         "outputTokens": {
           "values": [
-            635
+            519
           ],
           "unknown": 0,
           "statuses": [
@@ -947,9 +947,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 635,
-          "median": 635,
-          "max": 635
+          "min": 519,
+          "median": 519,
+          "max": 519
         },
         "cost": {
           "values": [
@@ -964,20 +964,20 @@
         },
         "agentPhaseMs": {
           "values": [
-            24657
+            19121
           ],
           "unknown": 0,
           "statuses": [
             "observed"
           ],
           "methods": [],
-          "min": 24657,
-          "median": 24657,
-          "max": 24657
+          "min": 19121,
+          "median": 19121,
+          "max": 19121
         },
         "toolOutputBytes": {
           "values": [
-            27893
+            17414
           ],
           "unknown": 0,
           "statuses": [
@@ -986,9 +986,9 @@
           "methods": [
             "cli-stream-unattested"
           ],
-          "min": 27893,
-          "median": 27893,
-          "max": 27893
+          "min": 17414,
+          "median": 17414,
+          "max": 17414
         }
       },
       "latencyLabel": "indicative",
@@ -1014,7 +1014,7 @@
           "firstPassSuccess": "unknown",
           "evidence": "complete",
           "failingChecks": [],
-          "comparabilityKey": "03fbfad2a6e23cb2d57fd51bcc51515c4732452a7da7805544bfba9025d776d8"
+          "comparabilityKey": "d5179e5f09135833290845584d854e34f66ef0ab4fc34965eae31f32c97a2a14"
         }
       ]
     }
@@ -1023,7 +1023,7 @@
     "claude-haiku": {
       "byWorkflow": {
         "composition": {
-          "k": 0,
+          "k": 1,
           "nValid": 1,
           "nPlanned": 1,
           "nUnsupported": 0,
@@ -1039,26 +1039,26 @@
       },
       "byCaseType": {
         "positive": {
-          "k": 1,
+          "k": 2,
           "nValid": 2,
           "nPlanned": 2,
           "nUnsupported": 0,
           "nMissing": 0
         }
       },
-      "k": 1,
+      "k": 2,
       "nValid": 2,
       "nPlanned": 2,
       "nUnsupported": 0,
       "nMissing": 0,
-      "lowerBoundK": 1,
-      "pointEstimate": 0.5,
-      "lowerBound": 0.5
+      "lowerBoundK": 2,
+      "pointEstimate": 1,
+      "lowerBound": 1
     },
     "claude-sonnet": {
       "byWorkflow": {
         "composition": {
-          "k": 0,
+          "k": 1,
           "nValid": 1,
           "nPlanned": 1,
           "nUnsupported": 0,
@@ -1074,21 +1074,21 @@
       },
       "byCaseType": {
         "positive": {
-          "k": 1,
+          "k": 2,
           "nValid": 2,
           "nPlanned": 2,
           "nUnsupported": 0,
           "nMissing": 0
         }
       },
-      "k": 1,
+      "k": 2,
       "nValid": 2,
       "nPlanned": 2,
       "nUnsupported": 0,
       "nMissing": 0,
-      "lowerBoundK": 1,
-      "pointEstimate": 0.5,
-      "lowerBound": 0.5
+      "lowerBoundK": 2,
+      "pointEstimate": 1,
+      "lowerBound": 1
     },
     "gpt-sol": {
       "byWorkflow": {
@@ -1129,58 +1129,13 @@
   "breaches": [
     {
       "taskId": "composition-positive-order-summary",
-      "modelKey": "claude-haiku",
-      "repetition": 1,
-      "attempt": 1,
-      "verdict": "pass",
-      "breaches": [
-        {
-          "kind": "local-install",
-          "source": "filesystem",
-          "enforcement": "detected",
-          "detail": "node_modules digest changed"
-        }
-      ],
-      "realizedScope": [],
-      "vocabulary": "pass",
-      "anomalies": [],
-      "fidelity": "faithful"
-    },
-    {
-      "taskId": "composition-positive-order-summary",
-      "modelKey": "claude-sonnet",
-      "repetition": 1,
-      "attempt": 1,
-      "verdict": "fail",
-      "breaches": [
-        {
-          "kind": "local-install",
-          "source": "filesystem",
-          "enforcement": "detected",
-          "detail": "node_modules digest changed"
-        }
-      ],
-      "realizedScope": [],
-      "vocabulary": "fail",
-      "anomalies": [],
-      "fidelity": "faithful"
-    },
-    {
-      "taskId": "composition-positive-order-summary",
       "modelKey": "gpt-sol",
       "repetition": 1,
       "attempt": 1,
-      "verdict": "pass",
-      "breaches": [
-        {
-          "kind": "local-install",
-          "source": "filesystem",
-          "enforcement": "detected",
-          "detail": "node_modules digest changed"
-        }
-      ],
+      "verdict": "fail",
+      "breaches": [],
       "realizedScope": [],
-      "vocabulary": "pass",
+      "vocabulary": "fail",
       "anomalies": [],
       "fidelity": "no-reroute-surfaced"
     }

@@ -1,7 +1,7 @@
 {
   "schema": "pms-agentic-run-record/v1",
   "kind": "provider-backed",
-  "matrixId": "smoke-20261019-r2",
+  "matrixId": "smoke-20261019-r3",
   "cell": {
     "taskId": "composition-positive-order-summary",
     "modelKey": "claude-haiku"
@@ -9,7 +9,7 @@
   "repetition": 1,
   "attempt": 1,
   "comparability": {
-    "key": "47c2674c6a79ba2c5663139e269252237362f0453606a90b369029b714d18286",
+    "key": "f04bac3e5c8cef25804f74f39714ae5ed15aeb44d6bce6be692f38899df9e8d1",
     "projectionVersion": "pms-agentic-comparability/v1",
     "projection": {
       "version": "pms-agentic-comparability/v1",
@@ -21,7 +21,7 @@
         "corpusLockSha256": "4698cbdea6288e5bf51de2aac1a32af08270e81e97084de3ddcec628ef00e05b"
       },
       "harness": {
-        "runnerTreeDigest": "328228952db6eaf94aec5a732a8993a3120aa353f8f37c3db2c19ee302b94050",
+        "runnerTreeDigest": "2300641c5c72b992807b8327d9a37cb229e82bde76f14ee21c3b67c65119260e",
         "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970"
       },
       "prompt": {
@@ -73,7 +73,7 @@
         },
         "capabilityEnforcementMatrixSha256": "024d9d0f42da0ba4649b20b9cc7ceafb2b6aec67e2d824212792eff594b50172",
         "egressAllowlistSha256": "9d55abf902f7e8b5c07c24d26378522783913b217f99241ee9243d205bff41fc",
-        "proxyImageId": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
+        "proxyImageId": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
         "networkMode": "per-attempt-internal-isolated-gateway"
       },
       "budgets": {
@@ -82,8 +82,8 @@
         "cliMaxTurns": 120
       },
       "containers": {
-        "agentImageId": "sha256:82b2e75967d427ba593d81d0504abbde4ea447da08509b12f6a42fcde1d96a7b",
-        "graderImageId": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
+        "agentImageId": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+        "graderImageId": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
         "cpus": 2,
         "memoryBytes": 4294967296,
         "pidsLimit": 1024,
@@ -112,10 +112,10 @@
     "taskDigest": "f48ba7159694eb746829be23ae8a0e1c664b0b6f7f8c93e3897f546a5b115d99"
   },
   "harness": {
-    "commit": "5e6521d07b413edbf939fe13e826cb29c1f6791b",
+    "commit": "69e1f79978dcf388dc4da2324f2983f77892ea31",
     "clean": true,
     "corpusLockSha256": "4698cbdea6288e5bf51de2aac1a32af08270e81e97084de3ddcec628ef00e05b",
-    "runnerTreeDigest": "328228952db6eaf94aec5a732a8993a3120aa353f8f37c3db2c19ee302b94050",
+    "runnerTreeDigest": "2300641c5c72b992807b8327d9a37cb229e82bde76f14ee21c3b67c65119260e",
     "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970"
   },
   "prompt": {
@@ -153,7 +153,7 @@
       "--max-turns",
       "120",
       "--session-id",
-      "39e378c5-4fda-4f19-9712-72d63e169a38"
+      "31cb3c32-7c7a-40f1-90ed-32646257b376"
     ],
     "normalizedArgv": [
       "claude",
@@ -216,7 +216,7 @@
     "executeOnly": true
   },
   "provider": {
-    "sessionId": "39e378c5-4fda-4f19-9712-72d63e169a38",
+    "sessionId": "31cb3c32-7c7a-40f1-90ed-32646257b376",
     "primaryModelFidelity": "faithful",
     "servedModels": [
       "claude-haiku-5-5"
@@ -234,7 +234,7 @@
       "isUsingOverage": false,
       "unifiedWindows": {
         "five_hour": {
-          "utilization": 0.25,
+          "utilization": 0.3,
           "resetsAt": 1792424400
         }
       }
@@ -269,9 +269,9 @@
   },
   "environment": {
     "images": {
-      "agent": "sha256:82b2e75967d427ba593d81d0504abbde4ea447da08509b12f6a42fcde1d96a7b",
-      "grader": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
-      "proxy": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63"
+      "agent": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+      "grader": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+      "proxy": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b"
     },
     "dockerVersion": "29.2.1",
     "kernel": "6.8.0-146-generic",
@@ -279,18 +279,18 @@
     "cpus": 16,
     "memoryBytes": 33555574784,
     "cgroup": null,
-    "isolationSelfTest": "6af12df3a1ca14bad80971f729032abce3c81c85baf10d19eb3d453002b324d2",
+    "isolationSelfTest": "078997ab046ae7a81cc6af581593c6fbe62b147dbde8f18828109fd89f7f764c",
     "load": {
-      "samples": 10,
-      "min": 6.72,
-      "max": 8.89,
-      "median": 8.54
+      "samples": 7,
+      "min": 2.32,
+      "max": 2.78,
+      "median": 2.53
     }
   },
   "integrity": {
     "stream": "cli-unattested",
     "channelAudit": {
-      "samples": 4,
+      "samples": 3,
       "cliNonDumpable": true,
       "foreignStreamHolders": 0,
       "controlSocketConnections": null
@@ -299,8 +299,8 @@
     "proxy": {
       "connections": 4,
       "denied": 1,
-      "bytesUp": 407367,
-      "bytesDown": 61235,
+      "bytesUp": 392395,
+      "bytesDown": 58649,
       "targets": {
         "api.anthropic.com:443": 3,
         "registry.npmjs.org:443": 1
@@ -311,54 +311,47 @@
   },
   "timestamps": {
     "prepare": {
-      "startedAt": "2026-10-19T14:37:13.643Z",
-      "endedAt": "2026-10-19T14:37:15.372Z",
-      "durationMs": 1729
+      "startedAt": "2026-10-19T15:01:01.811Z",
+      "endedAt": "2026-10-19T15:01:02.732Z",
+      "durationMs": 921
     },
     "agent": {
-      "startedAt": "2026-10-19T14:37:15.536Z",
-      "endedAt": "2026-10-19T14:37:56.067Z",
-      "durationMs": 40530
+      "startedAt": "2026-10-19T15:01:02.919Z",
+      "endedAt": "2026-10-19T15:01:29.212Z",
+      "durationMs": 26292
     },
     "stage": {
-      "startedAt": "2026-10-19T14:37:57.128Z",
-      "endedAt": "2026-10-19T14:37:57.180Z",
-      "durationMs": 52
+      "startedAt": "2026-10-19T15:01:29.998Z",
+      "endedAt": "2026-10-19T15:01:30.003Z",
+      "durationMs": 5
     },
     "archive-baseline": {
-      "startedAt": "2026-10-19T14:37:57.436Z",
-      "endedAt": "2026-10-19T14:37:57.513Z",
-      "durationMs": 77
+      "startedAt": "2026-10-19T15:01:30.225Z",
+      "endedAt": "2026-10-19T15:01:30.254Z",
+      "durationMs": 29
     },
     "archive-final": {
-      "startedAt": "2026-10-19T14:37:57.513Z",
-      "endedAt": "2026-10-19T14:37:57.543Z",
-      "durationMs": 30
+      "startedAt": "2026-10-19T15:01:30.254Z",
+      "endedAt": "2026-10-19T15:01:30.318Z",
+      "durationMs": 64
     },
     "grading": {
-      "startedAt": "2026-10-19T14:37:57.543Z",
-      "endedAt": "2026-10-19T14:38:04.007Z",
-      "durationMs": 6464
+      "startedAt": "2026-10-19T15:01:30.318Z",
+      "endedAt": "2026-10-19T15:01:32.903Z",
+      "durationMs": 2585
     }
   },
   "outcome": {
-    "termination": "policy",
-    "class": "policy",
-    "code": "capability-breach",
+    "termination": "completed",
+    "class": "agent",
+    "code": "completed",
     "valid": true,
     "retry": {
       "scheduled": false,
       "backoffSeconds": null
     },
-    "taskSuccess": false,
-    "breaches": [
-      {
-        "kind": "local-install",
-        "source": "filesystem",
-        "enforcement": "detected",
-        "detail": "node_modules digest changed"
-      }
-    ]
+    "taskSuccess": true,
+    "breaches": []
   },
   "grading": {
     "verdict": "pass",
@@ -376,7 +369,7 @@
     "toolCalls": {
       "total": {
         "status": "estimate",
-        "value": 12,
+        "value": 11,
         "source": "claude.stream tool calls",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -384,7 +377,7 @@
       },
       "command": {
         "status": "estimate",
-        "value": 9,
+        "value": 8,
         "source": "claude.stream tool calls",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -449,7 +442,7 @@
     },
     "agentSteps": {
       "status": "estimate",
-      "value": 13,
+      "value": 12,
       "source": "claude.result.num_turns",
       "integrity": "cli-unattested",
       "method": "cli-stream-unattested",
@@ -464,7 +457,7 @@
       "lowerBound": 0,
       "unit": "cycles"
     },
-    "firstPassSuccess": false,
+    "firstPassSuccess": "unknown",
     "coverage": {
       "complete": false,
       "reasons": [
@@ -475,22 +468,21 @@
         "opaque:4",
         "opaque:5",
         "unknown-status:6",
-        "opaque:7",
+        "unknown-status:7",
         "unknown-status:8",
-        "unknown-status:9",
-        "opaque:10",
-        "opaque:11"
+        "opaque:9",
+        "opaque:10"
       ]
     },
     "tokens": {
       "raw": {
         "resultUsage": {
           "input_tokens": 16,
-          "cache_creation_input_tokens": 15720,
-          "cache_read_input_tokens": 114898,
-          "output_tokens": 4449,
+          "cache_creation_input_tokens": 12947,
+          "cache_read_input_tokens": 113204,
+          "output_tokens": 4488,
           "output_tokens_details": {
-            "thinking_tokens": 1569
+            "thinking_tokens": 1815
           },
           "server_tool_use": {
             "web_search_requests": 0,
@@ -498,7 +490,7 @@
           },
           "service_tier": "standard",
           "cache_creation": {
-            "ephemeral_1h_input_tokens": 15720,
+            "ephemeral_1h_input_tokens": 12947,
             "ephemeral_5m_input_tokens": 0
           },
           "inference_geo": "global",
@@ -509,14 +501,14 @@
         "modelUsage": {
           "claude-haiku-5-5": {
             "inputTokens": 16,
-            "outputTokens": 4449,
-            "cacheReadInputTokens": 114898,
-            "cacheCreationInputTokens": 15720,
+            "outputTokens": 4488,
+            "cacheReadInputTokens": 113204,
+            "cacheCreationInputTokens": 12947,
             "webSearchRequests": 0,
-            "costUSD": 0.006519080000000001,
+            "costUSD": 0.00596704,
             "contextWindow": 1000000,
             "maxOutputTokens": 128000,
-            "thinkingTokens": 1569,
+            "thinkingTokens": 1815,
             "canonicalModel": "claude-haiku-5-5",
             "provider": "firstParty",
             "costBasis": "list"
@@ -536,7 +528,7 @@
           },
           "inputCacheRead": {
             "status": "estimate",
-            "value": 114898,
+            "value": 113204,
             "source": "claude.result.modelUsage[*].inputCacheRead",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -544,7 +536,7 @@
           },
           "inputCacheWrite": {
             "status": "estimate",
-            "value": 15720,
+            "value": 12947,
             "source": "claude.result.modelUsage[*].inputCacheWrite",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -552,7 +544,7 @@
           },
           "inputTotal": {
             "status": "estimate",
-            "value": 130634,
+            "value": 126167,
             "source": "claude.result.modelUsage[*].inputTotal",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -560,7 +552,7 @@
           },
           "outputTotal": {
             "status": "estimate",
-            "value": 4449,
+            "value": 4488,
             "source": "claude.result.modelUsage[*].outputTotal",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -568,7 +560,7 @@
           },
           "outputReasoning": {
             "status": "estimate",
-            "value": 1569,
+            "value": 1815,
             "source": "claude.result.modelUsage[*].outputReasoning",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -587,7 +579,7 @@
             },
             "inputCacheRead": {
               "status": "estimate",
-              "value": 114898,
+              "value": 113204,
               "source": "claude.result.modelUsage[claude-haiku-5-5].cacheReadInputTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -595,7 +587,7 @@
             },
             "inputCacheWrite": {
               "status": "estimate",
-              "value": 15720,
+              "value": 12947,
               "source": "claude.result.modelUsage[claude-haiku-5-5].cacheCreationInputTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -603,7 +595,7 @@
             },
             "inputTotal": {
               "status": "estimate",
-              "value": 130634,
+              "value": 126167,
               "source": "claude.result.modelUsage[claude-haiku-5-5].input*",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -611,7 +603,7 @@
             },
             "outputTotal": {
               "status": "estimate",
-              "value": 4449,
+              "value": 4488,
               "source": "claude.result.modelUsage[claude-haiku-5-5].outputTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -619,7 +611,7 @@
             },
             "outputReasoning": {
               "status": "estimate",
-              "value": 1569,
+              "value": 1815,
               "source": "claude.result.modelUsage[claude-haiku-5-5].thinkingTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -632,7 +624,7 @@
     },
     "cost": {
       "status": "estimate",
-      "value": 0.006519080000000001,
+      "value": 0.00596704,
       "source": "claude.result.total_cost_usd",
       "integrity": "cli-unattested",
       "method": "cli-stream-unattested+claude-cli-api-equivalent",
@@ -641,7 +633,7 @@
     "elapsed": {
       "agentPhaseMs": {
         "status": "observed",
-        "value": 40530,
+        "value": 26292,
         "source": "harness monotonic clock",
         "integrity": "harness",
         "method": null,
@@ -649,7 +641,7 @@
       },
       "cliDurationMs": {
         "status": "estimate",
-        "value": 35135,
+        "value": 22865,
         "source": "claude.result.duration_ms",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -657,7 +649,7 @@
       },
       "cliApiDurationMs": {
         "status": "estimate",
-        "value": 29323,
+        "value": 21227,
         "source": "claude.result.duration_api_ms",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -667,7 +659,7 @@
     "toolCost": {
       "outputBytes": {
         "status": "estimate",
-        "value": 26876,
+        "value": 23287,
         "source": "claude.stream tool output",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -675,7 +667,7 @@
       },
       "wallMs": {
         "status": "estimate",
-        "value": 5909,
+        "value": 2938,
         "source": "harness receive times of stream tool events",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested+harness-receive-time",
@@ -683,7 +675,7 @@
       },
       "containerCpuUsec": {
         "status": "observed",
-        "value": 5748728,
+        "value": 3703363,
         "source": "cgroup cpu.stat",
         "integrity": "harness",
         "method": null,
@@ -693,7 +685,7 @@
     "compilerCost": {
       "agentVerifyCommands": {
         "status": "estimate",
-        "value": 3,
+        "value": 2,
         "source": "transcript",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested+transcript-heuristic/v1",
@@ -710,7 +702,7 @@
       },
       "harnessPrepareMs": {
         "status": "observed",
-        "value": 1729,
+        "value": 921,
         "source": "harness monotonic clock",
         "integrity": "harness",
         "method": null,
@@ -718,7 +710,7 @@
       },
       "harnessGradingMs": {
         "status": "observed",
-        "value": 6464,
+        "value": 2585,
         "source": "harness monotonic clock",
         "integrity": "harness",
         "method": null,
@@ -738,9 +730,7 @@
     "scopeViolations": {
       "realized": [],
       "prevented": [],
-      "detected": [
-        "local-install: node_modules digest changed"
-      ]
+      "detected": []
     }
   },
   "credential": {
@@ -757,10 +747,10 @@
     "completeness": "complete",
     "replay": "exact",
     "affectedPaths": [],
-    "gradedSetDigest": "6746c19e281224330cacca4fbd84c7f297b26fd8ba68407e4df7cc5669494cbf",
+    "gradedSetDigest": "b74a44f99b5c4fce1d5354222b0afba7410dce532904bffed7311b4776b4cdf5",
     "baselineSetDigest": "99e16f7d581ce52700883e11eb1acc36528584de68922ac05f49d6096fbd49f1",
     "manifests": {
-      "final": "0681a413ce0c49de99a10290d801ade491f2c7a7e96c97c83fa4125c24cda2ba",
+      "final": "0bfd8a6ec5f22f1c2574dbfc58f538506b9d7258f95b1f83ea42d2835e221f10",
       "baseline": "72b01fc932e48855d080aa6c2d3d2d7adfde0084b6105f5365b307f666e25882"
     },
     "stagedBytes": {
@@ -779,10 +769,10 @@
       },
       {
         "file": "stream.jsonl",
-        "sha256": "4f46e6ab28b55ef78e9e36d1aa5a0c6573d2d38f77c7d79506c3c41070c2d5aa",
-        "bytes": 114069,
+        "sha256": "01e56f490a901ce7f8cf7deb1fbfad266aee41ae02f50d51457ec0d49928058f",
+        "bytes": 99858,
         "truncated": false,
-        "originalBytes": 114069,
+        "originalBytes": 99858,
         "redacted": false
       },
       {
@@ -795,18 +785,18 @@
       },
       {
         "file": "transcript.jsonl",
-        "sha256": "2f87e9d63bc3f93cd15a920cac4dc742a6b1f4eb580a594d2aeeb958ec1a6287",
-        "bytes": 1459,
+        "sha256": "5378dc0bd01b9fb5480e05d21f7c776daf0c260c909ca25de7e6df2c4550763b",
+        "bytes": 1658,
         "truncated": false,
-        "originalBytes": 1459,
+        "originalBytes": 1658,
         "redacted": false
       },
       {
         "file": "final-message.txt",
-        "sha256": "70f4c31295ae7e29b822d5eed555f8b579b6d1a5701ca7a21344cff127959bd5",
-        "bytes": 1845,
+        "sha256": "b48d3d75973b84d8104cadb92382433b82cc6272dc10c29c16376574fe98faa0",
+        "bytes": 1738,
         "truncated": false,
-        "originalBytes": 1845,
+        "originalBytes": 1738,
         "redacted": false
       },
       {
@@ -819,7 +809,7 @@
       },
       {
         "file": "proxy.jsonl",
-        "sha256": "f96acaf91f3b0f77aa211d9e725abf8c4082b0322e1ff560c7f9c27eb2d4f716",
+        "sha256": "1b9eab924c8119d2d87fe4025d9674a23198586b3498d045535137286e41cfca",
         "bytes": 437,
         "truncated": false,
         "originalBytes": 437,

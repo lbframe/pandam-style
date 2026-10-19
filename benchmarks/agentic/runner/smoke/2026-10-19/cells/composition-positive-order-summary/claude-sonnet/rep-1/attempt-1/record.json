@@ -1,7 +1,7 @@
 {
   "schema": "pms-agentic-run-record/v1",
   "kind": "provider-backed",
-  "matrixId": "smoke-20261019-r2",
+  "matrixId": "smoke-20261019-r3",
   "cell": {
     "taskId": "composition-positive-order-summary",
     "modelKey": "claude-sonnet"
@@ -9,7 +9,7 @@
   "repetition": 1,
   "attempt": 1,
   "comparability": {
-    "key": "e122700d4d840cdec9d2cf717febc6136362f8dcbcc851beafc630a68ed7f2d1",
+    "key": "5023be57d5ac764328d4b64a2dc96ab9acfd37d7a118710b4ac137451d6b927a",
     "projectionVersion": "pms-agentic-comparability/v1",
     "projection": {
       "version": "pms-agentic-comparability/v1",
@@ -21,7 +21,7 @@
         "corpusLockSha256": "4698cbdea6288e5bf51de2aac1a32af08270e81e97084de3ddcec628ef00e05b"
       },
       "harness": {
-        "runnerTreeDigest": "328228952db6eaf94aec5a732a8993a3120aa353f8f37c3db2c19ee302b94050",
+        "runnerTreeDigest": "2300641c5c72b992807b8327d9a37cb229e82bde76f14ee21c3b67c65119260e",
         "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970"
       },
       "prompt": {
@@ -73,7 +73,7 @@
         },
         "capabilityEnforcementMatrixSha256": "024d9d0f42da0ba4649b20b9cc7ceafb2b6aec67e2d824212792eff594b50172",
         "egressAllowlistSha256": "9d55abf902f7e8b5c07c24d26378522783913b217f99241ee9243d205bff41fc",
-        "proxyImageId": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
+        "proxyImageId": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
         "networkMode": "per-attempt-internal-isolated-gateway"
       },
       "budgets": {
@@ -82,8 +82,8 @@
         "cliMaxTurns": 120
       },
       "containers": {
-        "agentImageId": "sha256:82b2e75967d427ba593d81d0504abbde4ea447da08509b12f6a42fcde1d96a7b",
-        "graderImageId": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
+        "agentImageId": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+        "graderImageId": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
         "cpus": 2,
         "memoryBytes": 4294967296,
         "pidsLimit": 1024,
@@ -112,10 +112,10 @@
     "taskDigest": "f48ba7159694eb746829be23ae8a0e1c664b0b6f7f8c93e3897f546a5b115d99"
   },
   "harness": {
-    "commit": "5e6521d07b413edbf939fe13e826cb29c1f6791b",
+    "commit": "69e1f79978dcf388dc4da2324f2983f77892ea31",
     "clean": true,
     "corpusLockSha256": "4698cbdea6288e5bf51de2aac1a32af08270e81e97084de3ddcec628ef00e05b",
-    "runnerTreeDigest": "328228952db6eaf94aec5a732a8993a3120aa353f8f37c3db2c19ee302b94050",
+    "runnerTreeDigest": "2300641c5c72b992807b8327d9a37cb229e82bde76f14ee21c3b67c65119260e",
     "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970"
   },
   "prompt": {
@@ -153,7 +153,7 @@
       "--max-turns",
       "120",
       "--session-id",
-      "b22143fa-2eca-45f5-86ee-46b80924ffb6"
+      "9b8872a9-f669-470d-90fb-f22c953d3385"
     ],
     "normalizedArgv": [
       "claude",
@@ -216,7 +216,7 @@
     "executeOnly": true
   },
   "provider": {
-    "sessionId": "b22143fa-2eca-45f5-86ee-46b80924ffb6",
+    "sessionId": "9b8872a9-f669-470d-90fb-f22c953d3385",
     "primaryModelFidelity": "faithful",
     "servedModels": [
       "claude-sonnet-5-5"
@@ -234,7 +234,7 @@
       "isUsingOverage": false,
       "unifiedWindows": {
         "five_hour": {
-          "utilization": 0.25,
+          "utilization": 0.3,
           "resetsAt": 1792424400
         }
       }
@@ -269,9 +269,9 @@
   },
   "environment": {
     "images": {
-      "agent": "sha256:82b2e75967d427ba593d81d0504abbde4ea447da08509b12f6a42fcde1d96a7b",
-      "grader": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
-      "proxy": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63"
+      "agent": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+      "grader": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+      "proxy": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b"
     },
     "dockerVersion": "29.2.1",
     "kernel": "6.8.0-146-generic",
@@ -279,18 +279,18 @@
     "cpus": 16,
     "memoryBytes": 33555574784,
     "cgroup": null,
-    "isolationSelfTest": "6af12df3a1ca14bad80971f729032abce3c81c85baf10d19eb3d453002b324d2",
+    "isolationSelfTest": "078997ab046ae7a81cc6af581593c6fbe62b147dbde8f18828109fd89f7f764c",
     "load": {
       "samples": 6,
-      "min": 6.95,
-      "max": 8.04,
-      "median": 7.74
+      "min": 2.11,
+      "max": 2.32,
+      "median": 2.18
     }
   },
   "integrity": {
     "stream": "cli-unattested",
     "channelAudit": {
-      "samples": 3,
+      "samples": 2,
       "cliNonDumpable": true,
       "foreignStreamHolders": 0,
       "controlSocketConnections": null
@@ -299,8 +299,8 @@
     "proxy": {
       "connections": 4,
       "denied": 1,
-      "bytesUp": 203743,
-      "bytesDown": 35718,
+      "bytesUp": 198563,
+      "bytesDown": 34930,
       "targets": {
         "api.anthropic.com:443": 3,
         "registry.npmjs.org:443": 1
@@ -311,74 +311,59 @@
   },
   "timestamps": {
     "prepare": {
-      "startedAt": "2026-10-19T14:38:04.059Z",
-      "endedAt": "2026-10-19T14:38:05.027Z",
-      "durationMs": 968
+      "startedAt": "2026-10-19T15:01:32.942Z",
+      "endedAt": "2026-10-19T15:01:33.835Z",
+      "durationMs": 893
     },
     "agent": {
-      "startedAt": "2026-10-19T14:38:05.140Z",
-      "endedAt": "2026-10-19T14:38:28.419Z",
-      "durationMs": 23277
+      "startedAt": "2026-10-19T15:01:34.061Z",
+      "endedAt": "2026-10-19T15:01:54.565Z",
+      "durationMs": 20502
     },
     "stage": {
-      "startedAt": "2026-10-19T14:38:29.389Z",
-      "endedAt": "2026-10-19T14:38:29.395Z",
-      "durationMs": 6
+      "startedAt": "2026-10-19T15:01:55.216Z",
+      "endedAt": "2026-10-19T15:01:55.224Z",
+      "durationMs": 8
     },
     "archive-baseline": {
-      "startedAt": "2026-10-19T14:38:29.632Z",
-      "endedAt": "2026-10-19T14:38:29.658Z",
-      "durationMs": 26
+      "startedAt": "2026-10-19T15:01:55.460Z",
+      "endedAt": "2026-10-19T15:01:55.518Z",
+      "durationMs": 58
     },
     "archive-final": {
-      "startedAt": "2026-10-19T14:38:29.658Z",
-      "endedAt": "2026-10-19T14:38:29.678Z",
-      "durationMs": 20
+      "startedAt": "2026-10-19T15:01:55.518Z",
+      "endedAt": "2026-10-19T15:01:55.605Z",
+      "durationMs": 87
     },
     "grading": {
-      "startedAt": "2026-10-19T14:38:29.678Z",
-      "endedAt": "2026-10-19T14:38:35.357Z",
-      "durationMs": 5679
+      "startedAt": "2026-10-19T15:01:55.605Z",
+      "endedAt": "2026-10-19T15:01:58.266Z",
+      "durationMs": 2661
     }
   },
   "outcome": {
-    "termination": "policy",
-    "class": "policy",
-    "code": "capability-breach",
+    "termination": "completed",
+    "class": "agent",
+    "code": "completed",
     "valid": true,
     "retry": {
       "scheduled": false,
       "backoffSeconds": null
     },
-    "taskSuccess": false,
-    "breaches": [
-      {
-        "kind": "local-install",
-        "source": "filesystem",
-        "enforcement": "detected",
-        "detail": "node_modules digest changed"
-      }
-    ]
+    "taskSuccess": true,
+    "breaches": []
   },
   "grading": {
-    "verdict": "fail",
+    "verdict": "pass",
     "passes": [
       {
         "pass": "G1",
         "status": "completed",
-        "verdict": "fail",
-        "resultSha256": "154b10102f5b190ac7de66c3bc78f81dfaa9ebd67cd44aabdd967373c8a278c8"
+        "verdict": "pass",
+        "resultSha256": "ba655c74e35fe7851f47e5dd83189f5ea4f05d8c4e6e71f9681b6e819f5fa3f4"
       }
     ],
-    "failingRequiredChecks": [
-      {
-        "id": "generated-untouched",
-        "kind": "generated.consistent",
-        "class": "integrity",
-        "status": "fail",
-        "reason": "generated output is not compiler output: missing generation state"
-      }
-    ]
+    "failingRequiredChecks": []
   },
   "metrics": {
     "toolCalls": {
@@ -472,7 +457,7 @@
       "lowerBound": 0,
       "unit": "cycles"
     },
-    "firstPassSuccess": false,
+    "firstPassSuccess": "unknown",
     "coverage": {
       "complete": false,
       "reasons": [
@@ -488,11 +473,11 @@
       "raw": {
         "resultUsage": {
           "input_tokens": 12,
-          "cache_creation_input_tokens": 8209,
-          "cache_read_input_tokens": 58511,
-          "output_tokens": 1851,
+          "cache_creation_input_tokens": 6600,
+          "cache_read_input_tokens": 60181,
+          "output_tokens": 1862,
           "output_tokens_details": {
-            "thinking_tokens": 113
+            "thinking_tokens": 57
           },
           "server_tool_use": {
             "web_search_requests": 0,
@@ -500,7 +485,7 @@
           },
           "service_tier": "standard",
           "cache_creation": {
-            "ephemeral_1h_input_tokens": 8209,
+            "ephemeral_1h_input_tokens": 6600,
             "ephemeral_5m_input_tokens": 0
           },
           "inference_geo": "global",
@@ -511,14 +496,14 @@
         "modelUsage": {
           "claude-sonnet-5-5": {
             "inputTokens": 12,
-            "outputTokens": 1851,
-            "cacheReadInputTokens": 58511,
-            "cacheCreationInputTokens": 8209,
+            "outputTokens": 1862,
+            "cacheReadInputTokens": 60181,
+            "cacheCreationInputTokens": 6600,
             "webSearchRequests": 0,
-            "costUSD": 0.0572211,
+            "costUSD": 0.051062100000000006,
             "contextWindow": 1000000,
             "maxOutputTokens": 128000,
-            "thinkingTokens": 113,
+            "thinkingTokens": 57,
             "canonicalModel": "claude-sonnet-5-5",
             "provider": "firstParty",
             "costBasis": "list"
@@ -538,7 +523,7 @@
           },
           "inputCacheRead": {
             "status": "estimate",
-            "value": 58511,
+            "value": 60181,
             "source": "claude.result.modelUsage[*].inputCacheRead",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -546,7 +531,7 @@
           },
           "inputCacheWrite": {
             "status": "estimate",
-            "value": 8209,
+            "value": 6600,
             "source": "claude.result.modelUsage[*].inputCacheWrite",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -554,7 +539,7 @@
           },
           "inputTotal": {
             "status": "estimate",
-            "value": 66732,
+            "value": 66793,
             "source": "claude.result.modelUsage[*].inputTotal",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -562,7 +547,7 @@
           },
           "outputTotal": {
             "status": "estimate",
-            "value": 1851,
+            "value": 1862,
             "source": "claude.result.modelUsage[*].outputTotal",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -570,7 +555,7 @@
           },
           "outputReasoning": {
             "status": "estimate",
-            "value": 113,
+            "value": 57,
             "source": "claude.result.modelUsage[*].outputReasoning",
             "integrity": "cli-unattested",
             "method": "cli-stream-unattested",
@@ -589,7 +574,7 @@
             },
             "inputCacheRead": {
               "status": "estimate",
-              "value": 58511,
+              "value": 60181,
               "source": "claude.result.modelUsage[claude-sonnet-5-5].cacheReadInputTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -597,7 +582,7 @@
             },
             "inputCacheWrite": {
               "status": "estimate",
-              "value": 8209,
+              "value": 6600,
               "source": "claude.result.modelUsage[claude-sonnet-5-5].cacheCreationInputTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -605,7 +590,7 @@
             },
             "inputTotal": {
               "status": "estimate",
-              "value": 66732,
+              "value": 66793,
               "source": "claude.result.modelUsage[claude-sonnet-5-5].input*",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -613,7 +598,7 @@
             },
             "outputTotal": {
               "status": "estimate",
-              "value": 1851,
+              "value": 1862,
               "source": "claude.result.modelUsage[claude-sonnet-5-5].outputTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -621,7 +606,7 @@
             },
             "outputReasoning": {
               "status": "estimate",
-              "value": 113,
+              "value": 57,
               "source": "claude.result.modelUsage[claude-sonnet-5-5].thinkingTokens",
               "integrity": "cli-unattested",
               "method": "cli-stream-unattested",
@@ -634,7 +619,7 @@
     },
     "cost": {
       "status": "estimate",
-      "value": 0.0572211,
+      "value": 0.051062100000000006,
       "source": "claude.result.total_cost_usd",
       "integrity": "cli-unattested",
       "method": "cli-stream-unattested+claude-cli-api-equivalent",
@@ -643,7 +628,7 @@
     "elapsed": {
       "agentPhaseMs": {
         "status": "observed",
-        "value": 23277,
+        "value": 20502,
         "source": "harness monotonic clock",
         "integrity": "harness",
         "method": null,
@@ -651,7 +636,7 @@
       },
       "cliDurationMs": {
         "status": "estimate",
-        "value": 19644,
+        "value": 17859,
         "source": "claude.result.duration_ms",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -659,7 +644,7 @@
       },
       "cliApiDurationMs": {
         "status": "estimate",
-        "value": 17364,
+        "value": 16068,
         "source": "claude.result.duration_api_ms",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -669,7 +654,7 @@
     "toolCost": {
       "outputBytes": {
         "status": "estimate",
-        "value": 12359,
+        "value": 12497,
         "source": "claude.stream tool output",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested",
@@ -677,7 +662,7 @@
       },
       "wallMs": {
         "status": "estimate",
-        "value": 2332,
+        "value": 1821,
         "source": "harness receive times of stream tool events",
         "integrity": "cli-unattested",
         "method": "cli-stream-unattested+harness-receive-time",
@@ -685,7 +670,7 @@
       },
       "containerCpuUsec": {
         "status": "observed",
-        "value": 4423599,
+        "value": 3443309,
         "source": "cgroup cpu.stat",
         "integrity": "harness",
         "method": null,
@@ -712,7 +697,7 @@
       },
       "harnessPrepareMs": {
         "status": "observed",
-        "value": 968,
+        "value": 893,
         "source": "harness monotonic clock",
         "integrity": "harness",
         "method": null,
@@ -720,7 +705,7 @@
       },
       "harnessGradingMs": {
         "status": "observed",
-        "value": 5679,
+        "value": 2661,
         "source": "harness monotonic clock",
         "integrity": "harness",
         "method": null,
@@ -729,20 +714,18 @@
     },
     "peakWorkspaceBytes": {
       "status": "observed",
-      "value": 56075109,
+      "value": 56077176,
       "source": "confined workspace samples",
       "integrity": "harness",
       "method": null,
       "unit": "bytes"
     },
     "visualFidelity": "unmeasured",
-    "vocabularyCompliance": "fail",
+    "vocabularyCompliance": "pass",
     "scopeViolations": {
       "realized": [],
       "prevented": [],
-      "detected": [
-        "local-install: node_modules digest changed"
-      ]
+      "detected": []
     }
   },
   "credential": {
@@ -759,14 +742,14 @@
     "completeness": "complete",
     "replay": "exact",
     "affectedPaths": [],
-    "gradedSetDigest": "06192b7db6a8056e577cd668ff2607c749f4cfd28f8a58cbd90f33b0cb8a70fe",
+    "gradedSetDigest": "9998293322d4f1b2aba048f13b10d0f0580c545a2d2b04e3dc85f592902f1703",
     "baselineSetDigest": "99e16f7d581ce52700883e11eb1acc36528584de68922ac05f49d6096fbd49f1",
     "manifests": {
-      "final": "a3fbe65474312c934c000011aae7175b2adb3621962e2866d8962ea9d0b00592",
+      "final": "3473ccb0cca9f1df9ca0a1dc01fa7676806738d1837fee383a783ca3ada45cc8",
       "baseline": "72b01fc932e48855d080aa6c2d3d2d7adfde0084b6105f5365b307f666e25882"
     },
     "stagedBytes": {
-      "final": 383849,
+      "final": 387804,
       "baseline": 73844
     },
     "purged": [],
@@ -781,10 +764,10 @@
       },
       {
         "file": "stream.jsonl",
-        "sha256": "9140e9a34a88a6a0a0a7d2975053fbcef268d4fed28411d84e82d0f9dd6b8245",
-        "bytes": 50957,
+        "sha256": "23de6e3c38b3c7b26bc6f7ed816738104bb7588a1d2d029c93cdef79d507e805",
+        "bytes": 51039,
         "truncated": false,
-        "originalBytes": 50957,
+        "originalBytes": 51039,
         "redacted": false
       },
       {
@@ -797,7 +780,7 @@
       },
       {
         "file": "transcript.jsonl",
-        "sha256": "2fe0f29128d2e071d60b26f1d046cce8a2176ae908564fc2918d041de92017f3",
+        "sha256": "03f771d33bd31e12c37fa70641a17bf1d8e3668913e6486d3bfd548c4fd94d30",
         "bytes": 2063,
         "truncated": false,
         "originalBytes": 2063,
@@ -805,10 +788,10 @@
       },
       {
         "file": "final-message.txt",
-        "sha256": "ee53ef4a866acb4aced875948b13c9a9a8600cd06358964f9406c250c63a617f",
-        "bytes": 1251,
+        "sha256": "8608d254c4fbe838d29d13e3893bb6dadb495333bff63330a4535ed25775c4b9",
+        "bytes": 1323,
         "truncated": false,
-        "originalBytes": 1251,
+        "originalBytes": 1323,
         "redacted": false
       },
       {
@@ -821,7 +804,7 @@
       },
       {
         "file": "proxy.jsonl",
-        "sha256": "6dca4d3c99f94ba385fbddfd0190fd3deceeb7e14fa730ad36ba76fc0ad3b4e0",
+        "sha256": "a4aa044b25bddab28db3bfa3c5bae6b75e4be1f3e44a42ac4b510eadbe52c989",
         "bytes": 437,
         "truncated": false,
         "originalBytes": 437,
@@ -829,10 +812,10 @@
       },
       {
         "file": "evaluation.json",
-        "sha256": "dcc13ae22eaff658d8908462d1e87dc53dd3f51283bafbc74e435c2d110f245b",
-        "bytes": 5013,
+        "sha256": "325e29d16c7404312ac48e2db574c0bb3188bb01ff8412e753b2a1fd2b112a62",
+        "bytes": 4979,
         "truncated": false,
-        "originalBytes": 5013,
+        "originalBytes": 4979,
         "redacted": false
       }
     ]

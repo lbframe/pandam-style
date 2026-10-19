@@ -1323,10 +1323,10 @@ bound check.
 - **Re-run (2026-10-19, `5e6521d`, matrix `smoke-20261019-r2`), observed.**
   Self-test of the exact binding passed (51 checks, binding `6af12df3…`);
   all 6 attempts ran once (14:35:31–14:39:18Z including preflight), none
-  retried, contested or missing. Records, evaluations and the report, leak-scanned, are in
-  [`smoke/2026-10-19/`](smoke/2026-10-19/). Discovery: pass and success for
-  all three models. Composition: oracle verdict pass (haiku, sol) and fail
-  (sonnet: it deleted the untracked `..pandamstyle.pms-state.json`,
+  retried, contested or missing. Its records were superseded by the third
+  run's (below). Discovery: pass and success for all three models.
+  Composition: oracle verdict pass (haiku, sol) and fail (sonnet: it
+  deleted the untracked `..pandamstyle.pms-state.json`,
   `generated-untouched`), but **all three are `capability-breach`**, a
   false positive (finding 1 below). Resolution of the items above:
   - *Tokens, cost, `costBasis`:* confirmed for Claude (`modelUsage` input,
@@ -1385,6 +1385,30 @@ bound check.
      `/etc/profile` resets `PATH` to the Debian default, so `npm` was not
      found (exit 127) until the agent added `/opt/node/bin` itself. Claude's
      tool shell keeps the image `PATH`. The environments are not equal.
+- **Third run (2026-10-19, `69e1f79`, matrix `smoke-20261019-r3`),
+  observed**, after both fixes, with rebuilt images and a passing
+  self-test (51 checks, binding `078997ab…`): 6 attempts once
+  (14:59:53–15:02:41Z), none retried, contested or missing; credential
+  files byte-identical, Codex export `unchanged`, no write-back. Its
+  leak-scanned records, evaluations and report are in
+  [`smoke/2026-10-19/`](smoke/2026-10-19/). No attempt reports a
+  `local-install` breach, and Codex's first `npm run build` succeeded
+  (`bash -lc`, exit 0). Codex's composition failure is an agent result: it
+  deleted the untracked `..pandamstyle.pms-state.json`, as sonnet did in
+  r2 (`generated-untouched`). The other observations of r2 held (hosts,
+  token fields, unknown effort and Codex cost, channel audit clean, no
+  usage discrepancy); Codex reported a nonzero `reasoning_output_tokens`
+  (18) once, recorded as an estimate, and Claude's `five_hour`
+  utilization read 0.3.
+
+  | Task × model | r2 verdict | r2 outcome | r3 verdict | r3 outcome |
+  | --- | --- | --- | --- | --- |
+  | discovery × haiku | pass | completed, success | pass | completed, success |
+  | discovery × sonnet | pass | completed, success | pass | completed, success |
+  | discovery × sol | pass | completed, success | pass | completed, success |
+  | composition × haiku | pass | `capability-breach` (false) | pass | completed, success |
+  | composition × sonnet | fail (`generated-untouched`) | `capability-breach` (false) | pass | completed, success |
+  | composition × sol | pass | `capability-breach` (false) | fail (`generated-untouched`) | completed, no success |
 - A successful smoke run cannot confirm rate-limit, capacity, quota
   exhaustion, refresh rotation under conflict, cancellation escalation or
   resource-limit behavior. Those stay covered by fixtures and are labelled

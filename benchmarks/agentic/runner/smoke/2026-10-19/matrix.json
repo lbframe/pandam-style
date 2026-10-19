@@ -52,9 +52,9 @@
     "manifestSha256": "acdefef3d8b44d8e8a784464e2093be8c6f5fe3a7f88f4c249bd1762cbc52884"
   },
   "images": {
-    "agent": "sha256:82b2e75967d427ba593d81d0504abbde4ea447da08509b12f6a42fcde1d96a7b",
-    "grader": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
-    "proxy": "sha256:46f915ed23cac80d77020f855144a4247089b5c23f49d8aa502c8f481444ca63",
+    "agent": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+    "grader": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+    "proxy": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
     "baseDigest": "sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392"
   },
   "container": {
@@ -102,7 +102,7 @@
     "wallClockCapSeconds": 7200
   },
   "authorization": "orchestrator-go",
-  "matrixId": "smoke-20261019-r2",
+  "matrixId": "smoke-20261019-r3",
   "identity": {
     "inputs": {
       "closures": {
@@ -124,10 +124,10 @@
         }
       }
     },
-    "configDigest": "e3fcc0c0529ccb6690a6bca04916bf2a8f2dc8ffd4c489d7d506e74669bfc3a1",
+    "configDigest": "81e8b2b4c62a2a889212ba07e72d0cd0d6271d3513c2ade3518c60e88ccc9577",
     "kind": "provider-backed",
     "harness": {
-      "runnerTreeDigest": "328228952db6eaf94aec5a732a8993a3120aa353f8f37c3db2c19ee302b94050",
+      "runnerTreeDigest": "2300641c5c72b992807b8327d9a37cb229e82bde76f14ee21c3b67c65119260e",
       "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970",
       "corpusLockSha256": "4698cbdea6288e5bf51de2aac1a32af08270e81e97084de3ddcec628ef00e05b"
     },
@@ -142,7 +142,7 @@
       "fixtureClosureNonProductLockSha256": null
     }
   },
-  "identityDigest": "957e80e0bb01d330f0f5cae0ea66be9975032b9f61c561d507b2e44c7338bfea",
+  "identityDigest": "878af31d034209dc5e87488a7c9c7cad28e0bba79fee6e6309301027a6b61893",
   "credentialSources": {
     "claude": {
       "configDir": "~/.claude-t3/team-2",
@@ -155,5 +155,5 @@
       "account": "chatgpt"
     }
   },
-  "startedAt": "2026-10-19T14:36:06.108Z"
+  "startedAt": "2026-10-19T15:00:04.563Z"
 }

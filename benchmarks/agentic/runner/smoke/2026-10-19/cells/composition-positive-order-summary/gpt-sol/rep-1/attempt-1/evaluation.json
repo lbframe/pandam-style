@@ -7,15 +7,15 @@
   "epoch": "alpha1",
   "classification": "expressible",
   "intendedOutcome": "application-success",
-  "verdict": "pass",
+  "verdict": "fail",
   "success": {
-    "application": true,
+    "application": false,
     "diagnosis": null,
     "report": null
   },
   "outcomes": {
     "scope": "pass",
-    "integrity": "pass",
+    "integrity": "fail",
     "compile": "pass",
     "static": "pass",
     "rendered": "pass",
@@ -91,12 +91,11 @@
       "kind": "generated.consistent",
       "class": "integrity",
       "required": true,
-      "status": "pass",
-      "reason": null,
-      "evidence": {
-        "note": "fresh compiler generation",
-        "files": 15
-      }
+      "status": "fail",
+      "reason": "generated output is not compiler output: missing generation state",
+      "evidence": [
+        "missing generation state"
+      ]
     },
     {
       "id": "vocabulary-unchanged",

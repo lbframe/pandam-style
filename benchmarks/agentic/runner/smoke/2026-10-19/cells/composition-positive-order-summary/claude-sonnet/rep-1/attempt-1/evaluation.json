@@ -7,15 +7,15 @@
   "epoch": "alpha1",
   "classification": "expressible",
   "intendedOutcome": "application-success",
-  "verdict": "fail",
+  "verdict": "pass",
   "success": {
-    "application": false,
+    "application": true,
     "diagnosis": null,
     "report": null
   },
   "outcomes": {
     "scope": "pass",
-    "integrity": "fail",
+    "integrity": "pass",
     "compile": "pass",
     "static": "pass",
     "rendered": "pass",
@@ -91,11 +91,12 @@
       "kind": "generated.consistent",
       "class": "integrity",
       "required": true,
-      "status": "fail",
-      "reason": "generated output is not compiler output: missing generation state",
-      "evidence": [
-        "missing generation state"
-      ]
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "fresh compiler generation",
+        "files": 15
+      }
     },
     {
       "id": "vocabulary-unchanged",
@@ -126,7 +127,7 @@
           "x1q3u54m",
           "xleecmb"
         ],
-        "text": "Order summary 1 × Mug 2 × Tote Checkout",
+        "text": "Order summary Mug × 1 Tote × 2 Checkout",
         "styles": {
           "box-shadow": "var(--xf6f47m)",
           "background-color": "var(--x1sr72fd)",
@@ -162,7 +163,7 @@
       "reason": null,
       "evidence": {
         "classes": [],
-        "text": "1 × Mug"
+        "text": "Mug × 1"
       }
     },
     {
@@ -209,7 +210,7 @@
       "reason": null,
       "evidence": {
         "classes": [],
-        "text": "2 × Canvas tote"
+        "text": "Canvas tote × 2"
       }
     },
     {
