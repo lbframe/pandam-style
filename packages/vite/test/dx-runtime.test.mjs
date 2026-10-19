@@ -276,3 +276,55 @@ test('a global token edit updates CSS and reloads without clearing the Vite grap
   assert.equal(css.status, 200);
   assert.match(await css.text(), /#222222/);
 });
+
+test('the plugin forwards `targets` to the Project Service (CE-01.1)', async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'pms-ce011-vite-'));
+  await fs.symlink(
+    fileURLToPath(new URL('../../../node_modules', import.meta.url)),
+    path.join(root, 'node_modules'),
+    'dir',
+  );
+  await fs.mkdir(path.join(root, 'semantic'));
+  await fs.writeFile(path.join(root, 'package.json'), '{"type":"module"}');
+  await fs.writeFile(
+    path.join(root, 'semantic/page.js'),
+    [
+      "import { create, token, props } from '../generated/design.js';",
+      "const style = create({ root: { color: token('colors.ink') } });",
+      'export const page = props(style.root);',
+      '',
+    ].join('\n'),
+  );
+  const plugin = pandamstyle({
+    definition: {
+      systemId: 'vite-targets@1',
+      tokens: { colors: { ink: { value: '#111111', visibility: 'public' } } },
+    },
+    roots: ['semantic'],
+    outDir: 'generated',
+    designSystemFile: 'design.js',
+    targets: { profiles: ['pandamstyle:ios-safari@1'] },
+  });
+  const server = await createServer({
+    configFile: false,
+    root,
+    plugins: [plugin],
+    logLevel: 'silent',
+    server: { port: 0 },
+  });
+  t.after(async () => {
+    await server.close();
+    await fs.rm(root, { recursive: true, force: true });
+  });
+  await server.listen();
+  await server.transformRequest('/semantic/page.js');
+  const manifest = JSON.parse(
+    await fs.readFile(path.join(root, 'generated/manifest.json'), 'utf8'),
+  );
+  assert.equal(manifest.targets.origin, 'project-config');
+  assert.equal(manifest.targets.enforcement, 'enforced');
+  assert.deepEqual(
+    manifest.targets.profiles.map((profile) => profile.ref),
+    ['pandamstyle:ios-safari@1'],
+  );
+});

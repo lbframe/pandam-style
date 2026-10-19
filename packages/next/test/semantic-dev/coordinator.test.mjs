@@ -761,3 +761,23 @@ test('durable event write failure cannot reject a successful strict receipt and 
     item.cleanup();
   }
 });
+
+test('the coordinator forwards `targets` to the Project Service (CE-01.1)', async () => {
+  const item = fixture();
+  const owner = await item.owner({
+    targets: { profiles: ['pandamstyle:android-webview@1'] },
+  });
+  try {
+    const manifest = JSON.parse(
+      fs.readFileSync(item.file('generated/manifest.json'), 'utf8'),
+    );
+    assert.equal(manifest.targets.origin, 'project-config');
+    assert.deepEqual(
+      manifest.targets.profiles.map((profile) => profile.ref),
+      ['pandamstyle:android-webview@1'],
+    );
+  } finally {
+    await owner.close();
+    item.cleanup();
+  }
+});
