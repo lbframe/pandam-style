@@ -353,7 +353,7 @@ test('F51 provider-backed grading without the trusted tree is a hard error befor
 });
 
 test('F53 a node_modules directory in an ancestor of the scratch path is refused', () => {
-  const root = tmpDir('anc');
+  const root = tmpDir('ancestor');
   const scratch = path.join(root, 'a/b/scratch');
   fs.mkdirSync(scratch, { recursive: true });
   fs.mkdirSync(path.join(root, 'a/node_modules'));
