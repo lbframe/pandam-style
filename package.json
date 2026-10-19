@@ -16,7 +16,9 @@
     "test": "./verify-pms.sh",
     "bench:agentic:validate": "node benchmarks/agentic/bin/pms-agentic.mjs validate && node benchmarks/agentic/bin/pms-agentic.mjs heldout guard",
     "bench:agentic:install": "yarn --cwd benchmarks/agentic/dom install --frozen-lockfile --non-interactive",
-    "bench:agentic:test": "node --test benchmarks/agentic/__tests__/*.test.mjs"
+    "bench:agentic:test": "node --test benchmarks/agentic/__tests__/*.test.mjs",
+    "bench:agentic:runner:test": "node --test --test-concurrency=1 benchmarks/agentic/runner/__tests__/*.test.mjs",
+    "bench:agentic:runner:docker-test": "PMS_RUNNER_DOCKER_TESTS=1 node --test --test-concurrency=1 benchmarks/agentic/runner/__tests__/docker.test.mjs"
   },
   "workspaces": [
     "packages/core",

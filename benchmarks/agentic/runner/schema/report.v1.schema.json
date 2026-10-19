@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/runner/schema/report.v1.schema.json",
+  "title": "Run report (pms-agentic-run-report/v1)",
+  "description": "Per-cell distributions and failures of one matrix (runner/DESIGN.md section 7). Values are listed per repetition; unknown values are null and counted. Success has a point estimate and a lower bound counting every contested, unclassified or missing repetition as non-success.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "synthetic",
+    "matrixId",
+    "productBuild",
+    "trustedTree",
+    "comparabilityKeys",
+    "cells",
+    "perModel",
+    "breaches",
+    "unsupported",
+    "missing",
+    "infrastructure",
+    "halted"
+  ],
+  "properties": {
+    "schema": {
+      "const": "pms-agentic-run-report/v1"
+    },
+    "kind": {
+      "enum": [
+        "provider-backed",
+        "adapter-fixture"
+      ]
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "matrixId": {
+      "type": "string"
+    },
+    "productBuild": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "trustedTree": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "comparabilityKeys": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "modelKey",
+          "planned",
+          "valid",
+          "missing",
+          "success",
+          "firstPass",
+          "metrics",
+          "latencyLabel",
+          "repetitions"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "modelKey": {
+            "type": "string"
+          },
+          "planned": {
+            "type": "integer"
+          },
+          "valid": {
+            "type": "integer"
+          },
+          "missing": {
+            "type": "integer"
+          },
+          "success": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "k",
+              "n",
+              "pointEstimate",
+              "lowerBound",
+              "contested",
+              "lowerBoundK"
+            ],
+            "properties": {
+              "k": {
+                "type": "integer"
+              },
+              "n": {
+                "type": "integer"
+              },
+              "pointEstimate": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "lowerBound": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "contested": {
+                "type": "integer"
+              },
+              "lowerBoundK": {
+                "type": "integer",
+                "description": "Uncontested successes: the numerator of lowerBound over planned repetitions."
+              }
+            }
+          },
+          "firstPass": {
+            "type": "object"
+          },
+          "metrics": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": [
+                "values",
+                "unknown",
+                "statuses",
+                "methods",
+                "min",
+                "median",
+                "max"
+              ],
+              "properties": {
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  }
+                },
+                "unknown": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "latencyLabel": {
+            "const": "indicative"
+          },
+          "repetitions": {
+            "type": "array"
+          }
+        }
+      }
+    },
+    "perModel": {
+      "type": "object"
+    },
+    "breaches": {
+      "type": "array"
+    },
+    "unsupported": {
+      "type": "array"
+    },
+    "missing": {
+      "type": "array"
+    },
+    "infrastructure": {
+      "type": "object"
+    },
+    "halted": {
+      "type": "object"
+    }
+  }
+}
