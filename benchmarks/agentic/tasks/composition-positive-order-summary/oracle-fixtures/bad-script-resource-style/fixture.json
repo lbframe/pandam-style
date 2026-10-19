@@ -1,0 +1,13 @@
+{
+  "description": "Review probe (PR #113): an async <script> resource whose source restyles the card. React resources are not compared as hoisted instances, so the verdict is unmeasured, never pass.",
+  "epoch": "alpha1",
+  "expectedVerdict": "unmeasured",
+  "expectedStatuses": {
+    "scope": "pass",
+    "compile": "pass",
+    "no-bypass": "pass",
+    "summary-card": "unmeasured",
+    "checkout-button": "unmeasured",
+    "visual-fidelity": "unmeasured"
+  }
+}

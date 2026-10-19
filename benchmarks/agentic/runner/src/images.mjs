@@ -16,6 +16,15 @@ import path from 'node:path';
 import { docker } from './docker.mjs';
 import { RUNNER_ROOT } from './util.mjs';
 
+/**
+ * The one PATH of every container role (section 4.2): the store's Node,
+ * then the system. Login shells reset PATH in /etc/profile (Codex runs
+ * commands with `bash -lc`); /etc/profile.d, which /etc/profile reads last
+ * for bash and dash alike, restores this value, and /etc/environment carries
+ * it for PAM-started shells. Both CLIs' tool shells therefore see it.
+ */
+export const IMAGE_PATH = '/opt/node/bin:/usr/bin:/bin';
+
 // Observed locally (Appendix A, P2); pulled by digest when absent.
 export const BASE_IMAGE =
   'node:22-bookworm-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392';
@@ -62,13 +71,15 @@ export function buildHarnessImage({
     `FROM ${BASE_IMAGE}`,
     nodeDir
       ? 'COPY node /opt/node'
-      : 'RUN mkdir -p /opt/node/bin && cp /usr/local/bin/node /opt/node/bin/node',
+      : // The base image's Node and npm in the distribution's layout.
+        'RUN mkdir -p /opt/node/bin /opt/node/lib && cp /usr/local/bin/node /opt/node/bin/node && cp -a /usr/local/lib/node_modules /opt/node/lib/ && ln -s ../lib/node_modules/npm/bin/npm-cli.js /opt/node/bin/npm && ln -s ../lib/node_modules/npm/bin/npx-cli.js /opt/node/bin/npx',
     'RUN rm -rf /usr/local/bin/node /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /usr/local/lib/node_modules /opt/yarn-* \\',
     ' && chown root:root /opt/node/bin/node && chmod 0711 /opt/node/bin/node \\',
     ' && test ! -e /node_modules',
     'COPY container /opt/harness',
     'RUN chmod -R a+rX /opt/harness',
-    'ENV PATH=/opt/node/bin:/usr/bin:/bin',
+    `ENV PATH=${IMAGE_PATH}`,
+    `RUN printf 'PATH=${IMAGE_PATH}\\nexport PATH\\n' > /etc/profile.d/00-pms-path.sh && chmod 0644 /etc/profile.d/00-pms-path.sh && printf 'PATH="${IMAGE_PATH}"\\n' > /etc/environment`,
     'ENTRYPOINT []',
     'CMD []',
   ].join('\n');

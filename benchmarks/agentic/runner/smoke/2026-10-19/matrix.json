@@ -1,0 +1,159 @@
+{
+  "schema": "pms-agentic-matrix/v1",
+  "kind": "provider-backed",
+  "purpose": "smoke",
+  "epoch": "alpha1",
+  "tasks": [
+    "discovery-positive-card-vocabulary",
+    "composition-positive-order-summary"
+  ],
+  "models": [
+    {
+      "key": "claude-haiku",
+      "cli": "claude",
+      "cliVersion": "2.1.303",
+      "cliSha256": "375988f457756524234695cf2d8f64ace99c5f68682e47ea24862a843c191450",
+      "model": "claude-haiku-5-5",
+      "reasoningEffort": null,
+      "toolPolicy": {
+        "web": false,
+        "subagents": false
+      }
+    },
+    {
+      "key": "claude-sonnet",
+      "cli": "claude",
+      "cliVersion": "2.1.303",
+      "cliSha256": "375988f457756524234695cf2d8f64ace99c5f68682e47ea24862a843c191450",
+      "model": "claude-sonnet-5-5",
+      "reasoningEffort": null,
+      "toolPolicy": {
+        "web": false,
+        "subagents": false
+      }
+    },
+    {
+      "key": "gpt-sol",
+      "cli": "codex",
+      "cliVersion": "0.163.0",
+      "cliSha256": "399ff69c431c066e40de318fba45c2b07f45a76b19939d247ee4828fc70c4215",
+      "model": "gpt-6.1-sol",
+      "reasoningEffort": null,
+      "toolPolicy": {
+        "web": false,
+        "subagents": false
+      }
+    }
+  ],
+  "repetitions": 1,
+  "maxAttempts": 2,
+  "productBuild": {
+    "digest": "4ecb0a02d0367ede6052449a1c920f52b42535a258d371667580cf8c196517f9",
+    "manifestSha256": "acdefef3d8b44d8e8a784464e2093be8c6f5fe3a7f88f4c249bd1762cbc52884"
+  },
+  "images": {
+    "agent": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+    "grader": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+    "proxy": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+    "baseDigest": "sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392"
+  },
+  "container": {
+    "cpus": 2,
+    "memoryBytes": 4294967296,
+    "pidsLimit": 1024,
+    "tmpfsBytes": 1073741824,
+    "workspaceBytesCap": 4294967296
+  },
+  "network": {
+    "mode": "per-attempt-internal-isolated-gateway",
+    "ipv6": false,
+    "allow": {
+      "claude": [
+        "api.anthropic.com:443"
+      ],
+      "codex": [
+        "chatgpt.com:443",
+        "auth.openai.com:443"
+      ]
+    }
+  },
+  "budgets": {},
+  "credentials": {
+    "claude": {
+      "mode": "access-only",
+      "fallback": "refresh-capable-copy",
+      "source": {
+        "configDir": "~/.claude-t3/team-2",
+        "account": "claude-team-2"
+      }
+    },
+    "codex": {
+      "mode": "refresh-capable-copy",
+      "source": {
+        "configDir": "~/.codex",
+        "account": "chatgpt"
+      }
+    }
+  },
+  "schedule": {
+    "order": "sequential",
+    "concurrencyPerProvider": 1,
+    "timeWindows": [],
+    "wallClockCapSeconds": 7200
+  },
+  "authorization": "orchestrator-go",
+  "matrixId": "smoke-20261019-r3",
+  "identity": {
+    "inputs": {
+      "closures": {
+        "discovery-positive-card-vocabulary": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "composition-positive-order-summary": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        }
+      },
+      "grading": {
+        "mode": "trusted",
+        "hostCommands": true,
+        "trusted": {
+          "digest": "8feb473da422f17b63d3bd3b4becbe120cfac3f259e50293725f47e16bca53b2",
+          "pandamstyleDigest": "935080b9616a6842d26ea3875d05e6f91a0e98ad4b71ad89d03355e2919bbfee"
+        }
+      }
+    },
+    "configDigest": "81e8b2b4c62a2a889212ba07e72d0cd0d6271d3513c2ade3518c60e88ccc9577",
+    "kind": "provider-backed",
+    "harness": {
+      "runnerTreeDigest": "2300641c5c72b992807b8327d9a37cb229e82bde76f14ee21c3b67c65119260e",
+      "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970",
+      "corpusLockSha256": "4698cbdea6288e5bf51de2aac1a32af08270e81e97084de3ddcec628ef00e05b"
+    },
+    "productBuild": "4ecb0a02d0367ede6052449a1c920f52b42535a258d371667580cf8c196517f9",
+    "dependencies": {
+      "nodeSha256": "9aa8e9d2298ab68c600bd6fb86a6c13bce11a4eca1ba9b39d79fa021755d7c37",
+      "packageManager": {
+        "name": "npm",
+        "version": "11.11.1",
+        "sha256": null
+      },
+      "fixtureClosureNonProductLockSha256": null
+    }
+  },
+  "identityDigest": "878af31d034209dc5e87488a7c9c7cad28e0bba79fee6e6309301027a6b61893",
+  "credentialSources": {
+    "claude": {
+      "configDir": "~/.claude-t3/team-2",
+      "file": ".credentials.json",
+      "account": "claude-team-2"
+    },
+    "codex": {
+      "configDir": "~/.codex",
+      "file": "auth.json",
+      "account": "chatgpt"
+    }
+  },
+  "startedAt": "2026-10-19T15:00:04.563Z"
+}

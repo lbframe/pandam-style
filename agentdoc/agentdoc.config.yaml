@@ -215,7 +215,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: .github/workflows/agentdoc.yml
-        sha256: 5d66173a3da41c5af4b035ed6ab8ed95693b0b93292fbf2d5c699b59314cab79
+        sha256: c7d0f2e00706333cc752517c0c138fd7a8c6362e870e4e9412a3cc14b41b880e
   - fact: requirement-satisfaction
     subject: component:pandamstyle/compiler
     key: requirement.product-vocabulary-authority
@@ -2631,7 +2631,7 @@ normativeCoverage:
     reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."
   - path: docs/agent-delivery-protocol.md
     section: publication
-    sha256: f05ccfa90492340b8401f6f3320af1a5d6634523e311f1ad03e66881f749f71a
+    sha256: 22a1d3a9fcd4eaad3e2aad9e3d0adf8063561f7f16f2c468de4602514815ea57
     disposition: no-implementation-obligation
     reason: "Contribution process requiring a local leak scan before pushing private- or sealed-derived data; existing guards are cited as examples, not new product guarantees."
     reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."

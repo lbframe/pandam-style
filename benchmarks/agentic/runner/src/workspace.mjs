@@ -25,6 +25,10 @@ function excludeMatcher(globs) {
     m.match(rel) != null || (isDir && m.match(`${rel}/`) != null);
 }
 
+function sha256Text(text) {
+  return crypto.createHash('sha256').update(text).digest('hex');
+}
+
 function withRoot(root, fn) {
   const fd = safe.openRoot(root);
   try {
@@ -132,47 +136,247 @@ export function sampleWorkspace(
   return out;
 }
 
+// Install metadata written by package managers beside the packages
+// (section 4.5): an install changes them, a build does not.
+const INSTALL_METADATA = new Set([
+  '.package-lock.json',
+  '.yarn-integrity',
+  '.yarn-state.yml',
+  '.modules.yaml',
+]);
+const ROOT_LOCKFILES = [
+  'package-lock.json',
+  'npm-shrinkwrap.json',
+  'yarn.lock',
+  'pnpm-lock.yaml',
+];
+
 /**
- * State of `node_modules` for local-install detection (section 4.5): null
- * when absent, `symlink:<target>` when the root is a link (never followed),
- * otherwise the confined tree digest. A failed walk is `unreadable:<code>`,
- * which differs from any digest, so it is detected as a change.
+ * Role of a path beneath `node_modules` in the package layout: the packages
+ * (`<name>`, `@<scope>/<name>`, nested `node_modules` at any depth inside a
+ * package), `.bin` links and install metadata. Any other dot-entry of a
+ * `node_modules` or scope directory cannot be a package (npm package names
+ * never start with a dot), so tool caches (`.vite`, `.vite-temp`, `.cache`,
+ * ...) are outside the install identity by construction.
  */
-export function nodeModulesState(root, { maxEntries = 500000 } = {}) {
+export function installRole(rel) {
+  const parts = rel.split('/');
+  let i = 0;
+  let prefix = '';
+  for (;;) {
+    const head = parts[i];
+    if (head === '.bin')
+      return parts.length === i + 1
+        ? { role: 'bin-dir' }
+        : { role: 'bin', key: parts.slice(0, i + 2).join('/') };
+    if (head.startsWith('.'))
+      return prefix === '' && parts.length === 1 && INSTALL_METADATA.has(head)
+        ? { role: 'metadata', key: head }
+        : { role: 'ignored' };
+    let rootLen = 1;
+    if (head.startsWith('@')) {
+      if (parts.length === i + 1) return { role: 'scope' };
+      if (parts[i + 1].startsWith('.')) return { role: 'ignored' };
+      rootLen = 2;
+    }
+    const pkg = parts.slice(0, i + rootLen).join('/');
+    const inner = parts.slice(i + rootLen);
+    const nested = inner.indexOf('node_modules');
+    if (nested === -1)
+      return inner.length === 0
+        ? { role: 'package', key: pkg }
+        : { role: 'content', key: pkg, path: inner.join('/') };
+    if (nested === inner.length - 1)
+      return { role: 'nested-dir', key: pkg, path: inner.join('/') };
+    i += rootLen + nested + 1;
+    prefix = parts.slice(0, i).join('/');
+  }
+}
+
+function stableJson(value) {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+  if (value != null && typeof value === 'object')
+    return `{${Object.keys(value)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${stableJson(value[k])}`)
+      .join(',')}}`;
+  return JSON.stringify(value);
+}
+
+function rootFileState(fd, name) {
+  let st;
+  try {
+    st = fs.lstatSync(safe.at(fd, name));
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
+  if (st.isSymbolicLink())
+    return `symlink:${fs.readlinkSync(safe.at(fd, name))}`;
+  if (!st.isFile()) return `special:${st.mode.toString(8)}`;
+  return crypto
+    .createHash('sha256')
+    .update(safe.readFile(fd, name))
+    .digest('hex');
+}
+
+/**
+ * Install identity of the workspace for local-install detection (section
+ * 4.5): what an install changes, never what a build writes. Packages with
+ * their name, version, lockfile integrity and a digest of their files (a
+ * hand-copied or modified package changes it), `.bin` links, the install
+ * metadata in `node_modules` and the workspace lockfiles. Taken without
+ * following links: a linked `node_modules` or package is recorded by its
+ * target. A failed walk is `unreadable:<code>`, which differs from any
+ * digest, so it is detected as a change.
+ */
+export function installState(root, { maxEntries = 500000 } = {}) {
   return withRoot(root, (fd) => {
+    const lockfiles = {};
+    for (const name of ROOT_LOCKFILES) {
+      const v = rootFileState(fd, name);
+      if (v != null) lockfiles[name] = v;
+    }
+    // An absent node_modules and one holding no package (only caches) are
+    // the same install.
+    const state = {
+      nodeModules: 'dir',
+      packages: {},
+      bins: {},
+      metadata: {},
+      lockfiles,
+    };
+    const done = () => ({ ...state, digest: sha256Text(stableJson(state)) });
     let st;
     try {
       st = fs.lstatSync(safe.at(fd, 'node_modules'));
     } catch (error) {
-      if (error.code === 'ENOENT') return null;
+      if (error.code === 'ENOENT') return done();
       throw error;
     }
-    if (st.isSymbolicLink())
-      return `symlink:${fs.readlinkSync(safe.at(fd, 'node_modules'))}`;
-    if (!st.isDirectory()) return `special:${st.mode.toString(8)}`;
+    if (st.isSymbolicLink()) {
+      state.nodeModules = `symlink:${fs.readlinkSync(safe.at(fd, 'node_modules'))}`;
+      return done();
+    }
+    if (!st.isDirectory()) {
+      state.nodeModules = `special:${st.mode.toString(8)}`;
+      return done();
+    }
+    state.nodeModules = 'dir';
+    const hashes = new Map();
+    const pkgOf = (key) => {
+      state.packages[key] ??= {
+        kind: 'dir',
+        name: null,
+        version: null,
+        integrity: null,
+      };
+      return state.packages[key];
+    };
     try {
       const nm = safe.openDir(fd, 'node_modules');
       try {
-        const hash = crypto.createHash('sha256');
         safe.walk(
           nm,
           (rel, e) => {
-            if (e.type === 'file')
-              hash.update(
-                `${rel}\0file\0${safe.hashFd(e.fd, { maxBytes: e.size })}\n`,
-              );
-            else hash.update(`${rel}\0${e.type}\0${e.target ?? ''}\n`);
+            const r = installRole(rel);
+            const fileHash = () => safe.hashFd(e.fd, { maxBytes: e.size });
+            const entry = () =>
+              e.type === 'file'
+                ? `file:${fileHash()}`
+                : e.type === 'symlink'
+                  ? `symlink:${e.target}`
+                  : e.type;
+            if (r.role === 'bin') state.bins[r.key] = entry();
+            else if (r.role === 'metadata') {
+              if (e.type !== 'file') state.metadata[r.key] = entry();
+              else {
+                const bytes = safe.readFile(nm, rel);
+                state.metadata[r.key] = crypto
+                  .createHash('sha256')
+                  .update(bytes)
+                  .digest('hex');
+                if (r.key === '.package-lock.json') state.lock = bytes;
+              }
+            } else if (r.role === 'package') {
+              const p = pkgOf(r.key);
+              if (e.type === 'symlink')
+                Object.assign(p, { kind: 'symlink', target: e.target });
+              else if (e.type !== 'dir')
+                Object.assign(p, { kind: e.type, target: entry() });
+            } else if (r.role === 'content') {
+              if (!hashes.has(r.key))
+                hashes.set(r.key, crypto.createHash('sha256'));
+              const value = entry();
+              hashes.get(r.key).update(`${r.path}\0${value}\n`);
+              if (r.path === 'package.json' && e.type === 'file') {
+                try {
+                  const pj = JSON.parse(
+                    safe
+                      .readFile(nm, rel, { maxBytes: 1 << 20 })
+                      .toString('utf8'),
+                  );
+                  Object.assign(pkgOf(r.key), {
+                    name: typeof pj.name === 'string' ? pj.name : null,
+                    version: typeof pj.version === 'string' ? pj.version : null,
+                  });
+                } catch {
+                  // Unparseable: still covered by the content digest.
+                }
+              }
+            }
           },
-          { maxEntries },
+          {
+            maxEntries,
+            exclude: (rel) => installRole(rel).role === 'ignored',
+          },
         );
-        return hash.digest('hex');
       } finally {
         fs.closeSync(nm);
       }
     } catch (error) {
-      return `unreadable:${error.code ?? 'error'}`;
+      const code = `unreadable:${error.code ?? 'error'}`;
+      return { nodeModules: code, digest: code };
     }
+    for (const [key, h] of hashes) pkgOf(key).contentSha256 = h.digest('hex');
+    if (state.lock) {
+      let entries = {};
+      try {
+        entries = JSON.parse(state.lock.toString('utf8')).packages ?? {};
+      } catch {
+        // Unparseable: covered by the metadata digest.
+      }
+      for (const [key, p] of Object.entries(state.packages))
+        p.integrity = entries[`node_modules/${key}`]?.integrity ?? null;
+      delete state.lock;
+    }
+    return done();
   });
+}
+
+/** What changed between two install identities, for the breach detail. */
+export function describeInstallChange(before, after) {
+  if (before?.digest === after?.digest) return null;
+  if (before?.packages == null || after?.packages == null)
+    return `node_modules ${before?.nodeModules ?? 'absent'} -> ${after?.nodeModules ?? 'absent'}`;
+  const label = (k, p) => `${p.name ?? k}${p.version ? `@${p.version}` : ''}`;
+  const out = [];
+  if (before.nodeModules !== after.nodeModules)
+    out.push(`node_modules ${before.nodeModules} -> ${after.nodeModules}`);
+  for (const k of Object.keys(after.packages).sort())
+    if (!(k in before.packages)) out.push(`+${label(k, after.packages[k])}`);
+    else if (stableJson(before.packages[k]) !== stableJson(after.packages[k]))
+      out.push(`~${label(k, after.packages[k])}`);
+  for (const k of Object.keys(before.packages).sort())
+    if (!(k in after.packages)) out.push(`-${label(k, before.packages[k])}`);
+  for (const field of ['bins', 'metadata', 'lockfiles'])
+    for (const k of new Set([
+      ...Object.keys(before[field]),
+      ...Object.keys(after[field]),
+    ]))
+      if (before[field][k] !== after[field][k])
+        out.push(`${field === 'lockfiles' ? '' : `${field}:`}${k}`);
+  return `installed packages changed: ${out.join(', ')}`.slice(0, 300);
 }
 
 /**

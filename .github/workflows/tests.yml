@@ -12,20 +12,26 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # One install for every static check (4 CI runner slots in total). Each check
+  # One install for every static check (one dedicated runner). Each check
   # still runs and reports when an earlier one fails.
   static:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, lbframe-ci, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    # Fork PRs never run on the self-hosted runner (this repository is public).
+    if: >-
+      github.event_name != 'pull_request' ||
+      (!github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: '22.x'
-          cache: 'yarn'
-          cache-dependency-path: yarn.lock
-      - run: corepack prepare yarn@1.22.22 --activate
+      # Self-hosted runners have no global yarn; corepack provides the pinned one.
+      # Yarn 1 cache is unsafe for concurrent installs: one cache per runner slot.
+      - run: |
+          corepack enable && corepack prepare yarn@1.22.22 --activate
+          echo "YARN_CACHE_FOLDER=$RUNNER_TOOL_CACHE/yarn-cache" >> "$GITHUB_ENV"
       - run: yarn install --frozen-lockfile
       - name: flow
         if: ${{ !cancelled() }}
@@ -45,11 +51,15 @@ jobs:
           config: .github/workflows/typos.toml
 
   pandamstyle:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, lbframe-ci, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    # Fork PRs never run on the self-hosted runner (this repository is public).
+    if: >-
+      github.event_name != 'pull_request' ||
+      (!github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     env:
-      # On this runner, `chromium` aborts creating its sandbox under the
+      # On Ubuntu runners, `chromium` aborts creating its sandbox under the
       # AppArmor user-namespace restriction; its Google Chrome runs the same
       # sandboxed launches.
       PMS_CHROMIUM: /opt/google/chrome/chrome
@@ -64,9 +74,11 @@ jobs:
           # The package and Next qualifications assert this exact host
           # runtime beside their pinned 22.12.0 and 24.21.0 consumer lanes.
           node-version: '22.22.0'
-          cache: 'yarn'
-          cache-dependency-path: yarn.lock
-      - run: corepack prepare yarn@1.22.22 --activate
+      # Self-hosted runners have no global yarn; corepack provides the pinned one.
+      # Yarn 1 cache is unsafe for concurrent installs: one cache per runner slot.
+      - run: |
+          corepack enable && corepack prepare yarn@1.22.22 --activate
+          echo "YARN_CACHE_FOLDER=$RUNNER_TOOL_CACHE/yarn-cache" >> "$GITHUB_ENV"
       - run: ./verify-pms.sh
       # CE-01.1: the bundled compat data, the frozen default profile and the
       # built-in profile resolutions are generated; each must re-derive byte
@@ -79,21 +91,32 @@ jobs:
       # devDependency) plugins forwarding `targets`, the Next semantic-dev
       # suites and the source-map type check.
       - run: node tools/pms/verify-dx-runtime.mjs
+      # Step logs stay on the self-hosted host; keep them when a step fails.
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: verify-pms-evidence
+          path: evidence/native/*.log
+          retention-days: 7
 
   agentic-corpus:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, lbframe-ci, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    # Fork PRs never run on the self-hosted runner (this repository is public).
+    if: >-
+      github.event_name != 'pull_request' ||
+      (!github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: '22.x'
-          cache: 'yarn'
-          cache-dependency-path: |
-            yarn.lock
-            benchmarks/agentic/dom/yarn.lock
-      - run: corepack prepare yarn@1.22.22 --activate
+      # Self-hosted runners have no global yarn; corepack provides the pinned one.
+      # Yarn 1 cache is unsafe for concurrent installs: one cache per runner slot.
+      - run: |
+          corepack enable && corepack prepare yarn@1.22.22 --activate
+          echo "YARN_CACHE_FOLDER=$RUNNER_TOOL_CACHE/yarn-cache" >> "$GITHUB_ENV"
       - run: yarn install --frozen-lockfile
       - run: yarn bench:agentic:install
       - run: yarn build

@@ -1,0 +1,16 @@
+{
+  "description": "Smoke-run behavior (#98): the agent rebuilds correctly, then deletes the generation state file as clutter. The fixtures gitignore it, so git status no longer lists it; generated integrity still fails.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "generated-untouched": "fail",
+    "summary-card": "pass"
+  },
+  "steps": [
+    {
+      "step": "delete",
+      "path": "..pandamstyle.pms-state.json"
+    }
+  ],
+  "regenerate": "before-steps"
+}

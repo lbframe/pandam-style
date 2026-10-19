@@ -1,0 +1,9 @@
+{
+  "description": "Review probe (#98): React DOM's preinit inserts a style sheet <link> into the head; no static rule names it, the sandbox does.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-card": "fail"
+  }
+}
