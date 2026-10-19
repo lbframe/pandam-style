@@ -50,7 +50,7 @@ import {
 import * as safe from '../src/safefs.mjs';
 import {
   applyEventSafe,
-  nodeModulesState,
+  installState,
   sampleWorkspace,
   stageWorkspace,
 } from '../src/workspace.mjs';
@@ -230,10 +230,14 @@ test('B1 root links: node_modules and the workspace root are never followed', ()
   const s = sentinel();
   const ws = tmpDir('rootlink');
   fs.symlinkSync(s.dir, path.join(ws, 'node_modules'));
-  const state = nodeModulesState(ws);
-  assert.equal(state, `symlink:${s.dir}`);
+  const state = installState(ws);
+  assert.equal(state.nodeModules, `symlink:${s.dir}`);
   fs.appendFileSync(s.file, 'more');
-  assert.equal(nodeModulesState(ws), state, 'outside contents never hashed');
+  assert.equal(
+    installState(ws).digest,
+    state.digest,
+    'outside contents never hashed',
+  );
   const linkRoot = path.join(tmpDir('lr'), 'ws');
   fs.symlinkSync(s.dir, linkRoot);
   assert.throws(
