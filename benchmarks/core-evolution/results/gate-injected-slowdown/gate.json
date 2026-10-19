@@ -1,0 +1,3294 @@
+{
+  "kind": "pandamstyle-ce003-gate",
+  "budgets": {
+    "policyVersion": 1
+  },
+  "reference": "alpha1",
+  "candidate": "injected-slowdown",
+  "verdict": "fail",
+  "problems": [],
+  "refusals": [],
+  "reconciliation": {
+    "errors": 0,
+    "first": []
+  },
+  "candidateIdentity": {
+    "name": "injected-slowdown",
+    "packageLockSha256": "b2b51766289a359a2fe8d9b68a8716b3283b44c9026e93a6d3b4e69088f1439d",
+    "installedPandamstyle": "43d170bd5e77ff599031975ccd809e8cca78b8b7cc08cf4cbae05716def845fd",
+    "packages": {
+      "@pandamstyle/compiler": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/compiler/-/compiler-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-BpCHIVMCHcnVsuolKjGWdXEqDNbCpRz6Hw+FNFzmvEKJDGi/iwneraMn1KXVZ+BbaVNhyJSY3uiMNnUuQY5NUQ=="
+      },
+      "@pandamstyle/core": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/core/-/core-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-JV3VOGTKawvg5zRDbOpEugVZ+968xfV/0Quge4dax7OCgq9qZ51p9zkvICFKLBgUd8hzDjn8G027Mqm5NY3LqA=="
+      },
+      "@pandamstyle/next": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/next/-/next-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-CIzeCG/cX5Fr22REgGPT6MxMhlo+ozgKi/OqCdRnh9/VGu5tl1V2GLJItZ+R1TWURGepRRn++fsfWsXrgdKS9A=="
+      },
+      "@pandamstyle/rsbuild": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/rsbuild/-/rsbuild-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-MKKkfv5/sHeUz90ZOqo0PIx2BzpTtEurMMXOXllll3ZjTkpZA5Rl33BMAnDOasE1x3xXbYwK1ikcNKeWwdSd3A=="
+      },
+      "@pandamstyle/vite": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/vite/-/vite-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-ePIW24QMWjkMoAHCiFBzBGck7dr5TCpLSuWWZR6FfFMeyxgMMF3bUy7jLXjeJqfw9vjZav/IkXQ+JYKjmutkFQ=="
+      }
+    }
+  },
+  "counts": {
+    "pass": 52,
+    "fail": 28,
+    "inconclusive": 1,
+    "notRun": 29,
+    "unknown": 10
+  },
+  "load": [
+    {
+      "label": "gate-injected-slowdown",
+      "before": {
+        "at": "2026-10-19T00:03:15.334Z",
+        "loadavg": [
+          1.36,
+          1.83,
+          2.18
+        ],
+        "windowMs": 5000,
+        "cpuUtilisation": 0.032,
+        "busyCores": 0.51,
+        "foreignBusyProcesses": 2,
+        "foreignBusyCores": 1.5,
+        "foreignHeavyCores": 0
+      },
+      "after": {
+        "at": "2026-10-19T00:20:03.300Z",
+        "loadavg": [
+          1.74,
+          1.86,
+          1.98
+        ],
+        "windowMs": 5000,
+        "cpuUtilisation": 0.005,
+        "busyCores": 0.07,
+        "foreignBusyProcesses": 0,
+        "foreignBusyCores": 0,
+        "foreignHeavyCores": 0
+      },
+      "batch": {
+        "maxLoadavg1": 2.88,
+        "maxSampleCpuUtilisation": 0.171,
+        "meanSampleCpuUtilisation": 0.1
+      }
+    }
+  ],
+  "results": [
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.buildMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.2,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.maxRssBytes",
+      "class": "memory",
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 323449036,
+        "factor": 1.15
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.cssBytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 2155,
+        "growth": 0.05
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.jsBytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 236211,
+        "growth": 0.05
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3125,
+        "lower": 1.3051,
+        "upper": 1.3245,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0062,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3139,
+        "lower": 1.3055,
+        "upper": 1.3236,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0061,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.0077,
+        "lower": 1.0005,
+        "upper": 1.0169,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0103,
+      "status": "pass"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.1301,
+        "lower": 1.1198,
+        "upper": 1.1413,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0164,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 136452096,
+        "factor": 1.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 122472448
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 167991296,
+        "factor": 1.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 151963648
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 2789,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 2657
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 1075,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 1024
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 33,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 32
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 1,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 1
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 69,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 66
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 18975,
+        "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 17250
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 26600,
+        "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 24182
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 10056,
+        "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 9142
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 46,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 44
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 4,
+        "growth": 0
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 4
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "limit": {
+        "equals": "true"
+      },
+      "observations": {
+        "candidate": {
+          "planned": 1,
+          "ok": 1,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 1,
+          "ok": 1,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 1,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": "true"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 15,
+        "median": 0.9981,
+        "lower": 0.9939,
+        "upper": 1.0043,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.012,
+      "status": "pass"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "class": "runtime",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0094,
+        "lower": 0.9961,
+        "upper": 1.0185,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0107,
+      "status": "pass"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.renderNsPerCall",
+      "class": "runtime",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0009,
+        "lower": 0.996,
+        "upper": 1.0203,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0101,
+      "status": "pass"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0075,
+        "lower": 0.9993,
+        "upper": 1.0178,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0085,
+      "status": "pass"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2853,
+        "lower": 1.2724,
+        "upper": 1.2954,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0119,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3067,
+        "lower": 1.2905,
+        "upper": 1.3246,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0211,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.2,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2937,
+        "lower": 1.2834,
+        "upper": 1.3061,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0198,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.25,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2917,
+        "lower": 1.265,
+        "upper": 1.3133,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0317,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2801,
+        "lower": 1.2631,
+        "upper": 1.2943,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0119,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2536,
+        "lower": 1.2366,
+        "upper": 1.2791,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0176,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2991,
+        "lower": 1.2777,
+        "upper": 1.3089,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0178,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2992,
+        "lower": 1.2672,
+        "upper": 1.3089,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0384,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2895,
+        "lower": 1.2761,
+        "upper": 1.3014,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0328,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2929,
+        "lower": 1.2809,
+        "upper": 1.2989,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0336,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.0098,
+        "lower": 1.0007,
+        "upper": 1.0128,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0094,
+      "status": "pass"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.091,
+        "lower": 1.084,
+        "upper": 1.1045,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0288,
+      "status": "inconclusive",
+      "reason": "interval straddles the limit"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 138301644,
+        "factor": 1.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 127035392
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 154771865,
+        "factor": 1.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 138878976
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 15342,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 14612
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 3917,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 3731
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 216,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 206
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 0,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 0
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 330,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 315
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 19554,
+        "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 17777
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 38940,
+        "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 35400
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 28255,
+        "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 25687
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 449,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 428
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 0,
+        "growth": 0
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 0
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "limit": {
+        "equals": "true"
+      },
+      "observations": {
+        "candidate": {
+          "planned": 1,
+          "ok": 1,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 1,
+          "ok": 1,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 1,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": "true"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0044,
+        "lower": 1.0016,
+        "upper": 1.0104,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0052,
+      "status": "pass"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0012,
+        "lower": 0.9975,
+        "upper": 1.011,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0142,
+      "status": "pass"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2666,
+        "lower": 1.2489,
+        "upper": 1.2874,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0212,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3141,
+        "lower": 1.2676,
+        "upper": 1.3253,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0604,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3118,
+        "lower": 1.3064,
+        "upper": 1.3154,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0067,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2886,
+        "lower": 1.2799,
+        "upper": 1.3023,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0275,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.2969,
+        "lower": 1.2856,
+        "upper": 1.3153,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0248,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.303,
+        "lower": 1.2928,
+        "upper": 1.32,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0158,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.0046,
+        "lower": 1.0005,
+        "upper": 1.0175,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0089,
+      "status": "pass"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.2,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.1905,
+        "lower": 1.1759,
+        "upper": 1.2097,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0164,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 332010905,
+        "factor": 1.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 305690624
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 389225267,
+        "factor": 1.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 356483072
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 49347,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 46998
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 9497,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 9045
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 727,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 693
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 49,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 47
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 948,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 903
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 112552,
+        "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 102320
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 90555,
+        "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 82323
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 2309061,
+        "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 2099147
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 17594,
+        "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 16757
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 176,
+        "growth": 0
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": 176
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "limit": {
+        "equals": "true"
+      },
+      "observations": {
+        "candidate": {
+          "planned": 1,
+          "ok": 1,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 1,
+          "ok": 1,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 1,
+        "nonAdjacent": 0
+      },
+      "status": "pass",
+      "value": "true"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 12,
+          "ok": 12,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 12,
+          "ok": 12,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 12,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 12,
+        "median": 1.0007,
+        "lower": 0.9923,
+        "upper": 1.0045,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.02,
+      "status": "pass"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "class": "runtime",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 12,
+          "ok": 12,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 12,
+          "ok": 12,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 12,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 12,
+        "median": 0.9935,
+        "lower": 0.9808,
+        "upper": 1.0028,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.021,
+      "status": "pass"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.renderNsPerCall",
+      "class": "runtime",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 12,
+          "ok": 12,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 12,
+          "ok": 12,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 12,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 12,
+        "median": 1.0033,
+        "lower": 0.9772,
+        "upper": 1.0229,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0212,
+      "status": "pass"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 12,
+          "ok": 12,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 12,
+          "ok": 12,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 12,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 12,
+        "median": 1.0154,
+        "lower": 1.0026,
+        "upper": 1.0305,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0078,
+      "status": "pass"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.2854,
+        "lower": 1.2546,
+        "upper": 1.3007,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0334,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.2151,
+        "lower": 1.1544,
+        "upper": 1.28,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0922,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.3035,
+        "lower": 1.2998,
+        "upper": 1.3331,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0104,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.3092,
+        "lower": 1.2993,
+        "upper": 1.3353,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.015,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.3018,
+        "lower": 1.2907,
+        "upper": 1.3159,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0192,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.2998,
+        "lower": 1.2879,
+        "upper": 1.3157,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0213,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.3036,
+        "lower": 1.2857,
+        "upper": 1.3177,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0057,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.45,
+        "minPairs": 5
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "failed": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.287,
+        "lower": 1.2333,
+        "upper": 1.313,
+        "rounds": 2000,
+        "seed": 307
+      },
+      "controlSpread": 0.0296,
+      "status": "fail",
+      "reason": "median paired ratio exceeds the limit"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 2.3,
+        "noiseCeiling": 2.2,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 2.15,
+        "noiseCeiling": 1.9,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 238568,
+        "growth": 0.05
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 46321,
+        "growth": 0.05
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 3479,
+        "growth": 0.05
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 252,
+        "growth": 0.05
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 4580,
+        "growth": 0.05
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 512150,
+        "growth": 0.1
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 384935,
+        "growth": 0.1
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 23272749,
+        "growth": 0.1
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 175711,
+        "growth": 0.05
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "limit": {
+        "maxValue": 895,
+        "growth": 0
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "limit": {
+        "equals": "true"
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.2,
+        "noiseCeiling": 0.2,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.2,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.2,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.1,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      },
+      "status": "not-run"
+    }
+  ],
+  "unknown": [
+    {
+      "id": "host.next.build-and-dev",
+      "scope": "Next.js 16.3.8 webpack and Turbopack build/dev time, memory and output bytes",
+      "reason": "Hosts are pinned and installable in the alpha1 closure, but CE-00.3 measured no Next workload; no baseline exists.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)",
+      "status": "unknown"
+    },
+    {
+      "id": "host.rsbuild.build-and-dev",
+      "scope": "Rsbuild 2.2.11 / Rspack 2.2.8 build/dev time, memory and output bytes",
+      "reason": "Pinned and installable, not measured in CE-00.3.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)",
+      "status": "unknown"
+    },
+    {
+      "id": "host.vite.dev-and-hmr",
+      "scope": "Vite dev server start, HMR and browser-visible update latency",
+      "reason": "Only the Vite production build of the pilot is measured; no dev-server or browser-visible latency harness ran.",
+      "owner": "CE-12.3 (#76), CE-13.1 (#78)",
+      "status": "unknown"
+    },
+    {
+      "id": "compiler.watcher-latency",
+      "scope": "Filesystem edit to diagnostics through ProjectSession.watch()",
+      "reason": "Incremental cost is measured from an explicit verified-explicit transaction; watcher debounce and filesystem notification latency are excluded.",
+      "owner": "CE-12.3 (#76)",
+      "status": "unknown"
+    },
+    {
+      "id": "browser.style-cost",
+      "scope": "Browser CSS parse, style recalculation, layout and paint cost of emitted CSS",
+      "reason": "No browser performance trace was taken; runtime selection is measured in Node only.",
+      "owner": "CE-12.3 (#76), CE-14 (#82-#84)",
+      "status": "unknown"
+    },
+    {
+      "id": "runtime.non-v8",
+      "scope": "Runtime selection cost in browsers and engines other than Node 22.22.0 V8",
+      "reason": "Measured in Node only.",
+      "owner": "CE-12.3 (#76)",
+      "status": "unknown"
+    },
+    {
+      "id": "output.new-resource-kinds",
+      "scope": "CSS/module bytes of capabilities absent in Alpha 1 (keyframes, fonts, assets, globals, typed resources, new conditions)",
+      "reason": "Alpha 1 cannot express them, so no comparable baseline exists; each must be baselined by its owning lot under a new policy version before its budget can exist.",
+      "owner": "Owning capability lots (CE-03 to CE-11), CE-12.2 (#75)",
+      "status": "unknown"
+    },
+    {
+      "id": "compiler.invalidation-counters",
+      "scope": "Rebuild, fallback and dependency-invalidation counts per incremental edit",
+      "reason": "Not exposed by the public compiler API; reading the internal perf collector would instrument the measured package.",
+      "owner": "CE-12.3 (#76)",
+      "status": "unknown"
+    },
+    {
+      "id": "runtime.c10000",
+      "scope": "Runtime selection cost and compile-to-canonical consistency at 10,000 components",
+      "reason": "The c10000 workload is measured for compile, incremental, memory and output only; runtime replay ran at c1000 and below.",
+      "owner": "CE-12.3 (#76)",
+      "status": "unknown"
+    },
+    {
+      "id": "cold-install",
+      "scope": "Package install time, cold disk cache and first-run cost",
+      "reason": "Samples run with a warm operating-system file cache and a preinstalled closure.",
+      "owner": "CE-15.1 (#77)",
+      "status": "unknown"
+    }
+  ],
+  "provenance": {
+    "rev": "HEAD",
+    "commit": "5ff24c5a65c4a20b3d3f1c3fc3fde0327498d6ad",
+    "mode": "release",
+    "budgets": "benchmarks/core-evolution/budgets.v1.json",
+    "problems": []
+  }
+}
