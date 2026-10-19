@@ -37,12 +37,18 @@ function killLocalGroup(pgid) {
   } catch {
     // Already gone.
   }
-  try {
-    process.kill(-pgid, 0);
-    return false;
-  } catch (error) {
-    return error.code === 'ESRCH';
+  // Killed members stay visible until reaped: wait (bounded) for the group
+  // to be gone, as the local executor's own cleanup does.
+  const pause = new Int32Array(new SharedArrayBuffer(4));
+  for (let i = 0; i < 40; i += 1) {
+    try {
+      process.kill(-pgid, 0);
+    } catch (error) {
+      if (error.code === 'ESRCH') return true;
+    }
+    Atomics.wait(pause, 0, 0, 50);
   }
+  return false;
 }
 
 function recoverOne(state, { docker, stateDir }) {

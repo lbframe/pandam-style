@@ -550,18 +550,48 @@ export class DockerExecutor {
 }
 
 /** Removes containers and a network, then lists what still exists. */
+function escapeRe(x) {
+  return String(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * State of one Docker object from an inspection: `present`, `absent` only on
+ * the daemon's definitive answer naming that object ("No such container:
+ * <name>", "network <name> not found", "No such object: <name>"), otherwise
+ * `unknown` (daemon unreachable, timeout, any other error).
+ */
+export function inspectState(kind, name, run = docker) {
+  const r = run([kind, 'inspect', name]);
+  if (r.status === 0) return 'present';
+  const err = `${r.stderr ?? ''}${r.stdout ?? ''}`;
+  const n = escapeRe(name);
+  const absent =
+    kind === 'container'
+      ? new RegExp(`No such (container|object): ${n}(\\s|$)`)
+      : new RegExp(
+          `(network ${n} not found|No such (network|object): ${n}(\\s|$))`,
+        );
+  return absent.test(err) ? 'absent' : 'unknown';
+}
+
+/**
+ * Removes containers and a network, then lists what is not provably gone:
+ * an object still present, or one whose absence the daemon did not confirm
+ * (`<name> (unknown)`). Callers treat any entry as an unverified cleanup.
+ */
 export function removeVerified(resources, run = docker) {
   const containers = [resources.container, resources.proxy].filter(Boolean);
   if (containers.length > 0) run(['rm', '-f', ...containers]);
   if (resources.network) run(['network', 'rm', resources.network]);
-  const remaining = containers.filter(
-    (c) => run(['container', 'inspect', c]).status === 0,
-  );
-  if (
-    resources.network &&
-    run(['network', 'inspect', resources.network]).status === 0
-  )
-    remaining.push(resources.network);
+  const remaining = [];
+  for (const [kind, name] of [
+    ...containers.map((c) => ['container', c]),
+    ...(resources.network ? [['network', resources.network]] : []),
+  ]) {
+    const state = inspectState(kind, name, run);
+    if (state === 'present') remaining.push(name);
+    else if (state === 'unknown') remaining.push(`${name} (unknown)`);
+  }
   return remaining;
 }
 

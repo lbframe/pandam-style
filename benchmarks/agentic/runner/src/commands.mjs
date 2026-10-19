@@ -18,7 +18,7 @@ import { STREAM_METHOD, estimate, unknown } from './measured.mjs';
 const METHOD = `${STREAM_METHOD}+transcript-heuristic/v1`;
 const UNATTESTED = { integrity: 'cli-unattested' };
 
-export const COMMAND_TABLE_VERSION = 'command-classes/v3';
+export const COMMAND_TABLE_VERSION = 'command-classes/v4';
 
 // Shell operators, substitutions and redirections make a command opaque.
 const SHELL_SYNTAX = /[;&|<>`$(){}\n\\]/;
@@ -121,9 +121,9 @@ const VERIFY = [
 /**
  * Splits a simple command line into words as a POSIX shell would, or returns
  * null when it is not simple: shell syntax, escapes, a quote adjacent to
- * other characters (the shell would join them), or an unquoted word starting
- * with a glob character (its expansion can inject options from
- * agent-controlled file names).
+ * other characters (the shell would join them), or an unquoted glob, brace
+ * or tilde character anywhere in a word (its expansion can inject options
+ * or paths from agent-controlled file names).
  */
 export function simpleWords(command) {
   const text = String(command ?? '').trim();
@@ -146,7 +146,11 @@ export function simpleWords(command) {
       let j = i;
       while (j < text.length && !/\s/.test(text[j])) j += 1;
       const w = text.slice(i, j);
-      if (/['"]/.test(w) || /^[*?[~]/.test(w)) return null;
+      // Any unquoted expansion character anywhere in a word (glob `*`, `?`,
+      // `[…]`, brace `{…}`, tilde `~`): the shell turns it into words the
+      // transcript does not show, e.g. `-fpri*` matching an agent-created
+      // file named `-fprintf` becomes a writing option.
+      if (/['"]/.test(w) || /[*?[\]{}~]/.test(w)) return null;
       words.push(w);
       i = j;
     }

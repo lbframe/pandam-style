@@ -693,6 +693,12 @@ test('B3 recovery re-checks the policy before writing back', () => {
 
 // ---------------------------------------------------------------- B4
 
+// The daemon's definitive answers for an absent object (observed, 29.2.1).
+const absentMessage = (kind, name) =>
+  kind === 'network'
+    ? `Error response from daemon: network ${name} not found`
+    : `Error response from daemon: No such container: ${name}`;
+
 function dockerStub({ survivors = [] } = {}) {
   const calls = [];
   const removed = new Set();
@@ -710,7 +716,9 @@ function dockerStub({ survivors = [] } = {}) {
       (args[0] === 'container' || args[0] === 'network') &&
       args[1] === 'inspect'
     )
-      return { status: removed.has(args[2]) ? 1 : 0, stdout: '', stderr: '' };
+      return removed.has(args[2])
+        ? { status: 1, stdout: '', stderr: absentMessage(args[0], args[2]) }
+        : { status: 0, stdout: '', stderr: '' };
     if (args[0] === 'ps' || (args[0] === 'network' && args[1] === 'ls'))
       return { status: 0, stdout: '', stderr: '' };
     return { status: 0, stdout: '', stderr: '' };
@@ -844,6 +852,21 @@ test('B4 the local executor registers its process group before use and recovery 
     { encoding: 'utf8' },
   );
   const pid = Number(child.stdout.trim());
+  // `echo $!` can run before the child's setsid(): wait until its own
+  // process group exists (as the executor's does before spawn returns),
+  // otherwise a group kill finds nothing and the process survives.
+  const pgrpOf = () => {
+    try {
+      const stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
+      return Number(stat.slice(stat.lastIndexOf(')') + 2).split(' ')[2]);
+    } catch {
+      return null;
+    }
+  };
+  const pause = new Int32Array(new SharedArrayBuffer(4));
+  for (let i = 0; i < 200 && pgrpOf() !== pid; i += 1)
+    Atomics.wait(pause, 0, 0, 25);
+  assert.equal(pgrpOf(), pid, 'the sleep leads its own process group');
   const dir = path.join(runs, 'm/.private/a');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(

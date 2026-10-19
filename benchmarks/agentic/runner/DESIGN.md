@@ -337,7 +337,7 @@ unknown.
 The harness knows a command's text and status, not its effects, and shell
 commands can write files, chain checks or mask failures. So:
 
-- **Command classes** (versioned table `command-classes/v3`, closed):
+- **Command classes** (versioned table `command-classes/v4`, closed):
   - `transparent`: a single simple command on the closed allowlist of
     transparent single-purpose commands that execute no code, load no
     project code and write no file, each with its audited options excluded:
@@ -355,9 +355,10 @@ commands can write files, chain checks or mask failures. So:
     pagers, aliases and hooks, and some of those sources are agent-writable
     in every run. Words are
     split as a POSIX shell would; `$` anywhere, escapes, a quote adjacent to
-    other characters and an unquoted word starting with a glob character
-    (whose expansion can inject options from agent-controlled names) make
-    the command opaque;
+    other characters and **any unquoted glob, brace or tilde character
+    anywhere in a word** (`*`, `?`, `[`, `]`, `{`, `}`, `~`), whose expansion
+    can inject options or paths from agent-controlled names (`-fpri*`
+    matching a file named `-fprintf`), make the command opaque;
   - configuration the transparent programs read (shell startup files,
     `~/.gitconfig`, `~/.magic`, tool configuration) can only be written
     without an opaque command through a file-write tool call outside the
@@ -1261,7 +1262,7 @@ Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 | §1.4 comparability | `comparability.mjs`, `matrix.mjs` `projectionFor` (per-cell closure) | `evidence.test.mjs` F34, F35; `measurement.test.mjs` B11 |
 | §1.5 replay, resume | `regrade.mjs` (integrity and identity first), `matrix.mjs` `matrixIdentity`, `repetitionState` | `evidence.test.mjs` F30; `measurement.test.mjs` B10, B12; `review-r2.test.mjs` B10, B12 |
 | §2.1–2.2 measured values, tokens | `measured.mjs`, `adapters/*.mjs` | `adapters.test.mjs` F1–F9; `metrics.test.mjs` lint and property test |
-| §2.4 repairs, first pass, attribution | `commands.mjs` (`command-classes/v3`) | `metrics.test.mjs` F24–F27, F58; `measurement.test.mjs` B8; `review-r2.test.mjs` B8 |
+| §2.4 repairs, first pass, attribution | `commands.mjs` (`command-classes/v4`) | `metrics.test.mjs` F24–F27, F58; `measurement.test.mjs` B8; `review-r2.test.mjs` B8 |
 | §3 adapters, budgets | `adapters/*.mjs`, `attempt.mjs` `agentPhase` | `adapters.test.mjs` F10–F20, F23, F28, F29 |
 | §3.2 container-visible paths | executors' `visiblePaths` | `docker.test.mjs` B6 |
 | §3.7 version pinning | `docker.mjs` identity checks, `provider.mjs` | `product-build.test.mjs` F55 |
@@ -1394,7 +1395,30 @@ Each item was found while implementing, testing or in review round 1
       match the manifest's and the record's; and the extraction is checked
       against the manifest (every entry, original bytes, links, modes,
       nothing extra) before grading. Any failure refuses the regrade.
-16. **Provider-backed path never executed.** Its preflight refusals are
+16. **Bounded verification micro-fix (user decision).**
+    - B4: Docker cleanup counts an object as gone only on the daemon's
+      definitive answer naming it ("No such container: <name>", "network
+      <name> not found"); any other inspection failure (daemon unreachable,
+      timeout) is `unknown`, which keeps the recovery state and records a
+      durable refusal, like a removal that failed.
+    - B8: `command-classes/v4`: any unquoted glob, brace or tilde character
+      in any word makes a command opaque.
+    - Flaky test fixed: the local-recovery test read the pid of
+      `setsid sleep` before the child had called `setsid()` (observed in
+      300 of 300 runs), so a recovery that ran first found no process group
+      and the process survived under full-suite load. The test now waits
+      until the process leads its own group (the executor's group exists
+      before `spawn` returns), and recovery waits, bounded, for killed
+      members to be reaped.
+17. **Accepted residuals (user decision).** Records are not tamper-evident
+    against the machine operator. Regrade and resume integrity checks
+    detect inconsistency between the runner's own private records
+    (`matrix.json`, `record.json`, evidence manifests and blobs), not a
+    coordinated forgery of all of them: an operator who rewrites a record
+    together with its manifests and digests can make a forged attempt look
+    consistent (review classes B10 and B12). Only the operator can do this;
+    the evaluated agent never has access to these files.
+18. **Provider-backed path never executed.** Its preflight refusals are
     tested; the containers, staging, grading and self-test binding run in the
     credential-free Docker integration tests; the remaining steps (binding
     of the real store, trusted tree from the real tarballs, CLI identity of
@@ -1410,7 +1434,8 @@ container, per-attempt proxy and network, fake Codex and Claude, grading in
 the grader container with a test-only trusted tree). Local result (Docker
 29.2.1, kernel 6.8.0-146-generic): passed (B5, B6, B7, and B4: a failure
 injected after each resource-creation step over real Docker, the invalid CPU
-limit case, and an unverifiable cleanup retained, refused and recovered).
+limit case, an unverifiable cleanup retained, refused and recovered, and a
+daemon outage during rollback treated as unknown, then recovered).
 The `agentic-corpus` CI job runs the same tests as extra steps.
 
 ## Appendix A: probes and sources

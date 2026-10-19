@@ -438,3 +438,86 @@ test(
     }
   },
 );
+
+test(
+  "B4 the reviewer's daemon-outage case over real Docker: kept, refused, then recovered when the daemon answers",
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const { activeRefusals } = await import('../src/refusals.mjs');
+    const { recoverStale } = await import('../src/recovery.mjs');
+    const config = dockerConfig();
+    const scenario = writeScenario(tmpDir('b4dscn'), 's', { steps: [] });
+    let down = false;
+    const run = (args, opts) => {
+      if (down)
+        return {
+          status: 1,
+          stdout: '',
+          stderr:
+            'Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?',
+        };
+      const r = docker(args, opts);
+      if (
+        args[0] === 'run' &&
+        args.some((a) => String(a).startsWith('pms-agent-')) &&
+        r.status !== 0
+      )
+        down = true;
+      return r;
+    };
+    const resources = [];
+    const ex = new DockerExecutor({
+      images: { agent: config.images.agent, harness: config.images.proxy },
+      limits: { ...config.container, cpus: -1 },
+      allow: config.network.allow,
+      cliBinary: { claude: '/opt/cli/claude' },
+      fixtureScenario: scenario,
+      run,
+    });
+    const start = ex.start.bind(ex);
+    ex.start = (args) =>
+      start({
+        ...args,
+        onResources: (r) => {
+          resources.push(r);
+          args.onResources(r);
+        },
+      });
+    const root = tmpDir('b4druns');
+    const stateDir = path.join(root, '.state');
+    try {
+      const out = await runMatrix({
+        config,
+        runsRoot: root,
+        stateDir,
+        identity: fixtureIdentity(),
+        executorFor: () => ex,
+        grading: { mode: 'dev-ancestor', hostCommands: false },
+      });
+      assert.deepEqual(
+        exists(resources[0]),
+        { container: false, proxy: true, network: true },
+        'the outage left the proxy and network alive',
+      );
+      assert.equal(
+        fs.readdirSync(path.join(out.matrixDir, '.private')).length,
+        1,
+        'recovery state kept',
+      );
+      assert.match(
+        activeRefusals(stateDir).claude.events[0].reason,
+        /\(unknown\)/,
+      );
+      const report = recoverStale(root, { stateDir });
+      assert.equal(report[0].cleanup, 'verified');
+      assert.deepEqual(exists(resources[0]), {
+        container: false,
+        proxy: false,
+        network: false,
+      });
+    } finally {
+      docker(['rm', '-f', resources[0].proxy, resources[0].container]);
+      docker(['network', 'rm', resources[0].network]);
+    }
+  },
+);

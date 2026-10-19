@@ -243,7 +243,16 @@ test('B4 partial startup: registered resources are removed (verified) or retaine
     if (args[0] === 'rm') for (const c of args.slice(2)) removed.add(c);
     if (args[0] === 'network' && args[1] === 'rm') removed.add(args[2]);
     if (args[1] === 'inspect')
-      return { status: removed.has(args[2]) ? 1 : 0, stdout: '', stderr: '' };
+      return removed.has(args[2])
+        ? {
+            status: 1,
+            stdout: '',
+            stderr:
+              args[0] === 'network'
+                ? `Error response from daemon: network ${args[2]} not found`
+                : `Error response from daemon: No such container: ${args[2]}`,
+          }
+        : { status: 0, stdout: '', stderr: '' };
     return { status: 0, stdout: '', stderr: '' };
   };
   const report = recoverStale(stuck.runsRoot, {
@@ -754,4 +763,149 @@ test('B12 the extraction is checked against its manifest: missing, extra, change
     }).some((p) => p.includes('gone.txt: missing')),
   );
   void MODELS;
+});
+
+// ---------------------------------------------------------------- micro-fix
+
+test("B8 the reviewer's embedded-glob case: `-fpri*` expands to an agent-named `-fprintf` and writes outside", async () => {
+  const outside = tmpDir('mf-home');
+  const target = path.join(outside, '.bashrc');
+  const command = `find . -maxdepth 0 -fpri* ${target} '. verify.sh'`;
+  const file = writeScenario(tmpDir('mf-g'), 's', {
+    steps: [
+      claudeInit(),
+      { write: { path: '-fprintf', content: 'x' } },
+      { run: command },
+      claudeText(goodDiscoveryResponse()),
+      claudeResult({ text: goodDiscoveryResponse() }),
+    ],
+  });
+  const out = await runFixture({
+    config: fixtureConfig({ tasks: [COMPOSITION] }),
+    scenarios: { '*': [file] },
+    grading: STUB_GRADING(),
+  });
+  assert.equal(
+    fs.readFileSync(target, 'utf8'),
+    '. verify.sh',
+    'the expansion really wrote outside the workspace',
+  );
+  const r = recordsOf(out.matrixDir)[0];
+  assert.equal(r.metrics.firstPassSuccess, 'unknown');
+  assert.ok(r.metrics.coverage.reasons.includes('opaque:1'));
+  assert.equal(classifyCommand(command).class, 'opaque');
+});
+
+test('B8 any unquoted glob, brace or tilde character in any word is opaque; quoted ones are literal', () => {
+  const opaque = [
+    'ls *',
+    'ls src/*.js',
+    'cat a?b',
+    'cat [ab].txt',
+    'cat a]b',
+    'find . -fpri*',
+    'find . -name *.js',
+    'ls ~/x',
+    'ls ~',
+    'ls x~',
+    'cat a{b,c}',
+    'grep foo -r src/**',
+    'head -n1 file?',
+  ];
+  for (const c of opaque) assert.equal(classifyCommand(c).class, 'opaque', c);
+  for (const c of [
+    'find src -name "*.js"',
+    "rg 'a*b' src",
+    "grep -rn '[ab]' src",
+    "cat 'a b.txt'",
+    "echo '~'",
+  ])
+    assert.equal(classifyCommand(c).class, 'transparent', c);
+});
+
+test('B4 a daemon that stops answering during rollback: nothing is assumed absent, state kept, provider refused', async () => {
+  // Fully injected Docker: creations succeed, the agent container fails,
+  // then the daemon is unreachable for every removal and inspection.
+  let down = false;
+  const run = (args) => {
+    if (down)
+      return {
+        status: 1,
+        stdout: '',
+        stderr:
+          'failed to connect to the docker API at unix:///var/run/docker.sock; check if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory',
+      };
+    if (
+      args[0] === 'run' &&
+      args.some((a) => String(a).startsWith('pms-agent-'))
+    ) {
+      down = true;
+      return {
+        status: 1,
+        stdout: '',
+        stderr:
+          'Error response from daemon: range of CPUs is from 0.01 to 16.00',
+      };
+    }
+    if (args[0] === 'run' || (args[0] === 'network' && args[1] === 'create'))
+      return { status: 0, stdout: 'id\n', stderr: '' };
+    return { status: 0, stdout: '', stderr: '' };
+  };
+  const { DockerExecutor, removeVerified, inspectState } = await import(
+    '../src/docker.mjs'
+  );
+  const ex = new DockerExecutor({
+    images: { agent: 'a', harness: 'h' },
+    limits: { cpus: -1, memoryBytes: 1, pidsLimit: 1, tmpfsBytes: 1 },
+    allow: { claude: [] },
+    cliBinary: { claude: '/opt/cli/claude' },
+    run,
+  });
+  const out = await runWithExecutor(ex);
+  const kept = fs.readdirSync(path.join(out.matrixDir, '.private'));
+  assert.equal(kept.length, 1, 'recovery state kept');
+  const state = readJson(
+    path.join(out.matrixDir, '.private', kept[0], 'state.json'),
+  );
+  assert.ok(state.resources.proxy.startsWith('pms-proxy-'));
+  assert.match(
+    activeRefusals(out.stateDir).claude.events[0].reason,
+    /partial startup not cleaned up: .*\(unknown\)/,
+  );
+  // Only the daemon's definitive answer naming the object means absent.
+  const answers = {
+    'Error response from daemon: No such container: c1': 'absent',
+    'Error response from daemon: No such container: c10': 'unknown',
+    'Error response from daemon: network c1 not found': 'unknown',
+    'Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?':
+      'unknown',
+    'context deadline exceeded': 'unknown',
+    '': 'unknown',
+  };
+  for (const [stderr, expected] of Object.entries(answers))
+    assert.equal(
+      inspectState('container', 'c1', () => ({
+        status: 1,
+        stdout: '',
+        stderr,
+      })),
+      expected,
+      stderr,
+    );
+  assert.equal(
+    inspectState('network', 'n1', () => ({
+      status: 1,
+      stdout: '',
+      stderr: 'Error response from daemon: network n1 not found',
+    })),
+    'absent',
+  );
+  assert.deepEqual(
+    removeVerified({ container: 'c1' }, () => ({
+      status: 1,
+      stdout: '',
+      stderr: 'dial unix: no such file or directory',
+    })),
+    ['c1 (unknown)'],
+  );
 });

@@ -202,7 +202,6 @@ test('B8 every code-executing, script-loading or writing form is opaque (class f
   assert.equal(classifyCommand("sed -n '$p' a.txt").class, 'opaque');
   for (const c of [
     "sed -n '1,20p' a.txt",
-    'rg foo src/*.js',
     'grep -rn foo src',
     'find src -name "*.js"',
     "cat 'a b.txt'",
