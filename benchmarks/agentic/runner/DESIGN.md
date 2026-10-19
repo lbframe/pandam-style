@@ -1435,7 +1435,24 @@ Each item was found while implementing, testing or in review round 1
     routable set of §4.3 (`stableHostAddresses`), computed by the same
     `currentFacts` in both places. The probes still target every host
     address and bridge gateway.
-19. **Provider-backed path never executed.** Its preflight refusals are
+19. **Smoke-run preparation findings (no model call).** Preparing the
+    authorized smoke run on `aebb19a` showed three implementation defects:
+    - the fixture installer required every product package of the binding,
+      while a fixture installs only those its `package.json` declares (the
+      storefront: core, compiler, vite). It now requires the declared ones,
+      verifies every installed one against its tarball and refuses any
+      installed `@pandamstyle/*` package outside the product build (§4.7);
+    - Codex 0.163.0's `debug prompt-input` accepts neither `--strict-config`
+      nor `-m` (observed), so the evidence render failed and every Codex
+      attempt would have been `config-integrity`. It now passes the model as
+      `-c model=…` with the attempt's overrides; the values are still
+      type-validated (an unknown `web_search` variant fails) and the attempt
+      runs `codex exec --strict-config` (§3.3);
+    - the agent image copied only `bin/codex`, so Codex lost the helpers it
+      finds next to its executable (`codex-code-mode-host`, bundled `rg`,
+      `bwrap`) and reported Code Mode unavailable. `/opt/cli/codex` is now a
+      link into the execute-only vendor tree (§3.7).
+20. **Provider-backed path never executed.** Its preflight refusals are
     tested; the containers, staging, grading and self-test binding run in the
     credential-free Docker integration tests; the remaining steps (binding
     of the real store, trusted tree from the real tarballs, CLI identity of

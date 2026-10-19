@@ -125,7 +125,15 @@ export function providerPreflight({
 }
 
 /** Codex effective configuration (section 3.3), rendered without a model call. */
-export function codexEffectiveConfig({ image, model }) {
+/**
+ * Arguments of the Codex evidence render (section 3.3): `codex debug
+ * prompt-input` with the same `-c` overrides as the attempt and the model
+ * as `-c model=…`. Codex 0.163.0 accepts neither `--strict-config` nor `-m`
+ * on `debug` (observed); its `-c` values are still validated by type (an
+ * unknown `web_search` variant fails), and the attempt itself runs
+ * `codex exec --strict-config`.
+ */
+export function codexPromptInputArgs(model) {
   const inv = codex.buildInvocation({
     model: model.model,
     effort: model.reasoningEffort ?? null,
@@ -133,6 +141,17 @@ export function codexEffectiveConfig({ image, model }) {
   const overrides = [];
   for (let i = 0; i < inv.argv.length; i += 1)
     if (inv.argv[i] === '-c') overrides.push('-c', inv.argv[i + 1]);
+  return [
+    'debug',
+    'prompt-input',
+    '-c',
+    `model="${model.model}"`,
+    ...overrides,
+  ];
+}
+
+/** Codex effective configuration (section 3.3), rendered without a model call. */
+export function codexEffectiveConfig({ image, model }) {
   const r = docker([
     'run',
     '--rm',
@@ -149,12 +168,7 @@ export function codexEffectiveConfig({ image, model }) {
     `${process.getuid()}:${process.getuid()}`,
     image,
     CLI_PATHS.codex,
-    'debug',
-    'prompt-input',
-    '--strict-config',
-    '-m',
-    model.model,
-    ...overrides,
+    ...codexPromptInputArgs(model),
   ]);
   let promptInput = null;
   try {
@@ -164,7 +178,8 @@ export function codexEffectiveConfig({ image, model }) {
   }
   return effectiveConfigFromPromptInput({
     promptInput,
-    strictConfigAccepted: r.status === 0,
+    // Overrides accepted with type validation (exit 0); see above.
+    strictConfigAccepted: r.status === 0 && Array.isArray(promptInput),
   });
 }
 
