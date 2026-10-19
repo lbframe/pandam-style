@@ -26,6 +26,9 @@ extend-ignore-re = [
   'Un seul registre alimente politique, compilation et manifeste',
   'les styles passent tous par le moteur du fork',
   '(?m)^\s*// Mouvement$',
+  # CE-01.1 generated compat data and caveat reviews key BCD notes by a
+  # 16-hex digest (`"t":"…"`, `"note": "…"`); only that exact field shape.
+  '"(?:t|note)": ?"[0-9a-f]{16}"',
 ]
 
 [default.extend-identifiers]
