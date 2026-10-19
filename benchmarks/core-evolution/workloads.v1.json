@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-ce003-workloads",
+  "version": 1,
+  "description": "Frozen CE-00.3 measurement workloads and repetition plans. A workload's contentSha256 is the identity of every number measured against it; tools/baselines/workloads.mjs refuses to materialize a different project.",
+  "workloads": [
+    {
+      "id": "alpha1-valid-fixture",
+      "description": "The Alpha 1 compiler's valid fixture (9 modules, conformance design system), read from the baseline commit.",
+      "source": {
+        "kind": "alpha1-valid-fixture",
+        "commit": "415e05539fcb5d36a78226112b5cf488b200b1aa"
+      },
+      "contentSha256": "43a6982f4753212d925852c89f95e0d664da8e0bfcce9371ec50930f2f00c0a9",
+      "kinds": ["compile", "runtime"],
+      "outDir": "generated",
+      "designModule": "design.pandamstyle.js",
+      "edits": [
+        {
+          "id": "local-style",
+          "kind": "source",
+          "file": "src/page.tsx",
+          "from": "gap: token('spacing.md')",
+          "to": "gap: token('spacing.lg')"
+        },
+        {
+          "id": "token-value",
+          "kind": "definition",
+          "path": ["tokens", "spacing", "md", "value"],
+          "to": "18px"
+        },
+        {
+          "id": "theme-value",
+          "kind": "definition",
+          "path": [
+            "themes",
+            "dark",
+            "tokens",
+            "colors",
+            "text",
+            "primary",
+            "ref"
+          ],
+          "to": "colors.gray.50"
+        },
+        {
+          "id": "recipe-branch",
+          "kind": "definition",
+          "path": ["recipes", "button", "variants", "size", "sm", "padding"],
+          "token": true,
+          "to": "spacing.xs"
+        }
+      ],
+      "runtimeArguments": [
+        {},
+        { "isActive": true, "isDisabled": true, "size": "sm" }
+      ]
+    },
+    {
+      "id": "alpha1-pilot-vite",
+      "description": "The Alpha 1 Vite React pilot application, read from the baseline commit, built for production through the epoch's @pandamstyle/vite adapter.",
+      "source": {
+        "kind": "alpha1-pilot",
+        "commit": "415e05539fcb5d36a78226112b5cf488b200b1aa"
+      },
+      "contentSha256": "b4d5efecc605d5f08b997c13d91c2ebf966eea017e949d4dc658dac8aaeec19d",
+      "kinds": ["vite"]
+    },
+    {
+      "id": "ce-corpus",
+      "description": "Every CE-00.2 corpus declaration (10 reference stylesheets) that the Alpha 1 policy classifies as expressible and the Alpha 1 compiler compiles, one source module per stylesheet.",
+      "source": {
+        "kind": "ce-corpus",
+        "record": "workloads/ce-corpus.v1.json"
+      },
+      "contentSha256": "9caca4435e26d39e8e98813bb7e8d26f37bf7669c1960b809f18ba869d41efb4",
+      "kinds": ["compile", "runtime"],
+      "outDir": "generated",
+      "designModule": "design.pandamstyle.js",
+      "edits": [
+        {
+          "id": "local-style",
+          "kind": "source",
+          "file": "src/app-shell.jsx",
+          "from": "margin: token(\"spacing.t000\")",
+          "to": "margin: token(\"spacing.t021\")"
+        },
+        {
+          "id": "token-value",
+          "kind": "definition",
+          "path": ["tokens", "spacing", "t000", "value"],
+          "to": "1px"
+        }
+      ],
+      "runtimeArguments": [{}]
+    },
+    {
+      "id": "synthetic-c1000-t200-r20-s307",
+      "description": "Seeded synthetic application: 1,000 components, 200 tokens, 20 recipes, two themes, five conditions.",
+      "source": {
+        "kind": "synthetic",
+        "id": "c1000-t200-r20-s307",
+        "components": 1000,
+        "tokens": 200,
+        "recipes": 20,
+        "seed": 307
+      },
+      "contentSha256": "765da046cc8dd30eff65b963dc951adefa87775347e9e8262a98c07a8b2354a4",
+      "kinds": ["compile", "runtime"],
+      "outDir": "generated",
+      "designModule": "design.pandamstyle.js",
+      "edits": [
+        {
+          "id": "local-style",
+          "kind": "source",
+          "file": "src/components/C00000.tsx",
+          "from": "backgroundColor: token('colors.s.c0')",
+          "to": "backgroundColor: token('colors.s.c1')"
+        },
+        {
+          "id": "token-value",
+          "kind": "definition",
+          "path": ["tokens", "spacing", "s1", "value"],
+          "to": "5px"
+        },
+        {
+          "id": "theme-value",
+          "kind": "definition",
+          "path": ["themes", "dark", "tokens", "colors", "s", "c0", "ref"],
+          "to": "colors.p.c4"
+        },
+        {
+          "id": "recipe-branch",
+          "kind": "definition",
+          "path": ["recipes", "rec0", "variants", "size", "z0", "padding"],
+          "token": true,
+          "to": "spacing.s5"
+        }
+      ],
+      "runtimeArguments": [
+        {},
+        { "active": true, "tone": "t1" },
+        { "active": true, "tone": "t0" },
+        { "tone": "t1" }
+      ]
+    },
+    {
+      "id": "synthetic-c10000-t1000-r100-s307",
+      "description": "Seeded synthetic application at the scale of the Alpha 1 reference corpus label (10,000 components, 1,000 tokens, 100 recipes); generator v1, not byte-identical to the unpublished historical c10000 corpus.",
+      "source": {
+        "kind": "synthetic",
+        "id": "c10000-t1000-r100-s307",
+        "components": 10000,
+        "tokens": 1000,
+        "recipes": 100,
+        "seed": 307
+      },
+      "contentSha256": "80fefc56d582efff33343f2a0f25ed44e94308a1f50db8dceb64f184749fc4b0",
+      "kinds": ["compile"],
+      "outDir": "generated",
+      "designModule": "design.pandamstyle.js",
+      "edits": [
+        {
+          "id": "local-style",
+          "kind": "source",
+          "file": "src/components/C00000.tsx",
+          "from": "backgroundColor: token('colors.s.c0')",
+          "to": "backgroundColor: token('colors.s.c1')"
+        },
+        {
+          "id": "token-value",
+          "kind": "definition",
+          "path": ["tokens", "spacing", "s1", "value"],
+          "to": "5px"
+        },
+        {
+          "id": "theme-value",
+          "kind": "definition",
+          "path": ["themes", "dark", "tokens", "colors", "s", "c0", "ref"],
+          "to": "colors.p.c4"
+        },
+        {
+          "id": "recipe-branch",
+          "kind": "definition",
+          "path": ["recipes", "rec0", "variants", "size", "z0", "padding"],
+          "token": true,
+          "to": "spacing.s5"
+        }
+      ]
+    }
+  ],
+  "plans": {
+    "pilot": {
+      "description": "Harness validation only; never frozen.",
+      "incrementalIterations": 4,
+      "runtimeWarmupRounds": 20,
+      "runtimeBudgetMs": 200,
+      "repetitions": {
+        "alpha1-valid-fixture": {
+          "compile": 2,
+          "consistency": 1,
+          "runtime": 2
+        },
+        "alpha1-pilot-vite": { "vite": 2 },
+        "ce-corpus": { "compile": 2, "consistency": 1, "runtime": 2 },
+        "synthetic-c1000-t200-r20-s307": {
+          "compile": 2,
+          "consistency": 1,
+          "runtime": 2
+        },
+        "synthetic-c10000-t1000-r100-s307": { "compile": 1, "consistency": 1 }
+      }
+    },
+    "final": {
+      "description": "Frozen-baseline plan: fresh process per sample, epochs interleaved with alternating order, workload order shuffled per round with a fixed seed.",
+      "incrementalIterations": 8,
+      "incrementalIterationsByWorkload": {
+        "synthetic-c10000-t1000-r100-s307": 4
+      },
+      "runtimeWarmupRounds": 50,
+      "runtimeBudgetMs": 400,
+      "repetitions": {
+        "alpha1-valid-fixture": {
+          "compile": 20,
+          "consistency": 1,
+          "runtime": 15
+        },
+        "alpha1-pilot-vite": { "vite": 15 },
+        "ce-corpus": { "compile": 20, "consistency": 1, "runtime": 15 },
+        "synthetic-c1000-t200-r20-s307": {
+          "compile": 10,
+          "consistency": 1,
+          "runtime": 12
+        },
+        "synthetic-c10000-t1000-r100-s307": { "compile": 5, "consistency": 1 }
+      }
+    }
+  }
+}

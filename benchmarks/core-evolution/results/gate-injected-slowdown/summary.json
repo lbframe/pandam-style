@@ -1,0 +1,6586 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-ce003-summary",
+  "labels": [
+    "gate-injected-slowdown"
+  ],
+  "statisticalMethod": "Per (epoch, workload, metric): median and nearest-rank p95 over independent fresh-process samples, each with a distribution-free 95% order-statistic interval (null = unbounded at this n). Incremental edits: one value per sample (median of warm iterations, iteration 0 excluded); pooledIterations also summarizes every warm iteration for the tail. Epoch comparisons: per-round paired ratios candidate/reference (adjacent samples of the same round, workload and kind); median of ratios with a seeded (307) 2,000-round percentile bootstrap over pairs. Deterministic metrics must be identical across samples.",
+  "epochs": [
+    "alpha1",
+    "injected-slowdown"
+  ],
+  "sampleCount": 190,
+  "failures": [],
+  "results": [
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 4491.009,
+        "median": 4540.146000000001,
+        "p95": 4801.338,
+        "max": 4801.338,
+        "mean": 4575.4449,
+        "medianCi95": {
+          "lower": 4497.687,
+          "upper": 4659.406,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 4618.144,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 4270.104,
+        "median": 4318.426,
+        "p95": 4553.54,
+        "max": 4553.54,
+        "mean": 4339.9193,
+        "medianCi95": {
+          "lower": 4276.754,
+          "upper": 4393.146,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 4353.856,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 169.533,
+        "median": 170.6335,
+        "p95": 176.009,
+        "max": 176.009,
+        "mean": 171.2682,
+        "medianCi95": {
+          "lower": 169.87,
+          "upper": 172.548,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 171.764,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 6944.383000000001,
+        "median": 7031.0625,
+        "p95": 7491.21,
+        "max": 7491.21,
+        "mean": 7094.9758,
+        "medianCi95": {
+          "lower": 7002.7970000000005,
+          "upper": 7187.603,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 7123.611,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 298524672,
+        "median": 300974080,
+        "p95": 304799744,
+        "max": 304799744,
+        "mean": 301056819.2,
+        "medianCi95": {
+          "lower": 298999808,
+          "upper": 302546944,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 302088192,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 350330880,
+        "median": 353597440,
+        "p95": 357851136,
+        "max": 357851136,
+        "mean": 354113945.6,
+        "medianCi95": {
+          "lower": 350666752,
+          "upper": 357572608,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 357064704,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 46998
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 9045
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.brotliBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 7424
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 693
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 47
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 903
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.distinctClassNames",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 693
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 102320
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "designModule.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 6567
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 82323
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 2099147
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiledModules.count",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 1000
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 16757
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.designSystemRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 176
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.consumerRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 16581
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 176
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.recipeAxisValues",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 119
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.compoundVariants",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 10
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "output.cssSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 10,
+      "deterministic": true,
+      "value": "40e5966b6e309cbde2f3db4592ef0eba28418878b0728e54dfabfe0408519949"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "output.compiledModulesSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 10,
+      "deterministic": true,
+      "value": "b557f46e0e8aa19b9739d3319e402fc268fcee34564054c8da97327191453619"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "output.restoredAfterEdits",
+      "class": "identity",
+      "unit": null,
+      "n": 10,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "n": 1,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 12,
+      "stats": {
+        "n": 12,
+        "min": 2369.5,
+        "median": 2419.6000000000004,
+        "p95": 2511.5,
+        "max": 2511.5,
+        "mean": 2422.775,
+        "medianCi95": {
+          "lower": 2391,
+          "upper": 2459.7,
+          "lowerRank": 3,
+          "upperRank": 10,
+          "coverage": 0.9614257812500003
+        },
+        "p95Ci95": {
+          "lower": 2459.7,
+          "upper": null,
+          "lowerRank": 10,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 12,
+      "stats": {
+        "n": 12,
+        "min": 3666.8,
+        "median": 3747.75,
+        "p95": 3946.9,
+        "max": 3946.9,
+        "mean": 3753.8999999999996,
+        "medianCi95": {
+          "lower": 3691.1,
+          "upper": 3780.2,
+          "lowerRank": 3,
+          "upperRank": 10,
+          "coverage": 0.9614257812500003
+        },
+        "p95Ci95": {
+          "lower": 3780.2,
+          "upper": null,
+          "lowerRank": 10,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.renderNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 12,
+      "stats": {
+        "n": 12,
+        "min": 14209.4,
+        "median": 14523.6,
+        "p95": 15549.1,
+        "max": 15549.1,
+        "mean": 14611.816666666668,
+        "medianCi95": {
+          "lower": 14363.1,
+          "upper": 14817.7,
+          "lowerRank": 3,
+          "upperRank": 10,
+          "coverage": 0.9614257812500003
+        },
+        "p95Ci95": {
+          "lower": 14817.7,
+          "upper": null,
+          "lowerRank": 10,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 12,
+      "stats": {
+        "n": 12,
+        "min": 353.064,
+        "median": 357.397,
+        "p95": 419.524,
+        "max": 419.524,
+        "mean": 363.33683333333335,
+        "medianCi95": {
+          "lower": 356.273,
+          "upper": 365.383,
+          "lowerRank": 3,
+          "upperRank": 10,
+          "coverage": 0.9614257812500003
+        },
+        "p95Ci95": {
+          "lower": 365.383,
+          "upper": null,
+          "lowerRank": 10,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recordedPropsCalls",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 12,
+      "deterministic": true,
+      "value": 16000
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recordedRecipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 12,
+      "deterministic": true,
+      "value": 4000
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 144.666,
+        "median": 146.8315,
+        "p95": 155.869,
+        "max": 155.869,
+        "mean": 148.5898,
+        "medianCi95": {
+          "lower": 145.572,
+          "upper": 152.676,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 150.807,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 143.575,
+        "median": 148.7585,
+        "p95": 163.593,
+        "max": 169.225,
+        "mean": 151.1020285714286,
+        "medianCi95": {
+          "lower": 146.485,
+          "upper": 151.975,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 160.917,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 9.899,
+        "median": 10.8065,
+        "p95": 12.248,
+        "max": 12.248,
+        "mean": 11.015800000000002,
+        "medianCi95": {
+          "lower": 10.534,
+          "upper": 11.753,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 11.589,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 9.278,
+        "median": 10.879,
+        "p95": 12.776,
+        "max": 15.427,
+        "mean": 11.106857142857143,
+        "medianCi95": {
+          "lower": 10.534,
+          "upper": 11.508,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 12.349,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 1060.242,
+        "median": 1072.1734999999999,
+        "p95": 1086.596,
+        "max": 1086.596,
+        "mean": 1071.5404999999998,
+        "medianCi95": {
+          "lower": 1061.329,
+          "upper": 1079.999,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 1076.6,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 1047.131,
+        "median": 1070.9814999999999,
+        "p95": 1105.817,
+        "max": 1160.527,
+        "mean": 1074.648,
+        "medianCi95": {
+          "lower": 1067.072,
+          "upper": 1076.356,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 1088.888,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 911.212,
+        "median": 921.4445000000001,
+        "p95": 938.279,
+        "max": 938.279,
+        "mean": 921.4458000000001,
+        "medianCi95": {
+          "lower": 911.552,
+          "upper": 930.378,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 926.943,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 894.751,
+        "median": 921.3489999999999,
+        "p95": 952.956,
+        "max": 1011.266,
+        "mean": 924.5304999999998,
+        "medianCi95": {
+          "lower": 917.721,
+          "upper": 925.02,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 938.563,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 1330.835,
+        "median": 1350.597,
+        "p95": 1386.588,
+        "max": 1386.588,
+        "mean": 1352.7467,
+        "medianCi95": {
+          "lower": 1331.814,
+          "upper": 1380.032,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 1358.311,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 1306.166,
+        "median": 1351.306,
+        "p95": 1423.148,
+        "max": 1472.98,
+        "mean": 1359.1696,
+        "medianCi95": {
+          "lower": 1345.494,
+          "upper": 1367.733,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 1403.968,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 1165.332,
+        "median": 1187.8265000000001,
+        "p95": 1222.506,
+        "max": 1222.506,
+        "mean": 1190.6121999999998,
+        "medianCi95": {
+          "lower": 1168.151,
+          "upper": 1219.933,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 1197.956,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 1145.814,
+        "median": 1187.9895000000001,
+        "p95": 1244.132,
+        "max": 1267.925,
+        "mean": 1194.3731428571427,
+        "medianCi95": {
+          "lower": 1183.219,
+          "upper": 1204.169,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 1233.693,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 149.956,
+        "median": 151.42950000000002,
+        "p95": 156.878,
+        "max": 156.878,
+        "mean": 151.86999999999998,
+        "medianCi95": {
+          "lower": 150.195,
+          "upper": 153.787,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 151.638,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 148.545,
+        "median": 151.4315,
+        "p95": 160.577,
+        "max": 168.28,
+        "mean": 152.54207142857143,
+        "medianCi95": {
+          "lower": 151.059,
+          "upper": 151.915,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 155.979,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 15.462,
+        "median": 15.9755,
+        "p95": 17.382,
+        "max": 17.382,
+        "mean": 16.0697,
+        "medianCi95": {
+          "lower": 15.56,
+          "upper": 16.634,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 16.155,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 14.789,
+        "median": 15.998000000000001,
+        "p95": 19.632,
+        "max": 22.983,
+        "mean": 16.47832857142858,
+        "medianCi95": {
+          "lower": 15.642,
+          "upper": 16.296,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 18.906,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 5836.403,
+        "median": 5915.606,
+        "p95": 6091.709,
+        "max": 6091.709,
+        "mean": 5942.376800000001,
+        "medianCi95": {
+          "lower": 5885.556,
+          "upper": 5998.097,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 5987.978,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 5551.929,
+        "median": 5628.628000000001,
+        "p95": 5803.933,
+        "max": 5803.933,
+        "mean": 5654.082200000001,
+        "medianCi95": {
+          "lower": 5598.953,
+          "upper": 5712.048,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 5702.093,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 170.208,
+        "median": 172.2945,
+        "p95": 200.334,
+        "max": 200.334,
+        "mean": 175.1388,
+        "medianCi95": {
+          "lower": 170.264,
+          "upper": 176.5,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 174.246,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 8264.262,
+        "median": 8468.843,
+        "p95": 8636.203,
+        "max": 8636.203,
+        "mean": 8444.4224,
+        "medianCi95": {
+          "lower": 8331.017,
+          "upper": 8531.940999999999,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 8511.86,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 302112768,
+        "median": 305690624,
+        "p95": 309182464,
+        "max": 309182464,
+        "mean": 305655808,
+        "medianCi95": {
+          "lower": 303030272,
+          "upper": 308809728,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 307617792,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 347381760,
+        "median": 356483072,
+        "p95": 365244416,
+        "max": 365244416,
+        "mean": 356818124.8,
+        "medianCi95": {
+          "lower": 352849920,
+          "upper": 360914944,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 360714240,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 46998
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 9045
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.brotliBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 7424
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 693
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 47
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 903
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.distinctClassNames",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 693
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 102320
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "designModule.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 6567
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 82323
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 10,
+      "deterministic": true,
+      "value": 2099147
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiledModules.count",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 1000
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 16757
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.designSystemRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 176
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.consumerRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 16581
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 176
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.recipeAxisValues",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 119
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.compoundVariants",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 10,
+      "deterministic": true,
+      "value": 10
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "output.cssSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 10,
+      "deterministic": true,
+      "value": "40e5966b6e309cbde2f3db4592ef0eba28418878b0728e54dfabfe0408519949"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "output.compiledModulesSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 10,
+      "deterministic": true,
+      "value": "b557f46e0e8aa19b9739d3319e402fc268fcee34564054c8da97327191453619"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "output.restoredAfterEdits",
+      "class": "identity",
+      "unit": null,
+      "n": 10,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "n": 1,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 12,
+      "stats": {
+        "n": 12,
+        "min": 2391.6,
+        "median": 2413.95,
+        "p95": 2540.5,
+        "max": 2540.5,
+        "mean": 2430.466666666667,
+        "medianCi95": {
+          "lower": 2395.3,
+          "upper": 2449.7,
+          "lowerRank": 3,
+          "upperRank": 10,
+          "coverage": 0.9614257812500003
+        },
+        "p95Ci95": {
+          "lower": 2449.7,
+          "upper": null,
+          "lowerRank": 10,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 12,
+      "stats": {
+        "n": 12,
+        "min": 3644.2,
+        "median": 3702.55,
+        "p95": 3837.4,
+        "max": 3837.4,
+        "mean": 3717.866666666667,
+        "medianCi95": {
+          "lower": 3679.9,
+          "upper": 3776.5,
+          "lowerRank": 3,
+          "upperRank": 10,
+          "coverage": 0.9614257812500003
+        },
+        "p95Ci95": {
+          "lower": 3776.5,
+          "upper": null,
+          "lowerRank": 10,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.renderNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 12,
+      "stats": {
+        "n": 12,
+        "min": 14265.1,
+        "median": 14589.7,
+        "p95": 15475.9,
+        "max": 15475.9,
+        "mean": 14674.349999999999,
+        "medianCi95": {
+          "lower": 14400.5,
+          "upper": 14949.9,
+          "lowerRank": 3,
+          "upperRank": 10,
+          "coverage": 0.9614257812500003
+        },
+        "p95Ci95": {
+          "lower": 14949.9,
+          "upper": null,
+          "lowerRank": 10,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 12,
+      "stats": {
+        "n": 12,
+        "min": 356.378,
+        "median": 365.40599999999995,
+        "p95": 381.052,
+        "max": 381.052,
+        "mean": 366.36924999999997,
+        "medianCi95": {
+          "lower": 359.176,
+          "upper": 371.794,
+          "lowerRank": 3,
+          "upperRank": 10,
+          "coverage": 0.9614257812500003
+        },
+        "p95Ci95": {
+          "lower": 371.794,
+          "upper": null,
+          "lowerRank": 10,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recordedPropsCalls",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 12,
+      "deterministic": true,
+      "value": 16000
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recordedRecipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 12,
+      "deterministic": true,
+      "value": 4000
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 188.181,
+        "median": 189.447,
+        "p95": 195.575,
+        "max": 195.575,
+        "mean": 190.15410000000003,
+        "medianCi95": {
+          "lower": 188.438,
+          "upper": 191.423,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 190.42,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 184.712,
+        "median": 190.4115,
+        "p95": 203.6,
+        "max": 208.901,
+        "mean": 191.87954285714287,
+        "medianCi95": {
+          "lower": 189.249,
+          "upper": 191.367,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 199.246,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 12.962,
+        "median": 13.3195,
+        "p95": 13.786,
+        "max": 13.786,
+        "mean": 13.3278,
+        "medianCi95": {
+          "lower": 12.988,
+          "upper": 13.637,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 13.637,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 12.174,
+        "median": 13.365,
+        "p95": 14.504,
+        "max": 14.766,
+        "mean": 13.372471428571426,
+        "medianCi95": {
+          "lower": 13.195,
+          "upper": 13.572,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 13.946,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 1388.953,
+        "median": 1405.8145,
+        "p95": 1425.99,
+        "max": 1425.99,
+        "mean": 1406.6576,
+        "medianCi95": {
+          "lower": 1395.866,
+          "upper": 1421.176,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 1414.856,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 1372.982,
+        "median": 1402.9045,
+        "p95": 1468.095,
+        "max": 1669.977,
+        "mean": 1413.859442857143,
+        "medianCi95": {
+          "lower": 1397.483,
+          "upper": 1410.346,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 1438.188,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 1195.331,
+        "median": 1215.3865,
+        "p95": 1228.759,
+        "max": 1228.759,
+        "mean": 1211.4622000000002,
+        "medianCi95": {
+          "lower": 1197.875,
+          "upper": 1220.163,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 1219.853,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 1167.889,
+        "median": 1209.902,
+        "p95": 1267.598,
+        "max": 1438.264,
+        "mean": 1216.5897285714286,
+        "medianCi95": {
+          "lower": 1200.245,
+          "upper": 1216.025,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 1236.944,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 1745.749,
+        "median": 1760.109,
+        "p95": 1791.648,
+        "max": 1791.648,
+        "mean": 1764.6223000000002,
+        "medianCi95": {
+          "lower": 1751.307,
+          "upper": 1783.956,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 1777.169,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 1713.516,
+        "median": 1760.6185,
+        "p95": 1862.305,
+        "max": 1953.382,
+        "mean": 1774.4817285714284,
+        "medianCi95": {
+          "lower": 1752.383,
+          "upper": 1776.332,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 1833.377,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 1533.909,
+        "median": 1545.688,
+        "p95": 1579.694,
+        "max": 1579.694,
+        "mean": 1550.6190000000001,
+        "medianCi95": {
+          "lower": 1538.093,
+          "upper": 1571.602,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 1561.637,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 1502.551,
+        "median": 1546.2575,
+        "p95": 1637.285,
+        "max": 1681.9,
+        "mean": 1559.1268428571432,
+        "medianCi95": {
+          "lower": 1538.093,
+          "upper": 1561.637,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 1614.829,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 196.02,
+        "median": 196.8485,
+        "p95": 201.67,
+        "max": 201.67,
+        "mean": 197.61630000000002,
+        "medianCi95": {
+          "lower": 196.069,
+          "upper": 201.253,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 197.798,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 193.465,
+        "median": 197.05149999999998,
+        "p95": 214.136,
+        "max": 218.259,
+        "mean": 198.75019999999995,
+        "medianCi95": {
+          "lower": 196.267,
+          "upper": 198.01,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 203.359,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 10,
+      "stats": {
+        "n": 10,
+        "min": 19.698,
+        "median": 20.531,
+        "p95": 21.974,
+        "max": 21.974,
+        "mean": 20.5101,
+        "medianCi95": {
+          "lower": 19.757,
+          "upper": 21.241,
+          "lowerRank": 2,
+          "upperRank": 9,
+          "coverage": 0.978515625000001
+        },
+        "p95Ci95": {
+          "lower": 20.913,
+          "upper": null,
+          "lowerRank": 8,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 70,
+        "min": 18.881,
+        "median": 20.642,
+        "p95": 26.211,
+        "max": 26.696,
+        "mean": 21.27511428571428,
+        "medianCi95": {
+          "lower": 20.22,
+          "upper": 21.056,
+          "lowerRank": 27,
+          "upperRank": 44,
+          "coverage": 0.9586085713260708
+        },
+        "p95Ci95": {
+          "lower": 24.153,
+          "upper": null,
+          "lowerRank": 63,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 177.23,
+        "median": 177.9345,
+        "p95": 179.954,
+        "max": 194.645,
+        "mean": 178.95745,
+        "medianCi95": {
+          "lower": 177.629,
+          "upper": 178.67,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 179.042,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 158.853,
+        "median": 159.6695,
+        "p95": 161.711,
+        "max": 176.256,
+        "mean": 160.684,
+        "medianCi95": {
+          "lower": 159.445,
+          "upper": 160.389,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 160.603,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 168.441,
+        "median": 170.7605,
+        "p95": 173.469,
+        "max": 178.126,
+        "mean": 170.93775,
+        "medianCi95": {
+          "lower": 169.697,
+          "upper": 171.317,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 171.737,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 581.259,
+        "median": 588.624,
+        "p95": 600.014,
+        "max": 636.22,
+        "mean": 590.6838,
+        "medianCi95": {
+          "lower": 584.753,
+          "upper": 592.335,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 593.466,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 121065472,
+        "median": 123494400,
+        "p95": 125542400,
+        "max": 126132224,
+        "mean": 123585536,
+        "medianCi95": {
+          "lower": 122802176,
+          "upper": 124076032,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 124751872,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 148471808,
+        "median": 152576000,
+        "p95": 153907200,
+        "max": 156114944,
+        "mean": 152121958.4,
+        "medianCi95": {
+          "lower": 151273472,
+          "upper": 152862720,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 153313280,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 2657
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 1024
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.brotliBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 902
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 32
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 1
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 66
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.distinctClassNames",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 32
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 17250
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "designModule.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 3227
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 24182
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 9142
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiledModules.count",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 9
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 44
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.designSystemRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 17
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.consumerRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 27
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 4
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.recipeAxisValues",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 4
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.compoundVariants",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "output.cssSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "3f90ae2bfa77e9cf0e48fda603be08c015264ef9a322335f334c7fa4fcadcc2b"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "output.compiledModulesSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "a213ec687d8ba3153ad4a1b9305732c2b8572e647ceff7c2618e6cb8e4a5b1eb"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "output.restoredAfterEdits",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "n": 1,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 1537.8,
+        "median": 1547.3,
+        "p95": 1563.8,
+        "max": 1563.8,
+        "mean": 1549.5733333333333,
+        "medianCi95": {
+          "lower": 1540,
+          "upper": 1558.6,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 1558.6,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 2617.3,
+        "median": 2642.3,
+        "p95": 2691.2,
+        "max": 2691.2,
+        "mean": 2644.8066666666664,
+        "medianCi95": {
+          "lower": 2627.9,
+          "upper": 2656.1,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 2656.1,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.renderNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 4804,
+        "median": 4884.2,
+        "p95": 5472.8,
+        "max": 5472.8,
+        "mean": 4912.986666666666,
+        "medianCi95": {
+          "lower": 4849.9,
+          "upper": 4899.2,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 4899.2,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 5.464,
+        "median": 5.512,
+        "p95": 5.557,
+        "max": 5.557,
+        "mean": 5.5124666666666675,
+        "medianCi95": {
+          "lower": 5.489,
+          "upper": 5.536,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 5.536,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recordedPropsCalls",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 15,
+      "deterministic": true,
+      "value": 28
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recordedRecipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 15,
+      "deterministic": true,
+      "value": 6
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 11.273,
+        "median": 11.35,
+        "p95": 12.376,
+        "max": 12.936,
+        "mean": 11.503449999999999,
+        "medianCi95": {
+          "lower": 11.299,
+          "upper": 11.432,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 11.455,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 10.274,
+        "median": 11.4305,
+        "p95": 12.458,
+        "max": 41.412,
+        "mean": 11.790521428571425,
+        "medianCi95": {
+          "lower": 11.295,
+          "upper": 11.537,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 12.263,
+          "upper": 26.448,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 5.056,
+        "median": 5.219,
+        "p95": 5.38,
+        "max": 5.836,
+        "mean": 5.235549999999999,
+        "medianCi95": {
+          "lower": 5.16,
+          "upper": 5.262,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 5.266,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 4.633,
+        "median": 5.1975,
+        "p95": 5.971,
+        "max": 6.641,
+        "mean": 5.24962857142857,
+        "medianCi95": {
+          "lower": 5.143,
+          "upper": 5.256,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 5.887,
+          "upper": 6.289,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 19.712,
+        "median": 20.0555,
+        "p95": 20.462,
+        "max": 21.544,
+        "mean": 20.16275,
+        "medianCi95": {
+          "lower": 19.97,
+          "upper": 20.337,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 20.4,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 18.82,
+        "median": 20.119,
+        "p95": 22.07,
+        "max": 23.47,
+        "mean": 20.165692857142865,
+        "medianCi95": {
+          "lower": 19.939,
+          "upper": 20.28,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 21.437,
+          "upper": 23.39,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 12.401,
+        "median": 12.8835,
+        "p95": 13.081,
+        "max": 14.397,
+        "mean": 12.868500000000001,
+        "medianCi95": {
+          "lower": 12.601,
+          "upper": 12.981,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 13.04,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 11.699,
+        "median": 12.897,
+        "p95": 14.503,
+        "max": 16.564,
+        "mean": 12.975457142857147,
+        "medianCi95": {
+          "lower": 12.522,
+          "upper": 13.153,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 14.27,
+          "upper": 15.65,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 21.708,
+        "median": 22.032,
+        "p95": 22.691,
+        "max": 22.761,
+        "mean": 22.109200000000005,
+        "medianCi95": {
+          "lower": 21.987,
+          "upper": 22.184,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 22.352,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 20.213,
+        "median": 22.034,
+        "p95": 23.011,
+        "max": 39.326,
+        "mean": 21.960171428571414,
+        "medianCi95": {
+          "lower": 21.922,
+          "upper": 22.205,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 22.84,
+          "upper": 23.796,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 14.502,
+        "median": 14.8605,
+        "p95": 15.215,
+        "max": 15.399,
+        "mean": 14.869199999999998,
+        "medianCi95": {
+          "lower": 14.744,
+          "upper": 14.98,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 14.985,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 13.047,
+        "median": 14.8065,
+        "p95": 15.598,
+        "max": 16.304,
+        "mean": 14.4928,
+        "medianCi95": {
+          "lower": 14.605,
+          "upper": 14.973,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 15.511,
+          "upper": 16.268,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 8.567,
+        "median": 8.716000000000001,
+        "p95": 8.997,
+        "max": 9.125,
+        "mean": 8.734300000000001,
+        "medianCi95": {
+          "lower": 8.631,
+          "upper": 8.756,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 8.867,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 8.338,
+        "median": 8.744,
+        "p95": 9.59,
+        "max": 10.242,
+        "mean": 8.879599999999998,
+        "medianCi95": {
+          "lower": 8.691,
+          "upper": 8.887,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 9.48,
+          "upper": 10.103,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 2.383,
+        "median": 2.471,
+        "p95": 2.717,
+        "max": 2.845,
+        "mean": 2.5053,
+        "medianCi95": {
+          "lower": 2.44,
+          "upper": 2.531,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 2.548,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 2.23,
+        "median": 2.4665,
+        "p95": 3.176,
+        "max": 3.519,
+        "mean": 2.5542571428571432,
+        "medianCi95": {
+          "lower": 2.447,
+          "upper": 2.523,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 2.982,
+          "upper": 3.403,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 230.627,
+        "median": 233.563,
+        "p95": 252.362,
+        "max": 256.846,
+        "mean": 236.90249999999997,
+        "medianCi95": {
+          "lower": 232.404,
+          "upper": 235.493,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 246.448,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 206.993,
+        "median": 209.8875,
+        "p95": 226.937,
+        "max": 228.73,
+        "mean": 212.15999999999994,
+        "medianCi95": {
+          "lower": 208.723,
+          "upper": 211.632,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 213.701,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 169.608,
+        "median": 171.65449999999998,
+        "p95": 176.369,
+        "max": 178.946,
+        "mean": 172.34850000000003,
+        "medianCi95": {
+          "lower": 170.941,
+          "upper": 173.072,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 173.641,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 642.6469999999999,
+        "median": 663.482,
+        "p95": 690.5930000000001,
+        "max": 699.846,
+        "mean": 667.5152999999999,
+        "medianCi95": {
+          "lower": 657.666,
+          "upper": 675.538,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 680.985,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 120377344,
+        "median": 122472448,
+        "p95": 127926272,
+        "max": 130813952,
+        "mean": 123150336,
+        "medianCi95": {
+          "lower": 121696256,
+          "upper": 123375616,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 124186624,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 150171648,
+        "median": 151963648,
+        "p95": 156442624,
+        "max": 160305152,
+        "mean": 152822169.6,
+        "medianCi95": {
+          "lower": 151355392,
+          "upper": 153079808,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 155570176,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 2657
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 1024
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.brotliBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 902
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 32
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 1
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 66
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.distinctClassNames",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 32
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 17250
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "designModule.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 3227
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 24182
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 9142
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiledModules.count",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 9
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 44
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.designSystemRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 17
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.consumerRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 27
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 4
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.recipeAxisValues",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 4
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.compoundVariants",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "output.cssSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "3f90ae2bfa77e9cf0e48fda603be08c015264ef9a322335f334c7fa4fcadcc2b"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "output.compiledModulesSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "a213ec687d8ba3153ad4a1b9305732c2b8572e647ceff7c2618e6cb8e4a5b1eb"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "output.restoredAfterEdits",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "n": 1,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 1539,
+        "median": 1547.3,
+        "p95": 1679.7,
+        "max": 1679.7,
+        "mean": 1563.3933333333337,
+        "medianCi95": {
+          "lower": 1543,
+          "upper": 1553.7,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 1553.7,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 2607.1,
+        "median": 2661.9,
+        "p95": 2998.7,
+        "max": 2998.7,
+        "mean": 2687.78,
+        "medianCi95": {
+          "lower": 2634.8,
+          "upper": 2681.7,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 2681.7,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.renderNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 4829.7,
+        "median": 4900.7,
+        "p95": 4997.4,
+        "max": 4997.4,
+        "mean": 4902.546666666665,
+        "medianCi95": {
+          "lower": 4876,
+          "upper": 4928.6,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 4928.6,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 5.503,
+        "median": 5.547,
+        "p95": 6.014,
+        "max": 6.014,
+        "mean": 5.591333333333333,
+        "medianCi95": {
+          "lower": 5.511,
+          "upper": 5.591,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 5.591,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recordedPropsCalls",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 15,
+      "deterministic": true,
+      "value": 28
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recordedRecipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 15,
+      "deterministic": true,
+      "value": 6
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 14.347,
+        "median": 14.546,
+        "p95": 15.175,
+        "max": 17.339,
+        "mean": 14.738049999999998,
+        "medianCi95": {
+          "lower": 14.481,
+          "upper": 14.751,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 14.829,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 13.365,
+        "median": 14.6095,
+        "p95": 17.339,
+        "max": 197.928,
+        "mean": 16.527678571428567,
+        "medianCi95": {
+          "lower": 14.508,
+          "upper": 14.743,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 16.258,
+          "upper": 50.321,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 6.665,
+        "median": 6.7925,
+        "p95": 6.978,
+        "max": 8.187,
+        "mean": 6.861750000000001,
+        "medianCi95": {
+          "lower": 6.718,
+          "upper": 6.858,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 6.94,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 6.046,
+        "median": 6.7955000000000005,
+        "p95": 8.187,
+        "max": 10.026,
+        "mean": 6.9723857142857115,
+        "medianCi95": {
+          "lower": 6.719,
+          "upper": 6.863,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 7.933,
+          "upper": 9.215,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 25.53,
+        "median": 26.022,
+        "p95": 27.516,
+        "max": 28.372,
+        "mean": 26.136599999999998,
+        "medianCi95": {
+          "lower": 25.847,
+          "upper": 26.076,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 26.121,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 24.409,
+        "median": 26.029,
+        "p95": 28.594,
+        "max": 54.702,
+        "mean": 26.429157142857147,
+        "medianCi95": {
+          "lower": 25.865,
+          "upper": 26.14,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 27.714,
+          "upper": 31.488,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 15.924,
+        "median": 16.448500000000003,
+        "p95": 17.948,
+        "max": 18.067,
+        "mean": 16.6232,
+        "medianCi95": {
+          "lower": 16.185,
+          "upper": 16.928,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 17.023,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 15.15,
+        "median": 16.7255,
+        "p95": 19.091,
+        "max": 21.647,
+        "mean": 16.828349999999997,
+        "medianCi95": {
+          "lower": 16.217,
+          "upper": 16.928,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 18.134,
+          "upper": 21.479,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 27.349,
+        "median": 28.1475,
+        "p95": 29.573,
+        "max": 29.61,
+        "mean": 28.24815,
+        "medianCi95": {
+          "lower": 27.873,
+          "upper": 28.584,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 28.678,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 26.774,
+        "median": 28.175,
+        "p95": 30.203,
+        "max": 32.169,
+        "mean": 28.3409857142857,
+        "medianCi95": {
+          "lower": 27.93,
+          "upper": 28.363,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 29.728,
+          "upper": 31.751,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 17.816,
+        "median": 18.59,
+        "p95": 19.679,
+        "max": 19.97,
+        "mean": 18.7063,
+        "medianCi95": {
+          "lower": 18.442,
+          "upper": 19.014,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 19.166,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 17.104,
+        "median": 18.545,
+        "p95": 20.744,
+        "max": 22.418,
+        "mean": 18.76617142857143,
+        "medianCi95": {
+          "lower": 18.442,
+          "upper": 18.741,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 20.094,
+          "upper": 22.387,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 11.085,
+        "median": 11.277000000000001,
+        "p95": 11.661,
+        "max": 11.923,
+        "mean": 11.3097,
+        "medianCi95": {
+          "lower": 11.187,
+          "upper": 11.343,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 11.387,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 10.872,
+        "median": 11.268,
+        "p95": 12.643,
+        "max": 43.411,
+        "mean": 11.936485714285716,
+        "medianCi95": {
+          "lower": 11.231,
+          "upper": 11.343,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 12.007,
+          "upper": 40.765,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 3.138,
+        "median": 3.202,
+        "p95": 3.302,
+        "max": 3.338,
+        "mean": 3.2047999999999996,
+        "medianCi95": {
+          "lower": 3.169,
+          "upper": 3.214,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 3.237,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 2.904,
+        "median": 3.2085,
+        "p95": 3.75,
+        "max": 4.66,
+        "mean": 3.2814428571428564,
+        "medianCi95": {
+          "lower": 3.163,
+          "upper": 3.262,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 3.671,
+          "upper": 4.228,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 210.061,
+        "median": 213.64499999999998,
+        "p95": 246.477,
+        "max": 563.3,
+        "mean": 233.85850000000005,
+        "medianCi95": {
+          "lower": 212.453,
+          "upper": 219.226,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 219.744,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 190.066,
+        "median": 193.5285,
+        "p95": 210.796,
+        "max": 224.032,
+        "mean": 196.52115,
+        "medianCi95": {
+          "lower": 192.348,
+          "upper": 198.76,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 199.227,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 168.678,
+        "median": 170.166,
+        "p95": 173.077,
+        "max": 182.938,
+        "mean": 170.86209999999997,
+        "medianCi95": {
+          "lower": 169.279,
+          "upper": 170.807,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 171.647,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 686.567,
+        "median": 701.0045,
+        "p95": 731.699,
+        "max": 740.457,
+        "mean": 707.23035,
+        "medianCi95": {
+          "lower": 698.296,
+          "upper": 716.604,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 725.168,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 122740736,
+        "median": 125140992,
+        "p95": 126652416,
+        "max": 127348736,
+        "mean": 125200793.6,
+        "medianCi95": {
+          "lower": 124133376,
+          "upper": 126509056,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 126562304,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 137883648,
+        "median": 139870208,
+        "p95": 141856768,
+        "max": 142569472,
+        "mean": 139875532.8,
+        "medianCi95": {
+          "lower": 138457088,
+          "upper": 140869632,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 141455360,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 14612
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 3731
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "css.brotliBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 3242
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 206
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 315
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "css.distinctClassNames",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 206
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 17777
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "designModule.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 2768
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 35400
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 25687
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "compiledModules.count",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 10
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 428
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "report.designSystemRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 1
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "report.consumerRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 427
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "variants.recipeAxisValues",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "variants.compoundVariants",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "output.cssSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "438005ed1d591913a15a1e67d3b66d508ae658bb94459f7cd1fa23e40fbe14ca"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "output.compiledModulesSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "7c188e8a81d69d8f7f109e2a5752c09a2be92558fc23372c2e1c8e0a7f15bdbe"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "output.restoredAfterEdits",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "n": 1,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 1274.1,
+        "median": 1282.2,
+        "p95": 1296,
+        "max": 1296,
+        "mean": 1282.1266666666666,
+        "medianCi95": {
+          "lower": 1277.7,
+          "upper": 1284.4,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 1284.4,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 4.052,
+        "median": 4.076,
+        "p95": 5.567,
+        "max": 5.567,
+        "mean": 4.185,
+        "medianCi95": {
+          "lower": 4.058,
+          "upper": 4.116,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 4.116,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "runtime.recordedPropsCalls",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 15,
+      "deterministic": true,
+      "value": 88
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "runtime.recordedRecipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 15,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 13.409,
+        "median": 13.624500000000001,
+        "p95": 13.978,
+        "max": 14.545,
+        "mean": 13.685649999999999,
+        "medianCi95": {
+          "lower": 13.497,
+          "upper": 13.785,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 13.909,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 12.376,
+        "median": 13.649000000000001,
+        "p95": 14.565,
+        "max": 16.599,
+        "mean": 13.555514285714281,
+        "medianCi95": {
+          "lower": 13.409,
+          "upper": 13.848,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 14.363,
+          "upper": 16.418,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 7.337,
+        "median": 7.468,
+        "p95": 8.139,
+        "max": 8.189,
+        "mean": 7.607849999999999,
+        "medianCi95": {
+          "lower": 7.418,
+          "upper": 7.856,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 7.922,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 6.975,
+        "median": 7.4785,
+        "p95": 8.663,
+        "max": 10.604,
+        "mean": 7.667449999999998,
+        "medianCi95": {
+          "lower": 7.424,
+          "upper": 7.541,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 8.497,
+          "upper": 10.168,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 6.964,
+        "median": 7.0065,
+        "p95": 7.176,
+        "max": 7.305,
+        "mean": 7.0357,
+        "medianCi95": {
+          "lower": 6.987,
+          "upper": 7.032,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 7.071,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 6.747,
+        "median": 7.0065,
+        "p95": 8.485,
+        "max": 38.378,
+        "mean": 7.708035714285714,
+        "medianCi95": {
+          "lower": 6.973,
+          "upper": 7.046,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 8.404,
+          "upper": 34.512,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "alpha1",
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 2.708,
+        "median": 2.7615,
+        "p95": 2.835,
+        "max": 2.942,
+        "mean": 2.765,
+        "medianCi95": {
+          "lower": 2.718,
+          "upper": 2.789,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 2.795,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 2.578,
+        "median": 2.7575000000000003,
+        "p95": 4.089,
+        "max": 4.651,
+        "mean": 2.9801571428571423,
+        "medianCi95": {
+          "lower": 2.74,
+          "upper": 2.791,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 3.998,
+          "upper": 4.307,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 272.384,
+        "median": 276.3905,
+        "p95": 286.743,
+        "max": 298.733,
+        "mean": 277.7884,
+        "medianCi95": {
+          "lower": 275.033,
+          "upper": 277.561,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 279.034,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 245.91,
+        "median": 249.894,
+        "p95": 259.684,
+        "max": 272.046,
+        "mean": 251.27280000000005,
+        "medianCi95": {
+          "lower": 248.694,
+          "upper": 251.363,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 252.14,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 169.769,
+        "median": 171.67700000000002,
+        "p95": 172.972,
+        "max": 174.792,
+        "mean": 171.59115000000003,
+        "medianCi95": {
+          "lower": 170.944,
+          "upper": 171.94,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 172.331,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 753.922,
+        "median": 767.9245,
+        "p95": 785.213,
+        "max": 803.191,
+        "mean": 770.8459500000001,
+        "medianCi95": {
+          "lower": 765.983,
+          "upper": 773.204,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 779.332,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 124260352,
+        "median": 127035392,
+        "p95": 129536000,
+        "max": 132845568,
+        "mean": 127237324.8,
+        "medianCi95": {
+          "lower": 126058496,
+          "upper": 128266240,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 129228800,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 136736768,
+        "median": 138878976,
+        "p95": 141164544,
+        "max": 143859712,
+        "mean": 139218329.6,
+        "medianCi95": {
+          "lower": 137846784,
+          "upper": 140439552,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 140750848,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 14612
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 3731
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "css.brotliBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 3242
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 206
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 315
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "css.distinctClassNames",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 206
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 17777
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "designModule.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 2768
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 35400
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "n": 20,
+      "deterministic": true,
+      "value": 25687
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "compiledModules.count",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 10
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 428
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "report.designSystemRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 1
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "report.consumerRuleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 427
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "variants.recipeAxisValues",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "variants.compoundVariants",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 20,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "output.cssSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "438005ed1d591913a15a1e67d3b66d508ae658bb94459f7cd1fa23e40fbe14ca"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "output.compiledModulesSha256",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "7c188e8a81d69d8f7f109e2a5752c09a2be92558fc23372c2e1c8e0a7f15bdbe"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "output.restoredAfterEdits",
+      "class": "identity",
+      "unit": null,
+      "n": 20,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "n": 1,
+      "deterministic": true,
+      "value": "true"
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 1274,
+        "median": 1288,
+        "p95": 1331.8,
+        "max": 1331.8,
+        "mean": 1290.5999999999997,
+        "medianCi95": {
+          "lower": 1281.5,
+          "upper": 1297,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 1297,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 15,
+      "stats": {
+        "n": 15,
+        "min": 4.038,
+        "median": 4.094,
+        "p95": 4.219,
+        "max": 4.219,
+        "mean": 4.112666666666667,
+        "medianCi95": {
+          "lower": 4.066,
+          "upper": 4.166,
+          "lowerRank": 4,
+          "upperRank": 12,
+          "coverage": 0.9648437500000012
+        },
+        "p95Ci95": {
+          "lower": 4.166,
+          "upper": null,
+          "lowerRank": 12,
+          "upperRank": null,
+          "coverage": null
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "runtime.recordedPropsCalls",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 15,
+      "deterministic": true,
+      "value": 88
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "runtime.recordedRecipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "n": 15,
+      "deterministic": true,
+      "value": 0
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 16.952,
+        "median": 17.2175,
+        "p95": 17.672,
+        "max": 19.521,
+        "mean": 17.380150000000008,
+        "medianCi95": {
+          "lower": 17.109,
+          "upper": 17.445,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 17.615,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 16.095,
+        "median": 17.229999999999997,
+        "p95": 18.899,
+        "max": 23.324,
+        "mean": 17.516371428571432,
+        "medianCi95": {
+          "lower": 17.111,
+          "upper": 17.497,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 18.774,
+          "upper": 21.561,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 9.644,
+        "median": 9.846,
+        "p95": 10.018,
+        "max": 11.985,
+        "mean": 9.945600000000002,
+        "medianCi95": {
+          "lower": 9.787,
+          "upper": 9.906,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 9.943,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 9.114,
+        "median": 9.863,
+        "p95": 11.362,
+        "max": 15.764,
+        "mean": 10.176064285714284,
+        "medianCi95": {
+          "lower": 9.744,
+          "upper": 10.015,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 11.165,
+          "upper": 14.318,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 9.152,
+        "median": 9.183499999999999,
+        "p95": 9.258,
+        "max": 9.436,
+        "mean": 9.2021,
+        "medianCi95": {
+          "lower": 9.162,
+          "upper": 9.211,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 9.241,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 8.808,
+        "median": 9.183499999999999,
+        "p95": 10.088,
+        "max": 11.688,
+        "mean": 9.35885714285714,
+        "medianCi95": {
+          "lower": 9.084,
+          "upper": 9.428,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 10.024,
+          "upper": 11.194,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    },
+    {
+      "epoch": "injected-slowdown",
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "n": 20,
+      "stats": {
+        "n": 20,
+        "min": 3.53,
+        "median": 3.5585,
+        "p95": 3.603,
+        "max": 3.618,
+        "mean": 3.561999999999999,
+        "medianCi95": {
+          "lower": 3.541,
+          "upper": 3.573,
+          "lowerRank": 6,
+          "upperRank": 15,
+          "coverage": 0.9586105346679679
+        },
+        "p95Ci95": {
+          "lower": 3.598,
+          "upper": null,
+          "lowerRank": 17,
+          "upperRank": null,
+          "coverage": null
+        }
+      },
+      "pooledIterations": {
+        "n": 140,
+        "min": 3.332,
+        "median": 3.5645,
+        "p95": 3.96,
+        "max": 4.745,
+        "mean": 3.6299571428571435,
+        "medianCi95": {
+          "lower": 3.535,
+          "upper": 3.609,
+          "lowerRank": 58,
+          "upperRank": 83,
+          "coverage": 0.9657643381268047
+        },
+        "p95Ci95": {
+          "lower": 3.93,
+          "upper": 4.602,
+          "lowerRank": 128,
+          "upperRank": 139,
+          "coverage": 0.9699187059212483
+        }
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.2969,
+        "lower": 1.2856,
+        "upper": 1.3153,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.303,
+        "lower": 1.2928,
+        "upper": 1.32,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiler.importMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.0046,
+        "lower": 1.0005,
+        "upper": 1.0175,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.cpuMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.1905,
+        "lower": 1.1759,
+        "upper": 1.2097,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.maxRssBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.0171,
+        "lower": 1.0062,
+        "upper": 1.022,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "session.maxRssBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.0082,
+        "lower": 0.9925,
+        "upper": 1.0207,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.propsNsPerCall",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 12,
+        "median": 1.0007,
+        "lower": 0.9923,
+        "upper": 1.0045,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 12,
+        "median": 0.9935,
+        "lower": 0.9808,
+        "upper": 1.0028,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.renderNsPerCall",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 12,
+        "median": 1.0033,
+        "lower": 0.9772,
+        "upper": 1.0229,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.moduleLoadMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 12,
+        "median": 1.0154,
+        "lower": 1.0026,
+        "upper": 1.0305,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.2854,
+        "lower": 1.2546,
+        "upper": 1.3007,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.2151,
+        "lower": 1.1544,
+        "upper": 1.28,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.3035,
+        "lower": 1.2998,
+        "upper": 1.3331,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.3092,
+        "lower": 1.2993,
+        "upper": 1.3353,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.3018,
+        "lower": 1.2907,
+        "upper": 1.3159,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.2998,
+        "lower": 1.2879,
+        "upper": 1.3157,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.3036,
+        "lower": 1.2857,
+        "upper": 1.3177,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 10,
+        "median": 1.287,
+        "lower": 1.2333,
+        "upper": 1.313,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3125,
+        "lower": 1.3051,
+        "upper": 1.3245,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3139,
+        "lower": 1.3055,
+        "upper": 1.3236,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiler.importMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.0077,
+        "lower": 1.0005,
+        "upper": 1.0169,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.cpuMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.1301,
+        "lower": 1.1198,
+        "upper": 1.1413,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.maxRssBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 0.9928,
+        "lower": 0.9838,
+        "upper": 0.9981,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "session.maxRssBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.0006,
+        "lower": 0.9931,
+        "upper": 1.0107,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.propsNsPerCall",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 15,
+        "median": 0.9981,
+        "lower": 0.9939,
+        "upper": 1.0043,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0094,
+        "lower": 0.9961,
+        "upper": 1.0185,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.renderNsPerCall",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0009,
+        "lower": 0.996,
+        "upper": 1.0203,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.moduleLoadMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0075,
+        "lower": 0.9993,
+        "upper": 1.0178,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2853,
+        "lower": 1.2724,
+        "upper": 1.2954,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3067,
+        "lower": 1.2905,
+        "upper": 1.3246,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2937,
+        "lower": 1.2834,
+        "upper": 1.3061,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2917,
+        "lower": 1.265,
+        "upper": 1.3133,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2801,
+        "lower": 1.2631,
+        "upper": 1.2943,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2536,
+        "lower": 1.2366,
+        "upper": 1.2791,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2991,
+        "lower": 1.2777,
+        "upper": 1.3089,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2992,
+        "lower": 1.2672,
+        "upper": 1.3089,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2895,
+        "lower": 1.2761,
+        "upper": 1.3014,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2929,
+        "lower": 1.2809,
+        "upper": 1.2989,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "compiler.importMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.0098,
+        "lower": 1.0007,
+        "upper": 1.0128,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.cpuMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.091,
+        "lower": 1.084,
+        "upper": 1.1045,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.maxRssBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.0128,
+        "lower": 1.0063,
+        "upper": 1.0217,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "session.maxRssBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 0.9922,
+        "lower": 0.9875,
+        "upper": 1.0033,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "runtime.propsNsPerCall",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0044,
+        "lower": 1.0016,
+        "upper": 1.0104,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "runtime.moduleLoadMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 15,
+        "median": 1.0012,
+        "lower": 0.9975,
+        "upper": 1.011,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2666,
+        "lower": 1.2489,
+        "upper": 1.2874,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3141,
+        "lower": 1.2676,
+        "upper": 1.3253,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.totalMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.3118,
+        "lower": 1.3064,
+        "upper": 1.3154,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "interleaved": true,
+      "pairedRatio": {
+        "n": 20,
+        "median": 1.2886,
+        "lower": 1.2799,
+        "upper": 1.3023,
+        "rounds": 2000,
+        "seed": 307
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 46998,
+      "candidateValue": 46998
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.gzipBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 9045,
+      "candidateValue": 9045
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.brotliBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 7424,
+      "candidateValue": 7424
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.styleRules",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 693,
+      "candidateValue": 693
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.atRules",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 47,
+      "candidateValue": 47
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.declarations",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 903,
+      "candidateValue": 903
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.distinctClassNames",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 693,
+      "candidateValue": 693
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "designModule.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 102320,
+      "candidateValue": 102320
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "designModule.gzipBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 6567,
+      "candidateValue": 6567
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "declarations.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 82323,
+      "candidateValue": 82323
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiledModules.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 2099147,
+      "candidateValue": 2099147
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiledModules.count",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 1000,
+      "candidateValue": 1000
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.ruleCount",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 16757,
+      "candidateValue": 16757
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.designSystemRuleCount",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 176,
+      "candidateValue": 176
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.consumerRuleCount",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 16581,
+      "candidateValue": 16581
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.recipeSelections",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 176,
+      "candidateValue": 176
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.recipeAxisValues",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 119,
+      "candidateValue": 119
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.compoundVariants",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 10,
+      "candidateValue": 10
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "output.cssSha256",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "40e5966b6e309cbde2f3db4592ef0eba28418878b0728e54dfabfe0408519949",
+      "candidateValue": "40e5966b6e309cbde2f3db4592ef0eba28418878b0728e54dfabfe0408519949"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "output.compiledModulesSha256",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "b557f46e0e8aa19b9739d3319e402fc268fcee34564054c8da97327191453619",
+      "candidateValue": "b557f46e0e8aa19b9739d3319e402fc268fcee34564054c8da97327191453619"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "output.restoredAfterEdits",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "true",
+      "candidateValue": "true"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "true",
+      "candidateValue": "true"
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recordedPropsCalls",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 16000,
+      "candidateValue": 16000
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recordedRecipeSelections",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 4000,
+      "candidateValue": 4000
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 2657,
+      "candidateValue": 2657
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.gzipBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 1024,
+      "candidateValue": 1024
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.brotliBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 902,
+      "candidateValue": 902
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.styleRules",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 32,
+      "candidateValue": 32
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.atRules",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 1,
+      "candidateValue": 1
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.declarations",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 66,
+      "candidateValue": 66
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.distinctClassNames",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 32,
+      "candidateValue": 32
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "designModule.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 17250,
+      "candidateValue": 17250
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "designModule.gzipBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 3227,
+      "candidateValue": 3227
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "declarations.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 24182,
+      "candidateValue": 24182
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiledModules.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 9142,
+      "candidateValue": 9142
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiledModules.count",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 9,
+      "candidateValue": 9
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.ruleCount",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 44,
+      "candidateValue": 44
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.designSystemRuleCount",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 17,
+      "candidateValue": 17
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.consumerRuleCount",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 27,
+      "candidateValue": 27
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.recipeSelections",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 4,
+      "candidateValue": 4
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.recipeAxisValues",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 4,
+      "candidateValue": 4
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.compoundVariants",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 0,
+      "candidateValue": 0
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "output.cssSha256",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "3f90ae2bfa77e9cf0e48fda603be08c015264ef9a322335f334c7fa4fcadcc2b",
+      "candidateValue": "3f90ae2bfa77e9cf0e48fda603be08c015264ef9a322335f334c7fa4fcadcc2b"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "output.compiledModulesSha256",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "a213ec687d8ba3153ad4a1b9305732c2b8572e647ceff7c2618e6cb8e4a5b1eb",
+      "candidateValue": "a213ec687d8ba3153ad4a1b9305732c2b8572e647ceff7c2618e6cb8e4a5b1eb"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "output.restoredAfterEdits",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "true",
+      "candidateValue": "true"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "true",
+      "candidateValue": "true"
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recordedPropsCalls",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 28,
+      "candidateValue": 28
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recordedRecipeSelections",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 6,
+      "candidateValue": 6
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 14612,
+      "candidateValue": 14612
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.gzipBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 3731,
+      "candidateValue": 3731
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.brotliBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 3242,
+      "candidateValue": 3242
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.styleRules",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 206,
+      "candidateValue": 206
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.atRules",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 0,
+      "candidateValue": 0
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.declarations",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 315,
+      "candidateValue": 315
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.distinctClassNames",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 206,
+      "candidateValue": 206
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "designModule.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 17777,
+      "candidateValue": 17777
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "designModule.gzipBytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 2768,
+      "candidateValue": 2768
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "declarations.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 35400,
+      "candidateValue": 35400
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "compiledModules.bytes",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 25687,
+      "candidateValue": 25687
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "compiledModules.count",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 10,
+      "candidateValue": 10
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "report.ruleCount",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 428,
+      "candidateValue": 428
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "report.designSystemRuleCount",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 1,
+      "candidateValue": 1
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "report.consumerRuleCount",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 427,
+      "candidateValue": 427
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "variants.recipeSelections",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 0,
+      "candidateValue": 0
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "variants.recipeAxisValues",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 0,
+      "candidateValue": 0
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "variants.compoundVariants",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 0,
+      "candidateValue": 0
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "output.cssSha256",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "438005ed1d591913a15a1e67d3b66d508ae658bb94459f7cd1fa23e40fbe14ca",
+      "candidateValue": "438005ed1d591913a15a1e67d3b66d508ae658bb94459f7cd1fa23e40fbe14ca"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "output.compiledModulesSha256",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "7c188e8a81d69d8f7f109e2a5752c09a2be92558fc23372c2e1c8e0a7f15bdbe",
+      "candidateValue": "7c188e8a81d69d8f7f109e2a5752c09a2be92558fc23372c2e1c8e0a7f15bdbe"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "output.restoredAfterEdits",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "true",
+      "candidateValue": "true"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": "true",
+      "candidateValue": "true"
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "runtime.recordedPropsCalls",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 88,
+      "candidateValue": 88
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "runtime.recordedRecipeSelections",
+      "reference": "alpha1",
+      "candidate": "injected-slowdown",
+      "identical": true,
+      "referenceValue": 0,
+      "candidateValue": 0
+    }
+  ]
+}
