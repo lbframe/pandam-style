@@ -351,45 +351,52 @@ function summarize(state, requestedModel) {
         : sumMeasured(parts, `claude.result.modelUsage[*].${f}`, 'tokens');
   }
 
-  // Cross-check of the main-loop messages against modelUsage[requested].
+  // Cross-check of the main-loop messages against modelUsage[requested]
+  // (section 2.2), on the fields that are final per message: input, cache
+  // read and cache write (observed in the smoke run: equal in every event of
+  // a message and summing exactly to modelUsage). Per-message output counts
+  // are early streaming snapshots (35 vs 3299 final), so output is never
+  // compared. A message without one of these counters makes the check
+  // impossible; it is never read as 0.
   let discrepancy = null;
-  if (usable && modelUsage[requestedModel] != null) {
-    // A message without a numeric counter makes the cross-check impossible;
-    // it is never read as 0.
-    let input = 0;
-    let output = 0;
+  if (
+    usable &&
+    modelUsage[requestedModel] != null &&
+    state.messageUsage.size > 0
+  ) {
+    const fields = [
+      ['input_tokens', 'inputTokens'],
+      ['cache_read_input_tokens', 'cacheReadInputTokens'],
+      ['cache_creation_input_tokens', 'cacheCreationInputTokens'],
+    ];
+    const sums = Object.fromEntries(fields.map(([m]) => [m, 0]));
     let complete = true;
     for (const { model, usage } of state.messageUsage.values()) {
       if (model !== requestedModel) continue;
-      if (
-        typeof usage.input_tokens !== 'number' ||
-        typeof usage.output_tokens !== 'number'
-      ) {
-        complete = false;
-        break;
+      for (const [m] of fields) {
+        if (typeof usage[m] !== 'number') complete = false;
+        else sums[m] += usage[m];
       }
-      input += usage.input_tokens;
-      output += usage.output_tokens;
     }
     const mu = modelUsage[requestedModel];
-    if (!complete)
+    if (!complete || fields.some(([, u]) => typeof mu[u] !== 'number'))
       discrepancy = {
         status: 'not-computable',
-        reason: 'a message lacks a counter',
+        reason: 'a message or modelUsage lacks an input or cache counter',
       };
-    else if (
-      state.messageUsage.size > 0 &&
-      (input !== mu.inputTokens || output !== mu.outputTokens)
-    )
-      discrepancy = {
-        status: 'disagreement',
-        messagesInput: input,
-        messagesOutput: output,
-        modelUsageInput:
-          typeof mu.inputTokens === 'number' ? mu.inputTokens : null,
-        modelUsageOutput:
-          typeof mu.outputTokens === 'number' ? mu.outputTokens : null,
-      };
+    else {
+      const differing = fields.filter(([m, u]) => sums[m] !== mu[u]);
+      if (differing.length > 0)
+        discrepancy = {
+          status: 'disagreement',
+          fields: Object.fromEntries(
+            differing.map(([m, u]) => [
+              u,
+              { messages: sums[m], modelUsage: mu[u] },
+            ]),
+          ),
+        };
+    }
   }
 
   // Cost: an estimate of the CLI; unknown on default zeros or unknown basis.

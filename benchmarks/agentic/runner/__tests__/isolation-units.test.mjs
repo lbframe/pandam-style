@@ -123,9 +123,23 @@ test('channel audit: a sample without the CLI or a count is unknown, never clean
     controlSocketConnections: null,
   });
   const s = summarizeAudits([
-    { cliFound: false, cliNonDumpable: null, foreignStreamHolders: 0 },
+    { cliFound: false, cliNonDumpable: null, foreignStreamHolders: null },
   ]);
   assert.equal(s.cliNonDumpable, null);
+  assert.equal(s.foreignStreamHolders, null, 'nothing was checked');
+  // A sample before the CLI started does not hide the samples that saw it.
+  assert.deepEqual(
+    summarizeAudits([
+      { cliFound: false, cliNonDumpable: null, foreignStreamHolders: null },
+      { cliFound: true, cliNonDumpable: true, foreignStreamHolders: 1 },
+    ]),
+    {
+      samples: 2,
+      cliNonDumpable: true,
+      foreignStreamHolders: 1,
+      controlSocketConnections: null,
+    },
+  );
   assert.equal(
     summarizeAudits([
       { cliFound: true, cliNonDumpable: true, foreignStreamHolders: 0 },

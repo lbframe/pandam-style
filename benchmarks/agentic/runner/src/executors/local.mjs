@@ -12,7 +12,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { readCredentialFile } from '../credentials.mjs';
 
 export class LocalFixtureExecutor {
@@ -75,6 +75,33 @@ export class LocalFixtureExecutor {
     const configDir =
       cli === 'claude' ? path.join(agentHome, '.claude') : agentHome;
     fs.mkdirSync(configDir, { recursive: true, mode: 0o700 });
+    if (credential?.login) {
+      // Access-only login through the fake CLI (`codex login …` shape).
+      const login = spawnSync(
+        process.execPath,
+        [this.fakeBinary, ...credential.login.args],
+        {
+          input: credential.login.stdin,
+          encoding: 'utf8',
+          env: {
+            PATH: process.env.PATH,
+            HOME: agentHome,
+            PMS_FAKE_CLI: cli,
+            PMS_FAKE_SCENARIO: this.scenario,
+            PMS_FAKE_CREDENTIAL_DIR: configDir,
+          },
+        },
+      );
+      if (login.status !== 0) {
+        fs.rmSync(agentHome, { recursive: true, force: true });
+        throw Object.assign(
+          new Error(
+            `access-only login rejected: ${String(login.stderr).trim().slice(-300)}`,
+          ),
+          { code: 'credential-login', cleanupRemaining: [] },
+        );
+      }
+    }
     const child = spawn(process.execPath, [this.fakeBinary, ...argv.slice(1)], {
       cwd: workspace,
       detached: true,
