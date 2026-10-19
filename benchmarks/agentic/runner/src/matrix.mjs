@@ -569,6 +569,7 @@ export async function runMatrix({
               repetition: r,
               status: 'missing',
               reason: out.haltProvider,
+              ...(out.failure ?? {}),
             });
             break;
           }

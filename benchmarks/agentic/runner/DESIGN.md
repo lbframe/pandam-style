@@ -306,7 +306,15 @@ derives **normalized counters**. Each derivation states its rule.
 - Per-message usage of non-synthetic main-loop assistant messages
   (`parent_tool_use_id: null`), de-duplicated by `message.id`, is a
   cross-check of `modelUsage[requested]`. A disagreement is recorded as
-  `discrepancy` and never silently resolved.
+  `discrepancy` and never silently resolved. Only fields that are final per
+  message are compared: `input_tokens`, `cache_read_input_tokens` and
+  `cache_creation_input_tokens` against `inputTokens`,
+  `cacheReadInputTokens` and `cacheCreationInputTokens`. Per-message
+  `output_tokens` are early snapshots (observed in the smoke run, Claude
+  Code 2.1.303: the events of one `message.id` repeat the same input and
+  cache counts, while their output sums to 35 against 3299 in
+  `modelUsage`) and are never compared. A missing counter makes the check
+  `not-computable`.
 
 Normalized token fields: `inputUncached`, `inputCacheRead`, `inputCacheWrite`,
 `inputTotal`, `outputTotal`, `outputReasoning` (subset of `outputTotal`). Each
@@ -672,9 +680,17 @@ That is host state, not a guarantee. The design therefore uses:
 
 **Self-test validity.** The isolation self-test (§9.3) result is bound to the
 digest of: Docker server version, network create options, agent and proxy
-image ids, proxy allowlist, kernel release and the host's global interface
-address set. It expires after 24 h. A provider-backed attempt refuses to start
-without a valid result for its exact binding.
+image ids, proxy allowlist, kernel release and the host's **stable routable
+address set**: every non-loopback address except link-local ones
+(`169.254.0.0/16`, `fe80::/10`), addresses of Docker interfaces (`docker*`,
+`br-*`, `veth*`) and any address inside a Docker network's subnet. Docker
+networks, bridges and container veths created or removed between the
+self-test and preflight (by the self-test itself, by attempts or by other
+projects on the host) therefore leave the binding unchanged, while a change
+of a genuine routable address still invalidates it. The self-test (at its
+start) and preflight compute these facts with the same function. It expires
+after 24 h. A provider-backed attempt refuses to start without a valid
+result for its exact binding.
 
 ### 4.4 Telemetry and failure-signal integrity (R3)
 
@@ -723,6 +739,23 @@ paths:
   enabled by default (observed in `features list`). The audit records
   connections to these sockets; any connection from a non-CLI process is a
   breach observation. Residual risk: documented, not closed.
+
+**Audit identification (observed, smoke run and agent image).** The CLI is
+the direct child of the `run-cli.mjs` launcher that `docker exec` started
+(parent PID 0, which no process in the container can produce), not a
+process whose arguments name the CLI: the launcher's own arguments contain
+`/opt/cli/claude`. Non-dumpability is read from the owner of
+`/proc/<pid>/environ`: `/proc/<pid>` itself always belongs to the task's
+effective UID, even for a non-dumpable task (`task_dump_owner`). In the
+agent image during an offline Claude Code run, `/proc/<cli>` was owned by
+the agent UID while `/proc/<cli>/fd` and `environ` were root-owned, and the
+agent UID got EACCES on both: the CLI is non-dumpable as designed.
+Foreign holders are counted per process, excluding exactly the launcher and
+the CLI (the CLI holds the stream twice: fd 1 and a duplicate). The first
+smoke run's `cliNonDumpable: false` and its 2 holders per sample were these
+three misreadings. A sample that did not see the CLI (taken before it
+started or after it ended) has no count; the summary covers the samples
+that saw it and is unknown when there are none.
 - **Self-inflicted failures.** Agent code can kill the CLI (signals are
   allowed) or exhaust the quota with the credential it can read (§4.10).
   Neither forges a stream: a kill without a provider error is
@@ -796,8 +829,23 @@ credential with no refresh token: for Claude, the access token in
 `CLAUDE_CODE_OAUTH_TOKEN`; for Codex, `codex login --with-access-token` inside
 the tmpfs. An attempt starts only if the token's remaining lifetime exceeds
 the attempt budget plus a margin. The user's refresh token never enters a
-container, so the user's own login cannot be rotated by a run. Feasibility is
-**unverified** (smoke item). If it fails, mode B is used and recorded.
+container, so the user's own login cannot be rotated by a run.
+Feasibility (observed in the smoke run): Claude Code 2.1.303 runs with
+`CLAUDE_CODE_OAUTH_TOKEN`; Codex 0.163.0 **rejects** a ChatGPT login's
+access token (`Error logging in with access token: agent identity JWT
+payload is not valid JSON`; the option expects an agent identity token), so
+mode A is infeasible for Codex ChatGPT logins and a matrix using one
+declares `mode: refresh-capable-copy` for Codex.
+
+**Fallback on a rejected login.** A login rejected inside the container is a
+credential failure of that provider, never of the matrix: the attempt's
+containers are removed (and their removal verified), then the attempt
+starts again in mode B if `fallback: refresh-capable-copy` is declared,
+recording `accessOnlyRefused` and the redacted login error. Without a
+declared fallback the provider gets a durable refusal and its repetition is
+`missing` with class `infrastructure`, code `credential-login`; the other
+providers' cells go on. The same applies when the token's lifetime is too
+short.
 
 **Mode B: refresh-capable copy.** The full file is copied into the agent
 tmpfs. Because the refresh token is shared with the user's own sessions,
@@ -1116,7 +1164,7 @@ contracts (§3.4–3.5) and the observed offline outputs.
 | F4 | Codex non-zero input/output, zero cached and reasoning counters | details `unknown`, totals `observed` |
 | F5 | Codex several `turn.completed` with growing cumulative usage | last value used, no sum |
 | F6 | Claude error result with zero usage, `modelUsage: {}`, synthetic message (the observed shape) | all tokens and cost `unknown` |
-| F7 | Claude duplicate assistant events per `message.id`; `modelUsage` vs per-message disagreement | de-duplication; `discrepancy` recorded |
+| F7 | Claude duplicate assistant events per `message.id`; `modelUsage` vs per-message disagreement | de-duplication; `discrepancy` recorded for input and cache counters, never for output snapshots |
 | F8 | Claude cache read/creation and thinking counters | additive and subset rules; normalized fields |
 | F9 | `costBasis: unknown` | cost `unknown` |
 | F10 | Claude `rate_limit` error with `rejected` rate-limit event; Codex usage-limit message | `infrastructure:rate-limit`, backoff from `resetsAt` |
@@ -1233,6 +1281,13 @@ bound check.
   - tool-result exit-status forms;
   - additive/subset token consistency;
   - channel-audit results.
+- **First run (2026-10-19, `ffd2590`), observed:** discovery × both Claude
+  models completed in mode A (verdict pass, only `api.anthropic.com:443`
+  contacted); the Codex access-only login was rejected (§4.6) and the
+  container error halted the whole matrix, so the remaining four attempts
+  never ran. It also showed a spurious usage `discrepancy` (output
+  snapshots, §2.2) and a channel audit that misidentified the CLI (§4.4).
+  All three are fixed (§11.2 item 20); the full run is to be repeated.
 - A successful smoke run cannot confirm rate-limit, capacity, quota
   exhaustion, refresh rotation under conflict, cancellation escalation or
   resource-limit behavior. Those stay covered by fixtures and are labelled
@@ -1261,22 +1316,22 @@ Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 | §1.1–1.3 units, record, identity | `matrix.mjs`, `attempt.mjs`, `identity.mjs`, `schema/run-record.v1.schema.json` | every fixture run validates its records and report (F57, `helpers.mjs`) |
 | §1.4 comparability | `comparability.mjs`, `matrix.mjs` `projectionFor` (per-cell closure) | `evidence.test.mjs` F34, F35; `measurement.test.mjs` B11 |
 | §1.5 replay, resume | `regrade.mjs` (integrity and identity first), `matrix.mjs` `matrixIdentity`, `repetitionState` | `evidence.test.mjs` F30; `measurement.test.mjs` B10, B12; `review-r2.test.mjs` B10, B12 |
-| §2.1–2.2 measured values, tokens | `measured.mjs`, `adapters/*.mjs` | `adapters.test.mjs` F1–F9; `metrics.test.mjs` lint and property test |
+| §2.1–2.2 measured values, tokens | `measured.mjs`, `adapters/*.mjs` | `adapters.test.mjs` F1–F9; `smoke-fixes-2.test.mjs` observed Claude usage shape; `metrics.test.mjs` lint and property test |
 | §2.4 repairs, first pass, attribution | `commands.mjs` (`command-classes/v4`) | `metrics.test.mjs` F24–F27, F58; `measurement.test.mjs` B8; `review-r2.test.mjs` B8 |
 | §3 adapters, budgets | `adapters/*.mjs`, `attempt.mjs` `agentPhase` | `adapters.test.mjs` F10–F20, F23, F28, F29 |
 | §3.2 container-visible paths | executors' `visiblePaths` | `docker.test.mjs` B6 |
 | §3.7 version pinning | `docker.mjs` identity checks, `provider.mjs` | `product-build.test.mjs` F55 |
 | §4.2 roles, confinement, grading | `safefs.mjs`, `workspace.mjs`, `docker.mjs`, `attempt.mjs` `grade` | `confinement.test.mjs` B1; `policy-report.test.mjs` F40, F43; `docker.test.mjs` B7 |
 | §4.3 network, proxy | `docker.mjs`, `container/connect-proxy.mjs`, `selftest.mjs` | `isolation-units.test.mjs`; `docker.test.mjs` B5 |
-| §4.4 stream integrity | `measured.mjs`, `container/channel-audit.mjs`, `docker.mjs` `summarizeAudits` | `adapters.test.mjs` F20, F22, F23; self-test (F21) |
+| §4.4 stream integrity | `measured.mjs`, `container/channel-audit.mjs`, `docker.mjs` `summarizeAudits` | `adapters.test.mjs` F20, F22, F23; `smoke-fixes-2.test.mjs` (audit over the observed process table); `isolation-units.test.mjs` summary; `docker.test.mjs` channel audit; self-test (F21) |
 | §4.5 capability matrix | `capabilities.mjs` | `adapters.test.mjs` F18, F36–F38; `policy-report.test.mjs` F39 |
-| §4.6 credentials, source policy, recovery, refusals | `credentials.mjs`, `recovery.mjs`, `refusals.mjs`, `container/*` | `credentials.test.mjs` F31, F44–F50, F59; `confinement.test.mjs` B3, B4; `review-r2.test.mjs` B2, B4; `docker.test.mjs` B4 |
+| §4.6 credentials, source policy, recovery, refusals | `credentials.mjs`, `recovery.mjs`, `refusals.mjs`, `container/*` | `credentials.test.mjs` F31, F44–F50, F59; `confinement.test.mjs` B3, B4; `review-r2.test.mjs` B2, B4; `smoke-fixes-2.test.mjs` login fallback and provider refusal; `docker.test.mjs` B4, login fallback |
 | §4.8 product build, trusted tree, closures | `store.mjs`, `trusted-tree.mjs` `installFixtureClosure`, `provider.mjs` | `product-build.test.mjs` G, F51–F53; `measurement.test.mjs` B11 |
 | §4.9 held-out | `capabilities.mjs` `heldoutRefusal`, CLI | `policy-report.test.mjs` F54 |
 | §5 failures, retries, contested | `classify.mjs`, `matrix.mjs` | `adapters.test.mjs` F10–F16, F22; `measurement.test.mjs` B10 |
 | §6 evidence, redaction, bounds | `workspace.mjs` staging, `evidence.mjs`, `redact.mjs` (chunked scans), `stream.mjs` (bounded splitter and sink), `attempt.mjs` `writeRecord` | `evidence.test.mjs` F30–F33; `confinement.test.mjs` B2; `measurement.test.mjs` B13 |
 | §7 report | `report.mjs` (seeded from the planned matrix), CLI `writeReport` | `policy-report.test.mjs` F56, F57; `measurement.test.mjs` B9 |
-| §9.3 isolation self-test | `selftest.mjs`, `container/probe-*.mjs` | `docker.test.mjs` B5; §11.3 |
+| §9.3 isolation self-test | `selftest.mjs`, `container/probe-*.mjs`, `docker.mjs` `stableHostAddresses` | `selftest-binding.test.mjs`; `docker.test.mjs` B5; §11.3 |
 
 ### 11.2 Where the implementation differs from or completes this note
 
@@ -1418,11 +1473,51 @@ Each item was found while implementing, testing or in review round 1
     together with its manifests and digests can make a forged attempt look
     consistent (review classes B10 and B12). Only the operator can do this;
     the evaluated agent never has access to these files.
-18. **Provider-backed path never executed.** Its preflight refusals are
-    tested; the containers, staging, grading and self-test binding run in the
-    credential-free Docker integration tests; the remaining steps (binding
-    of the real store, trusted tree from the real tarballs, CLI identity of
-    the real binaries) run first in the authorized smoke run.
+18. **Stable self-test host binding (after merge, main CI).** The binding
+    first included every non-loopback host address, so Docker bridges,
+    container veths and IPv6 link-local addresses created or removed
+    between the self-test and preflight (the self-test's own networks, CI
+    runners, restarting containers of other projects) changed it and
+    preflight refused a self-test that had passed. It now binds the stable
+    routable set of §4.3 (`stableHostAddresses`), computed by the same
+    `currentFacts` in both places. The probes still target every host
+    address and bridge gateway.
+19. **Smoke-run preparation findings (no model call).** Preparing the
+    authorized smoke run on `aebb19a` showed three implementation defects:
+    - the fixture installer required every product package of the binding,
+      while a fixture installs only those its `package.json` declares (the
+      storefront: core, compiler, vite). It now requires the declared ones,
+      verifies every installed one against its tarball and refuses any
+      installed `@pandamstyle/*` package outside the product build (§4.7);
+    - Codex 0.163.0's `debug prompt-input` accepts neither `--strict-config`
+      nor `-m` (observed), so the evidence render failed and every Codex
+      attempt would have been `config-integrity`. It now passes the model as
+      `-c model=…` with the attempt's overrides; the values are still
+      type-validated (an unknown `web_search` variant fails) and the attempt
+      runs `codex exec --strict-config` (§3.3);
+    - the agent image copied only `bin/codex`, so Codex lost the helpers it
+      finds next to its executable (`codex-code-mode-host`, bundled `rg`,
+      `bwrap`) and reported Code Mode unavailable. `/opt/cli/codex` is now a
+      link into the execute-only vendor tree (§3.7).
+20. **First smoke run findings (observed, §9.4).** Three defects, fixed
+    with tests built from the observed shapes (synthetic credentials only):
+    - a rejected Codex access-only login was a container error that halted
+      the matrix. The executors now raise a coded `credential-login`
+      failure; the attempt falls back to the declared mode B or refuses only
+      that provider (§4.6). Codex mode A is infeasible for ChatGPT logins;
+    - the usage cross-check compared per-message output snapshots and
+      reported a spurious disagreement; it compares input and cache
+      counters only (§2.2);
+    - the channel audit took the launcher for the CLI, read dumpability from
+      `/proc/<pid>` and counted the CLI's own descriptors as foreign holders;
+      a sample that missed the CLI counted as clean (§4.4). The fixed audit
+      runs in the Docker integration tests.
+21. **Provider-backed path.** Its preflight refusals are tested; the
+    containers, staging, grading and self-test binding run in the
+    credential-free Docker integration tests. The first smoke run executed
+    it end to end for Claude (binding of the real store, trusted tree from
+    the real tarballs, CLI identity of the real binaries); Codex attempts
+    run first in the repeated smoke run.
 
 ### 11.3 Isolation self-test and Docker integration
 
@@ -1435,7 +1530,10 @@ the grader container with a test-only trusted tree). Local result (Docker
 29.2.1, kernel 6.8.0-146-generic): passed (B5, B6, B7, and B4: a failure
 injected after each resource-creation step over real Docker, the invalid CPU
 limit case, an unverifiable cleanup retained, refused and recovered, and a
-daemon outage during rollback treated as unknown, then recovered).
+daemon outage during rollback treated as unknown, then recovered; the
+channel audit identifying the non-dumpable fake CLI with no foreign holder,
+and a tool child holding the stream; a rejected Codex access-only login
+falling back to mode B).
 The `agentic-corpus` CI job runs the same tests as extra steps.
 
 ## Appendix A: probes and sources

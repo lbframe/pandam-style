@@ -475,6 +475,25 @@ export function claudeCredentialDoc({
   };
 }
 
+/** Synthetic Codex ChatGPT login (`auth.json` shape; JWT access token). */
+export function codexCredentialDoc({
+  expiresAt = Date.now() + 10 * 3600 * 1000,
+} = {}) {
+  const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+  const jwt = `${b64({ alg: 'none' })}.${b64({ exp: Math.floor(expiresAt / 1000) })}.c2lnbmF0dXJlLXN5bnRoZXRpYw`;
+  return {
+    OPENAI_API_KEY: null,
+    auth_mode: 'chatgpt',
+    last_refresh: '2026-10-19T00:00:00Z',
+    tokens: {
+      access_token: jwt,
+      account_id: 'acct-synthetic-0000',
+      id_token: jwt,
+      refresh_token: 'rt-synthetic-refresh-0123456789abcdef',
+    },
+  };
+}
+
 // Synthetic CE baseline store (two product tarballs, Node, source archive)
 // standing in for ~/.local/share/pandamstyle-baselines/alpha1.
 export const STORE_COMMIT = '415e05539fcb5d36a78226112b5cf488b200b1aa';

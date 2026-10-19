@@ -308,8 +308,9 @@ test('F7 Claude duplicate assistant events per message.id; discrepancy recorded'
   const d = records[0].metrics.tokens.discrepancy;
   // De-duplicated by message.id: 7 + 5, not 7 + 7 + 5.
   assert.equal(d.status, 'disagreement');
-  assert.equal(d.messagesInput, 12);
-  assert.equal(d.modelUsageInput, 40);
+  assert.deepEqual(d.fields.inputTokens, { messages: 12, modelUsage: 40 });
+  // Output is never compared (per-message output counts are snapshots).
+  assert.equal(d.fields.outputTokens, undefined);
 });
 
 test('F8 Claude cache and thinking counters: additive input, reasoning subset', async () => {

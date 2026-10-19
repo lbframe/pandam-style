@@ -181,7 +181,7 @@ export function graderRunArgs({
   ];
 }
 
-export function auditRunArgs({ container, image, cliName, uid = agentUid() }) {
+export function auditRunArgs({ container, image, uid = agentUid() }) {
   return [
     'run',
     '--rm',
@@ -202,7 +202,6 @@ export function auditRunArgs({ container, image, cliName, uid = agentUid() }) {
     NODE,
     `${HARNESS_DIR}/channel-audit.mjs`,
     String(uid),
-    cliName,
   ];
 }
 
@@ -409,18 +408,24 @@ export class DockerExecutor {
       runCli.push('--env-file', `${home}/.cred-env`);
     }
     if (credential?.login) {
-      must(
-        run(
-          execArgs({
-            container: agent,
-            interactive: true,
-            env: cliEnv,
-            command: [this.cliBinary[cli], ...credential.login.args],
-          }),
-          { input: credential.login.stdin },
-        ),
-        'access-only login',
+      // A rejected access-only login is a credential failure of this
+      // provider (section 4.6), not a container failure.
+      const login = run(
+        execArgs({
+          container: agent,
+          interactive: true,
+          env: cliEnv,
+          command: [this.cliBinary[cli], ...credential.login.args],
+        }),
+        { input: credential.login.stdin },
       );
+      if (login.status !== 0)
+        throw Object.assign(
+          new Error(
+            `access-only login rejected: ${`${login.stderr ?? ''}`.trim().slice(-300)}`,
+          ),
+          { code: 'credential-login' },
+        );
     }
     const binary = this.cliBinary[cli];
     const child = spawn(
@@ -446,7 +451,6 @@ export class DockerExecutor {
         auditRunArgs({
           container: agent,
           image: this.images.harness,
-          cliName: path.basename(binary),
         }),
       );
       if (r.status === 0) {
@@ -605,18 +609,20 @@ export function hasDockerSync() {
 }
 
 /**
- * Summary of the channel-audit samples (section 4.4). A sample that did not
- * see the CLI or lacks a count makes the summary unknown (null), never clean.
+ * Summary of the channel-audit samples (section 4.4), over the samples that
+ * saw the CLI (one taken before the CLI started or after it ended checked
+ * nothing). No such sample, or one without a count, makes the summary
+ * unknown (null), never clean.
  */
 export function summarizeAudits(audits) {
   const seen = audits.filter((a) => a.cliFound === true);
-  const counts = audits.map((a) => a.foreignStreamHolders);
+  const counts = seen.map((a) => a.foreignStreamHolders);
   return {
     samples: audits.length,
     cliNonDumpable:
       seen.length === 0 ? null : seen.every((a) => a.cliNonDumpable === true),
     foreignStreamHolders:
-      audits.length > 0 && counts.every(Number.isInteger)
+      seen.length > 0 && counts.every(Number.isInteger)
         ? counts.reduce((n, x) => n + x, 0)
         : null,
     controlSocketConnections: null,
@@ -643,12 +649,102 @@ export function staleResources(run = docker) {
   return { containers, networks };
 }
 
+/** Every non-loopback host address (self-test probe targets). */
 export function hostAddresses() {
   return Object.values(os.networkInterfaces())
     .flat()
     .filter((a) => a && !a.internal)
     .map((a) => a.address)
     .sort();
+}
+
+/** An IPv4 or IPv6 address as [family, BigInt]; null when unparseable. */
+function ipValue(address) {
+  const a = String(address).split('%')[0];
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(a)) {
+    const parts = a.split('.').map(Number);
+    if (parts.some((x) => x > 255)) return null;
+    return [4, parts.reduce((v, x) => (v << 8n) | BigInt(x), 0n)];
+  }
+  if (!a.includes(':')) return null;
+  const [head, tail] = a.split('::');
+  const v4 = /(\d+\.\d+\.\d+\.\d+)$/.exec(a);
+  const hex = (s) => (s ? s.split(':').filter(Boolean) : []);
+  let h = hex(head);
+  let t = hex(tail);
+  if (v4) {
+    const n = ipValue(v4[1])[1];
+    const words = [(n >> 16n).toString(16), (n & 0xffffn).toString(16)];
+    if (tail != null) t = [...t.slice(0, -1), ...words];
+    else h = [...h.slice(0, -1), ...words];
+  }
+  const missing = 8 - h.length - t.length;
+  if (tail == null ? missing !== 0 : missing < 0) return null;
+  const all = [...h, ...Array(tail == null ? 0 : missing).fill('0'), ...t];
+  return [6, all.reduce((v, x) => (v << 16n) | BigInt(parseInt(x, 16)), 0n)];
+}
+
+/** Whether `address` lies in CIDR `subnet` (same family only). */
+export function inSubnet(address, subnet) {
+  const [base, bits] = String(subnet).split('/');
+  const a = ipValue(address);
+  const b = ipValue(base);
+  if (a == null || b == null || a[0] !== b[0] || bits == null) return false;
+  const width = a[0] === 4 ? 32n : 128n;
+  const shift = width - BigInt(Number(bits));
+  return a[1] >> shift === b[1] >> shift;
+}
+
+/** Subnets of every Docker network on the host; throws when unknown. */
+export function dockerSubnets(run = docker) {
+  const ls = run(['network', 'ls', '-q']);
+  if (ls.status !== 0)
+    throw Object.assign(
+      new Error(`docker network ls failed: ${(ls.stderr || '').trim()}`),
+      { code: 'selftest' },
+    );
+  const ids = ls.stdout.trim().split('\n').filter(Boolean);
+  if (ids.length === 0) return [];
+  const r = run([
+    'network',
+    'inspect',
+    '-f',
+    '{{range .IPAM.Config}}{{.Subnet}} {{end}}',
+    ...ids,
+  ]);
+  if (r.status !== 0)
+    throw Object.assign(
+      new Error(`docker network inspect failed: ${(r.stderr || '').trim()}`),
+      { code: 'selftest' },
+    );
+  return [...new Set(r.stdout.split(/\s+/).filter(Boolean))].sort();
+}
+
+const DOCKER_INTERFACE = /^(docker\d*|br-[0-9a-f]+|veth[0-9a-z]*)$/;
+const LINK_LOCAL = ['169.254.0.0/16', 'fe80::/10'];
+
+/**
+ * The host addresses the isolation self-test binds (section 4.3): stable,
+ * routable addresses not created by Docker or by the runner. Excluded:
+ * loopback, link-local IPv4/IPv6, Docker interfaces (docker*, br-*, veth*)
+ * and any address inside a Docker network's subnet. Creating or removing
+ * Docker networks and containers, and link-local churn, leave it unchanged;
+ * a change of a genuine routable address changes it (fail closed).
+ */
+export function stableHostAddresses({ interfaces, subnets } = {}) {
+  interfaces ??= os.networkInterfaces();
+  const docker = subnets ?? dockerSubnets();
+  const out = new Set();
+  for (const [name, addrs] of Object.entries(interfaces)) {
+    if (DOCKER_INTERFACE.test(name)) continue;
+    for (const a of addrs ?? []) {
+      if (a == null || a.internal) continue;
+      if (LINK_LOCAL.some((c) => inSubnet(a.address, c))) continue;
+      if (docker.some((c) => inSubnet(a.address, c))) continue;
+      out.add(String(a.address).split('%')[0]);
+    }
+  }
+  return [...out].sort();
 }
 
 /**

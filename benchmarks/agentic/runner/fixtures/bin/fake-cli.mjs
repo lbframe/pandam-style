@@ -32,6 +32,24 @@ const session = argv.includes('--session-id')
   : '01a152b3-0000-7000-8000-000000000000';
 const credentialDir = process.env.PMS_FAKE_CREDENTIAL_DIR ?? null;
 
+// `codex login --with-access-token` (access-only mode, DESIGN.md 4.6): the
+// token arrives on stdin; `loginRejects` reproduces Codex 0.163.0 rejecting a
+// ChatGPT access token (message observed in the smoke run).
+if (argv[0] === 'login') {
+  const token = fs.readFileSync(0, 'utf8');
+  if (scenario.loginRejects) {
+    process.stderr.write(
+      'Reading access token from stdin...\nError logging in with access token: agent identity JWT payload is not valid JSON\n',
+    );
+    process.exit(1);
+  }
+  fs.writeFileSync(
+    path.join(credentialDir, 'access-login.marker'),
+    token.length > 0 ? 'token' : 'empty',
+  );
+  process.exit(0);
+}
+
 // Like the real Codex, `-C <dir>` changes directory and fails if the
 // directory is not visible to the CLI (DESIGN.md 3.2).
 if (cli === 'codex' && argv.includes('-C')) {
@@ -281,6 +299,14 @@ async function runStep(step) {
     const child = spawn(
       process.execPath,
       ['-e', `process.stdout.write(${JSON.stringify(step.leakChild.text)})`],
+      { stdio: ['ignore', 'inherit', 'inherit'] },
+    );
+    await new Promise((r) => child.on('exit', r));
+  } else if (step.holdStream) {
+    // A tool child that keeps this process's stdout open (channel audit).
+    const child = spawn(
+      process.execPath,
+      ['-e', `setTimeout(() => {}, ${Number(step.holdStream)})`],
       { stdio: ['ignore', 'inherit', 'inherit'] },
     );
     await new Promise((r) => child.on('exit', r));

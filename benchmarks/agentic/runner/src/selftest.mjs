@@ -30,6 +30,7 @@ import {
   execArgs,
   graderRunArgs,
   hostAddresses,
+  stableHostAddresses,
   networkCreateArgs,
   proxyRunArgs,
 } from './docker.mjs';
@@ -75,13 +76,17 @@ export function mechanismsDigest() {
     audit: auditRunArgs({
       container: '<agent>',
       image: '<image>',
-      cliName: '<cli>',
       uid: 0,
     }),
   });
 }
 
-export function currentFacts() {
+/**
+ * Host facts a self-test result is bound to. The self-test (at its start)
+ * and preflight call this same function; `interfaces`/`subnets` are
+ * injectable for tests.
+ */
+export function currentFacts({ interfaces, subnets } = {}) {
   return {
     dockerVersion: docker([
       'version',
@@ -89,7 +94,8 @@ export function currentFacts() {
       '{{.Server.Version}}',
     ]).stdout.trim(),
     kernel: os.release(),
-    hostAddresses: hostAddresses(),
+    // Stable routable addresses only (no Docker, no link-local).
+    hostAddresses: stableHostAddresses({ interfaces, subnets }),
   };
 }
 
@@ -227,9 +233,7 @@ export async function runSelfTest({ stateDir, config }) {
       `{{(index .NetworkSettings.Networks "${names.netB}").IPAddress}}`,
       names.peer,
     ]).stdout.trim();
-    const addresses = [
-      ...new Set([...facts.hostAddresses, ...bridgeGateways()]),
-    ];
+    const addresses = [...new Set([...hostAddresses(), ...bridgeGateways()])];
     // IPv6 link-local addresses need an interface scope and are not on the
     // attempt's link; they are recorded as skipped, not as passed.
     const linkLocal = addresses.filter((a) => /^fe80:/i.test(a));

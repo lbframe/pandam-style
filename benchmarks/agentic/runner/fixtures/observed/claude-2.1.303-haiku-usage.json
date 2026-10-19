@@ -1,0 +1,454 @@
+{
+  "source": "AG-00.2 smoke run 2026-10-19, discovery x claude-haiku-5-5: usage-bearing events only, content stripped",
+  "steps": [
+    {
+      "emit": {
+        "type": "system",
+        "subtype": "init",
+        "session_id": "${SESSION}",
+        "tools": ["Bash", "Edit", "Glob", "Grep", "Read", "Write"],
+        "model": "${REQUESTED_MODEL}",
+        "plugins": [
+          {
+            "name": "cc-plugin-agents-md"
+          },
+          {
+            "name": "cc-plugin-plugin-authoring"
+          }
+        ],
+        "mcp_servers": [],
+        "skills": [],
+        "slash_commands": [],
+        "apiKeySource": "none",
+        "claude_code_version": "2.1.303",
+        "per_turn_effort_active": true
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfYdpEPW73wMCsazS9n",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 3002,
+            "cache_read_input_tokens": 4738,
+            "output_tokens": 8
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfYdpEPW73wMCsazS9n",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 3002,
+            "cache_read_input_tokens": 4738,
+            "output_tokens": 8
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfYdpEPW73wMCsazS9n",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 3002,
+            "cache_read_input_tokens": 4738,
+            "output_tokens": 8
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfYdpEPW73wMCsazS9n",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 3002,
+            "cache_read_input_tokens": 4738,
+            "output_tokens": 8
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfYnS9qzPW7EHGHGh4L",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 977,
+            "cache_read_input_tokens": 7740,
+            "output_tokens": 16
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfYnS9qzPW7EHGHGh4L",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 977,
+            "cache_read_input_tokens": 7740,
+            "output_tokens": 16
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "system",
+        "subtype": "thinking_tokens",
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "system",
+        "subtype": "thinking_tokens",
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfYtiBKTTHW772doCyV",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 5648,
+            "cache_read_input_tokens": 8717,
+            "output_tokens": 3
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfYtiBKTTHW772doCyV",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 5648,
+            "cache_read_input_tokens": 8717,
+            "output_tokens": 3
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfYtiBKTTHW772doCyV",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 5648,
+            "cache_read_input_tokens": 8717,
+            "output_tokens": 3
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "system",
+        "subtype": "thinking_tokens",
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "system",
+        "subtype": "thinking_tokens",
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfZ9VRPQ8DYL8MsBAXD",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 1648,
+            "cache_read_input_tokens": 14365,
+            "output_tokens": 3
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfZ9VRPQ8DYL8MsBAXD",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 1648,
+            "cache_read_input_tokens": 14365,
+            "output_tokens": 3
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfZ9VRPQ8DYL8MsBAXD",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 1648,
+            "cache_read_input_tokens": 14365,
+            "output_tokens": 3
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "system",
+        "subtype": "thinking_tokens",
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "system",
+        "subtype": "thinking_tokens",
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "system",
+        "subtype": "thinking_tokens",
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "system",
+        "subtype": "thinking_tokens",
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfZN1VgKvRPHKWNqsB3",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 1177,
+            "cache_read_input_tokens": 16013,
+            "output_tokens": 5
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "assistant",
+        "message": {
+          "id": "msg_011CgBfZN1VgKvRPHKWNqsB3",
+          "model": "${REQUESTED_MODEL}",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "(content stripped)"
+            }
+          ],
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 1177,
+            "cache_read_input_tokens": 16013,
+            "output_tokens": 5
+          }
+        },
+        "parent_tool_use_id": null,
+        "session_id": "${SESSION}"
+      }
+    },
+    {
+      "emit": {
+        "type": "result",
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 17560,
+        "duration_api_ms": 17418,
+        "num_turns": 7,
+        "result": "done",
+        "stop_reason": "end_turn",
+        "total_cost_usd": 0.00465663,
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 3299,
+          "cache_read_input_tokens": 51573,
+          "cache_creation_input_tokens": 12452
+        },
+        "modelUsage": {
+          "${REQUESTED_MODEL}": {
+            "inputTokens": 10,
+            "outputTokens": 3299,
+            "cacheReadInputTokens": 51573,
+            "cacheCreationInputTokens": 12452,
+            "webSearchRequests": 0,
+            "costUSD": 0.00465663,
+            "thinkingTokens": 1334,
+            "costBasis": "list"
+          }
+        },
+        "permission_denials": [],
+        "terminal_reason": "completed",
+        "session_id": "${SESSION}"
+      }
+    }
+  ]
+}
