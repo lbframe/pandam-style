@@ -193,14 +193,19 @@ export function summarizeSources(sources) {
 
 const unitCache = new WeakMap();
 
-/** The summary of a unit, computed once per unit identity (an object). */
-export function unitSummary(identity, sourcesOf) {
+/** A unit summary built once per unit identity (an object). */
+export function cachedUnit(identity, buildSummary) {
   let summary = unitCache.get(identity);
   if (summary == null) {
-    summary = summarizeSources(sourcesOf());
+    summary = buildSummary();
     unitCache.set(identity, summary);
   }
   return summary;
+}
+
+/** The summary of a unit's sources, computed once per unit identity. */
+export function unitSummary(identity, sourcesOf) {
+  return cachedUnit(identity, () => summarizeSources(sourcesOf()));
 }
 
 const INTRINSIC_OWNER = Object.freeze({

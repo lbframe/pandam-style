@@ -55,6 +55,7 @@ export {
   FACTS_KIND,
   FACTS_SCHEMA_VERSION,
   evaluateRequirements,
+  cachedUnit,
   createTargetAccumulator,
   evaluateTargets,
   stableJsonCached,

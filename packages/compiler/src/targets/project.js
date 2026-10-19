@@ -25,7 +25,13 @@ import {
 } from '../design-system/registry/build-system';
 import crypto from 'crypto';
 
-import { evaluateTargets, stableJsonCached, unitSummary } from './evaluate';
+import {
+  cachedUnit,
+  evaluateTargets,
+  stableJsonCached,
+  summarizeSources,
+  unitSummary,
+} from './evaluate';
 
 export function enforcementOf(resolution) {
   return resolution.provenance.origin === 'default' ? 'advisory' : 'enforced';
@@ -91,7 +97,7 @@ export function evaluateProjectTargets({
   for (const { file, rules, ruleOrigins } of pages) {
     units.push([
       file,
-      unitSummary(rules, () => pageTargetSources(file, rules, ruleOrigins)),
+      cachedUnit(rules, () => pageSummary(file, rules, ruleOrigins)),
     ]);
   }
   const result = evaluateTargets({
@@ -133,6 +139,34 @@ export function evaluateProjectTargets({
       ...result.infos,
     ],
   };
+}
+
+// The latest summary of each page file with the content it was computed
+// from. A recompiled page whose emitted rules and locations are unchanged
+// (a theme or token edit recompiles its consumers) keeps the same summary
+// object, which the accumulator then skips. One entry per file.
+const latestPageSummary = new Map();
+
+function pageSummary(file, rules, ruleOrigins = []) {
+  const origins = new Map(
+    ruleOrigins.map((origin) => [origin.className, origin]),
+  );
+  const content = JSON.stringify(
+    rules.map(([className, rule]) => {
+      const origin = origins.get(className);
+      return [
+        rule?.ltr ?? null,
+        rule?.rtl ?? null,
+        origin?.line,
+        origin?.column,
+      ];
+    }),
+  );
+  const latest = latestPageSummary.get(file);
+  if (latest != null && latest.content === content) return latest.summary;
+  const summary = summarizeSources(pageTargetSources(file, rules, ruleOrigins));
+  latestPageSummary.set(file, { content, summary });
+  return summary;
 }
 
 const projectedFacts = new WeakMap();

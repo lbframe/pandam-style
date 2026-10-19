@@ -30,6 +30,10 @@ jobs:
       PMS_CHROMIUM: /opt/google/chrome/chrome
     steps:
       - uses: actions/checkout@v6
+        with:
+          # The floor check materializes the frozen CE-00.3 workloads from
+          # Git objects at their pinned commits.
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           # The package and Next qualifications assert this exact host
@@ -39,6 +43,13 @@ jobs:
           cache-dependency-path: yarn.lock
       - run: corepack prepare yarn@1.22.22 --activate
       - run: ./verify-pms.sh
+      # CE-01.1: the bundled compat data, the frozen default profile and the
+      # built-in profile resolutions are generated; each must re-derive byte
+      # for byte from its pinned inputs (verify-pms.sh installed and built,
+      # and its compiler step ran the target suites).
+      - run: node tools/targets/build-compat-data.mjs --check
+      - run: node tools/targets/measure-floor.mjs --check
+      - run: node tools/targets/build-builtin-resolutions.mjs --check
 
   prettier:
     runs-on: ubuntu-latest
@@ -65,33 +76,6 @@ jobs:
       - run: corepack prepare yarn@1.22.22 --activate
       - run: yarn install --frozen-lockfile
       - run: yarn lint:report
-
-  targets-data:
-    # CE-01.1: the bundled compat data, the frozen default profile and the
-    # built-in profile resolutions are generated; each must re-derive byte for
-    # byte from its pinned inputs.
-    # The target class tests run with the compiler suite in verify-pms.sh.
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          # The floor measurement materializes the frozen CE-00.3 workloads
-          # from Git objects at their pinned commits.
-          fetch-depth: 0
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22.22.0'
-          cache: 'yarn'
-          cache-dependency-path: yarn.lock
-      - run: corepack prepare yarn@1.22.22 --activate
-      - run: yarn install --frozen-lockfile
-      - run: yarn build
-      - run: node tools/targets/build-compat-data.mjs --check
-      - run: node tools/targets/measure-floor.mjs --check
-      - run: node tools/targets/build-builtin-resolutions.mjs --check
-      - run: >-
-          node_modules/.bin/jest --config jest.config.js --ci --runInBand
-          packages/compiler/__tests__/pandamstyle/targets-
 
   agentic-corpus:
     runs-on: ubuntu-latest

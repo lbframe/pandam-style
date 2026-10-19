@@ -554,3 +554,32 @@ describe('incremental accumulation equals a fresh evaluation', () => {
     expect(fresh.errors).toEqual(first.errors);
   });
 });
+
+describe('recompiled pages with unchanged content', () => {
+  test('keep their summary; a changed page is re-read', () => {
+    const accumulator = targets.createTargetAccumulator();
+    const designSystem = {
+      registry: { enhancements: [], conditions: {}, conditionOrder: [] },
+    };
+    const evaluate = (rules) =>
+      targets.evaluateProjectTargets({
+        resolution: DEFAULT,
+        designSystem,
+        designSystemRules: [],
+        pages: [{ file: '/app/p.js', rules, ruleOrigins: [] }],
+        accumulator,
+      });
+    const rule = (css) => [['x1', { ltr: css, rtl: null }]];
+    const first = evaluate(rule('.x1{text-wrap:pretty}'));
+    // A new rule list with the same content: the previous result stands.
+    const same = evaluate(rule('.x1{text-wrap:pretty}'));
+    expect(same.facts).toBe(first.facts);
+    const changed = evaluate(rule('.x1{text-wrap:balance}'));
+    expect(changed.facts.features.map((f) => f.feature)).toContain(
+      'value:text-wrap/balance',
+    );
+    expect(changed.facts.features.map((f) => f.feature)).not.toContain(
+      'value:text-wrap/pretty',
+    );
+  });
+});
