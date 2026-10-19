@@ -1003,6 +1003,146 @@ describe('keywords are read in their consuming grammar', () => {
   });
 });
 
+describe('an anchored inset is animated only by what its rule animates', () => {
+  // [rule body, animated child expected] at Firefox 147, where anchor() is
+  // native and its animation is not.
+  const ANIMATED = 'value:top/anchor()/anchor-animated';
+  test.each([
+    ['top:anchor(--a bottom)', false],
+    ['top:anchor(--a bottom);transition:opacity 1s', false],
+    ['top:anchor(--a bottom);transition-property:opacity', false],
+    ['top:anchor(--a bottom);transition:left 1s', false],
+    ['top:anchor(--a bottom);transition:none', false],
+    ['top:anchor(--a bottom);transition:top 1s', true],
+    ['top:anchor(--a bottom);transition:all 1s', true],
+    ['top:anchor(--a bottom);transition:1s', true],
+    ['top:anchor(--a bottom);transition-duration:1s', true],
+    ['top:anchor(--a bottom);transition-property:inset', true],
+    ['top:anchor(--a bottom);transition-property:inset-block-start', true],
+    ['top:anchor(--a bottom);transition:opacity 1s, top 2s', true],
+    ['top:anchor(--a bottom);animation:none', false],
+    ['top:anchor(--a bottom);animation-name:none', false],
+    ['top:anchor(--a bottom);animation:spin 1s infinite', true],
+  ])('.x{%s}', (body, expected) => {
+    const features = targets
+      .featuresOfCss(`.x{${body}}`)
+      .map((e) => e.record.feature);
+    expect(features.includes(ANIMATED)).toBe(expected);
+    if (expected) {
+      expect(outcomeOf(ANIMATED, profile('firefox 147')).state).toBe(
+        'incompatible',
+      );
+    }
+    expect(outcomeOf('value:top/anchor()', profile('firefox 147')).state).toBe(
+      'native',
+    );
+  });
+
+  test('keyframes read in the same text decide an animation', () => {
+    const animated = (keyframes) =>
+      targets
+        .featuresOfCss(
+          `@keyframes k{${keyframes}}.x{top:anchor(--a bottom);animation:k 1s}`,
+        )
+        .map((e) => e.record.feature)
+        .includes(ANIMATED);
+    expect(animated('from{opacity:0}to{opacity:1}')).toBe(false);
+    expect(animated('from{top:0}to{top:10px}')).toBe(true);
+    expect(animated('from{inset-block-start:0}')).toBe(true);
+  });
+
+  test('anchor-size() in a logical inset follows the same rule', () => {
+    const key = 'value:inset-inline-start/anchor-size()/anchor-size-animated';
+    const features = (body) =>
+      targets.featuresOfCss(`.x{${body}}`).map((e) => e.record.feature);
+    expect(
+      features('inset-inline-start:anchor-size(width);animation:none'),
+    ).not.toContain(key);
+    expect(
+      features('inset-inline-start:anchor-size(width);transition:left 1s'),
+    ).toContain(key);
+    expect(
+      features(
+        'inset-inline-start:anchor-size(width);transition:inset-block-start 1s',
+      ),
+    ).not.toContain(key);
+  });
+});
+
+describe('identifier arguments are never keywords', () => {
+  // One identifier slot and one value slot per function of the extractor's
+  // identifier-slot table. `%s` is replaced by the identifier.
+  const SLOTS = {
+    attr: [
+      'color:attr(%s type(<color>), red)',
+      'color:attr(data-x type(<color>), %s)',
+    ],
+    env: ['color:env(%s, red)', 'color:env(x, %s)'],
+    var: ['color:var(--%s, red)', 'color:var(--x, %s)'],
+    counter: ['content:counter(%s)', null],
+    counters: ['content:counters(%s, ".", %s)', null],
+    anchor: ['top:anchor(%s top)', null],
+    'anchor-size': ['width:anchor-size(%s width)', null],
+    paint: ['background-image:paint(%s)', null],
+    local: ['--f:local(%s)', null],
+    type: ['color:attr(data-x type(<%s>), red)', null],
+    scroll: ['animation-timeline:scroll(%s)', null],
+    view: ['animation-timeline:view(%s)', null],
+  };
+  const IDENTIFIERS = [
+    'Mark',
+    'MarkText',
+    'AccentColor',
+    'AccentColorText',
+    'rebeccapurple',
+  ];
+  const keywordKeys = (css, grammars) =>
+    targets
+      .featuresOfCss(css, grammars)
+      .map((e) => e.record.feature)
+      .filter((f) =>
+        /\/(mark|marktext|accentcolor|accentcolortext|rebeccapurple)$/.test(f),
+      );
+
+  test('every function with an identifier slot is covered here', () => {
+    expect(Object.keys(SLOTS).sort()).toEqual(
+      targets.identifierSlotFunctions().sort(),
+    );
+  });
+
+  test.each(Object.entries(SLOTS))(
+    '%s()',
+    (name, [identifierSlot, valueSlot]) => {
+      for (const identifier of IDENTIFIERS) {
+        expect([
+          name,
+          identifier,
+          keywordKeys(`.x{${identifierSlot.replaceAll('%s', identifier)}}`),
+        ]).toEqual([name, identifier, []]);
+        if (valueSlot != null) {
+          expect(
+            keywordKeys(`.x{${valueSlot.replaceAll('%s', identifier)}}`).length,
+          ).toBe(1);
+        }
+      }
+    },
+  );
+
+  test('through a design-system color token', () => {
+    const grammars = new Map([['--t', 'color']]);
+    expect(
+      keywordKeys('.x{--t:attr(AccentColor type(<color>), red)}', grammars),
+    ).toEqual([]);
+    expect(keywordKeys('.x{--t:env(Mark, red)}', grammars)).toEqual([]);
+    expect(keywordKeys('.x{--t:var(--y, AccentColor)}', grammars)).toEqual([
+      'value:--t/accentcolor',
+    ]);
+    expect(
+      keywordKeys('.x{--t:attr(data-x type(<color>), Mark)}', grammars),
+    ).toEqual(['value:--t/mark']);
+  });
+});
+
 describe('enhancement policies cover the forms of their construct', () => {
   test('a policy on a construct applies to its forms only', () => {
     const resolution = profile('chrome 110');

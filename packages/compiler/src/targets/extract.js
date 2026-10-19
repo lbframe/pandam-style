@@ -1074,6 +1074,32 @@ function fontSourceForms(tokens, start, end, out, context) {
 // does not know an entry uses the next one.
 const FALLBACK_LIST_PROPERTIES = new Set(['font-family']);
 
+// Function arguments that are identifiers, not values: the attribute,
+// environment variable, custom property, counter, anchor, worklet or font
+// name, and the syntax or axis keywords of a function. A keyword family is
+// never looked up there (`attr(AccentColor …)` names an attribute); the other
+// slots (a fallback) keep the consuming grammar. Indexed by function name:
+// `(commas, position) => boolean` for the argument item and the component
+// position within it.
+const IDENTIFIER_SLOTS = Object.freeze({
+  attr: (commas, position) => commas === 0 && position === 0,
+  env: (commas, position) => commas === 0 && position === 0,
+  var: (commas, position) => commas === 0 && position === 0,
+  counter: () => true,
+  counters: () => true,
+  anchor: (commas) => commas === 0,
+  'anchor-size': (commas) => commas === 0,
+  paint: (commas) => commas === 0,
+  local: () => true,
+  type: () => true,
+  scroll: () => true,
+  view: () => true,
+});
+
+export function identifierSlotFunctions() {
+  return Object.keys(IDENTIFIER_SLOTS);
+}
+
 function analyseValue(tokens, start, end, property, out, context) {
   const topIdents = [];
   // In a fallback chain, every entry but the last is backed up by a later one.
@@ -1082,10 +1108,26 @@ function analyseValue(tokens, start, end, property, out, context) {
     : start;
   let depth = 0;
   const functionStack = [];
+  // Per open function or block: its comma-separated item and the number of
+  // components read in that item.
+  const slots = [];
+  const advance = () => {
+    const frame = slots.at(-1);
+    if (frame == null) return -1;
+    frame.position += 1;
+    return frame.position - 1;
+  };
   for (let i = start; i < end; i += 1) {
     const token = tokens[i];
     const t = type(token);
+    if (t === 'comma-token' && slots.length > 0) {
+      const frame = slots.at(-1);
+      frame.commas += 1;
+      frame.position = 0;
+      continue;
+    }
     if (t === 'function-token') {
+      advance();
       const name = String(value(token)).toLowerCase();
       // Relative color syntax: the first argument of a color function is
       // the `from` keyword.
@@ -1185,20 +1227,25 @@ function analyseValue(tokens, start, end, property, out, context) {
         );
       }
       functionStack.push(name);
+      slots.push({ commas: 0, position: 0 });
       depth += 1;
       continue;
     }
     if (t === '(-token' || t === '[-token') {
+      advance();
       depth += 1;
       functionStack.push(null);
+      slots.push({ commas: 0, position: 0 });
       continue;
     }
     if (t === ')-token' || t === ']-token') {
       depth -= 1;
       functionStack.pop();
+      slots.pop();
       continue;
     }
     if (t === 'ident-token') {
+      const position = advance();
       const ident = String(value(token)).toLowerCase();
       if (depth === 0) topIdents.push(ident);
       const enclosing =
@@ -1219,9 +1266,14 @@ function analyseValue(tokens, start, end, property, out, context) {
           context,
         );
       }
+      const frame = slots.at(-1);
+      const identifierSlot =
+        enclosing != null &&
+        Object.hasOwn(IDENTIFIER_SLOTS, enclosing) &&
+        IDENTIFIER_SLOTS[enclosing](frame.commas, position);
       if (GLOBAL_KEYWORDS.has(ident) && depth === 0) {
         out.add({ kind: 'global-keyword', keyword: ident }, context);
-      } else if (ident !== 'from') {
+      } else if (ident !== 'from' && !identifierSlot) {
         // A keyword is read in its consuming grammar: the property, the
         // function it is an argument of, or a custom property's known one.
         const keyword = { kind: 'value-keyword', property, keyword: ident };
@@ -1235,6 +1287,7 @@ function analyseValue(tokens, start, end, property, out, context) {
       }
       continue;
     }
+    if (!isWs(token)) advance();
     if (t === 'dimension-token') {
       out.add(
         { kind: 'unit', unit: String(token[4].unit).toLowerCase() },
@@ -1282,9 +1335,14 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
   const keyframes = (context.atRules ?? []).find(
     (a) => a.name === 'keyframes' || a.name.endsWith('-keyframes'),
   );
-  // Anchored insets of the block, and whether the block animates.
+  // Anchored insets of the block, and what the block animates.
   const anchored = [];
-  let animates = false;
+  const motion = {
+    transitioned: new Set(),
+    longhand: false,
+    explicit: false,
+    names: [],
+  };
   for (const range of splitTop(tokens, start, end, 'semicolon-token')) {
     const [s, e] = trimRange(tokens, range);
     if (s >= e) continue;
@@ -1425,7 +1483,7 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
       );
     }
     if (name.startsWith('transition') || name.startsWith('animation')) {
-      animates = true;
+      readMotion(name, tokens, colon + 1, valueEnd, motion);
     }
     if (INSET_PROPERTY.test(name)) {
       for (let k = colon + 1; k < valueEnd; k += 1) {
@@ -1441,8 +1499,11 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
   }
   // An anchored inset animated by a transition or animation of the same
   // rule (keyframes declarations are read by anchorForms).
-  if (animates && keyframes == null) {
+  if (keyframes == null && anchored.length > 0) {
+    // Transition longhands alone transition the initial property list, `all`.
+    if (motion.longhand && !motion.explicit) motion.transitioned.add('all');
     for (const [fn, property, declarationContext] of anchored) {
+      if (!animatesInset(motion, property)) continue;
       out.add(
         {
           kind: 'form',
@@ -1455,6 +1516,182 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
       );
     }
   }
+}
+
+// ------------------------------------------------------- animated insets ----
+
+const EASING_KEYWORDS = new Set([
+  'ease',
+  'linear',
+  'ease-in',
+  'ease-out',
+  'ease-in-out',
+  'step-start',
+  'step-end',
+]);
+const TRANSITION_KEYWORDS = new Set([
+  ...EASING_KEYWORDS,
+  'normal',
+  'allow-discrete',
+]);
+const ANIMATION_KEYWORDS = new Set([
+  ...EASING_KEYWORDS,
+  'infinite',
+  'normal',
+  'reverse',
+  'alternate',
+  'alternate-reverse',
+  'forwards',
+  'backwards',
+  'both',
+  'running',
+  'paused',
+  'auto',
+  'replace',
+  'add',
+  'accumulate',
+]);
+
+/**
+ * Reads what one declaration animates into `motion`: transitioned property
+ * names (`all` included), and animation names. `none` animates nothing.
+ */
+function readMotion(name, tokens, start, end, motion) {
+  const items = commaItems(tokens, start, end);
+  const words = ([s, e]) =>
+    components(tokens, s, e)
+      .map((part) => single(tokens, part))
+      .filter(
+        (token) =>
+          token != null &&
+          (type(token) === 'ident-token' || type(token) === 'string-token'),
+      )
+      .map((token) =>
+        type(token) === 'string-token' ? String(value(token)) : lower(token),
+      );
+  if (name === 'transition-property') {
+    motion.explicit = true;
+    for (const item of items) {
+      for (const word of words(item)) {
+        if (word !== 'none') motion.transitioned.add(word);
+      }
+    }
+  } else if (name === 'transition') {
+    motion.explicit = true;
+    for (const item of items) {
+      // The item's property; without one, the shorthand's default `all`.
+      const property = words(item).find((w) => !TRANSITION_KEYWORDS.has(w));
+      if (property === 'none') continue;
+      motion.transitioned.add(property ?? 'all');
+    }
+  } else if (name.startsWith('transition-')) {
+    motion.longhand = true;
+  } else if (name === 'animation-name') {
+    for (const item of items) {
+      for (const word of words(item)) {
+        if (word !== 'none') motion.names.push(word);
+      }
+    }
+  } else if (name === 'animation') {
+    for (const item of items) {
+      const animationName = words(item).find((w) => !ANIMATION_KEYWORDS.has(w));
+      if (animationName != null && animationName !== 'none') {
+        motion.names.push(animationName);
+      }
+    }
+  }
+}
+
+const PHYSICAL_INSETS = ['top', 'right', 'bottom', 'left'];
+const BLOCK_INSETS = ['inset-block-start', 'inset-block-end'];
+const INLINE_INSETS = ['inset-inline-start', 'inset-inline-end'];
+const INSET_FAMILY = new Set([
+  ...PHYSICAL_INSETS,
+  ...BLOCK_INSETS,
+  ...INLINE_INSETS,
+  'inset',
+  'inset-block',
+  'inset-inline',
+]);
+
+/**
+ * The animated properties that change inset `property`: itself, `all`,
+ * `inset`, its axis shorthand, and its physical or logical counterparts (the
+ * writing mode is unknown, so a physical side counts every logical inset and
+ * the reverse).
+ */
+function insetCoverage(property) {
+  const covers = new Set([property, 'all', 'inset']);
+  const add = (list) => list.forEach((p) => covers.add(p));
+  if (PHYSICAL_INSETS.includes(property)) {
+    add([...BLOCK_INSETS, ...INLINE_INSETS, 'inset-block', 'inset-inline']);
+  } else if (BLOCK_INSETS.includes(property) || property === 'inset-block') {
+    add([...PHYSICAL_INSETS, ...BLOCK_INSETS, 'inset-block']);
+  } else if (INLINE_INSETS.includes(property) || property === 'inset-inline') {
+    add([...PHYSICAL_INSETS, ...INLINE_INSETS, 'inset-inline']);
+  } else if (property === 'inset') {
+    add([...INSET_FAMILY]);
+  }
+  return covers;
+}
+
+/**
+ * Whether the rule's transitions or animations change inset `property`. An
+ * animation whose keyframes are not in this text is assumed to (it cannot be
+ * read); one whose keyframes are read must set a covering property.
+ */
+function animatesInset(motion, property) {
+  const covers = insetCoverage(property);
+  if ([...motion.transitioned].some((p) => covers.has(p))) return true;
+  return motion.names.some((animationName) => {
+    const animated = keyframesOf?.get(animationName);
+    return animated == null || [...animated].some((p) => covers.has(p));
+  });
+}
+
+// The properties each `@keyframes` rule of the text animates, by name.
+let keyframesOf = null;
+
+function readKeyframes(tokens) {
+  const found = new Map();
+  for (let i = 0; i < tokens.length; i += 1) {
+    if (
+      type(tokens[i]) !== 'at-keyword-token' ||
+      !lower(tokens[i]).endsWith('keyframes')
+    ) {
+      continue;
+    }
+    let j = i + 1;
+    while (j < tokens.length && isWs(tokens[j])) j += 1;
+    const nameToken = tokens[j];
+    if (nameToken == null) break;
+    const name =
+      type(nameToken) === 'string-token'
+        ? String(value(nameToken))
+        : lower(nameToken);
+    while (j < tokens.length && type(tokens[j]) !== '{-token') j += 1;
+    if (j >= tokens.length) break;
+    const close = matching(tokens, j);
+    const properties = found.get(name) ?? new Set();
+    for (let k = j + 1; k < close; k += 1) {
+      if (type(tokens[k]) !== '{-token') continue;
+      const frameClose = matching(tokens, k);
+      for (const range of splitTop(
+        tokens,
+        k + 1,
+        frameClose,
+        'semicolon-token',
+      )) {
+        const [s, e] = trimRange(tokens, range);
+        if (s < e && type(tokens[s]) === 'ident-token')
+          properties.add(lower(tokens[s]));
+      }
+      k = frameClose;
+    }
+    found.set(name, properties);
+    i = close;
+  }
+  return found;
 }
 
 // ------------------------------------------------------------- selectors ----
@@ -1947,6 +2184,7 @@ export function extractConstructs(
   const tokens = (tokenizeEmitted(css) ?? tokenize({ css })).filter(
     (token) => type(token) !== 'EOF-token',
   );
+  keyframesOf = css.includes('keyframes') ? readKeyframes(tokens) : null;
   analyseRules(tokens, 0, tokens.length, out, { atRules: [] });
   return out.items;
 }

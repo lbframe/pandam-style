@@ -12,7 +12,11 @@
 
 export { compatData, compatDataFromText } from './data';
 export { compareVersions, isReleaseString, parseVersion } from './versions';
-export { constructKey, extractConstructs } from './extract';
+export {
+  constructKey,
+  extractConstructs,
+  identifierSlotFunctions,
+} from './extract';
 export { tokenizeEmitted } from './tokens';
 export {
   CATALOG_KIND,
