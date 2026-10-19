@@ -93,13 +93,16 @@ export class RedactionSet {
     for (const s of this.list()) out = out.split(s).join(MARKER);
     for (const re of PATTERNS) out = out.replace(re, MARKER);
     if (this.home && this.home.length > 1) out = out.split(this.home).join('~');
+    // The user name in home-directory paths of any form (`/home/<user>`,
+    // `/Users/<user>`); a word or a repository directory that merely equals
+    // the name (a CI user called `runner`) is left intact.
     if (this.user && this.user.length > 2)
       out = out.replace(
         new RegExp(
-          `(?<![A-Za-z0-9])${escapeRe(this.user)}(?![A-Za-z0-9])`,
-          'g',
+          `/(home|Users|var/home)/${escapeRe(this.user)}(?=/|$|[^A-Za-z0-9_.-])`,
+          'gm',
         ),
-        '<user>',
+        '/$1/<user>',
       );
     return out;
   }

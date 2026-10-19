@@ -865,3 +865,13 @@ test('B4 the local executor registers its process group before use and recovery 
     (e) => e.code === 'ESRCH',
   );
 });
+
+test('B2 user-name redaction targets home-directory paths, never words or directories equal to the name', () => {
+  const set = new RedactionSet({ home: '/home/runner', user: 'runner' });
+  const text =
+    '/home/runner/x /Users/runner /mnt/home/runner benchmarks/agentic/runner/src agentic-runner-tests pms-runner runner';
+  assert.equal(
+    set.redactText(text),
+    '~/x /Users/<user> /mnt~ benchmarks/agentic/runner/src agentic-runner-tests pms-runner runner',
+  );
+});

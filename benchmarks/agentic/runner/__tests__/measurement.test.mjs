@@ -184,7 +184,7 @@ test('B8 every code-executing, script-loading or writing form is opaque (class f
     'rg --pre sh foo',
     'rg --pre=sh foo',
     'rg -z foo',
-    'rg -iz foo',
+    'rg -uz foo',
     'rg --hostname-bin=sh foo',
     'file -z x.gz',
     'file -C',

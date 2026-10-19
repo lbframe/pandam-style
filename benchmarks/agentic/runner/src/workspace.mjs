@@ -19,7 +19,7 @@ import { compileGlobs } from '../../src/glob.mjs';
 import { oracleIgnoredGlobs } from './evidence.mjs';
 import * as safe from './safefs.mjs';
 
-function excluder(globs) {
+function excludeMatcher(globs) {
   const m = compileGlobs(globs);
   return (rel, isDir) =>
     m.match(rel) != null || (isDir && m.match(`${rel}/`) != null);
@@ -119,7 +119,7 @@ export function sampleWorkspace(
           }
         },
         {
-          exclude: excluder([...oracleIgnoredGlobs(), ...harnessIgnored]),
+          exclude: excludeMatcher([...oracleIgnoredGlobs(), ...harnessIgnored]),
           maxEntries,
         },
       );
@@ -186,7 +186,7 @@ export function stageWorkspace(
 ) {
   return withRoot(root, (fd) =>
     safe.stageTree(fd, dest, {
-      exclude: excluder(oracleIgnoredGlobs()),
+      exclude: excludeMatcher(oracleIgnoredGlobs()),
       maxBytes,
     }),
   );
