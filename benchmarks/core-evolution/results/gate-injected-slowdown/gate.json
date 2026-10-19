@@ -8,6 +8,43 @@
   "verdict": "fail",
   "problems": [],
   "refusals": [],
+  "candidateIdentity": [
+    {
+      "label": "gate-injected-slowdown",
+      "candidate": {
+        "name": "injected-slowdown",
+        "packageLockSha256": "b2b51766289a359a2fe8d9b68a8716b3283b44c9026e93a6d3b4e69088f1439d",
+        "installedPandamstyle": "43d170bd5e77ff599031975ccd809e8cca78b8b7cc08cf4cbae05716def845fd",
+        "packages": {
+          "@pandamstyle/compiler": {
+            "version": "0.1.0-alpha.1",
+            "resolved": "https://registry.npmjs.org/@pandamstyle/compiler/-/compiler-0.1.0-alpha.1.tgz",
+            "integrity": "sha512-BpCHIVMCHcnVsuolKjGWdXEqDNbCpRz6Hw+FNFzmvEKJDGi/iwneraMn1KXVZ+BbaVNhyJSY3uiMNnUuQY5NUQ=="
+          },
+          "@pandamstyle/core": {
+            "version": "0.1.0-alpha.1",
+            "resolved": "https://registry.npmjs.org/@pandamstyle/core/-/core-0.1.0-alpha.1.tgz",
+            "integrity": "sha512-JV3VOGTKawvg5zRDbOpEugVZ+968xfV/0Quge4dax7OCgq9qZ51p9zkvICFKLBgUd8hzDjn8G027Mqm5NY3LqA=="
+          },
+          "@pandamstyle/next": {
+            "version": "0.1.0-alpha.1",
+            "resolved": "https://registry.npmjs.org/@pandamstyle/next/-/next-0.1.0-alpha.1.tgz",
+            "integrity": "sha512-CIzeCG/cX5Fr22REgGPT6MxMhlo+ozgKi/OqCdRnh9/VGu5tl1V2GLJItZ+R1TWURGepRRn++fsfWsXrgdKS9A=="
+          },
+          "@pandamstyle/rsbuild": {
+            "version": "0.1.0-alpha.1",
+            "resolved": "https://registry.npmjs.org/@pandamstyle/rsbuild/-/rsbuild-0.1.0-alpha.1.tgz",
+            "integrity": "sha512-MKKkfv5/sHeUz90ZOqo0PIx2BzpTtEurMMXOXllll3ZjTkpZA5Rl33BMAnDOasE1x3xXbYwK1ikcNKeWwdSd3A=="
+          },
+          "@pandamstyle/vite": {
+            "version": "0.1.0-alpha.1",
+            "resolved": "https://registry.npmjs.org/@pandamstyle/vite/-/vite-0.1.0-alpha.1.tgz",
+            "integrity": "sha512-ePIW24QMWjkMoAHCiFBzBGck7dr5TCpLSuWWZR6FfFMeyxgMMF3bUy7jLXjeJqfw9vjZav/IkXQ+JYKjmutkFQ=="
+          }
+        }
+      }
+    }
+  ],
   "counts": {
     "pass": 52,
     "fail": 28,
@@ -107,6 +144,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.3125,
@@ -116,8 +175,6 @@
         "seed": 307
       },
       "controlSpread": 0.0062,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -131,6 +188,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.3139,
@@ -140,8 +219,6 @@
         "seed": 307
       },
       "controlSpread": 0.0061,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -155,6 +232,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.0077,
@@ -164,8 +263,6 @@
         "seed": 307
       },
       "controlSpread": 0.0103,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -178,6 +275,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.1301,
@@ -187,8 +306,6 @@
         "seed": 307
       },
       "controlSpread": 0.0164,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -201,9 +318,30 @@
         "maxMedian": 136452096,
         "factor": 1.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
-      "value": 122472448,
-      "n": 20
+      "value": 122472448
     },
     {
       "workload": "alpha1-valid-fixture",
@@ -214,9 +352,30 @@
         "maxMedian": 167991296,
         "factor": 1.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
-      "value": 151963648,
-      "n": 20
+      "value": 151963648
     },
     {
       "workload": "alpha1-valid-fixture",
@@ -225,6 +384,28 @@
       "limit": {
         "maxValue": 2789,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 2657
@@ -237,6 +418,28 @@
         "maxValue": 1075,
         "growth": 0.05
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 1024
     },
@@ -247,6 +450,28 @@
       "limit": {
         "maxValue": 33,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 32
@@ -259,6 +484,28 @@
         "maxValue": 1,
         "growth": 0.05
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 1
     },
@@ -269,6 +516,28 @@
       "limit": {
         "maxValue": 69,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 66
@@ -281,6 +550,28 @@
         "maxValue": 18975,
         "growth": 0.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 17250
     },
@@ -291,6 +582,28 @@
       "limit": {
         "maxValue": 26600,
         "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 24182
@@ -303,6 +616,28 @@
         "maxValue": 10056,
         "growth": 0.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 9142
     },
@@ -313,6 +648,28 @@
       "limit": {
         "maxValue": 46,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 44
@@ -325,6 +682,28 @@
         "maxValue": 4,
         "growth": 0
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 4
     },
@@ -334,6 +713,28 @@
       "class": "identity",
       "limit": {
         "equals": "true"
+      },
+      "observations": {
+        "candidate": {
+          "planned": 1,
+          "ok": 1,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 1,
+          "ok": 1,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 1,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": "true"
@@ -348,6 +749,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 15,
         "median": 0.9981,
@@ -357,8 +780,6 @@
         "seed": 307
       },
       "controlSpread": 0.012,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -371,6 +792,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 15,
         "median": 1.0094,
@@ -380,8 +823,6 @@
         "seed": 307
       },
       "controlSpread": 0.0107,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -394,6 +835,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 15,
         "median": 1.0009,
@@ -403,8 +866,6 @@
         "seed": 307
       },
       "controlSpread": 0.0101,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -417,6 +878,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 15,
         "median": 1.0075,
@@ -426,8 +909,6 @@
         "seed": 307
       },
       "controlSpread": 0.0085,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -440,6 +921,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2853,
@@ -449,8 +952,6 @@
         "seed": 307
       },
       "controlSpread": 0.0119,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -464,6 +965,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.3067,
@@ -473,8 +996,6 @@
         "seed": 307
       },
       "controlSpread": 0.0211,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -488,6 +1009,28 @@
         "noiseCeiling": 0.2,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2937,
@@ -497,8 +1040,6 @@
         "seed": 307
       },
       "controlSpread": 0.0198,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -512,6 +1053,28 @@
         "noiseCeiling": 0.25,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2917,
@@ -521,8 +1084,6 @@
         "seed": 307
       },
       "controlSpread": 0.0317,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -536,6 +1097,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2801,
@@ -545,8 +1128,6 @@
         "seed": 307
       },
       "controlSpread": 0.0119,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -560,6 +1141,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2536,
@@ -569,8 +1172,6 @@
         "seed": 307
       },
       "controlSpread": 0.0176,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -584,6 +1185,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2991,
@@ -593,8 +1216,6 @@
         "seed": 307
       },
       "controlSpread": 0.0178,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -608,6 +1229,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2992,
@@ -617,8 +1260,6 @@
         "seed": 307
       },
       "controlSpread": 0.0384,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -632,6 +1273,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2895,
@@ -641,8 +1304,6 @@
         "seed": 307
       },
       "controlSpread": 0.0328,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -656,6 +1317,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2929,
@@ -665,8 +1348,6 @@
         "seed": 307
       },
       "controlSpread": 0.0336,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -680,6 +1361,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.0098,
@@ -689,8 +1392,6 @@
         "seed": 307
       },
       "controlSpread": 0.0094,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -703,6 +1404,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.091,
@@ -712,8 +1435,6 @@
         "seed": 307
       },
       "controlSpread": 0.0288,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "inconclusive",
       "reason": "interval straddles the limit"
     },
@@ -726,9 +1447,30 @@
         "maxMedian": 138301644,
         "factor": 1.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
-      "value": 127035392,
-      "n": 20
+      "value": 127035392
     },
     {
       "workload": "ce-corpus",
@@ -739,9 +1481,30 @@
         "maxMedian": 154771865,
         "factor": 1.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
-      "value": 138878976,
-      "n": 20
+      "value": 138878976
     },
     {
       "workload": "ce-corpus",
@@ -750,6 +1513,28 @@
       "limit": {
         "maxValue": 15342,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 14612
@@ -762,6 +1547,28 @@
         "maxValue": 3917,
         "growth": 0.05
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 3731
     },
@@ -772,6 +1579,28 @@
       "limit": {
         "maxValue": 216,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 206
@@ -784,6 +1613,28 @@
         "maxValue": 0,
         "growth": 0.05
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 0
     },
@@ -794,6 +1645,28 @@
       "limit": {
         "maxValue": 330,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 315
@@ -806,6 +1679,28 @@
         "maxValue": 19554,
         "growth": 0.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 17777
     },
@@ -816,6 +1711,28 @@
       "limit": {
         "maxValue": 38940,
         "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 35400
@@ -828,6 +1745,28 @@
         "maxValue": 28255,
         "growth": 0.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 25687
     },
@@ -838,6 +1777,28 @@
       "limit": {
         "maxValue": 449,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 428
@@ -850,6 +1811,28 @@
         "maxValue": 0,
         "growth": 0
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 0
     },
@@ -859,6 +1842,28 @@
       "class": "identity",
       "limit": {
         "equals": "true"
+      },
+      "observations": {
+        "candidate": {
+          "planned": 1,
+          "ok": 1,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 1,
+          "ok": 1,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 1,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": "true"
@@ -873,6 +1878,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 15,
         "median": 1.0044,
@@ -882,8 +1909,6 @@
         "seed": 307
       },
       "controlSpread": 0.0052,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -896,6 +1921,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 15,
+          "ok": 15,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 15,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 15,
         "median": 1.0012,
@@ -905,8 +1952,6 @@
         "seed": 307
       },
       "controlSpread": 0.0142,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -919,6 +1964,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2666,
@@ -928,8 +1995,6 @@
         "seed": 307
       },
       "controlSpread": 0.0212,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -943,6 +2008,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.3141,
@@ -952,8 +2039,6 @@
         "seed": 307
       },
       "controlSpread": 0.0604,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -967,6 +2052,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.3118,
@@ -976,8 +2083,6 @@
         "seed": 307
       },
       "controlSpread": 0.0067,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -991,6 +2096,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 20,
+          "ok": 20,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 20,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 20,
         "median": 1.2886,
@@ -1000,8 +2127,6 @@
         "seed": 307
       },
       "controlSpread": 0.0275,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1015,6 +2140,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.2969,
@@ -1024,8 +2171,6 @@
         "seed": 307
       },
       "controlSpread": 0.0248,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1039,6 +2184,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.303,
@@ -1048,8 +2215,6 @@
         "seed": 307
       },
       "controlSpread": 0.0158,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1063,6 +2228,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.0046,
@@ -1072,8 +2259,6 @@
         "seed": 307
       },
       "controlSpread": 0.0089,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -1086,6 +2271,28 @@
         "noiseCeiling": 0.2,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.1905,
@@ -1095,8 +2302,6 @@
         "seed": 307
       },
       "controlSpread": 0.0164,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1109,9 +2314,30 @@
         "maxMedian": 332010905,
         "factor": 1.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "status": "pass",
-      "value": 305690624,
-      "n": 10
+      "value": 305690624
     },
     {
       "workload": "synthetic-c1000-t200-r20-s307",
@@ -1122,9 +2348,30 @@
         "maxMedian": 389225267,
         "factor": 1.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "status": "pass",
-      "value": 356483072,
-      "n": 10
+      "value": 356483072
     },
     {
       "workload": "synthetic-c1000-t200-r20-s307",
@@ -1133,6 +2380,28 @@
       "limit": {
         "maxValue": 49347,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 46998
@@ -1145,6 +2414,28 @@
         "maxValue": 9497,
         "growth": 0.05
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 9045
     },
@@ -1155,6 +2446,28 @@
       "limit": {
         "maxValue": 727,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 693
@@ -1167,6 +2480,28 @@
         "maxValue": 49,
         "growth": 0.05
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 47
     },
@@ -1177,6 +2512,28 @@
       "limit": {
         "maxValue": 948,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 903
@@ -1189,6 +2546,28 @@
         "maxValue": 112552,
         "growth": 0.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 102320
     },
@@ -1199,6 +2578,28 @@
       "limit": {
         "maxValue": 90555,
         "growth": 0.1
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 82323
@@ -1211,6 +2612,28 @@
         "maxValue": 2309061,
         "growth": 0.1
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 2099147
     },
@@ -1221,6 +2644,28 @@
       "limit": {
         "maxValue": 17594,
         "growth": 0.05
+      },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": 16757
@@ -1233,6 +2678,28 @@
         "maxValue": 176,
         "growth": 0
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "status": "pass",
       "value": 176
     },
@@ -1242,6 +2709,28 @@
       "class": "identity",
       "limit": {
         "equals": "true"
+      },
+      "observations": {
+        "candidate": {
+          "planned": 1,
+          "ok": 1,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 1,
+          "ok": 1,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 1,
+        "nonAdjacent": 0
       },
       "status": "pass",
       "value": "true"
@@ -1256,6 +2745,28 @@
         "noiseCeiling": 0.15,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 12,
+          "ok": 12,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 12,
+          "ok": 12,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 12,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 12,
         "median": 1.0007,
@@ -1265,8 +2776,6 @@
         "seed": 307
       },
       "controlSpread": 0.02,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -1279,6 +2788,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 12,
+          "ok": 12,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 12,
+          "ok": 12,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 12,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 12,
         "median": 0.9935,
@@ -1288,8 +2819,6 @@
         "seed": 307
       },
       "controlSpread": 0.021,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -1302,6 +2831,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 12,
+          "ok": 12,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 12,
+          "ok": 12,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 12,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 12,
         "median": 1.0033,
@@ -1311,8 +2862,6 @@
         "seed": 307
       },
       "controlSpread": 0.0212,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -1325,6 +2874,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 12,
+          "ok": 12,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 12,
+          "ok": 12,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 12,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 12,
         "median": 1.0154,
@@ -1334,8 +2905,6 @@
         "seed": 307
       },
       "controlSpread": 0.0078,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "pass"
     },
     {
@@ -1348,6 +2917,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.2854,
@@ -1357,8 +2948,6 @@
         "seed": 307
       },
       "controlSpread": 0.0334,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1372,6 +2961,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.2151,
@@ -1381,8 +2992,6 @@
         "seed": 307
       },
       "controlSpread": 0.0922,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1396,6 +3005,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.3035,
@@ -1405,8 +3036,6 @@
         "seed": 307
       },
       "controlSpread": 0.0104,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1420,6 +3049,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.3092,
@@ -1429,8 +3080,6 @@
         "seed": 307
       },
       "controlSpread": 0.015,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1444,6 +3093,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.3018,
@@ -1453,8 +3124,6 @@
         "seed": 307
       },
       "controlSpread": 0.0192,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1468,6 +3137,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.2998,
@@ -1477,8 +3168,6 @@
         "seed": 307
       },
       "controlSpread": 0.0213,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1492,6 +3181,28 @@
         "noiseCeiling": 0.1,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.3036,
@@ -1501,8 +3212,6 @@
         "seed": 307
       },
       "controlSpread": 0.0057,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1516,6 +3225,28 @@
         "noiseCeiling": 0.45,
         "minPairs": 5
       },
+      "observations": {
+        "candidate": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "control": {
+          "planned": 10,
+          "ok": 10,
+          "missing": 0,
+          "duplicate": 0,
+          "failed": 0,
+          "invalid": 0,
+          "unplanned": 0
+        },
+        "pairs": 10,
+        "nonAdjacent": 0
+      },
       "pairedRatio": {
         "n": 10,
         "median": 1.287,
@@ -1525,8 +3256,6 @@
         "seed": 307
       },
       "controlSpread": 0.0296,
-      "interleaved": true,
-      "unpaired": 0,
       "status": "fail",
       "reason": "median paired ratio exceeds the limit"
     },
@@ -1879,5 +3608,12 @@
       "owner": "CE-15.1 (#77)",
       "status": "unknown"
     }
-  ]
+  ],
+  "provenance": {
+    "rev": "HEAD",
+    "commit": "62c022e0443942d5ec099bc46e73390b6554ee3d",
+    "mode": "release",
+    "budgets": "benchmarks/core-evolution/budgets.v1.json",
+    "problems": []
+  }
 }
