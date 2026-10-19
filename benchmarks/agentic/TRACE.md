@@ -136,6 +136,11 @@ not repeated below unless they are the discriminating evidence.
       `good-link-canonical` (a hoisted canonical link, compared with React's
       props) and `good-img-fetch-priority` (an eager `<img src>`, which React's
       serializer precedes with an image preload).
+    - 1.4.5 (PR #113 review): React resources are never compared as hoisted
+      instances. `bad-script-resource-style` (an async script whose source
+      would restyle the card) and `unmeasured-script-resource-dedup` (two
+      deduplicated async scripts) are `unmeasured`, never `pass` and never a
+      false divergence.
   - Good controls: `good-idiomatic-indexing` (array indexing and lookup maps),
     `good-handler-map` (`handlers[e.key]?.()`), `good-focus-ref`,
     `good-memo-hooks` and `good-regenerated` (complete fresh generation).

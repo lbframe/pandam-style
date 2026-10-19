@@ -9,10 +9,10 @@ no product behavior depends on it.
 
 Status:
 
-- **Present:** corpus `1.4.4`, reference epoch `alpha1`. It has 47 development
+- **Present:** corpus `1.4.5`, reference epoch `alpha1`. It has 47 development
   tasks and 16 held-out tasks (encrypted in the repository; see
   [held-out policy](heldout/ACCESS-POLICY.md)), 8 project shapes on 5 hosts, the
-  oracles, and 199 development oracle fixtures (known-good and known-bad
+  oracles, and 201 development oracle fixtures (known-good and known-bad
   solutions, including the independent reviews' probes).
 - **Present (AG-00.2, #6):** the evaluation runner and its Claude Code and
   Codex adapters in [`runner/`](runner/), tested with adapter fixtures (fake
@@ -329,8 +329,9 @@ sandbox for hostile native code.
      attributes React's own serializer derives from the committed props
      (portal nodes inside a node React renders count among that node's
      children; hoisted `<title>`, `<meta>` and non-resource `<link>`
-     instances are compared like the others, while resources and singletons
-     are `unmeasured`); the rest of the document is unchanged apart from React-placed nodes, and no
+     instances are compared like the others, while resources (identified by
+     React's memoized resource state, such as async scripts and style sheets
+     with a precedence) and singletons are `unmeasured`); the rest of the document is unchanged apart from React-placed nodes, and no
      own property or replaced prototype shadows a DOM interface member. This catches writes with no
      agent stack frame, such as a bound DOM method handed to React as a ref or
      handler.

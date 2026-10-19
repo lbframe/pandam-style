@@ -413,6 +413,40 @@ test('only style sheet links are style channels; hoisted and preloaded elements 
   }
 });
 
+test('React resources are never compared as hoisted instances: they stay unmeasured', () => {
+  const dir = workspace('resources', {});
+  const header =
+    "import { jsx, jsxs } from 'react/jsx-runtime';\nimport { useEffect, useState } from 'react';\n";
+  const scenario = (body) =>
+    payload(render(dir, `${header}export function C() { ${body} }\n`));
+  const styleScript = `data:text/javascript,${encodeURIComponent('document.querySelector("section").style.backgroundColor = "red";')}`;
+  for (const body of [
+    "return jsx('script', { async: true, src: '/a.js' });",
+    "return jsx('script', { async: true, type: 'module', src: '/a.js' });",
+    // A resource that would restyle the component when executed.
+    `return jsx('section', { children: jsx('script', { async: true, src: ${JSON.stringify(styleScript)} }) });`,
+    `return jsx('section', { children: jsx('script', { async: true, type: 'module', src: ${JSON.stringify(styleScript)} }) });`,
+    // React deduplicates resources: two fibers share one node.
+    "return jsxs('div', { children: [jsx('script', { async: true, src: '/a.js', id: 'one' }), jsx('script', { async: true, src: '/a.js', id: 'two' })] });",
+    // React does not commit prop updates to a resource's node.
+    "const [n, setN] = useState(0); useEffect(() => setN(1), []); return jsx('script', { async: true, src: '/a.js', id: `s${n}` });",
+  ]) {
+    const s = scenario(body);
+    assert.deepEqual(s.violations, [], body);
+    assert.deepEqual(
+      s.unmeasured,
+      ['hoisted or singleton React element is not measured'],
+      body,
+    );
+    assert.doesNotMatch(s.html, /style=/, body);
+  }
+  // A style sheet resource is still a style channel.
+  const sheet = scenario(
+    "const [n, setN] = useState(0); useEffect(() => setN(1), []); return jsx('link', { rel: 'stylesheet', href: '/a.css', precedence: 'default', title: `t${n}` });",
+  );
+  assert.match(sheet.violations.join('\n'), /style sheet <link> \(rel\)/);
+});
+
 test('definitions load in the sandbox as plain data with token references', () => {
   const dir = workspace('definition', {
     'ok.mjs':

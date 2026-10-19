@@ -1422,9 +1422,17 @@ function checkTree(read, container, fiberRoot, phase) {
     for (const f of acc.nodes) visit(f);
     for (const f of acc.elsewhere) {
       // A hoisted instance (<title>, <meta>, a non-resource <link>) is
-      // React's own element in the head: compared like any other. Resources
-      // (memoized state, no instance) and singletons are not measured.
-      if (f.tag === HOST_HOISTABLE && f.stateNode != null) visit(f);
+      // React's own element in the head: compared like any other. A resource
+      // (async <script>, style sheet with precedence, ...) is identified by
+      // its memoized state, never by its node: React shares one node between
+      // deduplicated fibers and does not commit later prop changes to it, so
+      // resources, like singletons, are not measured.
+      if (
+        f.tag === HOST_HOISTABLE &&
+        f.memoizedState == null &&
+        f.stateNode != null
+      )
+        visit(f);
       else {
         known.add(f.stateNode);
         unmeasured.push('hoisted or singleton React element is not measured');
