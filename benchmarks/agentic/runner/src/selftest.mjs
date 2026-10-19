@@ -76,7 +76,6 @@ export function mechanismsDigest() {
     audit: auditRunArgs({
       container: '<agent>',
       image: '<image>',
-      cliName: '<cli>',
       uid: 0,
     }),
   });

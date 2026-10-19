@@ -217,7 +217,21 @@ async function agentPhase(ctx) {
   );
 
   const start = monotonicMs();
-  const handle = executor.start(ctx.startArgs);
+  let handle;
+  try {
+    handle = executor.start(ctx.startArgs);
+  } catch (error) {
+    // Section 4.6: an access-only login rejected inside the container falls
+    // back once to the declared refresh-capable copy (the failed start was
+    // rolled back and verified by the executor); otherwise it propagates.
+    const fallback =
+      error.code === 'credential-login' &&
+      (error.cleanupRemaining ?? []).length === 0
+        ? ctx.onLoginRejected?.(error)
+        : null;
+    if (fallback == null) throw error;
+    handle = executor.start({ ...ctx.startArgs, credential: fallback });
+  }
   ctx.handle = handle;
   let stopping = null;
   const timers = [];
@@ -902,9 +916,47 @@ async function attemptBody(opts, plan, ctx) {
     },
   };
   const agentStartedAt = nowIso();
+  // A rejected access-only login: mode B when declared (the attempt goes
+  // on, recorded), else a provider-scoped credential failure (below).
+  actx.onLoginRejected = (error) => {
+    if (
+      cred.mode !== 'access-only' ||
+      credential?.fallback !== 'refresh-capable-copy'
+    )
+      return null;
+    const p = PROVIDERS[credential.provider];
+    Object.assign(cred, {
+      mode: 'refresh-capable-copy',
+      delivery: {
+        env: {},
+        files: [{ rel: p.containerFile, bytes: cred.original.bytes }],
+      },
+      accessOnlyRefused: true,
+      accessOnlyLoginError: redaction
+        .redactText(String(error.message))
+        .slice(0, 300),
+    });
+    state.credential = recoveryState(credential.provider, cred.original);
+    saveState();
+    return cred.delivery;
+  };
   let run;
   try {
     run = await agentPhase(actx);
+  } catch (error) {
+    if (error.code !== 'credential-login') throw error;
+    // No fallback declared: refuse this provider durably; the matrix goes on
+    // with the other providers (infrastructure/credential, not harness).
+    const reason = `access-only login rejected and no fallback declared: ${redaction.redactText(String(error.message)).slice(0, 300)}`;
+    recordRefusal(opts.stateDir, credential?.provider ?? modelConfig.cli, {
+      reason,
+      attempt: ctx.attemptLabel,
+      redaction,
+    });
+    return {
+      haltProvider: reason,
+      failure: { class: 'infrastructure', code: 'credential-login' },
+    };
   } finally {
     ctx.handle = actx.handle ?? null;
   }
@@ -1405,6 +1457,9 @@ async function attemptBody(opts, plan, ctx) {
       haltProvider: down.haltProvider,
       source: credential?.source ?? null,
       ...(cred.accessOnlyRefused ? { accessOnlyRefused: true } : {}),
+      ...(cred.accessOnlyLoginError
+        ? { accessOnlyLoginError: cred.accessOnlyLoginError }
+        : {}),
     },
     evidence: {
       completeness,

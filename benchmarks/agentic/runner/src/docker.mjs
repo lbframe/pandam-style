@@ -181,7 +181,7 @@ export function graderRunArgs({
   ];
 }
 
-export function auditRunArgs({ container, image, cliName, uid = agentUid() }) {
+export function auditRunArgs({ container, image, uid = agentUid() }) {
   return [
     'run',
     '--rm',
@@ -202,7 +202,6 @@ export function auditRunArgs({ container, image, cliName, uid = agentUid() }) {
     NODE,
     `${HARNESS_DIR}/channel-audit.mjs`,
     String(uid),
-    cliName,
   ];
 }
 
@@ -409,18 +408,24 @@ export class DockerExecutor {
       runCli.push('--env-file', `${home}/.cred-env`);
     }
     if (credential?.login) {
-      must(
-        run(
-          execArgs({
-            container: agent,
-            interactive: true,
-            env: cliEnv,
-            command: [this.cliBinary[cli], ...credential.login.args],
-          }),
-          { input: credential.login.stdin },
-        ),
-        'access-only login',
+      // A rejected access-only login is a credential failure of this
+      // provider (section 4.6), not a container failure.
+      const login = run(
+        execArgs({
+          container: agent,
+          interactive: true,
+          env: cliEnv,
+          command: [this.cliBinary[cli], ...credential.login.args],
+        }),
+        { input: credential.login.stdin },
       );
+      if (login.status !== 0)
+        throw Object.assign(
+          new Error(
+            `access-only login rejected: ${`${login.stderr ?? ''}`.trim().slice(-300)}`,
+          ),
+          { code: 'credential-login' },
+        );
     }
     const binary = this.cliBinary[cli];
     const child = spawn(
@@ -446,7 +451,6 @@ export class DockerExecutor {
         auditRunArgs({
           container: agent,
           image: this.images.harness,
-          cliName: path.basename(binary),
         }),
       );
       if (r.status === 0) {
@@ -605,18 +609,20 @@ export function hasDockerSync() {
 }
 
 /**
- * Summary of the channel-audit samples (section 4.4). A sample that did not
- * see the CLI or lacks a count makes the summary unknown (null), never clean.
+ * Summary of the channel-audit samples (section 4.4), over the samples that
+ * saw the CLI (one taken before the CLI started or after it ended checked
+ * nothing). No such sample, or one without a count, makes the summary
+ * unknown (null), never clean.
  */
 export function summarizeAudits(audits) {
   const seen = audits.filter((a) => a.cliFound === true);
-  const counts = audits.map((a) => a.foreignStreamHolders);
+  const counts = seen.map((a) => a.foreignStreamHolders);
   return {
     samples: audits.length,
     cliNonDumpable:
       seen.length === 0 ? null : seen.every((a) => a.cliNonDumpable === true),
     foreignStreamHolders:
-      audits.length > 0 && counts.every(Number.isInteger)
+      seen.length > 0 && counts.every(Number.isInteger)
         ? counts.reduce((n, x) => n + x, 0)
         : null,
     controlSocketConnections: null,

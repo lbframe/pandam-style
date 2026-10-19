@@ -25,6 +25,7 @@ import {
   claudeInit,
   claudeResult,
   claudeText,
+  codexCredentialDoc,
   codexDone,
   codexMessage,
   codexStart,
@@ -32,6 +33,7 @@ import {
   fixtureIdentity,
   goodDiscoveryResponse,
   recordsOf,
+  syntheticCredentialDir,
   tmpDir,
   writeScenario,
   assertDocumentsValid,
@@ -181,9 +183,18 @@ test(
   },
 );
 
-async function dockerAttempt({ model, steps, grade = true }) {
-  const scenario = writeScenario(tmpDir('dscn'), 's', { steps });
-  const config = dockerConfig({ models: [model] });
+async function dockerAttempt({
+  model,
+  steps,
+  grade = true,
+  credentials,
+  scenario: extra = {},
+}) {
+  const scenario = writeScenario(tmpDir('dscn'), 's', { steps, ...extra });
+  const config = dockerConfig({
+    models: [model],
+    ...(credentials ? { credentials } : {}),
+  });
   const trusted = grade ? devTrustedTree() : null;
   const executor = new DockerExecutor({
     images: { agent: config.images.agent, harness: config.images.proxy },
@@ -244,11 +255,12 @@ test(
   async () => {
     const { out, record } = await dockerAttempt({
       model: MODELS.sol,
-      // Long enough for channel-audit samples (the first one at 1 s).
+      // Alive across several channel-audit samples (at 1 s, then every
+      // 2 s), whatever the start-up latency of `docker exec` and the sidecar.
       steps: [
         ...codexStart(),
         { run: 'pwd && id -u' },
-        { sleep: 2500 },
+        { sleep: 6000 },
         codexMessage(goodDiscoveryResponse()),
         codexDone(),
       ],
@@ -284,10 +296,11 @@ test(
     );
     assert.equal(record.trustedTree.mode, 'trusted');
     assert.equal(record.integrity.proxy.connections, 0);
+    // Section 4.4: the execute-only CLI is non-dumpable and nothing else
+    // holds its stream (the launcher is not taken for the CLI).
     assert.ok(record.integrity.channelAudit.samples >= 1);
-    assert.ok(
-      Number.isInteger(record.integrity.channelAudit.foreignStreamHolders),
-    );
+    assert.equal(record.integrity.channelAudit.cliNonDumpable, true);
+    assert.equal(record.integrity.channelAudit.foreignStreamHolders, 0);
     // Nothing left behind: containers, networks, working copies.
     assert.equal(
       docker([
@@ -556,5 +569,59 @@ test(
       docker(['rm', '-f', resources[0].proxy, resources[0].container]);
       docker(['network', 'rm', resources[0].network]);
     }
+  },
+);
+
+test(
+  'channel audit in the agent container: a tool child holding the stream is a foreign holder',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const { record } = await dockerAttempt({
+      model: MODELS.sol,
+      steps: [
+        ...codexStart(),
+        { holdStream: 6000 },
+        codexMessage(goodDiscoveryResponse()),
+        codexDone(),
+      ],
+    });
+    assert.equal(record.integrity.channelAudit.cliNonDumpable, true);
+    assert.ok(record.integrity.channelAudit.foreignStreamHolders >= 1);
+  },
+);
+
+test(
+  'a rejected Codex access-only login in the agent container falls back to the declared copy',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const cred = syntheticCredentialDir('codex', codexCredentialDoc());
+    const before = fs.readFileSync(cred.file);
+    const { record } = await dockerAttempt({
+      model: MODELS.sol,
+      grade: false,
+      scenario: { loginRejects: true },
+      credentials: {
+        claude: { mode: 'none', source: null },
+        codex: {
+          mode: 'access-only',
+          fallback: 'refresh-capable-copy',
+          synthetic: true,
+          source: { configDir: cred.dir, account: 'synthetic-chatgpt' },
+        },
+      },
+      steps: [
+        ...codexStart(),
+        { run: 'test -e "$CODEX_HOME/auth.json"' },
+        codexMessage(goodDiscoveryResponse()),
+        codexDone(),
+      ],
+    });
+    // The rejected start left nothing behind and the attempt ran in mode B.
+    assert.equal(record.outcome.code, 'completed');
+    assert.equal(record.credential.mode, 'refresh-capable-copy');
+    assert.equal(record.credential.accessOnlyRefused, true);
+    assert.match(record.credential.accessOnlyLoginError, /not valid JSON/);
+    assert.equal(record.credential.export, 'unchanged');
+    assert.deepEqual(fs.readFileSync(cred.file), before);
   },
 );
