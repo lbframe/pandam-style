@@ -7,24 +7,25 @@ tooling changes no product behavior and is not part of the product test suites.
 It uses Node built-ins only. `derive-ce-corpus.mjs` also imports the CE-00.2
 classifier, which needs the repository install.
 
-| File                   | Purpose                                                                                                                                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `lib.mjs`              | Digests, tree digests, statistics (median, nearest-rank p95, order-statistic intervals, paired-ratio bootstrap, spread, CV), environment and machine-load records, the optional quiet rule |
-| `archive.mjs`          | `build`, `manifest`, `verify [--replay]` and `closure --dest` for the digest-bound Alpha 1 store                                                                                           |
-| `workloads.mjs`        | Materializes frozen workloads from Git objects, the derived corpus record or the seeded generator, and refuses any other digest; `digest` and `materialize` subcommands                    |
-| `derive-ce-corpus.mjs` | Derives `workloads/ce-corpus.v1.json` from the CE-00.2 accounting and the Alpha 1 policy at pinned commits, excluding what the Alpha 1 compiler rejects                                    |
-| `sample.mjs`           | One fresh-process sample: `compile`, `consistency`, `runtime` or `vite`                                                                                                                    |
-| `measure.mjs`          | Interleaved, load-recording batches with an optional quiet-machine gate; writes `raw.json` and `summary.json`                                                                              |
-| `summarize.mjs`        | Metric definitions and summaries; pools runs and compares epochs                                                                                                                           |
-| `budgets.mjs`          | `freeze` (policy + baseline runs → budgets) and `gate` (candidate against `alpha1`, same run), with budgets provenance, control identity and observation validation                        |
-| `gate-regression.mjs`  | Class-level regression matrix of the gate's input validation, with a seeded omission and perturbation fuzzer (`--fuzz-samples <n>`, `--no-fuzz`)                                           |
+| File                         | Purpose                                                                                                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `lib.mjs`                    | Digests, tree digests, statistics (median, nearest-rank p95, order-statistic intervals, paired-ratio bootstrap, spread, CV), environment and machine-load records, the optional quiet rule |
+| `archive.mjs`                | `build`, `manifest`, `npm-cache-record`, `verify [--replay]` and `closure --dest` for the digest-bound Alpha 1 store, with non-vacuous file-level tree digests                             |
+| `tree-digest-regression.mjs` | Regression test for vacuous tree digests (`--store <copy>` adds the real store)                                                                                                            |
+| `workloads.mjs`              | Materializes frozen workloads from Git objects, the derived corpus record or the seeded generator, and refuses any other digest; `digest` and `materialize` subcommands                    |
+| `derive-ce-corpus.mjs`       | Derives `workloads/ce-corpus.v1.json` from the CE-00.2 accounting and the Alpha 1 policy at pinned commits, excluding what the Alpha 1 compiler rejects                                    |
+| `sample.mjs`                 | One fresh-process sample: `compile`, `consistency`, `runtime` or `vite`                                                                                                                    |
+| `measure.mjs`                | Interleaved, load-recording batches with an optional quiet-machine gate; writes `raw.json` and `summary.json`                                                                              |
+| `summarize.mjs`              | Metric definitions and summaries; pools runs and compares epochs                                                                                                                           |
+| `budgets.mjs`                | `freeze` (policy + baseline runs → budgets) and `gate` (candidate against `alpha1`, same run), with budgets provenance, control identity and observation validation                        |
+| `gate-regression.mjs`        | Class-level regression matrix of the gate's input validation, with a seeded omission and perturbation fuzzer (`--fuzz-samples <n>`, `--no-fuzz`)                                           |
 
 ## Commands
 
 ```sh
 # Store: reconstruct, verify, and get an offline closure copy.
 node tools/baselines/archive.mjs build --store <empty dir>
-node tools/baselines/archive.mjs verify --replay
+node tools/baselines/archive.mjs verify --store <copy of the store> --replay
 node tools/baselines/archive.mjs closure --dest <dir>
 
 # Workloads: check the frozen digests.

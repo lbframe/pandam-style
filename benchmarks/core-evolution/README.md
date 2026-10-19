@@ -53,7 +53,7 @@ source/            git archive of 415e055
 packages/registry/ published tarballs
 packages/source-pack[-repeat]/  two clean-checkout packs
 closure/           executable closure (node_modules installed from the lockfile)
-npm-cache/         npm cache able to reinstall the closure offline
+npm-cache/         npm cache able to reinstall the closure offline (bound by npm-cache.v1.json)
 node/              Node archives and SHASUMS; extracted 22.22.0
 engines/ms-playwright/  Chromium 148 and its headless shell
 fonts/             resolved font files
@@ -63,7 +63,8 @@ Reconstruct and verify it from any checkout that contains this directory:
 
 ```sh
 node tools/baselines/archive.mjs build --store <empty dir>  # registry, nodejs.org, Playwright CDN
-node tools/baselines/archive.mjs verify --store <dir> --replay
+node tools/baselines/archive.mjs verify --store <dir> --replay --rebuilt  # a rebuilt store
+node tools/baselines/archive.mjs verify --store <copy of the archived store> --replay
 node tools/baselines/archive.mjs closure --store <dir> --dest <dir>  # offline closure copy
 ```
 
@@ -72,15 +73,60 @@ source archive and reinstalls the closure offline with `npm ci --offline`. The
 reinstalled tree must be byte-identical to the recorded one, apart from npm's
 hidden `.package-lock.json`.
 
+The store and `manifest.v1.json` are immutable. Run `verify --replay` and any
+digest recomputation on a copy of the store, because an offline `npm ci` writes
+npm logs and index entries into the cache it uses.
+
+Every tree digest is non-vacuous. Tree selections are file-level, so a filter
+never prunes the directories above a file it includes. `verify` and `build` fail
+when a tree covers no files, or fewer than its recorded count.
+`node tools/baselines/tree-digest-regression.mjs [--store <copy>]` is the
+regression test for this class.
+
+**Erratum: the npm cache binding.**
+
+- In `manifest.v1.json`, `closure.npmCache.tree` is vacuous: `e3b0c442…`, 0
+  files. It was recorded with a filter that pruned `_cacache` itself, so it
+  binds nothing, and earlier `verify` runs compared two empty digests.
+- The manifest stays unchanged because `budgets.v1.json` binds its digest.
+- The binding is
+  [`epochs/alpha1/npm-cache.v1.json`](epochs/alpha1/npm-cache.v1.json), in two
+  parts:
+  - **`lockedTarballs` (reproducible):** all 102 lockfile packages installed in
+    the closure, each cached with bytes matching its lockfile integrity, with
+    digest `5af5774a…`. It is checked on every store. A store rebuilt by
+    `archive.mjs build` reproduces it exactly.
+  - **`contentTree` (archived identity):** the content-addressed entries of the
+    archived store's cache (`_cacache/content-v2`): 314 files, 460,115,581
+    bytes, SHA-256 `4fa28496…`. The original `npm install` also cached 212
+    registry-metadata entries, so a rebuilt store holds only the 102 tarballs
+    (135,164,055 bytes). `verify --rebuilt` reports that difference as a note; a
+    plain `verify` requires the archived inventory.
+- `verify` reports the manifest field as a note, never as a check.
+- The offline replay was sound throughout: npm checks every tarball against the
+  lockfile integrity, and the reinstalled tree digest was compared with the
+  manifest.
+
 ## Executable baseline and agentic-optimizations reuse
 
-The closure is the executable Alpha 1 baseline. It holds the published packages
-with the exact qualified hosts, installed through their public entry points.
-AG-00.3 (#7) runs its multi-model baseline against the same store:
+The `alpha1` closure is the CE measurement closure. It holds the published
+packages with the exact hosts these measurements use, such as React 19.3.0 as in
+the Alpha 1 package qualification. It is not an installation for AG tasks or
+other consumers, whose fixtures pin their own hosts (the AG fixtures pin React
+19.2.0, among others) and need their own per-fixture closures.
 
-1. Run `node tools/baselines/archive.mjs verify --replay`.
-2. Use `<store>/closure/node_modules`, or an offline copy from
-   `archive.mjs closure`, with `<store>/node/node-v22.22.0-linux-x64/bin/node`.
+The reusable parts of the store are:
+
+- the Alpha 1 product tarballs (`packages/registry/`);
+- the Node runtimes (`node/`);
+- the Chromium engine (`engines/`).
+
+All three are digest-bound by the manifest. AG-00.3 (#7) reuses them:
+
+1. Run `node tools/baselines/archive.mjs verify --replay` on a copy of the
+   store.
+2. Install the archived product tarballs into its own closures, and run with
+   `<store>/node/node-v22.22.0-linux-x64/bin/node` and the archived Chromium.
 3. Label the results with epoch `alpha1`, and cite the manifest path and
    SHA-256.
 
