@@ -254,20 +254,51 @@ and anything that cannot be validated fails closed.
   A `--budgets` file that is not byte-identical to that committed version is
   evaluated in `not-release` mode.
 
-- **Control and environment:** the `alpha1` control must be one epoch whose
-  recorded package integrities, installed `@pandamstyle` tree digest, closure
-  lockfile digest and host versions equal the manifest's. The Node version and
-  binary digest must equal the frozen pins. The candidate's identity must be
-  recorded, and is reported.
-- **Observations:** every planned round of every budgeted workload is accounted
-  for on both sides. A failed candidate sample fails the budget. Any other
-  missing, failed, null, non-finite, non-positive (for ratios), duplicated,
-  unplanned or non-adjacent observation makes the budget `inconclusive`. Each
-  result reports its observation counts.
+- **Reconciliation:** before any statistic, every run is reconciled 1:1 against
+  cells derived only from the committed plan of the baseline, the workloads
+  record, the harness, the manifest and the frozen pins at the evaluated
+  revision. Every object has exact keys (nothing missing or extra) and typed
+  values.
+
+  - Sample cells: exactly one sample per epoch, workload, kind and round for
+    every planned kind of each measured workload, with adjacent pairs and
+    contiguous indexes.
+  - Nested cells: every incremental edit of the workload, in order, with every
+    planned iteration, and every canonical comparison, whose `equal` flags must
+    agree with the recorded digests.
+  - Runtime values: `null` only when the matching call count is zero.
+  - The run's `workloads` list must name exactly the measured workloads, with
+    the committed content digests. It never selects what is inspected. A planned
+    workload is either entirely absent from a run (its budgets are not run) or
+    complete.
+
+  Any reconciliation error makes the verdict non-passing.
+
+- **Control and environment:** the run holds exactly the `alpha1` control and
+  the candidate. The control's package integrities, installed `@pandamstyle`
+  tree digest, closure lockfile digest and host versions must equal the
+  manifest's. The Node version and binary digest must equal the frozen pins.
+- **Candidate identity:** fully recorded and well formed: package integrities,
+  tree digest and lockfile digest. It must be identical across all pooled runs,
+  as must the control's.
+- **Observations:** a failed candidate sample fails the budget. Any other
+  missing, failed, invalid or non-adjacent observation makes it `inconclusive`.
+  Each result reports its observation counts.
 
 `node tools/baselines/gate-regression.mjs` runs the class-level regression
-matrix of these rules on the committed runs and on temporary clones with altered
-history.
+matrix of these rules. It runs on the committed runs, on temporary clones with
+altered history, and through a seeded omission and perturbation fuzzer:
+
+- **Mutations:** deletion, null/NaN/negative/string substitution and
+  duplication.
+- **Coverage:** every node outside the samples, and every normalized sample
+  path, at least once per applicable mutation, plus a random sample.
+- **Invariant:** a failing run never becomes `pass`. A passing run stays `pass`
+  only for a provable no-op: a field the gate never reads, with identical budget
+  results.
+
+The trust boundary is unchanged: complete, well-formed values produced by the
+harness are trusted.
 
 ```sh
 node tools/baselines/measure.mjs --plan final --label <label> \

@@ -17,7 +17,7 @@ classifier, which needs the repository install.
 | `measure.mjs`          | Interleaved, load-recording batches with an optional quiet-machine gate; writes `raw.json` and `summary.json`                                                                              |
 | `summarize.mjs`        | Metric definitions and summaries; pools runs and compares epochs                                                                                                                           |
 | `budgets.mjs`          | `freeze` (policy + baseline runs → budgets) and `gate` (candidate against `alpha1`, same run), with budgets provenance, control identity and observation validation                        |
-| `gate-regression.mjs`  | Class-level regression matrix of the gate's input validation                                                                                                                               |
+| `gate-regression.mjs`  | Class-level regression matrix of the gate's input validation, with a seeded omission and perturbation fuzzer (`--fuzz-samples <n>`, `--no-fuzz`)                                           |
 
 ## Commands
 

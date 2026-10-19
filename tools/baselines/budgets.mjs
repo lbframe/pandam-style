@@ -518,8 +518,515 @@ export function verifyBudgetsChain(source, file, seen = new Set()) {
     const previous = verifyBudgetsChain(source, budgets.supersedes.path, seen);
     problems.push(...previous.problems);
   }
-  return { budgets, problems };
+  const planIds = [...new Set(raws.map((raw) => raw?.plan?.id))];
+  if (raws.length > 0 && planIds.length !== 1)
+    problems.push(`${at}: baseline evidence mixes plans`);
+  return {
+    budgets,
+    problems,
+    planId: planIds.length === 1 ? planIds[0] : null,
+  };
 }
+
+// ----------------------------------------------------------- reconciliation
+
+// Before any statistic, every raw run is reconciled 1:1 against the cells
+// that the committed plan, workloads record, harness, manifest and budgets
+// pins at the evaluated revision require: exact keys (nothing missing or
+// extra) and value types for every object, the exact sample cells (epoch,
+// workload, kind, round), incremental edits and iterations, canonical
+// comparisons, identities and environment. The raw `workloads` list is only
+// checked, never used to select what is inspected. Any reconciliation error
+// makes the verdict non-passing.
+
+const RAW_KIND = 'pandamstyle-ce003-raw-results';
+const HEX64 = /^[0-9a-f]{64}$/;
+const HEX40 = /^[0-9a-f]{40}$/;
+const INTEGRITY = /^sha512-[A-Za-z0-9+/]{86}==$/;
+export const RECORDED_HOSTS = [
+  'vite',
+  'next',
+  '@rsbuild/core',
+  '@rspack/core',
+  'react',
+  'react-dom',
+  '@vitejs/plugin-react',
+  'playwright-core',
+  'typescript',
+];
+const PROJECTIONS = [
+  'css',
+  'designModule',
+  'declarations',
+  'manifest',
+  'artifacts',
+  'compiledModules',
+];
+
+const finite = (v) => typeof v === 'number' && Number.isFinite(v);
+const T = {
+  pos: (v) => finite(v) && v > 0,
+  nonneg: (v) => finite(v) && v >= 0,
+  int: (v) => Number.isInteger(v) && v >= 0,
+  posint: (v) => Number.isInteger(v) && v > 0,
+  str: (v) => typeof v === 'string' && v.length > 0,
+  strOrNull: (v) => v === null || (typeof v === 'string' && v.length > 0),
+  bool: (v) => typeof v === 'boolean',
+  sha: (v) => typeof v === 'string' && HEX64.test(v),
+  sha40: (v) => typeof v === 'string' && HEX40.test(v),
+  integrity: (v) => typeof v === 'string' && INTEGRITY.test(v),
+  date: (v) => typeof v === 'string' && !Number.isNaN(Date.parse(v)),
+  eq: (expected) => (v) => v === expected,
+  triple: (v) =>
+    Array.isArray(v) && v.length === 3 && v.every((x) => finite(x) && x >= 0),
+};
+
+// Checks `value` against `spec`: a predicate, or an object of exact keys
+// (every key required, no other key allowed).
+function check(value, spec, at, errors) {
+  if (typeof spec === 'function') {
+    if (!spec(value)) errors.push(`${at}: invalid value`);
+    return;
+  }
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    errors.push(`${at}: expected an object`);
+    return;
+  }
+  for (const key of Object.keys(value))
+    if (!(key in spec)) errors.push(`${at}.${key}: unexpected key`);
+  for (const [key, inner] of Object.entries(spec)) {
+    if (!(key in value)) errors.push(`${at}.${key}: missing`);
+    else check(value[key], inner, `${at}.${key}`, errors);
+  }
+}
+
+function checkArray(value, at, errors, length, each) {
+  if (!Array.isArray(value)) return errors.push(`${at}: expected an array`);
+  if (length != null && value.length !== length)
+    errors.push(`${at}: expected ${length} elements, found ${value.length}`);
+  value.forEach((item, i) => each(item, `${at}[${i}]`, i));
+}
+
+const SNAPSHOT = {
+  at: T.date,
+  loadavg: T.triple,
+  windowMs: T.pos,
+  cpuUtilisation: T.nonneg,
+  busyCores: T.nonneg,
+  foreignBusyProcesses: T.int,
+  foreignBusyCores: T.nonneg,
+  foreignHeavyCores: T.nonneg,
+};
+const USAGE = { maxRssBytes: T.pos, userCpuMs: T.pos, systemCpuMs: T.pos };
+const SIZES = { bytes: T.pos, gzipBytes: T.pos, brotliBytes: T.pos };
+const ITERATION_TIMES = [
+  'applyMs',
+  'validateMs',
+  'compileMs',
+  'toDiagnosticsMs',
+  'totalMs',
+];
+
+function compileSpec(kind) {
+  return {
+    ok: T.eq(true),
+    kind: T.eq(kind),
+    importMs: T.pos,
+    full: {
+      initializeMs: T.pos,
+      validateMs: T.pos,
+      compileMs: T.pos,
+      toDiagnosticsMs: T.pos,
+      totalMs: T.pos,
+    },
+    afterFull: USAGE,
+    output: {
+      css: {
+        ...SIZES,
+        sha256: T.sha,
+        styleRules: T.posint,
+        atRules: T.int,
+        declarations: T.posint,
+        distinctClassNames: T.posint,
+        balanced: T.eq(true),
+      },
+      designModule: { ...SIZES, sha256: T.sha },
+      declarationsBytes: T.pos,
+      compiledModules: { count: T.posint, bytes: T.pos, sha256: T.sha },
+      metadataBytes: {
+        'artifacts.json': T.pos,
+        'manifest.json': T.pos,
+        'build-report.json': T.pos,
+      },
+      report: {
+        ruleCount: T.posint,
+        designSystemRuleCount: T.int,
+        consumerRuleCount: T.int,
+        cssBytes: T.pos,
+        coveredFileCount: T.posint,
+        analysedFileCount: T.posint,
+      },
+      variants: {
+        recipes: T.int,
+        recipeAxisValues: T.int,
+        recipeSelections: T.int,
+        compoundVariants: T.int,
+        themes: T.int,
+        conditions: T.int,
+        tokens: T.int,
+      },
+    },
+    incremental: () => true,
+    restoredToFullOutput: T.eq(true),
+    final: USAGE,
+    wallMs: T.pos,
+    ...(kind === 'consistency' ? { canonical: () => true } : {}),
+  };
+}
+
+const RESULT_SPECS = {
+  compile: compileSpec('compile'),
+  consistency: compileSpec('consistency'),
+  runtime: {
+    ok: T.eq(true),
+    kind: T.eq('runtime'),
+    modules: T.posint,
+    moduleLoadMs: T.pos,
+    recordedPropsCalls: T.int,
+    rejectedPropsCalls: T.int,
+    recordedRecipeSelections: T.int,
+    renders: T.int,
+    renderErrors: T.int,
+    propsNsPerCall: () => true,
+    recipeSelectNsPerCall: () => true,
+    renderNsPerCall: () => true,
+    sink: T.eq(true),
+    final: USAGE,
+    wallMs: T.pos,
+  },
+  vite: {
+    ok: T.eq(true),
+    kind: T.eq('vite'),
+    importMs: T.pos,
+    buildMs: T.pos,
+    css: { files: T.posint, ...SIZES },
+    js: { files: T.posint, ...SIZES },
+    distSha256: T.sha,
+    final: USAGE,
+    wallMs: T.pos,
+  },
+};
+
+function checkResult(result, kind, workload, plan, at, errors) {
+  if (result?.ok === false) {
+    check(result, { ok: T.eq(false), error: T.str }, at, errors);
+    return;
+  }
+  check(result, RESULT_SPECS[kind], at, errors);
+  if (kind === 'compile' || kind === 'consistency') {
+    const iterations =
+      kind === 'consistency'
+        ? 2
+        : (plan.incrementalIterationsByWorkload?.[workload.id] ??
+          plan.incrementalIterations);
+    const edits = workload.edits ?? [];
+    checkArray(
+      result?.incremental,
+      `${at}.incremental`,
+      errors,
+      edits.length,
+      (edit, eat, e) => {
+        check(
+          edit,
+          {
+            id: T.eq(edits[e].id),
+            iterations: () => true,
+            restoredCssSha256: T.sha,
+          },
+          eat,
+          errors,
+        );
+        checkArray(
+          edit?.iterations,
+          `${eat}.iterations`,
+          errors,
+          iterations,
+          (it, iat, k) =>
+            check(
+              it,
+              {
+                iteration: T.eq(k),
+                direction: T.eq(k % 2 === 0 ? 'forward' : 'back'),
+                ...Object.fromEntries(ITERATION_TIMES.map((f) => [f, T.pos])),
+              },
+              iat,
+              errors,
+            ),
+        );
+      },
+    );
+    if (kind === 'consistency')
+      checkArray(
+        result?.canonical,
+        `${at}.canonical`,
+        errors,
+        edits.length,
+        (c, cat, e) => {
+          const digests = Object.fromEntries(
+            PROJECTIONS.map((p) => [p, T.sha]),
+          );
+          check(
+            c,
+            {
+              id: T.eq(edits[e].id),
+              equal: Object.fromEntries(PROJECTIONS.map((p) => [p, T.bool])),
+              incremental: digests,
+              canonical: digests,
+            },
+            cat,
+            errors,
+          );
+          for (const p of PROJECTIONS)
+            if (c?.equal?.[p] !== (c?.incremental?.[p] === c?.canonical?.[p]))
+              errors.push(
+                `${cat}.equal.${p}: contradicts the recorded digests`,
+              );
+        },
+      );
+  }
+  if (kind === 'runtime')
+    for (const [field, count] of [
+      ['propsNsPerCall', 'recordedPropsCalls'],
+      ['recipeSelectNsPerCall', 'recordedRecipeSelections'],
+      ['renderNsPerCall', 'renders'],
+    ]) {
+      const ok =
+        result?.[count] === 0
+          ? result?.[field] === null
+          : T.pos(result?.[field]);
+      if (!ok)
+        errors.push(`${at}.${field}: invalid for ${count} ${result?.[count]}`);
+    }
+}
+
+function identitySpec(manifest) {
+  return {
+    name: T.str,
+    closure: T.str,
+    packageLockSha256: T.sha,
+    packages: Object.fromEntries(
+      manifest.packages.map((p) => [
+        p.name,
+        { version: T.str, resolved: T.str, integrity: T.integrity },
+      ]),
+    ),
+    installedPandamstyle: { sha256: T.sha, files: T.posint, bytes: T.posint },
+    hosts: Object.fromEntries(RECORDED_HOSTS.map((h) => [h, T.str])),
+  };
+}
+
+// The identity that must agree across pooled runs of one epoch.
+const identityKey = (epoch) =>
+  JSON.stringify({
+    packageLockSha256: epoch?.packageLockSha256,
+    packages: epoch?.packages,
+    installedPandamstyle: epoch?.installedPandamstyle,
+    hosts: epoch?.hosts,
+  });
+
+// Reconciles one raw run with the committed expectations. Returns errors.
+export function reconcile(raw, expected) {
+  const errors = [];
+  const {
+    plan,
+    workloadsRecord,
+    workloadsSha256,
+    harness,
+    pins,
+    manifest,
+    reference,
+    candidate,
+  } = expected;
+  const at = raw?.label ?? '<run>';
+  check(
+    raw,
+    {
+      schemaVersion: T.eq(1),
+      kind: T.eq(RAW_KIND),
+      label: T.str,
+      plan: () => true,
+      workloadsRecord: {
+        path: T.eq(WORKLOADS_PATH),
+        sha256: T.eq(workloadsSha256),
+      },
+      harness: Object.fromEntries(
+        HARNESS_FILES.map((f) => [f, T.eq(harness[f])]),
+      ),
+      repositoryCommit: T.sha40,
+      repositoryDirty: T.eq(false),
+      environment: {
+        os: T.str,
+        kernel: T.str,
+        architecture: T.str,
+        cpu: T.str,
+        logicalCores: T.posint,
+        memoryBytes: T.posint,
+        scalingGovernor: T.strOrNull,
+        boost: T.strOrNull,
+        filesystem: T.str,
+        node: T.eq(pins?.node),
+        nodeBinary: T.str,
+        nodeBinarySha256: T.eq(pins?.nodeBinarySha256),
+      },
+      quietRule: {
+        maxCpuUtilisation: T.nonneg,
+        maxForeignHeavyCores: T.nonneg,
+        description: T.str,
+      },
+      epochs: () => true,
+      workloads: () => true,
+      load: {
+        before: (v) => Array.isArray(v) && v.length > 0,
+        after: SNAPSHOT,
+        quietAtStart: T.bool,
+        quietRequired: T.bool,
+        quietAtEnd: T.bool,
+        batch: {
+          maxLoadavg1: T.nonneg,
+          maxSampleCpuUtilisation: T.nonneg,
+          meanSampleCpuUtilisation: T.nonneg,
+        },
+      },
+      seed: T.int,
+      startedAt: T.date,
+      finishedAt: T.date,
+      samples: () => true,
+    },
+    at,
+    errors,
+  );
+  if (raw === null || typeof raw !== 'object') return errors;
+  if (plan == null || JSON.stringify(raw.plan) !== JSON.stringify(plan))
+    errors.push(`${at}.plan: not the committed plan of the baseline`);
+  checkArray(raw.load?.before, `${at}.load.before`, errors, null, (s, sat) =>
+    check(s, SNAPSHOT, sat, errors),
+  );
+
+  // Epochs: exactly the control and the candidate, each fully identified.
+  const names = (Array.isArray(raw.epochs) ? raw.epochs : []).map(
+    (e) => e?.name,
+  );
+  if (
+    names.length !== 2 ||
+    !names.includes(reference) ||
+    !names.includes(candidate) ||
+    reference === candidate
+  )
+    errors.push(`${at}.epochs: must be exactly ${reference} and ${candidate}`);
+  checkArray(raw.epochs, `${at}.epochs`, errors, null, (e, eat) =>
+    check(e, identitySpec(manifest), eat, errors),
+  );
+
+  // Expected sample cells, from the committed plan only. A planned workload
+  // is either entirely absent from the run (its budgets are not run) or
+  // complete; the raw workloads list must name exactly the measured ones.
+  const samples = Array.isArray(raw.samples) ? raw.samples : [];
+  if (!Array.isArray(raw.samples))
+    errors.push(`${at}.samples: expected an array`);
+  const byWorkload = new Map(workloadsRecord.workloads.map((w) => [w.id, w]));
+  const measured = new Set();
+  samples.forEach((s, i) => {
+    const sat = `${at}.samples[${i}]`;
+    check(
+      s,
+      {
+        index: T.eq(i),
+        round: T.int,
+        epoch: (v) => v === reference || v === candidate,
+        workload: (v) =>
+          typeof v === 'string' && plan?.repetitions?.[v] != null,
+        kind: (v) =>
+          typeof v === 'string' &&
+          plan?.repetitions?.[s?.workload]?.[v] != null,
+        startedAt: T.date,
+        load: {
+          loadavgBefore: T.triple,
+          loadavgAfter: T.triple,
+          cpuUtilisation: T.nonneg,
+        },
+        result: () => true,
+      },
+      sat,
+      errors,
+    );
+    const workload = byWorkload.get(s?.workload);
+    if (
+      workload != null &&
+      RESULT_SPECS[s?.kind] != null &&
+      plan?.repetitions?.[s.workload]?.[s.kind] != null
+    ) {
+      measured.add(s.workload);
+      checkResult(s.result, s.kind, workload, plan, `${sat}.result`, errors);
+    }
+  });
+  const cells = new Map();
+  for (const s of samples) {
+    const key = `${s?.epoch}\0${s?.workload}\0${s?.kind}\0${s?.round}`;
+    cells.set(key, [...(cells.get(key) ?? []), s]);
+  }
+  for (const id of measured) {
+    for (const [kind, count] of Object.entries(plan.repetitions[id]))
+      for (let round = 0; round < count; round++) {
+        const pair = [reference, candidate].map(
+          (epoch) => cells.get(`${epoch}\0${id}\0${kind}\0${round}`) ?? [],
+        );
+        for (const [n, found] of pair.entries())
+          if (found.length !== 1)
+            errors.push(
+              `${at}: ${[reference, candidate][n]} ${id} ${kind} round ${round} has ${found.length} samples`,
+            );
+        if (
+          pair.every((f) => f.length === 1) &&
+          Math.abs(pair[0][0].index - pair[1][0].index) !== 1
+        )
+          errors.push(`${at}: ${id} ${kind} round ${round} is not interleaved`);
+      }
+  }
+  for (const [key, found] of cells) {
+    const [, id, kind, round] = key.split('\0');
+    const count = plan?.repetitions?.[id]?.[kind];
+    if (count == null || !(Number(round) < count) || found.length > 1)
+      errors.push(
+        `${at}: unplanned or duplicate cell ${key.replace(/\0/g, ' ')}`,
+      );
+  }
+  const listed = Array.isArray(raw.workloads) ? raw.workloads : [];
+  checkArray(raw.workloads, `${at}.workloads`, errors, null, (w, wat) =>
+    check(
+      w,
+      {
+        id: T.str,
+        contentSha256: T.eq(byWorkload.get(w?.id)?.contentSha256),
+        files: T.posint,
+        bytes: T.posint,
+      },
+      wat,
+      errors,
+    ),
+  );
+  const ids = listed.map((w) => w?.id);
+  if (
+    new Set(ids).size !== ids.length ||
+    ids.length !== measured.size ||
+    ids.some((id) => !measured.has(id))
+  )
+    errors.push(
+      `${at}.workloads: must list exactly the measured workloads ${[...measured].sort().join(', ')}`,
+    );
+  return errors;
+}
+
+// ------------------------------------------------------------------- gate
 
 const isPositive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
 const isCount = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0;
@@ -532,48 +1039,15 @@ function safeGet(metric, result) {
   }
 }
 
-// Run-level validation: the alpha1 control must be the unchanged manifest
-// artifact, the environment must match the frozen pins, the plan and
-// harness must be the committed ones, and the candidate must be identified.
-function runChecks(raw, context, reference, candidate) {
+// Control identity against the manifest; candidate identity consistent
+// across pooled runs.
+function identityChecks(raws, { manifest, reference, candidate }) {
   const problems = [];
   const refusals = [];
-  const label = raw?.label ?? '<unlabelled run>';
-  const { manifest, workloads, harness, pins, workloadsSha256 } = context;
-  const epochs = Array.isArray(raw?.epochs) ? raw.epochs : [];
-  const ref = epochs.find((e) => e?.name === reference);
-  const cand = epochs.find((e) => e?.name === candidate);
-  if (epochs.filter((e) => e?.name === reference).length !== 1)
-    refusals.push(`${label}: no single ${reference} control epoch in the run`);
-  if (epochs.filter((e) => e?.name === candidate).length !== 1)
-    refusals.push(
-      `${label}: no single candidate epoch ${candidate} in the run`,
-    );
-  if (raw?.workloadsRecord?.sha256 !== workloadsSha256)
-    problems.push(`${label}: workloads record differs from the committed one`);
-  const plan = workloads?.plans?.[raw?.plan?.id];
-  const { id: _planId, ...recordedPlan } = raw?.plan ?? {};
-  if (plan == null || JSON.stringify(recordedPlan) !== JSON.stringify(plan))
-    refusals.push(`${label}: plan is not the committed plan ${raw?.plan?.id}`);
-  if (raw?.repositoryDirty !== false)
-    refusals.push(`${label}: measured with an uncommitted harness`);
-  for (const file of HARNESS_FILES)
-    if (harness != null && raw?.harness?.[file] !== harness[file])
-      refusals.push(
-        `${label}: harness ${file} is not the evaluated revision's`,
-      );
-  if (raw?.environment?.node !== pins?.node)
-    problems.push(
-      `${label}: Node ${raw?.environment?.node} is not the pinned ${pins?.node}`,
-    );
-  if (
-    typeof pins?.nodeBinarySha256 !== 'string' ||
-    raw?.environment?.nodeBinarySha256 !== pins.nodeBinarySha256
-  )
-    problems.push(
-      `${label}: Node binary digest is missing or not the pinned archived binary`,
-    );
-  if (ref != null) {
+  for (const raw of raws) {
+    const label = raw?.label ?? '<run>';
+    const ref = (raw?.epochs ?? []).find((e) => e?.name === reference);
+    if (ref == null) continue;
     for (const pkg of manifest.packages)
       if (
         ref.packages?.[pkg.name]?.integrity !== pkg.registry.registryIntegrity
@@ -601,137 +1075,153 @@ function runChecks(raw, context, reference, candidate) {
           `${label}: ${reference} host ${host} is not the manifest's`,
         );
   }
-  if (
-    cand != null &&
-    (typeof cand.packageLockSha256 !== 'string' ||
-      typeof cand.installedPandamstyle?.sha256 !== 'string' ||
-      cand.packages == null)
-  )
-    refusals.push(`${label}: candidate ${candidate} identity is not recorded`);
+  for (const epoch of [reference, candidate]) {
+    const keys = new Set(
+      raws.map((raw) =>
+        identityKey((raw?.epochs ?? []).find((e) => e?.name === epoch)),
+      ),
+    );
+    if (keys.size > 1)
+      refusals.push(`${epoch}: identity differs across pooled runs`);
+  }
+  const identity = raws.map(
+    (raw) => (raw?.epochs ?? []).find((e) => e?.name === candidate) ?? null,
+  )[0];
   return {
     problems,
     refusals,
-    identity:
-      cand == null
+    candidateIdentity:
+      identity == null
         ? null
         : {
-            name: cand.name,
-            packageLockSha256: cand.packageLockSha256 ?? null,
-            installedPandamstyle: cand.installedPandamstyle?.sha256 ?? null,
-            packages: cand.packages ?? null,
+            name: identity.name,
+            packageLockSha256: identity.packageLockSha256,
+            installedPandamstyle: identity.installedPandamstyle?.sha256,
+            packages: identity.packages,
           },
   };
 }
 
-// Every planned observation of one epoch for one budget: a status per round
-// (ok, missing, duplicate, failed, invalid) and the valid values.
-function observe(raw, epoch, budget, metric, valid) {
-  const planned = raw?.plan?.repetitions?.[budget.workload]?.[metric.kind];
-  const samples = (raw?.samples ?? []).filter(
-    (s) =>
-      s?.epoch === epoch &&
-      s?.workload === budget.workload &&
-      s?.kind === metric.kind,
-  );
-  const counts = {
-    planned: Number.isInteger(planned) ? planned : 0,
-    ok: 0,
-    missing: 0,
-    duplicate: 0,
-    failed: 0,
-    invalid: 0,
-    unplanned: 0,
-  };
-  const byRound = new Map();
-  for (const s of samples) {
-    if (!Number.isInteger(s.round) || s.round < 0 || s.round >= counts.planned)
-      counts.unplanned++;
-    else byRound.set(s.round, [...(byRound.get(s.round) ?? []), s]);
+// Samples of one run by (epoch, workload, kind, round). Built afresh on every
+// evaluation, so it always reflects the run being judged.
+function indexSamples(raw) {
+  const index = new Map();
+  for (const s of Array.isArray(raw?.samples) ? raw.samples : []) {
+    const key = `${s?.epoch}\0${s?.workload}\0${s?.kind}\0${s?.round}`;
+    index.set(key, [...(index.get(key) ?? []), s]);
   }
+  return index;
+}
+
+// pairedRatio is a pure, seeded function of its pairs; identical pairs are
+// computed once.
+const pairedMemo = new Map();
+function pairedRatioOf(pairs) {
+  const key = pairs.map(([a, b]) => `${a},${b}`).join(';');
+  if (!pairedMemo.has(key)) pairedMemo.set(key, pairedRatio(pairs));
+  return pairedMemo.get(key);
+}
+
+// Valid planned observations of one epoch for one budget, by round.
+function observe(raw, index, epoch, budget, metric, valid, plan) {
+  const planned = plan?.repetitions?.[budget.workload]?.[metric.kind] ?? 0;
   const rounds = new Map();
-  for (let r = 0; r < counts.planned; r++) {
-    const found = byRound.get(r) ?? [];
-    if (found.length === 0) counts.missing++;
-    else if (found.length > 1) counts.duplicate++;
+  const counts = { planned, ok: 0, failed: 0, invalid: 0, missing: 0 };
+  for (let round = 0; round < planned; round++) {
+    const found =
+      index.get(`${epoch}\0${budget.workload}\0${metric.kind}\0${round}`) ?? [];
+    if (found.length !== 1) counts.missing++;
     else if (found[0].result?.ok !== true) counts.failed++;
     else {
       const value = safeGet(metric, found[0].result);
       if (!valid(value)) counts.invalid++;
       else {
         counts.ok++;
-        rounds.set(r, { value, index: found[0].index });
+        rounds.set(round, { value, index: found[0].index });
       }
     }
   }
+  return { counts, rounds };
+}
+
+// An incremental metric defined by its id, independent of what a run holds.
+function incrementalMetric(id) {
+  const [, edit, field] =
+    /^incremental\.(.+)\.(totalMs|toDiagnosticsMs)$/.exec(id) ?? [];
+  if (edit == null) return null;
   return {
-    counts,
-    rounds,
-    complete:
-      counts.ok === counts.planned &&
-      counts.unplanned === 0 &&
-      counts.planned > 0,
+    id,
+    kind: 'compile',
+    class: 'timing',
+    get: (r) => {
+      const found = r.incremental?.find((e) => e.id === edit);
+      return found == null
+        ? undefined
+        : median(
+            found.iterations
+              .filter((i) => i.iteration > 0)
+              .map((i) => i[field]),
+          );
+    },
   };
 }
 
+const METRIC_BY_ID = new Map(metricsFor([]).map((m) => [m.id, m]));
+const metricOf = (id) => METRIC_BY_ID.get(id) ?? incrementalMetric(id);
+
+// Evaluates committed budgets against raw runs. `expected` carries the
+// committed plan, workloads record and digest, harness digests, manifest and
+// environment pins of the evaluated revision.
 export function evaluate(
   budgets,
   raws,
-  {
-    candidate,
-    reference = 'alpha1',
-    manifest,
-    workloads,
-    workloadsSha256,
-    harness,
-    pins,
-  },
+  { candidate, reference = 'alpha1', expected },
 ) {
   const problems = [];
   const refusals = [];
-  const identities = [];
-  const context = {
-    manifest,
-    workloads,
-    harness,
-    pins: pins ?? budgets.baseline?.environment,
-    workloadsSha256: workloadsSha256 ?? budgets.baseline?.workloads?.sha256,
-  };
-  if (!Array.isArray(raws) || raws.length === 0)
-    refusals.push('no run to evaluate');
+  const reconciliation = [];
+  raws = Array.isArray(raws) ? raws : [];
+  if (raws.length === 0) refusals.push('no run to evaluate');
   if (reference !== budgets.baseline?.epoch)
     refusals.push(
       `the control must be the budgets' baseline epoch ${budgets.baseline?.epoch}, not ${reference}`,
     );
   if (candidate == null || candidate === reference)
     refusals.push('the candidate must be a named epoch other than the control');
-  const labels = (raws ?? []).map((raw) => raw?.label);
+  const labels = raws.map((raw) => raw?.label);
   if (new Set(labels).size !== labels.length)
     refusals.push('the same run is given more than once');
-  for (const raw of raws ?? []) {
-    const checked = runChecks(raw, context, reference, candidate);
-    problems.push(...checked.problems);
-    refusals.push(...checked.refusals);
-    identities.push({ label: raw?.label ?? null, candidate: checked.identity });
-  }
-  const samples = (raws ?? []).flatMap((r) => r?.samples ?? []);
-  const metrics = metricsFor(samples.filter((s) => s?.result != null));
+  const context = {
+    ...expected,
+    reference,
+    candidate,
+    pins: expected.pins ?? budgets.baseline?.environment,
+  };
+  for (const raw of raws) reconciliation.push(...reconcile(raw, context));
+  if (reconciliation.length > 0)
+    refusals.push(
+      `${reconciliation.length} reconciliation errors against the committed expectations`,
+    );
+  const identity = identityChecks(raws, context);
+  problems.push(...identity.problems);
+  refusals.push(...identity.refusals);
+  const plan = expected.plan;
+  const indexes = new Map(raws.map((raw) => [raw, indexSamples(raw)]));
   const results = [];
   for (const budget of budgets.budgets) {
-    const metric =
-      metrics.find((m) => m.id === budget.metric) ??
-      (budget.metric.startsWith('incremental.')
-        ? incrementalMetric(budget.metric)
-        : null);
+    const metric = metricOf(budget.metric);
     const entry = {
       workload: budget.workload,
       metric: budget.metric,
       class: budget.class,
       limit: budget.limit,
     };
-    const present = (raws ?? []).filter(
+    // A workload is measured in a run when the run holds any sample of it;
+    // the raw workloads list is reconciled, not trusted.
+    const present = raws.filter(
       (raw) =>
-        Array.isArray(raw?.workloads) &&
-        raw.workloads.some((w) => w?.id === budget.workload),
+        Array.isArray(raw?.samples) &&
+        raw.samples.some((s) => s?.workload === budget.workload),
     );
     if (metric == null || present.length === 0) {
       results.push({ ...entry, status: 'not-run' });
@@ -754,11 +1244,31 @@ export function evaluate(
     let spread = 0;
     let complete = true;
     for (const raw of present) {
-      const c = observe(raw, candidate, budget, metric, valid);
-      const r = observe(raw, reference, budget, metric, valid);
+      const c = observe(
+        raw,
+        indexes.get(raw),
+        candidate,
+        budget,
+        metric,
+        valid,
+        plan,
+      );
+      const r = observe(
+        raw,
+        indexes.get(raw),
+        reference,
+        budget,
+        metric,
+        valid,
+        plan,
+      );
       add(totals.candidate, c.counts);
       add(totals.control, r.counts);
-      complete = complete && c.complete && r.complete;
+      complete =
+        complete &&
+        c.counts.ok === c.counts.planned &&
+        r.counts.ok === r.counts.planned &&
+        c.counts.planned > 0;
       for (const [round, obs] of c.rounds) {
         candidateValues.push(obs.value);
         const control = r.rounds.get(round);
@@ -787,12 +1297,12 @@ export function evaluate(
         ...detail,
         status: 'inconclusive',
         reason:
-          'planned observations missing, duplicated, failed, invalid or not interleaved',
+          'planned observations missing, failed, invalid or not interleaved',
       });
       continue;
     }
     if (ratio) {
-      const paired = pairedRatio(pairs);
+      const paired = pairedRatioOf(pairs);
       Object.assign(detail, { pairedRatio: paired, controlSpread: spread });
       if (pairs.length < budget.limit.minPairs)
         results.push({
@@ -887,7 +1397,11 @@ export function evaluate(
     verdict,
     problems,
     refusals,
-    candidateIdentity: identities,
+    reconciliation: {
+      errors: reconciliation.length,
+      first: reconciliation.slice(0, 50),
+    },
+    candidateIdentity: identity.candidateIdentity,
     counts: {
       pass: count('pass'),
       fail: count('fail'),
@@ -895,9 +1409,9 @@ export function evaluate(
       notRun: count('not-run'),
       unknown: (budgets.unknown ?? []).length,
     },
-    load: (raws ?? []).map((raw) => ({
+    load: raws.map((raw) => ({
       label: raw?.label ?? null,
-      before: raw?.load?.before?.at(-1) ?? null,
+      before: raw?.load?.before?.at?.(-1) ?? null,
       after: raw?.load?.after ?? null,
       batch: raw?.load?.batch ?? null,
     })),
@@ -906,42 +1420,11 @@ export function evaluate(
   };
 }
 
-// An incremental metric defined by its id, for budgets whose edit has no
-// sample at all in the run (its observations then count as missing).
-function incrementalMetric(id) {
-  const [, edit, field] =
-    /^incremental\.(.+)\.(totalMs|toDiagnosticsMs)$/.exec(id) ?? [];
-  if (edit == null) return null;
-  return {
-    id,
-    kind: 'compile',
-    class: 'timing',
-    get: (r) => {
-      const found = r.incremental?.find((e) => e.id === edit);
-      return found == null
-        ? undefined
-        : median(
-            found.iterations
-              .filter((i) => i.iteration > 0)
-              .map((i) => i[field]),
-          );
-    },
-  };
-}
-
-// Release gate: budgets, policy, manifest, workloads and harness come from
-// Git at `rev`, the budgets version in force there is verified back to
-// version 1, and the run files are validated against them. A `--budgets`
-// file that is not byte-identical to the in-force committed version is
-// evaluated in non-release mode and can never pass.
-export function gate({
-  rev = 'HEAD',
-  budgetsFile = null,
-  rawFiles,
-  candidate,
-  reference = 'alpha1',
-  root = REPO,
-}) {
+// Release context: budgets, policy, manifest, workloads record, harness and
+// the baseline plan read from Git at `rev`, with the budgets in force
+// verified back to version 1. A `--budgets` file that is not byte-identical
+// to that committed version switches to non-release mode.
+export function prepareGate({ rev = 'HEAD', budgetsFile = null, root = REPO }) {
   const source = gitSource(rev, root);
   const provenance = {
     rev,
@@ -952,6 +1435,7 @@ export function gate({
   };
   const inForce = inForceBudgets(source);
   let budgets = null;
+  let planId = null;
   if (inForce == null)
     provenance.problems.push(`no committed budgets at ${rev}`);
   else {
@@ -959,6 +1443,7 @@ export function gate({
     const chain = verifyBudgetsChain(source, inForce);
     provenance.problems.push(...chain.problems);
     budgets = chain.budgets;
+    planId = chain.planId;
   }
   if (budgetsFile != null) {
     const bytes = fs.readFileSync(budgetsFile);
@@ -975,17 +1460,54 @@ export function gate({
   }
   const manifest = jsonOf(source.read(MANIFEST_PATH));
   const workloadsBytes = source.read(WORKLOADS_PATH);
+  const workloadsRecord = jsonOf(workloadsBytes);
   const harness = Object.fromEntries(
-    HARNESS_FILES.map((f) => [
-      f,
-      source.read(`tools/baselines/${f}`) == null
-        ? null
-        : sha256(source.read(`tools/baselines/${f}`)),
-    ]),
+    HARNESS_FILES.map((f) => {
+      const bytes = source.read(`tools/baselines/${f}`);
+      return [f, bytes == null ? null : sha256(bytes)];
+    }),
   );
-  const raws = rawFiles.map((file) => jsonOf(fs.readFileSync(file)));
+  const plan =
+    planId == null || workloadsRecord?.plans?.[planId] == null
+      ? null
+      : { id: planId, ...workloadsRecord.plans[planId] };
+  const ready = budgets != null && manifest != null && workloadsRecord != null;
+  return {
+    provenance,
+    budgets,
+    expected: ready
+      ? {
+          plan,
+          workloadsRecord,
+          workloadsSha256: sha256(workloadsBytes),
+          harness,
+          manifest,
+          pins: budgets.baseline?.environment,
+        }
+      : null,
+  };
+}
+
+// An input the evaluation cannot even process fails closed.
+function evaluateSafely(budgets, raws, options) {
+  try {
+    return evaluate(budgets, raws, options);
+  } catch (error) {
+    return {
+      kind: 'pandamstyle-ce003-gate',
+      verdict: 'inconclusive',
+      problems: [],
+      refusals: [`evaluation error: ${error.message}`],
+      results: [],
+      counts: {},
+    };
+  }
+}
+
+export function judge(prepared, raws, { candidate, reference = 'alpha1' }) {
+  const { provenance, budgets, expected } = prepared;
   const report =
-    budgets == null || manifest == null || workloadsBytes == null
+    expected == null
       ? {
           kind: 'pandamstyle-ce003-gate',
           verdict: 'fail',
@@ -994,15 +1516,7 @@ export function gate({
           results: [],
           counts: {},
         }
-      : evaluate(budgets, raws, {
-          candidate,
-          reference,
-          manifest,
-          workloads: jsonOf(workloadsBytes),
-          workloadsSha256: sha256(workloadsBytes),
-          harness,
-          pins: budgets.baseline?.environment,
-        });
+      : evaluateSafely(budgets, raws, { candidate, reference, expected });
   report.provenance = provenance;
   if (provenance.mode === 'release' && provenance.problems.length > 0) {
     report.problems = [...provenance.problems, ...report.problems];
@@ -1011,6 +1525,25 @@ export function gate({
   if (provenance.mode === 'non-release' && report.verdict === 'pass')
     report.verdict = 'not-release';
   return report;
+}
+
+export function gate({
+  rev = 'HEAD',
+  budgetsFile = null,
+  rawFiles,
+  candidate,
+  reference = 'alpha1',
+  root = REPO,
+}) {
+  const prepared = prepareGate({ rev, budgetsFile, root });
+  const raws = rawFiles.map((file) => {
+    try {
+      return jsonOf(fs.readFileSync(file));
+    } catch {
+      return null;
+    }
+  });
+  return judge(prepared, raws, { candidate, reference });
 }
 
 // ---------------------------------------------------------------------- cli
