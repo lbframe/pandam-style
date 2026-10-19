@@ -14,6 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { CORPUS_ROOT, digestJson } from './util.mjs';
+import { describeInstallChange } from './workspace.mjs';
 
 export const MATRIX_VERSION = 'capability-enforcement/v1';
 
@@ -182,15 +183,16 @@ export function detectBreaches({
           enforcement: 'detected',
           detail: c.command.slice(0, 200),
         });
-    if (
-      nodeModules != null &&
-      (nodeModules.before ?? null) !== (nodeModules.after ?? null)
-    )
+    const changed =
+      nodeModules == null
+        ? null
+        : describeInstallChange(nodeModules.before, nodeModules.after);
+    if (changed != null)
       breaches.push({
         kind: 'local-install',
         source: 'filesystem',
         enforcement: 'detected',
-        detail: 'node_modules digest changed',
+        detail: changed,
       });
   }
   if (plan.detectors.includes('tool-policy'))

@@ -39,7 +39,11 @@ import {
   assertDocumentsValid,
 } from './helpers.mjs';
 import { DockerExecutor, containerEvaluator, docker } from '../src/docker.mjs';
-import { buildFixtureAgentImage, buildHarnessImage } from '../src/images.mjs';
+import {
+  IMAGE_PATH,
+  buildFixtureAgentImage,
+  buildHarnessImage,
+} from '../src/images.mjs';
 import { runMatrix } from '../src/matrix.mjs';
 import { requireValidSelfTest, runSelfTest } from '../src/selftest.mjs';
 import { trustedTreeDigests } from '../src/trusted-tree.mjs';
@@ -623,5 +627,50 @@ test(
     assert.match(record.credential.accessOnlyLoginError, /not valid JSON/);
     assert.equal(record.credential.export, 'unchanged');
     assert.deepEqual(fs.readFileSync(cred.file), before);
+  },
+);
+
+test(
+  "both CLIs' tool shells see the image PATH: login and non-login bash and sh find node, npm and npx",
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  () => {
+    const { agent } = fixtureImages();
+    // Codex runs `bash -lc`; Claude's tool shell inherits the exec PATH.
+    for (const shell of [
+      ['/bin/bash', '-lc'],
+      ['/bin/sh', '-lc'],
+      ['/bin/bash', '-c'],
+      ['/bin/sh', '-c'],
+    ]) {
+      const r = docker([
+        'run',
+        '--rm',
+        '--network',
+        'none',
+        '--read-only',
+        '--cap-drop',
+        'ALL',
+        '--user',
+        '10001:10001',
+        '-e',
+        'HOME=/tmp',
+        agent,
+        ...shell,
+        // One name per `command -v` (dash takes a single one).
+        'for c in node npm npx; do command -v "$c" || exit 1; done && npm --version >/dev/null && printf "PATH=%s" "$PATH"',
+      ]);
+      const label = shell.join(' ');
+      assert.equal(r.status, 0, `${label}: ${r.stderr}`);
+      assert.deepEqual(
+        r.stdout.trim().split('\n'),
+        [
+          '/opt/node/bin/node',
+          '/opt/node/bin/npm',
+          '/opt/node/bin/npx',
+          `PATH=${IMAGE_PATH}`,
+        ],
+        label,
+      );
+    }
   },
 );

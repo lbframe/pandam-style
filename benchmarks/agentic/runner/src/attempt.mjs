@@ -70,7 +70,7 @@ import {
 } from './util.mjs';
 import {
   applyEventSafe,
-  nodeModulesState,
+  installState,
   pathLeaks,
   sampleWorkspace,
   stageWorkspace,
@@ -827,7 +827,7 @@ async function attemptBody(opts, plan, ctx) {
       exclude: ['node_modules/**', '**/node_modules/**'],
     });
   });
-  const nodeModulesBefore = nodeModulesState(ws);
+  const nodeModulesBefore = installState(ws);
 
   const prompt = buildPrompt({
     corpusRoot: CORPUS_ROOT,
@@ -981,7 +981,7 @@ async function attemptBody(opts, plan, ctx) {
       maxBytes: budgets.bounds.evidence,
     }),
   }));
-  const nodeModulesAfter = nodeModulesState(ws);
+  const nodeModulesAfter = installState(ws);
   removeOwned(paths.workRoot);
 
   // Breaches: detect-and-fail capabilities, tool policy, credential leaks.

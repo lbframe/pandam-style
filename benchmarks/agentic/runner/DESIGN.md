@@ -619,6 +619,17 @@ a `--read-only` root, cpu/memory/pids limits and **no credentials** except
 the agent container. All harness Node processes use the store's Node 22.22.0
 installed execute-only, so they are non-dumpable (§4.4).
 
+**One tool PATH.** Every image sets `PATH=/opt/node/bin:/usr/bin:/bin`
+(`IMAGE_PATH`). Login shells reset `PATH` in `/etc/profile` (observed: the
+Debian default, without `/opt/node/bin`), and Codex runs every command with
+`bash -lc`, while Claude's tool shell inherits the exec `PATH`. An
+`/etc/profile.d` entry, which `/etc/profile` reads at its end for bash and
+dash alike, restores `IMAGE_PATH`, and `/etc/environment` carries it for
+PAM-started shells. Both CLIs' tool shells therefore see the same `PATH`
+and find the same `node`, `npm` and `npx` (Docker test: login and non-login
+`bash` and `sh` as the agent UID). The agent's own `~/.profile` in its
+tmpfs home can still change it, as any agent action can.
+
 | Role | UID | Network | Mounts (owner, mode) | Executes | Result channel |
 | --- | --- | --- | --- | --- | --- |
 | **P** prepare | agent 10001 (no agent code exists yet; files end up owned by the agent UID without `CAP_CHOWN`) | none | fixture closure (ro), product tarballs (ro), fresh workspace dir (rw), trusted-tree build dir (rw, mounted read-only everywhere afterwards) | `materialize`, offline `npm ci --ignore-scripts`, `prepare` (corpus content only, no agent code yet) | stdout → runner |
@@ -784,7 +795,7 @@ question 2.
 | `git.write` | `/workspace/.git` bind-mounted read-only | prevent | observed: `git status`/`diff` work, `git commit` fails with EROFS |
 | `design-system.edit` | definition sources of the fixture (`project.definition` files or directory) bind-mounted read-only over the writable workspace; generated output stays writable because legitimate builds rewrite it | prevent (definitions) + detect (generated output, via `generated.consistent` and `definition.diff`) | observed: write → EROFS, rename onto or delete → EBUSY |
 | `network.registry` | no route except the proxy, whose allowlist has provider hosts only | prevent | observed probes (§4.3) |
-| `package.install` | network prevention above; a local install (from files already in the container) only changes `node_modules`, which grading never uses (trusted tree, §4.8) | prevent (network) + detect (local: `node_modules` tree digest before/after, computed in E; transcript) | design |
+| `package.install` | network prevention above; a local install (from files already in the container) only changes `node_modules`, which grading never uses (trusted tree, §4.8) | prevent (network) + detect (local: the install identity before/after, computed in E; transcript) | fixtures (`install-detection.test.mjs`) |
 | `host.build` (9 read-only tasks) | the read-only workspace prevents build output in the workspace; a build to `/tmp` is possible because tools need Node | detect-and-fail (transcript `verify` class, §2.4) | Q12 |
 | `host.dev-server` (withheld in every task) | a dev server can listen inside the container; nothing outside can reach it | detect-and-fail (transcript) | Q12 |
 | web tools (Q4) | Claude: tools absent from `init.tools`; Codex: `web_search="disabled"` | Claude prevent (observed evidence); Codex prevent by configuration (source evidence) + detect-and-fail (`web_search` items) | Q12 |
@@ -794,6 +805,26 @@ question 2.
 Provider-side tools create no new proxy destination, so the proxy does not
 enforce them. They are enforced only by tool configuration and detected in
 the stream.
+
+**Install identity (local-install detection).** An install is what an install
+changes, never what a build writes: the installed packages (npm layout:
+`<name>`, `@<scope>/<name>` and nested `node_modules` at any depth), each
+with its `package.json` name and version, the integrity recorded for it in
+`node_modules/.package-lock.json` and a digest of its files; the `.bin`
+links; the install metadata beside the packages (`.package-lock.json`,
+`.yarn-integrity`, `.yarn-state.yml`, `.modules.yaml`); and the workspace
+lockfiles. It is taken without following links (a linked package or
+`node_modules` is recorded by its target), and an absent `node_modules` is
+the same identity as one holding no package. Any other dot-entry of a
+`node_modules` or scope directory cannot be a package (npm package names
+never start with a dot), so tool caches (`.vite-temp`, `.vite`, `.cache`
+of Vite, Rsbuild, babel-loader or Next.js plugins) are outside it by
+construction, not by a name list. A modified file of an installed package
+changes that package's digest, so this layer detects it; the product
+packages' tarball check (§4.8) runs at preparation only, and grading never
+reads the workspace's `node_modules` (trusted tree), so such a change cannot
+alter a verdict either way. Not covered: a pnpm store under
+`node_modules/.pnpm` (fixtures install with npm).
 
 ### 4.6 Credentials (R9, Q1)
 
@@ -1196,7 +1227,7 @@ contracts (§3.4–3.5) and the observed offline outputs.
 | F35 | one mutation per projection field; a product-only change | unequal key naming the field; equal key for the product-only change |
 | F36 | Codex/Claude streams with web or subagent tool use | breach, non-success |
 | F37 | read-only task in which the agent builds into `/tmp` | `host.build` detection recorded |
-| F38 | local `npm install` into `node_modules` | detected through the `node_modules` digest |
+| F38 | local `npm install` into `node_modules` | detected through the install identity (§4.5); builds' tool caches are not (`install-detection.test.mjs`) |
 | F39 | task with a `package-registry` network, services, browser or compile events | refused, `unsupported / not run` |
 | F40 | G2 build script that kills the grader | `aborted-by-agent-code`; verdict not `pass` |
 | F41 | G2 build script that tries to write harness, trusted tree or evidence mounts | EROFS; consistency with G1 holds |
@@ -1344,7 +1375,7 @@ bound check.
   - *Rate limits:* Claude `rate_limit_event`: `five_hour` allowed,
     utilization 0.25, overage rejected (`org_level_disabled`); Codex
     reports none.
-- **Defects found by the re-run (not fixed here; §11.2 item 22):**
+- **Defects found by the re-run (fixed, §11.2 item 22):**
   1. `local-install` is detected from a `node_modules` digest that also
      covers tool caches: Vite's `npm run build` leaves an empty
      `node_modules/.vite-temp` directory (reproduced offline, with no
@@ -1387,10 +1418,10 @@ Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 | §3 adapters, budgets | `adapters/*.mjs`, `attempt.mjs` `agentPhase` | `adapters.test.mjs` F10–F20, F23, F28, F29 |
 | §3.2 container-visible paths | executors' `visiblePaths` | `docker.test.mjs` B6 |
 | §3.7 version pinning | `docker.mjs` identity checks, `provider.mjs` | `product-build.test.mjs` F55 |
-| §4.2 roles, confinement, grading | `safefs.mjs`, `workspace.mjs`, `docker.mjs`, `attempt.mjs` `grade` | `confinement.test.mjs` B1; `policy-report.test.mjs` F40, F43; `docker.test.mjs` B7 |
+| §4.2 roles, confinement, grading, tool PATH | `safefs.mjs`, `workspace.mjs`, `docker.mjs`, `attempt.mjs` `grade`, `images.mjs` `IMAGE_PATH` | `confinement.test.mjs` B1; `policy-report.test.mjs` F40, F43; `docker.test.mjs` B7, tool shells' PATH |
 | §4.3 network, proxy | `docker.mjs`, `container/connect-proxy.mjs`, `selftest.mjs` | `isolation-units.test.mjs`; `docker.test.mjs` B5 |
 | §4.4 stream integrity | `measured.mjs`, `container/channel-audit.mjs`, `docker.mjs` `summarizeAudits` | `adapters.test.mjs` F20, F22, F23; `smoke-fixes-2.test.mjs` (audit over the observed process table); `isolation-units.test.mjs` summary; `docker.test.mjs` channel audit; self-test (F21) |
-| §4.5 capability matrix | `capabilities.mjs` | `adapters.test.mjs` F18, F36–F38; `policy-report.test.mjs` F39 |
+| §4.5 capability matrix, install identity | `capabilities.mjs`, `workspace.mjs` `installState` | `adapters.test.mjs` F18, F36–F38; `install-detection.test.mjs`; `policy-report.test.mjs` F39 |
 | §4.6 credentials, source policy, recovery, refusals | `credentials.mjs`, `recovery.mjs`, `refusals.mjs`, `container/*` | `credentials.test.mjs` F31, F44–F50, F59; `confinement.test.mjs` B3, B4; `review-r2.test.mjs` B2, B4; `smoke-fixes-2.test.mjs` login fallback and provider refusal; `docker.test.mjs` B4, login fallback |
 | §4.8 product build, trusted tree, closures | `store.mjs`, `trusted-tree.mjs` `installFixtureClosure`, `provider.mjs` | `product-build.test.mjs` G, F51–F53; `measurement.test.mjs` B11 |
 | §4.9 held-out | `capabilities.mjs` `heldoutRefusal`, CLI | `policy-report.test.mjs` F54 |
@@ -1584,11 +1615,15 @@ Each item was found while implementing, testing or in review round 1
     it end to end for Claude (binding of the real store, trusted tree from
     the real tarballs, CLI identity of the real binaries); the re-run
     executed it for all three models (§9.4).
-22. **Open defects from the smoke re-run (§9.4).** The `local-install`
-    filesystem detector counts tool caches under `node_modules` (Vite's
-    `.vite-temp`), and the agent image's login shell drops `/opt/node/bin`
-    from `PATH` for Codex. Neither is fixed yet; the composition outcomes of
-    the re-run are therefore not evidence of a breach.
+22. **Defects from the smoke re-run (§9.4), fixed.** The `local-install`
+    filesystem detector hashed every byte under `node_modules`, tool caches
+    included (Vite's `.vite-temp`); it now compares the install identity
+    (§4.5), with class tests for build caches (no breach) and installs
+    (breach). The login shells of the images reset `PATH`, so Codex's
+    `bash -lc` lost `/opt/node/bin`; every image now restores `IMAGE_PATH`
+    for login shells (§4.2), with a Docker test of login and non-login bash
+    and sh. The re-run's composition outcomes were therefore not evidence
+    of a breach; the third run (r3) confirms the fix (§9.4).
 
 ### 11.3 Isolation self-test and Docker integration
 
