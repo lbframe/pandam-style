@@ -1,8 +1,10 @@
 # AG-00.2 runner: design note
 
 Status: **design note, round 2 plus the conservative amendment of §0.4
-(user decision after the bounded verification of `772422c`).** The runner is
-implemented as described here; §11 maps each section to its code and tests.
+(user decision after the bounded verification of `772422c`) and the
+credential-source decision of §4.6.** The runner is implemented as described
+here; §11 maps each section to its code and tests and lists every place where
+the implementation differs from or completes this note.
 This note defines how the multi-model evaluation
 runner of [issue #6](https://github.com/lbframe/pandam-style/issues/6) will
 work. It is written before implementation as the
@@ -10,7 +12,8 @@ work. It is written before implementation as the
 runner has a privacy surface (the user's subscription credentials), a security
 surface (it executes agent-written code) and an adversarial surface (the
 evaluated agent can try to influence its own score). Nothing here is a shipped
-API. The drafts in [`schema/`](schema/) are marked `draft`.
+API. The schemas in [`schema/`](schema/) are `v1`, promoted from the round-2
+drafts together with the implementation.
 
 Inputs: the [corpus README](../README.md) (its runner contract and the
 required isolation precondition), the
@@ -56,7 +59,7 @@ of these labels. Appendix A lists every probe and source read.
 | R9 | a secret lifecycle step ordered after the destruction of its source; redaction sets fixed too early | §4.6: export phase before tmpfs destruction, untrusted-file handling, compare-and-swap of the host file, redaction set completed before any persistence; fixtures F44–F50 |
 | R10 | adapter semantics assumed from strings instead of the output contract | §3.4–3.6: event mappings from the pinned sources and offline observation; free-text errors classified conservatively; Codex reroutes detected; primary-model fidelity separated from auxiliary usage; fixtures F10–F19 |
 | F1 | future scope implemented early | §4.9: held-out refusal is unconditional in AG-00.2; future held-out and candidate-packing paths are declarative only |
-| F2 | unrouted catalog files | the three draft schemas are routed in `tools/agentdoc.yaml` |
+| F2 | unrouted catalog files | the runner's schemas (now `v1`) are routed in `tools/agentdoc.yaml` |
 | G (orchestrator) | the grading compiler must be the frozen product, never repository `HEAD` | §4.8: trusted tree built only from the digest-verified Alpha 1 tarballs, ancestor fallback refused, digest recorded and re-checked every attempt; fixtures F51–F53 |
 
 ### 0.2 Issue requirements
@@ -77,7 +80,7 @@ of these labels. Appendix A lists every probe and source read.
 
 | # | Decision | Applied in |
 | --- | --- | --- |
-| Q1 | **User decision:** copies of the user's existing login files (`~/.claude/.credentials.json`, `~/.codex/auth.json`), not dedicated logins. The user accepted the risk to their own sessions. The design minimizes it: access-only mode if the CLI supports it, else a controlled export and compare-and-swap. | §4.6 |
+| Q1 | **User decision:** copies of the user's existing login files, not dedicated logins. The user accepted the risk to their own sessions. The design minimizes it: access-only mode if the CLI supports it, else a controlled export and compare-and-swap. **Amended (user rule, AG-00.2 phase 2):** the credential source is a required, recorded run-config input per provider. Claude models authenticate with the **claude-team-2** account, whose configuration directory is `~/.claude-t3/team-2/` (`.credentials.json`, mode 0600); the runner never defaults to `~/.claude`. Codex keeps `~/.codex` (`auth.json`). | §4.6 |
 | Q2 | The 3 `network: package-registry` tasks need a read-only local mirror of the pinned closure; until it exists they are reported `unsupported / not run`, never failed or dropped. | §4.5, §7 |
 | Q3 | **User decision (final):** the smoke run passes **no** effort flag and observes each CLI's effective effort; the baseline then pins that observed value explicitly in argv and records it. A CLI that does not report its effective effort records `unknown`, and the pinned value is the CLI's documented default for the pinned version (Codex 0.163.0 bundled catalog: `low` for `gpt-6.1-sol`, observed), labelled as such. | §3.2, §9.4 |
 | Q4 | Web tools and subagents disabled for both CLIs with effective-configuration evidence, or the task refused. Codex web search, which has configuration and source evidence but no runtime pre-run evidence, is **detect-and-fail** (Q12). | §3.3, §4.5 |
@@ -135,10 +138,11 @@ are labelled synthetic wherever they appear.
 
 ### 1.2 Fields
 
-Draft schemas:
-[`run-config.draft.schema.json`](schema/run-config.draft.schema.json),
-[`run-record.draft.schema.json`](schema/run-record.draft.schema.json),
-[`product-build.draft.schema.json`](schema/product-build.draft.schema.json).
+Schemas:
+[`run-config.v1.schema.json`](schema/run-config.v1.schema.json),
+[`run-record.v1.schema.json`](schema/run-record.v1.schema.json),
+[`product-build.v1.schema.json`](schema/product-build.v1.schema.json),
+[`report.v1.schema.json`](schema/report.v1.schema.json).
 
 | Group | Fields |
 | --- | --- |
@@ -203,8 +207,8 @@ Normalization (the raw values are kept in the record, outside the key):
   with every `@pandamstyle/*` entry removed.
 
 **Excluded, recorded only:** repetition and attempt indices, timestamps,
-session ids, host load, repository commit SHA, credential mode, isolation
-self-test id.
+session ids, host load, repository commit SHA, credential mode and source
+(§4.6), isolation self-test id.
 
 **Permitted product-dependent differences** (the axis under comparison):
 product build binding digest, the `@pandamstyle/*` lockfile entries and
@@ -597,9 +601,11 @@ installed execute-only, so they are non-dumpable (§4.4).
 Invariants by construction:
 
 - The baseline and the final evidence are archives written by the runner and
-  extracted into fresh read-only mounts for each grader. The agent's
-  workspace directory is never re-read by host code after the agent stops
-  (only P/E/G containers touch it, without following links).
+  extracted into fresh read-only mounts for each grader. **Implementation
+  (§11.2 item 2):** P and E run in the runner process; host code reads the
+  workspace only without following links, during the agent phase only
+  through the bounded non-blocking delta walker, and archives it only after
+  every agent process is gone.
 - Harness code and the trusted tree are read-only in every grader. Grader
   results leave only through the container's stdout, read by the runner.
   There is no result file a build could overwrite.
@@ -737,6 +743,24 @@ the stream.
 
 ### 4.6 Credentials (R9, Q1)
 
+**Credential source (required, recorded).** Each provider of a matrix has a
+`credentials.<provider>` entry in the run configuration: a mode
+(`access-only`, `refresh-capable-copy`, or `none` for adapter fixtures only),
+an optional `fallback: refresh-capable-copy` after `access-only`, and a
+**source** `{ configDir, account }`. The credential file is the CLI's own file
+inside that directory: `.credentials.json` for Claude (the account's
+`CLAUDE_CONFIG_DIR`), `auth.json` for Codex (`CODEX_HOME`). There is **no
+default directory**: a missing entry, a missing source, a relative path or a
+missing or non-regular credential file refuses the matrix before any attempt
+(an `lstat`, names and modes only). In particular the runner never falls back
+to `~/.claude`. Under the user's subscription rule, Claude models under
+evaluation authenticate with the **claude-team-2** account
+(`configDir: "~/.claude-t3/team-2"`, `account: "claude-team-2"`); Codex may use
+`~/.codex`. The matrix record (`credentialSources`) and every attempt record
+(`credential.source`) carry the directory (home shown as `~`), the file name
+and the account label, never contents. Write-back (mode B) and crash recovery
+target that same resolved file.
+
 The user's existing login files are the source. The runner reads them at run
 time and never logs them; this design read only their names and modes.
 
@@ -813,7 +837,7 @@ tmpfs files, so the agent can read the credential: residual risk.
 ### 4.8 Product build and grading compiler (invariant G)
 
 **Binding.** A run is bound to the product build by digest
-(`pms-agentic-product-build/v0-draft`):
+(`pms-agentic-product-build/v1`):
 
 - epoch, which must be an epoch of `corpus.json` listing the source commit;
 - source commit and tree;
@@ -890,7 +914,7 @@ declarative here, as is candidate packing from a commit.
 | Same-UID control of the CLI through its sockets | channel audit; streams are `cli-unattested`; breach observation |
 | Kernel escape (rootful Docker, no user-namespace remap) | non-root, no capabilities, `no-new-privileges`, seccomp, AppArmor, read-only root, no Docker socket, short-lived containers |
 | Disk exhaustion through the workspace mount | size sampling with a kill cap (`resource-limit`); size-limited tmpfs |
-| Hostile workspace content (links, FIFOs, huge files) | host code never reads the live workspace; containers archive without following links or reading special files; size bounds |
+| Hostile workspace content (links, FIFOs, huge files) | host code reads the live workspace only through the bounded `O_NOFOLLOW`/`O_NONBLOCK` delta walker (§11.2 item 2); archives are taken after every agent process is gone, without following links or reading special files; size bounds |
 
 ## 5. Failure taxonomy and retries
 
@@ -1001,7 +1025,7 @@ the label and reports `non-exact` with the affected paths.
 
 ## 7. Report
 
-`report.json` (`pms-agentic-run-report/v0-draft`) and Markdown:
+`report.json` (`pms-agentic-run-report/v1`) and Markdown:
 
 - **Per cell:** every repetition's verdict, termination, class, attempts,
   contested flag and evidence completeness; every metric's full list of
@@ -1068,7 +1092,7 @@ contracts (§3.4–3.5) and the observed offline outputs.
 | F18 | Claude `init.tools` containing `WebSearch`; Codex `web_search` and `collab_tool_call` items | `config-integrity` / `tool-policy-breach` |
 | F19 | interrupted Codex turn without terminal event, with and without a harness signal | budget/cancel vs `abnormal-exit` |
 | F20 | stream integrity: events before init, two terminal events, events after the terminal one, invalid JSON | `adapter-stream` |
-| F21 | a fake execute-only CLI whose fake tool child tries `/proc/<ppid>/fd/1` injection and environment reads | blocked (EACCES); stream stays `cli-attested` (needs Docker: §9.3) |
+| F21 | a fake execute-only CLI whose fake tool child tries `/proc/<ppid>/fd/1` injection and environment reads | blocked (EACCES); the stream stays `cli-unattested` (§0.4: blocking these paths is not a demonstrated boundary) (needs Docker: §9.3) |
 | F22 | a fake CLI that leaks its stdout into a child, which writes a valid, complete replacement stream | usage stays `estimate` (`cli-stream-unattested`); a retry it causes is `contested`; the replaced stream is never `observed` |
 | F23 | text in tool output and model messages mimicking errors and JSON events | classification unchanged |
 | F24 | shell-mediated write (`sed -i`) between a failed and a passing build | repair detected through the workspace delta |
@@ -1106,6 +1130,7 @@ contracts (§3.4–3.5) and the observed offline outputs.
 | F56 | report over synthetic records: fails, unknowns, missing, unsupported, contested | distributions, breaches, bounds (AC3) |
 | F57 | schema validation of every record, config and report | completeness |
 | F58 | a shell script performing fail → repair → pass and exiting 0, run through `npm run verify` | no repair detected (lower bound 0); `firstPassSuccess` `unknown` because an opaque command ran (§0.4) |
+| F59 | credential source: no entry, no source, relative path, missing file; the claude-team-2 directory; Codex `~/.codex` | refused before any attempt / resolved to the account's file and recorded with `~` (§4.6) |
 
 ### 9.2 Class-level checks
 
@@ -1181,6 +1206,115 @@ None. The effort values (Q3) and the detection-only denials (Q12) were decided
 by the user (§0.3); R3 and R5 follow the conservative amendment (§0.4).
 
 No oracle API change is required: two-pass grading uses `evaluate` as it is.
+
+## 11. Implementation
+
+### 11.1 Map
+
+Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
+(`validate-config`, `run`, `report`, `compare`, `regrade`, `copy-store`,
+`bind`, `trusted-tree`, `selftest`, `recover`, `prune`). Tests:
+`yarn bench:agentic:runner:test` (adapter fixtures, CI) and
+`node benchmarks/agentic/runner/bin/pms-agentic-runner.mjs selftest` (Docker,
+local).
+
+| Section | Code (`src/` unless noted) | Tests (`__tests__/`) |
+| --- | --- | --- |
+| §1.1–1.3 units, record, identity | `matrix.mjs`, `attempt.mjs`, `identity.mjs`, `schema/run-record.v1.schema.json` | every fixture run validates its records and report (F57, `helpers.mjs`) |
+| §1.4 comparability | `comparability.mjs`, `matrix.mjs` `projectionFor` | `evidence.test.mjs` F34, F35 |
+| §1.5 replay | `regrade.mjs`, `evidence.mjs` | `evidence.test.mjs` F30 |
+| §2.1–2.2 measured values, tokens | `measured.mjs`, `adapters/claude.mjs`, `adapters/codex.mjs` | `adapters.test.mjs` F1–F9; `metrics.test.mjs` lint and property test |
+| §2.4 repairs, first pass, attribution | `commands.mjs` | `metrics.test.mjs` F24–F27, F58 |
+| §2.5–2.7 cost accounts, time | `attempt.mjs`, `identity.mjs` | `adapters.test.mjs` F1, F2 |
+| §3 adapters, budgets | `adapters/*.mjs`, `attempt.mjs` `agentPhase` | `adapters.test.mjs` F10–F20, F23, F28, F29 |
+| §3.7 version pinning | `docker.mjs` `observeCliIdentity`, `checkCliIdentity`; `provider.mjs` | `product-build.test.mjs` F55 |
+| §4.2 roles, two-pass grading | `docker.mjs`, `attempt.mjs` `grade`, `executors/local.mjs` | `policy-report.test.mjs` F40, F43; `isolation-units.test.mjs` argv |
+| §4.3 network, proxy | `docker.mjs`, `container/connect-proxy.mjs`, `selftest.mjs` | `isolation-units.test.mjs` proxy; self-test |
+| §4.4 stream integrity | `measured.mjs`, `container/channel-audit.mjs`, `docker.mjs` `summarizeAudits` | `adapters.test.mjs` F20, F22, F23; `isolation-units.test.mjs`; self-test (F21) |
+| §4.5 capability matrix | `capabilities.mjs` | `adapters.test.mjs` F18, F36–F38; `policy-report.test.mjs` F39 |
+| §4.6 credentials and source | `credentials.mjs`, `recovery.mjs`, `container/deliver.mjs`, `container/export-credential.mjs` | `credentials.test.mjs` F31, F44–F50, F59, mode A |
+| §4.7 attempt order | `attempt.mjs` `runAttempt`, `provider.mjs` | the fixture suites |
+| §4.8 product build, trusted tree | `store.mjs`, `trusted-tree.mjs`, `provider.mjs` | `product-build.test.mjs` G, F51–F53 (synthetic fixture store) |
+| §4.9 held-out | `capabilities.mjs` `heldoutRefusal`, `bin/pms-agentic-runner.mjs` | `policy-report.test.mjs` F54 |
+| §5 failures, retries, contested | `classify.mjs`, `matrix.mjs` | `adapters.test.mjs` F10–F16, F22; `metrics.test.mjs` classifier independence |
+| §6 evidence | `evidence.mjs`, `redact.mjs`, `attempt.mjs` `evidenceCompleteness` | `evidence.test.mjs` F30–F33; `credentials.test.mjs` F31, F50, redaction |
+| §7 report | `report.mjs`, `schema/report.v1.schema.json` | `policy-report.test.mjs` F56, F57, CLI |
+| §9.3 isolation self-test | `selftest.mjs`, `container/probe-*.mjs` | run locally (§11.3) |
+
+### 11.2 Where the implementation differs from or completes this note
+
+Each item was found while implementing or testing, and the note above was
+corrected where it stated something false.
+
+1. **Agent UID.** The agent runs as the runner's own host UID (not 10001), so
+   the bind-mounted workspace is writable without `CAP_CHOWN`. The self-test
+   checks non-root, no capabilities and `no-new-privileges`.
+2. **P and E run in the runner process, not in containers.** Materialization,
+   the offline install and `prepare` (no agent code exists yet), corpus
+   events and workspace-delta samples run on the host against the
+   bind-mounted workspace. Delta samples during the agent phase use a bounded
+   walker that never follows links, opens files `O_NOFOLLOW | O_NONBLOCK` and
+   checks them with `fstat`, so a swapped link or FIFO fails the sample
+   (coverage incomplete) instead of redirecting or blocking the host.
+   Archives, leak scans and the `node_modules` digest run only after every
+   agent process is killed and the agent container removed.
+3. **Two-pass grading is not reached by corpus 1.4.3.** Only the three
+   installation tasks have a `host.build` check, and they are refused until
+   the local mirror exists (Q2). G2 is therefore tested at the `grade` level
+   (F40, F43). F41 and F42 (tampering by a G2 build script) have no
+   automated test yet.
+4. **Codex duplicate terminal events.** §2.2 (last cumulative usage, never a
+   sum) and F20 (two terminals are an anomaly) both hold: the parser keeps
+   the last `turn.completed` usage and the attempt is invalid
+   (`adapter-stream`), F5.
+5. **Missing audit and proxy data are unknown.** Without a channel audit
+   (local fixture executor) or with a sample lacking a count, the audit
+   fields are `null`, never `0`. Proxy accounting (`integrity.proxy`:
+   connections, denials, bytes per target) is read before the proxy is
+   removed; no proxy is `null`; an unparseable log line makes the counts
+   unknown. Anomaly thresholds on these counts are not implemented.
+6. **Control-socket audit not implemented.** `controlSocketConnections` is
+   always `null` (§4.4 residual risk).
+7. **Truncated grader inputs.** A truncated transcript or final message makes
+   the evidence `incomplete` (§6.4), not only an oversized archive.
+8. **Refusals per cell.** An unsupported task is listed once per task × model
+   cell with its planned repetitions; a repetition whose last attempt is
+   invalid is `missing` with its reason (`attempts exhausted` or the invalid
+   class and code).
+9. **Credential source** (§4.6, user rule of this round): required per
+   provider, recorded, no default; F59.
+10. **Fixture closures are an input, not built.** A provider-backed `run`
+    needs `--setup` (`pms-agentic-provider-setup/v1`): the verified store
+    copy, the CE manifest, the trusted closure and one closure per fixture
+    (`package.json`, `package-lock.json`, offline cache). Producing those
+    closures (with network, once, then verified) is not implemented. Every
+    closure is installed with `npm ci --offline --ignore-scripts`, whatever
+    the fixture's package manager.
+11. **Self-test scope.** It covers §9.3 except: the memory limit, IPv6
+    link-local host addresses (recorded as skipped: they need an interface
+    scope and are not on the attempt link), the G2 tampering cases, and the
+    "mutations" item, which is covered by controls (a readable binary exposes
+    its descriptors, a same-network peer and the host service are reachable)
+    rather than by removing each mechanism. Only routing and timeout errors
+    count as unreachable; a probe error never passes.
+12. **Provider-backed path never executed.** Its preflight refusals are
+    tested (authorization, CI, dirty checkout, setup, credential source,
+    fixture-only inputs); everything after them (binding, trusted tree,
+    self-test binding, CLI identity, Docker executor, container grading) runs
+    for the first time in the authorized smoke run.
+
+### 11.3 Isolation self-test result (local)
+
+Docker 29.2.1, kernel 6.8.0-146-generic, harness image from the pinned
+`node:22-bookworm-slim` base, no credentials, no model call: **passed**, 39
+checks (every host IPv4 and global IPv6 address, bridge gateways, external
+addresses and DNS, another attempt's network, the proxy's reachability and
+denial, execute-only `/proc` denials with their readable-binary control,
+read-only workspace parts, privileges, no ancestor `node_modules`, PID 1
+survival, the pids limit); 35 IPv6 link-local addresses skipped. It is not
+run in CI: it needs a local Docker daemon with the isolated gateway mode
+(Docker 28 or later), a host service on every interface and minutes of
+image builds.
 
 ## Appendix A: probes and sources
 

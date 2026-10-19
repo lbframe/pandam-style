@@ -97,6 +97,7 @@ spec:
       - tools/eslint/copyright-header.txt
       - CHANGELOG.md
       - PANDAMSTYLE.md
+      - benchmarks/agentic/runner/DESIGN.md
     runbooks:
       - docs/agentdoc.md
       - tools/README.md
@@ -106,7 +107,7 @@ spec:
       - benchmarks/agentic/README.md
       - benchmarks/agentic/TRACE.md
       - benchmarks/agentic/heldout/ACCESS-POLICY.md
-      - benchmarks/agentic/runner/DESIGN.md
-      - benchmarks/agentic/runner/schema/run-config.draft.schema.json
-      - benchmarks/agentic/runner/schema/run-record.draft.schema.json
-      - benchmarks/agentic/runner/schema/product-build.draft.schema.json
+      - benchmarks/agentic/runner/schema/run-config.v1.schema.json
+      - benchmarks/agentic/runner/schema/run-record.v1.schema.json
+      - benchmarks/agentic/runner/schema/product-build.v1.schema.json
+      - benchmarks/agentic/runner/schema/report.v1.schema.json

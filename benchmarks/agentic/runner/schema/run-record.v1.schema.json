@@ -1,0 +1,1499 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/runner/schema/run-record.v1.schema.json",
+  "title": "Attempt record (pms-agentic-run-record/v1)",
+  "description": "One attempt of one repetition of one task x model cell (runner/DESIGN.md). Missing or ambiguous telemetry is status unknown with value null, never 0. A value is observed only with harness integrity: CLI streams are not attested (section 0.4), so stream-derived values are at most estimates. Provider-backed records are graded with the trusted product tree (invariant G).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "matrixId",
+    "cell",
+    "repetition",
+    "attempt",
+    "comparability",
+    "task",
+    "harness",
+    "prompt",
+    "modelConfig",
+    "cli",
+    "provider",
+    "budgets",
+    "productBuild",
+    "trustedTree",
+    "environment",
+    "integrity",
+    "timestamps",
+    "outcome",
+    "grading",
+    "metrics",
+    "credential",
+    "evidence",
+    "classificationDetail"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "provider-backed"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "trustedTree": {
+            "properties": {
+              "mode": {
+                "const": "trusted"
+              },
+              "matchesProductTarballs": {
+                "const": true
+              },
+              "checkedBeforeGrading": {
+                "const": true
+              }
+            }
+          },
+          "cli": {
+            "properties": {
+              "executeOnly": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "schema": {
+      "const": "pms-agentic-run-record/v1"
+    },
+    "kind": {
+      "enum": [
+        "provider-backed",
+        "adapter-fixture"
+      ]
+    },
+    "matrixId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId",
+        "modelKey"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string"
+        },
+        "modelKey": {
+          "type": "string"
+        }
+      }
+    },
+    "repetition": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "comparability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "projectionVersion",
+        "projection"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/sha256"
+        },
+        "projectionVersion": {
+          "const": "pms-agentic-comparability/v1"
+        },
+        "projection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "task",
+            "harness",
+            "prompt",
+            "model",
+            "policy",
+            "budgets",
+            "containers",
+            "dependencies"
+          ],
+          "properties": {
+            "version": {
+              "const": "pms-agentic-comparability/v1"
+            },
+            "task": {
+              "type": "object"
+            },
+            "harness": {
+              "type": "object"
+            },
+            "prompt": {
+              "type": "object"
+            },
+            "model": {
+              "type": "object"
+            },
+            "policy": {
+              "type": "object"
+            },
+            "budgets": {
+              "type": "object"
+            },
+            "containers": {
+              "type": "object"
+            },
+            "dependencies": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "split",
+        "workflow",
+        "caseType",
+        "epoch",
+        "corpusVersion",
+        "corpusLockSha256",
+        "taskDigest"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "split": {
+          "const": "development"
+        },
+        "workflow": {
+          "type": "string"
+        },
+        "caseType": {
+          "type": "string"
+        },
+        "epoch": {
+          "type": "string"
+        },
+        "corpusVersion": {
+          "type": "string"
+        },
+        "corpusLockSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "taskDigest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "harness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commit",
+        "clean",
+        "corpusLockSha256",
+        "runnerTreeDigest",
+        "harnessDepsLockSha256"
+      ],
+      "properties": {
+        "commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "clean": {
+          "type": "boolean"
+        },
+        "corpusLockSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "runnerTreeDigest": {
+          "type": "string"
+        },
+        "harnessDepsLockSha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "prompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "sha256",
+        "docsPath",
+        "channel"
+      ],
+      "properties": {
+        "file": {
+          "const": "prompt.md"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "docsPath": {
+          "type": "string"
+        },
+        "channel": {
+          "enum": [
+            "argv",
+            "stdin"
+          ]
+        }
+      }
+    },
+    "modelConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requestedModel",
+        "reasoningEffort",
+        "rawArgv",
+        "normalizedArgv",
+        "env",
+        "configFiles",
+        "effectiveConfig"
+      ],
+      "properties": {
+        "requestedModel": {
+          "type": "string"
+        },
+        "reasoningEffort": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requested",
+            "effective"
+          ],
+          "properties": {
+            "requested": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "null when no effort flag was passed (smoke run, Q3)."
+            },
+            "effective": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "null when the CLI does not report it."
+            }
+          }
+        },
+        "rawArgv": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "normalizedArgv": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "env": {
+          "type": "object",
+          "description": "Variables passed to the CLI; secret values are replaced by <secret>.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "configFiles": {
+          "type": "array"
+        },
+        "effectiveConfig": {
+          "type": "object",
+          "required": [
+            "source",
+            "subagents",
+            "web",
+            "matchesRequest"
+          ],
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "tools": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "subagents": {
+              "enum": [
+                "disabled-evidenced",
+                "disabled-configured",
+                "enabled",
+                "unknown"
+              ]
+            },
+            "web": {
+              "enum": [
+                "disabled-evidenced",
+                "disabled-configured",
+                "enabled",
+                "unknown"
+              ]
+            },
+            "builtins": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "matchesRequest": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "cli": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "sha256",
+        "executeOnly"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "claude",
+            "codex"
+          ]
+        },
+        "version": {
+          "type": "string"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "executeOnly": {
+          "type": "boolean"
+        }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "primaryModelFidelity",
+        "servedModels",
+        "auxiliaryModels",
+        "reroutes",
+        "apiRetries",
+        "reconnects",
+        "rateLimit"
+      ],
+      "properties": {
+        "sessionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "primaryModelFidelity": {
+          "enum": [
+            "faithful",
+            "violated",
+            "no-reroute-surfaced",
+            "unknown"
+          ]
+        },
+        "servedModels": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "const": "unknown"
+            }
+          ]
+        },
+        "auxiliaryModels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reroutes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "apiRetries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reconnects": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rateLimit": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "corpusTimeoutSeconds",
+        "corpusMaxTurnsHint",
+        "timeoutSeconds",
+        "maxToolCalls",
+        "cliMaxTurns",
+        "limitFired"
+      ],
+      "properties": {
+        "corpusTimeoutSeconds": {
+          "type": "integer"
+        },
+        "corpusMaxTurnsHint": {
+          "type": "integer"
+        },
+        "timeoutSeconds": {
+          "type": "number"
+        },
+        "maxToolCalls": {
+          "type": "integer"
+        },
+        "cliMaxTurns": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "limitFired": {
+          "enum": [
+            null,
+            "timeout",
+            "max-tool-calls",
+            "cli-max-turns"
+          ]
+        }
+      }
+    },
+    "productBuild": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "epoch",
+        "sourceCommit"
+      ],
+      "properties": {
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "epoch": {
+          "type": "string"
+        },
+        "sourceCommit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "trustedTree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "digest",
+        "pandamstyleDigest",
+        "matchesProductTarballs",
+        "checkedBeforeGrading"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "trusted",
+            "ancestor-fallback-dev"
+          ],
+          "description": "ancestor-fallback-dev only in adapter-fixture records (invariant G)."
+        },
+        "digest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pandamstyleDigest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "matchesProductTarballs": {
+          "type": "boolean"
+        },
+        "checkedBeforeGrading": {
+          "type": "boolean"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "images",
+        "kernel",
+        "cpuModel",
+        "cpus",
+        "memoryBytes",
+        "load"
+      ],
+      "properties": {
+        "images": {
+          "type": "object"
+        },
+        "dockerVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kernel": {
+          "type": "string"
+        },
+        "cpuModel": {
+          "type": "string"
+        },
+        "cpus": {
+          "type": "integer"
+        },
+        "memoryBytes": {
+          "type": "integer"
+        },
+        "load": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "samples",
+            "min",
+            "max",
+            "median"
+          ],
+          "properties": {
+            "samples": {
+              "type": "integer"
+            },
+            "min": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "max": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "median": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "isolationSelfTest": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stream",
+        "channelAudit",
+        "anomalies",
+        "contested",
+        "proxy"
+      ],
+      "properties": {
+        "stream": {
+          "const": "cli-unattested",
+          "description": "No protection boundary of the CLI stream is demonstrated (section 0.4)."
+        },
+        "channelAudit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "samples",
+            "cliNonDumpable",
+            "foreignStreamHolders",
+            "controlSocketConnections"
+          ],
+          "properties": {
+            "samples": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "cliNonDumpable": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "foreignStreamHolders": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "description": "null when no sample saw a count (no audit, or a sample without one)."
+            },
+            "controlSocketConnections": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          }
+        },
+        "anomalies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contested": {
+          "type": "boolean"
+        },
+        "proxy": {
+          "description": "Egress accounting from the per-attempt proxy log; null without a proxy (local fixture executor). Counts are null when a log line is unparseable.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "connections",
+                "denied",
+                "bytesUp",
+                "bytesDown",
+                "targets",
+                "unparseableLines"
+              ],
+              "properties": {
+                "connections": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "denied": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "bytesUp": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "bytesDown": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "targets": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "integer"
+                  }
+                },
+                "unparseableLines": {
+                  "type": "integer"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "timestamps": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "startedAt",
+          "endedAt",
+          "durationMs"
+        ],
+        "properties": {
+          "startedAt": {
+            "type": "string"
+          },
+          "endedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "durationMs": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "termination",
+        "class",
+        "code",
+        "valid",
+        "retry",
+        "taskSuccess",
+        "breaches"
+      ],
+      "properties": {
+        "termination": {
+          "enum": [
+            "completed",
+            "budget-timeout",
+            "budget-max-tool-calls",
+            "cli-max-turns",
+            "context-exhausted",
+            "resource-limit",
+            "abnormal-exit",
+            "policy",
+            "infrastructure",
+            "unclassified",
+            "harness"
+          ]
+        },
+        "class": {
+          "enum": [
+            "agent",
+            "agent-resource",
+            "agent-abnormal",
+            "policy",
+            "infrastructure",
+            "unclassified",
+            "harness"
+          ]
+        },
+        "code": {
+          "type": "string"
+        },
+        "valid": {
+          "type": "boolean"
+        },
+        "retry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scheduled",
+            "backoffSeconds"
+          ],
+          "properties": {
+            "scheduled": {
+              "type": "boolean"
+            },
+            "backoffSeconds": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "taskSuccess": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "breaches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "source",
+              "enforcement"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string"
+              },
+              "source": {
+                "enum": [
+                  "oracle",
+                  "proxy",
+                  "stream",
+                  "transcript",
+                  "filesystem",
+                  "channel-audit",
+                  "redaction"
+                ]
+              },
+              "enforcement": {
+                "enum": [
+                  "prevented",
+                  "detected"
+                ]
+              },
+              "detail": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "grading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verdict",
+        "passes",
+        "failingRequiredChecks"
+      ],
+      "properties": {
+        "verdict": {
+          "enum": [
+            "pass",
+            "fail",
+            "unmeasured",
+            "error",
+            "not-evaluable",
+            "not-graded"
+          ]
+        },
+        "passes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "pass",
+              "status",
+              "verdict"
+            ],
+            "properties": {
+              "pass": {
+                "enum": [
+                  "G1",
+                  "G2"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "completed",
+                  "aborted-by-agent-code",
+                  "inconsistent",
+                  "harness-error",
+                  "not-run"
+                ]
+              },
+              "verdict": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "resultSha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        },
+        "failingRequiredChecks": {
+          "type": "array"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "toolCalls",
+        "agentSteps",
+        "repairCycles",
+        "firstPassSuccess",
+        "coverage",
+        "tokens",
+        "cost",
+        "elapsed",
+        "toolCost",
+        "compilerCost",
+        "visualFidelity",
+        "vocabularyCompliance",
+        "scopeViolations"
+      ],
+      "properties": {
+        "toolCalls": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/measured"
+          }
+        },
+        "agentSteps": {
+          "$ref": "#/$defs/measured"
+        },
+        "repairCycles": {
+          "$ref": "#/$defs/measured"
+        },
+        "firstPassSuccess": {
+          "enum": [
+            true,
+            false,
+            "unknown"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "complete",
+            "reasons"
+          ],
+          "properties": {
+            "complete": {
+              "type": "boolean"
+            },
+            "reasons": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tokens": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "raw",
+            "normalized",
+            "discrepancy"
+          ],
+          "properties": {
+            "raw": {
+              "type": "object"
+            },
+            "normalized": {
+              "type": "object",
+              "required": [
+                "total",
+                "perModel"
+              ],
+              "properties": {
+                "total": {
+                  "$ref": "#/$defs/tokenSet"
+                },
+                "perModel": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/$defs/tokenSet"
+                  }
+                }
+              }
+            },
+            "discrepancy": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          }
+        },
+        "cost": {
+          "$ref": "#/$defs/measured"
+        },
+        "elapsed": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/measured"
+          }
+        },
+        "toolCost": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/measured"
+          }
+        },
+        "compilerCost": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/measured"
+          }
+        },
+        "visualFidelity": {
+          "enum": [
+            "pass",
+            "fail",
+            "unmeasured"
+          ]
+        },
+        "vocabularyCompliance": {
+          "enum": [
+            "pass",
+            "fail",
+            "unmeasured",
+            "not-graded"
+          ]
+        },
+        "scopeViolations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "realized",
+            "prevented",
+            "detected"
+          ],
+          "properties": {
+            "realized": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "prevented": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "detected": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "credential": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "export",
+        "haltProvider",
+        "source"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "access-only",
+            "refresh-capable-copy",
+            "none"
+          ]
+        },
+        "export": {
+          "enum": [
+            "not-applicable",
+            "unchanged",
+            "host-replaced",
+            "conflict-not-written",
+            "failed"
+          ]
+        },
+        "haltProvider": {
+          "type": "boolean"
+        },
+        "accessOnlyRefused": {
+          "type": "boolean"
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "configDir",
+                "file",
+                "account"
+              ],
+              "properties": {
+                "configDir": {
+                  "type": "string"
+                },
+                "file": {
+                  "type": "string"
+                },
+                "account": {
+                  "type": "string"
+                }
+              }
+            }
+          ],
+          "description": "The run-config credential source (home shown as ~); names only, never contents."
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completeness",
+        "replay",
+        "affectedPaths",
+        "gradedSetDigest",
+        "purged",
+        "artifacts"
+      ],
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete",
+            "redacted",
+            "incomplete"
+          ]
+        },
+        "replay": {
+          "enum": [
+            "exact",
+            "non-exact"
+          ]
+        },
+        "affectedPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gradedSetDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "purged": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "sha256",
+              "bytes",
+              "truncated",
+              "originalBytes",
+              "redacted"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "truncated": {
+                "type": "boolean"
+              },
+              "originalBytes": {
+                "type": "integer"
+              },
+              "redacted": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "classificationDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "haltProvider",
+        "haltMatrix",
+        "retry"
+      ],
+      "properties": {
+        "haltProvider": {
+          "type": "boolean"
+        },
+        "haltMatrix": {
+          "type": "boolean"
+        },
+        "retry": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "tokenSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inputUncached",
+        "inputCacheRead",
+        "inputCacheWrite",
+        "inputTotal",
+        "outputTotal",
+        "outputReasoning"
+      ],
+      "properties": {
+        "inputUncached": {
+          "$ref": "#/$defs/measured"
+        },
+        "inputCacheRead": {
+          "$ref": "#/$defs/measured"
+        },
+        "inputCacheWrite": {
+          "$ref": "#/$defs/measured"
+        },
+        "inputTotal": {
+          "$ref": "#/$defs/measured"
+        },
+        "outputTotal": {
+          "$ref": "#/$defs/measured"
+        },
+        "outputReasoning": {
+          "$ref": "#/$defs/measured"
+        }
+      }
+    },
+    "measured": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "value",
+        "source",
+        "integrity",
+        "method"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "observed",
+            "estimate",
+            "unknown"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "integrity": {
+          "enum": [
+            "harness",
+            "cli-unattested",
+            null
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lowerBound": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "unknown"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "observed",
+                  "estimate"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "estimate"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "method"
+            ],
+            "properties": {
+              "method": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "observed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "integrity": {
+                "const": "harness"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "integrity": {
+                "const": "cli-unattested"
+              }
+            },
+            "required": [
+              "integrity"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "estimate"
+              },
+              "method": {
+                "type": "string",
+                "pattern": "^cli-stream-unattested"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

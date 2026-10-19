@@ -1,0 +1,518 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbframe/pandam-style/benchmarks/agentic/runner/schema/run-config.v1.schema.json",
+  "title": "Evaluation matrix configuration (pms-agentic-matrix/v1)",
+  "description": "The resolved matrix.json (runner/DESIGN.md). Tasks never name models; this file does. Held-out tasks are refused unconditionally in AG-00.2 (F1). Adapter-fixture matrices may shorten timeouts and retries; provider-backed matrices may not, and need the orchestrator's authorization.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "purpose",
+    "epoch",
+    "tasks",
+    "models",
+    "repetitions",
+    "maxAttempts",
+    "productBuild",
+    "images",
+    "container",
+    "network",
+    "budgets",
+    "schedule",
+    "credentials"
+  ],
+  "properties": {
+    "schema": {
+      "const": "pms-agentic-matrix/v1"
+    },
+    "kind": {
+      "enum": [
+        "provider-backed",
+        "adapter-fixture"
+      ]
+    },
+    "purpose": {
+      "enum": [
+        "development",
+        "smoke",
+        "reference"
+      ]
+    },
+    "epoch": {
+      "type": "string"
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      }
+    },
+    "models": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/modelConfig"
+      }
+    },
+    "repetitions": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "maxAttempts": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3,
+      "description": "Attempts per repetition; only infrastructure failures start a new attempt."
+    },
+    "productBuild": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "manifestSha256"
+      ],
+      "properties": {
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "manifestSha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "images": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent",
+        "grader",
+        "proxy",
+        "baseDigest"
+      ],
+      "properties": {
+        "agent": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "grader": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "proxy": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "baseDigest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpus": {
+          "type": "number",
+          "minimum": 0
+        },
+        "memoryBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pidsLimit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tmpfsBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "workspaceBytesCap": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "ipv6",
+        "allow"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "per-attempt-internal-isolated-gateway",
+            "none-local-fixture"
+          ]
+        },
+        "ipv6": {
+          "const": false
+        },
+        "allow": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9.-]+:[0-9]+$"
+            }
+          }
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxToolCalls": {
+          "type": "string",
+          "description": "'corpus-maxTurns-hint' or an integer as a string; recorded separately from the corpus hint (Q11)."
+        },
+        "cliMaxTurns": {
+          "type": "string",
+          "description": "'2x-maxToolCalls', 'none' or an integer as a string: Claude --max-turns backstop (API round-trips), not equivalent to maxToolCalls."
+        },
+        "graceInterruptMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "graceTerminateMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "timeoutSecondsOverride": {
+          "type": "number",
+          "description": "adapter-fixture matrices only"
+        }
+      }
+    },
+    "credentials": {
+      "type": "object",
+      "description": "Per provider of the matrix (required, no default): the mode and the credential source, never a secret. access-only = no refresh token enters a container; refresh-capable-copy = full copy with export and compare-and-swap (forces concurrency 1 for that provider). The source is a configuration directory (Claude: the CLAUDE_CONFIG_DIR of the account, holding .credentials.json; Codex: the CODEX_HOME, holding auth.json) and an account label; both are recorded in every attempt. The runner never defaults to ~/.claude.",
+      "propertyNames": {
+        "enum": [
+          "claude",
+          "codex"
+        ]
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/credentialConfig"
+      }
+    },
+    "schedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "order",
+        "concurrencyPerProvider",
+        "timeWindows",
+        "wallClockCapSeconds"
+      ],
+      "properties": {
+        "order": {
+          "enum": [
+            "sequential",
+            "interleaved"
+          ]
+        },
+        "concurrencyPerProvider": {
+          "const": 1,
+          "description": "This runner executes attempts sequentially."
+        },
+        "timeWindows": {
+          "type": "array",
+          "description": "Operator time windows in which attempts may start (Q8); empty means unrestricted.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "wallClockCapSeconds": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      }
+    },
+    "retry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "baseSeconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "capSeconds": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "authorization": {
+      "enum": [
+        "orchestrator-go"
+      ],
+      "description": "Required for provider-backed matrices."
+    },
+    "adapterFixtures": {
+      "type": "object",
+      "description": "Adapter-fixture matrices only: scenario files of the fake CLI per '<taskId>/<modelKey>' or '*', one per attempt (the last repeats), relative to the matrix file.",
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "adapterEffectiveConfig": {
+      "type": "object",
+      "description": "Adapter-fixture matrices only: recorded Codex `debug prompt-input` evidence ({ promptInput, strictConfigAccepted }).",
+      "additionalProperties": false,
+      "properties": {
+        "codex": {
+          "type": "object",
+          "required": [
+            "promptInput",
+            "strictConfigAccepted"
+          ],
+          "properties": {
+            "promptInput": {
+              "type": [
+                "array",
+                "null"
+              ]
+            },
+            "strictConfigAccepted": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "imageId": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "modelConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "cli",
+        "cliVersion",
+        "cliSha256",
+        "model",
+        "reasoningEffort",
+        "toolPolicy"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9.]+)*$"
+        },
+        "cli": {
+          "enum": [
+            "claude",
+            "codex"
+          ]
+        },
+        "cliVersion": {
+          "type": "string"
+        },
+        "cliSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reasoningEffort": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "null: no effort flag (smoke run observes the effective default, Q3); otherwise the pinned value, passed explicitly."
+        },
+        "toolPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "web",
+            "subagents"
+          ],
+          "properties": {
+            "web": {
+              "const": false
+            },
+            "subagents": {
+              "const": false
+            }
+          }
+        }
+      }
+    },
+    "credentialConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "source"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "access-only",
+            "refresh-capable-copy",
+            "none"
+          ]
+        },
+        "fallback": {
+          "enum": [
+            "refresh-capable-copy"
+          ],
+          "description": "Only after access-only: use mode B when mode A is not feasible."
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/credentialSource"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "none"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "enum": [
+                  "access-only",
+                  "refresh-capable-copy"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/credentialSource"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "credentialSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "configDir",
+        "account"
+      ],
+      "properties": {
+        "configDir": {
+          "type": "string",
+          "pattern": "^(/|~/)",
+          "description": "Absolute or ~/ path of the provider's configuration directory, e.g. ~/.claude-t3/team-2 (claude-team-2) or ~/.codex."
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Account label, e.g. claude-team-2."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "provider-backed"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "authorization"
+        ],
+        "properties": {
+          "budgets": {
+            "not": {
+              "required": [
+                "timeoutSecondsOverride"
+              ]
+            }
+          },
+          "network": {
+            "properties": {
+              "mode": {
+                "const": "per-attempt-internal-isolated-gateway"
+              }
+            }
+          }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "adapterFixtures"
+              ]
+            },
+            {
+              "required": [
+                "adapterEffectiveConfig"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

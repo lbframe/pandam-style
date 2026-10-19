@@ -14,9 +14,12 @@ Status:
   [held-out policy](heldout/ACCESS-POLICY.md)), 8 project shapes on 5 hosts, the
   oracles, and 193 development oracle fixtures (known-good and known-bad
   solutions, including the independent reviews' probes).
-- **Not present:** the runner, the provider adapters, the frozen baseline and the
-  thresholds. Those are AG-00.2 (#6) and AG-00.3 (#7). No LLM run has been
-  executed against this corpus.
+- **Present (AG-00.2, #6):** the evaluation runner and its Claude Code and
+  Codex adapters in [`runner/`](runner/), tested with adapter fixtures (fake
+  CLIs) only. See [Runner](#runner-ag-002).
+- **Not present:** the frozen baseline and the thresholds (AG-00.3, #7). No
+  LLM run has been executed against this corpus; the first provider-backed run
+  is the authorized smoke run of the runner's design note (section 9.4).
 
 ## Layout
 
@@ -478,6 +481,36 @@ node benchmarks/agentic/bin/pms-agentic.mjs lock # after a reviewed change only
 Local oracle-fixture runs materialize under `.pms-bench/`, which is gitignored
 and inside the repository so packages resolve from the workspace root.
 
+## Runner (AG-00.2)
+
+The [design note](runner/DESIGN.md) is the runner's contract; its section 11
+maps each section to code and tests and lists the implementation's
+differences. Schemas: [`runner/schema/`](runner/schema/) (`v1`).
+
+```sh
+yarn bench:agentic:runner:test                   # adapter fixtures (section 9.1), no provider, no Docker
+R=benchmarks/agentic/runner/bin/pms-agentic-runner.mjs
+node $R validate-config matrix.json
+node $R run matrix.json                          # adapter-fixture matrices: fake CLIs, under .pms-bench/
+node $R report <matrix dir> --out report.json --markdown report.md
+node $R compare <record a> <record b>            # refuses unequal comparability keys
+node $R selftest                                 # Docker isolation self-test (local only)
+```
+
+- `matrix.json` (`pms-agentic-matrix/v1`) names tasks, models, repetitions,
+  budgets and, **per provider, the credential mode and source** (a
+  configuration directory and an account label; no default). Claude runs use
+  the claude-team-2 account directory (`~/.claude-t3/team-2`), never
+  `~/.claude`.
+- Provider-backed matrices need `"authorization": "orchestrator-go"`, a clean
+  checkout, a run root outside the repository, `--setup` (verified store copy
+  and closures), a valid isolation self-test, and never run in CI. Held-out
+  tasks and `--heldout-dir` are always refused.
+- Stream-derived tokens, cost and tool counts are estimates
+  (`cli-stream-unattested`); unknown values stay `null`; reports give each
+  cell's success as a point estimate and a lower bound counting contested
+  repetitions as non-success.
+
 ## Versioning
 
 Any change that can alter a verdict needs a `corpusVersion` bump, review and a
@@ -492,9 +525,11 @@ field, the committed held-out manifest and its digest in the lock.
   (`role="button"` with its own key handling) fails, because jsdom cannot
   verify keyboard activation.
 
-- No runner, provider adapter or real LLM run exists yet (AG-00.2).
-- Host builds, dev servers, services and browser behavior require the runner.
-  Pixel fidelity has no oracle.
+- No real LLM run exists yet: the runner is tested with adapter fixtures
+  only, and its provider-backed path first runs in the authorized smoke run.
+- Services and browser tasks are refused by the runner; installation tasks
+  are refused until a local package mirror exists. Pixel fidelity has no
+  oracle.
 - The rendered oracle covers compiler-emitted selectors only. jsdom has no
   layout, popover state or navigation, so those effects are `unmeasured` or
   absent.
