@@ -310,6 +310,40 @@ describe('design-system facts memo', () => {
   });
 });
 
+describe('owner groups of a page summary', () => {
+  test('are rebuilt once per summary and equal a fresh build', () => {
+    const owner = { role: 'page', file: '/p.js', line: 2, column: 3 };
+    const sources = [
+      { owner, css: '.a{text-wrap:pretty;display:flex}' },
+      { owner: { ...owner, line: 5 }, css: '.b{text-wrap:pretty}' },
+    ];
+    let reads = 0;
+    const summary = targets.summarizePage(() => {
+      reads += 1;
+      return sources;
+    });
+    expect(reads).toBe(1);
+    const key = 'value:text-wrap/pretty';
+    const first = summary.groups(key);
+    const second = summary.groups(key);
+    // The summary's sources are fixed: the second request reads nothing.
+    expect(reads).toBe(2);
+    expect(second).toBe(first);
+    expect(first).toEqual(targets.summarizeSources(sources).groups(key));
+    expect(summary.groups('property:not-used')).toEqual([]);
+    // A view over other sources has its own groups.
+    const moved = sources.map((source) => ({
+      ...source,
+      owner: { ...source.owner, line: source.owner.line + 10 },
+    }));
+    const view = summary.withSources(() => moved);
+    expect(view.groups(key)).toEqual(
+      targets.summarizeSources(moved).groups(key),
+    );
+    expect(view.groups(key)).not.toEqual(first);
+  });
+});
+
 describe('retention', () => {
   test('the accumulator drops deleted and renamed files', () => {
     const accumulator = targets.createTargetAccumulator();

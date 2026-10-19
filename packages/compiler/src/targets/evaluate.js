@@ -281,6 +281,7 @@ class UnitSummary {
     this.role = single ? (role ?? null) : null;
     this.roles = single ? null : perUse;
     this.groupsSource = groupsSource;
+    this.groupCache = null;
   }
 
   get size() {
@@ -294,10 +295,21 @@ class UnitSummary {
       : this.roles[i];
   }
 
-  /** Owner groups of a use (diagnostics only), or [] when absent. */
+  /**
+   * Owner groups of a use (diagnostics only), or [] when absent. A summary's
+   * sources never change, so the groups a diagnostic asked for are kept: only
+   * failing uses are asked for, and an unchanged page answers the next
+   * revision without rebuilding its groups.
+   */
   groups(useKey) {
     if (!this.keys.includes(useKey)) return [];
-    return this.groupsSource().get(useKey)?.groups ?? [];
+    let groups = this.groupCache?.get(useKey);
+    if (groups === undefined) {
+      groups = this.groupsSource().get(useKey)?.groups ?? [];
+      this.groupCache ??= new Map();
+      this.groupCache.set(useKey, groups);
+    }
+    return groups;
   }
 
   /**
@@ -313,6 +325,7 @@ class UnitSummary {
     view.role = this.role;
     view.roles = this.roles;
     view.groupsSource = () => ownerGroupsOf(sourcesOf());
+    view.groupCache = null;
     return view;
   }
 }
