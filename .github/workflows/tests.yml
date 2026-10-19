@@ -66,6 +66,27 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn lint:report
 
+  targets-data:
+    # CE-01.1: the bundled compat data and the frozen default profile are
+    # generated; both must re-derive byte for byte from their pinned inputs.
+    # The target class tests run with the compiler suite in verify-pms.sh.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.22.0'
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+      - run: corepack prepare yarn@1.22.22 --activate
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: node tools/targets/build-compat-data.mjs --check
+      - run: node tools/targets/measure-floor.mjs --check
+      - run: >-
+          node_modules/.bin/jest --config jest.config.js --ci --runInBand
+          packages/compiler/__tests__/pandamstyle/targets-
+
   agentic-corpus:
     runs-on: ubuntu-latest
     steps:
