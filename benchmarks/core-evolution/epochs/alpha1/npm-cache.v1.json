@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-baseline-npm-cache-record",
+  "epoch": "alpha1",
+  "generatedBy": "node tools/baselines/archive.mjs npm-cache-record --store <copy of the store>",
+  "erratumFor": {
+    "path": "benchmarks/core-evolution/epochs/alpha1/manifest.v1.json",
+    "field": "closure.npmCache.tree",
+    "recorded": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "files": 0,
+      "bytes": 0
+    },
+    "reason": "Recorded with a directory-pruning exclude filter that pruned `_cacache` itself: the digest covers 0 files and binds nothing. The manifest stays unchanged because budgets.v1.json binds its digest; this record is the npm cache binding."
+  },
+  "store": {
+    "path": "npm-cache",
+    "scope": "_cacache/content-v2/** (content-addressed entries)"
+  },
+  "contentTree": {
+    "sha256": "4fa28496464251465aa5888eb3b740ef5945129006d2d331466d93ee55222e42",
+    "files": 314,
+    "bytes": 460115581,
+    "description": "Identity of the archived store cache. The original npm install also cached registry metadata, so a store rebuilt with npm ci from the lockfile holds only the locked tarballs and does not reproduce this inventory (verify --rebuilt reports it as a note)."
+  },
+  "lockedTarballs": {
+    "description": "Reproducible binding: every lockfile package installed in the closure has a content entry whose bytes match its lockfile integrity; optional packages for other platforms are not installed and not cached. Checked on every store, archived or rebuilt.",
+    "installedPackages": 102,
+    "cachedAndVerified": 102,
+    "sha256": "5af5774a92f0ae2f4c06d82ea64514830cef4a75abbf14381079f4c54e25cf16"
+  }
+}

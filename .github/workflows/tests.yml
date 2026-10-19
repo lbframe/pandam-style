@@ -5,11 +5,19 @@ on:
     branches:
       - 'main'
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  flow:
+  # One install for every static check (4 CI runner slots in total). Each check
+  # still runs and reports when an earlier one fails.
+  static:
     runs-on: ubuntu-latest
+    # Draft PRs are verified locally; CI runs once they are ready for review.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -19,10 +27,27 @@ jobs:
           cache-dependency-path: yarn.lock
       - run: corepack prepare yarn@1.22.22 --activate
       - run: yarn install --frozen-lockfile
-      - run: yarn flow
+      - name: flow
+        if: ${{ !cancelled() }}
+        run: yarn flow
+      - name: prettier
+        if: ${{ !cancelled() }}
+        run: yarn prettier:report
+      - name: lint
+        if: ${{ !cancelled() }}
+        run: yarn lint:report
+      # Pin the release that reported and verified the inherited findings;
+      # the floating `v1` tag is deprecated.
+      - name: spelling
+        if: ${{ !cancelled() }}
+        uses: crate-ci/typos@v1.50.2
+        with:
+          config: .github/workflows/typos.toml
 
   pandamstyle:
     runs-on: ubuntu-latest
+    # Draft PRs are verified locally; CI runs once they are ready for review.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     env:
       # On this runner, `chromium` aborts creating its sandbox under the
       # AppArmor user-namespace restriction; its Google Chrome runs the same
@@ -51,34 +76,10 @@ jobs:
       - run: node tools/targets/measure-floor.mjs --check
       - run: node tools/targets/build-builtin-resolutions.mjs --check
 
-  prettier:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22.x'
-          cache: 'yarn'
-          cache-dependency-path: yarn.lock
-      - run: corepack prepare yarn@1.22.22 --activate
-      - run: yarn install --frozen-lockfile
-      - run: yarn prettier:report
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22.x'
-          cache: 'yarn'
-          cache-dependency-path: yarn.lock
-      - run: corepack prepare yarn@1.22.22 --activate
-      - run: yarn install --frozen-lockfile
-      - run: yarn lint:report
-
   agentic-corpus:
     runs-on: ubuntu-latest
+    # Draft PRs are verified locally; CI runs once they are ready for review.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -94,13 +95,10 @@ jobs:
       - run: yarn build
       - run: yarn bench:agentic:validate
       - run: yarn bench:agentic:test
+      # AG-00.2 runner: adapter fixtures (fake CLIs, no provider, no Docker),
+      # then the credential-free Docker integration tests (fake CLI image,
+      # real agent, proxy and grader containers, isolation self-test).
+      - run: yarn bench:agentic:runner:test
+      - run: docker version
+      - run: yarn bench:agentic:runner:docker-test
 
-  spelling:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      # Pin the release that reported and verified the inherited findings;
-      # the floating `v1` tag is deprecated.
-      - uses: crate-ci/typos@v1.50.2
-        with:
-          config: .github/workflows/typos.toml

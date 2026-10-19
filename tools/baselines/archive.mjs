@@ -22,6 +22,7 @@
 // the archived npm cache, re-creates the source archive and compares both.
 
 import { execFileSync, spawnSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -34,7 +35,6 @@ import {
   sha1,
   sha256,
   sha512Integrity,
-  treeDigest,
   writeJson,
 } from './lib.mjs';
 
@@ -70,16 +70,149 @@ export const EPOCH_DIR = path.join(BENCH, 'epochs', EPOCH);
 export const MANIFEST = path.join(EPOCH_DIR, 'manifest.v1.json');
 export const CLOSURE_DIR = path.join(EPOCH_DIR, 'closure');
 
+export const NPM_CACHE_RECORD = path.join(EPOCH_DIR, 'npm-cache.v1.json');
+
+// Tree selections are file-level predicates: fileTreeDigest always descends
+// into every directory and asks the predicate only about files and symlinks,
+// so a selection can never prune the ancestors of a file it includes. (The
+// manifest's npmCache.tree was recorded with a directory-pruning exclude that
+// pruned `_cacache` itself and digested nothing; see npm-cache.v1.json.)
+
 // Playwright writes these markers itself; they are not browser content.
 const ENGINE_MARKERS = /(^|\/)(INSTALLATION_COMPLETE|DEPENDENCIES_VALIDATED)$/;
+export const ENGINE_FILES = (rel) => !ENGINE_MARKERS.test(rel);
 // npm's hidden lockfile records install-time metadata, not package content.
-const CLOSURE_EXCLUDE = (rel) =>
-  rel === 'node_modules/.package-lock.json' ||
-  rel.startsWith('node_modules/.cache/');
-
-// The npm cache digest covers content-addressed entries only; the index,
+export const CLOSURE_FILES = (rel) =>
+  rel !== '.package-lock.json' && !rel.startsWith('.cache/');
+// The npm cache record covers content-addressed entries only; the index,
 // logs and temporary files change on every (offline) use.
-const NPM_CACHE_EXCLUDE = (rel) => !rel.startsWith('_cacache/content-v2/');
+export const NPM_CACHE_FILES = (rel) => rel.startsWith('_cacache/content-v2/');
+
+// Same line format and digest as lib.mjs treeDigest without a filter.
+export function fileTreeDigest(root, include = () => true) {
+  const lines = [];
+  let files = 0;
+  let bytes = 0;
+  const walk = (dir) => {
+    const entries = fs
+      .readdirSync(dir, { withFileTypes: true })
+      .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      const rel = path.relative(root, full).split(path.sep).join('/');
+      if (entry.isDirectory()) {
+        walk(full);
+        continue;
+      }
+      if (!include(rel)) continue;
+      if (entry.isSymbolicLink())
+        lines.push(`l ${rel} ${fs.readlinkSync(full)}`);
+      else if (entry.isFile()) {
+        const stat = fs.statSync(full);
+        lines.push(
+          `f ${rel} ${stat.mode & 0o111 ? 'x' : '-'} ${fileSha256(full)}`,
+        );
+        files++;
+        bytes += stat.size;
+      }
+    }
+  };
+  walk(root);
+  return { sha256: sha256(lines.join('\n')), files, bytes };
+}
+
+// A tree digest that is expected to be non-empty must cover at least one file
+// and at least the recorded minimum; otherwise it proves nothing.
+export function vacuity(name, tree, minFiles = 1) {
+  if (!(tree.files >= Math.max(1, minFiles)))
+    return `${name}: digest covers ${tree.files} files, expected at least ${Math.max(1, minFiles)} (vacuous)`;
+  return null;
+}
+
+function cachePath(cacheRoot, integrity) {
+  const [algorithm, base64] = integrity.split('-');
+  const hex = Buffer.from(base64, 'base64').toString('hex');
+  return path.join(
+    cacheRoot,
+    '_cacache/content-v2',
+    algorithm,
+    hex.slice(0, 2),
+    hex.slice(2, 4),
+    hex.slice(4),
+  );
+}
+
+// The npm cache binding: the content-addressed inventory, and every lockfile
+// package installed in the closure present in the cache with bytes matching
+// its lockfile integrity.
+export function npmCacheInventory(store) {
+  const cache = path.join(store, 'npm-cache');
+  const lock = readJson(path.join(CLOSURE_DIR, 'package-lock.json'));
+  const lines = [];
+  const missing = [];
+  let installed = 0;
+  for (const [key, entry] of Object.entries(lock.packages)) {
+    if (key === '' || entry.integrity == null) continue;
+    if (!fs.existsSync(path.join(store, 'closure', key, 'package.json')))
+      continue;
+    installed++;
+    const file = cachePath(cache, entry.integrity);
+    const [algorithm, base64] = entry.integrity.split('-');
+    const ok =
+      fs.existsSync(file) &&
+      crypto
+        .createHash(algorithm)
+        .update(fs.readFileSync(file))
+        .digest('base64') === base64;
+    if (ok) lines.push(`${key} ${entry.integrity}`);
+    else missing.push(key);
+  }
+  return {
+    contentTree: fileTreeDigest(cache, NPM_CACHE_FILES),
+    lockedTarballs: {
+      installedPackages: installed,
+      cachedAndVerified: lines.length,
+      missing,
+      sha256: sha256(lines.join('\n')),
+    },
+  };
+}
+
+// Checks the npm cache against its record. The locked tarballs are the
+// reproducible binding and are always checked; the full content inventory
+// identifies the archived store's cache (the original install also cached
+// registry metadata) and is checked unless `rebuilt` is set. The cache must
+// never cover fewer content entries than the locked tarballs.
+export function npmCacheProblems(store, record, { rebuilt = false } = {}) {
+  const now = npmCacheInventory(store);
+  const problems = [];
+  const notes = [];
+  const vacuous = vacuity(
+    'npm cache content',
+    now.contentTree,
+    record.lockedTarballs.cachedAndVerified,
+  );
+  if (vacuous) problems.push(vacuous);
+  const t = now.lockedTarballs;
+  if (t.missing.length > 0)
+    problems.push(
+      `npm cache lacks verified tarballs for ${t.missing.join(', ')}`,
+    );
+  for (const field of ['installedPackages', 'cachedAndVerified', 'sha256'])
+    if (t[field] !== record.lockedTarballs[field])
+      problems.push(
+        `npm cache locked tarballs ${field} ${t[field]} differs from ${record.lockedTarballs[field]}`,
+      );
+  const inventoryDiffers = ['sha256', 'files', 'bytes'].filter(
+    (f) => now.contentTree[f] !== record.contentTree[f],
+  );
+  if (inventoryDiffers.length > 0) {
+    const text = `npm cache content inventory ${now.contentTree.sha256.slice(0, 12)}… (${now.contentTree.files} files, ${now.contentTree.bytes} bytes) differs from the archived ${record.contentTree.sha256.slice(0, 12)}… (${record.contentTree.files} files, ${record.contentTree.bytes} bytes)`;
+    if (rebuilt) notes.push(`${text}; expected for a rebuilt store`);
+    else problems.push(text);
+  }
+  return { problems, notes, inventory: now };
+}
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -263,6 +396,49 @@ function build(store) {
     const file = run('fc-match', ['-f', '%{file}', family]);
     fs.copyFileSync(file, path.join(store, 'fonts', path.basename(file)));
   }
+
+  // 8. No built tree may be vacuous: the recorded file counts are minimums.
+  const problems = builtTreeProblems(store);
+  if (problems.length > 0)
+    throw new Error(`vacuous build: ${problems.join('; ')}`);
+}
+
+// Non-vacuous guard for a built store: every tree the manifest and the npm
+// cache record bind must cover at least its recorded number of files, and
+// every installed locked package must be cached with a matching integrity.
+export function builtTreeProblems(store) {
+  const record = readJson(MANIFEST);
+  const problems = [];
+  const guard = (name, tree, minFiles) => {
+    const vacuous = vacuity(name, tree, minFiles);
+    if (vacuous) problems.push(vacuous);
+  };
+  guard(
+    'installed closure tree',
+    fileTreeDigest(path.join(store, 'closure/node_modules'), CLOSURE_FILES),
+    record.closure.installedTree.files,
+  );
+  guard(
+    'installed @pandamstyle tree',
+    fileTreeDigest(path.join(store, 'closure/node_modules/@pandamstyle')),
+    record.closure.installedPandamstyle.files,
+  );
+  for (const engine of record.engines)
+    guard(
+      `engine ${engine.name}`,
+      fileTreeDigest(path.join(store, engine.path), ENGINE_FILES),
+      engine.tree.files,
+    );
+  const inventory = npmCacheInventory(store);
+  const minimum = fs.existsSync(NPM_CACHE_RECORD)
+    ? readJson(NPM_CACHE_RECORD).lockedTarballs.cachedAndVerified
+    : inventory.lockedTarballs.installedPackages;
+  guard('npm cache content', inventory.contentTree, minimum);
+  if (inventory.lockedTarballs.missing.length > 0)
+    problems.push(
+      `npm cache lacks verified tarballs for ${inventory.lockedTarballs.missing.join(', ')}`,
+    );
+  return problems;
 }
 
 // ---------------------------------------------------------------- manifest
@@ -414,9 +590,7 @@ function manifest(store) {
       revision: entry.revision,
       playwrightCore: hostVersion('playwright-core'),
       path: `engines/ms-playwright/${dir}`,
-      tree: treeDigest(path.join(engineRoot, dir), {
-        exclude: (rel) => ENGINE_MARKERS.test(rel),
-      }),
+      tree: fileTreeDigest(path.join(engineRoot, dir), ENGINE_FILES),
     };
   });
   const fonts = FONT_FAMILIES.map((family) => {
@@ -531,10 +705,11 @@ function manifest(store) {
       path: 'closure',
       install:
         'npm ci --offline --ignore-scripts --no-audit --no-fund --cache <store>/npm-cache',
-      installedTree: treeDigest(path.join(closure, 'node_modules'), {
-        exclude: (rel) => CLOSURE_EXCLUDE(`node_modules/${rel}`),
-      }),
-      installedPandamstyle: treeDigest(
+      installedTree: fileTreeDigest(
+        path.join(closure, 'node_modules'),
+        CLOSURE_FILES,
+      ),
+      installedPandamstyle: fileTreeDigest(
         path.join(closure, 'node_modules/@pandamstyle'),
       ),
       lockedPackages: Object.keys(lock.packages).filter((k) => k !== '').length,
@@ -559,9 +734,7 @@ function manifest(store) {
       note: 'The published compiler declares caret ranges for its Babel/CSS dependencies; this lockfile freezes the resolution observed when the closure was created. React 19.3.0 follows tools/pms/package-qualification.js; the Vite pilot itself pins React 19.2.0.',
       npmCache: {
         path: 'npm-cache',
-        tree: treeDigest(path.join(store, 'npm-cache'), {
-          exclude: NPM_CACHE_EXCLUDE,
-        }),
+        tree: fileTreeDigest(path.join(store, 'npm-cache'), NPM_CACHE_FILES),
       },
     },
     node: NODE_VERSIONS.map(({ version, role }) => {
@@ -645,9 +818,10 @@ export function installClosure(store, dest) {
     ],
     { cwd: dest },
   );
-  const tree = treeDigest(path.join(dest, 'node_modules'), {
-    exclude: (rel) => CLOSURE_EXCLUDE(`node_modules/${rel}`),
-  }).sha256;
+  const tree = fileTreeDigest(
+    path.join(dest, 'node_modules'),
+    CLOSURE_FILES,
+  ).sha256;
   if (tree !== record.closure.installedTree.sha256)
     throw new Error(
       `offline closure ${tree} differs from ${record.closure.installedTree.sha256}`,
@@ -655,9 +829,10 @@ export function installClosure(store, dest) {
   return tree;
 }
 
-export function verify(store, { replay = false } = {}) {
+export function verify(store, { replay = false, rebuilt = false } = {}) {
   const record = readJson(MANIFEST);
   const checks = [];
+  const notes = [];
   const check = (name, actual, expected) =>
     checks.push({ name, ok: actual === expected, actual, expected });
   check(
@@ -709,17 +884,29 @@ export function verify(store, { replay = false } = {}) {
       pkg.sourcePack.sha256,
     );
   }
-  check(
+  // Tree checks: digest equality plus a non-vacuous guard against the
+  // recorded file count.
+  const treeCheck = (name, tree, recorded) => {
+    const vacuous = vacuity(name, tree, recorded.files);
+    checks.push({
+      name,
+      ok:
+        vacuous == null &&
+        tree.sha256 === recorded.sha256 &&
+        tree.files === recorded.files,
+      actual: vacuous ?? `${tree.sha256} (${tree.files} files)`,
+      expected: `${recorded.sha256} (${recorded.files} files)`,
+    });
+  };
+  treeCheck(
     'installed @pandamstyle tree',
-    treeDigest(path.join(store, 'closure/node_modules/@pandamstyle')).sha256,
-    record.closure.installedPandamstyle.sha256,
+    fileTreeDigest(path.join(store, 'closure/node_modules/@pandamstyle')),
+    record.closure.installedPandamstyle,
   );
-  check(
+  treeCheck(
     'installed closure tree',
-    treeDigest(path.join(store, 'closure/node_modules'), {
-      exclude: (rel) => CLOSURE_EXCLUDE(`node_modules/${rel}`),
-    }).sha256,
-    record.closure.installedTree.sha256,
+    fileTreeDigest(path.join(store, 'closure/node_modules'), CLOSURE_FILES),
+    record.closure.installedTree,
   );
   for (const node of record.node)
     check(
@@ -728,12 +915,10 @@ export function verify(store, { replay = false } = {}) {
       node.sha256,
     );
   for (const engine of record.engines)
-    check(
+    treeCheck(
       `engine ${engine.name} ${engine.browserVersion}`,
-      treeDigest(path.join(store, engine.path), {
-        exclude: (rel) => ENGINE_MARKERS.test(rel),
-      }).sha256,
-      engine.tree.sha256,
+      fileTreeDigest(path.join(store, engine.path), ENGINE_FILES),
+      engine.tree,
     );
   for (const font of record.fonts.resolutions)
     check(
@@ -741,12 +926,36 @@ export function verify(store, { replay = false } = {}) {
       fileSha256(path.join(store, font.archived)),
       font.sha256,
     );
-  check(
-    'npm cache content',
-    treeDigest(path.join(store, 'npm-cache'), { exclude: NPM_CACHE_EXCLUDE })
-      .sha256,
-    record.closure.npmCache.tree.sha256,
+  // Erratum: the manifest's npmCache.tree is vacuous (0 files) and binds
+  // nothing; it is reported, never counted as a check. The binding is the
+  // separate npm-cache.v1.json record.
+  notes.push(
+    `manifest closure.npmCache.tree is vacuous (${record.closure.npmCache.tree.files} files, ${record.closure.npmCache.tree.sha256.slice(0, 12)}…); superseded by ${path.relative(REPO, NPM_CACHE_RECORD)}`,
   );
+  if (!fs.existsSync(NPM_CACHE_RECORD))
+    checks.push({
+      name: 'npm cache record',
+      ok: false,
+      actual: 'missing',
+      expected: path.relative(REPO, NPM_CACHE_RECORD),
+    });
+  else {
+    const cacheRecord = readJson(NPM_CACHE_RECORD);
+    const { problems, notes: cacheNotes } = npmCacheProblems(
+      store,
+      cacheRecord,
+      { rebuilt },
+    );
+    notes.push(...cacheNotes);
+    checks.push({
+      name: rebuilt
+        ? `npm cache locked tarballs (${cacheRecord.lockedTarballs.cachedAndVerified} verified; rebuilt store)`
+        : `npm cache content (${cacheRecord.contentTree.files} files, ${cacheRecord.lockedTarballs.cachedAndVerified} verified locked tarballs)`,
+      ok: problems.length === 0,
+      actual: problems.join('; ') || 'matches',
+      expected: 'matches npm-cache.v1.json',
+    });
+  }
   if (replay) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ce003-replay-'));
     try {
@@ -758,22 +967,21 @@ export function verify(store, { replay = false } = {}) {
       );
       const closure = path.join(dir, 'closure');
       installClosure(store, closure);
-      check(
+      treeCheck(
         'replayed closure tree (offline npm ci)',
-        treeDigest(path.join(closure, 'node_modules'), {
-          exclude: (rel) => CLOSURE_EXCLUDE(`node_modules/${rel}`),
-        }).sha256,
-        record.closure.installedTree.sha256,
+        fileTreeDigest(path.join(closure, 'node_modules'), CLOSURE_FILES),
+        record.closure.installedTree,
       );
-      check(
+      treeCheck(
         'replayed @pandamstyle tree',
-        treeDigest(path.join(closure, 'node_modules/@pandamstyle')).sha256,
-        record.closure.installedPandamstyle.sha256,
+        fileTreeDigest(path.join(closure, 'node_modules/@pandamstyle')),
+        record.closure.installedPandamstyle,
       );
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
   }
+  checks.notes = notes;
   return checks;
 }
 
@@ -800,18 +1008,72 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(
       `installed ${installClosure(store, path.resolve(argv[index + 1]))}`,
     );
+  } else if (command === 'npm-cache-record') {
+    // Written once from a copy of the store; the committed record is frozen.
+    if (fs.existsSync(NPM_CACHE_RECORD))
+      throw new Error(
+        `${path.relative(REPO, NPM_CACHE_RECORD)} exists and is frozen`,
+      );
+    const inventory = npmCacheInventory(store);
+    const vacuous = vacuity(
+      'npm cache content',
+      inventory.contentTree,
+      inventory.lockedTarballs.installedPackages,
+    );
+    if (vacuous != null || inventory.lockedTarballs.missing.length > 0)
+      throw new Error(
+        vacuous ??
+          `missing locked tarballs: ${inventory.lockedTarballs.missing.join(', ')}`,
+      );
+    writeJson(NPM_CACHE_RECORD, {
+      schemaVersion: 1,
+      kind: 'pandamstyle-baseline-npm-cache-record',
+      epoch: EPOCH,
+      generatedBy:
+        'node tools/baselines/archive.mjs npm-cache-record --store <copy of the store>',
+      erratumFor: {
+        path: path.relative(REPO, MANIFEST),
+        field: 'closure.npmCache.tree',
+        recorded: readJson(MANIFEST).closure.npmCache.tree,
+        reason:
+          'Recorded with a directory-pruning exclude filter that pruned `_cacache` itself: the digest covers 0 files and binds nothing. The manifest stays unchanged because budgets.v1.json binds its digest; this record is the npm cache binding.',
+      },
+      store: {
+        path: 'npm-cache',
+        scope: '_cacache/content-v2/** (content-addressed entries)',
+      },
+      contentTree: {
+        ...inventory.contentTree,
+        description:
+          'Identity of the archived store cache. The original npm install also cached registry metadata, so a store rebuilt with npm ci from the lockfile holds only the locked tarballs and does not reproduce this inventory (verify --rebuilt reports it as a note).',
+      },
+      lockedTarballs: {
+        description:
+          'Reproducible binding: every lockfile package installed in the closure has a content entry whose bytes match its lockfile integrity; optional packages for other platforms are not installed and not cached. Checked on every store, archived or rebuilt.',
+        installedPackages: inventory.lockedTarballs.installedPackages,
+        cachedAndVerified: inventory.lockedTarballs.cachedAndVerified,
+        sha256: inventory.lockedTarballs.sha256,
+      },
+    });
+    console.log(
+      `wrote ${path.relative(REPO, NPM_CACHE_RECORD)}: ${JSON.stringify(inventory.contentTree)}`,
+    );
   } else if (command === 'verify') {
-    const checks = verify(store, { replay: argv.includes('--replay') });
+    const checks = verify(store, {
+      replay: argv.includes('--replay'),
+      rebuilt: argv.includes('--rebuilt'),
+    });
     for (const c of checks)
       console.log(
         `${c.ok ? 'ok  ' : 'FAIL'} ${c.name}${c.ok ? '' : ` (actual ${c.actual}, expected ${c.expected})`}`,
       );
+    for (const note of checks.notes) console.log(`note ${note}`);
     const failed = checks.filter((c) => !c.ok).length;
     console.log(`${checks.length - failed}/${checks.length} checks passed`);
     if (failed > 0) process.exitCode = 1;
   } else {
     console.error(
-      'usage: archive.mjs build|manifest|verify|closure [--store <dir>] [--replay] [--dest <dir>]',
+      'usage: archive.mjs build|manifest|npm-cache-record|verify|closure [--store <dir>] [--replay] [--rebuilt] [--dest <dir>]',
     );
     process.exitCode = 2;
   }
