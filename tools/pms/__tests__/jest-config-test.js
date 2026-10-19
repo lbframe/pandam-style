@@ -201,6 +201,13 @@ describe('the root jest configuration is not a broad ignore', () => {
         'packages/compiler/__tests__/pandamstyle/local-publication-test.js',
         'packages/compiler/__tests__/pandamstyle/transaction-backup-test.js',
         'packages/compiler/__tests__/pandamstyle/source-map-test.js',
+        // CE-01.1 browser targets.
+        'packages/compiler/__tests__/pandamstyle/targets-capability-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-catalog-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-outcome-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-policy-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-project-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-resolution-test.js',
       ].sort(),
     );
   });

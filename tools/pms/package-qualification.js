@@ -203,6 +203,8 @@ function fileInventory(root) {
   });
 }
 
+const CODE_FILE_RE = /\.(?:mjs|js|cjs|jsx|ts|tsx)$/;
+
 function importsOf(source) {
   const found = [];
   const ast = parse(source, {
@@ -1308,7 +1310,7 @@ function assertBrowserSafety(consumerDir, unpackedPackages) {
     ['browser-bundles', path.join(consumerDir, 'bundle-output')],
   ]) {
     for (const file of listFiles(root)) {
-      if (!/\.(?:mjs|js|cjs|jsx|ts|tsx)$/.test(file)) continue;
+      if (!CODE_FILE_RE.test(file)) continue;
       const source = fs.readFileSync(file, 'utf8');
       const imports = importsOf(source);
       const forbiddenImports = imports.filter(
@@ -2349,9 +2351,9 @@ function writeQualificationReports(output, report) {
 
 function runNextPackageChecks(consumerDir, packages, commandLog) {
   const directory = packages['@pandamstyle/next'].first.packageDir;
-  const imports = listFiles(path.join(directory, 'src')).flatMap((file) =>
-    importsOf(fs.readFileSync(file, 'utf8')),
-  );
+  const imports = listFiles(path.join(directory, 'src'))
+    .filter((file) => CODE_FILE_RE.test(file))
+    .flatMap((file) => importsOf(fs.readFileSync(file, 'utf8')));
   const privateCompilerImports = imports.filter(
     (specifier) =>
       specifier.startsWith('@pandamstyle/compiler/') &&
@@ -2608,9 +2610,11 @@ async function runExternalConsumer(
   const compilerPackage = packages['@pandamstyle/compiler'].first;
   const compiledImports = [
     ...new Set(
-      listFiles(path.join(compilerPackage.packageDir, 'lib')).flatMap((file) =>
-        importsOf(fs.readFileSync(file, 'utf8')),
-      ),
+      // Code files only: lib also ships the compat-data JSON asset (CE-01.1),
+      // which has no imports.
+      listFiles(path.join(compilerPackage.packageDir, 'lib'))
+        .filter((file) => CODE_FILE_RE.test(file))
+        .flatMap((file) => importsOf(fs.readFileSync(file, 'utf8'))),
     ),
   ].sort();
   const unresolvedExternalImports = compiledImports
