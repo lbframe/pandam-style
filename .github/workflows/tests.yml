@@ -76,6 +76,13 @@ jobs:
           corepack enable && corepack prepare yarn@1.22.22 --activate
           echo "YARN_CACHE_FOLDER=$RUNNER_TOOL_CACHE/yarn-cache" >> "$GITHUB_ENV"
       - run: ./verify-pms.sh
+      # Step logs stay on the self-hosted host; keep them when a step fails.
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: verify-pms-evidence
+          path: evidence/native/*.log
+          retention-days: 7
 
   agentic-corpus:
     runs-on: [self-hosted, lbframe-ci, sk]
