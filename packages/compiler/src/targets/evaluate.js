@@ -56,8 +56,28 @@ export function extractionCacheSizes() {
 }
 
 /** Feature records and their contexts for one emitted CSS text (memoized). */
-export function featuresOfCss(cssText) {
-  const cached = extractionCache.get(cssText);
+const DECLARED_CUSTOM_PROPERTY = /(--[A-Za-z0-9_-]+)\s*:/g;
+
+/**
+ * The extraction key of a text: the text, plus the grammars of the custom
+ * properties it declares when they are known (a design-system token of a
+ * color category), since those decide how their keywords read.
+ */
+function extractionKey(cssText, grammars) {
+  if (grammars == null || grammars.size === 0 || !cssText.includes('--')) {
+    return cssText;
+  }
+  let known = '';
+  for (const [, name] of cssText.matchAll(DECLARED_CUSTOM_PROPERTY)) {
+    const grammar = grammars.get(name);
+    if (grammar != null) known += `${name}=${grammar};`;
+  }
+  return known === '' ? cssText : `${cssText}\u0000${known}`;
+}
+
+export function featuresOfCss(cssText, grammars = null) {
+  const cacheKey = extractionKey(cssText, grammars);
+  const cached = extractionCache.get(cacheKey);
   if (cached != null) return cached;
   if (
     extractionCache.size >= EXTRACTION_LIMIT ||
@@ -66,7 +86,9 @@ export function featuresOfCss(cssText) {
     evictExtraction();
   }
   const out = [];
-  for (const { construct, context } of extractConstructs(cssText)) {
+  for (const { construct, context } of extractConstructs(cssText, {
+    grammars: cacheKey === cssText ? null : grammars,
+  })) {
     const key = constructKey(construct);
     let records = recordCache.get(key);
     if (records == null) {
@@ -75,7 +97,7 @@ export function featuresOfCss(cssText) {
     }
     for (const record of records) out.push({ record, context });
   }
-  extractionCache.set(cssText, out);
+  extractionCache.set(cacheKey, out);
   return out;
 }
 
@@ -201,10 +223,10 @@ function useKeyOf(record) {
  */
 function ownerGroupsOf(sources) {
   const building = new Map();
-  for (const { owner, css } of sources) {
+  for (const { owner, css, grammars } of sources) {
     const oKey = ownerKey(owner);
     const gKey = `${owner.role}|${owner.file ?? ''}|${roleOf(owner)}`;
-    for (const entry of featuresOfCss(css)) {
+    for (const entry of featuresOfCss(css, grammars)) {
       const key = useKeyOf(entry.record);
       let use = building.get(key);
       if (use == null) {

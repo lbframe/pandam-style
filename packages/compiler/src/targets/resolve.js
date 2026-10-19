@@ -31,6 +31,7 @@ import { compatData } from './data';
 import { compareVersions } from './versions';
 import defaultProfile from './profiles/default.v1.json';
 import builtinResolutions from './profiles/builtin-resolutions.v1.json';
+import minimumFloor from './profiles/minimum.v1.json';
 import { Codes, PmsError, diagnostic } from '../protocol/diagnostics';
 
 // Browserslist is loaded on the first live resolution only: built-in profiles
@@ -495,8 +496,91 @@ function resolveQuery(ref, query, platform, errors, warnings, builtin) {
 }
 
 /** Splits a resolved list into engines and exclusions, with their findings. */
+// Orchestrator decision O13: the oldest engine release PandamStyle supports.
+export const MINIMUM_FLOOR = minimumFloor;
+
+let chromiumVersions = null;
+
+/**
+ * The Blink version of a downstream browser release (`samsung 29` -> 136),
+ * from the pinned baseline-browser-mapping, or null when it records none.
+ * Loaded only when a resolved list holds such a browser.
+ */
+function chromiumEquivalent(browser, version) {
+  const name = MINIMUM_FLOOR.chromiumEquivalents.browsers[browser];
+  if (name == null) return null;
+  if (chromiumVersions == null) {
+    // The copy Browserslist loads (the pinned data package).
+    const fromList = createRequire(
+      createRequire(import.meta.url).resolve('browserslist'),
+    );
+    chromiumVersions = new Map();
+    const releases = withoutOldDataWarning(() =>
+      fromList('baseline-browser-mapping').getAllVersions({
+        includeDownstreamBrowsers: true,
+        suppressWarnings: true,
+      }),
+    );
+    for (const release of releases) {
+      if (release.engine !== 'Blink' || release.engine_version == null)
+        continue;
+      chromiumVersions.set(
+        `${release.browser}|${Number.parseFloat(release.version)}`,
+        String(release.engine_version),
+      );
+    }
+  }
+  return (
+    chromiumVersions.get(`${name}|${Number.parseFloat(lowerBound(version))}`) ??
+    null
+  );
+}
+
+/** Refusals of a resolved list below the minimum floor (O13). */
+function belowMinimum(ref, query, engines, excluded) {
+  const out = [];
+  const refuse = (browser, version, minimum, extra = {}) =>
+    out.push(
+      targetDiagnostic(
+        Codes.INVALID_TARGET_CONFIG,
+        'targets.below-minimum',
+        `${ref} resolves to ${browser === 'electron' ? 'Electron at' : browser} ${browser === 'electron' ? `Chromium ${version}` : version}${extra.chromium == null || browser === 'electron' ? '' : ` (Chromium ${extra.chromium})`}, below PandamStyle's minimum ${minimum}: engines released before 2022 are not supported. Raise the query's floor.`,
+        { profile: ref, query, browser, version, minimum, ...extra },
+      ),
+    );
+  for (const target of engines) {
+    const minimum = MINIMUM_FLOOR.engines[target.engine];
+    if (minimum != null && compareVersions(target.floor, minimum) < 0) {
+      // An Electron target's versions are its Chromium versions.
+      if (target.engine === 'electron') {
+        refuse('electron', target.floor, `Chromium ${minimum}`, {
+          chromium: target.floor,
+        });
+      } else {
+        refuse(target.engine, target.floor, `${target.engine} ${minimum}`);
+      }
+    }
+  }
+  for (const entry of excluded) {
+    if (entry.disposition !== 'unannounced') continue;
+    const chromium = chromiumEquivalent(entry.browser, entry.version);
+    const minimum = MINIMUM_FLOOR.chromiumEquivalents.minimum;
+    if (chromium != null && compareVersions(chromium, minimum) < 0) {
+      refuse(entry.browser, entry.version, `Chromium ${minimum}`, {
+        chromium,
+      });
+    }
+  }
+  return out;
+}
+
 function resolvedList(ref, query, list, platform, errors, warnings) {
   const { engines, excluded } = enginesOf(list, platform);
+  const refused = belowMinimum(ref, query, engines, excluded);
+  if (refused.length > 0) {
+    errors.push(...refused);
+    return null;
+  }
   if (excluded.length > 0) {
     warnings.push(
       targetDiagnostic(

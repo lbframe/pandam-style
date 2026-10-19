@@ -2413,9 +2413,9 @@ reviewedOverrides:
       - path: packages/compiler/types/index.d.ts
         sha256: 253aadaa8ebf44660b179556801c8f09d6a34e00474395eff9e765ea4f6448a3
       - path: packages/compiler/src/targets/project.js
-        sha256: 8555f399b0c6eef6def6c9995719f84c976c97a8a41bfd7b61015c13db3a827c
+        sha256: accc93af63f58be35b2687c2989fd9b59d86897e114e12608d6bdbd73c9a2885
       - path: packages/compiler/src/targets/evaluate.js
-        sha256: 8e63eabbb84d04dd6a3c5ce589657cb6d6439c4a3cc502a4ed56b312346c1fba
+        sha256: 763ead8f31dcf8845035c0ff74c0e4e643a83a82efe4f3b946e55a4fff1ecd12
       - path: packages/compiler/__tests__/pandamstyle/targets-project-test.js
         sha256: a62273e5dbf2b4f210bf1e7c9edafcb3f05100bdb82f4a7976645fc0d616b6c5
   - fact: requirement-satisfaction
@@ -2811,7 +2811,7 @@ normativeCoverage:
     reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."
   - path: docs/agent-migration.md
     section: browser-targets-ce-011-behavior-change
-    sha256: f0ebb9960bc83d1e15c653a19a6a04560980e883c5134c9fba35c08b9efb4838
+    sha256: c8f935038de2addb3b7c7df929dc1600baa9faebeb6ea0b8bed2939afd3d4863
     disposition: no-implementation-obligation
     reason: "Tells the migrating agent how to record target findings and forbids changing targets or enhancements to alter a migration result; the compiler behavior it summarizes is the compiler-api diagnostics requirement."
     reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."

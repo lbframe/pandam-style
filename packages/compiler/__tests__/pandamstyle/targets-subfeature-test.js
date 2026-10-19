@@ -11,10 +11,13 @@
  * CE-01.1 (#44) AC2: a construct is never reported native from its parent's
  * statement when BCD records the way it is written as a subfeature.
  *
- * The guard is derived from the bundled data: every BCD subfeature of a path
- * an emitted construct is evaluated on is either extracted as its own feature
- * key (executed here on example CSS), reviewed as not expressible in CSS text,
- * or fail-closed. A subfeature added by a data update fails until classified.
+ * The guard is derived from the bundled data. Every BCD subfeature of a path
+ * an emitted construct is evaluated on, and every `css.types.*` path a value
+ * can reach, is either extracted as its own feature key (executed here on
+ * example CSS), native on every engine at the minimum floor (decision O13,
+ * derived from the data), or reviewed (`not-css-syntax`,
+ * `base-form-unaffected`). A path added by a data update fails until it is
+ * classified.
  */
 
 const fs = require('fs');
@@ -50,6 +53,37 @@ const NOT_PSEUDO = new Set([
   'namespace',
 ]);
 const NOT_FUNCTION = new Set(['named-color', 'system-color']);
+// The `css.types.<name>` nodes, split by BCD's description: a function is
+// called (`abs()`), a value type is not (`<number>`). A node in neither list
+// fails the guard until it is classified.
+const FUNCTION_TYPES = new Set(
+  (
+    '-moz-image-rect abs acos anchor anchor-size asin atan atan2 attr calc ' +
+    'calc-size clamp cos counter counters dynamic-range-limit-mix env exp ' +
+    'hypot if log max min mod param pow progress random random-item ray rem ' +
+    'round sibling-count sibling-index sign sin sqrt superellipse tan type ' +
+    'url var'
+  ).split(' '),
+);
+const VALUE_TYPES = new Set(
+  (
+    'angle angle-percentage basic-shape blend-mode calc-keyword color ' +
+    'corner-shape-value dashed-function dimension easing-function ' +
+    'filter-function flex global_keywords gradient image integer length ' +
+    'length-percentage line-style line-width number overflow percentage ' +
+    'position ratio resolution shape string text-edge time ' +
+    'timeline-range-name transform-function'
+  ).split(' '),
+);
+// Value types whose keywords the catalog reads where a property takes them.
+const TYPE_KEYWORD_PROPERTY = {
+  'color.named-color': 'color',
+  'color.system-color': 'color',
+  overflow: 'overflow-block',
+  'text-edge': 'text-box-edge',
+  'corner-shape-value': 'corner-shape',
+  'timeline-range-name': 'animation-range',
+};
 const IDENT = /^-?[A-Za-z][A-Za-z0-9-]*$/;
 const UNITS = (
   'px cm mm in pt pc q em rem ex rex ch rch cap rcap ic ric lh rlh vw vh vi ' +
@@ -280,6 +314,16 @@ const FORMS = [
   ...['color-colrv0', 'color-svg', 'color-sbix', 'color-cbdt'].map(
     (tech) => `@font-face{src:url(a) tech(${tech})}`,
   ),
+  '.x{width:attr(ns|data-x)}',
+  '@function --f(){result:1px}',
+  '@container anchored(fallback: --a){.x{color:red}}',
+  '.x{width:if(style(--x > 1): 1px)}',
+  '.x{d:path("M0 0")}',
+  '@keyframes k{from{top:anchor(--a top);left:anchor-size(width)}}',
+  '.x{margin-top:anchor-size(width)}',
+  '.x{aspect-ratio:1.5}',
+  '.x{corner-shape:superellipse(2)}',
+  '@keyframes k{scroll 0%{color:red}}',
 ];
 
 /** Example CSS for every family, generated from the bundled paths. */
@@ -317,17 +361,71 @@ function examples() {
         `@${a}{${b}:x}`,
         `@${a} x{${b}:x}`,
       );
-    } else if (
-      top === 'types' &&
-      depth >= 4 &&
-      Object.hasOwn(FAMILY_PROPERTY, a) &&
-      IDENT.test(b) &&
-      !NOT_FUNCTION.has(b)
-    ) {
-      out.push(`.x{${FAMILY_PROPERTY[a]}:${b}(1px)}`);
+    } else if (top === 'types') {
+      const leaf = key.split('.').at(-1);
+      const typeNode = key.split('.').slice(2, -1).join('.');
+      // A custom property reads functions on their type node; a property may
+      // record its own (`width: anchor-size()`).
+      if (depth === 3 && FUNCTION_TYPES.has(a)) {
+        out.push(`.x{width:${a}(1px)}`, `.x{--x:${a}(1px)}`);
+      }
+      if (
+        depth >= 4 &&
+        Object.hasOwn(FAMILY_PROPERTY, a) &&
+        IDENT.test(b) &&
+        !NOT_FUNCTION.has(b)
+      ) {
+        out.push(`.x{${FAMILY_PROPERTY[a]}:${b}(1px)}`, `.x{--x:${b}(1px)}`);
+      }
+      if (Object.hasOwn(TYPE_KEYWORD_PROPERTY, typeNode)) {
+        out.push(`.x{${TYPE_KEYWORD_PROPERTY[typeNode]}:${leaf}}`);
+      }
+      if (typeNode === 'calc-keyword')
+        out.push(`.x{width:calc(${leaf} * 1px)}`);
+      if (typeNode === 'global_keywords') out.push(`.x{color:${leaf}}`);
+      if (typeNode === 'attr.type_function') {
+        out.push(`.x{width:attr(data-x type(<${leaf}>))}`);
+      }
+      if (typeNode === 'url')
+        out.push(`.x{background-image:url("a" ${leaf}(x))}`);
     }
   }
   return out;
+}
+
+/** A profile at the minimum floor (decision O13): every engine at its floor. */
+const MINIMUM = (() => {
+  const names = {
+    chrome: 'chrome',
+    chrome_android: 'and_chr',
+    edge: 'edge',
+    firefox: 'firefox',
+    firefox_android: 'and_ff',
+    safari: 'safari',
+    safari_ios: 'ios_saf',
+    webview_android: 'android',
+  };
+  const query = Object.entries(names)
+    .map(
+      ([engine, name]) => `${name} >= ${targets.MINIMUM_FLOOR.engines[engine]}`,
+    )
+    .join(', ');
+  return targets.resolveTargets({
+    profiles: ['project:minimum'],
+    define: { minimum: { query } },
+  }).record;
+})();
+
+/** Whether the data marks `bcdPath` native on every engine at the floor. */
+function belowFloor(bcdPath) {
+  const record = Object.freeze({
+    feature: `probe:${bcdPath}`,
+    kind: 'value',
+    parent: null,
+    bcd: [{ path: bcdPath, match: null }],
+    recognized: true,
+  });
+  return targets.profileOutcomes(record, MINIMUM)[0].state === 'native';
 }
 
 /** Every BCD path some example construct is evaluated on. */
@@ -350,9 +448,45 @@ const reviewed = new Map(
 
 describe('every subfeature of an evaluated path is classified', () => {
   const reached = reachedPaths();
-  const subfeatures = Object.keys(DATA.paths).filter(
-    (p) => !reached.has(p) && reached.has(parentOf(p)),
-  );
+  // Subfeatures of evaluated paths, and every css.types path a value can
+  // reach (all but the value-type nodes themselves).
+  const universe = [
+    ...new Set([
+      ...Object.keys(DATA.paths).filter((p) => reached.has(parentOf(p))),
+      ...Object.keys(DATA.paths).filter(
+        (p) =>
+          p.startsWith('css.types.') &&
+          !(p.split('.').length === 3 && VALUE_TYPES.has(p.split('.')[2])),
+      ),
+    ]),
+  ].filter((p) => !reached.has(p));
+  const subfeatures = universe.filter((p) => !belowFloor(p));
+
+  test('every css.types node is classified as a function or a value type', () => {
+    const nodes = Object.keys(DATA.paths)
+      .filter((p) => /^css\.types\.[^.]+$/.test(p))
+      .map((p) => p.split('.')[2]);
+    expect(
+      nodes.filter((n) => FUNCTION_TYPES.has(n) === VALUE_TYPES.has(n)),
+    ).toEqual([]);
+    expect(
+      [...FUNCTION_TYPES, ...VALUE_TYPES].filter((n) => !nodes.includes(n)),
+    ).toEqual([]);
+  });
+
+  test('the minimum-floor profile resolves every engine at its floor', () => {
+    expect(
+      Object.fromEntries(
+        MINIMUM.profiles[0].engines.map((e) => [e.engine, e.floor]),
+      ),
+    ).toEqual(
+      Object.fromEntries(
+        Object.entries(targets.MINIMUM_FLOOR.engines).filter(
+          ([engine]) => engine !== 'electron',
+        ),
+      ),
+    );
+  });
 
   test('reviewed catalog shape', () => {
     expect(REVIEWS).toMatchObject({
@@ -363,32 +497,50 @@ describe('every subfeature of an evaluated path is classified', () => {
     const all = REVIEWS.reviews.flatMap((review) => review.paths);
     expect(new Set(all).size).toBe(all.length);
     for (const review of REVIEWS.reviews) {
-      expect(['not-css-syntax', 'fail-closed']).toContain(review.disposition);
+      expect(['not-css-syntax', 'base-form-unaffected']).toContain(
+        review.disposition,
+      );
       expect(review.rationale.length).toBeGreaterThan(40);
       expect(review.paths.length).toBeGreaterThan(0);
     }
   });
 
-  test('each unmapped subfeature is reviewed, and each review is of one', () => {
-    // A subfeature that no example reaches and no review lists is reported
-    // native from its parent: the class this guard exists for.
+  test('each unmapped subfeature above the floor is reviewed, and each review is of one', () => {
+    // A subfeature that no example reaches, that the floor does not make
+    // native and that no review lists is reported native from its parent:
+    // the class this guard exists for.
     expect(subfeatures.filter((p) => !reviewed.has(p))).toEqual([]);
-    // A review of a path that is mapped, absent or not a subfeature is stale.
+    // A review of a path that is mapped, native at the floor, absent or not
+    // in the universe is stale.
     expect(
       [...reviewed.keys()].filter((p) => !subfeatures.includes(p)),
     ).toEqual([]);
   });
 
-  test('a fail-closed review is applied to its parent path', () => {
-    for (const [p, disposition] of reviewed) {
-      expect(targets.failClosedSubfeatures(parentOf(p)).includes(p)).toBe(
-        disposition === 'fail-closed',
-      );
-    }
+  test('a construct is evaluated on its own statement, never its parent', () => {
+    // No outcome borrows a parent's statement: the fail-closed rule that
+    // made a parent unknown for any of its uses is gone.
+    expect(targets.REASONS).not.toContain('unresolved-subfeature');
   });
 });
 
 /** A one-engine project profile from a Browserslist query. */
+const TYPE_FUNCTION_TYPES = [
+  'angle',
+  'color',
+  'custom-ident',
+  'ident',
+  'image',
+  'integer',
+  'length',
+  'length-percentage',
+  'number',
+  'percentage',
+  'resolution',
+  'string',
+  'time',
+  'transform-function',
+];
 const profile = (query) =>
   targets.resolveTargets({
     profiles: ['project:t'],
@@ -398,43 +550,55 @@ const outcomeOf = (feature, resolution) =>
   targets.profileOutcomes(targets.featureByKey(feature), resolution)[0];
 
 describe('a syntax form is evaluated on its own statement, not its parent', () => {
-  // [css, form key, parent key, query where the parent is native and the
-  // form is not]. The first four are the reviewed false acceptances.
+  // [css, form key, parent key, query at or above the minimum floor where the
+  // parent is native and the form is not]. Reviewed false acceptances first.
   test.each([
     [
       '.x:nth-child(2 of .y){color:red}',
       'selector::nth-child/of-syntax',
       'selector::nth-child',
-      'chrome 100',
+      'chrome 105',
     ],
     [
       '.x:nth-last-child(2 of .y){color:red}',
       'selector::nth-last-child/of-syntax',
       'selector::nth-last-child',
-      'chrome 100',
-    ],
-    [
-      '.x{overflow:hidden auto}',
-      'property:overflow/multiple-keywords',
-      'property:overflow',
-      'chrome 60',
-    ],
-    [
-      '.x{color:rgb(1 2 3 / .5)}',
-      'function:rgb/space-separated-parameters',
-      'function:rgb',
-      'chrome 60',
-    ],
-    [
-      '.x{color:hsl(1 2% 3% / .5)}',
-      'function:hsl/space-separated-parameters',
-      'function:hsl',
-      'chrome 60',
+      'chrome 105',
     ],
     [
       '.x{color:color(display-p3-linear 1 0 0)}',
       'function:color/display-p3-linear',
       'function:color',
+      'chrome 120',
+    ],
+    [
+      '.x{width:calc(1px / 1px * 1px)}',
+      'function:calc/typed-division-produces-unitless-number',
+      'function:calc',
+      'chrome 120',
+    ],
+    [
+      '.x{width:calc(1px / (1px) * 1px)}',
+      'function:calc/typed-division-produces-unitless-number',
+      'function:calc',
+      'chrome 120',
+    ],
+    [
+      '.x{width:calc(1px / calc(1px) * 1px)}',
+      'function:calc/typed-division-produces-unitless-number',
+      'function:calc',
+      'chrome 120',
+    ],
+    [
+      '.x{width:calc(1px / (2px * 3) * 1px)}',
+      'function:calc/typed-division-produces-unitless-number',
+      'function:calc',
+      'chrome 120',
+    ],
+    [
+      '.x{width:calc(1px / min(1px, 2px) * 1px)}',
+      'function:calc/typed-division-produces-unitless-number',
+      'function:calc',
       'chrome 120',
     ],
     [
@@ -456,18 +620,6 @@ describe('a syntax form is evaluated on its own statement, not its parent', () =
       'chrome 125',
     ],
     [
-      '.x{transition-timing-function:steps(2, jump-end)}',
-      'function:steps/jump-end',
-      'function:steps',
-      'chrome 70',
-    ],
-    [
-      '.x{width:calc(1px / 1px * 1px)}',
-      'function:calc/typed-division-produces-unitless-number',
-      'function:calc',
-      'chrome 120',
-    ],
-    [
       '.x{background-image:linear-gradient(in oklch, red, blue)}',
       'function:linear-gradient/interpolation-color-space',
       'function:linear-gradient',
@@ -477,7 +629,7 @@ describe('a syntax form is evaluated on its own statement, not its parent', () =
       '.x{color:AccentColor}',
       'value:color/accentcolor',
       'property:color',
-      'safari 15',
+      'safari 15.4',
     ],
     [
       '.x::before::marker{color:red}',
@@ -489,7 +641,7 @@ describe('a syntax form is evaluated on its own statement, not its parent', () =
       '.x[a=b s]{color:red}',
       'selector:attribute/case-sensitive-modifier',
       'selector:attribute',
-      'firefox 60',
+      'chrome 120',
     ],
     [
       '.x{display:none;transition:display 1s}',
@@ -501,7 +653,7 @@ describe('a syntax form is evaluated on its own statement, not its parent', () =
       '@media (min-width: calc(1px + 1em)){.x{color:red}}',
       'media:media_query_values',
       'at-rule:media',
-      'chrome 60',
+      'safari 15.4',
     ],
     [
       '@media (display-mode: picture-in-picture){.x{color:red}}',
@@ -527,14 +679,34 @@ describe('a syntax form is evaluated on its own statement, not its parent', () =
     const record = targets.featureByKey(form);
     expect(record.parent).toBe(parent);
     expect(record.bcd).toHaveLength(1);
-    expect(
-      record.bcd[0].path.startsWith(`${parentOf(record.bcd[0].path)}.`),
-    ).toBe(true);
     const resolution = profile(query);
     expect(outcomeOf(parent, resolution).state).toBe('native');
     expect(['incompatible', 'unknown']).toContain(
       outcomeOf(form, resolution).state,
     );
+  });
+
+  test('a unitless compound denominator is not typed division', () => {
+    for (const value of [
+      'calc(1px / (2 * 3))',
+      'calc(1px / calc(2))',
+      'calc(1px / 2)',
+      'calc(1px / pi)',
+      'calc(100% / var(--n))',
+    ]) {
+      const forms = targets
+        .featuresOfCss(`.x{width:${value}}`)
+        .map((e) => e.record.feature)
+        .filter((feature) => feature.includes('typed-division'));
+      expect({ value, forms }).toEqual({ value, forms: [] });
+    }
+    // A division inside sign() is sign()'s own subfeature.
+    expect(
+      targets
+        .featuresOfCss('.x{width:calc(1px * sign(1px / 1px))}')
+        .map((e) => e.record.feature)
+        .filter((feature) => feature.includes('typed-division')),
+    ).toEqual(['function:sign/typed-division-produces-unitless-number']);
   });
 
   test('the base forms add no subfeature key', () => {
@@ -577,55 +749,282 @@ describe('a syntax form is evaluated on its own statement, not its parent', () =
   });
 });
 
-describe('fail-closed subfeatures', () => {
-  test('the construct is unknown where the subfeature is not native, native elsewhere', () => {
-    // `content` is native from Chrome 1; its content-replacement form, which
-    // the extractor does not detect, from Chrome 28.
-    expect(targets.failClosedSubfeatures('css.properties.content')).toContain(
-      'css.properties.content.content_replacement',
-    );
-    const before = outcomeOf('property:content', profile('chrome 20'));
-    expect(before).toMatchObject({
-      state: 'unknown',
-      engines: [
-        expect.objectContaining({
-          state: 'unknown',
-          reason: 'unresolved-subfeature',
-          path: 'css.properties.content.content_replacement',
-        }),
+// Every subfeature that had been fail-closed is extracted now. Base form next
+// to variant: [base css, base key, variant css, variant key, query]. The base
+// is native at the query, the variant is not.
+const BASE_AND_VARIANT = [
+  [
+    '.x{width:attr(data-x)}',
+    'function:attr',
+    '.x{width:attr(ns|data-x)}',
+    'function:attr/attr-name-accepts-namespaces',
+    'firefox 150',
+  ],
+  [
+    '.x{width:attr(data-x)}',
+    'function:attr',
+    '.x{width:attr(data-x, 1px)}',
+    'function:attr/declaration-value',
+    'chrome 130',
+  ],
+  ...TYPE_FUNCTION_TYPES.map((name) => [
+    '.x{width:attr(data-x)}',
+    'function:attr',
+    `.x{width:attr(data-x type(<${name}>))}`,
+    `function:attr/type()/${name}`,
+    'chrome 130',
+  ]),
+  [
+    '.x{width:if(style(--x: 1): 1px)}',
+    'function:if/style()',
+    '.x{width:if(style(--x > 1): 1px)}',
+    'function:if/style()/range-syntax',
+    'chrome 140',
+  ],
+  [
+    '.x{offset-path:path("M0 0")}',
+    'function:path',
+    '.x{d:path("M0 0")}',
+    'function:path/in-d',
+    'safari 18.2',
+  ],
+  [
+    '.x{top:anchor(--a top)}',
+    'value:top/anchor()',
+    '@keyframes k{from{top:anchor(--a top)}}',
+    'value:top/anchor()/anchor-animated',
+    'firefox 147',
+  ],
+  [
+    '.x{top:anchor(--a top)}',
+    'value:top/anchor()',
+    '.x{top:anchor(--a top);transition:top 1s}',
+    'value:top/anchor()/anchor-animated',
+    'firefox 147',
+  ],
+  [
+    '.x{width:anchor-size(width)}',
+    'value:width/anchor-size()',
+    '@keyframes k{from{top:anchor-size(width)}}',
+    'value:top/anchor-size()/anchor-size-animated',
+    'firefox 147',
+  ],
+  [
+    '.x{width:anchor-size(width)}',
+    'value:width/anchor-size()',
+    '.x{margin-top:anchor-size(width)}',
+    'value:margin-top/anchor-size()/anchor-size-inset-margin',
+    'chrome 130',
+  ],
+];
+
+describe('former fail-closed subfeatures: base form native, variant not', () => {
+  test.each(BASE_AND_VARIANT)(
+    '%s / %s',
+    (baseCss, baseKey, variantCss, variantKey, query) => {
+      const resolution = profile(query);
+      const base = targets.featuresOfCss(baseCss).map((e) => e.record.feature);
+      expect(base).toContain(baseKey);
+      expect(base).not.toContain(variantKey);
+      expect(outcomeOf(baseKey, resolution).state).toBe('native');
+      const variant = targets
+        .featuresOfCss(variantCss)
+        .map((e) => e.record.feature);
+      expect(variant).toContain(variantKey);
+      expect(['incompatible', 'unknown']).toContain(
+        outcomeOf(variantKey, resolution).state,
+      );
+    },
+  );
+
+  test('a variant whose data equals its construct is extracted on its own path', () => {
+    // `@function` `result` and `anchored(fallback: …)` any value record the
+    // same support as their construct on every engine: no profile separates
+    // them, so each is mapped to its own statement and agrees with it.
+    for (const [css, parentKey, key, bcdPath] of [
+      [
+        '@function --f(){result:1px}',
+        'at-rule:function',
+        'at-rule:function/result',
+        'css.at-rules.function.result',
       ],
+      [
+        '@container anchored(fallback: --a){.x{color:red}}',
+        'at-rule:container/anchored/fallback',
+        'at-rule:container/anchored/fallback/any-value',
+        'css.at-rules.container.anchor_position_queries.fallback.any_value',
+      ],
+    ]) {
+      const records = targets.featuresOfCss(css).map((e) => e.record);
+      const record = records.find((r) => r.feature === key);
+      expect(record.bcd).toEqual([{ path: bcdPath, match: null }]);
+      for (const query of ['chrome 120', 'chrome 150', 'safari 26.2']) {
+        expect(outcomeOf(key, profile(query)).state).toBe(
+          outcomeOf(parentKey, profile(query)).state,
+        );
+      }
+    }
+  });
+});
+
+describe('the minimum floor makes old syntax native by construction', () => {
+  test('a query below the floor is refused, and these forms are native at it', () => {
+    for (const query of ['safari 9.1', 'chrome 26', 'chrome 20']) {
+      let error = null;
+      try {
+        profile(query);
+      } catch (e) {
+        error = e;
+      }
+      expect(error.diagnostics.map((d) => d.rule)).toContain(
+        'targets.below-minimum',
+      );
+    }
+    for (const bcdPath of [
+      // R2.1: scientific notation (Safari 10.1).
+      'css.types.number.scientific_notation',
+      'css.types.calc.number_values',
+      'css.properties.content.content_replacement',
+      'css.selectors.is.forgiving_selector_list',
+      'css.selectors.where.forgiving_selector_list',
+      'css.properties.overflow.multiple_keywords',
+      'css.types.color.rgb.space_separated_parameters',
+      'css.types.color.hsl.space_separated_parameters',
+      'css.types.easing-function.steps.jump',
+    ]) {
+      expect([bcdPath, belowFloor(bcdPath)]).toEqual([bcdPath, true]);
+    }
+  });
+
+  test("the reviewer's base forms are native at their profiles", () => {
+    for (const [css, query] of [
+      ['.x{content:attr(title)}', 'chrome 120, safari 18.2'],
+      ['.x{font-family:attr(data-font)}', 'chrome 152'],
+      ['.x{width:calc(100% - 1px)}', 'chrome 100'],
+      ['.x::before{content:"hello"}', 'chrome 100'],
+      ['.x{line-height:1e-1}', 'safari 15.4'],
+    ]) {
+      const resolution = profile(query);
+      for (const { record } of targets.featuresOfCss(css)) {
+        expect([
+          css,
+          record.feature,
+          targets.profileOutcomes(record, resolution)[0].state,
+        ]).toEqual([css, record.feature, 'native']);
+      }
+    }
+  });
+});
+
+describe('keywords are read in their consuming grammar', () => {
+  const keywordKeys = (css, grammars) =>
+    targets
+      .featuresOfCss(css, grammars)
+      .map((e) => e.record.feature)
+      .filter((feature) =>
+        /\/(mark|marktext|accentcolor|accentcolortext|overlay|bevel|cap)$/.test(
+          feature,
+        ),
+      );
+
+  test('a color keyword is a system color only where a color is taken', () => {
+    for (const keyword of [
+      'Mark',
+      'MarkText',
+      'AccentColor',
+      'AccentColorText',
+    ]) {
+      const k = keyword.toLowerCase();
+      expect(keywordKeys(`.x{color:${keyword}}`)).toEqual([`value:color/${k}`]);
+      expect(keywordKeys(`.x{border:1px solid ${keyword}}`)).toEqual([
+        `value:border/${k}`,
+      ]);
+      expect(
+        keywordKeys(`.x{background-image:linear-gradient(${keyword}, red)}`),
+      ).toEqual([`value:background-image/${k}`]);
+      for (const property of ['font-family', 'grid-area', 'animation-name']) {
+        expect(keywordKeys(`.x{${property}:${keyword}}`)).toEqual([]);
+      }
+      // A custom property: its token category decides, and an unknown
+      // consumer infers nothing.
+      expect(keywordKeys(`.x{--a:${keyword}}`)).toEqual([]);
+      expect(
+        keywordKeys(`.x{--a:${keyword}}`, new Map([['--a', 'color']])),
+      ).toEqual([`value:--a/${k}`]);
+    }
+  });
+
+  test('every type keyword family is scoped to its consumers', () => {
+    expect(keywordKeys('.x{overflow:overlay}')).toEqual([
+      'value:overflow/overlay',
+    ]);
+    expect(keywordKeys('.x{width:overlay}')).toEqual([]);
+    expect(keywordKeys('.x{corner-shape:bevel}')).toEqual([
+      'value:corner-shape/bevel',
+    ]);
+    expect(keywordKeys('.x{grid-area:bevel}')).toEqual([]);
+    expect(keywordKeys('.x{text-box-edge:cap}')).toEqual([
+      'value:text-box-edge/cap',
+    ]);
+    expect(keywordKeys('.x{font-family:cap}')).toEqual([]);
+  });
+
+  test('design-system tokens: a color token is read as a color, a font family is not', () => {
+    const ds =
+      targets &&
+      loadCompiler().buildDesignSystem({
+        systemId: 'grammar@1',
+        tokens: {
+          colors: { c: { value: 'Mark', visibility: 'public' } },
+          shadows: { s: { value: '0 0 1px Mark', visibility: 'public' } },
+          fontFamilies: { f: { value: 'Mark', visibility: 'public' } },
+        },
+        recipes: {
+          r: { base: { fontFamily: loadCompiler().token('fontFamilies.f') } },
+        },
+      });
+    const evaluation = targets.evaluateProjectTargets({
+      resolution: targets.resolveTargets(null).record,
+      designSystem: ds,
+      designSystemRules: [],
+      pages: [],
     });
-    expect(outcomeOf('property:content', profile('chrome 40')).state).toBe(
-      'native',
+    const marks = evaluation.facts.features
+      .map((f) => f.feature)
+      .filter((feature) => feature.endsWith('/mark'));
+    const vars = ds.varsByToken;
+    const name = (token) => /var\((--[^)]+)\)/.exec(vars[token])[1];
+    expect(marks.sort()).toEqual(
+      [
+        `value:${name('colors.c')}/mark`,
+        `value:${name('shadows.s')}/mark`,
+      ].sort(),
     );
   });
 });
 
 describe('enhancement policies cover the forms of their construct', () => {
   test('a policy on a construct applies to its forms only', () => {
-    const resolution = profile('chrome 60');
+    const resolution = profile('chrome 110');
     const evaluate = (enhancements) =>
       targets.evaluateTargets({
         resolution,
         sources: [
           {
             owner: { role: 'design-system', file: null, label: 'ds' },
-            css: '.x{overflow:hidden auto;display:inline flex}',
+            css: '.x{width:calc(1px / 1px * 1px);display:inline flex}',
           },
         ],
         enhancements,
       });
     const failing = (result) => result.errors.map((d) => d.context.feature);
-    expect(failing(evaluate([]))).toEqual(
-      expect.arrayContaining(['property:overflow/multiple-keywords']),
-    );
+    const form = 'function:calc/typed-division-produces-unitless-number';
+    expect(failing(evaluate([]))).toEqual(expect.arrayContaining([form]));
     const covered = evaluate([
-      { feature: 'property:overflow', fallback: { kind: 'degrade' } },
+      { feature: 'function:calc', fallback: { kind: 'degrade' } },
       { feature: 'property:display', fallback: { kind: 'degrade' } },
     ]);
-    expect(failing(covered)).not.toContain(
-      'property:overflow/multiple-keywords',
-    );
+    expect(failing(covered)).not.toContain(form);
     // `value:display/…` keys are keyword values, not forms of the property.
     expect(failing(covered)).toEqual(
       expect.arrayContaining(['value:display/multi-keyword']),

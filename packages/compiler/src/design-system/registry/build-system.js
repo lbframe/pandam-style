@@ -29,6 +29,7 @@ import {
   supportedProperties,
 } from '../policy/properties';
 import { designSystemTargetFacts, unitSummary } from '../../targets/evaluate';
+import { tokenGrammars } from '../../targets/catalog';
 import { PmsError } from '../../protocol/diagnostics';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, phase as perfPhase } from '../../observability/metrics';
@@ -128,7 +129,7 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
           designSystemTargetFacts({
             resolution: targets,
             summary: unitSummary(injected, () =>
-              designSystemTargetSources(injected),
+              designSystemTargetSources(injected, varsByToken),
             ),
             enhancements: registry.enhancements,
           }),
@@ -165,8 +166,13 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
   };
 }
 
-/** The design system's own rules as target-evaluation sources. */
-export function designSystemTargetSources(injected) {
+/**
+ * The design system's own rules as target-evaluation sources. Each carries
+ * the value grammar of the token custom properties it may declare (from the
+ * token's category), so a token keyword is read where it is consumed.
+ */
+export function designSystemTargetSources(injected, varsByToken = null) {
+  const grammars = tokenGrammars(varsByToken);
   const sources = [];
   for (const key of Object.keys(injected)) {
     const { ltr, rtl } = injected[key];
@@ -177,8 +183,8 @@ export function designSystemTargetSources(injected) {
       column: null,
       label: 'design-system',
     };
-    if (typeof ltr === 'string') sources.push({ owner, css: ltr });
-    if (typeof rtl === 'string') sources.push({ owner, css: rtl });
+    if (typeof ltr === 'string') sources.push({ owner, css: ltr, grammars });
+    if (typeof rtl === 'string') sources.push({ owner, css: rtl, grammars });
   }
   return sources;
 }

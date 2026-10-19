@@ -254,6 +254,11 @@
       "id": "CE-01.1-O12",
       "subject": "simulator evidence",
       "decision": "iOS Simulator evidence is labelled executed-simulator; Playwright WebKit never counts as Safari evidence."
+    },
+    {
+      "id": "CE-01.1-O13",
+      "subject": "minimum target floor",
+      "decision": "PandamStyle does not support pre-2022 engines. A resolved target below Chrome/Edge/Firefox 100 (and_chr and and_ff likewise), Safari/iOS Safari 15.4, Android WebView 100, or an Electron or Chromium-based browser (via the pinned baseline-browser-mapping Blink version) below Chromium 100 is refused with PMS_INVALID_TARGET_CONFIG (targets.below-minimum). The floors live in packages/compiler/src/targets/profiles/minimum.v1.json. A subfeature the pinned data marks native on every engine at the floor is classified below-floor by the data-derived guard (targets-subfeature-test.js), never by hand review. The default and built-in profiles are above the floor and unchanged."
     }
   ],
   "deferrals": [

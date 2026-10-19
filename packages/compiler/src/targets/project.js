@@ -90,7 +90,7 @@ export function evaluateProjectTargets({
     designSystem.injected ??
     Object.fromEntries(designSystemRules.map(([key, rule]) => [key, rule]));
   const designSystemSummary = unitSummary(injected, () =>
-    designSystemTargetSources(injected),
+    designSystemTargetSources(injected, designSystem.varsByToken ?? null),
   );
   const units = [
     [

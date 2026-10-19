@@ -312,17 +312,25 @@ describe('required capabilities and enhancements', () => {
     );
     expect(keys(ladder)).not.toContain('at-rule:layer/block');
     expect(keys(ladder)).toContain('selector::not');
-    // Below layer support the layered emission fails the profile.
-    const old = targets.resolveTargets({
-      profiles: ['project:old'],
-      define: { old: { query: 'chrome 90' } },
+    // Every engine at or above the minimum floor (O13) has layers: a profile
+    // below layer support is refused before any evaluation.
+    expect(() =>
+      targets.resolveTargets({
+        profiles: ['project:old'],
+        define: { old: { query: 'chrome 90' } },
+      }),
+    ).toThrow(/below PandamStyle's minimum/);
+    const minimum = targets.resolveTargets({
+      profiles: ['project:minimum'],
+      define: { minimum: { query: 'chrome 100, firefox 100, safari 15.4' } },
     }).record;
-    const below = targets.evaluateTargets({
-      resolution: old,
+    const atFloor = targets.evaluateTargets({
+      resolution: minimum,
       sources: [],
       intrinsic: { useCSSLayers: true },
     });
-    expect(below.errors.map((e) => e.context.feature)).toEqual(
+    expect(atFloor.errors).toEqual([]);
+    expect(keys(atFloor)).toEqual(
       expect.arrayContaining([
         'at-rule:layer/block',
         'at-rule:layer/statement',

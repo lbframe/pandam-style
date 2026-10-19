@@ -23,11 +23,11 @@ export {
   caveatDisposition,
   featureByKey,
   featuresOf,
-  failClosedSubfeatures,
   inapplicability,
   inapplicableCatalog,
   subfeatureCatalog,
   subfeaturePath,
+  tokenGrammars,
 } from './catalog';
 export {
   BASES,
@@ -46,6 +46,7 @@ export {
   BUILTIN_PROFILE_REFS,
   DATA_PINS,
   DEFAULT_PROFILE_REF,
+  MINIMUM_FLOOR,
   RESOLUTION_KIND,
   RESOLUTION_SCHEMA_VERSION,
   dataPackages,

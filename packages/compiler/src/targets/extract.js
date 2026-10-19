@@ -26,6 +26,7 @@ const GLOBAL_KEYWORDS = new Set([
   'unset',
   'revert',
   'revert-layer',
+  'revert-rule',
 ]);
 
 // At-rules whose block holds rules, declarations or keyframes.
@@ -99,6 +100,9 @@ function trimRange(tokens, [start, end]) {
 // a token range is the source between the first token's start and the last
 // token's end.
 let source = '';
+// The value grammar of custom properties whose consumer is known (a
+// design-system token's category), for the text being extracted.
+let grammarOf = null;
 
 function text(tokens, start, end) {
   if (start >= end) return '';
@@ -368,6 +372,7 @@ const FORM_FUNCTIONS = new Set([
   'color-mix',
   'light-dark',
   'attr',
+  'if',
   ...GRADIENTS,
   ...MATH_FUNCTIONS,
 ]);
@@ -390,6 +395,7 @@ const FORM_PROPERTIES = new Set([
   'font',
   'transition-property',
   'transition',
+  'aspect-ratio',
   ...ALIGNMENT_PROPERTIES,
   ...CORNER_RADII,
 ]);
@@ -454,6 +460,154 @@ function isLengthLike(tokens, part) {
     type(token) === 'percentage-token' ||
     (type(token) === 'number-token' && token[4].value === 0)
   );
+}
+
+const TYPED_DIVISION = 'typed-division-produces-unitless-number';
+// Math functions whose result is a `<number>` whatever their arguments.
+const NUMBER_RESULT = new Set([
+  'sign',
+  'sin',
+  'cos',
+  'tan',
+  'pow',
+  'sqrt',
+  'exp',
+  'log',
+  'progress',
+]);
+// ... or an `<angle>`.
+const ANGLE_RESULT = new Set(['asin', 'acos', 'atan', 'atan2']);
+const MATH_CONSTANTS = new Set(['e', 'pi', 'infinity', '-infinity', 'nan']);
+
+// The type of a math expression: `number`, `typed` (a dimension or a
+// percentage, whatever its unit) or `unknown` (a `var()`, an unrecognized
+// function or keyword).
+const combineProduct = (a, b) =>
+  a === 'unknown' || b === 'unknown'
+    ? 'unknown'
+    : a === 'typed' || b === 'typed'
+      ? 'typed'
+      : 'number';
+// A sum has its operands' type.
+const combineSum = combineProduct;
+// typed / typed is a number; a typed operand otherwise keeps a type.
+const combineQuotient = (a, b) =>
+  a === 'typed' && b === 'typed' ? 'number' : combineProduct(a, b);
+
+/**
+ * Type of one factor at `[start, end)` (a single component), and whether a
+ * typed division appears inside it at this function's own level (in a
+ * parenthesized group; a nested math function reports its own divisions).
+ */
+function factorType(tokens, [s, e]) {
+  const token = tokens[s];
+  const t = type(token);
+  if (e - s === 1) {
+    if (t === 'number-token') return { type: 'number', typedDivision: false };
+    if (t === 'dimension-token' || t === 'percentage-token') {
+      return { type: 'typed', typedDivision: false };
+    }
+    if (t === 'ident-token' && MATH_CONSTANTS.has(lower(token))) {
+      return { type: 'number', typedDivision: false };
+    }
+    return { type: 'unknown', typedDivision: false };
+  }
+  if (t === '(-token') return expressionType(tokens, s + 1, e - 1);
+  if (t === 'function-token') {
+    const name = lower(token);
+    if (NUMBER_RESULT.has(name))
+      return { type: 'number', typedDivision: false };
+    if (ANGLE_RESULT.has(name)) return { type: 'typed', typedDivision: false };
+    if (MATH_FUNCTIONS.has(name)) {
+      // calc(), min(), max(), clamp(), round(), mod(), rem(), abs(),
+      // hypot(): the type of their arguments.
+      return {
+        type: mathArguments(tokens, s + 1, e - 1).type,
+        typedDivision: false,
+      };
+    }
+  }
+  return { type: 'unknown', typedDivision: false };
+}
+
+/** Type of a sum of products at `[start, end)`. */
+function expressionType(tokens, start, end) {
+  let sum = null;
+  let product = null;
+  let operator = null;
+  let typedDivision = false;
+  for (const part of components(tokens, start, end)) {
+    const delim = single(tokens, part);
+    const char =
+      delim != null && type(delim) === 'delim-token' ? value(delim) : null;
+    if (char === '+' || char === '-') {
+      if (product != null)
+        sum = sum == null ? product : combineSum(sum, product);
+      product = null;
+      continue;
+    }
+    if (char === '*' || char === '/') {
+      operator = char;
+      continue;
+    }
+    const factor = factorType(tokens, part);
+    typedDivision ||= factor.typedDivision;
+    if (product == null) {
+      product = factor.type;
+    } else if (operator === '/') {
+      // A denominator with a type (`/ 1px`, `/ (1px)`, `/ calc(1px)`):
+      // typed arithmetic.
+      if (factor.type === 'typed') typedDivision = true;
+      product = combineQuotient(product, factor.type);
+    } else {
+      product = combineProduct(product, factor.type);
+    }
+    operator = null;
+  }
+  if (product != null) sum = sum == null ? product : combineSum(sum, product);
+  return { type: sum ?? 'unknown', typedDivision };
+}
+
+/** Type of a math function's arguments and whether one divides by a type. */
+function mathArguments(tokens, start, end) {
+  let result = null;
+  let typedDivision = false;
+  for (const [s, e] of commaItems(tokens, start, end)) {
+    const item = expressionType(tokens, s, e);
+    typedDivision ||= item.typedDivision;
+    if (result == null || result === 'unknown') result = item.type;
+  }
+  return { type: result ?? 'unknown', typedDivision };
+}
+
+// Properties an anchor() / anchor-size() value can set: insets and margins.
+const INSET_PROPERTY =
+  /^(inset(-(block|inline)(-(start|end))?)?|top|right|bottom|left)$/;
+const MARGIN_PROPERTY =
+  /^margin(-(top|right|bottom|left|block|inline)(-(start|end))?)?$/;
+
+/**
+ * Forms of an `anchor()` / `anchor-size()` use: an anchor size in an inset
+ * or margin, and an anchored inset animated by the keyframes it is set in
+ * (a transition of the same rule is read by analyseDeclarations).
+ */
+function anchorForms(name, property, out, context) {
+  const add = (suffix) =>
+    out.add({ kind: 'form', of: 'function', property, name, suffix }, context);
+  if (
+    name === 'anchor-size' &&
+    (INSET_PROPERTY.test(property) || MARGIN_PROPERTY.test(property))
+  ) {
+    add('anchor-size-inset-margin');
+  }
+  if (
+    INSET_PROPERTY.test(property) &&
+    (context.atRules ?? []).some(
+      (a) => a.name === 'keyframes' || a.name.endsWith('-keyframes'),
+    )
+  ) {
+    add(`${name}-animated`);
+  }
 }
 
 /** Syntax forms of the arguments `[start, end)` of function `name`. */
@@ -568,19 +722,60 @@ function functionForms(name, tokens, start, end) {
     return forms;
   }
   if (name === 'attr') {
-    if (items.length > 1) forms.push('fallback');
+    // `attr(<attr-name> <attr-type>?, <declaration-value>?)`: a fallback is a
+    // declaration value; a namespace prefix is `ns|name`; a typed attribute
+    // names its syntax in `type(<length>)`.
+    if (items.length > 1) forms.push('fallback', 'declaration-value');
+    const [nameStart, nameEnd] = items[0] ?? [start, start];
+    if (
+      components(tokens, nameStart, nameEnd).some((part) =>
+        isDelim(single(tokens, part), '|'),
+      )
+    ) {
+      forms.push('attr-name-accepts-namespaces');
+    }
+    for (let i = nameStart; i < nameEnd; i += 1) {
+      if (type(tokens[i]) !== 'function-token' || lower(tokens[i]) !== 'type') {
+        continue;
+      }
+      const close = matching(tokens, i);
+      for (let j = i + 1; j + 2 <= close; j += 1) {
+        if (
+          isDelim(tokens[j], '<') &&
+          type(tokens[j + 1]) === 'ident-token' &&
+          isDelim(tokens[j + 2], '>')
+        ) {
+          forms.push(`type()/${lower(tokens[j + 1])}`);
+        }
+      }
+      i = close;
+    }
+    return forms;
+  }
+  if (name === 'if') {
+    // A range comparison in a style() query of if().
+    for (let i = start; i < end; i += 1) {
+      if (
+        type(tokens[i]) !== 'function-token' ||
+        lower(tokens[i]) !== 'style'
+      ) {
+        continue;
+      }
+      const close = matching(tokens, i);
+      if (
+        tokens
+          .slice(i + 1, close)
+          .some((token) => ['<', '>', '='].some((char) => isDelim(token, char)))
+      ) {
+        forms.push('style()/range-syntax');
+      }
+      i = close;
+    }
     return forms;
   }
   if (MATH_FUNCTIONS.has(name)) {
-    for (let i = start; i < end; i += 1) {
-      if (!isDelim(tokens[i], '/')) continue;
-      let j = i + 1;
-      while (j < end && isWs(tokens[j])) j += 1;
-      const t = j < end ? type(tokens[j]) : null;
-      if (t === 'dimension-token' || t === 'percentage-token') {
-        forms.push('typed-division-produces-unitless-number');
-        break;
-      }
+    if (mathArguments(tokens, start, end).typedDivision) {
+      forms.push(TYPED_DIVISION);
     }
     if (name === 'mod' || name === 'rem' || name === 'round') {
       const leaves = tokens.slice(start, end).map(type);
@@ -700,6 +895,18 @@ function valueForms(property, tokens, start, end, out, context) {
     case 'clip-path':
       if (parts.some((part) => BASIC_SHAPES.has(functionName(tokens, part)))) {
         add('basic-shape');
+      }
+      break;
+    case 'aspect-ratio':
+      // A `<ratio>` written as a single `<number>` (`1.5`, not `3 / 2`).
+      if (
+        slash === -1 &&
+        parts.some(
+          (part) =>
+            type(tokens[part[0]]) === 'number-token' && part[1] - part[0] === 1,
+        )
+      ) {
+        add('ratio-number-value');
       }
       break;
     case 'text-decoration': {
@@ -889,6 +1096,25 @@ function analyseValue(tokens, start, end, property, out, context) {
         type(tokens[j]) === 'ident-token' &&
         String(value(tokens[j])).toLowerCase() === 'from';
       out.add({ kind: 'function', property, name, relative }, context);
+      if (name === 'anchor' || name === 'anchor-size') {
+        anchorForms(name, property, out, context);
+      }
+      if (
+        name === 'superellipse' &&
+        /^corner(-[a-z-]+)?-shape$/.test(property)
+      ) {
+        // A `<corner-shape-value>` function.
+        out.add(
+          {
+            kind: 'form',
+            of: 'function',
+            property,
+            name,
+            suffix: 'corner-shape-value',
+          },
+          context,
+        );
+      }
       const outer =
         functionStack.length === 0
           ? null
@@ -936,8 +1162,12 @@ function analyseValue(tokens, start, end, property, out, context) {
         i + 1,
         Math.min(close, end),
       )) {
+        // Typed arithmetic is one engine feature for every math function;
+        // BCD records it under calc() and, separately, sign().
+        const owner =
+          suffix === TYPED_DIVISION && name !== 'sign' ? 'calc' : name;
         out.add(
-          { kind: 'form', of: 'function', property, name, suffix },
+          { kind: 'form', of: 'function', property, name: owner, suffix },
           context,
         );
       }
@@ -992,17 +1222,16 @@ function analyseValue(tokens, start, end, property, out, context) {
       if (GLOBAL_KEYWORDS.has(ident) && depth === 0) {
         out.add({ kind: 'global-keyword', keyword: ident }, context);
       } else if (ident !== 'from') {
-        out.add(
-          i < lastEntryStart
-            ? {
-                kind: 'value-keyword',
-                property,
-                keyword: ident,
-                listFallback: true,
-              }
-            : { kind: 'value-keyword', property, keyword: ident },
-          context,
-        );
+        // A keyword is read in its consuming grammar: the property, the
+        // function it is an argument of, or a custom property's known one.
+        const keyword = { kind: 'value-keyword', property, keyword: ident };
+        if (i < lastEntryStart) keyword.listFallback = true;
+        if (enclosing != null) keyword.fn = enclosing;
+        const grammar = property.startsWith('--')
+          ? grammarOf?.get(property)
+          : undefined;
+        if (grammar != null) keyword.grammar = grammar;
+        out.add(keyword, context);
       }
       continue;
     }
@@ -1053,6 +1282,9 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
   const keyframes = (context.atRules ?? []).find(
     (a) => a.name === 'keyframes' || a.name.endsWith('-keyframes'),
   );
+  // Anchored insets of the block, and whether the block animates.
+  const anchored = [];
+  let animates = false;
   for (const range of splitTop(tokens, start, end, 'semicolon-token')) {
     const [s, e] = trimRange(tokens, range);
     if (s >= e) continue;
@@ -1189,6 +1421,36 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
     if (important && (context.atRules ?? []).some((a) => a.name === 'layer')) {
       out.add(
         { kind: 'combination', key: 'at-rule:layer/block+important' },
+        declarationContext,
+      );
+    }
+    if (name.startsWith('transition') || name.startsWith('animation')) {
+      animates = true;
+    }
+    if (INSET_PROPERTY.test(name)) {
+      for (let k = colon + 1; k < valueEnd; k += 1) {
+        const token = tokens[k];
+        if (
+          type(token) === 'function-token' &&
+          (lower(token) === 'anchor' || lower(token) === 'anchor-size')
+        ) {
+          anchored.push([lower(token), name, declarationContext]);
+        }
+      }
+    }
+  }
+  // An anchored inset animated by a transition or animation of the same
+  // rule (keyframes declarations are read by anchorForms).
+  if (animates && keyframes == null) {
+    for (const [fn, property, declarationContext] of anchored) {
+      out.add(
+        {
+          kind: 'form',
+          of: 'function',
+          property,
+          name: fn,
+          suffix: `${fn}-animated`,
+        },
         declarationContext,
       );
     }
@@ -1406,6 +1668,27 @@ function analyseMediaQuery(tokens, start, end, out, context) {
       }
     }
     if (range) out.add({ kind: 'media-syntax', name: 'range_syntax' }, context);
+    const ratio = feature?.replace(/^(min|max)-/, '');
+    if (ratio === 'aspect-ratio' || ratio === 'device-aspect-ratio') {
+      // A `<ratio>` value written as a single `<number>`.
+      const inside = tokens.slice(inner[0], inner[1]);
+      const colonAt = inside.findIndex((x) => type(x) === 'colon-token');
+      const valueTokens = colonAt === -1 ? [] : inside.slice(colonAt + 1);
+      if (
+        valueTokens.some((x) => type(x) === 'number-token') &&
+        !valueTokens.some((x) => isDelim(x, '/'))
+      ) {
+        out.add(
+          {
+            kind: 'form',
+            of: 'media',
+            name: ratio,
+            suffix: 'ratio-number-value',
+          },
+          context,
+        );
+      }
+    }
     i = close;
   }
 }
@@ -1451,6 +1734,22 @@ function analyseContainerQuery(tokens, start, end, out, context) {
             { kind: 'form', of: 'container', name, suffix: lower(token) },
             context,
           );
+        }
+        // A value for it (`anchored(fallback: --x)`).
+        if (type(tokens[k]) === 'colon-token') {
+          let v = k + 1;
+          while (v < close && isWs(tokens[v])) v += 1;
+          if (v < close) {
+            out.add(
+              {
+                kind: 'form',
+                of: 'container',
+                name,
+                suffix: `${lower(token)}/any-value`,
+              },
+              context,
+            );
+          }
         }
       }
       i = close;
@@ -1579,6 +1878,20 @@ function analyseRules(tokens, start, end, out, context) {
               },
               atContext,
             );
+            for (const token of tokens.slice(selectorStart, k)) {
+              if (type(token) === 'ident-token') {
+                // The range name itself (`scroll 0%`), a `<timeline-range-name>`.
+                out.add(
+                  {
+                    kind: 'form',
+                    of: 'at-rule',
+                    name,
+                    suffix: `range-name-${lower(token)}`,
+                  },
+                  atContext,
+                );
+              }
+            }
           }
           const frameClose = matching(tokens, k);
           analyseDeclarations(tokens, k + 1, frameClose, out, atContext, null);
@@ -1589,6 +1902,23 @@ function analyseRules(tokens, start, end, out, context) {
         analyseDeclarations(tokens, j + 1, close, out, atContext, descriptorOf);
       } else {
         out.add({ kind: 'unclassified', where: 'at-rule-block' }, atContext);
+        if (name === 'function') {
+          // The `result` descriptor of a custom function.
+          for (const range of splitTop(
+            tokens,
+            j + 1,
+            close,
+            'semicolon-token',
+          )) {
+            const [s, e] = trimRange(tokens, range);
+            if (s < e && isIdent(tokens[s], 'result')) {
+              out.add(
+                { kind: 'form', of: 'at-rule', name, suffix: 'result' },
+                atContext,
+              );
+            }
+          }
+        }
       }
     } else {
       const selector = text(tokens, i, j);
@@ -1605,10 +1935,14 @@ function analyseRules(tokens, start, end, out, context) {
  * Each item is `{ construct, context }`; duplicates within the text collapse
  * unless `dedupe` is false (attribution tooling wants every occurrence).
  */
-export function extractConstructs(cssText, { dedupe = true } = {}) {
+export function extractConstructs(
+  cssText,
+  { dedupe = true, grammars = null } = {},
+) {
   const out = new Collector(dedupe);
   const css = String(cssText);
   source = css;
+  grammarOf = grammars;
   // The emitted subset tokenizes on the fast path; anything else, exactly.
   const tokens = (tokenizeEmitted(css) ?? tokenize({ css })).filter(
     (token) => type(token) !== 'EOF-token',

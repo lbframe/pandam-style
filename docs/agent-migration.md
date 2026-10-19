@@ -117,6 +117,13 @@ target profiles; the behavior is specified in
 valid before stays valid, with new warnings. With explicit `targets`, the same
 findings are errors and nothing is published.
 
+Explicit `targets` must stay at or above PandamStyle's minimum floor
+(orchestrator decision O13: Chrome, Edge and Firefox 100, Safari and iOS
+Safari 15.4, Android WebView 100, Electron and Chromium-based browsers at
+Chromium 100). A query reaching older engines is refused with
+`PMS_INVALID_TARGET_CONFIG` (`targets.below-minimum`); raise its floor, never
+work around it.
+
 During migration, record target warnings in the batch outcome as baseline
 facts. Do not add, remove or weaken `targets`, and do not declare
 `enhancements`, to change a migration result: target profiles are an

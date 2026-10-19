@@ -127,7 +127,7 @@ const FUNCTION_FAMILIES = Object.freeze([
       'animation-timing-function',
     ],
   ],
-  ['css.types.basic-shape', ['clip-path', 'shape-outside', 'offset-path']],
+  ['css.types.basic-shape', ['clip-path', 'shape-outside', 'offset-path', 'd']],
   // Last: a value type of the same name (`css.types.color` for `color()`) is
   // not the function.
   ['css.types', null],
@@ -399,18 +399,147 @@ function propertyFeature(name) {
   return unrecognized(`property:${name}`, 'property', { name });
 }
 
-// Value types whose keywords BCD records one by one (`AccentColor`): a
-// keyword of the type is the same keyword in every property that takes it.
+// Properties whose grammar takes a `<color>` besides `color` and `*-color`.
+const COLOR_SHORTHANDS = new Set([
+  'background',
+  'border',
+  'border-top',
+  'border-right',
+  'border-bottom',
+  'border-left',
+  'border-block',
+  'border-inline',
+  'border-block-start',
+  'border-block-end',
+  'border-inline-start',
+  'border-inline-end',
+  'outline',
+  'column-rule',
+  'text-decoration',
+  'text-emphasis',
+  'box-shadow',
+  'text-shadow',
+  'caret',
+  'fill',
+  'stroke',
+  '-webkit-text-stroke',
+]);
+// Functions whose arguments take a `<color>`.
+const COLOR_ARGUMENT_FUNCTIONS = new Set([
+  'rgb',
+  'rgba',
+  'hsl',
+  'hsla',
+  'hwb',
+  'lab',
+  'lch',
+  'oklab',
+  'oklch',
+  'color',
+  'color-mix',
+  'light-dark',
+  'contrast-color',
+  'linear-gradient',
+  'radial-gradient',
+  'conic-gradient',
+  'repeating-linear-gradient',
+  'repeating-radial-gradient',
+  'repeating-conic-gradient',
+  'drop-shadow',
+]);
+// Functions whose arguments are read in the enclosing property's grammar.
+const TRANSPARENT_FUNCTIONS = new Set(['var', 'env', 'attr', 'if']);
+
+/**
+ * Whether a keyword in `property` (inside function `fn`, or a custom property
+ * of known `grammar`) is read as a `<color>`. A custom property of unknown
+ * consumption is an untyped value: no color is inferred.
+ */
+function takesColor(property, fn, grammar) {
+  if (fn != null && !TRANSPARENT_FUNCTIONS.has(fn)) {
+    return COLOR_ARGUMENT_FUNCTIONS.has(fn);
+  }
+  if (property.startsWith('--')) return grammar === 'color';
+  return (
+    property === 'color' ||
+    property.endsWith('-color') ||
+    COLOR_SHORTHANDS.has(property)
+  );
+}
+
+const OVERFLOW_PROPERTIES = new Set([
+  'overflow',
+  'overflow-x',
+  'overflow-y',
+  'overflow-block',
+  'overflow-inline',
+]);
+const ANIMATION_RANGE_PROPERTIES = new Set([
+  'animation-range',
+  'animation-range-start',
+  'animation-range-end',
+]);
+const outsideFunctions = (fn) => fn == null || TRANSPARENT_FUNCTIONS.has(fn);
+
+// Value types whose keywords BCD records one by one (`AccentColor`), each
+// with the grammars that consume it: a keyword is the type's only where its
+// consumer takes the type.
 const KEYWORD_TYPES = Object.freeze([
-  'css.types.color.named-color',
-  'css.types.color.system-color',
+  ['css.types.color.named-color', takesColor],
+  ['css.types.color.system-color', takesColor],
+  [
+    'css.types.overflow',
+    (property, fn) => outsideFunctions(fn) && OVERFLOW_PROPERTIES.has(property),
+  ],
+  [
+    'css.types.text-edge',
+    (property, fn) =>
+      outsideFunctions(fn) &&
+      (property === 'text-box-edge' || property === 'text-box'),
+  ],
+  [
+    'css.types.corner-shape-value',
+    (property, fn) =>
+      outsideFunctions(fn) && /^corner(-[a-z-]+)?-shape$/.test(property),
+  ],
+  [
+    'css.types.timeline-range-name',
+    (property, fn) =>
+      outsideFunctions(fn) && ANIMATION_RANGE_PROPERTIES.has(property),
+  ],
 ]);
 
-function keywordFeature(property, keyword) {
+// Token categories whose values are read as a `<color>` where consumed.
+const COLOR_TOKEN_CATEGORIES = new Set(['colors', 'shadows']);
+const grammarCache = new WeakMap();
+
+/**
+ * Value grammars of a design system's token custom properties, by name:
+ * `--x -> 'color'` for tokens of a color-valued category. Other tokens are
+ * consumed by properties that take no color (a font family named `Mark` is
+ * not the system color).
+ */
+export function tokenGrammars(varsByToken) {
+  if (varsByToken == null) return null;
+  let grammars = grammarCache.get(varsByToken);
+  if (grammars == null) {
+    grammars = new Map();
+    for (const [token, reference] of Object.entries(varsByToken)) {
+      const name = /var\((--[^),\s]+)/.exec(String(reference))?.[1];
+      if (name != null && COLOR_TOKEN_CATEGORIES.has(token.split('.')[0])) {
+        grammars.set(name, 'color');
+      }
+    }
+    grammarCache.set(varsByToken, grammars);
+  }
+  return grammars;
+}
+
+function keywordFeature(property, keyword, fn = null, grammar = null) {
   if (property.startsWith('@')) return null;
   const owner = propertyFeature(property);
   if (owner.base == null || owner.feature === 'property:custom-property') {
-    return typeKeywordFeature(property, keyword);
+    return typeKeywordFeature(property, keyword, fn, grammar);
   }
   // CSS keywords are ASCII case-insensitive (`currentColor`).
   const direct = childPath(owner.base, keyword);
@@ -435,11 +564,12 @@ function keywordFeature(property, keyword) {
       keyword,
     });
   }
-  return typeKeywordFeature(property, keyword);
+  return typeKeywordFeature(property, keyword, fn, grammar);
 }
 
-function typeKeywordFeature(property, keyword) {
-  for (const type of KEYWORD_TYPES) {
+function typeKeywordFeature(property, keyword, fn, grammar) {
+  for (const [type, consumes] of KEYWORD_TYPES) {
+    if (!consumes(property, fn, grammar)) continue;
     const path = childPath(type, keyword);
     if (path != null) {
       return record(
@@ -534,6 +664,7 @@ function mediaFeature(name) {
 // Form suffixes whose BCD subfeature name is not derived from the suffix.
 const FORM_CHILDREN = Object.freeze({
   animated: 'is_animatable',
+  'attr-name-accepts-namespaces': 'attr-name_accepts_namespaces',
   'ident-value': 'IDENT_value',
   'font-width-keyword-values': 'font-width_keyword_values',
   'alt-text-counters': 'alt_text.counters',
@@ -541,6 +672,47 @@ const FORM_CHILDREN = Object.freeze({
 // Forms recorded on a shared node rather than under the construct's own.
 const ABSOLUTE_FORMS = Object.freeze({
   'from-currentcolor': 'css.types.color.from_currentcolor',
+  'ratio-number-value': 'css.types.ratio.number_value',
+  // anchor() / anchor-size() are recorded per property (`top: anchor()`);
+  // their animation and inset/margin support only on the type.
+  'anchor-animated': 'css.types.anchor.is_animatable',
+  'anchor-size-animated': 'css.types.anchor-size.is_animatable',
+  'anchor-size-inset-margin': 'css.types.anchor-size.inset_margin',
+  // superellipse() as a corner shape.
+  'corner-shape-value': 'css.types.corner-shape-value.superellipse',
+});
+// Math functions: a constant argument (`pi`) is a `<calc-keyword>`.
+const MATH_FUNCTION_PATHS = new Set(
+  [
+    'calc',
+    'min',
+    'max',
+    'clamp',
+    'round',
+    'mod',
+    'rem',
+    'abs',
+    'sign',
+    'sin',
+    'cos',
+    'tan',
+    'asin',
+    'acos',
+    'atan',
+    'atan2',
+    'pow',
+    'sqrt',
+    'hypot',
+    'log',
+    'exp',
+  ].map((name) => `css.types.${name}`),
+);
+const CALC_KEYWORDS = Object.freeze({
+  e: 'e',
+  pi: 'pi',
+  infinity: 'infinity',
+  '-infinity': 'infinity',
+  nan: 'NaN',
 });
 // Keyword arguments whose BCD subfeature is named after the syntax.
 const ARGUMENT_CHILDREN = Object.freeze({
@@ -574,6 +746,19 @@ const ARGUMENT_CHILDREN = Object.freeze({
 export function subfeaturePath(parentPath, suffix) {
   if (Object.hasOwn(ABSOLUTE_FORMS, suffix)) {
     return has(ABSOLUTE_FORMS[suffix]) ? ABSOLUTE_FORMS[suffix] : null;
+  }
+  if (suffix.startsWith('range-name-')) {
+    // A keyframe selector's timeline range name.
+    return childPath(
+      'css.types.timeline-range-name',
+      suffix.slice('range-name-'.length),
+    );
+  }
+  if (
+    MATH_FUNCTION_PATHS.has(parentPath) &&
+    Object.hasOwn(CALC_KEYWORDS, suffix)
+  ) {
+    return childPath('css.types.calc-keyword', CALC_KEYWORDS[suffix]);
   }
   const alias = ARGUMENT_CHILDREN[parentPath]?.[suffix];
   if (alias != null) return childPath(parentPath, alias);
@@ -661,13 +846,22 @@ function formParent(construct) {
 export function featuresOf(construct) {
   switch (construct.kind) {
     case 'form': {
-      const feature = subfeature(formParent(construct), construct.suffix);
+      // A form of a form (`type()/length`) is resolved step by step.
+      let feature = formParent(construct);
+      for (const part of construct.suffix.split('/')) {
+        feature = subfeature(feature, part);
+      }
       return feature == null ? [] : [feature];
     }
     case 'property':
       return [propertyFeature(construct.name)];
     case 'value-keyword': {
-      const feature = keywordFeature(construct.property, construct.keyword);
+      const feature = keywordFeature(
+        construct.property,
+        construct.keyword,
+        construct.fn ?? null,
+        construct.grammar ?? null,
+      );
       if (feature == null) return [];
       // An entry of a font stack that a later entry backs up is an
       // author-declared fallback in the value itself.
@@ -876,28 +1070,6 @@ export function inapplicableCatalog() {
 
 // ------------------------------------------------------------ subfeatures ---
 
-let failClosedIndex = null;
-
-/**
- * Reviewed `fail-closed` subfeatures of a BCD path: syntax forms the extractor
- * does not detect. The construct evaluated on `path` is `unknown` on an engine
- * where one of them is not native (outcome.js).
- */
-export function failClosedSubfeatures(path) {
-  if (failClosedIndex == null) {
-    failClosedIndex = new Map();
-    for (const review of subfeatureReviews.reviews) {
-      if (review.disposition !== 'fail-closed') continue;
-      for (const child of review.paths) {
-        const parent = child.slice(0, child.lastIndexOf('.'));
-        if (!failClosedIndex.has(parent)) failClosedIndex.set(parent, []);
-        failClosedIndex.get(parent).push(child);
-      }
-    }
-  }
-  return failClosedIndex.get(path) ?? [];
-}
-
 export function subfeatureCatalog() {
   return subfeatureReviews;
 }
@@ -959,7 +1131,14 @@ function catalogKey(key) {
           functionFeature(property, keyword.slice(0, -2), false),
         );
       }
-      const record = keywordFeature(property, keyword);
+      // An authored key names a keyword as consumed: a custom property's
+      // keyword key is valid for a color-consumed token.
+      const record = keywordFeature(
+        property,
+        keyword,
+        null,
+        property.startsWith('--') ? 'color' : null,
+      );
       return record != null && record.feature === key && record.recognized
         ? record
         : null;

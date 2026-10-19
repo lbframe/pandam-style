@@ -198,9 +198,13 @@ describe('decision-closures.v1.json', () => {
     }
   });
 
-  test('orchestrator decisions O1..O12 are recorded once each', () => {
+  test('orchestrator decisions O1..O13 are recorded once each', () => {
     expect(CLOSURES.orchestratorDecisions.map((d) => d.id)).toEqual(
-      Array.from({ length: 12 }, (_, i) => `CE-01.1-O${i + 1}`),
+      Array.from({ length: 13 }, (_, i) => `CE-01.1-O${i + 1}`),
+    );
+    // O13 names the record that holds the floors.
+    expect(CLOSURES.orchestratorDecisions[12].decision).toContain(
+      'profiles/minimum.v1.json',
     );
   });
 

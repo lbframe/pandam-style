@@ -18,11 +18,7 @@
  * another feature's statement.
  */
 
-import {
-  caveatDisposition,
-  failClosedSubfeatures,
-  inapplicability,
-} from './catalog';
+import { caveatDisposition, inapplicability } from './catalog';
 import { compatData } from './data';
 import { compareVersions, parseVersion } from './versions';
 
@@ -52,7 +48,6 @@ export const REASONS = Object.freeze([
   'preview-only',
   'engine-not-in-data',
   'unrecognized-construct',
-  'unresolved-subfeature',
   'obsolete-engine',
   'platform-scoped',
   'invalid-combination',
@@ -446,30 +441,6 @@ export function featureOutcome(
       worst = { ...outcome, path };
     } else {
       worst.caveats = [...worst.caveats, ...outcome.caveats];
-    }
-    // A subfeature the extractor cannot see: where it is not native but the
-    // construct is, whether the emitted CSS uses it is unknown.
-    if (worst.state !== 'native') continue;
-    for (const child of failClosedSubfeatures(path)) {
-      const sub = statementOutcome({
-        path: child,
-        engine: engineKey,
-        statements: data.entry(child)?.e?.[engineKey],
-        match: null,
-        range: target,
-        scope: null,
-        reviews,
-      });
-      if (sub.state !== 'native') {
-        worst = {
-          ...worst,
-          state: 'unknown',
-          reason: 'unresolved-subfeature',
-          basis: 'catalog',
-          path: child,
-        };
-        break;
-      }
     }
   }
   // Reviewed platform inapplicability turns a non-native answer into an

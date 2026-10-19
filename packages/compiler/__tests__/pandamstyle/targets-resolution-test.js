@@ -299,7 +299,6 @@ describe('refused query terms', () => {
       'firefox esr',
       'baseline 2024',
       '> 1% in US',
-      'cover 90% in US',
       'cover 90% in alt-as',
     ]) {
       const { record } = targets.resolveTargets(project(query));
@@ -496,5 +495,109 @@ describe('precomputed built-in resolutions', () => {
     });
     expect(child.stderr).toBe('');
     expect(JSON.parse(child.stdout)).toEqual([false, true]);
+  });
+});
+
+describe('minimum target floor (orchestrator decision O13)', () => {
+  const refusalOf = (query, extra = {}) => {
+    try {
+      targets.resolveTargets(project(query, extra));
+    } catch (error) {
+      return error.diagnostics;
+    }
+    return null;
+  };
+
+  test('the floors live in one versioned record', () => {
+    expect(targets.MINIMUM_FLOOR).toMatchObject({
+      kind: 'pandamstyle-minimum-floor',
+      schemaVersion: 1,
+      decision: 'O13',
+      engines: {
+        chrome: '100',
+        chrome_android: '100',
+        edge: '100',
+        firefox: '100',
+        firefox_android: '100',
+        safari: '15.4',
+        safari_ios: '15.4',
+        webview_android: '100',
+        electron: '100',
+      },
+      chromiumEquivalents: { minimum: '100' },
+    });
+  });
+
+  test.each([
+    ['chrome 99', 'chrome', '99'],
+    ['edge 99', 'edge', '99'],
+    ['firefox 99', 'firefox', '99'],
+    ['and_chr 99', 'chrome_android', '99'],
+    ['and_ff 99', 'firefox_android', '99'],
+    ['android 99', 'webview_android', '99'],
+    ['safari 15.2', 'safari', '15.2'],
+    ['ios_saf 15.2', 'safari_ios', '15.2'],
+  ])('%s is refused below the floor', (query, browser, version) => {
+    const diagnostics = refusalOf(query);
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0]).toMatchObject({
+      code: 'PMS_INVALID_TARGET_CONFIG',
+      severity: 'error',
+      rule: 'targets.below-minimum',
+      context: { browser, version, profile: 'project:app' },
+    });
+  });
+
+  test('Electron and Chromium-based browsers are judged by their Chromium version', () => {
+    expect(
+      refusalOf('electron 12.0', { platform: 'electron' })[0],
+    ).toMatchObject({
+      rule: 'targets.below-minimum',
+      context: { browser: 'electron', chromium: '89', minimum: 'Chromium 100' },
+    });
+    expect(refusalOf('chrome >= 120, samsung 15.0')[0]).toMatchObject({
+      rule: 'targets.below-minimum',
+      context: { browser: 'samsung', chromium: '90' },
+    });
+    expect(refusalOf('chrome >= 120, opera 70')[0]).toMatchObject({
+      rule: 'targets.below-minimum',
+      context: { browser: 'opera', chromium: '84' },
+    });
+    // At or above the floor they stay excluded (unannounced), and a browser
+    // without a Chromium equivalent keeps its exclusion.
+    for (const query of [
+      'chrome >= 120, samsung 29',
+      'chrome >= 120, and_uc 15.5',
+      'chrome >= 120, kaios 2.5',
+    ]) {
+      expect(refusalOf(query)).toBeNull();
+    }
+  });
+
+  test('a region query reaching old engines is refused for the floor, not as ambient', () => {
+    const diagnostics = refusalOf('cover 90% in US');
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(new Set(diagnostics.map((d) => d.rule))).toEqual(
+      new Set(['targets.below-minimum']),
+    );
+  });
+
+  test('every engine at its floor is accepted, and every built-in profile is above it', () => {
+    expect(
+      refusalOf(
+        'chrome 100, edge 100, firefox 100, safari 15.4, ios_saf 15.4, and_chr 100, and_ff 100, android 100',
+      ),
+    ).toBeNull();
+    for (const ref of targets.BUILTIN_PROFILE_REFS) {
+      const { record } = targets.resolveTargets({ profiles: [ref] });
+      for (const engine of record.profiles[0].engines) {
+        const minimum = targets.MINIMUM_FLOOR.engines[engine.engine];
+        expect([
+          ref,
+          engine.engine,
+          Number(engine.floor) >= Number(minimum),
+        ]).toEqual([ref, engine.engine, true]);
+      }
+    }
   });
 });

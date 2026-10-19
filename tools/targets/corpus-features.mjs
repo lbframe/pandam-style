@@ -137,8 +137,16 @@ export async function emittedCss(workloadId) {
         };
       }
       await session.compile(init.revision);
+      // The value grammar of the design system's token custom properties,
+      // as the compiler's own evaluation reads them (a color token's keyword
+      // is a color; a font family's is not).
+      const inspection = loadInspection();
+      const grammars = inspection.targets.tokenGrammars(
+        inspection.buildDesignSystem(definition).varsByToken,
+      );
       return {
         css: fs.readFileSync(path.join(outDir, 'styles.css'), 'utf8'),
+        grammars,
         diagnostics: validation.diagnostics ?? [],
       };
     } finally {
@@ -156,15 +164,17 @@ export async function emittedCss(workloadId) {
 export async function collectFeatureUses({ includeEmitted = true } = {}) {
   const inspection = loadInspection();
   const t = inspection.targets;
-  const toUses = (css, attribution, dedupe = true) =>
-    t.extractConstructs(css, { dedupe }).flatMap(({ construct, context }) =>
-      t.featuresOf(construct).map((record) => ({
-        feature: record.feature,
-        record,
-        attribution,
-        context,
-      })),
-    );
+  const toUses = (css, attribution, dedupe = true, grammars = null) =>
+    t
+      .extractConstructs(css, { dedupe, grammars })
+      .flatMap(({ construct, context }) =>
+        t.featuresOf(construct).map((record) => ({
+          feature: record.feature,
+          record,
+          attribution,
+          context,
+        })),
+      );
   const sources = [];
 
   const accounting = readJson(CORPUS_ACCOUNTING);
@@ -211,7 +221,7 @@ export async function collectFeatureUses({ includeEmitted = true } = {}) {
 
   if (includeEmitted) {
     for (const workloadId of EMITTED_WORKLOADS) {
-      const { css, diagnostics } = await emittedCss(workloadId);
+      const { css, grammars, diagnostics } = await emittedCss(workloadId);
       if (css == null) {
         throw new Error(
           `workload ${workloadId} did not compile: ${diagnostics.map((d) => d.code).join(', ')}`,
@@ -220,7 +230,7 @@ export async function collectFeatureUses({ includeEmitted = true } = {}) {
       sources.push({
         id: `emitted:${workloadId}`,
         group: 'compiler-emitted',
-        uses: toUses(css, { workload: workloadId }, false),
+        uses: toUses(css, { workload: workloadId }, false, grammars),
       });
     }
   }

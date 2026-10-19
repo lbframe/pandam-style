@@ -1,0 +1,28 @@
+{
+  "kind": "pandamstyle-minimum-floor",
+  "schemaVersion": 1,
+  "decision": "O13",
+  "rationale": "PandamStyle does not support pre-2022 engines. A resolved target below these floors is refused with PMS_INVALID_TARGET_CONFIG (targets.below-minimum).",
+  "engines": {
+    "chrome": "100",
+    "chrome_android": "100",
+    "edge": "100",
+    "firefox": "100",
+    "firefox_android": "100",
+    "safari": "15.4",
+    "safari_ios": "15.4",
+    "webview_android": "100",
+    "electron": "100"
+  },
+  "chromiumEquivalents": {
+    "source": "baseline-browser-mapping (pinned): Blink engine version of each downstream browser release",
+    "minimum": "100",
+    "browsers": {
+      "and_qq": "qq_android",
+      "and_uc": "uc_android",
+      "op_mob": "opera_android",
+      "opera": "opera",
+      "samsung": "samsunginternet_android"
+    }
+  }
+}
