@@ -14,21 +14,38 @@
 // whose Git history is changed. Classes: control and environment identity,
 // planned-observation accounting, and budgets/policy provenance. Every
 // negative case must end in its expected non-pass verdict; the positive
-// controls must keep `pass` (null comparison, honest version 2) and `fail`
-// (injected slowdown). Exits non-zero on any mismatch.
+// controls must keep `pass` (null comparisons, honest next version) and
+// `fail` (injected slowdown). Versioned cases are relative to the budgets
+// version in force at HEAD. Exits non-zero on any mismatch.
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { REPO, mulberry32, readJson, sha256 } from './lib.mjs';
-import { deriveBudgets, gate, judge, prepareGate } from './budgets.mjs';
+import {
+  deriveBudgets,
+  gate,
+  gitSource,
+  inForceBudgets,
+  judge,
+  prepareGate,
+} from './budgets.mjs';
 
 const R = 'benchmarks/core-evolution/results';
 const FINAL = [1, 2].map((n) => `${R}/alpha1-final-${n}/raw.json`);
 const SLOW = `${R}/gate-injected-slowdown/raw.json`;
-const BUDGETS = 'benchmarks/core-evolution/budgets.v1.json';
-const POLICY = 'benchmarks/core-evolution/budget-policy.v1.json';
+// Cases are relative to the budgets version in force at HEAD (N), its
+// predecessors (1..N) and the next version (N+1), never to a fixed version.
+const budgetsPath = (n) => `benchmarks/core-evolution/budgets.v${n}.json`;
+const policyPath = (n) => `benchmarks/core-evolution/budget-policy.v${n}.json`;
+const BUDGETS = inForceBudgets(gitSource('HEAD'));
+const VERSION = Number(/\.v(\d+)\.json$/.exec(BUDGETS)[1]);
+const POLICY = policyPath(VERSION);
+const NEXT = VERSION + 1;
+const CHAIN = Array.from({ length: VERSION }, (_, i) => i + 1);
+const evidenceOf = (n) =>
+  readJson(path.join(REPO, budgetsPath(n))).baseline.results.map((r) => r.path);
 const work = fs.mkdtempSync(path.join(os.tmpdir(), 'ce003-gate-regression-'));
 const originals = FINAL.map((f) => readJson(path.join(REPO, f)));
 const slowRun = readJson(path.join(REPO, SLOW));
@@ -70,12 +87,19 @@ const gateOn = (raws, options = {}) =>
 add('control', 'null comparison (alpha1-replay) at HEAD', 'pass', () =>
   gateOn(fresh()),
 );
+for (const n of CHAIN)
+  add(
+    'control',
+    `null comparison on the v${n} baseline evidence, v${VERSION} in force`,
+    'pass',
+    () => gateOn(evidenceOf(n).map((f) => readJson(path.join(REPO, f)))),
+  );
 add('control', 'injected 30% compiler slowdown', 'fail', () =>
   gateOn([structuredClone(slowRun)], { candidate: 'injected-slowdown' }),
 );
 add(
   'control',
-  'committed budgets passed explicitly stay in release mode',
+  `committed in-force budgets (v${VERSION}) passed explicitly stay in release mode`,
   'pass',
   () => gateOn(fresh(), { budgets: path.join(REPO, BUDGETS) }),
 );
@@ -438,9 +462,14 @@ add('observations', 'noisy control (review probe)', 'inconclusive', () =>
     ),
   ),
 );
+// Paired ratios alternate between limit + 0.1 and limit - 0.1, so the median
+// sits on the in-force limit and the interval straddles it.
+const fixtureTotalLimit = readJson(path.join(REPO, BUDGETS)).budgets.find(
+  (b) => b.workload === 'alpha1-valid-fixture' && b.metric === 'full.totalMs',
+).limit.maxRatio;
 add(
   'observations',
-  'interval straddling the limit (review probe)',
+  `interval straddling the v${VERSION} limit ${fixtureTotalLimit} (review probe)`,
   'inconclusive',
   () =>
     gateOn(
@@ -449,7 +478,9 @@ add(
         (s) =>
           fixture(s) &&
           (s.result.full.totalMs =
-            s.epoch === 'alpha1' ? 100 : s.round % 2 ? 120 : 100),
+            s.epoch === 'alpha1'
+              ? 100
+              : 100 * (fixtureTotalLimit + (s.round % 2 ? 0.1 : -0.1))),
       ),
     ),
 );
@@ -507,17 +538,17 @@ const cssRegression = () =>
   );
 add(
   'provenance',
-  'untracked weakened copy of v1 (review probe)',
+  `untracked weakened copy of v${VERSION} (review probe)`,
   'not-release',
   () => gateOn(cssRegression(), { budgets: writeBudgets(weak()) }),
 );
 add(
   'provenance',
-  'untracked v2 reusing the v1 baseline (review probe)',
+  `untracked v${NEXT} reusing the v${VERSION} baseline (review probe)`,
   'not-release',
   () => {
     const b = weak();
-    b.policyVersion = 2;
+    b.policyVersion = NEXT;
     b.supersedes = {
       path: BUDGETS,
       sha256: sha256(fs.readFileSync(path.join(REPO, BUDGETS))),
@@ -527,11 +558,11 @@ add(
 );
 add(
   'provenance',
-  'untracked v2 with fabricated evidence and a relaxation (review probe)',
+  `untracked v${NEXT} with fabricated evidence and a relaxation (review probe)`,
   'not-release',
   () => {
     const b = weak();
-    b.policyVersion = 2;
+    b.policyVersion = NEXT;
     b.supersedes = {
       path: BUDGETS,
       sha256: sha256(fs.readFileSync(path.join(REPO, BUDGETS))),
@@ -598,28 +629,59 @@ const writeIn = (dir, file, text) => {
 const gateIn = (dir, raws = fresh(), options = {}) =>
   gateOn(raws, { ...options, root: dir });
 
-add('provenance', 'v1 budgets weakened and re-committed', 'fail', () => {
-  const dir = clone('recommit');
-  writeIn(dir, BUDGETS, `${JSON.stringify(weak(), null, 2)}\n`);
-  commit(dir, 'weaken v1');
-  return gateIn(dir, cssRegression());
-});
-add('provenance', 'v1 budgets deleted, then re-added weakened', 'fail', () => {
-  const dir = clone('readd');
-  fs.rmSync(path.join(dir, BUDGETS));
-  commit(dir, 'remove v1');
-  writeIn(dir, BUDGETS, `${JSON.stringify(weak(), null, 2)}\n`);
-  commit(dir, 're-add v1');
-  return gateIn(dir, cssRegression());
-});
-add('provenance', 'v1 policy edited after the freeze', 'fail', () => {
-  const dir = clone('policy');
-  const policy = readJson(path.join(dir, POLICY));
-  policy.thresholdRule.deterministic.growth.default = 0.5;
-  writeIn(dir, POLICY, `${JSON.stringify(policy, null, 2)}\n`);
-  commit(dir, 'edit policy');
-  return gateIn(dir);
-});
+// Every committed version of the chain, not only the one in force, must stay
+// as first committed, with its policy and evidence.
+const weakened = (dir, n) => {
+  const b = readJson(path.join(dir, budgetsPath(n)));
+  b.budgets.find(
+    (x) => x.workload === 'alpha1-valid-fixture' && x.metric === 'css.bytes',
+  ).limit.maxValue *= 2;
+  return `${JSON.stringify(b, null, 2)}\n`;
+};
+for (const n of CHAIN) {
+  add('provenance', `v${n} budgets weakened and re-committed`, 'fail', () => {
+    const dir = clone(`recommit-v${n}`);
+    writeIn(dir, budgetsPath(n), weakened(dir, n));
+    commit(dir, `weaken v${n}`);
+    return gateIn(dir, cssRegression());
+  });
+  add(
+    'provenance',
+    `v${n} budgets deleted, then re-added weakened`,
+    'fail',
+    () => {
+      const dir = clone(`readd-v${n}`);
+      const text = weakened(dir, n);
+      fs.rmSync(path.join(dir, budgetsPath(n)));
+      commit(dir, `remove v${n}`);
+      writeIn(dir, budgetsPath(n), text);
+      commit(dir, `re-add v${n}`);
+      return gateIn(dir, cssRegression());
+    },
+  );
+  add('provenance', `v${n} policy edited after the freeze`, 'fail', () => {
+    const dir = clone(`policy-v${n}`);
+    const policy = readJson(path.join(dir, policyPath(n)));
+    policy.thresholdRule.deterministic.growth.default = 0.5;
+    writeIn(dir, policyPath(n), `${JSON.stringify(policy, null, 2)}\n`);
+    commit(dir, `edit v${n} policy`);
+    return gateIn(dir);
+  });
+  add(
+    'provenance',
+    `v${n} baseline evidence file edited after the freeze`,
+    'fail',
+    () => {
+      const dir = clone(`evidence-v${n}`);
+      const file = evidenceOf(n)[0];
+      const raw = readJson(path.join(dir, file));
+      raw.samples[0].result.wallMs += 1;
+      writeIn(dir, file, `${JSON.stringify(raw, null, 2)}\n`);
+      commit(dir, `edit v${n} evidence`);
+      return gateIn(dir);
+    },
+  );
+}
 add('provenance', 'alpha1 manifest edited after the freeze', 'fail', () => {
   const dir = clone('manifest');
   const file = 'benchmarks/core-evolution/epochs/alpha1/manifest.v1.json';
@@ -627,28 +689,15 @@ add('provenance', 'alpha1 manifest edited after the freeze', 'fail', () => {
   commit(dir, 'edit manifest');
   return gateIn(dir);
 });
-add(
-  'provenance',
-  'baseline evidence file edited after the freeze',
-  'fail',
-  () => {
-    const dir = clone('evidence');
-    const raw = readJson(path.join(dir, FINAL[0]));
-    raw.samples[0].result.wallMs += 1;
-    writeIn(dir, FINAL[0], `${JSON.stringify(raw, null, 2)}\n`);
-    commit(dir, 'edit evidence');
-    return gateIn(dir);
-  },
-);
-const v2Budgets = (dir, mutate) => {
+const nextBudgets = (dir, mutate) => {
   const b = weak();
-  b.policyVersion = 2;
+  b.policyVersion = NEXT;
   b.supersedes = {
     path: BUDGETS,
     sha256: sha256(fs.readFileSync(path.join(dir, BUDGETS))),
   };
   b.policy = {
-    path: 'benchmarks/core-evolution/budget-policy.v2.json',
+    path: policyPath(NEXT),
     sha256: '4'.repeat(64),
   };
   b.relaxations = [
@@ -659,46 +708,41 @@ const v2Budgets = (dir, mutate) => {
     },
   ];
   mutate?.(b);
-  writeIn(
-    dir,
-    'benchmarks/core-evolution/budgets.v2.json',
-    `${JSON.stringify(b, null, 2)}\n`,
-  );
+  writeIn(dir, budgetsPath(NEXT), `${JSON.stringify(b, null, 2)}\n`);
 };
-add('provenance', 'committed v2 budgets without a v2 policy', 'fail', () => {
-  const dir = clone('v2-no-policy');
-  v2Budgets(
-    dir,
-    (b) =>
-      (b.baseline.results = b.baseline.results.map((r, i) => ({
-        ...r,
-        sha256: String(i + 5).repeat(64),
-      }))),
-  );
-  commit(dir, 'v2 without policy');
-  return gateIn(dir, cssRegression());
-});
 add(
   'provenance',
-  'committed v2 policy and budgets whose evidence files are absent',
+  `committed v${NEXT} budgets without a v${NEXT} policy`,
   'fail',
   () => {
-    const dir = clone('v2-no-evidence');
+    const dir = clone('next-no-policy');
+    nextBudgets(
+      dir,
+      (b) =>
+        (b.baseline.results = b.baseline.results.map((r, i) => ({
+          ...r,
+          sha256: String(i + 5).repeat(64),
+        }))),
+    );
+    commit(dir, `v${NEXT} without policy`);
+    return gateIn(dir, cssRegression());
+  },
+);
+add(
+  'provenance',
+  `committed v${NEXT} policy and budgets whose evidence files are absent`,
+  'fail',
+  () => {
+    const dir = clone('next-no-evidence');
     const policy = {
       ...readJson(path.join(dir, POLICY)),
-      policyVersion: 2,
-      justification: 'a version 2 that names results never committed',
+      policyVersion: NEXT,
+      justification: `a version ${NEXT} that names results never committed`,
     };
-    writeIn(
-      dir,
-      'benchmarks/core-evolution/budget-policy.v2.json',
-      `${JSON.stringify(policy, null, 2)}\n`,
-    );
-    v2Budgets(dir, (b) => {
+    writeIn(dir, policyPath(NEXT), `${JSON.stringify(policy, null, 2)}\n`);
+    nextBudgets(dir, (b) => {
       b.policy.sha256 = sha256(
-        fs.readFileSync(
-          path.join(dir, 'benchmarks/core-evolution/budget-policy.v2.json'),
-        ),
+        fs.readFileSync(path.join(dir, policyPath(NEXT))),
       );
       b.baseline.results = [
         {
@@ -708,34 +752,34 @@ add(
         },
       ];
     });
-    commit(dir, 'v2 without evidence');
+    commit(dir, `v${NEXT} without evidence`);
     return gateIn(dir, cssRegression());
   },
 );
 
-// An honest version 2: its own policy, new committed evidence (the baseline
-// runs re-labelled, so new files with new digests), and budgets derived from
-// them. The gate must accept it in release mode, and refuse to treat the
-// superseded v1 as release budgets.
-function honestV2(dir) {
-  const policyFile = 'benchmarks/core-evolution/budget-policy.v2.json';
+// An honest next version (N+1): its own policy, new committed evidence (the
+// in-force baseline runs re-labelled, so new files with new digests), and
+// budgets derived from them. The gate must accept it in release mode, and
+// refuse to treat any superseded version as release budgets.
+function honestNext(dir) {
+  const policyFile = policyPath(NEXT);
   const policy = {
     ...readJson(path.join(dir, POLICY)),
-    policyVersion: 2,
+    policyVersion: NEXT,
     supersedes: {
       path: BUDGETS,
       sha256: sha256(fs.readFileSync(path.join(dir, BUDGETS))),
     },
-    justification:
-      'Regression-matrix version 2 resting on new committed baseline evidence.',
+    justification: `Regression-matrix version ${NEXT} resting on new committed baseline evidence.`,
+    relaxations: [],
   };
   writeIn(dir, policyFile, `${JSON.stringify(policy, null, 2)}\n`);
   const refs = [];
   const raws = [];
-  for (const [n, file] of FINAL.entries()) {
+  for (const [n, file] of evidenceOf(VERSION).entries()) {
     const raw = readJson(path.join(dir, file));
-    raw.label = `alpha1-v2-${n + 1}`;
-    const target = `${R}/alpha1-v2-${n + 1}/raw.json`;
+    raw.label = `alpha1-v${NEXT}-${n + 1}`;
+    const target = `${R}/alpha1-v${NEXT}-${n + 1}/raw.json`;
     const text = `${JSON.stringify(raw, null, 2)}\n`;
     writeIn(dir, target, text);
     refs.push({ path: target, sha256: sha256(text), label: raw.label });
@@ -751,33 +795,30 @@ function honestV2(dir) {
     refs,
     { manifestSha256: sha256(manifest) },
   );
-  writeIn(
-    dir,
-    'benchmarks/core-evolution/budgets.v2.json',
-    `${JSON.stringify(budgets, null, 2)}\n`,
-  );
-  commit(dir, 'honest v2');
+  writeIn(dir, budgetsPath(NEXT), `${JSON.stringify(budgets, null, 2)}\n`);
+  commit(dir, `honest v${NEXT}`);
 }
 add(
   'provenance',
-  'honest committed v2 with new evidence (positive control)',
+  `honest committed v${NEXT} with new evidence (positive control)`,
   'pass',
   () => {
-    const dir = clone('v2-honest');
-    honestV2(dir);
+    const dir = clone('next-honest');
+    honestNext(dir);
     return gateIn(dir);
   },
 );
-add(
-  'provenance',
-  'superseded v1 passed while v2 is in force',
-  'not-release',
-  () => {
-    const dir = clone('v2-older');
-    honestV2(dir);
-    return gateIn(dir, fresh(), { budgets: path.join(dir, BUDGETS) });
-  },
-);
+for (const n of CHAIN)
+  add(
+    'provenance',
+    `superseded v${n} passed while v${NEXT} is in force`,
+    'not-release',
+    () => {
+      const dir = clone(`next-older-v${n}`);
+      honestNext(dir);
+      return gateIn(dir, fresh(), { budgets: path.join(dir, budgetsPath(n)) });
+    },
+  );
 
 // --------------------------------------- round-2 review probes (explicit)
 const r2 = (name, expected, mutate, options = {}) =>
