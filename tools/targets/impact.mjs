@@ -27,6 +27,9 @@ export async function impact({ targets = null } = {}) {
   const { sources } = await collectFeatureUses();
   const t = loadInspection().targets;
   const { record: resolution, diagnostics } = t.resolveTargets(targets);
+  // Without `targets` the compiler is advisory: the same failing units are
+  // reported as warnings, never errors.
+  const enforcement = t.enforcementOf(resolution);
   const outcomeCache = new Map();
   const outcomeOf = (record) => {
     if (!outcomeCache.has(record.feature)) {
@@ -110,6 +113,7 @@ export async function impact({ targets = null } = {}) {
   return {
     kind: 'pandamstyle-target-impact',
     schemaVersion: 1,
+    enforcement,
     resolution: {
       digest: resolution.digest,
       profiles: resolution.profiles.map((p) => ({
@@ -126,9 +130,13 @@ export async function impact({ targets = null } = {}) {
           name,
           {
             units: g.declarations.size,
-            errorUnits: g.failing.size,
+            failingUnits: g.failing.size,
+            errorUnits: enforcement === 'enforced' ? g.failing.size : 0,
             unknownUnits: g.unknownDeclarations.size,
-            warningUnits: g.warnings.size,
+            warningUnits:
+              g.warnings.size +
+              (enforcement === 'advisory' ? g.failing.size : 0),
+            enhancementWarningUnits: g.warnings.size,
             failingFeatures: [...g.features].sort(),
           },
         ]),
@@ -147,9 +155,10 @@ async function main() {
   if (oIndex !== -1) {
     fs.writeFileSync(argv[oIndex + 1], JSON.stringify(result, null, 2) + '\n');
   }
+  process.stdout.write(`enforcement: ${result.enforcement}\n`);
   for (const [name, g] of Object.entries(result.groups)) {
     process.stdout.write(
-      `${name.padEnd(28)} units=${g.units} errors=${g.errorUnits} unknown=${g.unknownUnits} warnings=${g.warningUnits}\n`,
+      `${name.padEnd(28)} units=${g.units} failing=${g.failingUnits} errors=${g.errorUnits} unknown=${g.unknownUnits} warnings=${g.warningUnits}\n`,
     );
   }
   process.stdout.write(`unknown features: ${result.unknowns.length}\n`);

@@ -1,0 +1,299 @@
+{
+  "kind": "pandamstyle-core-evolution-decision-closures",
+  "schemaVersion": 1,
+  "task": "CE-01.1",
+  "issue": 44,
+  "policy": [
+    "A new versioned record. The frozen CE-00.1 input tests/core-evolution/scope-decisions.v1.json is not edited.",
+    "Each closure names the decision, the lot that closes it, the closing decision, its rationale, the evidence paths and the commands that executed it. A split decision names the part each lot owns.",
+    "A closure is a contract statement, not a support claim: browser support claims attach to emitted CSS and exact target evidence only (docs/architecture/ce-01.1-browser-targets.md)."
+  ],
+  "closures": [
+    {
+      "id": "D-BP-01",
+      "status": "closed",
+      "closesIn": "CE-01.1",
+      "decision": "pandamstyle:default@1 is the Browserslist query 'chrome >= 120, edge >= 120, firefox >= 121, and_chr >= 120, and_ff >= 121, safari >= 18.2, ios_saf >= 18.2', resolved with browserslist 4.28.0, caniuse-lite 1.0.30001799, electron-to-chromium 1.5.459 and baseline-browser-mapping 2.11.23 (exact pins), evaluated on the CE-00.1 BCD 8.1.6 data restricted to emittable paths.",
+      "rationale": "Floors are measured, not copied: for each default engine, the maximum over the CE-00.2 corpus, the compiler's output for the frozen workloads and its intrinsic emission of the earliest release whose outcome is native or equivalent-fallback. A feature never acceptable on some default engine sets no floor and is listed as a non-binding exception. Orchestrator decision of 2026-10-19.",
+      "evidence": [
+        "packages/compiler/src/targets/profiles/default.v1.json",
+        "tools/targets/measure-floor.mjs",
+        "packages/compiler/__tests__/pandamstyle/targets-resolution-test.js"
+      ],
+      "commands": [
+        "node tools/targets/measure-floor.mjs --check",
+        "node tools/targets/build-compat-data.mjs --check"
+      ]
+    },
+    {
+      "id": "D-BP-02",
+      "status": "closed",
+      "closesIn": "CE-01.1",
+      "proofIn": "CE-13.4 (#81)",
+      "decision": "safari_ios is announced in pandamstyle:default@1 and in the opt-in pandamstyle:ios-safari@1 at floor 18.2, evaluated only on safari_ios statements. The basis is compat-data until #81 records executed evidence. The evidence schema refuses Playwright WebKit and other WebKit ports as safari or safari_ios evidence, refuses desktop and headless runs as safari_ios evidence, and labels Apple iOS Simulator evidence executed-simulator, distinct from a real device (executed).",
+      "rationale": "No dependency range or Playwright engine implies Safari/iOS support (#44 deliverable 8). Compat data is never a qualification.",
+      "evidence": [
+        "packages/compiler/src/targets/evidence.js",
+        "packages/compiler/__tests__/pandamstyle/targets-policy-test.js"
+      ],
+      "commands": [
+        "npx jest --config jest.config.js packages/compiler/__tests__/pandamstyle/targets-policy-test.js"
+      ]
+    },
+    {
+      "id": "D-BP-03",
+      "status": "closed",
+      "closesIn": "CE-01.1",
+      "proofIn": "CE-13.4 (#81); admission in CE-05",
+      "decision": "pandamstyle:electron@1 is the query 'electron 44.7' with platform electron, mapped by the pinned electron-to-chromium to Chromium 152 (basis derived-from-electron). platform:electron/* keys are incompatible (platform-scoped) on every profile without that platform. On Electron, -webkit-app-region and -webkit-font-smoothing evaluate native; -webkit-user-drag is unknown (no-data) because it is not in the emittable data set until CE-05 admits it.",
+      "rationale": "Electron is not Chrome: the platform scope keeps desktop-renderer extensions out of web profiles.",
+      "evidence": [
+        "packages/compiler/src/targets/resolve.js",
+        "packages/compiler/src/targets/catalog.js",
+        "packages/compiler/__tests__/pandamstyle/targets-catalog-test.js"
+      ],
+      "commands": [
+        "npx jest --config jest.config.js packages/compiler/__tests__/pandamstyle/targets-catalog-test.js"
+      ]
+    },
+    {
+      "id": "D-BP-04",
+      "status": "closed",
+      "closesIn": "CE-01.1",
+      "decision": "Android WebView is not in the default profile. It is the opt-in pandamstyle:android-webview@1, query 'android >= 120', on webview_android statements, explicitly unqualified (basis compat-data).",
+      "rationale": "Orchestrator decision of 2026-10-19.",
+      "evidence": [
+        "packages/compiler/src/targets/resolve.js",
+        "packages/compiler/__tests__/pandamstyle/targets-resolution-test.js"
+      ],
+      "commands": [
+        "npx jest --config jest.config.js packages/compiler/__tests__/pandamstyle/targets-resolution-test.js"
+      ]
+    },
+    {
+      "id": "D-BP-05",
+      "status": "closed",
+      "closesIn": "CE-01.1",
+      "decision": "Internet Explorer, legacy EdgeHTML (< 79), Presto Opera (< 15), Opera Mini and BlackBerry resolve to excluded entries with disposition obsolete and a PMS_INCOMPATIBLE_TARGET_ENGINE warning; a profile with no announced engine is an error. -ms-, -o- and -khtml- properties in emitted CSS are incompatible with reason obsolete-engine on every profile.",
+      "rationale": "Old target syntax is accepted but promises nothing (LIM-05).",
+      "evidence": [
+        "packages/compiler/src/targets/resolve.js",
+        "packages/compiler/__tests__/pandamstyle/targets-resolution-test.js",
+        "packages/compiler/__tests__/pandamstyle/targets-outcome-test.js"
+      ],
+      "commands": [
+        "npx jest --config jest.config.js packages/compiler/__tests__/pandamstyle/targets-resolution-test.js packages/compiler/__tests__/pandamstyle/targets-outcome-test.js"
+      ]
+    },
+    {
+      "id": "D-BP-06",
+      "status": "closed",
+      "closesIn": "CE-01.1",
+      "decision": "Every D-BP-06 registry entry has a determined per-engine outcome. The two entries emittable today are evaluated on their BCD data: forced-color-adjust is equivalent-fallback (platform-inapplicable) on safari and safari_ios, overscroll-behavior is native under its reviewed partial. The other 33 are not emittable in Alpha 1 and are not in the bundled data (decision 6): a construct naming one is unknown (unrecognized-construct) on every engine and fails closed. Their BCD outcomes are computed when the owning lot admits the property and extends the compat-data inputs.",
+      "rationale": "The bundled data is restricted to emittable paths (orchestrator decision 6). A non-emittable property cannot reach emitted CSS, and if it did it would never borrow another feature's support.",
+      "evidence": [
+        "docs/research/core-evolution-registry.v1.json",
+        "packages/compiler/__tests__/pandamstyle/targets-catalog-test.js"
+      ],
+      "commands": [
+        "npx jest --config jest.config.js packages/compiler/__tests__/pandamstyle/targets-catalog-test.js"
+      ]
+    },
+    {
+      "id": "D-BP-07",
+      "status": "deferred",
+      "closesIn": "CE-01.2",
+      "issue": 45,
+      "decision": "Prefix emission and its identity binding belong to CE-01.2. CE-01.1 keeps prefixed-only data visible as incompatible (prefixed-only); user-select on Safari stays an exception of the default profile until CE-01.2 proves a transformation.",
+      "rationale": "Emission changes CSS bytes and artifact identity.",
+      "evidence": [
+        "packages/compiler/src/targets/profiles/default.v1.json",
+        "packages/compiler/__tests__/pandamstyle/targets-catalog-test.js"
+      ],
+      "commands": []
+    },
+    {
+      "id": "D-BP-08",
+      "status": "closed",
+      "closesIn": "CE-01.1",
+      "decision": "Value keywords, functions, units, query kinds and descriptors with a BCD statement of their own are their own feature keys (value:<property>/<keyword>, value:<property>/<fn>(), function:<name>[/relative], unit:<unit>, at-rule:<name>/<kind>, descriptor:<at-rule>/<name>), each evaluated on its own path. A keyword without a statement of its own is the property's base grammar.",
+      "rationale": "#44 AC2: property support is not substituted for keyword or subfeature support.",
+      "evidence": [
+        "packages/compiler/src/targets/catalog.js",
+        "packages/compiler/__tests__/pandamstyle/targets-capability-test.js",
+        "packages/compiler/__tests__/pandamstyle/targets-outcome-test.js"
+      ],
+      "commands": [
+        "npx jest --config jest.config.js packages/compiler/__tests__/pandamstyle/targets-capability-test.js packages/compiler/__tests__/pandamstyle/targets-outcome-test.js"
+      ]
+    },
+    {
+      "id": "D-BP-09",
+      "status": "split",
+      "closesIn": "CE-01.1 (data pin); CE-01.2 (transformation engine and identity stage)",
+      "issue": 45,
+      "decision": "CE-01.1 closes the data pin: exact browserslist, caniuse-lite, electron-to-chromium and baseline-browser-mapping runtime dependencies, recorded with version and digest in every resolution record, plus the CE-00.1 BCD 8.1.6 data regenerated byte for byte in CI. The transformation engine and its identity stage close in CE-01.2.",
+      "rationale": "The pin binds CE-01.2; emission does not exist yet.",
+      "evidence": [
+        "packages/compiler/package.json",
+        "packages/compiler/src/targets/data/compat-data.v1.json",
+        "tools/targets/build-compat-data.mjs"
+      ],
+      "commands": ["node tools/targets/build-compat-data.mjs --check"]
+    },
+    {
+      "id": "D-BP-10",
+      "status": "split",
+      "closesIn": "CE-01.1 (tracking); CE-01.2 (lowering and useCSSLayers ownership)",
+      "issue": 45,
+      "decision": "CE-01.1 tracks layers as at-rule:layer/statement and at-rule:layer/block, native-only: useCSSLayers below layer support fails the profile, and the :not(#\\#) ladder emitted otherwise is recorded as its own intrinsic feature. Whether a lowering is a proven equivalent, and who owns useCSSLayers, close in CE-01.2.",
+      "rationale": "A lowering changes CSS bytes and cascade semantics.",
+      "evidence": [
+        "packages/compiler/src/targets/evaluate.js",
+        "packages/compiler/__tests__/pandamstyle/targets-policy-test.js"
+      ],
+      "commands": [
+        "npx jest --config jest.config.js packages/compiler/__tests__/pandamstyle/targets-policy-test.js"
+      ]
+    },
+    {
+      "id": "D-BP-11",
+      "status": "closed",
+      "closesIn": "CE-01.1",
+      "decision": "Media features in emitted conditions get media:<feature> keys (min-/max- folded, range and or syntax separate). The ones the corpus exercises are in the floor set; every one is evaluated per engine and none is assumed equivalent without a reviewed proof. The only reviewed equivalents are the three platform-inapplicable entries.",
+      "rationale": "Named conditions are emitted verbatim, so their media features are emitted constructs.",
+      "evidence": [
+        "packages/compiler/src/targets/extract.js",
+        "packages/compiler/src/targets/catalog/inapplicable.v1.json",
+        "packages/compiler/__tests__/pandamstyle/targets-capability-test.js"
+      ],
+      "commands": []
+    },
+    {
+      "id": "D-BP-12",
+      "status": "untouched",
+      "closesIn": "CE-13",
+      "issue": 78,
+      "decision": "Not addressed by CE-01.1.",
+      "rationale": "Owned by CE-13.",
+      "evidence": [],
+      "commands": []
+    },
+    {
+      "id": "D-BP-13",
+      "status": "closed",
+      "closesIn": "CE-01.1 (contract); CE-10.3 (wiring, #70)",
+      "decision": "A package publishes the computed manifest.json targetRequirements (the required feature keys of its design system's emitted CSS, with the facts digest) and never a target list. The consuming application resolves targets once and evaluates the requirements with evaluateRequirements; package composition calls it in #70.",
+      "rationale": "Targets are a property of the application.",
+      "evidence": [
+        "packages/compiler/src/design-system/registry/snapshot.js",
+        "packages/compiler/src/targets/evaluate.js",
+        "packages/compiler/__tests__/pandamstyle/targets-project-test.js",
+        "packages/compiler/__tests__/pandamstyle/targets-catalog-test.js"
+      ],
+      "commands": []
+    }
+  ],
+  "orchestratorDecisions": [
+    {
+      "id": "CE-01.1-O1",
+      "subject": "frozen profiles",
+      "decision": "pandamstyle:default@1, pandamstyle:ios-safari@1 (ios_saf >= 18.2), pandamstyle:android-webview@1 (android >= 120, opt-in) and pandamstyle:electron@1 (electron 44.7, Chromium 152, platform electron)."
+    },
+    {
+      "id": "CE-01.1-O2",
+      "subject": "floor method",
+      "decision": "Floors from the CE-00.2 corpus, the compiler's output for the frozen workloads and its intrinsic emission; acceptable means native or equivalent-fallback; a feature never acceptable on some default engine sets no floor."
+    },
+    {
+      "id": "CE-01.1-O3",
+      "subject": "Wacando text-decoration: underline dotted (W-UTIL-343)",
+      "decision": "value:text-decoration/dotted (Safari 26.2) does not set the default floor; under explicit targets it is a correct error on safari and safari_ios (support-after-floor), to be handled as an enhancement in CE-14."
+    },
+    {
+      "id": "CE-01.1-O4",
+      "subject": "enforcement",
+      "decision": "No targets: advisory, the default profile is still resolved and every outcome recorded, a failing profile is recorded as failing and every target finding is a warning. Explicit targets: enforced, a required incompatible or unknown capability is an error and an author enhancement a warning. Migration note in docs/agent-migration.md."
+    },
+    {
+      "id": "CE-01.1-O5",
+      "subject": "Browserslist",
+      "decision": "Profiles are Browserslist queries resolved with exact pins and fixed options; clock-dependent and ambient terms are refused; unannounced or obsolete engines are excluded with a warning; a profile with no announced engine is an error."
+    },
+    {
+      "id": "CE-01.1-O6",
+      "subject": "compat data",
+      "decision": "Only the CE-00.1 BCD 8.1.6, restricted to emittable paths; checks on emitted CSS at keyword and subfeature granularity."
+    },
+    {
+      "id": "CE-01.1-O7",
+      "subject": "reviews",
+      "decision": "Note reviews keyed by note digest with effectiveFrom; a partial statement is native only under a review with partial: true, missing and a rationale. Reviewed partials: overscroll-behavior, accent-color, and ::marker on Safari limited to color and font-size; font-weight inside ::marker stays an error."
+    },
+    {
+      "id": "CE-01.1-O8",
+      "subject": "platform-inapplicable entries",
+      "decision": "equivalent-fallback with reason platform-inapplicable for cursor values on safari_ios, forced-color-adjust on safari and safari_ios, and resize on safari_ios and firefox_android."
+    },
+    {
+      "id": "CE-01.1-O9",
+      "subject": "unknowns with no BCD entry",
+      "decision": "::-webkit-search-decoration and ::-webkit-outer-spin-button stay unknown, owned by CE-07 (CAP-23) with CE-09 for resets; see unknowns."
+    },
+    {
+      "id": "CE-01.1-O10",
+      "subject": "deferrals to CE-01.2 (#45)",
+      "decision": "alternative-value emission, D-BP-07 prefix emission, the D-BP-09 transformation engine and the D-BP-10 layer lowering and useCSSLayers ownership; see deferrals."
+    },
+    {
+      "id": "CE-01.1-O11",
+      "subject": "versioning",
+      "decision": "Additive fields only, sub-records at schemaVersion 1; ABI, manifest, artifacts and build-report schema versions unchanged; reader compatibility proven by execution."
+    },
+    {
+      "id": "CE-01.1-O12",
+      "subject": "simulator evidence",
+      "decision": "iOS Simulator evidence is labelled executed-simulator; Playwright WebKit never counts as Safari evidence."
+    }
+  ],
+  "deferrals": [
+    {
+      "item": "emission of alternative-value enhancement fallbacks",
+      "to": "CE-01.2",
+      "issue": 45,
+      "currentBehavior": "the fallback kind is in the schema and refused with PMS_INVALID_ENHANCEMENT_POLICY (context.deferredTo CE-01.2)"
+    },
+    {
+      "item": "D-BP-07 prefix emission",
+      "to": "CE-01.2",
+      "issue": 45,
+      "currentBehavior": "prefixed-only data stays incompatible; user-select on safari and safari_ios is a non-binding exception of the default profile"
+    },
+    {
+      "item": "D-BP-09 transformation engine and identity stage",
+      "to": "CE-01.2",
+      "issue": 45,
+      "currentBehavior": "no transformation; transformed-with-proof is in the schema and never computed"
+    },
+    {
+      "item": "D-BP-10 layer lowering and useCSSLayers ownership",
+      "to": "CE-01.2",
+      "issue": 45,
+      "currentBehavior": "layers are native-only; useCSSLayers stays a host option"
+    }
+  ],
+  "unknowns": [
+    {
+      "construct": "selector:::-webkit-search-decoration",
+      "reason": "unrecognized-construct: no BCD 8.1.6 entry",
+      "owner": "CE-07 (CAP-23)",
+      "related": "CE-09 for resets"
+    },
+    {
+      "construct": "selector:::-webkit-outer-spin-button",
+      "reason": "unrecognized-construct: no BCD 8.1.6 entry",
+      "owner": "CE-07 (CAP-23)",
+      "related": "CE-09 for resets"
+    }
+  ]
+}
