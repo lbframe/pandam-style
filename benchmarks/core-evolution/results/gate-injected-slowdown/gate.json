@@ -8,43 +8,42 @@
   "verdict": "fail",
   "problems": [],
   "refusals": [],
-  "candidateIdentity": [
-    {
-      "label": "gate-injected-slowdown",
-      "candidate": {
-        "name": "injected-slowdown",
-        "packageLockSha256": "b2b51766289a359a2fe8d9b68a8716b3283b44c9026e93a6d3b4e69088f1439d",
-        "installedPandamstyle": "43d170bd5e77ff599031975ccd809e8cca78b8b7cc08cf4cbae05716def845fd",
-        "packages": {
-          "@pandamstyle/compiler": {
-            "version": "0.1.0-alpha.1",
-            "resolved": "https://registry.npmjs.org/@pandamstyle/compiler/-/compiler-0.1.0-alpha.1.tgz",
-            "integrity": "sha512-BpCHIVMCHcnVsuolKjGWdXEqDNbCpRz6Hw+FNFzmvEKJDGi/iwneraMn1KXVZ+BbaVNhyJSY3uiMNnUuQY5NUQ=="
-          },
-          "@pandamstyle/core": {
-            "version": "0.1.0-alpha.1",
-            "resolved": "https://registry.npmjs.org/@pandamstyle/core/-/core-0.1.0-alpha.1.tgz",
-            "integrity": "sha512-JV3VOGTKawvg5zRDbOpEugVZ+968xfV/0Quge4dax7OCgq9qZ51p9zkvICFKLBgUd8hzDjn8G027Mqm5NY3LqA=="
-          },
-          "@pandamstyle/next": {
-            "version": "0.1.0-alpha.1",
-            "resolved": "https://registry.npmjs.org/@pandamstyle/next/-/next-0.1.0-alpha.1.tgz",
-            "integrity": "sha512-CIzeCG/cX5Fr22REgGPT6MxMhlo+ozgKi/OqCdRnh9/VGu5tl1V2GLJItZ+R1TWURGepRRn++fsfWsXrgdKS9A=="
-          },
-          "@pandamstyle/rsbuild": {
-            "version": "0.1.0-alpha.1",
-            "resolved": "https://registry.npmjs.org/@pandamstyle/rsbuild/-/rsbuild-0.1.0-alpha.1.tgz",
-            "integrity": "sha512-MKKkfv5/sHeUz90ZOqo0PIx2BzpTtEurMMXOXllll3ZjTkpZA5Rl33BMAnDOasE1x3xXbYwK1ikcNKeWwdSd3A=="
-          },
-          "@pandamstyle/vite": {
-            "version": "0.1.0-alpha.1",
-            "resolved": "https://registry.npmjs.org/@pandamstyle/vite/-/vite-0.1.0-alpha.1.tgz",
-            "integrity": "sha512-ePIW24QMWjkMoAHCiFBzBGck7dr5TCpLSuWWZR6FfFMeyxgMMF3bUy7jLXjeJqfw9vjZav/IkXQ+JYKjmutkFQ=="
-          }
-        }
+  "reconciliation": {
+    "errors": 0,
+    "first": []
+  },
+  "candidateIdentity": {
+    "name": "injected-slowdown",
+    "packageLockSha256": "b2b51766289a359a2fe8d9b68a8716b3283b44c9026e93a6d3b4e69088f1439d",
+    "installedPandamstyle": "43d170bd5e77ff599031975ccd809e8cca78b8b7cc08cf4cbae05716def845fd",
+    "packages": {
+      "@pandamstyle/compiler": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/compiler/-/compiler-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-BpCHIVMCHcnVsuolKjGWdXEqDNbCpRz6Hw+FNFzmvEKJDGi/iwneraMn1KXVZ+BbaVNhyJSY3uiMNnUuQY5NUQ=="
+      },
+      "@pandamstyle/core": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/core/-/core-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-JV3VOGTKawvg5zRDbOpEugVZ+968xfV/0Quge4dax7OCgq9qZ51p9zkvICFKLBgUd8hzDjn8G027Mqm5NY3LqA=="
+      },
+      "@pandamstyle/next": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/next/-/next-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-CIzeCG/cX5Fr22REgGPT6MxMhlo+ozgKi/OqCdRnh9/VGu5tl1V2GLJItZ+R1TWURGepRRn++fsfWsXrgdKS9A=="
+      },
+      "@pandamstyle/rsbuild": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/rsbuild/-/rsbuild-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-MKKkfv5/sHeUz90ZOqo0PIx2BzpTtEurMMXOXllll3ZjTkpZA5Rl33BMAnDOasE1x3xXbYwK1ikcNKeWwdSd3A=="
+      },
+      "@pandamstyle/vite": {
+        "version": "0.1.0-alpha.1",
+        "resolved": "https://registry.npmjs.org/@pandamstyle/vite/-/vite-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-ePIW24QMWjkMoAHCiFBzBGck7dr5TCpLSuWWZR6FfFMeyxgMMF3bUy7jLXjeJqfw9vjZav/IkXQ+JYKjmutkFQ=="
       }
     }
-  ],
+  },
   "counts": {
     "pass": 52,
     "fail": 28,
@@ -148,20 +147,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -192,20 +187,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -236,20 +227,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -279,20 +266,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -322,20 +305,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -356,20 +335,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -389,20 +364,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -422,20 +393,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -455,20 +422,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -488,20 +451,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -521,20 +480,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -554,20 +509,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -587,20 +538,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -620,20 +567,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -653,20 +596,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -686,20 +625,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -718,20 +653,16 @@
         "candidate": {
           "planned": 1,
           "ok": 1,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 1,
           "ok": 1,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 1,
         "nonAdjacent": 0
@@ -753,20 +684,16 @@
         "candidate": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 15,
         "nonAdjacent": 0
@@ -796,20 +723,16 @@
         "candidate": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 15,
         "nonAdjacent": 0
@@ -839,20 +762,16 @@
         "candidate": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 15,
         "nonAdjacent": 0
@@ -882,20 +801,16 @@
         "candidate": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 15,
         "nonAdjacent": 0
@@ -925,20 +840,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -969,20 +880,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1013,20 +920,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1057,20 +960,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1101,20 +1000,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1145,20 +1040,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1189,20 +1080,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1233,20 +1120,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1277,20 +1160,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1321,20 +1200,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1365,20 +1240,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1408,20 +1279,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1451,20 +1318,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1485,20 +1348,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1518,20 +1377,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1551,20 +1406,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1584,20 +1435,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1617,20 +1464,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1650,20 +1493,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1683,20 +1522,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1716,20 +1551,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1749,20 +1580,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1782,20 +1609,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1815,20 +1638,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -1847,20 +1666,16 @@
         "candidate": {
           "planned": 1,
           "ok": 1,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 1,
           "ok": 1,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 1,
         "nonAdjacent": 0
@@ -1882,20 +1697,16 @@
         "candidate": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 15,
         "nonAdjacent": 0
@@ -1925,20 +1736,16 @@
         "candidate": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 15,
           "ok": 15,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 15,
         "nonAdjacent": 0
@@ -1968,20 +1775,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -2012,20 +1815,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -2056,20 +1855,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -2100,20 +1895,16 @@
         "candidate": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 20,
           "ok": 20,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 20,
         "nonAdjacent": 0
@@ -2144,20 +1935,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2188,20 +1975,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2232,20 +2015,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2275,20 +2054,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2318,20 +2093,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2352,20 +2123,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2385,20 +2152,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2418,20 +2181,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2451,20 +2210,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2484,20 +2239,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2517,20 +2268,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2550,20 +2297,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2583,20 +2326,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2616,20 +2355,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2649,20 +2384,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2682,20 +2413,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2714,20 +2441,16 @@
         "candidate": {
           "planned": 1,
           "ok": 1,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 1,
           "ok": 1,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 1,
         "nonAdjacent": 0
@@ -2749,20 +2472,16 @@
         "candidate": {
           "planned": 12,
           "ok": 12,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 12,
           "ok": 12,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 12,
         "nonAdjacent": 0
@@ -2792,20 +2511,16 @@
         "candidate": {
           "planned": 12,
           "ok": 12,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 12,
           "ok": 12,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 12,
         "nonAdjacent": 0
@@ -2835,20 +2550,16 @@
         "candidate": {
           "planned": 12,
           "ok": 12,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 12,
           "ok": 12,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 12,
         "nonAdjacent": 0
@@ -2878,20 +2589,16 @@
         "candidate": {
           "planned": 12,
           "ok": 12,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 12,
           "ok": 12,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 12,
         "nonAdjacent": 0
@@ -2921,20 +2628,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -2965,20 +2668,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -3009,20 +2708,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -3053,20 +2748,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -3097,20 +2788,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -3141,20 +2828,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -3185,20 +2868,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -3229,20 +2908,16 @@
         "candidate": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "control": {
           "planned": 10,
           "ok": 10,
-          "missing": 0,
-          "duplicate": 0,
           "failed": 0,
           "invalid": 0,
-          "unplanned": 0
+          "missing": 0
         },
         "pairs": 10,
         "nonAdjacent": 0
@@ -3611,7 +3286,7 @@
   ],
   "provenance": {
     "rev": "HEAD",
-    "commit": "62c022e0443942d5ec099bc46e73390b6554ee3d",
+    "commit": "5ff24c5a65c4a20b3d3f1c3fc3fde0327498d6ad",
     "mode": "release",
     "budgets": "benchmarks/core-evolution/budgets.v1.json",
     "problems": []
