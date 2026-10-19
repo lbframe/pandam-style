@@ -68,8 +68,8 @@ class, and the absence of a severity and exit contract.
    push. Pushing a branch to this public repository publishes its commits;
    deleting the branch afterwards does not make them unreachable by SHA.
    Existing guards include the CE-00.2 publication gate
-   (`tools/coverage/publication.mjs`). The AG held-out guard
-   (`pms-agentic heldout guard`) lands with AG-00.1 (PR #88).
+   (`tools/coverage/publication.mjs`) and the AG held-out guard
+   (`node benchmarks/agentic/bin/pms-agentic.mjs heldout guard`).
 
 ## Reviewer briefs
 

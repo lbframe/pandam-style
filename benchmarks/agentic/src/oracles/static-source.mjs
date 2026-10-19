@@ -10,7 +10,11 @@
 // evaluated agent introduced are attributed to it.
 
 import { createRequire, isBuiltin } from 'node:module';
-import { HTML_ELEMENTS, presentationalChannel } from './style-channels.mjs';
+import {
+  HTML_ELEMENTS,
+  presentationalChannel,
+  styleSheetLink,
+} from './style-channels.mjs';
 
 const require = createRequire(import.meta.url);
 const { parse } = require('@babel/parser');
@@ -134,6 +138,39 @@ function constantKey(node) {
     return l != null && r != null ? l + r : null;
   }
   return null;
+}
+
+// A <link> in source is not a style channel only when every prop is visible
+// and its `rel` and `as` are constants that are not a style sheet
+// (`styleSheetLink`). Spreads, computed or non-constant `rel`/`as` and a link
+// without a constant `rel` cannot be proven harmless and are reported.
+// `entries` are `{ name, value }`, `name` null when not statically known and
+// `value` null when not a constant.
+function sourceLinkChannel(entries) {
+  let rel = false;
+  for (const { name, value } of entries) {
+    if (name == null) return '<link> with props that are not statically known';
+    const key = name.toLowerCase();
+    if (key !== 'rel' && key !== 'as') continue;
+    if (value == null) return `<link> with a non-constant ${key}`;
+    if (key === 'rel') rel = true;
+    const channel = styleSheetLink((n) => (n === key ? value : null));
+    if (channel != null) return channel;
+  }
+  return rel ? null : '<link> without a constant rel';
+}
+
+function objectEntries(node) {
+  if (node == null) return [];
+  if (node.type !== 'ObjectExpression') return [{ name: null, value: null }];
+  return node.properties.map((p) => {
+    if (p.type === 'SpreadElement') return { name: null, value: null };
+    const key = p.computed ? constantKey(p.key) : (p.key?.name ?? p.key?.value);
+    return {
+      name: key == null ? null : '' + key,
+      value: p.type === 'ObjectProperty' ? constantKey(p.value) : null,
+    };
+  });
 }
 
 function propertyName(node) {
@@ -736,8 +773,30 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
         break;
       case 'JSXOpeningElement': {
         const tag = node.name?.type === 'JSXIdentifier' ? node.name.name : null;
-        if (tag === 'style' || tag === 'link')
-          add('runtime-style-injection', node, `<${tag}> element`);
+        if (tag === 'style')
+          add('runtime-style-injection', node, '<style> element');
+        if (tag === 'link') {
+          const channel = sourceLinkChannel(
+            (node.attributes ?? []).map((a) => {
+              if (a.type !== 'JSXAttribute') return { name: null, value: null };
+              const n = a.name;
+              const value =
+                a.value?.type === 'StringLiteral'
+                  ? a.value.value
+                  : a.value?.type === 'JSXExpressionContainer'
+                    ? constantKey(a.value.expression)
+                    : null;
+              return {
+                name:
+                  n?.type === 'JSXNamespacedName'
+                    ? `${n.namespace.name}:${n.name.name}`
+                    : (n?.name ?? null),
+                value,
+              };
+            }),
+          );
+          if (channel != null) add('runtime-style-injection', node, channel);
+        }
         presentational(
           node,
           tag,
@@ -787,9 +846,22 @@ export function findConstructs(code, file, { isDefinition = false } = {}) {
               node,
               `${name} with non-constant tag`,
             );
-          if (tagKey === 'style' || tagKey === 'link')
-            add('runtime-style-injection', node, `${name}('${tagKey}')`);
           const props = node.arguments?.[name === 'createElementNS' ? 2 : 1];
+          if (
+            tagKey === 'style' ||
+            (tagKey === 'link' && name === 'createElementNS')
+          )
+            add('runtime-style-injection', node, `${name}('${tagKey}')`);
+          else if (tagKey === 'link') {
+            // React.createElement props, or the DOM's options (no `rel`).
+            const channel = sourceLinkChannel(objectEntries(props));
+            if (channel != null)
+              add(
+                'runtime-style-injection',
+                node,
+                `${name}('link'): ${channel}`,
+              );
+          }
           if (name === 'createElement' && tagKey != null)
             presentational(
               node,

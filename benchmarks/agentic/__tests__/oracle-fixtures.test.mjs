@@ -13,13 +13,22 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import test from 'node:test';
-import { CORPUS_ROOT, heldoutPaths, loadCorpus } from '../src/corpus.mjs';
+import {
+  CORPUS_ROOT,
+  findTask,
+  heldoutPaths,
+  loadCorpus,
+} from '../src/corpus.mjs';
+import { copyTree } from '../src/fs-tree.mjs';
 import { validate } from '../src/json-schema.mjs';
+import { compileInPlace, materializeTask } from '../src/materialize.mjs';
 import {
   listOracleFixtures,
   runOracleFixture,
 } from '../src/oracle-fixtures.mjs';
+import { evaluateTask, stateFileFor } from '../src/oracles/evaluate.mjs';
 
 const REPO = path.resolve(CORPUS_ROOT, '../..');
 const SCRATCH = path.join(REPO, '.pms-bench/agentic-test');
@@ -79,6 +88,67 @@ test('every development task with an application outcome has a known-good oracle
     );
   }
 });
+
+// A consumer project ignores the compiler's generation state file, so a
+// rebuild leaves nothing for an agent to "clean up". The oracle never reads
+// git: deleting the file still fails generated integrity.
+test(
+  'the generation state file is gitignored in every fixture, and deleting it still fails',
+  { skip: !compilerBuilt && 'compiler not built' },
+  async () => {
+    const root = path.join(SCRATCH, 'state-file-ignored');
+    fs.rmSync(root, { recursive: true, force: true });
+    const status = (dir) =>
+      spawnSync('git', ['status', '--porcelain', '--untracked-files=all'], {
+        cwd: dir,
+        encoding: 'utf8',
+      }).stdout;
+    const withProject = [...loaded.fixtures.values()].filter(
+      (f) => f.meta.project != null,
+    );
+    assert.equal(withProject.length, 5);
+    for (const fixture of withProject) {
+      const entry = loaded.development.find(
+        (t) => t.task.workspace.fixture === fixture.meta.id,
+      );
+      const dir = path.join(root, fixture.meta.id);
+      materializeTask({ taskEntry: entry, fixture, dest: dir });
+      compileInPlace({ dir, project: fixture.meta.project });
+      const state = stateFileFor(fixture.meta.project.outDir);
+      assert.ok(fs.existsSync(path.join(dir, state)), state);
+      assert.equal(status(dir), '', `${fixture.meta.id}: ${state} is listed`);
+    }
+    const entry = findTask(loaded, 'composition-positive-order-summary');
+    const fixture = loaded.fixtures.get(entry.task.workspace.fixture);
+    const baselineDir = path.join(root, 'trial/baseline');
+    const workspaceDir = path.join(root, 'trial/workspace');
+    materializeTask({ taskEntry: entry, fixture, dest: baselineDir });
+    copyTree(baselineDir, workspaceDir, { includeEmptyDirs: true });
+    copyTree(path.join(entry.dir, 'oracle-fixtures/good/files'), workspaceDir, {
+      includeEmptyDirs: true,
+    });
+    compileInPlace({ dir: workspaceDir, project: fixture.meta.project });
+    const before = status(workspaceDir);
+    fs.rmSync(
+      path.join(workspaceDir, stateFileFor(fixture.meta.project.outDir)),
+    );
+    assert.equal(status(workspaceDir), before, 'the deletion is not listed');
+    assert.doesNotMatch(before, /pms-state/);
+    const r = await evaluateTask({
+      task: entry.task,
+      fixture: fixture.meta,
+      epoch: 'alpha1',
+      baselineDir,
+      workspaceDir,
+      scratchRoot: path.join(root, 'trial'),
+      options: { hostCommands: false },
+    });
+    const check = r.checks.find((c) => c.id === 'generated-untouched');
+    assert.equal(check.status, 'fail', check.reason);
+    assert.equal(r.verdict, 'fail');
+    fs.rmSync(root, { recursive: true, force: true });
+  },
+);
 
 test(
   'held-out oracle fixtures (only where plaintext is staged locally)',

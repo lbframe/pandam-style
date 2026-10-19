@@ -2623,7 +2623,7 @@ normativeCoverage:
     reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."
   - path: docs/agent-delivery-protocol.md
     section: publication
-    sha256: f05ccfa90492340b8401f6f3320af1a5d6634523e311f1ad03e66881f749f71a
+    sha256: 22a1d3a9fcd4eaad3e2aad9e3d0adf8063561f7f16f2c468de4602514815ea57
     disposition: no-implementation-obligation
     reason: "Contribution process requiring a local leak scan before pushing private- or sealed-derived data; existing guards are cited as examples, not new product guarantees."
     reviewWhen: "When this section changes scope or starts asserting a present implementation guarantee."

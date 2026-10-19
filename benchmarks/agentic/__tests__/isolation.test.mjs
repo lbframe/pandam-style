@@ -343,6 +343,76 @@ test('the committed DOM must be what React committed, read through frozen interf
   );
 });
 
+test('only style sheet links are style channels; hoisted and preloaded elements are compared', () => {
+  const dir = workspace('links', {});
+  const header =
+    "import { jsx, jsxs } from 'react/jsx-runtime';\nimport { useEffect, useLayoutEffect, useState } from 'react';\nimport { preinit, preload } from 'react-dom';\n";
+  const scenario = (body) =>
+    payload(render(dir, `${header}export function C() { ${body} }\n`));
+  // Not style channels, and React's hoisted instances are measured.
+  for (const body of [
+    "return jsx('link', { rel: 'canonical', href: '/orders' });",
+    "return jsx('link', { rel: 'icon', href: '/favicon.ico' });",
+    "return jsx('link', { rel: 'preload', as: 'image', href: '/a.png' });",
+    "return jsx('link', { rel: 'modulepreload', href: '/m.js' });",
+    "return jsx('link', { rel: 'preconnect', href: 'https://cdn.example' });",
+    "return jsxs('div', { children: [jsx('title', { children: 'Orders' }), jsx('meta', { name: 'description', content: 'x' }), jsx('link', { rel: 'alternate', hrefLang: 'fr', href: '/fr' })] });",
+    "return jsx('img', { src: '/a.png', fetchPriority: 'high', alt: '' });",
+    "return jsx('img', { src: '/a.png', width: 24, height: 24, alt: '' });",
+    "return jsx('img', { srcSet: '/a.png 1x, /b.png 2x', sizes: '24px', alt: '' });",
+    "return jsxs('picture', { children: [jsx('source', { srcSet: '/a.webp', type: 'image/webp' }), jsx('img', { src: '/a.png', alt: '' })] });",
+  ]) {
+    const s = scenario(body);
+    assert.deepEqual(s.violations, [], body);
+    assert.deepEqual(s.unmeasured, [], body);
+  }
+  // Style sheet links, however React or agent code makes them.
+  for (const [body, pattern] of [
+    [
+      "return jsx('link', { rel: 'stylesheet', href: '/a.css' });",
+      /style sheet <link> \(rel\)/,
+    ],
+    [
+      "return jsx('link', { rel: 'Alternate\\tSTYLESHEET', href: '/a.css', title: 'A' });",
+      /style sheet <link> \(rel\)/,
+    ],
+    [
+      "return jsx('link', { rel: 'import', href: '/a.html' });",
+      /style sheet <link> \(rel\)/,
+    ],
+    [
+      "return jsx('link', { rel: 'preload', as: 'style', href: '/a.css' });",
+      /style sheet <link> \(as="style"\)/,
+    ],
+    [
+      "return jsx('link', { rel: 'prefetch', as: ' Style ', href: '/a.css' });",
+      /style sheet <link> \(as="style"\)/,
+    ],
+    [
+      "return jsx('link', { rel: 'stylesheet', href: '/a.css', precedence: 'default' });",
+      /style sheet <link> \(rel\)/,
+    ],
+    ["preinit('/a.css', { as: 'style' }); return 'x';", /style sheet <link>/],
+    ["preload('/a.css', { as: 'style' }); return 'x';", /style sheet <link>/],
+    // A style sheet only between two commits is still one.
+    [
+      "const [rel, setRel] = useState('canonical'); useLayoutEffect(() => { if (rel === 'canonical') setRel('stylesheet'); else if (rel === 'stylesheet') setRel('next'); }); return jsx('link', { rel, href: '/a.css' });",
+      /style sheet <link> \(rel\): Element\.setAttribute by react/,
+    ],
+    [
+      "return jsx('link', { rel: 'canonical', href: '/a', ref: (el) => { if (el) el.rel = 'stylesheet'; } });",
+      /style sheet <link> \(rel\): HTMLLinkElement\.rel by code at src\/C\.jsx/,
+    ],
+    [
+      "useEffect(() => { const l = document.createElement('link'); l.setAttribute('as', 'style'); document.head.appendChild(l); }, []); return 'x';",
+      /style sheet <link> \(as="style"\)/,
+    ],
+  ]) {
+    const trace = scenario(body).violations.join('\n');
+    assert.match(trace, pattern, body);
+  }
+});
+
 test('definitions load in the sandbox as plain data with token references', () => {
   const dir = workspace('definition', {
     'ok.mjs':
@@ -429,6 +499,43 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
     "String.prototype.trim = () => '';": ['dynamic-code'],
     'export function A() { const r = useRef(null); useEffect(() => { const n = r.current; n[key] = 1; }); return <div ref={r} />; }':
       ['dynamic-code'],
+    // A <link> is harmless only with visible, constant, non-style-sheet props.
+    'export const A = () => <link rel="stylesheet" href="/a.css" />;': [
+      'runtime-style-injection',
+    ],
+    'export const A = () => <link REL="Alternate StyleSheet" href="/a.css" />;':
+      ['runtime-style-injection'],
+    "export const A = () => <link rel={'style' + 'sheet'} href=\"/a.css\" />;":
+      ['runtime-style-injection'],
+    'export const A = () => <link rel="preload" as="style" href="/a.css" />;': [
+      'runtime-style-injection',
+    ],
+    'export const A = ({ kind }) => <link rel={kind} href="/a" />;': [
+      'runtime-style-injection',
+    ],
+    'export const A = ({ as }) => <link rel="preload" as={as} href="/a" />;': [
+      'runtime-style-injection',
+    ],
+    'export const A = (p) => <link {...p} rel="canonical" />;': [
+      'runtime-style-injection',
+    ],
+    'export const A = () => <link href="/a.css" />;': [
+      'runtime-style-injection',
+    ],
+    "export const A = () => createElement('link', { rel: 'stylesheet' });": [
+      'runtime-style-injection',
+    ],
+    "export const A = (o) => createElement('link', o);": [
+      'runtime-style-injection',
+    ],
+    "export const A = (o) => createElement('link', { ...o, rel: 'icon' });": [
+      'runtime-style-injection',
+    ],
+    "export const f = (d) => d.createElement('link');": [
+      'runtime-style-injection',
+    ],
+    "export const f = (d, ns) => d.createElementNS(ns, 'link', { rel: 'icon' });":
+      ['runtime-style-injection'],
   };
   for (const [code, rules] of Object.entries(flagged)) {
     const found = new Set(findConstructs(code, 'x.jsx').map((f) => f.rule));
@@ -453,6 +560,9 @@ test('static rules fail closed on runtime style mutation and ambient access', ()
     'function IconPath() { return <path color="currentColor" d="M0 0" />; }\nexport const Icon = () => <svg><IconPath /></svg>;',
     'export const Meta = () => <product-meta text="sku-123" color="blue" width={3} />;',
     "import { useRef as useNodeRefs } from 'react';\nexport function L({ items }) { const refs = useNodeRefs(new Array(items.length)); return items.map((it, i) => <li key={it.id} ref={(el) => { refs.current[i] = el; }} onKeyDown={() => refs.current[(i + 1) % items.length]?.focus()} />); }",
+    'export const Head = () => <><link rel="canonical" href="https://example.test/orders" /><link rel={\'icon\'} href="/favicon.ico" /><link rel="preload" as="image" href="/hero.png" fetchPriority="high" /><link rel="modulepreload" href="/m.js" /></>;',
+    "export const Head = () => createElement('link', { rel: 'canonical', href: '/orders' });",
+    'export const Hero = () => <img src="/product.png" fetchPriority="high" width={24} height={24} alt="" />;',
   ];
   // A ref container stops being one when `current` can receive a node: every
   // assignment-target form of `r.current` (and a reassigned ref binding).

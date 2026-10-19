@@ -1,0 +1,9 @@
+{
+  "description": "Review probe (#98): a <link rel=\"preload\" as=\"style\"> fetches a style sheet.",
+  "epoch": "alpha1",
+  "expectedVerdict": "fail",
+  "expectedStatuses": {
+    "no-bypass": "fail",
+    "summary-card": "fail"
+  }
+}

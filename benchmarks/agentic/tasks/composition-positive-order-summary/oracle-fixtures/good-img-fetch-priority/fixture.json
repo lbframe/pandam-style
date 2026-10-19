@@ -1,0 +1,16 @@
+{
+  "description": "Review control (#98): an eager <img src fetchPriority=\"high\"> (React's serializer emits an image preload before it) is consistent with React.",
+  "epoch": "alpha1",
+  "expectedVerdict": "pass",
+  "expectedStatuses": {
+    "scope": "pass",
+    "compile": "pass",
+    "no-bypass": "pass",
+    "summary-card": "pass",
+    "summary-title": "pass",
+    "summary-items": "pass",
+    "checkout-button": "pass",
+    "mounted-on-page": "pass",
+    "visual-fidelity": "unmeasured"
+  }
+}
