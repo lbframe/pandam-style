@@ -20,12 +20,6 @@ jobs:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v6
-      # Pin the release that reported and verified the inherited findings;
-      # the floating `v1` tag is deprecated.
-      - name: spelling
-        uses: crate-ci/typos@v1.50.2
-        with:
-          config: .github/workflows/typos.toml
       - uses: actions/setup-node@v6
         with:
           node-version: '22.x'
@@ -42,6 +36,13 @@ jobs:
       - name: lint
         if: ${{ !cancelled() }}
         run: yarn lint:report
+      # Pin the release that reported and verified the inherited findings;
+      # the floating `v1` tag is deprecated.
+      - name: spelling
+        if: ${{ !cancelled() }}
+        uses: crate-ci/typos@v1.50.2
+        with:
+          config: .github/workflows/typos.toml
 
   pandamstyle:
     runs-on: ubuntu-latest
