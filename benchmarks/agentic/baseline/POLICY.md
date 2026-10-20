@@ -24,7 +24,7 @@ binding. Every value is copied from the baseline records, never retyped.
 | Corpus | `1.4.5`, `corpus.lock.json` sha256 `cc37a931…ab52`, development split only |
 | Epoch | `alpha1` (product `0.1.0-alpha.1`, source `415e055`) |
 | Reference product | the digest-verified Alpha 1 tarballs of CE manifest `acdefef3…2884`; trusted grading tree `8feb473d…53b2` (`@pandamstyle` subtree `935080b9…bfee`) |
-| Harness | `runnerTreeDigest` and `harnessDepsLockSha256` of the run (observed in preflight: `5507e7d3…e4fa`, `66395a2d…1970`) |
+| Harness | `runnerTreeDigest` (execution-relevant files only, below) and `harnessDepsLockSha256` of the run (observed in the phase 2 preflight: `08e7ae43…4d4d`, `66395a2d…1970`) |
 | Models | the three model configurations of section 2 |
 | Cells | one comparability key (DESIGN.md §1.4) per task × model, listed in the gate record |
 
@@ -32,6 +32,18 @@ A candidate is compared with a gate only when its cell's comparability key
 equals the gate's key; `compare` refuses otherwise. The product build digest,
 the `@pandamstyle/*` lockfile entries, the trusted tree and the agent-docs tree
 are the axis under comparison and may differ.
+
+**Runner digest scope (binding).** `runnerTreeDigest` covers every file under
+`benchmarks/agentic/runner/` except an explicit list of non-execution
+material (DESIGN.md §1.4, `identity.mjs` `RUNNER_DIGEST_EXCLUDE`): `*.md` at
+the runner root, `smoke/**`, `__tests__/**`, `fixtures/bin/fake-cli.mjs` and
+`fixtures/observed/**`. Editing documentation, smoke records or tests
+therefore keeps the frozen keys. Editing `src/`, `bin/`, `container/`,
+`schema/`, a package or lock file, or adding any file the list does not name,
+changes the key and needs a new comparable baseline (section 7). Extending
+the list is itself a runner change that changes the digest; it needs the same
+review as any other runner change and is never applied to a frozen gate
+record retroactively.
 
 ## 2. Baseline run configuration
 
@@ -54,7 +66,8 @@ These are the exact model configurations the thresholds are frozen for.
 - **Budgets:** corpus `timeoutSeconds`; `maxToolCalls` = corpus `maxTurns` hint;
   Claude `--max-turns` = 2 × `maxToolCalls`.
 - **Repetitions and retries:** 3 repetitions; at most 3 attempts, retried only
-  after infrastructure failures (DESIGN.md §5).
+  after infrastructure failures (DESIGN.md §5). A rate or usage limit is not
+  retried: it halts that provider for the rest of the run (section 6.1).
 - **Containers and network:** 2 CPUs, 4 GiB memory, 1024 pids, 1 GiB tmpfs, 4
   GiB workspace cap. Per-attempt internal network with the isolated gateway.
   Allowlists: Claude `api.anthropic.com:443`; Codex `chatgpt.com:443` and
@@ -171,8 +184,8 @@ stated before any candidate is seen.
 ### 5.4 Latency
 
 The machine is never idle, so absolute latencies are `indicative` only. The
-latency gates compare the candidate with an **interleaved Alpha 1 control** in
-the same qualification run: ABAB per task × model × repetition, the same host
+latency gates, and only they, compare the candidate with an **interleaved
+Alpha 1 control** in the same qualification run (section 6, drift): ABAB per task × model × repetition, the same host
 load (DESIGN.md §2.7). The frozen part is the tolerance. It is derived from the
 baseline's repetitions with a task-cluster bootstrap (`B = 10000`, fixed seed in
 the gate record): ratios between single repetitions of the same configuration on
@@ -210,13 +223,51 @@ slice.
    get it independently reviewed. The gates are frozen when that review is
    accepted, before any product change of lot AG-01 or later (#8 onwards).
 
-**Provider drift.** The served models and their server-side defaults are not
-observable and can change between the baseline and AG-12. Every qualification
-run therefore includes the interleaved Alpha 1 control (open question 3). If
-the control differs from the frozen baseline by more than a gate's margin, in
-either direction, the qualification is
-`inconclusive: reference drift` and cannot pass. That outcome triggers the
-change procedure of section 7. It never relaxes a gate.
+**Provider drift (decided 2026-10-19).** The served models and their
+server-side defaults are not observable and can change between the baseline
+and AG-12. The interleaved Alpha 1 control (section 5.4) runs in every
+qualification run **for the latency gates only**. The success, critical-task,
+safety, context and repair gates compare the candidate with the frozen
+baseline, with no control in the same run.
+
+Accepted consequence: on those gates, provider-side model drift is
+confounded with the product change. A regression may be the provider's, not
+the product's; an improvement may be too. The policy does not try to separate
+them, and a gate result is never adjusted for suspected drift. It is reported
+as follows:
+
+- the gate record of every qualification states the baseline and
+  qualification dates and the CLI versions and binary digests of both, and
+  says that non-latency gates do not control for provider drift;
+- a failed non-latency gate stays a failure. Its report says the failure may
+  be partly or wholly provider drift. Only the user, or an orchestrator the
+  user delegated that decision to, may accept it as a residual risk (section
+  7), or order a fresh comparable baseline (a new policy version) before
+  re-qualifying;
+- a passed non-latency gate is reported as a pass against the frozen baseline,
+  with the same caveat.
+
+### 6.1 Running the matrix (decided 2026-10-19)
+
+- **Cadence:** one sequential matrix with all three models: about 13 h,
+  396 attempts (264 Claude, 132 Codex), 27 installation cells `unsupported`.
+  No second runner process runs at the same time (section 9, finding 1).
+- **Rate limits:** the runner halts a provider automatically on its first
+  `rate-limit` attempt (DESIGN.md §5.2). The halt is per CLI: a Claude limit
+  stops both Claude models, and Codex continues, and vice versa. The
+  rate-limited attempt's record is kept; the cells left by the halt are
+  `missing` (reason `provider <cli> halted: rate-limit …`) and not contested.
+  `run` prints `rateLimited` with the reset time when the provider gave one
+  (Codex gives none) and exits with status 75.
+- **Resume:** after the reset (for Codex, which reports no reset time, once
+  the operator has checked that its usage window has reset), re-run the same command with the same
+  `--matrix-id`, without changing `matrix.json`, the checkout or the setup.
+  The resume identity rules refuse any change. Exactly the missing
+  repetitions run; the rate-limited repetition runs as its next attempt and
+  is `contested`. Repeat until every runnable repetition is valid or
+  completeness (step 2 above) applies.
+- Exit status 1 (a harness error or a matrix halt) is never resumed blindly:
+  the cause is read from `outcomes.json` first.
 
 ## 7. Versioning and changes
 
@@ -272,10 +323,9 @@ Refused tasks: `installation-positive-vite`,
 (DESIGN.md Q2). No other runnable development task is refused.
 
 Matrix: `matrix.json` sha256 `431bf476…b14d`, setup sha256 `4cda637b…b53d`
-(local). `retry.capSeconds` is 18000 (default 1800), so after a Claude rate
-limit the runner waits for the reported `resetsAt`, up to 5 h, before the
-retry. The repetition is still `contested`, and the sequential matrix waits as
-a whole. Codex reports no reset time (finding 2).
+(local). `retry.capSeconds` is 18000 (default 1800). Since phase 2 it applies
+only to the remaining retried infrastructure codes (`capacity`,
+`provider-error`): a rate limit halts the provider instead (finding 2).
 
 Findings that affect the run:
 
@@ -294,19 +344,19 @@ Findings that affect the run:
    export. That consequence is read from `recovery.mjs`, `docker.mjs` and
    `provider.mjs` (`sweepLabels: true`); the removal itself was not executed.
 
-2. **Rate limits do not stop the matrix** (read from `matrix.mjs`; no rate
-   limit has been observed). An infrastructure failure is retried until
+2. **Rate limits did not stop the matrix** (resolved in phase 2: the runner
+   now halts the provider, section 6.1; read from `matrix.mjs` at `f4845dd`;
+   no rate limit has been observed). An infrastructure failure is retried until
    `maxAttempts`, then the runner moves on to the next repetition. A resume
    runs such a repetition again, because its last attempt is retryable, but
    every repetition that consumed a retry stays `contested` and counts as a
    non-success in the conservative bound. Codex reported no rate-limit state in
    the smoke run, so its backoff falls back to 60 s × 2^k. A Codex usage limit
    would therefore make most of its remaining repetitions contested within
-   minutes. Operating rule: watch the records, and on the first `rate-limit`
-   record cancel the runner (SIGINT: `harness:cancelled`, resumable, cancelled
-   attempts not counted). Resume after the reset.
-3. **`runnerTreeDigest` covers every byte under `runner/`, including `DESIGN.md`
-   and the smoke records.** Observed: it changed from `2300641c…` (smoke r3,
+   minutes.
+3. **`runnerTreeDigest` covered every byte under `runner/`, including `DESIGN.md`
+   and the smoke records** (resolved in phase 2: section 1, runner digest
+   scope). Observed: it changed from `2300641c…` (smoke r3,
    `69e1f79`) to `5507e7d3…` (`f4845dd`), although only `DESIGN.md` and the
    smoke records changed under `runner/`. It enters the comparability key, so
    any later edit there, documentation included, makes candidates incomparable
@@ -332,11 +382,10 @@ Findings that affect the run:
   Assuming averages of about 1 min (haiku), 2 min (sonnet) and 2.5 min (sol) on
   the full corpus:
 
-  - one sequential matrix: about 13 h (range 4–27 h);
-  - two provider lanes in parallel, if made safe (finding 1): about 7 h, bounded
-    by the Claude lane.
+  - one sequential matrix (the decided cadence): about 13 h (range 4–27 h).
 
-  The matrix has a 24 h wall-clock cap and is resumable.
+  The matrix has a 24 h wall-clock cap and is resumable. Time spent halted on
+  a rate limit comes on top.
 
 - **Quota:**
   - **Claude list-price equivalent** (an estimate, not billed). The smoke run
@@ -351,19 +400,12 @@ Findings that affect the run:
     input tokens per attempt (mostly cached), so 132 attempts come to roughly
     7–20 M input tokens.
 
-## 11. Open questions
+## 11. Decisions (user, 2026-10-19)
 
-1. **Cadence.** The decided cadence (one Claude and one Codex attempt in
-   parallel) is not safely possible with the current runner (finding 1).
-   - Recommended: run the single sequential matrix as prepared (about 13 h, no
-     runner change).
-   - Alternative: a reviewed runner change before the run that scopes recovery
-     and the Docker sweep to the runner's own runs root and matrix, then two
-     matrices with disjoint models (about 7 h).
-2. **Harness digest scope** (finding 3). Should `runnerTreeDigest` exclude
-   documentation and smoke records before the baseline run (a small reviewed
-   runner change)? Otherwise every later documentation edit in `runner/`
-   invalidates the frozen gates and requires a new baseline (section 7).
-3. **Drift control.** Should every qualification run include the interleaved
-   Alpha 1 control for all gates (section 6), roughly doubling its cost, rather
-   than only for latency?
+1. **Cadence:** one sequential matrix (section 6.1). The parallel option (one
+   Claude and one Codex attempt at a time) is dropped.
+2. **Harness digest scope:** `runnerTreeDigest` excludes documentation,
+   smoke records and test-only material, fail-safe (section 1).
+3. **Drift control:** the interleaved Alpha 1 control is run for latency only;
+   the confounding of other gates with provider drift is accepted and
+   reported (section 6).

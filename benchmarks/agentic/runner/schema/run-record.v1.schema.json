@@ -867,6 +867,12 @@
                 "number",
                 "null"
               ]
+            },
+            "haltedProvider": {
+              "description": "Set when this attempt halted its provider instead of being retried (section 5.2): a rate or usage limit.",
+              "enum": [
+                "rate-limit"
+              ]
             }
           }
         },

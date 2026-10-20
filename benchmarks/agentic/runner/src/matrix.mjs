@@ -8,7 +8,9 @@
 // Matrix planning and execution (DESIGN.md sections 1.1, 5.2, 5.3 and Q8).
 // Repetition indices are fixed when planned. Only infrastructure failures
 // start a new attempt; every repetition that consumed such a retry is
-// contested. Refused tasks are recorded as `unsupported / not run`.
+// contested. A rate or usage limit is never retried: it halts its provider
+// for the rest of the run. Refused tasks are recorded as `unsupported / not
+// run`.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -375,6 +377,7 @@ export async function runMatrix({
   }
   const fidelityFailures = new Map();
   const outcomes = [];
+  const rateLimited = {};
 
   // Resume check of every planned repetition before anything runs: a
   // record that cannot be reused refuses the matrix before any mutation.
@@ -613,6 +616,42 @@ export async function runMatrix({
             });
             break;
           }
+          // Section 5.2: a provider rate or usage limit is not retried. It
+          // halts that CLI (one account for all its models) for the rest of
+          // this run; the record stays, so a resume re-runs this repetition
+          // (contested) and every cell the halt left missing.
+          if (
+            rec.outcome.class === 'infrastructure' &&
+            rec.outcome.code === 'rate-limit'
+          ) {
+            const resetsAt = rateLimitResetIso(rec.provider.rateLimit);
+            const reason = `rate-limit (${resetsAt ? `resets at ${resetsAt}` : 'no reset time reported'})`;
+            halted.providers.set(model.cli, reason);
+            rateLimited[model.cli] = {
+              resetsAt,
+              taskId,
+              model: model.key,
+              repetition: r,
+              attempt,
+            };
+            rec.outcome.retry = {
+              scheduled: false,
+              backoffSeconds: null,
+              haltedProvider: 'rate-limit',
+            };
+            writeRecord(attemptDir, rec, matrixRedaction);
+            outcomes.push({
+              taskId,
+              model: model.key,
+              repetition: r,
+              status: 'missing',
+              attempts: used,
+              contested: true,
+              code: rec.outcome.code,
+              reason: `provider ${model.cli} halted: ${reason}`,
+            });
+            break;
+          }
           if (detail.retry && used < config.maxAttempts) {
             const wait = backoffSeconds({
               attempt: used,
@@ -660,13 +699,22 @@ export async function runMatrix({
       matrix: halted.matrix,
       providers: Object.fromEntries(halted.providers),
     },
+    rateLimited,
   });
   // Returned (and printed by the CLI) through the same redaction.
   return {
     matrixId,
     matrixDir,
     outcomes: JSON.parse(matrixRedaction.redactText(JSON.stringify(outcomes))),
+    rateLimited,
   };
+}
+
+/** Reset time of a provider rate limit as ISO 8601, or null when unreported. */
+export function rateLimitResetIso(rateLimit) {
+  const v = rateLimit?.resetsAt;
+  if (typeof v !== 'number' || !Number.isFinite(v) || v <= 0) return null;
+  return new Date(v < 1e12 ? v * 1000 : v).toISOString();
 }
 
 function removeIfEmpty(dir) {

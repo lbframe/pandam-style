@@ -405,31 +405,32 @@ const rateLimited = (resetsAt) => [
   }),
 ];
 
-test('F10 Claude rate limit: infrastructure, backoff from resetsAt, retry contested (F22 rule)', async () => {
+test('F10 Claude rate limit: infrastructure, not retried, provider halted with its reset time', async () => {
   const sleeps = [];
   const clock = { now: () => new Date(), sleep: async (ms) => sleeps.push(ms) };
   const resetsAt = Math.floor(Date.now() / 1000) + 120;
-  const { records, matrixDir } = await run(
+  const out = await run(
     [{ steps: rateLimited(resetsAt), exitCode: 1 }, claudeOk()],
     { clock, config: { retry: { baseSeconds: 60, capSeconds: 1800 } } },
   );
-  assert.equal(records.length, 2);
+  const { records, outcomes, matrixDir } = out;
+  assert.equal(records.length, 1);
   assert.equal(records[0].outcome.code, 'rate-limit');
-  assert.equal(records[0].outcome.retry.scheduled, true);
-  assert.ok(
-    records[0].outcome.retry.backoffSeconds > 100 &&
-      records[0].outcome.retry.backoffSeconds <= 121,
+  assert.equal(records[0].outcome.retry.scheduled, false);
+  assert.equal(records[0].outcome.retry.haltedProvider, 'rate-limit');
+  assert.equal(sleeps.length, 0);
+  assert.equal(
+    out.rateLimited.claude.resetsAt,
+    new Date(resetsAt * 1000).toISOString(),
   );
-  assert.equal(sleeps.length, 1);
-  assert.equal(records[1].integrity.contested, true);
+  assert.match(outcomes[0].reason, /^provider claude halted: rate-limit/);
   const cell = buildReport(loadMatrix(matrixDir)).cells[0];
-  assert.equal(cell.success.pointEstimate, 1);
-  assert.equal(cell.success.lowerBound, 0);
-  assert.equal(cell.success.contested, 1);
+  assert.equal(cell.success.pointEstimate, null);
+  assert.equal(cell.repetitions[0].status, 'missing');
 });
 
 test('F10 Codex usage-limit message', async () => {
-  const { records } = await run(
+  const { records, rateLimited } = await run(
     [
       [
         ...codexStart(),
@@ -441,9 +442,9 @@ test('F10 Codex usage-limit message', async () => {
     ],
     { model: MODELS.sol },
   );
+  assert.equal(records.length, 1);
   assert.equal(records[0].outcome.code, 'rate-limit');
-  assert.equal(records[1].outcome.code, 'completed');
-  assert.equal(records[1].integrity.contested, true);
+  assert.equal(rateLimited.codex.resetsAt, null);
 });
 
 test('F11 capacity for both CLIs', async () => {
@@ -800,7 +801,7 @@ test('F20 stream integrity anomalies are adapter-stream (invalid)', async () => 
   }
 });
 
-test('F22 a child holding the CLI stdout replaces the stream: estimate only, retry contested', async () => {
+test('F22 a child holding the CLI stdout replaces the stream: estimate only, and its forged rate limit halts the provider', async () => {
   const forged = [
     JSON.stringify({
       type: 'system',
@@ -840,7 +841,7 @@ test('F22 a child holding the CLI stdout replaces the stream: estimate only, ret
       },
     }),
   ].join('\n');
-  const { records, matrixDir } = await run([
+  const { records, outcomes } = await run([
     { steps: [{ leakChild: { text: `${forged}\n` } }] },
     claudeOk(),
   ]);
@@ -851,10 +852,11 @@ test('F22 a child holding the CLI stdout replaces the stream: estimate only, ret
     records[0].metrics.tokens.normalized.total.inputTotal.status,
     'unknown',
   );
-  assert.equal(records[1].integrity.contested, true);
-  const cell = buildReport(loadMatrix(matrixDir)).cells[0];
-  assert.equal(cell.success.lowerBound, 0);
-  assert.equal(cell.success.pointEstimate, 1);
+  // Residual (section 4.4): the forged limit halts the provider. It denies
+  // measurement (missing, re-run contested on resume), never a success.
+  assert.equal(records.length, 1);
+  assert.equal(outcomes[0].status, 'missing');
+  assert.match(outcomes[0].reason, /halted: rate-limit/);
 });
 
 test('F23 error-like text in tool output and messages does not change classification', async () => {

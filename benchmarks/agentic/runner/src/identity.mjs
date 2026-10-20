@@ -27,15 +27,37 @@ function git(args) {
   return r.status === 0 ? r.stdout.trim() : null;
 }
 
+/**
+ * Runner files outside the comparability key (DESIGN.md section 1.4): only
+ * documentation, records and test-only material that no real run loads.
+ * Everything else under runner/ is digested, so a new file is included
+ * unless it matches this explicit list.
+ */
+export const RUNNER_DIGEST_EXCLUDE = Object.freeze([
+  'node_modules/**',
+  '**/node_modules/**',
+  // Documentation at the runner root (DESIGN.md).
+  '*.md',
+  // Recorded smoke runs.
+  'smoke/**',
+  // Tests and their test-only fixtures: the fake CLI (adapter-fixture and
+  // Docker integration tests) and observed CLI output replayed by tests.
+  '__tests__/**',
+  'fixtures/bin/fake-cli.mjs',
+  'fixtures/observed/**',
+]);
+
+export function runnerTreeDigest(root = RUNNER_ROOT) {
+  return treeDigest(root, { exclude: [...RUNNER_DIGEST_EXCLUDE] });
+}
+
 export function harnessIdentity() {
   const status = git(['status', '--porcelain', '--untracked-files=normal']);
   return {
     commit: git(['rev-parse', 'HEAD']),
     clean: status === '',
     corpusLockSha256: fileSha256(path.join(CORPUS_ROOT, 'corpus.lock.json')),
-    runnerTreeDigest: treeDigest(RUNNER_ROOT, {
-      exclude: ['node_modules/**', '**/node_modules/**'],
-    }),
+    runnerTreeDigest: runnerTreeDigest(),
     harnessDepsLockSha256: sha256(
       [
         path.join(REPO_ROOT, 'yarn.lock'),

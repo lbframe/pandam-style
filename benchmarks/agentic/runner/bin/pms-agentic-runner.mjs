@@ -12,6 +12,8 @@
 //   pms-agentic-runner validate-config <matrix.json>
 //   pms-agentic-runner run <matrix.json> [--runs-root d] [--matrix-id id]
 //                          [--state-dir d] [--setup provider-setup.json]
+//       exit 0: finished; 75: a provider was halted by a rate limit
+//       (resume with the same --matrix-id after the reset); 1: error
 //   pms-agentic-runner report <matrix dir> [--out report.json] [--markdown report.md]
 //   pms-agentic-runner compare <record a> <record b>
 //   pms-agentic-runner regrade <attempt dir> [--trusted-node-modules d]
@@ -61,6 +63,10 @@ import {
 } from '../src/util.mjs';
 
 export const FAKE_CLI = path.join(RUNNER_ROOT, 'fixtures/bin/fake-cli.mjs');
+// `run` exit status when a provider was halted by a rate or usage limit
+// (DESIGN.md section 5.2): the run finished, cells are missing, and the
+// operator resumes with the same --matrix-id after the reset (EX_TEMPFAIL).
+export const EXIT_RATE_LIMIT_HALT = 75;
 export const DEFAULT_PROVIDER_RUNS_ROOT = path.join(
   os.homedir(),
   '.local/share/pandamstyle-agentic-runs',
@@ -212,7 +218,18 @@ async function runCommand(positional, flags) {
     json: path.join(out.matrixDir, 'report.json'),
     markdown: path.join(out.matrixDir, 'report.md'),
   });
-  return { matrixDir: out.matrixDir, outcomes: out.outcomes };
+  const rateLimited = out.rateLimited ?? {};
+  return {
+    matrixDir: out.matrixDir,
+    outcomes: out.outcomes,
+    ...(Object.keys(rateLimited).length > 0
+      ? {
+          rateLimited,
+          resume: `after the reset, re-run the same command with --matrix-id ${path.basename(out.matrixDir)}`,
+          exitStatus: EXIT_RATE_LIMIT_HALT,
+        }
+      : {}),
+  };
 }
 
 /**
@@ -353,7 +370,10 @@ export async function main(argv) {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   main(process.argv.slice(2)).then(
-    (out) => process.stdout.write(`${JSON.stringify(out, null, 2)}\n`),
+    (out) => {
+      process.stdout.write(`${JSON.stringify(out, null, 2)}\n`);
+      if (out?.exitStatus != null) process.exitCode = out.exitStatus;
+    },
     (error) => {
       process.stderr.write(`pms-agentic-runner: ${error.message}\n`);
       process.exit(1);

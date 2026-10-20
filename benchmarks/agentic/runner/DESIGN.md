@@ -215,6 +215,23 @@ product build binding digest, the `@pandamstyle/*` lockfile entries and
 tarballs, the trusted grading tree digest, and the agent-docs tree digest
 (the docs ship with the product).
 
+**Runner digest scope.** `runnerTreeDigest` covers only the
+execution-relevant files of `runner/` (`identity.mjs`
+`RUNNER_DIGEST_EXCLUDE`). It hashes every file except an explicit list of
+non-execution material: `*.md` at the runner root (this note), `smoke/**`
+(recorded runs), `__tests__/**`, and the test-only fixtures
+`fixtures/bin/fake-cli.mjs` and `fixtures/observed/**`. No provider-backed
+run, preflight or self-test loads them (observed with `strace` on
+`validate-config`, provider preflight, `selftest` and dry grading: zero opens
+under `runner/fixtures/`, `runner/smoke/`, `runner/__tests__/` or of
+`runner/DESIGN.md`; the harness and agent images copy only `container/` and
+the CLI binaries). The rule is fail-safe: a new file anywhere else, including
+a new file under `fixtures/` or a nested `*.md`, is digested, so a new source
+file cannot leave the key silently. Editing this note or a smoke record
+therefore keeps frozen keys; editing `src/`, `bin/`, `container/`, `schema/`,
+a package or lock file, or adding an unlisted file changes them
+(`runner-digest.test.mjs`).
+
 `compare` pairs attempts only with equal keys. On a mismatch it lists the
 differing projection fields and refuses. A frozen AG-00.3 threshold is bound
 to one key per cell.
@@ -1027,6 +1044,7 @@ declarative here, as is candidate packing from a commit.
 | Risk | Covering layers |
 | --- | --- |
 | The agent reads the credential and uses it (exfiltration through allowlisted hosts, quota misuse, induced rate limits) | bounded attempt time; proxy byte and connection accounting with anomaly flags; transcript scan for credential paths and variable names; exact-match scans of stream, final message and workspace; `contested` handling of infrastructure failures (§5.3); mode A when feasible |
+| A real (induced) or forged (§4.4, F22) rate limit halts a provider for the rest of the run (§5.2) | measurement denial only: the cells are `missing`, never a success; `run` exits 75 and a resume re-runs them, the affected repetition `contested`; a forged stream still needs an inherited descriptor the channel audit samples |
 | Same-UID control of the CLI through its sockets | channel audit; streams are `cli-unattested`; breach observation |
 | Kernel escape (rootful Docker, no user-namespace remap) | non-root, no capabilities, `no-new-privileges`, seccomp, AppArmor, read-only root, no Docker socket, short-lived containers |
 | Disk exhaustion through the workspace mount | size sampling with a kill cap (`resource-limit`); size-limited tmpfs |
@@ -1048,7 +1066,7 @@ harness errors. It never sees the verdict, the workspace or model/tool text.
 | `agent-resource` | `resource-limit` | yes, non-success | never |
 | `agent-abnormal` | `abnormal-exit` (CLI gone without a provider error), `aborted-by-agent-code` (G2) | yes, non-success | never |
 | `policy` | `tool-policy-breach` (web/subagent use), `credential-leak` | yes, non-success | never |
-| `infrastructure` | `rate-limit` (Claude `rate_limit`, `rejected` rate-limit status; Codex usage-limit pattern), `capacity` (`overloaded`; server-overloaded pattern), `provider-error` (`server_error`; stream disconnected after the CLI's own retries), `auth` (`authentication_failed`, `oauth_org_not_allowed`, `account_on_hold`, `verification_required`, `billing_error`, `cloud_credential_error`; auth pattern), `container`, `proxy` | no: excluded and reported | yes, except `auth` (halts the provider) |
+| `infrastructure` | `rate-limit` (Claude `rate_limit`, `rejected` rate-limit status; Codex usage-limit pattern), `capacity` (`overloaded`; server-overloaded pattern), `provider-error` (`server_error`; stream disconnected after the CLI's own retries), `auth` (`authentication_failed`, `oauth_org_not_allowed`, `account_on_hold`, `verification_required`, `billing_error`, `cloud_credential_error`; auth pattern), `container`, `proxy` | no: excluded and reported | yes, except `auth` and `rate-limit` (both halt the provider, §5.2) |
 | `unclassified` | terminal error matching no structured value or pattern (Claude `unknown`, unmatched Codex message, unknown `terminal_reason`) | no: excluded and reported, and counted in the conservative bound (§5.3) | never |
 | `harness` | `adapter-stream`, `config-integrity`, `model-fidelity`, `drift`, `install`, `prepare`, `trusted-tree`, `evaluate-error`, `redaction`, `credential-export-failed`, `cancelled` | no: invalid | never; systematic codes halt the matrix |
 
@@ -1061,6 +1079,29 @@ Precedence: `harness` > `policy` > `infrastructure`/`unclassified` >
 - Only `infrastructure` attempts are retried, from scratch, up to 3 attempts
   per repetition. Backoff uses `resetsAt` when reported, otherwise
   60 s × 2^k, capped at 30 min, inside the operator time window (Q8).
+- **A rate or usage limit halts its provider** instead of being retried
+  (`rate-limit`: Claude `rate_limit` or a `rejected` rate-limit status, Codex
+  usage-limit patterns). A usage limit lasts hours (Codex reports no reset
+  time), so retries would only mark the remaining repetitions `contested`.
+  The halt is per CLI: both Claude models share one account; the other
+  provider continues. The rate-limited attempt's record is kept with
+  `outcome.retry = {scheduled: false, haltedProvider: "rate-limit"}`; its
+  repetition is `missing` and `contested` (it consumed an infrastructure
+  attempt). Cells never attempted because of the halt are `missing` with the
+  reason `provider <cli> halted: rate-limit (resets at <ISO> | no reset time
+  reported)` and are not contested. `outcomes.json` records `rateLimited`
+  (per CLI: `resetsAt` or null, and the cell that hit the limit), and `run`
+  prints it and exits with status **75** (`EX_TEMPFAIL`; 0 when nothing was
+  halted by a rate limit, 1 on an error). The operator resumes after the
+  reset with the same `--matrix-id`: the §1.5 resume rules are unchanged, so
+  exactly the missing repetitions run, the rate-limited one as its next
+  attempt, `contested`.
+- The halt trusts only what classification trusts (§5.1): structured CLI
+  fields and the Codex terminal error. Rate-limit text the agent prints in
+  tool output or messages never halts (`rate-limit-halt.test.mjs`). A forged
+  replacement stream (F22) can halt the provider: streams are
+  `cli-unattested` (§4.4). That is a measurement denial (missing cells,
+  re-run on resume), never a false success; it is a residual risk of §4.10.
 - A repetition with no valid attempt is `missing` and its cell
   `incomplete`; AG-00.3 cannot freeze a threshold on an incomplete cell
   without an explicit decision.
@@ -1199,7 +1240,7 @@ contracts (§3.4–3.5) and the observed offline outputs.
 | F7 | Claude duplicate assistant events per `message.id`; `modelUsage` vs per-message disagreement | de-duplication; `discrepancy` recorded for input and cache counters, never for output snapshots |
 | F8 | Claude cache read/creation and thinking counters | additive and subset rules; normalized fields |
 | F9 | `costBasis: unknown` | cost `unknown` |
-| F10 | Claude `rate_limit` error with `rejected` rate-limit event; Codex usage-limit message | `infrastructure:rate-limit`, backoff from `resetsAt` |
+| F10 | Claude `rate_limit` error with `rejected` rate-limit event; Codex usage-limit message | `infrastructure:rate-limit`, not retried, provider halted with `resetsAt` (§5.2) |
 | F11 | `overloaded`; Codex server-overloaded message | `capacity` |
 | F12 | `authentication_failed` (observed shape: `subtype: success`, `is_error: true`); Codex auth message | `auth`, provider halted |
 | F13 | Codex `error` "Reconnecting…" events followed by `turn.completed` | not terminal; noise counted |
@@ -1211,7 +1252,7 @@ contracts (§3.4–3.5) and the observed offline outputs.
 | F19 | interrupted Codex turn without terminal event, with and without a harness signal | budget/cancel vs `abnormal-exit` |
 | F20 | stream integrity: events before init, two terminal events, events after the terminal one, invalid JSON | `adapter-stream` |
 | F21 | a fake execute-only CLI whose fake tool child tries `/proc/<ppid>/fd/1` injection and environment reads | blocked (EACCES); the stream stays `cli-unattested` (§0.4: blocking these paths is not a demonstrated boundary) (needs Docker: §9.3) |
-| F22 | a fake CLI that leaks its stdout into a child, which writes a valid, complete replacement stream | usage stays `estimate` (`cli-stream-unattested`); a retry it causes is `contested`; the replaced stream is never `observed` |
+| F22 | a fake CLI that leaks its stdout into a child, which writes a valid, complete replacement stream | usage stays `estimate` (`cli-stream-unattested`); a retry it causes is `contested`, a forged rate limit halts the provider (measurement denial, §5.2); the replaced stream is never `observed` |
 | F23 | text in tool output and model messages mimicking errors and JSON events | classification unchanged |
 | F24 | shell-mediated write (`sed -i`) between a failed and a passing build | repair detected through the workspace delta |
 | F25 | `npm run build \|\| true`; `build && test` | `compound` → coverage incomplete → first-pass `unknown` |
@@ -1435,7 +1476,7 @@ Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 | Section | Code (`src/` unless noted) | Tests (`__tests__/`) |
 | --- | --- | --- |
 | §1.1–1.3 units, record, identity | `matrix.mjs`, `attempt.mjs`, `identity.mjs`, `schema/run-record.v1.schema.json` | every fixture run validates its records and report (F57, `helpers.mjs`) |
-| §1.4 comparability | `comparability.mjs`, `matrix.mjs` `projectionFor` (per-cell closure) | `evidence.test.mjs` F34, F35; `measurement.test.mjs` B11 |
+| §1.4 comparability | `comparability.mjs`, `matrix.mjs` `projectionFor` (per-cell closure), `identity.mjs` `runnerTreeDigest` (digest scope) | `evidence.test.mjs` F34, F35; `measurement.test.mjs` B11; `runner-digest.test.mjs` |
 | §1.5 replay, resume | `regrade.mjs` (integrity and identity first), `matrix.mjs` `matrixIdentity`, `repetitionState` | `evidence.test.mjs` F30; `measurement.test.mjs` B10, B12; `review-r2.test.mjs` B10, B12 |
 | §2.1–2.2 measured values, tokens | `measured.mjs`, `adapters/*.mjs` | `adapters.test.mjs` F1–F9; `smoke-fixes-2.test.mjs` observed Claude usage shape; `metrics.test.mjs` lint and property test |
 | §2.4 repairs, first pass, attribution | `commands.mjs` (`command-classes/v4`) | `metrics.test.mjs` F24–F27, F58; `measurement.test.mjs` B8; `review-r2.test.mjs` B8 |
@@ -1449,7 +1490,7 @@ Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 | §4.6 credentials, source policy, recovery, refusals | `credentials.mjs`, `recovery.mjs`, `refusals.mjs`, `container/*` | `credentials.test.mjs` F31, F44–F50, F59; `confinement.test.mjs` B3, B4; `review-r2.test.mjs` B2, B4; `smoke-fixes-2.test.mjs` login fallback and provider refusal; `docker.test.mjs` B4, login fallback |
 | §4.8 product build, trusted tree, closures | `store.mjs`, `trusted-tree.mjs` `installFixtureClosure`, `provider.mjs` | `product-build.test.mjs` G, F51–F53; `measurement.test.mjs` B11 |
 | §4.9 held-out | `capabilities.mjs` `heldoutRefusal`, CLI | `policy-report.test.mjs` F54 |
-| §5 failures, retries, contested | `classify.mjs`, `matrix.mjs` | `adapters.test.mjs` F10–F16, F22; `measurement.test.mjs` B10 |
+| §5 failures, retries, contested | `classify.mjs`, `matrix.mjs` | `adapters.test.mjs` F10–F16, F22; `measurement.test.mjs` B10; `rate-limit-halt.test.mjs` |
 | §6 evidence, redaction, bounds | `workspace.mjs` staging, `evidence.mjs`, `redact.mjs` (chunked scans), `stream.mjs` (bounded splitter and sink), `attempt.mjs` `writeRecord` | `evidence.test.mjs` F30–F33; `confinement.test.mjs` B2; `measurement.test.mjs` B13 |
 | §7 report | `report.mjs` (seeded from the planned matrix), CLI `writeReport` | `policy-report.test.mjs` F56, F57; `measurement.test.mjs` B9 |
 | §9.3 isolation self-test | `selftest.mjs`, `container/probe-*.mjs`, `docker.mjs` `stableHostAddresses` | `selftest-binding.test.mjs`; `docker.test.mjs` B5; §11.3 |
