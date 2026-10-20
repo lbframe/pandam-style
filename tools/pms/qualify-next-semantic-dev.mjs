@@ -21,9 +21,11 @@ import { createHash, randomUUID } from 'node:crypto';
 import { createRequire, isBuiltin } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import nextBrowserProfile from './next-browser-profile.js';
+import browserTooling from './browser.js';
 
 const { createNextBrowserProfile, launchWithNextBrowserProfile } =
   nextBrowserProfile;
+const { nextBrowserExecutable } = browserTooling;
 
 export const CANONICAL_FILES = Object.freeze([
   'design.js',
@@ -865,10 +867,7 @@ export class BrowserProbe {
         puppeteer.default,
         this.browserProfile,
         {
-          executablePath:
-            process.env.PMS_NEXT_CHROMIUM ??
-            process.env.PMS_CHROMIUM ??
-            '/usr/local/bin/chromium',
+          executablePath: nextBrowserExecutable(),
           protocolTimeout: 60_000,
           args: ['--no-sandbox', '--disable-dev-shm-usage'],
         },
@@ -880,10 +879,7 @@ export class BrowserProbe {
       this.browser.once('disconnected', () => this.finishCaptures());
       this.run.report.browser = {
         version: await this.browser.version(),
-        executable:
-          process.env.PMS_NEXT_CHROMIUM ??
-          process.env.PMS_CHROMIUM ??
-          '/usr/local/bin/chromium',
+        executable: nextBrowserExecutable(),
       };
       this.page = await this.newPage();
       this.run.report.firstBrowserConsumptionStartedAt ??= Date.now();
