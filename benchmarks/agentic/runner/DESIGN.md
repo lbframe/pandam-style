@@ -1117,6 +1117,13 @@ consumed an infrastructure retry is `contested`**, whatever its stream,
 proxy log or breach observations show; those observations are recorded as
 supporting detail.
 
+The status has one derivation (`src/contested.mjs`), from the repetition's
+attempt history on disk: it is contested when the history holds an
+`infrastructure` attempt (retried, rate-limited or halting) or an attempt
+directory without a record; cancelled attempts do not count. `outcomes.json`,
+a resume and the report all use it, so they agree before and after a resume
+(every fixture run asserts it: `assertContestedAgrees`).
+
 The report gives each cell's success as a point estimate (the failed attempt
 excluded, the retry's outcome counted) **and** as a conservative lower bound
 (every contested or `unclassified` repetition counted as non-success). A
@@ -1490,7 +1497,7 @@ Entry point: [`bin/pms-agentic-runner.mjs`](bin/pms-agentic-runner.mjs)
 | §4.6 credentials, source policy, recovery, refusals | `credentials.mjs`, `recovery.mjs`, `refusals.mjs`, `container/*` | `credentials.test.mjs` F31, F44–F50, F59; `confinement.test.mjs` B3, B4; `review-r2.test.mjs` B2, B4; `smoke-fixes-2.test.mjs` login fallback and provider refusal; `docker.test.mjs` B4, login fallback |
 | §4.8 product build, trusted tree, closures | `store.mjs`, `trusted-tree.mjs` `installFixtureClosure`, `provider.mjs` | `product-build.test.mjs` G, F51–F53; `measurement.test.mjs` B11 |
 | §4.9 held-out | `capabilities.mjs` `heldoutRefusal`, CLI | `policy-report.test.mjs` F54 |
-| §5 failures, retries, contested | `classify.mjs`, `matrix.mjs` | `adapters.test.mjs` F10–F16, F22; `measurement.test.mjs` B10; `rate-limit-halt.test.mjs` |
+| §5 failures, retries, contested | `classify.mjs`, `matrix.mjs`, `contested.mjs` | `adapters.test.mjs` F10–F16, F22; `measurement.test.mjs` B10; `rate-limit-halt.test.mjs`; `contested.test.mjs` |
 | §6 evidence, redaction, bounds | `workspace.mjs` staging, `evidence.mjs`, `redact.mjs` (chunked scans), `stream.mjs` (bounded splitter and sink), `attempt.mjs` `writeRecord` | `evidence.test.mjs` F30–F33; `confinement.test.mjs` B2; `measurement.test.mjs` B13 |
 | §7 report | `report.mjs` (seeded from the planned matrix), CLI `writeReport` | `policy-report.test.mjs` F56, F57; `measurement.test.mjs` B9 |
 | §9.3 isolation self-test | `selftest.mjs`, `container/probe-*.mjs`, `docker.mjs` `stableHostAddresses` | `selftest-binding.test.mjs`; `docker.test.mjs` B5; §11.3 |

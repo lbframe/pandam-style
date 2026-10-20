@@ -14,6 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { loadCorpus, findTask } from '../../src/corpus.mjs';
+import { repetitionContested } from './contested.mjs';
 import { CORPUS_ROOT, median, readJson } from './util.mjs';
 
 export const REPORT_SCHEMA = 'pms-agentic-run-report/v1';
@@ -24,6 +25,9 @@ export function loadMatrix(matrixDir) {
     ? readJson(path.join(matrixDir, 'outcomes.json'))
     : { outcomes: [], halted: {} };
   const records = [];
+  // Attempt directories without a record (a crash or an aborted provider
+  // start): part of the attempt history that decides `contested`.
+  const crashed = [];
   const cellsDir = path.join(matrixDir, 'cells');
   if (fs.existsSync(cellsDir))
     for (const task of fs.readdirSync(cellsDir).sort())
@@ -36,6 +40,12 @@ export function loadMatrix(matrixDir) {
             .sort()) {
             const f = path.join(cellsDir, task, model, rep, att, 'record.json');
             if (fs.existsSync(f)) records.push(readJson(f));
+            else if (/^attempt-\d+$/.test(att) && /^rep-\d+$/.test(rep))
+              crashed.push({
+                taskId: task,
+                modelKey: model,
+                repetition: Number(rep.slice(4)),
+              });
           }
   const loaded = loadCorpus(CORPUS_ROOT);
   const taskMeta = {};
@@ -44,7 +54,7 @@ export function loadMatrix(matrixDir) {
     if (e != null)
       taskMeta[t] = { workflow: e.task.workflow, caseType: e.task.caseType };
   }
-  return { matrix, outcomes, records, taskMeta };
+  return { matrix, outcomes, records, crashed, taskMeta };
 }
 
 function stat(measures) {
@@ -64,7 +74,13 @@ function stat(measures) {
   };
 }
 
-export function buildReport({ matrix, outcomes, records, taskMeta = {} }) {
+export function buildReport({
+  matrix,
+  outcomes,
+  records,
+  crashed = [],
+  taskMeta = {},
+}) {
   const kinds = new Set(records.map((r) => r.kind));
   if (kinds.size > 1)
     throw new Error('refusing to aggregate records of different kinds');
@@ -121,13 +137,23 @@ export function buildReport({ matrix, outcomes, records, taskMeta = {} }) {
       ) ?? null;
     for (let rep = 1; rep <= matrix.repetitions; rep += 1) {
       const attempts = c.reps.get(rep) ?? [];
+      // Section 5.3: the matrix's own derivation over the same history.
+      const contested = repetitionContested({
+        records: attempts,
+        crashed: crashed.filter(
+          (x) =>
+            x.taskId === c.taskId &&
+            x.modelKey === c.modelKey &&
+            x.repetition === rep,
+        ).length,
+      });
       if (attempts.length === 0) {
         const o = outcomeFor(c.taskId, c.modelKey, rep);
         reps.push({
           repetition: rep,
           attempts: [],
           valid: false,
-          contested: o?.contested === true,
+          contested,
           status: cellUnsupported ? 'unsupported' : 'missing',
           reason: cellUnsupported
             ? cellUnsupported.reasons.join('; ')
@@ -143,8 +169,6 @@ export function buildReport({ matrix, outcomes, records, taskMeta = {} }) {
       }
       attempts.sort((a, b) => a.attempt - b.attempt);
       const final = attempts.at(-1);
-      const contested =
-        attempts.length > 1 || final.integrity.contested === true;
       for (const a of attempts) {
         if (
           a.outcome.class === 'infrastructure' ||

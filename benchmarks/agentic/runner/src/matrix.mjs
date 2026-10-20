@@ -29,6 +29,7 @@ import {
   credentialConfigErrors,
   credentialFromConfig,
 } from './credentials.mjs';
+import { repetitionContested } from './contested.mjs';
 import { corpusInfo } from './identity.mjs';
 import { recoverStale } from './recovery.mjs';
 import { RedactionSet, scanFile } from './redact.mjs';
@@ -193,6 +194,37 @@ function attemptIndex(name) {
 }
 
 /**
+ * Attempt history of one planned repetition, in attempt order: its records
+ * and the number of attempt directories without a record (a crash).
+ */
+export function attemptHistory(cellDir) {
+  const dirs = fs.existsSync(cellDir)
+    ? fs
+        .readdirSync(cellDir)
+        .map((d) => [d, attemptIndex(d)])
+        .filter(([, i]) => i != null)
+        .sort((x, y) => x[1] - y[1])
+    : [];
+  const records = [];
+  let crashed = 0;
+  for (const [d] of dirs) {
+    const file = path.join(cellDir, d, 'record.json');
+    if (fs.existsSync(file)) records.push({ file, record: readJson(file) });
+    else crashed += 1;
+  }
+  return { dirs, records, crashed };
+}
+
+/** Section 5.3: contested status of a repetition from its history on disk. */
+export function contestedOnDisk(cellDir) {
+  const h = attemptHistory(cellDir);
+  return repetitionContested({
+    records: h.records.map((x) => x.record),
+    crashed: h.crashed,
+  });
+}
+
+/**
  * State of one planned repetition from its attempt directories (resume).
  * Records of another matrix, cell, model or kind refuse the resume; an
  * attempt directory without a record (a crash) counts as a used, contested
@@ -206,22 +238,10 @@ export function repetitionState({
   kind,
   expectedInstall = null,
 }) {
-  const dirs = fs.existsSync(cellDir)
-    ? fs
-        .readdirSync(cellDir)
-        .map((d) => [d, attemptIndex(d)])
-        .filter(([, i]) => i != null)
-        .sort((x, y) => x[1] - y[1])
-    : [];
+  const history = attemptHistory(cellDir);
+  const { dirs, crashed } = history;
   const records = [];
-  let crashed = 0;
-  for (const [d] of dirs) {
-    const f = path.join(cellDir, d, 'record.json');
-    if (!fs.existsSync(f)) {
-      crashed += 1;
-      continue;
-    }
-    const r = readJson(f);
+  for (const { file: f, record: r } of history.records) {
     const mismatch = [];
     if (r.matrixId !== matrixId) mismatch.push('matrixId');
     if (r.kind !== kind) mismatch.push('kind');
@@ -256,8 +276,7 @@ export function repetitionState({
       dirs.length -
       records.filter((r) => r.outcome.code === 'cancelled').length,
     done: records.some((r) => r.outcome.valid),
-    contested:
-      crashed > 0 || records.some((r) => r.outcome.class === 'infrastructure'),
+    contested: repetitionContested({ records, crashed }),
     finalInvalid:
       last != null &&
       crashed === 0 &&
@@ -425,6 +444,10 @@ export async function runMatrix({
           kind: config.kind,
           expectedInstall: inputs.closures[taskId] ?? null,
         });
+        // Contested is always re-derived from the repetition's attempt
+        // history on disk (section 5.3), never tracked separately, so
+        // outcomes.json, a resume and the report agree.
+        const contestedNow = () => contestedOnDisk(cellDir);
         if (prior.done) {
           outcomes.push({
             taskId,
@@ -432,6 +455,7 @@ export async function runMatrix({
             repetition: r,
             status: 'resumed',
             attempts: prior.records.length,
+            contested: prior.contested,
           });
           continue;
         }
@@ -450,7 +474,6 @@ export async function runMatrix({
         }
         let attempt = prior.nextIndex;
         let used = prior.used;
-        let contested = prior.contested;
         let done = false;
         while (!done) {
           if (signal?.aborted) {
@@ -458,6 +481,7 @@ export async function runMatrix({
               taskId,
               model: model.key,
               repetition: r,
+              contested: contestedNow(),
               status: 'missing',
               reason: 'cancelled',
             });
@@ -468,6 +492,7 @@ export async function runMatrix({
               taskId,
               model: model.key,
               repetition: r,
+              contested: contestedNow(),
               status: 'missing',
               reason:
                 halted.matrix ??
@@ -481,6 +506,7 @@ export async function runMatrix({
               taskId,
               model: model.key,
               repetition: r,
+              contested: contestedNow(),
               status: 'missing',
               reason: 'matrix wall-clock cap',
             });
@@ -495,7 +521,7 @@ export async function runMatrix({
               repetition: r,
               status: 'missing',
               reason: 'attempts exhausted',
-              contested,
+              contested: contestedNow(),
             });
             break;
           }
@@ -545,7 +571,7 @@ export async function runMatrix({
               effectiveConfigEvidence: effectiveConfigFor(model),
               install: installFor({ model, task: entry.task, taskId }),
               signal,
-              contested,
+              contested: contestedNow(),
               matrixRedaction,
               projectionFor: (p) =>
                 projectionFor({ ...p, config, identity, info, budgets }),
@@ -559,6 +585,7 @@ export async function runMatrix({
               taskId,
               model: model.key,
               repetition: r,
+              contested: contestedNow(),
               status: 'missing',
               reason: halted.matrix,
             });
@@ -570,6 +597,7 @@ export async function runMatrix({
               taskId,
               model: model.key,
               repetition: r,
+              contested: contestedNow(),
               status: 'missing',
               reason: out.haltProvider,
               ...(out.failure ?? {}),
@@ -610,6 +638,7 @@ export async function runMatrix({
               taskId,
               model: model.key,
               repetition: r,
+              contested: contestedNow(),
               status: 'missing',
               reason: 'cancelled',
               attempts: used,
@@ -646,7 +675,7 @@ export async function runMatrix({
               repetition: r,
               status: 'missing',
               attempts: used,
-              contested: true,
+              contested: contestedNow(),
               code: rec.outcome.code,
               reason: `provider ${model.cli} halted: ${reason}`,
             });
@@ -660,7 +689,6 @@ export async function runMatrix({
             });
             rec.outcome.retry = { scheduled: true, backoffSeconds: wait };
             writeRecord(attemptDir, rec, matrixRedaction);
-            contested = true;
             attempt += 1;
             if (wait > 0) await clock.sleep(wait * 1000);
             continue;
@@ -671,7 +699,7 @@ export async function runMatrix({
             repetition: r,
             status: rec.outcome.valid ? 'done' : 'missing',
             attempts: used,
-            contested,
+            contested: contestedNow(),
             code: rec.outcome.code,
             ...(rec.outcome.valid
               ? {}

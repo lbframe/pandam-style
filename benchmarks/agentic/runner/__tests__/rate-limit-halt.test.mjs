@@ -7,7 +7,8 @@
 
 // A provider rate or usage limit halts that provider instead of burning
 // repetitions (DESIGN.md section 5.2): no retry, no backoff, the other
-// provider continues, cells left by the halt are missing and not contested,
+// provider continues, cells left by the halt are missing and not contested
+// (the rate-limited repetition is contested before and after a resume),
 // the `run` command exits with a distinct status, and a resume re-runs
 // exactly the missing cells.
 
@@ -179,7 +180,7 @@ test('a Claude rate limit halts every Claude model, Codex continues, no retry or
         if (t === TASK && m === 'claude-haiku' && r === 1) continue;
         const o = cells[`${t}/${m}#${r}`];
         assert.equal(o.status, 'missing', `${t}/${m}#${r}`);
-        assert.equal(o.contested, undefined, `${t}/${m}#${r} not contested`);
+        assert.equal(o.contested, false, `${t}/${m}#${r} not contested`);
         assert.match(o.reason, /^provider claude halted: rate-limit/);
       }
   const stored = loadMatrix(out.matrixDir).outcomes;
@@ -195,12 +196,16 @@ test('a Claude rate limit halts every Claude model, Codex continues, no retry or
   assert.match(stored.halted.providers.claude, /rate-limit/);
   assert.equal(stored.halted.providers.codex, undefined);
   assert.equal(stored.halted.matrix, null);
-  // The report counts no halted cell as contested.
+  // The report counts no halted cell as contested, and already counts the
+  // rate-limited repetition as contested before any resume, as
+  // outcomes.json does (section 5.3: one derivation).
   const report = buildReport(loadMatrix(out.matrixDir));
   const contested = report.cells.flatMap((c) =>
-    c.repetitions.filter((r) => r.contested).map(() => c.modelKey),
+    c.repetitions
+      .filter((r) => r.contested)
+      .map((r) => `${c.taskId}/${c.modelKey}#${r.repetition}`),
   );
-  assert.deepEqual(contested, []);
+  assert.deepEqual(contested, [`${TASK}/claude-haiku#1`]);
 });
 
 test('resume re-runs exactly the missing cells; the rate-limited repetition is contested then', async () => {
