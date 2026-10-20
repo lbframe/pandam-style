@@ -179,7 +179,15 @@ function runCase(spec, reportDir = process.env.PMS_SEMANTIC_REPORT_DIR) {
     report.classificationVerified = true;
     return report;
   } catch (error) {
-    if (report) report.failure = error.message;
+    // A lane that fails to execute, such as a browser crash, still records
+    // its cause in the case report.
+    report ??= {
+      id: spec.id,
+      area: spec.area,
+      status: spec.status,
+      classificationVerified: false,
+    };
+    report.failure = error.message;
     throw error;
   } finally {
     if (reportDir && report) {

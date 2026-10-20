@@ -10,13 +10,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { chromium } from 'playwright-core';
-import { qualifyStart } from './qualify-rsbuild-start.mjs';
+import { launcherBrowser, qualifyStart } from './qualify-rsbuild-start.mjs';
 
 async function main() {
   const report = { node: process.version, start: {}, events: [] };
   const hash = (text) => createHash('sha256').update(text).digest('hex');
   const browser = await chromium.launch({
-    executablePath: process.env.PMS_CHROMIUM ?? '/opt/google/chrome/chrome',
+    executablePath: launcherBrowser(),
     headless: true,
     chromiumSandbox: true,
   });
