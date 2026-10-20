@@ -9,9 +9,13 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   agentdoc:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, lbframe-ci, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    # Fork PRs never run on the self-hosted runner (this repository is public).
+    if: >-
+      github.event_name != 'pull_request' ||
+      (!github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
