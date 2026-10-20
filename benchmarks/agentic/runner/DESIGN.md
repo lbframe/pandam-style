@@ -225,7 +225,7 @@ run, preflight or self-test loads them (observed with `strace` on
 `validate-config`, provider preflight, `selftest` and dry grading: zero opens
 under `runner/fixtures/`, `runner/smoke/`, `runner/__tests__/` or of
 `runner/DESIGN.md`; the harness and agent images copy only `container/` and
-the CLI binaries). The rule is fail-safe: a new file anywhere else, including
+the CLI binaries, read from `images.mjs`). The rule is fail-safe: a new file anywhere else, including
 a new file under `fixtures/` or a nested `*.md`, is digested, so a new source
 file cannot leave the key silently. Editing this note or a smoke record
 therefore keeps frozen keys; editing `src/`, `bin/`, `container/`, `schema/`,

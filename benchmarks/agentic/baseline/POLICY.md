@@ -317,6 +317,20 @@ Base `main` `f4845dd` (corpus 1.4.5). State directory
 | Isolation self-test | 51/51, binding `078997ab…764c` (the configuration of the smoke r3 run) |
 | Provider preflight | every check of `providerBackedRun` before the first attempt: matrix and source policy, clean checkout, binding, trusted tree, self-test, CLI identity of all three models in the image, Codex evidence render (`matchesRequest: true`), closure identities. Passed. Durable refusals: none |
 
+**Phase 2 re-run** (runner changes of section 1 and section 6.1, commit
+`d7128a6`, no model call):
+
+| Step | Result |
+| --- | --- |
+| `validate-config` | ok |
+| Provider preflight | passed; `runnerTreeDigest` `5507e7d3…e4fa` → `08e7ae43…4d4d`; every other value unchanged (`preflight.json` regenerated, the phase 1 file kept as `preflight.phase1.json`) |
+| Isolation self-test | 51/51, binding `078997ab…764c` (unchanged: the binding does not contain the runner digest) |
+| Null-agent grading | 44/44 `fail`, no `error`; identical per task to phase 1 |
+| Digest scope | `strace` over the four steps above: no file under `runner/fixtures/`, `runner/smoke/`, `runner/__tests__/` and no `runner/DESIGN.md` was opened (only directory listings by `git status`) |
+
+No other prepared input embeds the runner digest: `matrix.json`, `setup.json`
+and the binding do not, and the self-test binding is unchanged.
+
 Refused tasks: `installation-positive-vite`,
 `installation-boundary-turbopack-modes` and
 `installation-failure-unqualified-webpack` need the local package mirror
