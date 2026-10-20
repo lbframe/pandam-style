@@ -76,7 +76,8 @@ enhancements: [
   outcome stays as computed and is reported as degraded
   (`PMS_TARGET_ENHANCEMENT_DEGRADED`, a warning), never as equivalent.
 - `fallback.kind: 'alternative-value'` is reserved: its CSS emission belongs to
-  CE-01.2, and it is refused until then.
+  CE-07.3 (#62), and it is refused until then (`context.deferredTo:
+  "CE-07.3"`).
 - A policy for a feature native on every announced profile has no effect and
   produces `PMS_TARGET_ENHANCEMENT_INEFFECTIVE` (info).
 

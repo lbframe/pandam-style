@@ -121,6 +121,10 @@ try {
       path.join(repo, 'tools/pilot', name),
       path.join(consumer, name),
     );
+  fs.copyFileSync(
+    path.join(repo, 'tools/pms/host-css-identity.mjs'),
+    path.join(consumer, 'host-css-identity.mjs'),
+  );
   const realpaths = {};
   for (const slug of ['core', 'compiler', 'vite', 'rsbuild']) {
     const installed = fs.realpathSync(

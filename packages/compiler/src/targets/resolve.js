@@ -27,6 +27,7 @@ import { createRequire } from 'module';
 import path from 'path';
 
 import { caveatCatalog } from './catalog';
+import { transformTable } from './transforms';
 import { compatData } from './data';
 import { compareVersions } from './versions';
 import defaultProfile from './profiles/default.v1.json';
@@ -783,6 +784,8 @@ function resolveUncached(input) {
         },
       },
       caveatReviewsDigest: sha256(stableJson(caveatCatalog())),
+      // Outcomes credit only committed transform-table entries (CE-01.2).
+      transformsDigest: sha256(stableJson(transformTable())),
     },
     profiles,
   };

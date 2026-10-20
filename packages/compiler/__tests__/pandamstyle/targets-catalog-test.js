@@ -152,20 +152,27 @@ describe('frozen default profile', () => {
 });
 
 describe('decision-closures.v1.json', () => {
-  test('is versioned and closes D-BP-01..13 once each, D-BP-12 untouched in CE-13', () => {
+  test('is one versioned register: D-BP-01..13 once each, then the CE-01.2 closures', () => {
     expect(CLOSURES).toMatchObject({
       kind: 'pandamstyle-core-evolution-decision-closures',
       schemaVersion: 1,
       task: 'CE-01.1',
       issue: 44,
     });
+    expect(CLOSURES.register.map((r) => [r.task, r.issue])).toEqual([
+      ['CE-01.1', 44],
+      ['CE-01.2', 45],
+    ]);
     const ids = CLOSURES.closures.map((c) => c.id);
-    expect(ids).toEqual(
-      Array.from(
+    expect(ids).toEqual([
+      ...Array.from(
         { length: 13 },
         (_, i) => `D-BP-${String(i + 1).padStart(2, '0')}`,
       ),
-    );
+      'CE-01.2-T1',
+      'CE-01.2-T2',
+      'CE-01.2-T3',
+    ]);
     for (const closure of CLOSURES.closures) {
       expect(['closed', 'split', 'deferred', 'untouched']).toContain(
         closure.status,
@@ -180,11 +187,16 @@ describe('decision-closures.v1.json', () => {
       status: 'untouched',
       closesIn: 'CE-13',
     });
-    expect(CLOSURES.closures.find((c) => c.id === 'D-BP-07')).toMatchObject({
-      status: 'deferred',
-      closesIn: 'CE-01.2',
-      issue: 45,
-    });
+    // CE-01.2 closes the CE-01.1 deferrals in place and keeps their text.
+    for (const id of ['D-BP-07', 'D-BP-09', 'D-BP-10']) {
+      const closure = CLOSURES.closures.find((c) => c.id === id);
+      expect(closure).toMatchObject({ status: 'closed', issue: 45 });
+      expect(closure.supersedes).toMatchObject({ task: 'CE-01.1' });
+      expect(closure.closesIn).toContain('CE-01.2');
+    }
+    expect(
+      CLOSURES.closures.find((c) => c.id === 'D-BP-07').supersedes.status,
+    ).toBe('deferred');
   });
 
   test('every evidence path exists', () => {
@@ -198,25 +210,40 @@ describe('decision-closures.v1.json', () => {
     }
   });
 
-  test('orchestrator decisions O1..O13 are recorded once each', () => {
-    expect(CLOSURES.orchestratorDecisions.map((d) => d.id)).toEqual(
-      Array.from({ length: 13 }, (_, i) => `CE-01.1-O${i + 1}`),
-    );
+  test('orchestrator decisions O1..O13 and CE-01.2 Q1..Q5 are recorded once each', () => {
+    expect(CLOSURES.orchestratorDecisions.map((d) => d.id)).toEqual([
+      ...Array.from({ length: 13 }, (_, i) => `CE-01.1-O${i + 1}`),
+      ...Array.from({ length: 5 }, (_, i) => `CE-01.2-Q${i + 1}`),
+    ]);
     // O13 names the record that holds the floors.
     expect(CLOSURES.orchestratorDecisions[12].decision).toContain(
       'profiles/minimum.v1.json',
     );
   });
 
-  test('the CE-01.2 deferrals are the four orchestrator deferrals', () => {
+  test('the four CE-01.1 deferrals to CE-01.2 are each closed or re-deferred with an owner', () => {
     expect(CLOSURES.deferrals.map((d) => [d.to, d.issue])).toEqual(
       Array(4).fill(['CE-01.2', 45]),
     );
-    // Executed: alternative-value is refused as deferred.
+    const ids = new Set(CLOSURES.closures.map((c) => c.id));
+    for (const deferral of CLOSURES.deferrals) {
+      const { resolution } = deferral;
+      expect(['closed', 're-deferred']).toContain(resolution.status);
+      expect(ids.has(resolution.by)).toBe(true);
+      if (resolution.status === 're-deferred') {
+        expect(Number.isInteger(resolution.issue)).toBe(true);
+      }
+    }
+    expect(
+      CLOSURES.deferrals
+        .filter((d) => d.resolution.status === 're-deferred')
+        .map((d) => [d.resolution.to, d.resolution.issue]),
+    ).toEqual([['CE-07.3', 62]]);
+    // Executed: alternative-value is refused, deferred to its new owner.
     const [d] = targets.normalizeEnhancements([
       { feature: 'selector::has', fallback: { kind: 'alternative-value' } },
     ]).diagnostics;
-    expect(d.context.deferredTo).toBe('CE-01.2');
+    expect(d.context.deferredTo).toBe('CE-07.3');
   });
 
   test('each recorded unknown is unrecognized by the catalog, with an owner', () => {
@@ -325,7 +352,7 @@ describe('executed claims of the closures', () => {
     });
   });
 
-  test('D-BP-07: user-select stays prefixed-only on Safari and iOS', () => {
+  test('D-BP-07: an unpaired user-select stays prefixed-only on Safari and iOS', () => {
     const { profiles } = outcomes('property:user-select', [
       'pandamstyle:default@1',
     ]);

@@ -22,6 +22,7 @@
 
 import crypto from 'crypto';
 
+import { applyTransforms } from './transforms';
 import { featuresOf } from './catalog';
 import { constructKey, extractConstructs } from './extract';
 import { featureOutcome, summarize, worseState } from './outcome';
@@ -189,9 +190,13 @@ function conditionsUsing(context, conditions) {
     .sort(compareStrings);
 }
 
+// A candidate passes where the compiler's own emission of it does: natively,
+// or through a proven transformation of the stage.
 function nativeEverywhere(cssText, resolution) {
-  return featuresOfCss(cssText).every(({ record }) =>
-    profileOutcomes(record, resolution).every((p) => p.state === 'native'),
+  return featuresOfCss(applyTransforms(cssText)).every(({ record }) =>
+    profileOutcomes(record, resolution).every(
+      (p) => p.state === 'native' || p.state === 'transformed-with-proof',
+    ),
   );
 }
 
@@ -226,7 +231,8 @@ function ownerGroupsOf(sources) {
   for (const { owner, css, grammars } of sources) {
     const oKey = ownerKey(owner);
     const gKey = `${owner.role}|${owner.file ?? ''}|${roleOf(owner)}`;
-    for (const entry of featuresOfCss(css, grammars)) {
+    // Claims attach to the CSS the compiler emits: the transformed text.
+    for (const entry of featuresOfCss(applyTransforms(css), grammars)) {
       const key = useKeyOf(entry.record);
       let use = building.get(key);
       if (use == null) {
@@ -663,6 +669,7 @@ function featureEntry(resolution, use, mapKey, policy, keys) {
         ...(outcome.restriction == null
           ? {}
           : { restriction: outcome.restriction }),
+        ...(outcome.proof == null ? {} : { proof: outcome.proof }),
       })),
     })),
   });
@@ -1106,6 +1113,9 @@ function engineJson(outcome) {
     `,"engine":${stableJson(outcome.engine)}` +
     `,"floor":${stableJson(outcome.floor)}` +
     (outcome.path === undefined ? '' : `,"path":${stableJson(outcome.path)}`) +
+    (outcome.proof === undefined
+      ? ''
+      : `,"proof":${stableJson(outcome.proof)}`) +
     `,"reason":${stableJson(outcome.reason)}` +
     (outcome.restriction === undefined
       ? ''

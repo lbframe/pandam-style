@@ -99,7 +99,7 @@ async function canonicalArtifacts(root) {
   return entries;
 }
 
-async function buildApp(env = {}) {
+async function buildApp(env = {}, overrides = {}) {
   const started = performance.now();
   const previous = new Map(
     Object.keys(env).map((key) => [key, process.env[key]]),
@@ -114,6 +114,7 @@ async function buildApp(env = {}) {
       configFile: path.join(appRoot, 'vite.config.js'),
       logLevel: 'silent',
       clearScreen: false,
+      ...overrides,
     });
   } finally {
     for (const [key, value] of previous) {
@@ -1661,6 +1662,10 @@ async function runIsolationQualification() {
 }
 
 async function runProductionQualification() {
+  // Imported from the source checkout: this script runs as a copy in the app.
+  const { hostCssIdentity } = await import(
+    pathToFileURL(path.join(REPO_ROOT, 'tools/pms/host-css-identity.mjs')).href
+  );
   const firstBuildMs = await buildApp();
   const firstArtifacts = await canonicalArtifacts(appRoot);
   const firstArtifactDigests = Object.fromEntries(
@@ -1673,9 +1678,16 @@ async function runProductionQualification() {
     path.join(appRoot, 'dist/pandamstyle/styles.css'),
     'utf8',
   );
+  // CE-01.2 (AC3): the final CSS asset is the canonical member, byte for byte.
+  report.cssIdentity = hostCssIdentity({
+    host: 'vite',
+    mode: 'production',
+    canonical: firstArtifacts['styles.css'],
+    assets: [{ file: 'dist/pandamstyle/styles.css', content: firstCss }],
+  });
   assert.equal(
-    firstCss,
-    firstArtifacts['styles.css'],
+    report.cssIdentity.status,
+    'canonical',
     'the bundle CSS differs from the canonical compiler artifact',
   );
   const firstHtml = await fs.readFile(
@@ -1686,7 +1698,13 @@ async function runProductionQualification() {
   assert.ok(firstCss.length > 0);
   const firstBundleFiles = await digestTree(path.join(appRoot, 'dist'));
 
-  const repeatBuildMs = await buildApp();
+  // CE-01.2 (AC3): a host CSS targets knob on the repeat build changes no
+  // canonical artifact and no emitted byte (the stylesheet is a raw asset).
+  const repeatBuildMs = await buildApp(
+    {},
+    { build: { cssTarget: 'chrome100' } },
+  );
+  report.hostTargetsKnob = { option: 'build.cssTarget', value: 'chrome100' };
   const repeatedArtifacts = await canonicalArtifacts(appRoot);
   const repeatedArtifactDigests = Object.fromEntries(
     Object.entries(repeatedArtifacts).map(([name, content]) => [
