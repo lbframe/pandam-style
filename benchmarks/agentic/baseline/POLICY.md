@@ -24,7 +24,7 @@ binding. Every value is copied from the baseline records, never retyped.
 | Corpus | `1.4.5`, `corpus.lock.json` sha256 `cc37a931…ab52`, development split only |
 | Epoch | `alpha1` (product `0.1.0-alpha.1`, source `415e055`) |
 | Reference product | the digest-verified Alpha 1 tarballs of CE manifest `acdefef3…2884`; trusted grading tree `8feb473d…53b2` (`@pandamstyle` subtree `935080b9…bfee`) |
-| Harness | `runnerTreeDigest` (execution-relevant files only, below) and `harnessDepsLockSha256` of the run (observed in the phase 2 preflight: `08e7ae43…4d4d`, `66395a2d…1970`) |
+| Harness | `runnerTreeDigest` (execution-relevant files only, below) and `harnessDepsLockSha256` of the run (observed in the fix round 1 preflight: `27092b35…5636`, `66395a2d…1970`) |
 | Models | the three model configurations of section 2 |
 | Cells | one comparability key (DESIGN.md §1.4) per task × model, listed in the gate record |
 
@@ -410,6 +410,13 @@ Base `main` `f4845dd` (corpus 1.4.5). State directory
 | Isolation self-test | 51/51, binding `078997ab…764c` (unchanged: the binding does not contain the runner digest) |
 | Null-agent grading | 44/44 `fail`, no `error`; identical per task to phase 1 |
 | Digest scope | `strace` over the four steps above: no file under `runner/fixtures/`, `runner/smoke/`, `runner/__tests__/` and no `runner/DESIGN.md` was opened (only directory listings by `git status`) |
+
+**Fix round 1 re-run** (review r1 R4: one derivation of `contested`,
+`runner/src/contested.mjs`, commit `787bdf5`, no model call): provider
+preflight passed; `runnerTreeDigest` `08e7ae43…4d4d` → `27092b35…5636`, every
+other value unchanged (`preflight.json` regenerated, the phase 2 file kept
+as `preflight.phase2.json`). Nothing else under `runner/` that the self-test
+or the dry grading execute changed, so they were not re-run.
 
 No other prepared input embeds the runner digest: `matrix.json`, `setup.json`
 and the binding do not, and the self-test binding is unchanged.
