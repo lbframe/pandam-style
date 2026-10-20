@@ -79,7 +79,7 @@ function noteDigest(notes) {
   return crypto.createHash('sha256').update(text).digest('hex').slice(0, 16);
 }
 
-function compactStatement(statement) {
+export function compactStatement(statement) {
   const out = { a: statement.version_added };
   if (statement.version_removed != null) out.r = statement.version_removed;
   if (statement.partial_implementation === true) out.p = 1;
