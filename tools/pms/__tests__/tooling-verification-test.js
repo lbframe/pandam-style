@@ -103,13 +103,13 @@ const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../.
 const mode = fs.readFileSync(path.join(root, 'mode'), 'utf8');
 const output = process.argv[2];
 fs.mkdirSync(output, { recursive: true });
-if (mode !== 'next-missing') fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify({ pass: true, phase10Complete: mode !== 'next-blocked', cssIdentity: { status: 'known-non-canonical' } }));
+if (mode !== 'next-missing') fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify({ pass: true, phase10Complete: mode !== 'next-blocked', cssIdentity: { status: 'declaration-equivalent' } }));
 `,
   );
   write('yarn.lock', '# fixture lockfile\n');
   write(
     'tools/pilot/run-rsbuild-qualification.js',
-    "const fs = require('fs'); const path = require('path'); const root = path.resolve(__dirname, '../..'); const mode = fs.readFileSync(path.join(root, 'mode'), 'utf8'); if (mode !== 'rsbuild-missing') { fs.mkdirSync(process.argv[2], { recursive: true }); fs.writeFileSync(path.join(process.argv[2], 'report.json'), JSON.stringify({ complete: mode !== 'rsbuild-incomplete', start: { dev: { pass: true }, production: { pass: true } }, isolation: { pass: true }, failures: [{ pass: true }], bundleScan: { pass: true }, cssIdentity: { status: 'canonical' } })); }",
+    "const fs = require('fs'); const path = require('path'); const root = path.resolve(__dirname, '../..'); const mode = fs.readFileSync(path.join(root, 'mode'), 'utf8'); if (mode !== 'rsbuild-missing') { fs.mkdirSync(process.argv[2], { recursive: true }); fs.writeFileSync(path.join(process.argv[2], 'report.json'), JSON.stringify({ complete: mode !== 'rsbuild-incomplete', start: { dev: { pass: true }, production: { pass: true } }, isolation: { pass: true }, failures: [{ pass: true }], bundleScan: { pass: true }, cssIdentity: { status: 'declaration-equivalent' } })); }",
   );
   write(
     'tools/semantic-oracle/run.js',

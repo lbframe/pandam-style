@@ -156,13 +156,12 @@ the design module or its declarations changes.
   `transformed-with-proof` as acceptable.
 - `alternative-value` enhancement fallbacks are still refused; their emission
   moved to CE-07.3 (#62), and `context.deferredTo` is now `"CE-07.3"`.
-- A host's delivered CSS asset is canonical only when it is byte-identical to
-  `styles.css`. Vite delivers the canonical bytes. Next 16.3.8 webpack
-  production minifies them (known non-canonical host mode, owned by #78).
-  Rsbuild delivers a copy processed by its own CSS pipeline, which a host
-  browserslist can change
-  ([CE-01.2 note §10.3](architecture/ce-01.2-transformation-stage.md#103-host-findings-executed-locally-2026-10-20));
-  its disposition is pending.
+- A host's delivered CSS must be declaration-equivalent to `styles.css`: the
+  same rules, conditions, selector sets and declarations in the same order.
+  Minification is allowed; dropping or rewriting declarations is not. The
+  Rsbuild adapter therefore keeps the stylesheet out of Lightning CSS and
+  PostCSS target transforms and out of the CSS minifier. Other CSS bundled in
+  the same asset is no longer minified.
 
 During migration, record the new declaration as an expected CSS byte change.
 Do not add or remove `userSelect` to change a migration result.

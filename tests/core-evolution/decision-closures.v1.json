@@ -268,17 +268,24 @@
       "status": "closed",
       "closesIn": "CE-01.2",
       "issue": 45,
-      "decision": "Identity and hosts: the canonical identity is the compiler's styles.css bytes. A host's final CSS asset is canonical only when every CSS asset it delivers for the stylesheet is byte-identical; host minification and post-processing are outside the identity, and target facts attach only to canonical bytes. tools/pms/host-css-identity.mjs records the comparison in the Vite pilot, Rsbuild and Next production qualifications (cssIdentity). A host mode that rewrites the bytes is reported as a known non-canonical host mode with its owner, never repaired by CE-01.2: Next webpack production, owned by CE-13.1 (#78).",
-      "rationale": "Orchestrator answer Q5 of 2026-10-20 (AC3).",
+      "decision": "Identity and hosts: the compiler's styles.css bytes are the only input of the canonical digests and of the source map. A host's delivered CSS must be declaration-equivalent to them: the same rules in the same order, per rule the same at-rule conditions, the same selector set (order inside one selector list may differ) and the same declarations in the same order, including every prefixed pair. Whitespace, comments, final semicolons and selector-list order may differ, so minification passes; dropping, adding, merging, reordering or rewriting a declaration is a host redefining targets and fails. One shared normaliser (tools/pms/css-equivalence.cjs, on @csstools/css-tokenizer) is used by the Vite pilot, Rsbuild and Next production qualifications (cssIdentity), with a host targets knob on a repeat build. Hosts' own source maps are the host's concern. The Rsbuild adapter keeps the stylesheet out of builtin:lightningcss-loader and PostCSS and marks the CSS asset that carries it minimized, so neither the loader nor the Lightning CSS minimizer applies the host's browserslist to it.",
+      "rationale": "Orchestrator answers Q5 and Q6-Q8 of 2026-10-20 (AC3).",
       "evidence": [
+        "tools/pms/css-equivalence.cjs",
+        "tools/pms/__tests__/css-equivalence-test.js",
         "tools/pms/host-css-identity.mjs",
+        "packages/rsbuild/src/index.js",
+        "packages/rsbuild/test/dx-runtime.test.mjs",
         "tools/pilot/qualify-vite.mjs",
         "tools/pilot/qualify-rsbuild.mjs",
         "tools/pms/qualify-next.mjs",
         "docs/architecture/ce-01.2-transformation-stage.md"
       ],
       "commands": [
-        "node tools/pms/host-css-identity.mjs <qualification report.json>..."
+        "npx jest --config jest.config.js tools/pms/__tests__/css-equivalence-test.js",
+        "node tools/pms/verify-dx-runtime.mjs",
+        "node tools/pilot/run-rsbuild-qualification.js <out>",
+        "node tools/pms/qualify-next.mjs <out>"
       ]
     }
   ],
@@ -371,7 +378,22 @@
     {
       "id": "CE-01.2-Q5",
       "subject": "Next final asset",
-      "decision": "Verified in CE-01.2 by a byte-identity check of each host's final CSS asset. If Next rewrites the CSS it is not fixed here: the check reports a known non-canonical host mode owned by #78, and the orchestrator decides whether it blocks."
+      "decision": "Next is verified in CE-01.2 against the delivered CSS; superseded by CE-01.2-Q6 to Q8: under the declaration-equivalence contract a minification-only Next output passes and is not a known non-canonical mode, so no #78 deferral is recorded."
+    },
+    {
+      "id": "CE-01.2-Q6",
+      "subject": "host contract",
+      "decision": "Declaration equivalence replaces byte identity for delivered host CSS; one shared normaliser built on a parser already in the dependency tree, with class tests (accepted: minified, comment-stripped, selector-list reordered; rejected: dropped -webkit- declaration, reordered declarations, merged rule, changed value). Hosts' own source maps are the host's concern."
+    },
+    {
+      "id": "CE-01.2-Q7",
+      "subject": "Rsbuild",
+      "decision": "Fixed in CE-01.2 (a semantic AC3 violation): the stylesheet does not go through target-based lowering or prefix removal (lightningcss-loader, PostCSS, the browserslist-driven minimizer), whatever output.overrideBrowserslist says; fixture with overrideBrowserslist ['chrome >= 100']."
+    },
+    {
+      "id": "CE-01.2-Q8",
+      "subject": "Next",
+      "decision": "Minification-only output is declaration-equivalent and passes; if Next altered declarations, the orchestrator is told before pushing."
     }
   ],
   "deferrals": [
@@ -441,7 +463,7 @@
     {
       "task": "CE-01.2",
       "issue": 45,
-      "record": "closes D-BP-07, D-BP-09 and D-BP-10 (the CE-01.1 text is kept under supersedes), adds CE-01.2-T1..T3, orchestratorDecisions CE-01.2-Q1..Q5 and the resolution of each CE-01.1 deferral"
+      "record": "closes D-BP-07, D-BP-09 and D-BP-10 (the CE-01.1 text is kept under supersedes), adds CE-01.2-T1..T3, orchestratorDecisions CE-01.2-Q1..Q8 and the resolution of each CE-01.1 deferral"
     }
   ]
 }

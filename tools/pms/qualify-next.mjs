@@ -258,7 +258,7 @@ export default function Layout({ children }) { return <html {...props(themes.lig
       app,
       'app/shared.jsx',
       `import { create, token, props } from '../.pandamstyle/design.js';
-const styles = create({ panel: { display: 'block', padding: token('spacing.md'), color: token('colors.text') } });
+const styles = create({ panel: { display: 'block', padding: token('spacing.md'), color: token('colors.text'), userSelect: 'none' } });
 export default function Shared() { return <p id="server-style" {...props(styles.panel)}>shared server component</p>; }
 `,
     );
@@ -418,28 +418,9 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
     );
     report.production.push({ case: 'clean', code: built.code, ms: built.ms });
     assert.equal(built.code, 0, built.text);
-    // CE-01.2 (AC3): the final CSS asset against the canonical member. Next
-    // imports styles.css into its CSS pipeline; a rewrite is reported as a
-    // known non-canonical host mode (#78), never repaired here.
-    const cssDir = path.join(app, '.next/static/css');
-    const cssAssets = [];
-    for (const file of (await fs.readdir(cssDir, { recursive: true }))
-      .filter((name) => name.endsWith('.css'))
-      .sort()) {
-      cssAssets.push({
-        file: `.next/static/css/${file}`,
-        content: await fs.readFile(path.join(cssDir, file), 'utf8'),
-      });
-    }
-    report.cssIdentity = hostCssIdentity({
-      host: 'next',
-      mode: 'webpack-production',
-      canonical: await fs.readFile(
-        path.join(app, '.pandamstyle/styles.css'),
-        'utf8',
-      ),
-      assets: cssAssets,
-    });
+    // CE-01.2 (AC3): Next imports styles.css into its CSS pipeline; the
+    // delivered asset must be declaration-equivalent to the canonical member.
+    report.cssIdentity = await deliveredCssIdentity('webpack-production');
     assert.deepEqual(cssIdentityProblems(report.cssIdentity), []);
     canonicalBeforeKnob = {
       css: await fs.readFile(path.join(app, '.pandamstyle/styles.css'), 'utf8'),
@@ -579,6 +560,26 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
         browserProfile: report.browserProfile,
       }),
     );
+  }
+
+  /** The delivered CSS assets of the last production build, as a record. */
+  async function deliveredCssIdentity(mode) {
+    const cssDir = path.join(app, '.next/static/css');
+    const assets = [];
+    for (const file of (await fs.readdir(cssDir, { recursive: true }))
+      .filter((name) => name.endsWith('.css'))
+      .sort()) {
+      assets.push({
+        file: `.next/static/css/${file}`,
+        content: await fs.readFile(path.join(cssDir, file), 'utf8'),
+      });
+    }
+    const canonical = await fs.readFile(
+      path.join(app, '.pandamstyle/styles.css'),
+      'utf8',
+    );
+    assert.ok(canonical.includes('-webkit-user-select:none;user-select:none'));
+    return hostCssIdentity({ host: 'next', mode, canonical, assets });
   }
 
   async function qualifyRuntime() {
@@ -878,7 +879,14 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
             option: 'package.json#browserslist',
             value: ['chrome 100'],
             canonicalUnchanged: true,
+            cssIdentity: await deliveredCssIdentity(
+              'webpack-production-host-browserslist',
+            ),
           };
+          assert.deepEqual(
+            cssIdentityProblems(report.hostTargetsKnob.cssIdentity),
+            [],
+          );
         }
       }
       const minimumNode = path.join(app, 'node_modules/node22-next/bin/node');

@@ -210,10 +210,10 @@ describe('decision-closures.v1.json', () => {
     }
   });
 
-  test('orchestrator decisions O1..O13 and CE-01.2 Q1..Q5 are recorded once each', () => {
+  test('orchestrator decisions O1..O13 and CE-01.2 Q1..Q8 are recorded once each', () => {
     expect(CLOSURES.orchestratorDecisions.map((d) => d.id)).toEqual([
       ...Array.from({ length: 13 }, (_, i) => `CE-01.1-O${i + 1}`),
-      ...Array.from({ length: 5 }, (_, i) => `CE-01.2-Q${i + 1}`),
+      ...Array.from({ length: 8 }, (_, i) => `CE-01.2-Q${i + 1}`),
     ]);
     // O13 names the record that holds the floors.
     expect(CLOSURES.orchestratorDecisions[12].decision).toContain(

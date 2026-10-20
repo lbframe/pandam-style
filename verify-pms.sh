@@ -495,7 +495,8 @@ assert.equal(report.start.production.pass, true);
 assert.equal(report.isolation.pass, true);
 assert.equal(report.failures.every(row => row.pass), true);
 assert.equal(report.bundleScan.pass, true);
-assert.equal(report.cssIdentity?.status, 'canonical');
+// CE-01.2 (AC3): the delivered CSS is declaration-equivalent to styles.css.
+assert.ok(['canonical', 'declaration-equivalent'].includes(report.cssIdentity?.status), JSON.stringify(report.cssIdentity));
 NODE
 )
 qualify_next() (
@@ -507,8 +508,8 @@ const fs = require('node:fs');
 const report = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 assert.equal(report.pass, true);
 assert.equal(report.phase10Complete, true, 'Phase 10 remains open: TURBOPACK-DEV-SETTLEMENT');
-// CE-01.2 (AC3): canonical, or the recorded known non-canonical mode (#78).
-assert.ok(['canonical', 'known-non-canonical'].includes(report.cssIdentity?.status), JSON.stringify(report.cssIdentity?.status));
+// CE-01.2 (AC3): the delivered CSS is declaration-equivalent to styles.css.
+assert.ok(['canonical', 'declaration-equivalent'].includes(report.cssIdentity?.status), JSON.stringify(report.cssIdentity));
 NODE
 )
 if is_filtered_out "next-qualification"; then
