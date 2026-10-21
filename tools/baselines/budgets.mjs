@@ -76,12 +76,73 @@ function resultRef(file) {
   };
 }
 
+// The statistic an absolute limit applies to. `median` is the default.
+// `min` (the minimum over all samples) is allowed only for absolute peak-RSS
+// memory budgets: garbage-collector headroom is one-sided additive noise on
+// peak RSS, so the minimum estimates the working-set floor. Any other
+// statistic, or `min` anywhere else, is refused.
+export const STATISTICS = ['median', 'min'];
+const minAllowed = (cls, metric) =>
+  cls === 'memory' && /(^|\.)maxRssBytes$/.test(metric);
+
+// The policy's per-budget statistic overrides (thresholdRule.statistic), after
+// validation. A policy without the field uses the median everywhere.
+function statisticOverrides(policy, metrics) {
+  const rule = policy.thresholdRule.statistic;
+  const overrides = new Map();
+  if (rule == null) return overrides;
+  if (rule.default !== 'median')
+    throw new Error(`statistic default must be median, not ${rule.default}`);
+  for (const o of rule.overrides ?? []) {
+    const metric = metrics.find((m) => m.id === o.metric);
+    if (!STATISTICS.includes(o.statistic))
+      throw new Error(
+        `${o.workload} ${o.metric}: unknown statistic ${o.statistic}`,
+      );
+    if (o.statistic === 'min' && !minAllowed(metric?.class, o.metric))
+      throw new Error(
+        `${o.workload} ${o.metric}: statistic min is allowed only for absolute peak-RSS memory budgets`,
+      );
+    const key = `${o.workload}\0${o.metric}`;
+    if (overrides.has(key))
+      throw new Error(`${o.workload} ${o.metric}: statistic given twice`);
+    overrides.set(key, o.statistic);
+  }
+  return overrides;
+}
+
+// Statistic problems of a budgets file, checked by the gate whatever its
+// origin: an unknown statistic, or `min` outside absolute peak-RSS budgets.
+export function statisticProblems(budgets) {
+  const problems = [];
+  for (const b of budgets?.budgets ?? []) {
+    const statistic = b.limit?.statistic ?? 'median';
+    const at = `${b.workload} ${b.metric}`;
+    if (!STATISTICS.includes(statistic))
+      problems.push(`${at}: unknown statistic ${statistic}`);
+    else if (
+      statistic === 'min' &&
+      !(
+        b.limit.mode === 'absolute' &&
+        minAllowed(b.class, b.metric) &&
+        Number.isFinite(b.limit.maxMin)
+      )
+    )
+      problems.push(
+        `${at}: statistic min is allowed only for absolute peak-RSS memory budgets`,
+      );
+  }
+  return problems;
+}
+
 // Derives budgets from a policy (threshold rule, budgeted metrics, unknown
 // metrics) and baseline raws. Pure: identical inputs give identical output.
 export function deriveBudgets(policy, raws, resultRefs, options = {}) {
   const epochs = [policy.baseline.reference, policy.baseline.nullEpoch];
   const samples = raws.flatMap((r) => r.samples);
   const metrics = metricsFor(samples);
+  const statistics = statisticOverrides(policy, metrics);
+  const used = new Set();
   const budgets = [];
   const workloads = [...new Set(samples.map((s) => s.workload))].sort();
   for (const workload of workloads)
@@ -113,7 +174,41 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
         };
         const memory = policy.thresholdRule.memory;
         const cv = coefficientOfVariation(values);
-        if (metric.class === 'memory' && cv != null && cv <= memory.maxCv) {
+        const key = `${workload}\0${metric.id}`;
+        if (statistics.get(key) === 'min') {
+          // Absolute by declaration. The factor follows the memory rule on
+          // the reproducibility of the minimum itself: the CV of the minima
+          // of each baseline run and epoch.
+          used.add(key);
+          const minima = [];
+          for (const raw of raws)
+            for (const epoch of epochs) {
+              const v = valuesOf([raw], [epoch], workload, metric);
+              if (v.length > 0) minima.push(Math.min(...v));
+            }
+          const min = Math.min(...values);
+          const minimaCv = coefficientOfVariation(minima) ?? 0;
+          entry.baseline.informational = false;
+          entry.baseline.statistic = 'min';
+          entry.baseline.min = min;
+          entry.baseline.minima = minima;
+          entry.baseline.cv = cv;
+          entry.baseline.minimaCv = minimaCv;
+          const factor = roundUp(
+            Math.max(memory.floor, 1 + memory.cvMultiplier * minimaCv),
+            memory.roundUpTo,
+          );
+          entry.limit = {
+            mode: 'absolute',
+            statistic: 'min',
+            maxMin: Math.floor(min * factor),
+            factor,
+          };
+        } else if (
+          metric.class === 'memory' &&
+          cv != null &&
+          cv <= memory.maxCv
+        ) {
           entry.baseline.informational = false;
           entry.baseline.cv = cv;
           const factor = roundUp(
@@ -198,6 +293,11 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
       } else continue;
       budgets.push(entry);
     }
+  for (const key of statistics.keys())
+    if (!used.has(key))
+      throw new Error(
+        `statistic override for ${key.replace('\0', ' ')} matches no derived budget`,
+      );
   const environments = raws.map((r) => r.environment);
   return {
     schemaVersion: 1,
@@ -252,7 +352,15 @@ export function loadPolicy(file) {
 function looser(previous, next) {
   if (previous == null || next == null) return false;
   if (previous.mode !== next.mode) return true;
-  for (const key of ['maxRatio', 'noiseCeiling', 'maxMedian', 'maxValue'])
+  if ((previous.statistic ?? 'median') !== (next.statistic ?? 'median'))
+    return true;
+  for (const key of [
+    'maxRatio',
+    'noiseCeiling',
+    'maxMedian',
+    'maxMin',
+    'maxValue',
+  ])
     if (
       previous[key] != null &&
       (next[key] == null || next[key] > previous[key])
@@ -1185,7 +1293,7 @@ export function evaluate(
   raws,
   { candidate, reference = 'alpha1', expected },
 ) {
-  const problems = [];
+  const problems = [...statisticProblems(budgets)];
   const refusals = [];
   const reconciliation = [];
   raws = Array.isArray(raws) ? raws : [];
@@ -1343,12 +1451,17 @@ export function evaluate(
           reason: 'interval straddles the limit',
         });
     } else if (budget.limit.mode === 'absolute') {
-      const value = median(candidateValues);
+      const min = budget.limit.statistic === 'min';
+      const value = min
+        ? Math.min(...candidateValues)
+        : median(candidateValues);
+      const limit = min ? budget.limit.maxMin : budget.limit.maxMedian;
       results.push({
         ...entry,
         ...detail,
-        status: value <= budget.limit.maxMedian ? 'pass' : 'fail',
+        status: value <= limit ? 'pass' : 'fail',
         value,
+        ...(min ? { statistic: 'min' } : {}),
       });
     } else if (budget.class === 'deterministic') {
       const controlDistinct = [...new Set(controlValues)];

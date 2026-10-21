@@ -760,7 +760,10 @@ add(
 // in-force baseline runs re-labelled, so new files with new digests), and
 // budgets derived from them. The gate must accept it in release mode, and
 // refuse to treat any superseded version as release budgets.
-function honestNext(dir) {
+// With `mutate`, the committed policy is the mutated one while the budgets are
+// derived from the unmutated rules and bound to the mutated policy's digest:
+// the gate's own re-derivation must then judge the mutated policy.
+function honestNext(dir, mutate) {
   const policyFile = policyPath(NEXT);
   const policy = {
     ...readJson(path.join(dir, POLICY)),
@@ -772,7 +775,11 @@ function honestNext(dir) {
     justification: `Regression-matrix version ${NEXT} resting on new committed baseline evidence.`,
     relaxations: [],
   };
-  writeIn(dir, policyFile, `${JSON.stringify(policy, null, 2)}\n`);
+  writeIn(
+    dir,
+    policyFile,
+    `${JSON.stringify(mutate ? mutate(structuredClone(policy)) : policy, null, 2)}\n`,
+  );
   const refs = [];
   const raws = [];
   for (const [n, file] of evidenceOf(VERSION).entries()) {
@@ -935,6 +942,141 @@ for (const record of ['afterFull', 'final'])
         },
       );
   }
+// Per-budget statistic. `min` (absolute peak-RSS budgets only) absorbs
+// garbage-collector high-mode rounds but not a shift of every round; the gate
+// refuses `min` anywhere else and any unknown statistic, whether it comes from
+// a committed policy (re-derivation) or from a budgets file.
+const committedBudgets = readJson(path.join(REPO, BUDGETS));
+const minBudgets = committedBudgets.budgets.filter(
+  (b) => b.limit.statistic === 'min',
+);
+const SOURCE = {
+  'full.maxRssBytes': 'afterFull',
+  'session.maxRssBytes': 'final',
+};
+const expectStatus = (report, budget, status) => {
+  const r = report.results?.find(
+    (x) => x.workload === budget.workload && x.metric === budget.metric,
+  );
+  return r?.status === status
+    ? report
+    : { ...report, verdict: `${budget.metric} ${r?.status ?? 'missing'}` };
+};
+const expectProblem = (report, text) =>
+  [...(report.problems ?? []), ...(report.provenance?.problems ?? [])].some(
+    (p) => p.includes(text),
+  )
+    ? report
+    : { ...report, verdict: `no "${text}" problem` };
+for (const budget of minBudgets) {
+  const candidateSamples = (raws) =>
+    raws
+      .flatMap((r) => r.samples)
+      .filter(
+        (s) =>
+          s.workload === budget.workload &&
+          s.kind === 'compile' &&
+          s.epoch === 'alpha1-replay',
+      );
+  const usage = (s) => s.result[SOURCE[budget.metric]];
+  add(
+    'statistic',
+    `${budget.metric} min: every round but the lowest in the high mode passes`,
+    'pass',
+    () => {
+      const raws = fresh();
+      const samples = candidateSamples(raws);
+      const lowest = samples.reduce((a, b) =>
+        usage(b).maxRssBytes < usage(a).maxRssBytes ? b : a,
+      );
+      for (const s of samples) if (s !== lowest) usage(s).maxRssBytes *= 2;
+      return expectStatus(gateOn(raws), budget, 'pass');
+    },
+  );
+  add(
+    'statistic',
+    `${budget.metric} min: every round in the high mode fails`,
+    'fail',
+    () => {
+      const raws = fresh();
+      for (const s of candidateSamples(raws)) usage(s).maxRssBytes *= 2;
+      return expectStatus(gateOn(raws), budget, 'fail');
+    },
+  );
+  add(
+    'statistic',
+    `${budget.metric} min: every round +15% fails`,
+    'fail',
+    () => {
+      const raws = fresh();
+      for (const s of candidateSamples(raws))
+        usage(s).maxRssBytes = Math.round(usage(s).maxRssBytes * 1.15);
+      return expectStatus(gateOn(raws), budget, 'fail');
+    },
+  );
+}
+const timingBudget = committedBudgets.budgets.find(
+  (b) => b.class === 'timing' && b.limit.mode === 'paired-ratio',
+);
+const ratioBudget = committedBudgets.budgets.find(
+  (b) => b.class === 'runtime' && b.limit.mode === 'paired-ratio',
+);
+const withOverride = (budget, statistic) => (policy) => {
+  policy.thresholdRule.statistic.overrides.push({
+    workload: budget.workload,
+    metric: budget.metric,
+    statistic,
+  });
+  return policy;
+};
+for (const [name, budget, statistic, text] of [
+  [
+    'min on a timing budget',
+    timingBudget,
+    'min',
+    'statistic min is allowed only',
+  ],
+  [
+    'min on a paired-ratio runtime budget',
+    ratioBudget,
+    'min',
+    'statistic min is allowed only',
+  ],
+  [
+    'an unknown statistic',
+    minBudgets[0] ?? timingBudget,
+    'p95',
+    'unknown statistic',
+  ],
+]) {
+  add(
+    'statistic',
+    `committed v${NEXT} policy with ${name} is refused`,
+    'fail',
+    () => {
+      const dir = clone(`statistic-${statistic}-${budget.metric}`);
+      honestNext(dir, (policy) => {
+        policy.thresholdRule.statistic ??= { default: 'median', overrides: [] };
+        if (statistic === 'p95')
+          policy.thresholdRule.statistic.overrides =
+            policy.thresholdRule.statistic.overrides.filter(
+              (o) =>
+                !(o.workload === budget.workload && o.metric === budget.metric),
+            );
+        return withOverride(budget, statistic)(policy);
+      });
+      return expectProblem(gateIn(dir), text);
+    },
+  );
+  add('statistic', `budgets file with ${name} is refused`, 'fail', () => {
+    const b = structuredClone(committedBudgets);
+    const entry = b.budgets.find(
+      (x) => x.workload === budget.workload && x.metric === budget.metric,
+    );
+    entry.limit.statistic = statistic;
+    return expectProblem(gateOn(fresh(), { budgets: writeBudgets(b) }), text);
+  });
+}
 add(
   'review-r2',
   'stale-revision-harness-same (identical committed inputs at f4a7106, v1 evidence)',
