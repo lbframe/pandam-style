@@ -232,6 +232,8 @@ recorded.
 | `gate-injected-slowdown` | `alpha1`, `injected-slowdown` | 190, 0 failed | max 1-minute load average 2.88; mean CPU per sample 10.0% (max 17.1%)                |
 | `alpha1-v2-sk-b2`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 10.19; mean CPU per sample 15.8% (max 93.4%)               |
 | `alpha1-v2-sk-b3`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 1.81; mean CPU per sample 9.2% (max 25.4%)                 |
+| `alpha1-v3-sk-c1`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 1.78; mean CPU per sample 9.1% (max 14.3%)                 |
+| `alpha1-v3-sk-c4`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 1.61; mean CPU per sample 9.1% (max 13.5%)                 |
 
 - The two `alpha1-final` runs are the version 1 baseline.
   [`gate-null-alpha1-replay.json`](results/gate-null-alpha1-replay.json) is the
@@ -242,6 +244,11 @@ recorded.
   [`gate-null-alpha1-replay-v2.json`](results/gate-null-alpha1-replay-v2.json)
   is the gate on both runs with the identical artifact as candidate, under
   version 2: `pass`, 110 of 110 budgets, no reconciliation error.
+- The two `alpha1-v3-sk` runs are the version 3 baseline, measured on the same
+  host.
+  [`gate-null-alpha1-replay-v3.json`](results/gate-null-alpha1-replay-v3.json)
+  is the gate on both runs with the identical artifact as candidate, under
+  version 3: `pass`, 110 of 110 budgets, no reconciliation error.
 - `gate-injected-slowdown` checks the gate itself. Its candidate, built by
   [`make-candidate.mjs`](results/gate-injected-slowdown/make-candidate.mjs), is
   `alpha1` with every compiler session call slowed by 30%. The fixture, CE-00.2
@@ -315,19 +322,51 @@ foreign process at half a core or more.
 - Only B2 and B3 are committed. Every attempt's result file, logs and verdict
   are kept outside the repository with the measurement work.
 
+### Version 3 baseline provenance
+
+Version 3 re-derives every budget from a new baseline (the change policy rejects
+reused result files), measured on the same host and store copy at commit
+`7cb9fe9`, with the same harness files as version 2.
+
+- **Series C (pre-registered 2026-10-21, 19:01 UTC):** the series B start
+  condition (no CI job worker and a 1-minute load average below 1.0, checked
+  every 60 s and logged), no abort once started, and the same private process
+  sampler. An attempt is admissible with 232 of 232 samples, 0 failed, every
+  cell's null comparison within the version 2 noise ceiling, and no foreign
+  process at half a core or more in any sampler window. Stop at two admissible
+  attempts, at most 4. High-mode rounds of the c10000 peak-RSS cells (above 1.6
+  GB) are kept as evidence, never excluded.
+
+| Attempt              | Verdict                                                                                    | Worst noise / v2 ceiling | Max 1-min load | Foreign windows | c10000 high-mode rounds (`alpha1`, `alpha1-replay`) |
+| -------------------- | ------------------------------------------------------------------------------------------ | ------------------------ | -------------- | --------------- | --------------------------------------------------- |
+| C1 `alpha1-v3-sk-c1` | **admissible**                                                                             | 0.066 / 0.20             | 1.78           | 0 of 115        | 0 of 5, 1 of 5 (both cells)                         |
+| C2 `alpha1-v3-sk-c2` | not admissible: 2 windows with a foreign process (1.18 cores, and a login-message process) | 0.079 / 0.15             | 1.81           | 2 of 115        | 1 of 5, 0 of 5 (both cells)                         |
+| C3 `alpha1-v3-sk-c3` | not admissible: 1 window with a foreign process at 0.50 core                               | 0.046 / 0.15             | 1.83           | 1 of 115        | 0 of 5, 0 of 5                                      |
+| C4 `alpha1-v3-sk-c4` | **admissible**                                                                             | 0.035 / 0.10             | 1.61           | 0 of 115        | 0 of 5, 0 of 5                                      |
+
+- C1 and C4 are the first two admissible attempts; `budgets.v3.json` is frozen
+  from them.
+- The foreign processes in C2 and C3 were interactive agent sessions (`claude`)
+  of the host's account. C2's login-message process (`landscape-sysinfo`) was
+  most likely started by this work's own status polling: every SSH session
+  regenerates the login message. From C3 on, the polling used one SSH connection
+  per 10 minutes.
+
 ## Budgets
 
-[`budget-policy.v2.json`](budget-policy.v2.json) is the versioned threshold rule
+[`budget-policy.v3.json`](budget-policy.v3.json) is the versioned threshold rule
 in force. It lists the budgeted metrics, the metrics that stay `unknown`, the
-change policy and, for every budget that loosened relative to version 1, a
-relaxation with its justification. [`budgets.v2.json`](budgets.v2.json) is
-generated from the policy and the version 2 baseline runs by
+change policy and, for every budget that loosened relative to version 2, a
+relaxation with its justification. [`budgets.v3.json`](budgets.v3.json) is
+generated from the policy and the version 3 baseline runs by
 `budgets.mjs freeze`, never by hand. Rerunning the same freeze command must
 reproduce it byte for byte.
 
-Version 1 ([`budget-policy.v1.json`](budget-policy.v1.json),
-[`budgets.v1.json`](budgets.v1.json)) is superseded and stays committed,
-unchanged: the gate verifies the chain from version 2 back to it.
+Versions 1 and 2 ([`budget-policy.v1.json`](budget-policy.v1.json),
+[`budgets.v1.json`](budgets.v1.json),
+[`budget-policy.v2.json`](budget-policy.v2.json),
+[`budgets.v2.json`](budgets.v2.json)) are superseded and stay committed,
+unchanged: the gate verifies the chain from version 3 back to version 1.
 
 - **Version 2 (CE-00.3, #42):** raises only the paired-ratio timing floor, from
   1.10 to 1.25, for the measured cost of the always-on browser-target feature
@@ -347,6 +386,28 @@ unchanged: the gate verifies the chain from version 2 back to it.
     and are bound to that host. A gate run measured on another host is outside
     the version 2 contract.
 
+- **Version 3 (CE-00.3, #42, #76):** changes one rule. The two c10000 peak-RSS
+  budgets are judged on the minimum over all samples instead of the median.
+
+  - Why: peak RSS of these cells is bimodal on the measurement host as well.
+    When a V8 mark-compact lands mid full compile (about 19 s in, about 520 MB
+    live), the next heap limit is about four times that and the session peaks at
+    2.1–2.2 GB; otherwise it stays near 1.2–1.4 GB. `alpha1` itself reaches the
+    high mode in about a quarter of rounds, so it would fail its own version 2
+    median limit about 10% of the time. Every version 2 baseline sample happened
+    to be in the low mode, which gave a CV of 0.5% and an absolute median limit.
+    This was diagnosed on the CE-01.1 candidate's gate run; the CE-01.1 verdict
+    itself is not part of this change.
+  - Why the minimum: garbage-collector headroom is one-sided additive noise on
+    peak RSS, so the minimum estimates the working-set floor. High-mode rounds
+    stay in the evidence and cannot fail the budget alone; a real growth of the
+    floor still does (the regression matrix checks both).
+  - Every other rule is unchanged. All budgets are re-derived from the series C
+    baseline: 6 relaxations (the 2 statistic changes, and 4 absolute memory
+    medians re-derived, +0.05% to +1.04%) and 16 tightenings (noise ceilings and
+    absolute medians, from the quieter baseline). The host binding of version 2
+    still applies.
+
 - **Timing and runtime (paired ratios):** for each round, the candidate sample
   is divided by the adjacent `alpha1` sample. A budget passes when the upper
   bound of the bootstrap interval of the median ratio is within the limit, fails
@@ -364,13 +425,22 @@ unchanged: the gate verifies the chain from version 2 back to it.
   A cell whose baseline CV is at most 5% gets an absolute limit on the candidate
   median, baseline median × max(1.10, 1 + 3 CV), rounded up to 0.05. Any other
   cell is a paired ratio.
+  - Statistic: a policy may set a per-budget statistic
+    (`thresholdRule.statistic`). The default is the median. `min` is allowed
+    only for absolute peak-RSS budgets: limit = baseline minimum × max(1.10, 1 +
+    3 CV of the minima of each baseline run and epoch), rounded up to 0.05, and
+    the gate compares the candidate's minimum with it. The gate refuses `min`
+    anywhere else and any unknown statistic, and treats a statistic change as a
+    loosening that needs a relaxation.
   - c10000 peak RSS: on the version 1 host it is bimodal (about 1.05 GB or about
     2.3 GB, in both epochs of the identical artifact), so in version 1 its two
     cells fell back to paired ratios with limits of 2.15 and 2.30 and noise
-    ceilings of 1.9 and 2.2, which detect only a gross regression. On the
-    version 2 measurement host its CV is about 0.5%, so version 2 gives both
-    cells absolute limits. The bimodality is a documented property of the
-    version 1 host, not a defect of version 2.
+    ceilings of 1.9 and 2.2, which detect only a gross regression. Version 2
+    measured a CV of about 0.5% on the measurement host and gave both cells
+    absolute median limits, stating that the bimodality was a property of the
+    version 1 host. That statement was wrong: the measurement host is bimodal
+    too, and the version 2 baseline only happened to sample the low mode.
+    Version 3 judges both cells on the minimum.
 - **Deterministic outputs:** absolute limits on the frozen `alpha1` values.
   - 5% for CSS bytes, rule and declaration counts and host bundle bytes.
   - 10% for generated modules.
