@@ -14,11 +14,22 @@
 // CE-00.3 baseline store (read only). The candidate defaults to this
 // workspace's built compiler.
 //
-// One project, one page per probe group, one `create()` call per probe: the
-// probes the Jest equivalence test runs against the pinned Alpha 1 policy,
-// here compiled by both compilers end to end. For each call it compares the
-// diagnostic codes and rules. The only accepted differences are the CE-02.1
-// deltas: an unsupported-property rule gains a suffix.
+// The closure must be the frozen alpha1 one: its installed @pandamstyle tree
+// digest must equal `closure.installedPandamstyle` of
+// benchmarks/core-evolution/epochs/alpha1/manifest.v1.json, or the tool
+// refuses to run (exit 2).
+//
+// Coverage: `create()` declarations only, through the public Project Service
+// of both compilers. One project, one page per probe group, one `create()`
+// call per probe: the probes the Jest equivalence test runs against the
+// pinned Alpha 1 policy. For each call it compares the diagnostic codes and
+// rules. The only accepted differences are the CE-02.1 deltas: an
+// unsupported-property rule gains a suffix, and a prototype name (`__proto__`
+// literal or computed, `constructor`, `prototype`, ...) is refused by the
+// candidate as an unrecognized property, whatever Alpha 1 did (asserted).
+// Recipes, patterns, condition blocks, spreads and platform names under
+// target profiles are covered by the Jest suite
+// packages/compiler/__tests__/pandamstyle/property-descriptors-test.js.
 //
 // Prints a JSON summary; exits 1 on any other difference.
 
@@ -26,6 +37,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { fileTreeDigest } from '../baselines/archive.mjs';
 
 const REPO = path.resolve(new URL('../..', import.meta.url).pathname);
 const argv = process.argv.slice(2);
@@ -43,6 +55,31 @@ const ALPHA1 = path.join(
   path.resolve(arg('--alpha1')),
   'node_modules/@pandamstyle/compiler/lib/index.mjs',
 );
+
+// The caller-supplied closure must be the recorded alpha1 closure.
+function verifyAlpha1Closure(closure) {
+  const manifest = JSON.parse(
+    fs.readFileSync(
+      path.join(
+        REPO,
+        'benchmarks/core-evolution/epochs/alpha1/manifest.v1.json',
+      ),
+      'utf8',
+    ),
+  );
+  const expected = manifest.closure.installedPandamstyle.sha256;
+  const actual = fileTreeDigest(
+    path.join(closure, 'node_modules/@pandamstyle'),
+  ).sha256;
+  if (actual !== expected) {
+    process.stderr.write(
+      `the --alpha1 closure is not the recorded alpha1 closure: @pandamstyle tree ${actual}, manifest ${expected}\n`,
+    );
+    process.exit(2);
+  }
+  return expected;
+}
+const ALPHA1_TREE = verifyAlpha1Closure(path.resolve(arg('--alpha1')));
 const CANDIDATE = path.resolve(
   arg('--candidate') ?? path.join(REPO, 'packages/compiler/lib/index.mjs'),
 );
@@ -115,8 +152,20 @@ function probes() {
           ];
     for (const value of values) out.push({ key, value, entry });
   }
-  for (const key of ['constructor', 'toString', 'hasOwnProperty', 'valueOf']) {
-    for (const value of ["'x'", "token('colors.a')"]) {
+  for (const key of [
+    '__proto__',
+    "['__proto__']",
+    'constructor',
+    'prototype',
+    'toString',
+    'hasOwnProperty',
+    'valueOf',
+  ]) {
+    for (const value of [
+      "'x'",
+      "token('colors.a')",
+      "{ color: token('colors.a') }",
+    ]) {
       out.push({ key, value, entry: null });
     }
   }
@@ -224,8 +273,16 @@ async function main() {
       }
     }),
   );
+  // The candidate refuses every prototype name as an unrecognized property.
+  const UNRECOGNIZED = [
+    ['PMS_UNSUPPORTED_PROPERTY', 'supported-properties.unrecognized'],
+  ];
+  const prototypeFailures = prototypeKeys.filter(
+    (p) => JSON.stringify(p.candidate) !== JSON.stringify(UNRECOGNIZED),
+  );
   const summary = {
     alpha1: path.relative(process.cwd(), ALPHA1),
+    alpha1PandamstyleTree: ALPHA1_TREE,
     candidate: path.relative(process.cwd(), CANDIDATE),
     probes: all.length - prototypeKeys.length,
     accepted,
@@ -233,9 +290,11 @@ async function main() {
     differences: differences.length,
     firstDifferences: differences.slice(0, 20),
     prototypeKeys,
+    prototypeFailures: prototypeFailures.length,
   };
   process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
-  process.exitCode = differences.length === 0 ? 0 : 1;
+  process.exitCode =
+    differences.length === 0 && prototypeFailures.length === 0 ? 0 : 1;
 }
 
 main().catch((error) => {

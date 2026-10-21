@@ -33,7 +33,8 @@
  * same value as '0'), `tokens` (token categories), `resources` (resource
  * kinds, empty until CE-03) and `range`. `range` exists only on the four Alpha
  * 1 rows `opacity`, `flex`, `flexGrow` and `flexShrink`: it is a continuous
- * legacy interval, never a finite domain, and CE-02.2 replaces it.
+ * legacy interval, never a finite domain, and CE-02.2 replaces it. Its `max` is
+ * omitted when the interval has no upper bound (`{ min: 0 }`).
  *
  * Platform-extension rows are recognition-only in CE-02.1: they have no
  * domain and every use is rejected.
@@ -168,11 +169,18 @@ const SET = (key, grammar, family, def, std = [], extra = {}) => [
   family,
   { def: { values: def }, std: { values: std }, ...extra },
 ];
+// A range with no upper bound omits `max`: the domain stays JSON-safe, with
+// no Infinity to serialize as null.
+const rangeOf = (min, max) => (max === Infinity ? { min } : { min, max });
 const RANGE = (key, grammar, family, min, max, extra = {}) => [
   key,
   grammar,
   family,
-  { def: { range: { min, max } }, std: { range: { min, max } }, ...extra },
+  {
+    def: { range: rangeOf(min, max) },
+    std: { range: rangeOf(min, max) },
+    ...extra,
+  },
 ];
 const COMPOSITE = (key, grammar, family, longhands) => [
   key,
@@ -904,8 +912,6 @@ function canonicalJson(value) {
       .map((k) => `${JSON.stringify(k)}:${canonicalJson(value[k])}`)
       .join(',')}}`;
   }
-  // JSON has no Infinity: the legacy unbounded range keeps a distinct token.
-  if (value === Infinity) return '"Infinity"';
   return JSON.stringify(value);
 }
 

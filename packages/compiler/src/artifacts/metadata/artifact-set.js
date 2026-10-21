@@ -121,6 +121,25 @@ export function validateArtifactSet(metadata, contents) {
       mismatch('manifest', `identity field ${key} differs`);
     }
   }
+  // CE-02.1: legacy range bounds are finite numbers; an unbounded range omits
+  // `max`. A `null` or non-finite bound is not a valid manifest.
+  for (const [property, entry] of Object.entries(
+    manifest?.properties?.byProperty ?? {},
+  )) {
+    const range = entry?.range;
+    if (range == null) continue;
+    const finite = (bound) =>
+      typeof bound === 'number' && Number.isFinite(bound);
+    if (
+      !finite(range.min) ||
+      (Object.hasOwn(range, 'max') && !finite(range.max))
+    ) {
+      mismatch(
+        'manifest',
+        `range bounds of ${property} are not finite numbers`,
+      );
+    }
+  }
   // CE-01.1, additive: the target digest binds the artifact set to the target
   // resolution recorded in the manifest.
   if ((manifest.targets?.digest ?? null) !== (metadata.targetsDigest ?? null)) {
