@@ -524,8 +524,10 @@ altered history, and through a seeded omission and perturbation fuzzer:
 - **Coverage:** every node outside the samples, and every normalized sample
   path, at least once per applicable mutation, plus a random sample.
 - **Invariant:** a failing run never becomes `pass`. A passing run stays `pass`
-  only for a provable no-op: a field the gate never reads, with identical budget
-  results.
+  only for a verdict- and budget-invariant mutation of an informational field:
+  the verdict and every budget result are identical, compared field by field.
+  The gate does read some informational fields: `label` for duplicate-run
+  detection, and `load.before`, which it copies into its report.
 
 The trust boundary is unchanged: complete, well-formed values produced by the
 harness are trusted.

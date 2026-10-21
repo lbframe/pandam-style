@@ -1311,9 +1311,12 @@ r2('incremental-hidden-slowdown', 'inconclusive', (raws) => {
 // epochs by name) with every applicable mutation, is covered at least once;
 // a seeded random sample of concrete mutations is added. Invariants: a
 // failing base never becomes `pass`; a passing base stays `pass` only for a
-// provable no-op: the mutated path is one the gate never reads (free-text
-// and load-record fields) and every budget result is identical to the
-// unmutated base's.
+// mutation that is verdict- and budget-invariant: the mutated path is an
+// informational one (free-text, environment description and load-record
+// fields, not a budget input) and the verdict and every budget result are
+// identical to the unmutated base's, compared field by field. The gate does
+// read some of these paths: `label` for duplicate-run detection, and
+// `load.before`, which it copies into its report.
 
 const INFORMATIONAL =
   /^(label|startedAt|finishedAt|samples\[\d+\]\.startedAt|environment\.(os|kernel|architecture|cpu|filesystem|nodeBinary|scalingGovernor|boost)|epochs\[\d+\]\.closure|quietRule\.description|load\.before(\[\d+\](\.at)?)?|load\.after\.at)$/;
@@ -1399,16 +1402,32 @@ function apply(node, type) {
   return () => (parent[key] = old);
 }
 
-const resultsKey = (report) =>
-  JSON.stringify(
-    (report.results ?? []).map((r) => [
-      r.workload,
-      r.metric,
-      r.status,
-      r.value ?? null,
-      r.pairedRatio ?? null,
-    ]),
-  );
+// The first path at which two values differ, or null when they are equal
+// field by field (NaN equals NaN; key order is ignored).
+function firstDifference(a, b, at = '') {
+  if (Object.is(a, b)) return null;
+  if (
+    a === null ||
+    b === null ||
+    typeof a !== 'object' ||
+    typeof b !== 'object' ||
+    Array.isArray(a) !== Array.isArray(b)
+  )
+    return at || '(root)';
+  if (Array.isArray(a) && a.length !== b.length) return `${at}.length`;
+  for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    if (!(k in a) || !(k in b)) return at === '' ? k : `${at}.${k}`;
+    const d = firstDifference(a[k], b[k], at === '' ? k : `${at}.${k}`);
+    if (d != null) return d;
+  }
+  return null;
+}
+
+// Verdict- and budget-invariance against the unmutated base's report.
+const invariance = (report, base) =>
+  report.verdict !== base.verdict
+    ? 'verdict'
+    : firstDifference(report.results ?? [], base.results ?? [], 'results');
 
 function fuzz({ samples = 1500, seed = 307 } = {}) {
   const prepared = prepareGate({ rev: 'HEAD' });
@@ -1449,7 +1468,6 @@ function fuzz({ samples = 1500, seed = 307 } = {}) {
     });
     if (baseReport.verdict !== base.expect)
       throw new Error(`${base.name}: base verdict ${baseReport.verdict}`);
-    const baseKey = resultsKey(baseReport);
     const snapshot = JSON.stringify(base.raws);
     const nodes = nodesOf(base.raws);
     const plan = [];
@@ -1479,24 +1497,26 @@ function fuzz({ samples = 1500, seed = 307 } = {}) {
       i++;
     }
     const table = Object.fromEntries(TYPES.map((t) => [t, {}]));
-    let noOps = 0;
-    const noOpPaths = new Set();
+    let invariantPasses = 0;
+    const invariantPaths = new Set();
     for (const [node, type] of plan) {
       const undo = apply(node, type);
       const report = judge(prepared, base.raws, { candidate: base.candidate });
       undo();
       table[type][report.verdict] = (table[type][report.verdict] ?? 0) + 1;
       if (report.verdict !== 'pass') continue;
-      const provableNoOp =
-        base.expect === 'pass' &&
-        INFORMATIONAL.test(node.at) &&
-        resultsKey(report) === baseKey;
-      if (provableNoOp) {
-        noOps++;
-        noOpPaths.add(`${type} ${node.norm}`);
+      const difference =
+        base.expect === 'pass' && INFORMATIONAL.test(node.at)
+          ? invariance(report, baseReport)
+          : 'not an informational path of a passing base';
+      if (difference == null) {
+        invariantPasses++;
+        invariantPaths.add(`${type} ${node.norm}`);
       } else {
         violations++;
-        console.log(`VIOLATION ${base.name}: ${type} ${node.at} -> pass`);
+        console.log(
+          `VIOLATION ${base.name}: ${type} ${node.at} -> pass (${difference})`,
+        );
       }
     }
     if (JSON.stringify(base.raws) !== snapshot)
@@ -1507,8 +1527,8 @@ function fuzz({ samples = 1500, seed = 307 } = {}) {
       normalizedSamplePaths: byPath.size,
       nodes: nodes.length,
       byType: table,
-      passesProvedNoOp: noOps,
-      noOpPaths: [...noOpPaths].sort(),
+      passesVerdictAndBudgetInvariant: invariantPasses,
+      invariantPaths: [...invariantPaths].sort(),
     });
   }
   return { summary, violations };
