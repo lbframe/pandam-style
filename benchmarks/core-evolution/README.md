@@ -230,25 +230,122 @@ recorded.
 | `alpha1-final-1`         | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 12.26; mean whole-machine CPU per sample 18.7% (max 52.5%) |
 | `alpha1-final-2`         | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 5.63; mean CPU per sample 11.5% (max 38.7%)                |
 | `gate-injected-slowdown` | `alpha1`, `injected-slowdown` | 190, 0 failed | max 1-minute load average 2.88; mean CPU per sample 10.0% (max 17.1%)                |
+| `alpha1-v2-sk-b2`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 10.19; mean CPU per sample 15.8% (max 93.4%)               |
+| `alpha1-v2-sk-b3`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 1.81; mean CPU per sample 9.2% (max 25.4%)                 |
 
-- The two `alpha1-final` runs are the frozen baseline.
+- The two `alpha1-final` runs are the version 1 baseline.
   [`gate-null-alpha1-replay.json`](results/gate-null-alpha1-replay.json) is the
-  gate on both runs with the identical artifact as candidate: `pass`, 110 of 110
-  budgets.
+  gate on both runs with the identical artifact as candidate, under version 1:
+  `pass`, 110 of 110 budgets.
+- The two `alpha1-v2-sk` runs are the version 2 baseline, measured on the
+  dedicated measurement host (see below).
+  [`gate-null-alpha1-replay-v2.json`](results/gate-null-alpha1-replay-v2.json)
+  is the gate on both runs with the identical artifact as candidate, under
+  version 2: `pass`, 110 of 110 budgets, no reconciliation error.
 - `gate-injected-slowdown` checks the gate itself. Its candidate, built by
   [`make-candidate.mjs`](results/gate-injected-slowdown/make-candidate.mjs), is
   `alpha1` with every compiler session call slowed by 30%. The fixture, CE-00.2
   corpus and c1000 workloads ran interleaved with the `alpha1` control.
   [`gate.json`](results/gate-injected-slowdown/gate.json) is `fail`: 28 timing
-  budgets fail with median paired ratios of 1.13–1.31, against limits of 1.10.
+  budgets fail with median paired ratios of 1.13–1.31, against the version 1
+  limits of 1.10.
+
+### Version 2 baseline provenance
+
+The version 2 baseline was measured on a dedicated measurement host (AMD Ryzen 7
+9800X3D, 16 logical cores, Ubuntu 24.04.5, kernel 7.0.0-31), from a
+digest-identical copy of the Alpha 1 store, at harness commit `159f95c`. The
+host also runs the repository's self-hosted CI jobs, and other interactive
+sessions of the same account. Every attempt below used the final plan with the
+`alpha1` and `alpha1-replay` epochs. A private process sampler logged, every 15
+s, each process using half a core or more, with its control group; only the
+counts below are published.
+
+Admissibility rules, each fixed before the data it judges existed:
+
+- **Registered (2026-10-20), series A attempts 1–4:** 232 of 232 samples, 0
+  failed; every cell's null comparison (`alpha1-replay` against `alpha1`) within
+  the noise ceiling of the budgets in force (version 1); and no foreign heavy
+  load (half a core or more) other than CI jobs.
+- **Amended (2026-10-20), from attempt 5, prospective only:** the foreign-load
+  clause was dropped. The host runs other interactive agent sessions, so the
+  clause could not be met reliably, and it was stricter than the policy, whose
+  protection against load is the paired control and the noise ceiling. Foreign
+  load is recorded, not disqualifying. Attempts 1–4 stay judged under the
+  registered rule.
+- **Series B (pre-registered 2026-10-21, 12:15 UTC):** an attempt starts only
+  when no CI job worker runs and the 1-minute load average is below 1.0, checked
+  every 60 s; a started attempt always runs to the end; admissibility is the
+  amended rule; at most 4 attempts; the freeze uses the first two admissible
+  attempts in order.
+
+In the table, "worst noise" is the largest control spread against its version 1
+noise ceiling, and the windows are the sampler's 15-second windows with a
+foreign process at half a core or more.
+
+| Attempt              | Rule       | Verdict                                                                            | Worst noise / ceiling | Max 1-min load | CI windows | Other windows |
+| -------------------- | ---------- | ---------------------------------------------------------------------------------- | --------------------- | -------------- | ---------- | ------------- |
+| A1 `alpha1-v2-sk-1`  | registered | not admissible: a non-CI process at 1.19 cores in one window                       | 0.083 / 0.10          | 4.97           | 15 of 116  | 1             |
+| A2 `alpha1-v2-sk-2`  | registered | not admissible: 16 cells over the noise ceiling                                    | 0.253 / 0.10          | 8.60           | 64 of 116  | 3             |
+| A3 `alpha1-v2-sk-3`  | registered | not admissible: a non-CI process at 1.32 cores in one window                       | 0.071 / 0.10          | 8.33           | 35 of 119  | 1             |
+| A4 `alpha1-v2-sk-4`  | registered | not admissible: 4 cells over the noise ceiling, and a non-CI process in one window | 0.190 / 0.10          | 6.45           | 37 of 118  | 3             |
+| A5 `alpha1-v2-sk-5`  | amended    | not admissible: 5 cells over the noise ceiling                                     | 0.222 / 0.10          | 12.29          | 56 of 121  | 3             |
+| A6 `alpha1-v2-sk-6`  | amended    | not admissible: 2 cells over the noise ceiling                                     | 0.144 / 0.10          | 13.43          | 34 of 119  | 1             |
+| A7 `alpha1-v2-sk-7`  | amended    | not admissible: 1 cell over the noise ceiling                                      | 0.226 / 0.10          | 9.35           | 27 of 117  | 3             |
+| A8 `alpha1-v2-sk-8`  | amended    | stopped at sample 5 of 232: two admissible attempts were no longer reachable       | —                     | —              | —          | —             |
+| B1 `alpha1-v2-sk-b1` | amended    | not admissible: 2 cells over the noise ceiling                                     | 0.206 / 0.10          | 10.84          | 50 of 120  | 5             |
+| B2 `alpha1-v2-sk-b2` | amended    | **admissible**                                                                     | 0.063 / 0.10          | 10.19          | 22 of 116  | 0             |
+| B3 `alpha1-v2-sk-b3` | amended    | **admissible**                                                                     | 0.080 / 0.10          | 1.81           | 0 of 115   | 1             |
+
+- Series A (attempts 1–8) closed without two admissible attempts. The cell that
+  most often exceeded its ceiling was synthetic-c1000
+  `incremental.local-style.toDiagnosticsMs` (0.14–0.23 under CI load, 0.02 and
+  0.07 in attempts 1 and 3).
+- Series B stopped after B3: B2 and B3 are the first two admissible attempts,
+  and `budgets.v2.json` is frozen from them. B4 was never started.
+- B3's one other window is an interactive agent session process (`claude`) at
+  1.00 core. Under the amended rule it is recorded, not disqualifying.
+- Host condition: at 13:28 UTC on 2026-10-21, before B3 started, the shared
+  organisation CI label was removed from the measurement host's runners, so
+  other repositories' CI jobs no longer run there. No rule changed.
+- Excluded, never pooled: `alpha1-v2-final-1` and a partial second run (49 of
+  232 samples), measured on the version 1 host before the measurement moved.
+  They ran on a different host from the version 2 baseline, and the first was
+  contaminated by concurrent activity of this work.
+- Only B2 and B3 are committed. Every attempt's result file, logs and verdict
+  are kept outside the repository with the measurement work.
 
 ## Budgets
 
-[`budget-policy.v1.json`](budget-policy.v1.json) is the versioned threshold
-rule. It lists the budgeted metrics, the metrics that stay `unknown` and the
-change policy. [`budgets.v1.json`](budgets.v1.json) is generated from the policy
-and the baseline runs by `budgets.mjs freeze`, never by hand. Rerunning the same
-freeze command must reproduce it byte for byte.
+[`budget-policy.v2.json`](budget-policy.v2.json) is the versioned threshold rule
+in force. It lists the budgeted metrics, the metrics that stay `unknown`, the
+change policy and, for every budget that loosened relative to version 1, a
+relaxation with its justification. [`budgets.v2.json`](budgets.v2.json) is
+generated from the policy and the version 2 baseline runs by
+`budgets.mjs freeze`, never by hand. Rerunning the same freeze command must
+reproduce it byte for byte.
+
+Version 1 ([`budget-policy.v1.json`](budget-policy.v1.json),
+[`budgets.v1.json`](budgets.v1.json)) is superseded and stays committed,
+unchanged: the gate verifies the chain from version 2 back to it.
+
+- **Version 2 (CE-00.3, #42):** raises only the paired-ratio timing floor, from
+  1.10 to 1.25, for the measured cost of the always-on browser-target feature
+  checking of CE-01.1 (#44): under version 1 its candidate failed five paired
+  timing budgets at median ratios of 1.118 to 1.166. The floor is cumulative
+  against `alpha1` for the whole epic, so the remaining headroom is small and
+  later lots must not assume more. CE-12.3 (#76) owns recovering the cost.
+
+  - Every other rule is unchanged. The budgets are re-derived from the new
+    baseline, so noise ceilings and absolute memory limits follow its
+    measurements. The 55 relaxations are generated from the derivation with the
+    gate's own predicate: 48 timing budgets at the new floor (some with
+    re-derived noise ceilings), 5 absolute memory medians (+0.08% to +1.16%) and
+    the 2 c10000 peak-RSS cells.
+  - **Host binding:** the version 2 absolute limits, in particular the two
+    c10000 peak-RSS cells, derive from the measurement host's `alpha1` medians
+    and are bound to that host. A gate run measured on another host is outside
+    the version 2 contract.
 
 - **Timing and runtime (paired ratios):** for each round, the candidate sample
   is divided by the adjacent `alpha1` sample. A budget passes when the upper
@@ -256,8 +353,8 @@ freeze command must reproduce it byte for byte.
   when the median ratio exceeds it, and is otherwise `inconclusive`.
   - Limit: the larger of a floor and the largest null upper bound
     (`alpha1-replay` against `alpha1`) in each baseline batch and pooled,
-    rounded up to 0.05. Floors are 10% for time, 15% for runtime selection and
-    10% for memory measured as a ratio.
+    rounded up to 0.05. Floors are 25% for time (10% in version 1), 15% for
+    runtime selection and 10% for memory measured as a ratio.
   - Noise ceiling: if the `alpha1` control's interquartile range over median
     exceeds max(0.10, 2 × the noisiest baseline batch), the budget is
     `inconclusive`. So are runs without adjacent `alpha1` pairs or with fewer
@@ -267,10 +364,13 @@ freeze command must reproduce it byte for byte.
   A cell whose baseline CV is at most 5% gets an absolute limit on the candidate
   median, baseline median × max(1.10, 1 + 3 CV), rounded up to 0.05. Any other
   cell is a paired ratio.
-  - Limited sensitivity: c10000 peak RSS is bimodal (about 1.05 GB or about 2.3
-    GB, in both epochs of the identical artifact), so its two cells fell back to
-    paired ratios with limits of 2.15 and 2.30 and noise ceilings of 1.9 and
-    2.2. They detect only a gross memory regression at that scale.
+  - c10000 peak RSS: on the version 1 host it is bimodal (about 1.05 GB or about
+    2.3 GB, in both epochs of the identical artifact), so in version 1 its two
+    cells fell back to paired ratios with limits of 2.15 and 2.30 and noise
+    ceilings of 1.9 and 2.2, which detect only a gross regression. On the
+    version 2 measurement host its CV is about 0.5%, so version 2 gives both
+    cells absolute limits. The bimodality is a documented property of the
+    version 1 host, not a defect of version 2.
 - **Deterministic outputs:** absolute limits on the frozen `alpha1` values.
   - 5% for CSS bytes, rule and declaration counts and host bundle bytes.
   - 10% for generated modules.
@@ -322,6 +422,9 @@ and anything that cannot be validated fails closed.
     planned iteration, and every canonical comparison, whose `equal` flags must
     agree with the recorded digests.
   - Runtime values: `null` only when the matching call count is zero.
+  - CPU times (`userCpuMs`, `systemCpuMs`) may be zero, since the kernel can
+    account them in ticks; negative, non-finite and missing values are invalid.
+    Durations, peak RSS, sizes and counts must be positive.
   - The run's `workloads` list must name exactly the measured workloads, with
     the committed content digests. It never selects what is inspected. A planned
     workload is either entirely absent from a run (its budgets are not run) or
