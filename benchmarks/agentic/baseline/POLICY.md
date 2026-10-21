@@ -142,8 +142,9 @@ estimates never decide a gate.
 ## 5. Statistical method (`pms-agentic-stats/v1`)
 
 The method is implemented once, in [`stats.mjs`](stats.mjs) (`decideGate`).
-`gates derive` and `gates check` (planned under #7) call it and decide nothing
-themselves. Its tests are `benchmarks/agentic/__tests__/baseline-stats.test.mjs`
+`gates derive` and `gates check` ([`gates.mjs`](gates.mjs), section 6.2) call
+it and decide nothing themselves. Its tests are
+`benchmarks/agentic/__tests__/baseline-stats.test.mjs`
 (`yarn bench:agentic:test`).
 
 ### 5.1 Clean values, worst-case candidate, dropped reference
@@ -375,7 +376,7 @@ blocking (smallest p-value 0.032 over 50 datasets each for `context.input`,
      only on which repetitions are unclean, never on their values. The
      replaced records are kept and listed.
 3. Derive every gate value with a deterministic, tested tool from the published
-   records alone (planned under #7: `gates derive` and `gates check`), which
+   records alone (`gates derive`, section 6.2), which
    calls `stats.mjs` (section 5). The gate record holds, per model and gate,
    each task's oriented clean baseline values (section 5.1), every dropped
    baseline repetition (missing, contested, unclassified or unknown, with its
@@ -432,6 +433,131 @@ as follows:
   completeness (step 2 above) applies.
 - Exit status 1 (a harness error or a matrix halt) is never resumed blindly:
   the cause is read from `outcomes.json` first.
+
+### 6.2 Commands (`gates derive`, `gates check`)
+
+The tool is [`gates.mjs`](gates.mjs), with the command line
+[`bin/gates.mjs`](bin/gates.mjs). It is independent of
+`pms-agentic-runner` and lives outside `runner/`, so it is not part of
+`runnerTreeDigest`. It reads matrix directories through the runner's own
+loader and report (`loadMatrix`, `buildReport`, the one derivation of
+`contested`). It makes no model call and writes nothing but its output.
+
+```sh
+yarn bench:agentic:gates derive <baseline matrix dir> --out gates.v1.json
+yarn bench:agentic:gates check gates.v1.json <candidate matrix dir> \
+  --control <interleaved Alpha 1 control matrix dir> [--out check.json]
+```
+
+`yarn bench:agentic:gates` runs `node benchmarks/agentic/baseline/bin/gates.mjs`.
+
+**`gates derive`** writes `pms-agentic-gates/v1`. The same inputs give
+byte-identical output: there is no clock and no absolute path, keys are
+sorted, and the Monte Carlo seeds are those of section 5.2. An existing
+`--out` file with other content is never overwritten. The record holds:
+
+- `binding`:
+  - the method id and its constants (`α`, `G`, `B`, the minimums of section
+    5.1, the small-set size of section 5.5);
+  - the sha256 of `POLICY.md`, `stats.mjs` and `gates.mjs`;
+  - kind, `matrixId` and repetitions;
+  - corpus version, `corpus.lock.json` sha256, epoch and split;
+  - `runnerTreeDigest`, `harnessDepsLockSha256` and the recorded commits;
+  - the reference product (build digest, epoch, source commit, trusted tree
+    and `@pandamstyle` subtree digests);
+  - the shared projection groups;
+  - per runnable cell, its comparability key and projection.
+- `inputs`: the sha256 of `matrix.json`, `outcomes.json` and every record,
+  and every attempt directory without a record.
+- `models.<key>`:
+  - the exact model configuration of `matrix.json`;
+  - the task sets of sections 3 and 4, computed from the checkout's corpus
+    (refused unless its `corpus.lock.json` sha256 equals the records');
+  - the unsupported tasks;
+  - the latency medians and cuts (`latencyCuts`);
+  - per gate: blocking or not (section 5.5); the reference accounting of
+    `referenceEvidence`, with its insufficient tasks; each task's clean
+    oriented values; every dropped repetition with its reasons (`missing`,
+    `invalid`, `unclassified`, `contested`, `unknown-value`, `unsupported`)
+    and its recorded value (or recorded lower bound) where one exists;
+    unclean counts; point estimates; `minimumDetectable`; the seed and `B`
+    of `context.input`;
+  - the missing-capability diagnosis line (reported, not blocking).
+- `freeze`: `freezable` only for a `provider-backed` matrix with every
+  runnable repetition valid, every gate sufficient and every runnable cell
+  keyed. Otherwise `not-freezable`, with its reasons, the insufficient
+  gates, the missing repetitions and `recollectCells`. Those are the cells
+  to collect again by step 2: every insufficient task's cell, then the cells
+  with the most unclean repetitions (ties by task id) until the dropped
+  count is within the cap. The list depends only on which repetitions are
+  unclean.
+
+`derive` refuses (exit 1) when any of these holds:
+
+- a cell has more than one comparability key;
+- one model's cells differ in a shared projection group (harness, model,
+  policy, containers, task epoch, corpus version or lock);
+- a key is not the digest of its projection;
+- the records name more than one reference product;
+- a record contradicts its matrix (matrix id, kind, split, epoch), its
+  directory (a misfiled or duplicate record), or itself (a task success
+  without a normal pass);
+- the matrix plans a held-out task.
+
+**`gates check`** applies a gate record to a candidate matrix with
+`decideGate`, the reference being the record's frozen values. It refuses
+(exit 1), and decides nothing, when any of these holds:
+
+- the record's method constants or `stats.mjs` sha256 differ from the
+  checkout's;
+- the record's reference accounting does not recompute;
+- kind, repetitions or epoch differ;
+- a candidate or control record's comparability key differs from its
+  cell's key (the differing projection fields are listed);
+- a cell without a baseline key differs from its model's shared groups;
+- the control is not the reference product (trusted tree, `@pandamstyle`
+  subtree, source commit, epoch);
+- the control is the candidate matrix.
+
+Each blocking gate gives `pass`, `insufficient-reference` or `block` with
+its p-value. The verdict is `pass` only when every blocking gate passes.
+Otherwise it is the worst blocking outcome, and a record with no blocking
+gate is never a pass. Exit status 0 is `pass`, 2 any other verdict.
+
+- **Candidate side:** every planned repetition of every task of the record
+  counts, whatever the candidate matrix planned. An absent model, task or
+  repetition takes the worst bound, as does an unsupported cell or a
+  repetition that is not clean.
+- **Latency:** the gates are `insufficient-reference` without `--control`.
+  They are also `insufficient-reference` when the baseline's own latency
+  values lack the minimum of section 5.1, because the medians and cuts are
+  then not frozen. A pair is the candidate's repetition `r` and the
+  control's repetition `r` of the same task and model. The tool does not
+  check that the two matrices were interleaved, or the order inside a
+  pair. Counterbalancing that order in the runner is a follow-up; until
+  then an order effect is a stated limitation (section 5.4).
+- **Values per repetition:** each is read from the last attempt's record.
+  - Success is `outcome.taskSuccess`.
+  - Safety is 1 when any attempt of the repetition is in the report's
+    breach section.
+  - `context.input` is the log of the normalized `inputTotal`.
+  - `repair.cycles` is `repairCycles`.
+  - Latency is the log of agent-phase seconds.
+  - An unknown or non-positive measured value is not clean.
+- **Unmeasured baselines:** a gate whose baseline never measured its metric
+  for a model (`unmeasuredByBaseline`) is `insufficient-reference`, never a
+  silent pass. Declaring it absent (section 4) is a decision of the freezing
+  review.
+- **Reported beside the gates:** candidate point estimates and unclean
+  counts, the latency ratios candidate / control, the critical cells that
+  drop from 3/3 to 0/3 (mandatory review items), and the drift caveat.
+
+Not covered by the tool: excluding an uncollectable cell by a recorded
+decision (step 2) and the counterbalanced pair order. Tests:
+`benchmarks/agentic/__tests__/baseline-gates.test.mjs`
+(`yarn bench:agentic:test`), over synthetic matrix directories (one record
+from the runner's adapter-fixture driver, the others schema-valid copies
+with keys recomputed by the runner).
 
 ## 7. Versioning and changes
 

@@ -42,7 +42,7 @@ Status:
 | `bin/pms-agentic.mjs` | Command-line entry point. |
 | `__tests__/` | `node:test` suites. |
 | [`TRACE.md`](TRACE.md) | One task per workflow traced to its expected evidence. |
-| [`baseline/`](baseline/POLICY.md) | AG-00.3 baseline and qualification gate policy (draft); the baseline records once run. |
+| [`baseline/`](baseline/POLICY.md) | AG-00.3 baseline and qualification gate policy (draft), its statistics method and the `gates derive` / `gates check` tool (POLICY.md section 6.2); the baseline records once run. |
 
 ## Task model
 
