@@ -1,0 +1,603 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-ce003-budget-policy",
+  "policyVersion": 2,
+  "supersedes": {
+    "path": "benchmarks/core-evolution/budgets.v1.json",
+    "sha256": "5f083b830277dd66c38d0c72b7e2af5c6ed5d366858982252465f26386db2bd8"
+  },
+  "justification": "Version 2 raises only the paired-ratio timing floor, from 1.10 to 1.25, through the change procedure of version 1 (budget-policy.v1.json, SHA-256 edf9fde4361dcfaa3e5436a9d356aa4fdb6655547f0661e15665cf8fbb490e6c). Cause: CE-01.1 (#44, PR #106 at 4fddcdd) adds an always-on capability: the compiler checks every emitted CSS feature against the browser targets, and runs that check in advisory mode, producing warnings, when no targets are configured. Measured cost: gated in release mode against the frozen alpha1 control under version 1, the candidate passes every memory, deterministic and identity budget and fails five paired timing budgets, at median ratios of x1.118 to x1.166: alpha1-valid-fixture full.toDiagnosticsMs 1.118; ce-corpus full.totalMs 1.139; ce-corpus full.toDiagnosticsMs 1.145; ce-corpus incremental.local-style.toDiagnosticsMs 1.130; synthetic-c10000 incremental.token-value.toDiagnosticsMs 1.166 (interval 1.067 to 1.333). Four more were inconclusive under version 1, with intervals straddling the limit or a noisy control: alpha1-valid-fixture full.totalMs (median 1.095), and synthetic-c10000 compiler.importMs, incremental.local-style.toDiagnosticsMs and incremental.token-value.totalMs, each on 5 pairs. Profiles attribute the difference to the inherent cost of checking every feature: about 24 ms of the roughly 190 ms cold ce-corpus validation, and about 0.4 ms per incremental edit. CE-01.1 is not redesigned to hide that cost. The floor is cumulative against alpha1 for the whole core-evolution epic, not per lot: every later candidate is still compared with the unchanged alpha1 artifact, so CE-01.1 alone already uses up to about 0.17 of the 0.25 allowance. The remaining headroom is deliberately small, and later lots must not assume more; a further increase needs its own policy version and justification. Recovery of this cost is owned by CE-12.3 (#76). The version 2 baseline runs (alpha1-v2-sk-b2 and alpha1-v2-sk-b3) were measured on a different host from version 1 (AMD Ryzen 7 9800X3D, recorded in the budgets baseline environment). Paired timing ratios are relative to the interleaved alpha1 control; the absolute memory limits derive from that host's alpha1 medians and are bound to that measurement host, in particular the two synthetic-c10000 peak-RSS cells, which version 2 derives as absolute limits because their coefficient of variation there is about 0.5%. A gate run measured on another host is outside the contract of version 2. On the version 1 host, c10000 peak RSS of the identical artifact is bimodal (about 1.05 GB or about 2.3 GB, documented with version 1); that is a property of that host, not a defect of version 2. Every other rule is unchanged: the runtime and memory floors, the memory rule, deterministic growth, identity, budgeted metrics, workloads, noise ceiling, minimum pairs and rounding. The budgets are re-derived from a new comparable baseline run of the unchanged alpha1 artifact, and every budget whose derived limit loosens relative to version 1 is listed in relaxations.",
+  "relaxations": [
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.buildMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.2, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.2, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0094."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0167."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0228."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0149."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0052."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 136452096 (factor 1.1)",
+      "to": "absolute maxMedian 136589516 (factor 1.1)",
+      "justification": "maxMedian 136452096 -> 136589516 (+0.10%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 124172288 (version 1: 124047360), CV 0.0225, factor 1.1 (version 1: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0191."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0101."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0085."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.2, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0087."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.25, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0271."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0155."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.2, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0258; noiseCeiling 0.1 -> 0.2 follows the unchanged rule max(0.1, 2 x noisiest batch control spread): the new baseline's largest alpha1 spread is 0.0797 (version 1: 0.0469)."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0157."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0120."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0072; noiseCeiling 0.1 -> 0.15 follows the unchanged rule max(0.1, 2 x noisiest batch control spread): the new baseline's largest alpha1 spread is 0.0625 (version 1: 0.0489)."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0085."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0155; noiseCeiling 0.1 -> 0.15 follows the unchanged rule max(0.1, 2 x noisiest batch control spread): the new baseline's largest alpha1 spread is 0.0618 (version 1: 0.0171)."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0014."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 138301644 (factor 1.1)",
+      "to": "absolute maxMedian 139171225 (factor 1.1)",
+      "justification": "maxMedian 138301644 -> 139171225 (+0.63%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 126519296 (version 1: 125728768), CV 0.0201, factor 1.1 (version 1: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 154771865 (factor 1.1)",
+      "to": "absolute maxMedian 155249459 (factor 1.1)",
+      "justification": "maxMedian 154771865 -> 155249459 (+0.31%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 141135872 (version 1: 140701696), CV 0.0176, factor 1.1 (version 1: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0097."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0170; noiseCeiling 0.1 -> 0.15 follows the unchanged rule max(0.1, 2 x noisiest batch control spread): the new baseline's largest alpha1 spread is 0.0551 (version 1: 0.0268)."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0165."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0246."
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0078."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0140."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0143."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0295."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.2, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0106."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 332010905 (factor 1.1)",
+      "to": "absolute maxMedian 332285747 (factor 1.1)",
+      "justification": "maxMedian 332010905 -> 332285747 (+0.08%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 302077952 (version 1: 301828096), CV 0.0113, factor 1.1 (version 1: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 389225267 (factor 1.1)",
+      "to": "absolute maxMedian 393757900 (factor 1.1)",
+      "justification": "maxMedian 389225267 -> 393757900 (+1.16%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 357961728 (version 1: 353841152), CV 0.0095, factor 1.1 (version 1: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0241."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0256."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0445."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0102."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0115."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0170."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0202."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0214."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.45, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0597."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.1444."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.1464."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0716."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.1028."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "paired-ratio maxRatio 2.3, noiseCeiling 2.2, minPairs 5",
+      "to": "absolute maxMedian 1160160460 (factor 1.1)",
+      "justification": "the limit mode changes from paired-ratio to absolute because the pooled peak-RSS coefficient of variation of the new alpha1 baseline is 0.0054 (version 1: 0.3699) against the unchanged maxCv 0.05."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "from": "paired-ratio maxRatio 2.15, noiseCeiling 1.9, minPairs 5",
+      "to": "absolute maxMedian 1405762969 (factor 1.1)",
+      "justification": "the limit mode changes from paired-ratio to absolute because the pooled peak-RSS coefficient of variation of the new alpha1 baseline is 0.0213 (version 1: 0.3388) against the unchanged maxCv 0.05."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0588; noiseCeiling 0.1 -> 0.15 follows the unchanged rule max(0.1, 2 x noisiest batch control spread): the new baseline's largest alpha1 spread is 0.0560 (version 1: 0.0297)."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.2, noiseCeiling 0.2, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.2, minPairs 5",
+      "justification": "maxRatio 1.2 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0545."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0122; noiseCeiling 0.1 -> 0.15 follows the unchanged rule max(0.1, 2 x noisiest batch control spread): the new baseline's largest alpha1 spread is 0.0579 (version 1: 0.0485)."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.15, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0094; noiseCeiling 0.1 -> 0.15 follows the unchanged rule max(0.1, 2 x noisiest batch control spread): the new baseline's largest alpha1 spread is 0.0713 (version 1: 0.0289)."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.2, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.2 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0524."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.2, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.2 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0454."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.1, noiseCeiling 0.1, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.1 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0749."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "from": "paired-ratio maxRatio 1.15, noiseCeiling 0.15, minPairs 5",
+      "to": "paired-ratio maxRatio 1.25, noiseCeiling 0.1, minPairs 5",
+      "justification": "maxRatio 1.15 -> 1.25 is the version 2 timing floor (1.1 -> 1.25), raised for the measured cost of always-on browser-target feature checking (CE-01.1, #44); the new null upper bound is 1.0920."
+    }
+  ],
+  "baseline": {
+    "reference": "alpha1",
+    "nullEpoch": "alpha1-replay",
+    "manifest": "benchmarks/core-evolution/epochs/alpha1/manifest.v1.json"
+  },
+  "thresholdRule": {
+    "pairedRatio": {
+      "applies": "timing and runtime metrics, and memory cells whose baseline CV exceeds memory.maxCv",
+      "floor": {
+        "timing": 1.25,
+        "runtime": 1.15,
+        "memory": 1.1
+      },
+      "roundUpTo": 0.05,
+      "minPairs": 5,
+      "noiseCeiling": {
+        "multiplier": 2,
+        "floor": 0.1,
+        "roundUpTo": 0.05
+      }
+    },
+    "memory": {
+      "maxCv": 0.05,
+      "cvMultiplier": 3,
+      "floor": 1.1,
+      "roundUpTo": 0.05
+    },
+    "deterministic": {
+      "growth": {
+        "default": 0.05,
+        "variants.recipeSelections": 0,
+        "compiledModules.bytes": 0.1,
+        "designModule.bytes": 0.1,
+        "declarations.bytes": 0.1
+      }
+    },
+    "identity": {
+      "consistency.incrementalEqualsCanonical": "true"
+    }
+  },
+  "rationale": [
+    "The host is shared with work outside both epics and is never quiet, so absolute times are not comparable across runs. Every measurement and gate run therefore includes the unchanged alpha1 control, interleaved with the candidate in alternating order within each round, and timing budgets apply to the paired ratio candidate/alpha1 of the two adjacent samples of each round. Load that affects both samples of a pair cancels; absolute times and per-sample load records are kept as informational evidence only.",
+    "Paired ratio statistic: the median of per-round ratios, with a seeded (307) 2,000-round percentile-bootstrap 95% interval resampling whole pairs. A budget passes when the interval's upper bound is at most the limit, fails when the median ratio exceeds the limit, and is otherwise inconclusive (the run cannot resolve the question).",
+    "Ratio limit = the larger of a floor and the largest upper bound observed for the null comparison (alpha1-replay, an offline reinstall of the identical artifact, against alpha1) in each baseline batch and in both batches pooled, rounded up to 0.05. The unchanged artifact therefore passes in the baseline conditions, and no limit is tighter than the precision the shared host actually delivered. Floors: 25% for compile, import and host-build time and CPU, 15% for sub-microsecond runtime selection, where JIT and allocation effects dominate, and 10% for memory measured as a ratio. The timing floor was 10% in version 1 (a deliberate slow-down of one tenth was a reviewable regression); version 2 raises it to 25% to admit the measured cost of always-on browser-target feature checking (CE-01.1, #44). It is cumulative against alpha1 for the whole epic, so it bounds the total timing regression of all lots together; CE-12.3 (#76) owns recovery.",
+    "Noise ceiling: the gate refuses (inconclusive) a budget when the alpha1 control's own interquartile range over median in a gate run exceeds max(0.10, 2 x the largest value seen in any baseline batch), rounded up to 0.05; a run noisier than twice the noisiest baseline cannot pass. It also refuses a run without interleaved, adjacent alpha1 pairs for every candidate sample, or with fewer than 5 pairs.",
+    "Memory: pilot runs under the same shared load showed peak-RSS coefficients of variation of 0.2% to 4.4% per cell (time: 3% to 58%), so peak RSS is not load-sensitive here. A memory cell whose pooled baseline CV is at most 5% gets an absolute limit on the candidate median: baseline median x max(1.10, 1 + 3 CV), rounded up to 0.05; a cell above 5% falls back to a paired ratio.",
+    "Deterministic outputs (bytes, rule and declaration counts, selection domain) have no measurement noise, so their limits are absolute: at most 5% growth for CSS bytes, rule and declaration counts and host bundle bytes on the same Alpha 1 workload; 10% for generated JavaScript/TypeScript modules, whose metadata grows with catalog breadth; and no growth in the finite recipe selection domain, which the unchanged definitions fix.",
+    "Incremental output must keep equalling a fresh canonical compile of the same state for every edit."
+  ],
+  "budgetedMetrics": [
+    "full.totalMs",
+    "full.toDiagnosticsMs",
+    "full.cpuMs",
+    "compiler.importMs",
+    "incremental.*",
+    "full.maxRssBytes",
+    "session.maxRssBytes",
+    "css.bytes",
+    "css.gzipBytes",
+    "css.styleRules",
+    "css.atRules",
+    "css.declarations",
+    "designModule.bytes",
+    "declarations.bytes",
+    "compiledModules.bytes",
+    "report.ruleCount",
+    "variants.recipeSelections",
+    "consistency.incrementalEqualsCanonical",
+    "runtime.propsNsPerCall",
+    "runtime.recipeSelectNsPerCall",
+    "runtime.renderNsPerCall",
+    "runtime.moduleLoadMs",
+    "vite.buildMs",
+    "vite.maxRssBytes",
+    "vite.cssBytes",
+    "vite.jsBytes"
+  ],
+  "comparison": "Run tools/baselines/measure.mjs with the final plan and both --epoch alpha1=<alpha1 closure> and --epoch <candidate>=<candidate closure> on one machine (--require-quiet is optional). budgets.mjs gate pairs each candidate sample with the adjacent alpha1 sample of the same round, applies the paired-ratio, absolute-memory, deterministic and identity budgets, requires alpha1 to reproduce its frozen deterministic outputs, and lists unknown metrics. Verdicts: pass only when every budget passes; fail on any failing budget, workload-record mismatch, altered alpha1 tarball or policy-chain problem; inconclusive when the run lacks the interleaved control, has too few pairs, exceeds a noise ceiling or cannot resolve a limit; incomplete when a budgeted metric was not run.",
+  "unknown": [
+    {
+      "id": "host.next.build-and-dev",
+      "scope": "Next.js 16.3.8 webpack and Turbopack build/dev time, memory and output bytes",
+      "reason": "Hosts are pinned and installable in the alpha1 closure, but CE-00.3 measured no Next workload; no baseline exists.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)"
+    },
+    {
+      "id": "host.rsbuild.build-and-dev",
+      "scope": "Rsbuild 2.2.11 / Rspack 2.2.8 build/dev time, memory and output bytes",
+      "reason": "Pinned and installable, not measured in CE-00.3.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)"
+    },
+    {
+      "id": "host.vite.dev-and-hmr",
+      "scope": "Vite dev server start, HMR and browser-visible update latency",
+      "reason": "Only the Vite production build of the pilot is measured; no dev-server or browser-visible latency harness ran.",
+      "owner": "CE-12.3 (#76), CE-13.1 (#78)"
+    },
+    {
+      "id": "compiler.watcher-latency",
+      "scope": "Filesystem edit to diagnostics through ProjectSession.watch()",
+      "reason": "Incremental cost is measured from an explicit verified-explicit transaction; watcher debounce and filesystem notification latency are excluded.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "browser.style-cost",
+      "scope": "Browser CSS parse, style recalculation, layout and paint cost of emitted CSS",
+      "reason": "No browser performance trace was taken; runtime selection is measured in Node only.",
+      "owner": "CE-12.3 (#76), CE-14 (#82-#84)"
+    },
+    {
+      "id": "runtime.non-v8",
+      "scope": "Runtime selection cost in browsers and engines other than Node 22.22.0 V8",
+      "reason": "Measured in Node only.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "output.new-resource-kinds",
+      "scope": "CSS/module bytes of capabilities absent in Alpha 1 (keyframes, fonts, assets, globals, typed resources, new conditions)",
+      "reason": "Alpha 1 cannot express them, so no comparable baseline exists; each must be baselined by its owning lot under a new policy version before its budget can exist.",
+      "owner": "Owning capability lots (CE-03 to CE-11), CE-12.2 (#75)"
+    },
+    {
+      "id": "compiler.invalidation-counters",
+      "scope": "Rebuild, fallback and dependency-invalidation counts per incremental edit",
+      "reason": "Not exposed by the public compiler API; reading the internal perf collector would instrument the measured package.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "runtime.c10000",
+      "scope": "Runtime selection cost and compile-to-canonical consistency at 10,000 components",
+      "reason": "The c10000 workload is measured for compile, incremental, memory and output only; runtime replay ran at c1000 and below.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "cold-install",
+      "scope": "Package install time, cold disk cache and first-run cost",
+      "reason": "Samples run with a warm operating-system file cache and a preinstalled closure.",
+      "owner": "CE-15.1 (#77)"
+    }
+  ],
+  "changePolicy": [
+    "budgets.v2.json is generated by `node tools/baselines/budgets.mjs freeze` from this policy and the committed baseline results, and is never edited by hand; rerunning the same freeze command with this policy and the referenced results must reproduce it byte for byte.",
+    "Committed policy, budgets, workloads, derivation and baseline result files are immutable; `budgets.mjs gate` compares the budgets file with the version of the commit that added it and fails on any difference.",
+    "Changing a threshold, metric set or workload requires a new budget-policy.vN.json and budgets.vN.json (N incremented), a justification, a predecessor reference by path and SHA-256, and a new comparable baseline run of the unchanged alpha1 artifact; reusing an old result file is rejected.",
+    "Every budget loosened or removed relative to the predecessor must be listed in `relaxations` with its own justification; an unknown metric may only leave the unknown list by gaining a budget.",
+    "No release may pass against a weakened budget retroactively: the gate evaluates the budgets version current at the evaluated commit, fails on any policy-chain problem, and never reports inconclusive or incomplete as pass."
+  ],
+  "amendment": {
+    "note": "Version 1 was first committed in 52cf7b0 with absolute timing ratios that required a quiet host. Before any final baseline data existed it was replaced by this text: the shared host never becomes quiet (load 7.0/9.0/6.4 on 16 cores at 00:22 on 2026-10-19, mostly from other projects' work that cannot be paused), so timing budgets became paired ratios against the interleaved alpha1 control and the quiet rule became optional.",
+    "finalDataExistedWhenAmended": false
+  }
+}
