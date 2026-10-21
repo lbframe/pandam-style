@@ -783,3 +783,40 @@ Findings that affect the run:
 3. **Drift control:** the interleaved Alpha 1 control is run for latency only;
    the confounding of other gates with provider drift is accepted and
    reported (section 6).
+
+## 12. Baseline run record (observed, 2026-10-21)
+
+Matrix `baseline-alpha1-20261021`, run by the runner at commit `d38dbf5`
+(`runnerTreeDigest` `27092b35…5636`) with the configuration of sections 2 and
+9. The leak-scanned `matrix.json`, `outcomes.json`, `report.json`,
+`report.md` and every attempt's `record.json` and `evaluation.json` are
+published byte for byte in [`2026-10-21/`](2026-10-21/) (796 files,
+11,662,773 bytes). Raw artifacts stay local (section 6, step 1).
+
+| Item | Observed |
+| --- | --- |
+| Start, end | first attempt started 2026-10-21T12:58:25Z; last attempt ended 17:45:18Z |
+| Wall time | 4 h 46 min 53 s, one sequential matrix |
+| Attempts | 396 (132 per model), each repetition on its first attempt |
+| Outcomes | 396 `done`, 9 cells `unsupported` (the 3 installation tasks × 3 models, 27 repetitions); 0 missing, 0 contested; every record `valid` |
+| Classification | 359 `agent completed`, 37 `policy capability-breach` |
+| Infrastructure | no infrastructure failure, no retry, no rate limit, no halt; API retries and reconnects 0 on every attempt |
+| Host load | 1-minute load average on 16 CPUs, 3152 samples over the 396 attempts. Per-attempt medians: median 2.57, 90th percentile 5.99, range 0.60–14.36. Samples: range 0.49–16.04 |
+| Claude usage | list-price equivalent reported by the CLI (`total_cost_usd`, an estimate, not billed): haiku $0.95, sonnet $7.23, total $8.18. The `five_hour` window stayed `allowed`, utilization 0 to 0.39 |
+| Codex usage | cost unknown (not reported); 14.1 M input tokens (3.06 M uncached), 0.14 M output tokens |
+| Evidence | 378 attempts `complete` with exact replay, 18 `redacted` with non-exact replay |
+
+The process wrote every output by 17:45Z and then stayed alive, idle: an
+interval timer of the load sampler kept its event loop running. The
+orchestrator stopped it with SIGTERM about an hour later, so the run log
+ends with `EXIT=143`. That exit happened after the outputs were complete.
+
+`gates derive` on the published directory writes
+[`gates.v1.json`](gates.v1.json), sha256
+`1b33386bf0262b1113f5c0ec904dd991d1dad3f8c6fe265a40409ead1f9faf59`,
+`freeze.status` `freezable`. It is byte-identical to the derivation from
+the local run directory, because the record holds no path. Its
+`binding.policySha256` and `binding.toolSha256` are those of this file
+and `gates.mjs` at commit `0ffc81e`, before this section was added. Status:
+**derived, pending the freezing review** (section 6, step 4). Its gate
+values and point estimates are in the record.
