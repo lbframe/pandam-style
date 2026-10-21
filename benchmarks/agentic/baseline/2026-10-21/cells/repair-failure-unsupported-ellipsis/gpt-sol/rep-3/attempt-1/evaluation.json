@@ -1,0 +1,135 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "repair-failure-unsupported-ellipsis",
+  "split": "development",
+  "workflow": "repair",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "missing-product-capability",
+  "intendedOutcome": "capability-gap-diagnosis",
+  "verdict": "pass",
+  "success": {
+    "application": null,
+    "diagnosis": true,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "fail",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": false,
+    "diagnosticCodes": [
+      "PMS_UNSUPPORTED_PROPERTY"
+    ],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "blocked",
+    "gaps": [
+      {
+        "kind": "missing-product-capability",
+        "subject": "PandamStyle Alpha 1 support for textOverflow: ellipsis",
+        "detail": "Restoring compilation while preserving ellipsis requires compiler support outside the permitted file scope."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 9
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": false,
+      "status": "fail",
+      "reason": "diagnostics: PMS_UNSUPPORTED_PROPERTY",
+      "evidence": [
+        {
+          "code": "PMS_UNSUPPORTED_PROPERTY",
+          "severity": "error",
+          "message": "Property not covered by the profile: textOverflow.",
+          "source": {
+            "file": "src/components/AccountRow.tsx",
+            "line": 15,
+            "column": 19,
+            "endLine": null,
+            "endColumn": null,
+            "label": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "variants-positive-remove-button",
+  "split": "development",
+  "workflow": "variants",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "pass",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [
+      "src/components/RemoveFromCartButton.jsx"
+    ],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [
+          "src/components/RemoveFromCartButton.jsx"
+        ],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 9
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 11
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "remove-default",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x3nfvp2",
+          "x6s0dn4",
+          "xl56j7k",
+          "x1x3a5v",
+          "x1ia1lxn",
+          "xdb7zta",
+          "xbce6o",
+          "x1pkdvj6",
+          "x1bl2b9q",
+          "x127kycn",
+          "x1kebkhh",
+          "x10z1z4u",
+          "xdvt1v1",
+          "xqn6m5w",
+          "xi5den5",
+          "x54c1fo"
+        ],
+        "text": "Remove",
+        "styles": {
+          "background-color": "var(--x4n4f4f)",
+          "font-size": "var(--x1vqyhf1)",
+          "padding-inline": "var(--x1e4e0rw)"
+        }
+      }
+    },
+    {
+      "id": "remove-click",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x3nfvp2",
+          "x6s0dn4",
+          "xl56j7k",
+          "x1x3a5v",
+          "x1ia1lxn",
+          "xdb7zta",
+          "xbce6o",
+          "x1pkdvj6",
+          "x1bl2b9q",
+          "x127kycn",
+          "x1kebkhh",
+          "x10z1z4u",
+          "xdvt1v1",
+          "xqn6m5w",
+          "xi5den5",
+          "x54c1fo"
+        ],
+        "text": "Remove",
+        "callbacks": {
+          "onRemove": 1
+        }
+      }
+    },
+    {
+      "id": "remove-hover",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x3nfvp2",
+          "x6s0dn4",
+          "xl56j7k",
+          "x1x3a5v",
+          "x1ia1lxn",
+          "xdb7zta",
+          "xbce6o",
+          "x1pkdvj6",
+          "x1bl2b9q",
+          "x127kycn",
+          "x1kebkhh",
+          "x10z1z4u",
+          "xdvt1v1",
+          "xqn6m5w",
+          "xi5den5",
+          "x54c1fo"
+        ],
+        "text": "Remove",
+        "styles": {
+          "background-color": "var(--xrl0fdc)"
+        }
+      }
+    }
+  ]
+}

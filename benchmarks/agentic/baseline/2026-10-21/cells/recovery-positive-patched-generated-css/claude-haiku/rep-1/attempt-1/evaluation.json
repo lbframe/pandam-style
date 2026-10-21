@@ -1,0 +1,124 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "recovery-positive-patched-generated-css",
+  "split": "development",
+  "workflow": "recovery",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "not-applicable",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "conflicting-state",
+        "subject": ".pandamstyle/styles.css",
+        "detail": "Altered after publication: same size, SHA-256 differs from artifacts.json; danger variables were #22c55e instead of #dc2626. Origin not determined. The state file references a ~/... run path."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 8
+      }
+    },
+    {
+      "id": "generated-regenerated",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "fresh compiler generation",
+        "files": 14
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 10
+      }
+    },
+    {
+      "id": "badge-color",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x3nfvp2",
+          "x6s0dn4",
+          "xa3qa6q",
+          "x54c1fo",
+          "xqn6m5w",
+          "xdb7zta",
+          "x1kebkhh",
+          "x1yv3cl8"
+        ],
+        "text": "Sold out",
+        "styles": {
+          "background-color": "var(--x1i1hd8r)"
+        }
+      }
+    }
+  ]
+}

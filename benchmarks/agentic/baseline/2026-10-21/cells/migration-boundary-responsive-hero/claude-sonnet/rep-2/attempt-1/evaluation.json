@@ -1,0 +1,219 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "migration-boundary-responsive-hero",
+  "split": "development",
+  "workflow": "migration",
+  "caseType": "boundary",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "pass",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [
+      "src/ui/PromoHero.jsx"
+    ],
+    "modified": [
+      "src/Portal.jsx"
+    ],
+    "deleted": [
+      "src/legacy/PromoHero.jsx",
+      "src/legacy/PromoHero.module.css"
+    ],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [
+          "src/ui/PromoHero.jsx"
+        ],
+        "modified": [
+          "src/Portal.jsx"
+        ],
+        "deleted": [
+          "src/legacy/PromoHero.jsx",
+          "src/legacy/PromoHero.module.css"
+        ],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 2
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 8
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "fresh compiler generation",
+        "files": 8
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "hero-small",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xk9lud3",
+          "x78zum5",
+          "xdt5ytf",
+          "x1sa9pyg",
+          "x1pp5l6r",
+          "x1h96a8v",
+          "xvfledw",
+          "x1j371tl",
+          "x4fd897"
+        ],
+        "text": "Autumn Hand-picked stays for long weekends.",
+        "styles": {
+          "padding": "var(--xh03ynk)",
+          "gap": "var(--x1id9nbl)",
+          "background-color": "var(--xvoysdl)",
+          "border-radius": "var(--x1epzdwu)"
+        }
+      }
+    },
+    {
+      "id": "hero-breakpoint",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xk9lud3",
+          "x78zum5",
+          "xdt5ytf",
+          "x1sa9pyg",
+          "x1pp5l6r",
+          "x1h96a8v",
+          "xvfledw",
+          "x1j371tl",
+          "x4fd897"
+        ],
+        "text": "Autumn Hand-picked stays for long weekends.",
+        "styles": {
+          "padding": "var(--x1xk2mnh)"
+        }
+      }
+    },
+    {
+      "id": "hero-title",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x1l7m899",
+          "x5r4zyg"
+        ],
+        "text": "Autumn",
+        "styles": {
+          "font-size": "var(--x15yjv3d)",
+          "font-weight": "var(--x1mwj1s5)"
+        }
+      }
+    },
+    {
+      "id": "hero-lead",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xz4te25"
+        ],
+        "text": "Hand-picked stays for long weekends.",
+        "styles": {
+          "font-size": "var(--x1b3x6wl)"
+        }
+      }
+    },
+    {
+      "id": "legacy-removed",
+      "kind": "files.contains",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    }
+  ]
+}

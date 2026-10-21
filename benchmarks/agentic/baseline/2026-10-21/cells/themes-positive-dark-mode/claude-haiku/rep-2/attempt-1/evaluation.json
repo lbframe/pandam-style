@@ -1,0 +1,191 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "themes-positive-dark-mode",
+  "split": "development",
+  "workflow": "themes",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "fail",
+  "success": {
+    "application": false,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "fail",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "pass",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "src/App.jsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "src/App.jsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 8
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 10
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "fail",
+      "reason": "generated output is not compiler output: missing artifacts.json; missing build-report.json; missing design.pandamstyle.d.ts; missing design.pandamstyle.js; missing js/src/App.jsx; missing js/src/components/AddToCartButton.jsx; missing js/src/components/ProductCard.jsx; missing js/src/components/PromoBanner.jsx",
+      "evidence": [
+        "missing artifacts.json",
+        "missing build-report.json",
+        "missing design.pandamstyle.d.ts",
+        "missing design.pandamstyle.js",
+        "missing js/src/App.jsx",
+        "missing js/src/components/AddToCartButton.jsx",
+        "missing js/src/components/ProductCard.jsx",
+        "missing js/src/components/PromoBanner.jsx",
+        "missing js/src/components/StockBadge.jsx",
+        "missing js/src/data/products.js",
+        "missing js/src/main.jsx",
+        "missing js/src/pages/ProductPage.jsx",
+        "missing manifest.json",
+        "missing styles.css"
+      ]
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "dark-shell",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x1sqampt",
+          "x1akqw4w",
+          "x138jxqx",
+          "x1q3u54m",
+          "x1ia1lxn"
+        ],
+        "text": "Featured products Free shipping on orders over 50 EUR. Canvas tote In stock A sturdy everyday bag made from recycled canvas. Add to cart Enamel mug Sold out Keeps coffee warm on long mornings. Add to ",
+        "styles": {
+          "background-color": "var(--x1sr72fd)",
+          "color": "var(--x4p1bac)"
+        }
+      }
+    },
+    {
+      "id": "dark-card",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x78zum5",
+          "xdt5ytf",
+          "x1x3a5v",
+          "x138jxqx",
+          "x1q3u54m",
+          "xmkeg23",
+          "x1y0btm7",
+          "x1nah1oa"
+        ],
+        "text": "Canvas tote In stock A sturdy everyday bag made from recycled canvas. Add to cart",
+        "styles": {
+          "background-color": "var(--x1sr72fd)",
+          "color": "var(--x4p1bac)"
+        }
+      }
+    },
+    {
+      "id": "light-default",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x1akqw4w",
+          "x138jxqx",
+          "x1q3u54m",
+          "x1ia1lxn"
+        ],
+        "text": "Featured products Free shipping on orders over 50 EUR. Canvas tote In stock A sturdy everyday bag made from recycled canvas. Add to cart Enamel mug Sold out Keeps coffee warm on long mornings. Add to ",
+        "styles": {
+          "background-color": "var(--x1sr72fd)",
+          "color": "var(--x4p1bac)"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "states-positive-amount-error",
+  "split": "development",
+  "workflow": "states",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "pass",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "src/components/TransferForm.tsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "unsupported-environment",
+        "subject": ".pandamstyle/design.pandamstyle.js generated module missing",
+        "detail": "tsc fails with TS2307 in all files importing it, including untouched ones; the change itself is unverified by the compiler."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "src/components/TransferForm.tsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 7
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 9
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "hint-error",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xpmzdu9",
+          "x1fzh9zf"
+        ],
+        "text": "Insufficient funds",
+        "styles": {
+          "color": "var(--x1ory881)",
+          "font-size": "var(--x12wrihz)"
+        }
+      }
+    },
+    {
+      "id": "input-invalid",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xzeg8sj",
+          "x1mcd0s6",
+          "x1k7pt2j",
+          "xmkeg23",
+          "x1y0btm7",
+          "x7r38zr",
+          "xrjqu5t",
+          "x1xy2bl7",
+          "xwhjr6g",
+          "x13bezf9",
+          "x1ejmhcg",
+          "xphjlbh",
+          "x3wyqdy"
+        ],
+        "text": "",
+        "styles": {
+          "border-color": "var(--x1ory881)"
+        }
+      }
+    },
+    {
+      "id": "hint-default",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xpmzdu9",
+          "xjya7n8"
+        ],
+        "text": "Transfers settle in one business day.",
+        "styles": {
+          "color": "var(--x1w5rq2e)"
+        }
+      }
+    },
+    {
+      "id": "input-default",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xzeg8sj",
+          "x1mcd0s6",
+          "x1k7pt2j",
+          "xmkeg23",
+          "x1y0btm7",
+          "x7r38zr",
+          "xrjqu5t",
+          "x1xy2bl7",
+          "xwhjr6g",
+          "x13bezf9",
+          "x1ejmhcg",
+          "xphjlbh",
+          "x3wyqdy"
+        ],
+        "text": "",
+        "styles": {
+          "border-color": "var(--x11okn4v)"
+        }
+      }
+    }
+  ]
+}

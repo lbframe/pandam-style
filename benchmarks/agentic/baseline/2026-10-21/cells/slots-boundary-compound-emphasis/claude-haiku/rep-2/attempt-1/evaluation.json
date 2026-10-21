@@ -1,0 +1,222 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "slots-boundary-compound-emphasis",
+  "split": "development",
+  "workflow": "slots",
+  "caseType": "boundary",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "pass",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "src/components/SyncAlert.tsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "unsupported-environment",
+        "subject": "src/.../.pandamstyle/design.pandamstyle.js",
+        "detail": "Generated PandamStyle output is absent, so every component import fails typecheck (pre-existing, not caused by this change). Generating it would write outside the allowed file set."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "src/components/SyncAlert.tsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 7
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 9
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "failed-root",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x78zum5",
+          "x167nubf",
+          "xbg677t",
+          "x8vdnou",
+          "xmkeg23",
+          "x1y0btm7",
+          "x1qftll4",
+          "x7wcaxa"
+        ],
+        "text": "! Bank sync Sync failed.",
+        "styles": {
+          "background-color": "var(--x1ory881)",
+          "border-color": "var(--x1ory881)"
+        }
+      }
+    },
+    {
+      "id": "failed-icon",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xw4jnvo",
+          "x1qx5ct2",
+          "xz4r6h8"
+        ],
+        "text": "!",
+        "styles": {
+          "color": "var(--x1kvy9l6)"
+        }
+      }
+    },
+    {
+      "id": "failed-title",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x1u6lvev",
+          "x13bezf9",
+          "xz4r6h8"
+        ],
+        "text": "Bank sync",
+        "styles": {
+          "color": "var(--x1kvy9l6)"
+        }
+      }
+    },
+    {
+      "id": "stale-subtle",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x78zum5",
+          "x167nubf",
+          "xbg677t",
+          "x8vdnou",
+          "xmkeg23",
+          "x1y0btm7",
+          "x11ru1we",
+          "xrjqu5t"
+        ],
+        "text": "! Bank sync Balances may be out of date.",
+        "styles": {
+          "background-color": "var(--x16msgfy)"
+        }
+      }
+    },
+    {
+      "id": "stale-icon",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xw4jnvo",
+          "x1qx5ct2",
+          "x6zbn7c"
+        ],
+        "text": "!",
+        "styles": {
+          "color": "var(--x127jt67)"
+        }
+      }
+    }
+  ]
+}

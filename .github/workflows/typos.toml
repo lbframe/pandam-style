@@ -12,6 +12,10 @@ extend-exclude = [
   # Retained CE-00.4 tool output quotes the inherited findings verbatim as
   # before/after evidence; rewriting it would falsify that evidence.
   "docs/research/core-evolution-ci-repair/",
+  # Published AG-00.3 baseline records (POLICY.md section 6, step 1) are run
+  # output kept byte for byte: generated class hashes such as `x54c1fo` are
+  # not words, and the records are bound by digest in gates.v1.json.
+  "benchmarks/agentic/baseline/20*-*-*/",
 ]
 
 [default]

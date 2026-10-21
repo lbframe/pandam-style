@@ -1,0 +1,166 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "migration-positive-price-tag",
+  "split": "development",
+  "workflow": "migration",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "not-applicable",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [
+      "src/ui/PriceTag.jsx"
+    ],
+    "modified": [
+      "src/Portal.jsx"
+    ],
+    "deleted": [
+      "src/legacy/PriceTag.jsx",
+      "src/legacy/PriceTag.module.css"
+    ],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [
+          "src/ui/PriceTag.jsx"
+        ],
+        "modified": [
+          "src/Portal.jsx"
+        ],
+        "deleted": [
+          "src/legacy/PriceTag.jsx",
+          "src/legacy/PriceTag.module.css"
+        ],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 2
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 8
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "fresh compiler generation",
+        "files": 8
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "tag-parity",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x3nfvp2",
+          "x1imp7t5",
+          "xjykkhf",
+          "x1k7cxp1",
+          "x18u33c2",
+          "xh5z1qz"
+        ],
+        "text": "from 89 EUR",
+        "styles": {
+          "background-color": "var(--xrtqiik)",
+          "color": "var(--xea4yt6)",
+          "border-radius": "var(--xhhazlm)",
+          "font-size": "var(--xnb01p2)",
+          "padding-inline": "var(--x1id9nbl)",
+          "display": "inline-flex"
+        }
+      }
+    },
+    {
+      "id": "portal-wired",
+      "kind": "files.contains",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    },
+    {
+      "id": "legacy-removed",
+      "kind": "files.contains",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    }
+  ]
+}

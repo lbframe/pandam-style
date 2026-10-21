@@ -1,0 +1,82 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "audit-failure-unqualified-webpack",
+  "split": "development",
+  "workflow": "audit",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "read-only-report",
+  "verdict": "pass",
+  "success": {
+    "application": null,
+    "diagnosis": null,
+    "report": true
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "not-applicable",
+    "compile": "not-applicable",
+    "static": "not-applicable",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "pass",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": null,
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "unsupported-environment",
+        "subject": "Standalone webpack 5.97.1",
+        "detail": "Alpha 1 qualifies specific Vite, Next.js and Rsbuild/Rspack configurations, not standalone webpack. Next.js webpack qualification does not extend to this project."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    },
+    {
+      "id": "commands",
+      "kind": "transcript.commands",
+      "class": "transcript",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "commands": 6
+      }
+    }
+  ]
+}

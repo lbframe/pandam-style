@@ -1,0 +1,92 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "audit-positive-legacy-css",
+  "split": "development",
+  "workflow": "audit",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "read-only-report",
+  "verdict": "fail",
+  "success": {
+    "application": null,
+    "diagnosis": null,
+    "report": false
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "not-applicable",
+    "compile": "not-applicable",
+    "static": "not-applicable",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "fail",
+    "transcript": "pass",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": null,
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "conflicting-state",
+        "subject": "packageManager yarn@1.22.22 declared but no yarn.lock present",
+        "detail": "Blocks a frozen, reproducible install and a stable baseline for migration or benchmarking."
+      },
+      {
+        "kind": "unsupported-environment",
+        "subject": "Vite 8.3.1 Rolldown backend not confirmed",
+        "detail": "Unverified rather than unsupported. Not declared in package.json or vite.config.js; no lockfile or node_modules to confirm the resolved tuple. Compatibility stays unknown until confirmed."
+      },
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "PandamStyle design-system definition",
+        "detail": "No design.pandamstyle.config.js exists. Creating one from the token names in src/styles/tokens.css needs user direction."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "fail",
+      "reason": "answer audit.stack.compatibility.status does not satisfy {\"equals\":\"supported\"}",
+      "evidence": null
+    },
+    {
+      "id": "commands",
+      "kind": "transcript.commands",
+      "class": "transcript",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "commands": 4
+      }
+    }
+  ]
+}

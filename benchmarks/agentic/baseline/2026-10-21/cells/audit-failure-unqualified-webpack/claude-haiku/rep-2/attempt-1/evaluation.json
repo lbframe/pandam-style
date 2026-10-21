@@ -1,0 +1,97 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "audit-failure-unqualified-webpack",
+  "split": "development",
+  "workflow": "audit",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "read-only-report",
+  "verdict": "pass",
+  "success": {
+    "application": null,
+    "diagnosis": null,
+    "report": true
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "not-applicable",
+    "compile": "not-applicable",
+    "static": "not-applicable",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "pass",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": null,
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "unsupported-environment",
+        "subject": "webpack 5.97.1 custom config (webpack.config.js) with React 18.3.1",
+        "detail": "Not in the Alpha 1 qualified host matrix (Vite 8.3.1, Next.js 16.3.8, Rsbuild 2.2.11/Rspack 2.2.8)."
+      },
+      {
+        "kind": "missing-product-capability",
+        "subject": "PandamStyle Alpha 1 webpack host integration",
+        "detail": "No @pandamstyle webpack integration is qualified for a plain webpack project; the only webpack path is @pandamstyle/next."
+      },
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "design-system tokens, themes, recipes and patterns",
+        "detail": "None exist; only one SCSS variable ($danger) in src/styles/main.scss. A PandamStyle definition would need project-specific vocabulary that the install contract forbids inventing."
+      },
+      {
+        "kind": "ambiguous-request",
+        "subject": "whether to migrate the bundler to a qualified host",
+        "detail": "Adopting PandamStyle requires moving from webpack to Vite or Rsbuild, which is a migration decision for the user."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    },
+    {
+      "id": "commands",
+      "kind": "transcript.commands",
+      "class": "transcript",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "commands": 6
+      }
+    }
+  ]
+}
