@@ -236,7 +236,7 @@ async function buildMatrix(
     tasks = TASKS.map((t) => t.id),
     models = ['claude-haiku'],
     repetitions = 3,
-    kind = 'adapter-fixture',
+    kind = 'provider-backed',
     matrixId = `m-${name}`,
     spec = () => ({}),
     edit = () => {},
@@ -314,6 +314,7 @@ async function buildMatrix(
             retry: { scheduled: true, backoffSeconds: 0 },
           });
           infra.grading.verdict = 'not-graded';
+          if (kind === 'provider-backed') asProviderBacked(infra);
           edit(infra, { ...ctx, attempt });
           fs.mkdirSync(path.join(repDir, `attempt-${attempt}`), {
             recursive: true,
@@ -334,6 +335,7 @@ async function buildMatrix(
         });
         setAttempt(r, s, i, rep);
         r.integrity.contested = s.contested || s.crashed;
+        if (kind === 'provider-backed') asProviderBacked(r);
         edit(r, { ...ctx, attempt });
         fs.mkdirSync(path.join(repDir, `attempt-${attempt}`), {
           recursive: true,
@@ -441,12 +443,10 @@ test('derive: task sets, binding and freeze status of a clean baseline', async (
   assert.equal(g.inputs.records.length, 132);
   assert.equal(b.cells.length, 44);
   assert.ok(b.cells.every((c) => /^[0-9a-f]{64}$/.test(c.comparabilityKey)));
-  // Synthetic records are never a freezable baseline.
-  assert.equal(g.synthetic, true);
-  assert.equal(g.freeze.status, 'not-freezable');
-  assert.deepEqual(g.freeze.insufficientGates, []);
-  assert.deepEqual(g.freeze.missingRepetitions, []);
-  assert.equal(g.freeze.reasons.length, 1);
+  // Complete, clean, provider-backed (synthetic records in that shape).
+  assert.equal(g.synthetic, false);
+  assert.equal(g.freeze.status, 'freezable');
+  assert.deepEqual(g.freeze.reasons, []);
 });
 
 test('derive is deterministic: byte-identical output, wherever the directory is', async () => {
@@ -459,11 +459,8 @@ test('derive is deterministic: byte-identical output, wherever the directory is'
   assert.ok(!again.includes(dir), 'no absolute path in the record');
 });
 
-test('derive: a complete, clean provider-backed baseline is freezable', async () => {
-  const dir = await buildMatrix('provider-baseline', {
-    kind: 'provider-backed',
-    edit: asProviderBacked,
-  });
+test('derive: only a complete, clean provider-backed baseline is freezable; check refuses any other', async () => {
+  const dir = await buildMatrix('provider-baseline');
   const g = deriveGates(dir);
   assert.equal(g.synthetic, false);
   assert.deepEqual(g.freeze, {
@@ -485,6 +482,37 @@ test('derive: a complete, clean provider-backed baseline is freezable', async ()
   assert.equal(h.freeze.status, 'not-freezable');
   assert.equal(h.freeze.insufficientGates.length, 0);
   assert.equal(h.freeze.missingRepetitions.length, 1);
+  // Adapter-fixture records are never a freezable baseline.
+  const fixtureKind = await buildMatrix('fixture-kind-baseline', {
+    kind: 'adapter-fixture',
+  });
+  const f = deriveGates(fixtureKind);
+  assert.equal(f.synthetic, true);
+  assert.equal(f.freeze.status, 'not-freezable');
+  assert.deepEqual(f.freeze.reasons, [
+    'kind adapter-fixture: synthetic records, not a baseline',
+  ]);
+  // check refuses a record that is not freezable, whatever the candidate.
+  const cand = await buildMatrix('not-freezable-cand');
+  const fixtureCand = await buildMatrix('not-freezable-fixture-cand', {
+    kind: 'adapter-fixture',
+  });
+  for (const [record, c] of [
+    [h, cand],
+    [f, fixtureCand],
+  ])
+    assert.throws(
+      () => checkGates(record, c),
+      (e) => {
+        assert.ok(e instanceof GatesRefusal);
+        assert.match(
+          e.message,
+          /freeze\.status "not-freezable": a gate record that is not freezable is never applied/,
+        );
+        return true;
+      },
+    );
+  assert.equal(checkGates(g, cand).gates.length, 9);
 });
 
 test('derive lists every dropped reference repetition with its recorded value and reason', async () => {
@@ -666,10 +694,10 @@ test('derive: unmeasured baseline metric is insufficient-reference, never a pass
   const ctx = g.models['claude-haiku'].gates['context.input'];
   assert.equal(ctx.reference.status, 'insufficient-reference');
   assert.equal(ctx.unmeasuredByBaseline, true);
+  assert.equal(g.freeze.status, 'not-freezable');
+  // It is never applied: check refuses it.
   const cand = await buildMatrix('unmeasured-candidate');
-  const r = checkGates(g, cand);
-  assert.equal(gateOf(r, 'context.input').outcome, 'insufficient-reference');
-  assert.notEqual(r.verdict, 'pass');
+  assert.throws(() => checkGates(g, cand), /not freezable is never applied/);
 });
 
 // -------------------------------------------------------------- check
@@ -765,7 +793,8 @@ test('R1 check: a control task with fewer than 2 clean repetitions makes both la
           // 2 of 3 clean: decided, with the pair accounting.
           assert.equal(x.outcome, 'pass', what);
           assert.equal(x.reference.dropped, 1, what);
-          assert.equal(x.controlReference.status, 'sufficient', what);
+          assert.equal(x.reference.status, 'sufficient', what);
+          assert.deepEqual(x.reference.insufficientTasks, [], what);
         } else {
           assert.equal(x.outcome, 'insufficient-reference', what);
           assert.equal(x.pValue, null, what);
@@ -824,9 +853,17 @@ test('R2 check refuses a gate record whose reference accounting does not recompu
   );
   const cand = await buildMatrix('r2-candidate');
   const control = await buildMatrix('r2-control');
-  // Unchanged records are accepted.
+  // The unchanged clean record is accepted; the insufficient one is
+  // refused only because it is not freezable.
   checkGates(clean, cand, { controlDir: control });
-  checkGates(insufficient, cand, { controlDir: control });
+  assert.throws(
+    () => checkGates(insufficient, cand, { controlDir: control }),
+    (e) => {
+      assert.deepEqual(e.details.length, 1, e.message);
+      assert.match(e.details[0], /^freeze\.status "not-freezable"/);
+      return true;
+    },
+  );
   const mutations = (ref) => ({
     status:
       ref.status === 'sufficient' ? 'insufficient-reference' : 'sufficient',
@@ -926,11 +963,10 @@ test('check refuses a candidate or control outside the binding', async () => {
   assert.throws(() => checkGates(g, otherModel), /mixed model/);
   const twoReps = await buildMatrix('two-reps', { repetitions: 2 });
   assert.throws(() => checkGates(g, twoReps), /2 repetitions, gate 3/);
-  const provider = await buildMatrix('provider-kind', {
-    kind: 'provider-backed',
-    edit: asProviderBacked,
+  const fixtureKind = await buildMatrix('fixture-kind', {
+    kind: 'adapter-fixture',
   });
-  assert.throws(() => checkGates(g, provider), /kind provider-backed/);
+  assert.throws(() => checkGates(g, fixtureKind), /kind adapter-fixture/);
   const cand = await buildMatrix('binding-cand');
   // The control must be the reference product, and not the candidate.
   const notAlpha = await buildMatrix('control-not-alpha', {
@@ -1016,8 +1052,13 @@ test('check: overall verdict is the worst blocking outcome; non-blocking small s
     rs.gates.filter((x) => x.blocking).every((x) => x.outcome === 'pass'),
   );
   assert.equal(rs.verdict, 'pass');
-  // No blocking gate at all is never a pass.
-  const tiny = [APPLICATION[0], REPORT[0]];
+  // No blocking gate at all is never a pass: one task per family (every
+  // gate non-empty, so the record is freezable), each set under 5 tasks.
+  const tiny = [
+    RUNNABLE.find((t) => familyOf(t) === 'application' && isCritical(t)).id,
+    RUNNABLE.find((t) => familyOf(t) === 'diagnosis').id,
+    REPORT[0],
+  ];
   const tinyBase = deriveGates(await buildMatrix('tiny-base', { tasks: tiny }));
   const tinyR = checkGates(
     tinyBase,
@@ -1026,24 +1067,36 @@ test('check: overall verdict is the worst blocking outcome; non-blocking small s
       controlDir: await buildMatrix('tiny-control', { tasks: tiny }),
     },
   );
+  assert.equal(tinyBase.freeze.status, 'freezable');
   assert.ok(tinyR.gates.every((x) => !x.blocking));
+  // With fewer families, a gate's task set is empty: insufficient, so the
+  // record is not freezable and is refused.
+  const two = [APPLICATION[0], REPORT[0]];
+  const twoBase = deriveGates(await buildMatrix('two-base', { tasks: two }));
+  const twoCand = await buildMatrix('two-cand', { tasks: two });
+  assert.throws(
+    () => checkGates(twoBase, twoCand),
+    /not freezable is never applied/,
+  );
   assert.equal(tinyR.verdict, 'insufficient-reference');
   assert.equal(tinyR.verdictReason, 'no blocking gate');
-  // An insufficient blocking gate keeps the verdict from passing.
+  // An insufficient blocking gate keeps the verdict from passing: the
+  // control's (here, an absent one) for the latency gates; a baseline's
+  // insufficient gate makes the record not freezable, so it is refused.
+  assert.equal(
+    checkGates(g, await buildMatrix('ins-cand')).verdict,
+    'insufficient-reference',
+  );
   const [a] = APPLICATION;
   const insBase = deriveGates(
     await buildMatrix('ins-base', {
       spec: (t, _m, rep) => (t === a && rep <= 2 ? { missing: true } : {}),
     }),
   );
-  const insR = checkGates(insBase, await buildMatrix('ins-cand'), {
-    controlDir: control,
-  });
-  assert.equal(
-    gateOf(insR, 'success.application').outcome,
-    'insufficient-reference',
+  assert.throws(
+    () => checkGates(insBase, reportFails, { controlDir: control }),
+    /not freezable is never applied/,
   );
-  assert.equal(insR.verdict, 'insufficient-reference');
 });
 
 test('check: a candidate missing whole cells, models or tasks takes the worst case', async () => {
@@ -1151,6 +1204,344 @@ test('monotone end to end: a candidate failure turned contested, missing, crashe
   }
 });
 
+// Fix round 1, class of R2: every recorded value check relies on is
+// recomputed from the record's baseline data, or the record is refused,
+// field by field; a record that is not freezable is refused.
+test('check refuses a gate record any value of which it relies on does not recompute', async () => {
+  const { record: clean } = await cleanBaseline();
+  const holed = deriveGates(
+    await buildMatrix('verify-holed', {
+      spec: (t, _m, rep) =>
+        t === APPLICATION[0] && rep === 3 ? { missing: true } : {},
+    }),
+  );
+  const insufficient = deriveGates(
+    await buildMatrix('verify-insufficient', {
+      spec: (t, _m, rep) =>
+        t === APPLICATION[0] && rep <= 2 ? { missing: true } : {},
+    }),
+  );
+  const cand = await buildMatrix('verify-cand');
+  const control = await buildMatrix('verify-control');
+  const H = 'claude-haiku';
+  const crit = clean.models[H].taskSets.critical;
+  const app = clean.models[H].taskSets.application;
+  const critApp = crit.find((t) => app.includes(t));
+  const t0 = clean.models[H].taskSets.all[0];
+  const gates = (g) => g.models[H].gates;
+  const cases = [
+    [
+      'blocking',
+      (g) => (gates(g)['success.report'].blocking = false),
+      /success\.report: blocking does not recompute/,
+    ],
+    [
+      'blockingReason',
+      (g) => (gates(g).safety.blockingReason = 'x'),
+      /safety: blockingReason does not recompute/,
+    ],
+    [
+      'cut',
+      (g) => (gates(g)['latency.p95'].cut = 'p50'),
+      /latency\.p95: cut does not recompute/,
+    ],
+    [
+      'scale',
+      (g) => (gates(g)['context.input'].scale = 'count'),
+      /context\.input: scale does not recompute/,
+    ],
+    [
+      'design',
+      (g) => (gates(g)['repair.cycles'].design = 'paired'),
+      /repair\.cycles: design does not recompute/,
+    ],
+    [
+      'taskSet',
+      (g) => (gates(g)['success.critical'].taskSet = 'all'),
+      /success\.critical: taskSet does not recompute/,
+    ],
+    [
+      'tasks',
+      (g) => {
+        const e = gates(g)['success.application'];
+        const t = e.tasks.pop();
+        delete e.values[t];
+      },
+      /success\.application: tasks does not recompute/,
+    ],
+    [
+      'taskSets.application',
+      (g) => g.models[H].taskSets.application.pop(),
+      /taskSets: application does not recompute/,
+    ],
+    [
+      'taskSets.critical',
+      (g) => g.models[H].taskSets.critical.shift(),
+      /taskSets: critical does not recompute/,
+    ],
+    [
+      'taskSets.missingCapability',
+      (g) => (g.models[H].taskSets.missingCapability = []),
+      /taskSets: missingCapability does not recompute/,
+    ],
+    [
+      'taskSets extra',
+      (g) => (g.models[H].taskSets.extra = [t0]),
+      /taskSets: extra does not recompute/,
+    ],
+    [
+      'taskSets.all unsorted',
+      (g) => g.models[H].taskSets.all.reverse(),
+      /taskSets\.all does not recompute/,
+    ],
+    [
+      'taskSets.all shrunk',
+      (g) => g.models[H].taskSets.all.pop(),
+      /binding: cells does not recompute/,
+    ],
+    [
+      'monteCarlo.seed',
+      (g) => (gates(g)['context.input'].monteCarlo.seed = 'other'),
+      /context\.input: monteCarlo does not recompute/,
+    ],
+    [
+      'monteCarlo.draws',
+      (g) => (gates(g)['context.input'].monteCarlo.draws = 99),
+      /context\.input: monteCarlo does not recompute/,
+    ],
+    [
+      'monteCarlo on an exact gate',
+      (g) =>
+        (gates(g)['success.report'].monteCarlo = { seed: 's', draws: 9999 }),
+      /success\.report: monteCarlo does not recompute/,
+    ],
+    [
+      'latency.medians',
+      (g) => (g.models[H].latency.medians[t0] += 0.1),
+      /latency: medians does not recompute/,
+    ],
+    [
+      'latency.cuts.p50',
+      (g) => (g.models[H].latency.cuts.p50 -= 0.1),
+      /latency: cuts does not recompute/,
+    ],
+    [
+      'latency.cuts.p95',
+      (g) => (g.models[H].latency.cuts.p95 += 0.1),
+      /latency: cuts does not recompute/,
+    ],
+    [
+      'latency extra',
+      (g) => (g.models[H].latency.extra = 1),
+      /latency: extra does not recompute/,
+    ],
+    [
+      'critical vs family values',
+      (g) => (gates(g)['success.critical'].values[critApp][0] = 1),
+      /success\.critical and success\.application disagree/,
+    ],
+    [
+      'p50 vs p95 values',
+      (g) => (gates(g)['latency.p95'].values[t0][0] += 1),
+      /latency\.p50 and latency\.p95 disagree/,
+    ],
+    [
+      'values extra task',
+      (g) => (gates(g)['success.report'].values['not-a-task'] = []),
+      /success\.report: values \(tasks\) does not recompute/,
+    ],
+    [
+      'value off its scale',
+      (g) => (gates(g).safety.values[t0][0] = 2),
+      /safety .*: value 2 is outside the binary scale/,
+    ],
+    [
+      'dropped duplicate',
+      (g) => {
+        const e = gates(g)['repair.cycles'];
+        const t = e.tasks[0];
+        e.values[t].splice(0, 2);
+        e.droppedRepetitions.push(
+          {
+            taskId: t,
+            repetition: 1,
+            reasons: ['missing'],
+            recordedValue: null,
+          },
+          {
+            taskId: t,
+            repetition: 1,
+            reasons: ['missing'],
+            recordedValue: null,
+          },
+        );
+      },
+      /repair\.cycles .*: dropped repetitions \[1,1\]/,
+    ],
+    [
+      'dropped outside the gate',
+      (g) =>
+        gates(g)['success.report'].droppedRepetitions.push({
+          taskId: app[0],
+          repetition: 1,
+          reasons: ['missing'],
+        }),
+      /success\.report: dropped repetition of .*not in the gate/,
+    ],
+    [
+      'model projection',
+      (g) => (g.models[H].projection.model.cliVersion = '0'),
+      /claude-haiku: projection does not recompute/,
+    ],
+    [
+      'cell key',
+      (g) => (g.binding.cells[0].comparabilityKey = 'b'.repeat(64)),
+      /the key is not its projection's digest/,
+    ],
+    [
+      'cell projection rekeyed',
+      (g) => {
+        const c = g.binding.cells[1];
+        c.projection.model.cliVersion = '0';
+        c.comparabilityKey = comparabilityKey(c.projection);
+      },
+      /differs in a shared projection group/,
+    ],
+    [
+      'cell projection of another task',
+      (g) => {
+        const c = g.binding.cells[2];
+        c.projection.task.id = 'other';
+        c.comparabilityKey = comparabilityKey(c.projection);
+      },
+      /the projection is of task other/,
+    ],
+    [
+      'cell removed',
+      (g) => g.binding.cells.pop(),
+      /binding: cells does not recompute/,
+    ],
+    [
+      'binding.shared',
+      (g) => (g.binding.shared.harness.runnerTreeDigest = 'c'.repeat(64)),
+      /binding: shared does not recompute/,
+    ],
+    [
+      'synthetic',
+      (g) => (g.synthetic = true),
+      /record: synthetic does not recompute/,
+    ],
+    [
+      'corpus lock',
+      (g) => (g.binding.corpus.lockSha256 = 'd'.repeat(64)),
+      /binding\.corpus: lockSha256 does not recompute/,
+    ],
+    [
+      'method id',
+      (g) => (g.binding.method = 'pms-agentic-stats/v0'),
+      /binding\.method/,
+    ],
+    [
+      'freeze.status of a freezable record',
+      (g) => (g.freeze.status = 'not-freezable'),
+      /freeze: status does not recompute/,
+    ],
+    [
+      'freeze.reasons',
+      (g) => g.freeze.reasons.push('x'),
+      /freeze: reasons does not recompute/,
+    ],
+  ];
+  const holedCases = [
+    [
+      'freeze.status forged',
+      (g) => (g.freeze.status = 'freezable'),
+      /freeze: status does not recompute/,
+    ],
+    [
+      'freeze forged entirely',
+      (g) =>
+        Object.assign(g.freeze, {
+          status: 'freezable',
+          reasons: [],
+          missingRepetitions: [],
+        }),
+      /freeze: missingRepetitions does not recompute/,
+    ],
+    [
+      'freeze.missingRepetitions',
+      (g) => (g.freeze.missingRepetitions[0].repetition = 2),
+      /freeze: missingRepetitions does not recompute/,
+    ],
+  ];
+  const insufficientCases = [
+    [
+      'freeze.insufficientGates',
+      (g) => g.freeze.insufficientGates.pop(),
+      /freeze: insufficientGates does not recompute/,
+    ],
+  ];
+  // The unchanged freezable record is accepted.
+  assert.equal(
+    checkGates(clean, cand, { controlDir: control }).verdict,
+    'pass',
+  );
+  for (const [base, list] of [
+    [clean, cases],
+    [holed, holedCases],
+    [insufficient, insufficientCases],
+  ])
+    for (const [what, mutate, pattern] of list) {
+      // As check reads it: from JSON, with no shared objects.
+      const g = JSON.parse(serialize(base));
+      mutate(g);
+      assert.throws(
+        () => checkGates(g, cand, { controlDir: control }),
+        (e) => {
+          assert.ok(e instanceof GatesRefusal, what);
+          assert.match(e.message, pattern, what);
+          return true;
+        },
+        what,
+      );
+    }
+});
+
+// (c): every decided gate reports its reference accounting in the task-id
+// form of the gate record.
+test('check reports every reference accounting in the task-id form', async () => {
+  const { record: g } = await cleanBaseline();
+  const cand = await buildMatrix('shape-cand');
+  const control = await buildMatrix('shape-control', {
+    spec: (t, _m, rep) =>
+      t === APPLICATION[0] && rep === 1 ? { ms: null } : {},
+  });
+  const r = checkGates(g, cand, { controlDir: control });
+  const keys = [
+    'dropped',
+    'insufficientTasks',
+    'maxDropped',
+    'planned',
+    'status',
+  ];
+  for (const x of r.gates) {
+    assert.deepEqual(Object.keys(x.reference).sort(), keys, x.gate);
+    if (!x.gate.startsWith('latency.'))
+      assert.deepEqual(
+        x.reference,
+        g.models['claude-haiku'].gates[x.gate].reference,
+        x.gate,
+      );
+  }
+  assert.deepEqual(gateOf(r, 'latency.p50').reference, {
+    status: 'sufficient',
+    planned: 132,
+    dropped: 1,
+    maxDropped: 13,
+    insufficientTasks: [],
+  });
+});
+
 // ---------------------------------------------------------------- CLI
 
 test('CLI: derive writes once and never overwrites; check exit statuses', async () => {
@@ -1160,7 +1551,7 @@ test('CLI: derive writes once and never overwrites; check exit statuses', async 
     spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8' });
   const d = run('derive', dir, '--out', out);
   assert.equal(d.status, 0, d.stderr);
-  assert.match(d.stderr, /not-freezable/);
+  assert.match(d.stderr, /gates derive: freezable/);
   assert.equal(fs.readFileSync(out, 'utf8'), serialize(record));
   // Same content: idempotent. Different content: refused.
   assert.equal(run('derive', dir, '--out', out).status, 0);
@@ -1188,5 +1579,15 @@ test('CLI: derive writes once and never overwrites; check exit statuses', async 
   const refusal = run('check', out, bad);
   assert.equal(refusal.status, 1);
   assert.match(refusal.stderr, /refused/);
+  // A record that is not freezable: refused, exit 1.
+  const holedOut = path.join(tmpDir('gates-cli-holed'), 'gates.v1.json');
+  const holed = await buildMatrix('cli-holed', {
+    spec: (t, _m, rep) =>
+      t === APPLICATION[0] && rep === 3 ? { missing: true } : {},
+  });
+  assert.equal(run('derive', holed, '--out', holedOut).status, 0);
+  const notFreezable = run('check', holedOut, cand, '--control', control);
+  assert.equal(notFreezable.status, 1);
+  assert.match(notFreezable.stderr, /not freezable is never applied/);
   assert.equal(run('nope').status, 1);
 });

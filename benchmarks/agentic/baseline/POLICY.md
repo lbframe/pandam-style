@@ -508,12 +508,35 @@ sorted, and the Monte Carlo seeds are those of section 5.2. An existing
 `decideGate`, the reference being the record's frozen values. It refuses
 (exit 1), and decides nothing, when any of these holds:
 
+- the record is not freezable: its `freeze.status`, recomputed from the
+  record, is `not-freezable`. A record that cannot be frozen (section 6,
+  step 2) is never applied to a candidate. This is a refusal, not a
+  verdict;
 - the record's method constants or `stats.mjs` sha256 differ from the
-  checkout's;
-- any field of a recorded reference accounting (`status`, `planned`,
-  `dropped`, `maxDropped`, `insufficientTasks`) differs from the one
-  `referenceEvidence` recomputes from the record's values, or a field is
-  added or missing;
+  checkout's, or its `corpus.lock.json` sha256 differs from the
+  checkout's (the task sets are recomputed from it);
+- any recorded value `check` relies on does not recompute from the
+  record's baseline data (its runnable tasks, each task's clean values and
+  dropped repetitions, and the cells' projections), through the same
+  derivations as `derive`. The differing fields are listed. That covers:
+  - the task sets;
+  - per gate: `scale`, `design`, `taskSet`, `tasks`, `blocking`,
+    `blockingReason`, `cut` and `monteCarlo` (seed and `B`);
+  - one value list per task, every value on its scale, and each dropped
+    repetition planned and listed once;
+  - every field of the reference accounting (`status`, `planned`,
+    `dropped`, `maxDropped`, `insufficientTasks`), with no field added
+    or missing;
+  - agreement between gates over the same values: `success.critical`
+    with each task's family gate, and `latency.p50` with `latency.p95`;
+  - the latency medians and cuts;
+  - the models' shared projection groups, the cells (one per runnable task
+    and model, each key its projection's digest) and `binding.shared`;
+  - `synthetic`, and `freeze.status`, `reasons`, `insufficientGates` and
+    the missing repetitions;
+  - `minimumDetectable`, point estimates, unclean counts, `recollectCells`
+    and the input digests are neither used nor reported by `check`, and
+    are not verified;
 - kind, repetitions or epoch differ;
 - a candidate or control record's comparability key differs from its
   cell's key (the differing projection fields are listed);
@@ -531,10 +554,14 @@ gate is never a pass. Exit status 0 is `pass`, 2 any other verdict.
   counts, whatever the candidate matrix planned. An absent model, task or
   repetition takes the worst bound, as does an unsupported cell or a
   repetition that is not clean.
+- **Reference accounting:** every gate reports it in the record's task-id
+  form (`status`, `planned`, `dropped`, `maxDropped`,
+  `insufficientTasks`): the baseline's for the baseline gates, the
+  control's for the latency gates. Because a freezable record has every
+  baseline gate sufficient, only the control can make a gate
+  `insufficient-reference` in a qualification.
 - **Latency:** the gates are `insufficient-reference` without `--control`.
-  They are also `insufficient-reference` when the baseline's own latency
-  values lack the minimum of section 5.1, because the medians and cuts are
-  then not frozen. The control is their reference: before its repetitions
+  The control is their reference: before its repetitions
   become pairs, `referenceEvidence` is applied to them grouped by task, and
   the gates are `insufficient-reference`, naming the tasks, unless every
   task keeps 2 of its 3 control repetitions clean and the dropped cap

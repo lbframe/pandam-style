@@ -44,6 +44,7 @@ import {
   latencyCuts,
   minimumDetectable,
   normalizeLatency,
+  orient,
   referenceEvidence,
 } from './stats.mjs';
 
@@ -486,35 +487,36 @@ function pointEstimate(gate, clean) {
 
 // ------------------------------------------------------------------ derive
 
-function taskSets(loaded, matrix, modelKey, m) {
+const EMPTY_SETS = () => ({
+  application: [],
+  diagnosis: [],
+  report: [],
+  critical: [],
+  all: [],
+  missingCapability: [],
+});
+
+/**
+ * The task sets of POLICY.md sections 3 and 4 over the runnable tasks
+ * `all` (sorted), from the checkout's corpus: one derivation for `derive`
+ * and for the verification of a gate record in `check`.
+ */
+export function taskSetsFrom(loaded, epoch, all) {
   const heldout = new Set((loaded.manifest?.tasks ?? []).map((t) => t.id));
-  const sets = {
-    application: [],
-    diagnosis: [],
-    report: [],
-    critical: [],
-    all: [],
-    missingCapability: [],
-  };
-  const unsupported = [];
-  for (const taskId of [...(matrix.tasks ?? [])].sort(byId)) {
+  const sets = EMPTY_SETS();
+  for (const taskId of all) {
     if (heldout.has(taskId))
       throw new GatesRefusal(`held-out task ${taskId} in the matrix`);
-    const cell = m.cells.get(cellKey(taskId, modelKey));
-    if (cell?.unsupported != null) {
-      unsupported.push({ taskId, reasons: cell.unsupported });
-      continue;
-    }
     const entry = findTask(loaded, taskId);
     if (entry == null || !loaded.development.includes(entry))
       throw new GatesRefusal(
         `${taskId} is not a development task of the corpus`,
       );
-    const kind = entry.task.expectations?.[matrix.epoch]?.intendedOutcome?.kind;
+    const kind = entry.task.expectations?.[epoch]?.intendedOutcome?.kind;
     const family = FAMILY_OF_KIND[kind];
     if (family == null)
       throw new GatesRefusal(
-        `${taskId}: no outcome family for intended outcome ${kind} (epoch ${matrix.epoch})`,
+        `${taskId}: no outcome family for intended outcome ${kind} (epoch ${epoch})`,
       );
     sets[family].push(taskId);
     sets.all.push(taskId);
@@ -527,7 +529,71 @@ function taskSets(loaded, matrix, modelKey, m) {
     )
       sets.critical.push(taskId);
   }
-  return { sets, unsupported };
+  return sets;
+}
+
+function taskSets(loaded, matrix, modelKey, m) {
+  const heldout = new Set((loaded.manifest?.tasks ?? []).map((t) => t.id));
+  const runnable = [];
+  const unsupported = [];
+  for (const taskId of [...(matrix.tasks ?? [])].sort(byId)) {
+    if (heldout.has(taskId))
+      throw new GatesRefusal(`held-out task ${taskId} in the matrix`);
+    const cell = m.cells.get(cellKey(taskId, modelKey));
+    if (cell?.unsupported != null)
+      unsupported.push({ taskId, reasons: cell.unsupported });
+    else runnable.push(taskId);
+  }
+  return {
+    sets: taskSetsFrom(loaded, matrix.epoch, runnable),
+    unsupported,
+  };
+}
+
+/** POLICY.md section 5.5: whether a gate over `tasks` blocks. */
+function blockingOf(tasks) {
+  return tasks.length >= MIN_BLOCKING_TASKS
+    ? { blocking: true }
+    : {
+        blocking: false,
+        blockingReason: `fewer than ${MIN_BLOCKING_TASKS} runnable tasks (POLICY.md section 5.5): reported, not blocking`,
+      };
+}
+
+/** Section 5.2: the Monte Carlo seed and draws of a real-valued gate. */
+function monteCarloOf(modelKey, gate) {
+  const spec = GATES[gate];
+  return spec.design === 'between-runs' && spec.scale === 'log'
+    ? { seed: gateSeed(modelKey, gate), draws: DRAWS }
+    : null;
+}
+
+/** The latency medians and cuts from a gate's clean baseline values. */
+function latencyOf(tasks, values) {
+  const byTask = {};
+  for (const t of tasks)
+    byTask[t] = values[t].map((value) => ({ clean: true, value }));
+  return Object.values(byTask).some((v) => v.length > 0)
+    ? latencyCuts(byTask)
+    : null;
+}
+
+/** Why a gate record cannot be frozen (POLICY.md section 6, step 2). */
+function freezeReasons({ kind, missing, insufficient, unbound }) {
+  const reasons = [];
+  if (kind !== 'provider-backed')
+    reasons.push(`kind ${kind}: synthetic records, not a baseline`);
+  if (missing > 0)
+    reasons.push(
+      `${missing} runnable repetitions have no valid attempt (section 6, step 2)`,
+    );
+  if (insufficient > 0)
+    reasons.push(
+      `${insufficient} gates are insufficient-reference (section 5.1)`,
+    );
+  if (unbound > 0)
+    reasons.push(`${unbound} runnable cells have no record, hence no key`);
+  return reasons;
 }
 
 /**
@@ -653,12 +719,7 @@ export function deriveGates(baselineDir) {
         design: spec.design,
         taskSet: GATE_TASK_SET[gate],
         tasks,
-        blocking: tasks.length >= MIN_BLOCKING_TASKS,
-        ...(tasks.length >= MIN_BLOCKING_TASKS
-          ? {}
-          : {
-              blockingReason: `fewer than ${MIN_BLOCKING_TASKS} runnable tasks (POLICY.md section 5.5): reported, not blocking`,
-            }),
+        ...blockingOf(tasks),
         reference,
         values,
         droppedRepetitions: dropped,
@@ -667,11 +728,8 @@ export function deriveGates(baselineDir) {
           all.length > 0 && all.every((v) => v.recordedValue == null),
         pointEstimate: pointEstimate(gate, Object.values(values).flat()),
       };
+      entry.monteCarlo = monteCarloOf(model.key, gate);
       if (spec.design === 'between-runs') {
-        entry.monteCarlo =
-          spec.scale === 'log'
-            ? { seed: gateSeed(model.key, gate), draws: DRAWS }
-            : null;
         entry.minimumDetectable = minimumDetectable({
           gate,
           model: model.key,
@@ -679,15 +737,7 @@ export function deriveGates(baselineDir) {
         });
       } else {
         entry.cut = spec.cut;
-        entry.monteCarlo = null;
-        if (latency == null) {
-          const byTask = {};
-          for (const t of tasks)
-            byTask[t] = values[t].map((value) => ({ clean: true, value }));
-          latency = Object.values(byTask).some((v) => v.length > 0)
-            ? latencyCuts(byTask)
-            : null;
-        }
+        latency ??= latencyOf(tasks, values);
       }
       if (!sufficient) {
         insufficientGates.push({ modelKey: model.key, gate });
@@ -734,22 +784,12 @@ export function deriveGates(baselineDir) {
         projection: c?.projection ?? null,
       });
     }
-  const reasons = [];
-  if (matrix.kind !== 'provider-backed')
-    reasons.push(`kind ${matrix.kind}: synthetic records, not a baseline`);
-  if (missingRepetitions.length > 0)
-    reasons.push(
-      `${missingRepetitions.length} runnable repetitions have no valid attempt (section 6, step 2)`,
-    );
-  if (insufficientGates.length > 0)
-    reasons.push(
-      `${insufficientGates.length} gates are insufficient-reference (section 5.1)`,
-    );
-  const unbound = cells.filter((c) => c.comparabilityKey == null);
-  if (unbound.length > 0)
-    reasons.push(
-      `${unbound.length} runnable cells have no record, hence no key`,
-    );
+  const reasons = freezeReasons({
+    kind: matrix.kind,
+    missing: missingRepetitions.length,
+    insufficient: insufficientGates.length,
+    unbound: cells.filter((c) => c.comparabilityKey == null).length,
+  });
 
   return {
     schema: GATES_SCHEMA,
@@ -823,7 +863,33 @@ function referenceUnits(e, candidateOf = () => []) {
   }));
 }
 
-function verifyGateRecord(g) {
+const show = (v) => {
+  const text = JSON.stringify(v ?? null);
+  return text.length > 160 ? `${text.slice(0, 157)}...` : text;
+};
+
+/** Field-by-field comparison of recorded and recomputed values. */
+function compareFields(problems, where, recorded, expected, fields) {
+  for (const f of fields)
+    if (serialize(recorded?.[f] ?? null) !== serialize(expected?.[f] ?? null))
+      problems.push(
+        `${where}: ${f} does not recompute (recorded ${show(recorded?.[f])}, recomputed ${show(expected?.[f])})`,
+      );
+}
+
+const keysOf = (...objects) =>
+  [...new Set(objects.flatMap((o) => Object.keys(o ?? {})))].sort(byId);
+
+/**
+ * Every recorded value `check` relies on is recomputed from the record's
+ * baseline data (task sets, clean values and dropped repetitions, cell
+ * projections) through the same derivations as `derive`, or the record is
+ * refused, field by field. A record that is not freezable is refused
+ * (POLICY.md section 6.2). `minimumDetectable`, point estimates, unclean
+ * counts, `recollectCells` and the inputs' digests are neither used nor
+ * reported by `check`, so they are not verified here.
+ */
+function verifyGateRecord(g, loaded) {
   const problems = [];
   if (g?.schema !== GATES_SCHEMA) problems.push(`schema ${g?.schema}`);
   const b = g?.binding ?? {};
@@ -840,23 +906,142 @@ function verifyGateRecord(g) {
   };
   for (const [k, v] of Object.entries(expect))
     if (b[k] !== v) problems.push(`binding.${k} ${b[k]} is not ${v}`);
-  for (const [model, mg] of Object.entries(g?.models ?? {}))
-    for (const gate of Object.keys(GATES)) {
+  const R = b.repetitions;
+  if (!Number.isInteger(R) || R < 1)
+    problems.push(`binding.repetitions ${R} is not a positive integer`);
+  // The task sets are recomputed from the checkout's corpus: it must be the
+  // record's.
+  compareFields(
+    problems,
+    'binding.corpus',
+    b.corpus,
+    { lockSha256: fileSha256(path.join(CORPUS_ROOT, 'corpus.lock.json')) },
+    ['lockSha256'],
+  );
+  compareFields(
+    problems,
+    'record',
+    g,
+    { synthetic: b.kind !== 'provider-backed' },
+    ['synthetic'],
+  );
+  if (problems.length > 0)
+    throw new GatesRefusal(
+      'the gate record is not usable by this checkout',
+      problems,
+    );
+
+  const models = Object.keys(g.models ?? {}).sort(byId);
+  const insufficientGates = [];
+  const missingRepetitions = [];
+  const expectedCells = [];
+  for (const model of models) {
+    const mg = g.models[model];
+    const where = model;
+    // Task sets, from the runnable tasks through the corpus.
+    const all = Array.isArray(mg.taskSets?.all) ? mg.taskSets.all : [];
+    compareFields(
+      problems,
+      where,
+      { 'taskSets.all': mg.taskSets?.all },
+      { 'taskSets.all': [...new Set(all)].sort(byId) },
+      ['taskSets.all'],
+    );
+    let sets = EMPTY_SETS();
+    try {
+      sets = taskSetsFrom(loaded, b.corpus.epoch, all);
+    } catch (e) {
+      problems.push(`${where}: taskSets.all: ${e.message}`);
+    }
+    compareFields(
+      problems,
+      `${where} taskSets`,
+      mg.taskSets,
+      sets,
+      keysOf(mg.taskSets, sets),
+    );
+    const unsupported = (mg.unsupportedTasks ?? []).map((u) => u.taskId);
+    for (const t of unsupported.filter((x) => all.includes(x)))
+      problems.push(`${where}: ${t} is both runnable and unsupported`);
+    for (const t of sets.all)
+      expectedCells.push({ taskId: t, modelKey: model });
+
+    for (const [gate, spec] of Object.entries(GATES)) {
       const e = mg.gates?.[gate];
+      const at = `${model} ${gate}`;
       if (e == null) {
         problems.push(`${model}: gate ${gate} is absent`);
         continue;
       }
+      const tasks = sets[GATE_TASK_SET[gate]];
+      compareFields(
+        problems,
+        at,
+        e,
+        {
+          scale: spec.scale,
+          design: spec.design,
+          taskSet: GATE_TASK_SET[gate],
+          tasks,
+          ...blockingOf(tasks),
+          cut: spec.cut,
+          monteCarlo: monteCarloOf(model, gate),
+        },
+        [
+          'scale',
+          'design',
+          'taskSet',
+          'tasks',
+          'blocking',
+          'blockingReason',
+          'cut',
+          'monteCarlo',
+        ],
+      );
+      // The baseline data itself: one value list per task, every value on
+      // its scale, every dropped repetition planned and named once.
+      const values = e.values ?? {};
+      compareFields(
+        problems,
+        at,
+        { 'values (tasks)': Object.keys(values).sort(byId) },
+        { 'values (tasks)': [...tasks].sort(byId) },
+        ['values (tasks)'],
+      );
       let complete = true;
-      for (const t of e.tasks) {
-        const n =
-          (e.values[t]?.length ?? 0) +
-          e.droppedRepetitions.filter((d) => d.taskId === t).length;
-        if (n !== b.repetitions) {
+      for (const t of tasks) {
+        const vs = Array.isArray(values[t]) ? values[t] : [];
+        if (!Array.isArray(values[t])) complete = false;
+        for (const v of vs)
+          try {
+            orient({ clean: true, value: v }, 'reference', spec.scale);
+          } catch (err) {
+            complete = false;
+            problems.push(`${at} ${t}: ${err.message}`);
+          }
+        const reps = (e.droppedRepetitions ?? [])
+          .filter((d) => d.taskId === t)
+          .map((d) => d.repetition);
+        if (
+          new Set(reps).size !== reps.length ||
+          reps.some((r) => !Number.isInteger(r) || r < 1 || r > R)
+        ) {
           complete = false;
-          problems.push(`${model} ${gate} ${t}: ${n} reference repetitions`);
+          problems.push(`${at} ${t}: dropped repetitions ${show(reps)}`);
+        }
+        const n = vs.length + reps.length;
+        if (n !== R) {
+          complete = false;
+          problems.push(`${at} ${t}: ${n} reference repetitions`);
         }
       }
+      for (const d of e.droppedRepetitions ?? [])
+        if (!tasks.includes(d.taskId)) {
+          complete = false;
+          problems.push(
+            `${at}: dropped repetition of ${d.taskId}, not in the gate`,
+          );
+        }
       if (!complete) continue;
       // The recorded accounting is the method's, recomputed: every field,
       // and no other one.
@@ -865,16 +1050,172 @@ function verifyGateRecord(g) {
         referenceUnits(e).map((u) => u.reference),
       );
       const recorded = e.reference ?? {};
-      const fields = [
-        ...new Set([...Object.keys(expected), ...Object.keys(recorded)]),
-      ]
-        .filter((f) => serialize(expected[f]) !== serialize(recorded[f]))
-        .sort(byId);
+      const fields = keysOf(expected, recorded).filter(
+        (f) => serialize(expected[f]) !== serialize(recorded[f]),
+      );
       if (fields.length > 0)
         problems.push(
-          `${model} ${gate}: recorded reference accounting does not recompute (${fields.map((f) => `${f}: recorded ${JSON.stringify(recorded[f] ?? null)}, recomputed ${JSON.stringify(expected[f] ?? null)}`).join('; ')})`,
+          `${at}: recorded reference accounting does not recompute (${fields.map((f) => `${f}: recorded ${JSON.stringify(recorded[f] ?? null)}, recomputed ${JSON.stringify(expected[f] ?? null)}`).join('; ')})`,
+        );
+      if (expected.status !== 'sufficient')
+        insufficientGates.push({ modelKey: model, gate });
+      // Repetitions without a valid attempt, from the gate over every
+      // runnable task whose value is known whenever a record exists.
+      if (gate === 'safety')
+        for (const d of e.droppedRepetitions)
+          if (
+            d.reasons?.some((r) =>
+              ['missing', 'invalid', 'unclassified', 'unsupported'].includes(r),
+            )
+          )
+            missingRepetitions.push({
+              taskId: d.taskId,
+              modelKey: model,
+              repetition: d.repetition,
+            });
+    }
+
+    // One metric, one baseline: gates over the same values agree.
+    const gates = mg.gates ?? {};
+    const sameData = (gateA, gateB, t) => {
+      const strip = (x) =>
+        (x?.droppedRepetitions ?? [])
+          .filter((d) => d.taskId === t)
+          .map((d) => [d.repetition, d.reasons]);
+      return (
+        serialize(gates[gateA]?.values?.[t] ?? null) ===
+          serialize(gates[gateB]?.values?.[t] ?? null) &&
+        serialize(strip(gates[gateA])) === serialize(strip(gates[gateB]))
+      );
+    };
+    for (const t of sets.critical) {
+      const family = sets.application.includes(t)
+        ? 'success.application'
+        : sets.diagnosis.includes(t)
+          ? 'success.diagnosis'
+          : 'success.report';
+      if (!sameData('success.critical', family, t))
+        problems.push(
+          `${model}: success.critical and ${family} disagree on ${t}`,
         );
     }
+    for (const t of sets.all)
+      if (!sameData('latency.p50', 'latency.p95', t))
+        problems.push(`${model}: latency.p50 and latency.p95 disagree on ${t}`);
+    // Latency medians and cuts, from the latency baseline values.
+    let latency = null;
+    try {
+      latency = latencyOf(sets.all, gates['latency.p50']?.values ?? {});
+    } catch (err) {
+      problems.push(`${model}: latency: ${err.message}`);
+    }
+    compareFields(
+      problems,
+      `${model} latency`,
+      mg.latency,
+      latency,
+      keysOf(mg.latency, latency),
+    );
+    // The model's shared projection groups, from its cells' projections.
+    const own = (b.cells ?? []).filter(
+      (c) => c.modelKey === model && c.projection != null,
+    );
+    const shared =
+      own.length > 0
+        ? sharedProjection(own[0].projection, SHARED_PER_MODEL)
+        : null;
+    for (const c of own)
+      if (
+        sharedDiff(shared, sharedProjection(c.projection, SHARED_PER_MODEL))
+          .length > 0
+      )
+        problems.push(
+          `${model}: cell ${c.taskId} differs in a shared projection group`,
+        );
+    compareFields(problems, model, mg, { projection: shared }, ['projection']);
+  }
+
+  // Cells: one per runnable task and model, each key its projection's.
+  compareFields(
+    problems,
+    'binding',
+    { cells: (b.cells ?? []).map((c) => [c.taskId, c.modelKey]) },
+    { cells: expectedCells.map((c) => [c.taskId, c.modelKey]) },
+    ['cells'],
+  );
+  for (const c of b.cells ?? []) {
+    const at = `binding cell ${c.taskId}/${c.modelKey}`;
+    if ((c.comparabilityKey == null) !== (c.projection == null))
+      problems.push(`${at}: a key without a projection, or the reverse`);
+    else if (c.projection != null) {
+      if (comparabilityKey(c.projection) !== c.comparabilityKey)
+        problems.push(`${at}: the key is not its projection's digest`);
+      if (c.projection.task?.id !== c.taskId)
+        problems.push(
+          `${at}: the projection is of task ${c.projection.task?.id}`,
+        );
+    }
+  }
+  const keyed = (b.cells ?? []).filter((c) => c.projection != null);
+  compareFields(
+    problems,
+    'binding',
+    b,
+    {
+      shared:
+        keyed.length > 0
+          ? sharedProjection(keyed[0].projection, SHARED_ALL)
+          : null,
+    },
+    ['shared'],
+  );
+  for (const c of keyed)
+    if (
+      sharedDiff(b.shared ?? {}, sharedProjection(c.projection, SHARED_ALL))
+        .length > 0
+    )
+      problems.push(
+        `binding cell ${c.taskId}/${c.modelKey}: differs from binding.shared`,
+      );
+
+  // Freezing, recomputed; a record that is not freezable is never applied.
+  const reasons = freezeReasons({
+    kind: b.kind,
+    missing: missingRepetitions.length,
+    insufficient: insufficientGates.length,
+    unbound: (b.cells ?? []).filter((c) => c.comparabilityKey == null).length,
+  });
+  const freeze = g.freeze ?? {};
+  compareFields(
+    problems,
+    'freeze',
+    {
+      ...freeze,
+      missingRepetitions: (freeze.missingRepetitions ?? []).map((x) => [
+        x.taskId,
+        x.modelKey,
+        x.repetition,
+      ]),
+    },
+    {
+      status: reasons.length === 0 ? 'freezable' : 'not-freezable',
+      reasons,
+      insufficientGates,
+      missingRepetitions: missingRepetitions
+        .sort(
+          (x, y) =>
+            byId(x.modelKey, y.modelKey) ||
+            byId(x.taskId, y.taskId) ||
+            x.repetition - y.repetition,
+        )
+        .map((x) => [x.taskId, x.modelKey, x.repetition]),
+    },
+    ['status', 'reasons', 'insufficientGates', 'missingRepetitions'],
+  );
+  if (freeze.status !== 'freezable' || reasons.length > 0)
+    problems.push(
+      `freeze.status ${show(freeze.status)}: a gate record that is not freezable is never applied (POLICY.md section 6.2)`,
+    );
   if (problems.length > 0)
     throw new GatesRefusal(
       'the gate record is not usable by this checkout',
@@ -936,6 +1277,20 @@ function verifyBinding(g, m, role) {
   return [...ignored].sort(byId);
 }
 
+/**
+ * The accounting a result reports, in the task-id form of
+ * `referenceAccounting`, after checking that `decideGate` counted the same
+ * repetitions.
+ */
+function sameCounts(accounting, decided) {
+  for (const f of ['planned', 'dropped', 'maxDropped'])
+    if (accounting[f] !== decided[f])
+      throw new Error(`reference accounting disagrees with decideGate on ${f}`);
+  if (decided.sufficient !== (accounting.status === 'sufficient'))
+    throw new Error('reference accounting disagrees with decideGate');
+  return accounting;
+}
+
 const nearestRank = (sorted, q) =>
   sorted.length === 0
     ? null
@@ -955,7 +1310,7 @@ export function checkGates(
   candidateDir,
   { controlDir = null } = {},
 ) {
-  verifyGateRecord(gateRecord);
+  verifyGateRecord(gateRecord, loadCorpus(CORPUS_ROOT));
   const R = gateRecord.binding.repetitions;
   const cand = readMatrix(candidateDir);
   bindMatrix(cand);
@@ -1010,15 +1365,21 @@ export function checkGates(
         results.push(insufficient('empty task set'));
         continue;
       }
+      // The baseline's accounting (task-id form), as verified.
+      const baselineReference = referenceAccounting(
+        e.tasks,
+        referenceUnits(e).map((u) => u.reference),
+      );
       if (spec.design === 'paired') {
         if (control == null) {
           results.push(insufficient('no interleaved control (--control)'));
           continue;
         }
-        if (e.reference.status !== 'sufficient' || mg.latency == null) {
+        if (baselineReference.status !== 'sufficient' || mg.latency == null) {
           results.push(
             insufficient(
               'the baseline latency values have insufficient clean evidence',
+              baselineReference,
             ),
           );
           continue;
@@ -1081,8 +1442,9 @@ export function checkGates(
           method: d.method,
           observed: d.observed ?? null,
           alpha: d.alpha,
-          reference: d.reference,
-          controlReference,
+          // The control's accounting, in the task-id form; the pairs'
+          // accounting of decideGate counts the same repetitions.
+          reference: sameCounts(controlReference, d.reference),
           cut: { name: spec.cut, value: mg.latency.cuts[spec.cut] },
           // Reported, never deciding (POLICY.md section 5.4).
           ratioCandidateOverControl: { p50: ratio(0.5), p95: ratio(0.95) },
@@ -1100,7 +1462,7 @@ export function checkGates(
         method: d.method,
         observed: d.observed ?? null,
         alpha: d.alpha,
-        reference: d.reference,
+        reference: sameCounts(baselineReference, d.reference),
         ...(d.seed ? { monteCarlo: { seed: d.seed, draws: d.draws } } : {}),
       });
       // POLICY.md section 4: a critical cell from 3/3 to 0/3 is reviewed.
