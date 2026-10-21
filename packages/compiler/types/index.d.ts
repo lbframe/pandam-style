@@ -21,10 +21,48 @@ export interface ProjectConfig {
   readonly auditPolicy?: 'reference' | 'inline';
   /** Opt in to bounded compiler-owned accepted byte snapshots. */
   readonly acceptedSnapshotRetention?: AcceptedSnapshotRetentionOptions;
+  /**
+   * Browser targets (CE-01.1). Absent: the default profile is resolved and
+   * recorded, and its findings are warnings (advisory). Declared: a required
+   * incompatible or unknown capability is an error (enforced).
+   */
+  readonly targets?: TargetConfig | null;
+}
+
+/** Browser target configuration: named profiles, all of which must pass. */
+export interface TargetConfig {
+  readonly profiles: readonly TargetProfileRef[];
+  readonly define?: Readonly<Record<string, TargetProfileDefinition>>;
+}
+
+export type TargetProfileRef =
+  | 'pandamstyle:default@1'
+  | 'pandamstyle:ios-safari@1'
+  | 'pandamstyle:electron@1'
+  | 'pandamstyle:android-webview@1'
+  | `project:${string}`;
+
+export interface TargetProfileDefinition {
+  /**
+   * A Browserslist query. Clock-dependent terms (`last N years`, `since`,
+   * undated `baseline`) and terms reading outside inputs (`browserslist
+   * config`, `extends`, `in my stats`) are refused.
+   */
+  readonly query: string;
+  readonly platform?: 'electron';
+}
+
+/** A design-system author's optional progressive enhancement. */
+export interface TargetEnhancementPolicy {
+  /** A feature key of emitted CSS, e.g. `selector::has` or `value:text-wrap/pretty`. */
+  readonly feature: string;
+  /** CE-01.1 accepts `degrade`; `alternative-value` emission is CE-01.2. */
+  readonly fallback: { readonly kind: 'degrade'; readonly note?: string };
 }
 
 export interface Definition {
   readonly systemId: string;
+  readonly enhancements?: readonly TargetEnhancementPolicy[];
   readonly [key: string]: unknown;
 }
 
@@ -60,6 +98,7 @@ export interface ProjectConfigChanges {
   readonly engineOptions?: Readonly<Record<string, unknown>>;
   readonly useCSSLayers?: boolean;
   readonly auditPolicy?: 'reference' | 'inline';
+  readonly targets?: TargetConfig | null;
 }
 
 export interface ProjectRevisionResult {

@@ -65,6 +65,10 @@ jobs:
       PMS_CHROMIUM: /opt/google/chrome/chrome
     steps:
       - uses: actions/checkout@v6
+        with:
+          # The floor check materializes the frozen CE-00.3 workloads from
+          # Git objects at their pinned commits.
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           # The package and Next qualifications assert this exact host
@@ -76,6 +80,17 @@ jobs:
           corepack enable && corepack prepare yarn@1.22.22 --activate
           echo "YARN_CACHE_FOLDER=$RUNNER_TOOL_CACHE/yarn-cache" >> "$GITHUB_ENV"
       - run: ./verify-pms.sh
+      # CE-01.1: the bundled compat data, the frozen default profile and the
+      # built-in profile resolutions are generated; each must re-derive byte
+      # for byte from its pinned inputs (verify-pms.sh installed and built,
+      # and its compiler step ran the target suites).
+      - run: node tools/targets/build-compat-data.mjs --check
+      - run: node tools/targets/measure-floor.mjs --check
+      - run: node tools/targets/build-builtin-resolutions.mjs --check
+      # Host DX runtime: the Vite and Rsbuild (`@rsbuild/core` 2.2.11, a root
+      # devDependency) plugins forwarding `targets`, the Next semantic-dev
+      # suites and the source-map type check.
+      - run: node tools/pms/verify-dx-runtime.mjs
       # The run's evidence stays on the self-hosted host: keep it on every run,
       # passed or failed. Regenerated build artifacts and the pilot work tree
       # are left out; the pilot reports are kept from artifacts/.

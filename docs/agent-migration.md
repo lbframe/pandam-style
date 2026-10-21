@@ -106,6 +106,31 @@ supported mapping. Do not guess at a replacement or weaken compiler checks.
    styling system.
 6. Record the batch outcome and rollback point before the next batch.
 
+## Browser targets (CE-01.1 behavior change)
+
+Since CE-01.1 the compiler checks every emitted CSS feature against browser
+target profiles; the behavior is specified in
+[compiler API diagnostics](reference/compiler-api.md#diagnostics). Without a
+`targets` configuration, target findings are warnings
+(`context.enforcement: "advisory"`), the revision stays `ok` and
+`build-report.json` records the default profile as `failing`: a build that was
+valid before stays valid, with new warnings. With explicit `targets`, the same
+findings are errors and nothing is published.
+
+Explicit `targets` must stay at or above PandamStyle's minimum floor
+(orchestrator decision O13: Chrome, Edge and Firefox 100, Safari and iOS
+Safari 15.4, Android WebView 100, Electron and Chromium-based browsers at
+Chromium 100). A query reaching older engines is refused with
+`PMS_INVALID_TARGET_CONFIG` (`targets.below-minimum`); raise its floor, never
+work around it.
+
+During migration, record target warnings in the batch outcome as baseline
+facts. Do not add, remove or weaken `targets`, and do not declare
+`enhancements`, to change a migration result: target profiles are an
+application decision and enhancements a design-system decision. When the user
+asks to adopt targets, configure them explicitly and treat each new error as a
+design question.
+
 ## Rollback expectations
 
 Before each batch, preserve the user's existing changes. Use the repository's

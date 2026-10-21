@@ -16,6 +16,14 @@ The tools in this directory support PandamStyle development and qualification.
   baseline epoch: the digest-bound archive store, measurement workloads and
   harness, and the non-regression budget gate; see its
   [README](baselines/README.md).
+- `tools/targets/` contains the CE-01.1 browser-target generators and reports:
+  `build-compat-data.mjs` regenerates the bundled BCD 8.1.6 compat data,
+  `measure-floor.mjs` measures and freezes the default profile floors,
+  `build-builtin-resolutions.mjs` precomputes the built-in profiles' browser
+  lists (all three take `--check` to require byte identity), and `impact.mjs`
+  reports target
+  outcomes for the CE-00.2 corpus, both Wacando sets and the compiler's output
+  (`--profiles <json>` selects enforced targets).
 
 ## Qualification browser
 

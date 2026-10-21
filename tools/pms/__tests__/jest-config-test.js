@@ -201,6 +201,15 @@ describe('the root jest configuration is not a broad ignore', () => {
         'packages/compiler/__tests__/pandamstyle/local-publication-test.js',
         'packages/compiler/__tests__/pandamstyle/transaction-backup-test.js',
         'packages/compiler/__tests__/pandamstyle/source-map-test.js',
+        // CE-01.1 browser targets.
+        'packages/compiler/__tests__/pandamstyle/targets-capability-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-catalog-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-incremental-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-outcome-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-policy-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-project-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-resolution-test.js',
+        'packages/compiler/__tests__/pandamstyle/targets-subfeature-test.js',
       ].sort(),
     );
   });
@@ -274,5 +283,53 @@ describe('the root jest configuration is not a broad ignore', () => {
     expect(
       tests.some((t) => t.includes('pandamstyle/fixtures/valid/generated/')),
     ).toBe(false);
+  });
+});
+
+/**
+ * Host suites run under `node --test`, outside Jest discovery: each must be
+ * listed by `tools/pms/verify-dx-runtime.mjs`, and CI must run that script, or
+ * a host suite (the Vite and Rsbuild `targets` forwarding) is never executed.
+ */
+describe('host node:test suites are run by CI', () => {
+  const repo = path.resolve(__dirname, '../../..');
+  const suites = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(path.join(repo, dir), {
+      withFileTypes: true,
+    })) {
+      const rel = path.join(dir, entry.name);
+      if (entry.isDirectory() && entry.name !== 'node_modules') walk(rel);
+      else if (entry.name.endsWith('.test.mjs')) suites.push(rel);
+    }
+  };
+  for (const pkg of fs.readdirSync(path.join(repo, 'packages'))) {
+    if (fs.existsSync(path.join(repo, 'packages', pkg, 'test'))) {
+      walk(path.join('packages', pkg, 'test'));
+    }
+  }
+
+  test('every host suite is listed by verify-dx-runtime.mjs', () => {
+    const runner = fs.readFileSync(
+      path.join(repo, 'tools/pms/verify-dx-runtime.mjs'),
+      'utf8',
+    );
+    expect(suites.length).toBeGreaterThan(0);
+    expect(suites.filter((suite) => !runner.includes(`'${suite}'`))).toEqual(
+      [],
+    );
+  });
+
+  test('the pandamstyle CI job runs verify-dx-runtime.mjs', () => {
+    const workflow = fs.readFileSync(
+      path.join(repo, '.github/workflows/tests.yml'),
+      'utf8',
+    );
+    const start = workflow.indexOf('\n  pandamstyle:\n');
+    const end = workflow.indexOf('\n  agentic-corpus:\n');
+    expect(start).toBeGreaterThan(-1);
+    expect(workflow.slice(start, end)).toMatch(
+      /\n\s+- run: node tools\/pms\/verify-dx-runtime\.mjs\n/,
+    );
   });
 });

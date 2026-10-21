@@ -14,6 +14,7 @@
  * du fork (defineVars/createTheme), pas de CSS propre.
  */
 
+import { normalizeEnhancements } from '../../targets/policy';
 import { createHash } from 'crypto';
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 import { validateRecipeDefinition } from '../recipes/validate';
@@ -446,6 +447,12 @@ export function buildRegistry(definition) {
     recs[recipeId] = validateRecipeDefinition(recipeId, recipes[recipeId]);
   }
 
+  // CE-01.1: optional progressive enhancements, declared by the
+  // design-system author only, each with a fallback policy.
+  const enhancementPolicy = normalizeEnhancements(definition.enhancements);
+  diagnostics.push(...enhancementPolicy.diagnostics);
+  const enhancements = enhancementPolicy.enhancements;
+
   const payload = {
     systemId,
     tokens: tokensOut,
@@ -459,6 +466,9 @@ export function buildRegistry(definition) {
     // key for the digest.
     conditionOrder,
     recs,
+    // Present only when declared, so a definition without enhancements keeps
+    // the registry digest it always had.
+    ...(enhancements.length === 0 ? {} : { enhancements }),
   };
   const allTokenIds = Object.keys(tokensOut);
   const publicTokenIds = allTokenIds.filter(
@@ -496,6 +506,7 @@ export function buildRegistry(definition) {
     conditions: conds,
     conditionOrder,
     recipes: recs,
+    enhancements,
     vocabularyDomains,
     diagnostics,
     registryDigest: registryDigest(payload),

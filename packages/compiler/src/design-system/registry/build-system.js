@@ -14,7 +14,7 @@
 import { props as coreProps } from '@pandamstyle/core';
 
 import { buildRegistry } from './index';
-import { createCanonicalDesignSystemSnapshot } from './snapshot';
+import { createCanonicalDesignSystemSnapshot, deepFreeze } from './snapshot';
 import {
   compileTokens,
   compileStyles,
@@ -23,12 +23,23 @@ import {
 import { defineRecipe } from '../recipes/compile';
 import { toRuntimeRefs, toThemeRefs } from '../../artifacts/javascript/refs';
 import { token } from '../tokens/ref';
-import { supportedProperties } from '../policy/properties';
+import {
+  propertyKind,
+  structuralDomain,
+  supportedProperties,
+} from '../policy/properties';
+import { designSystemTargetFacts, unitSummary } from '../../targets/evaluate';
+import { tokenGrammars } from '../../targets/catalog';
 import { PmsError } from '../../protocol/diagnostics';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, phase as perfPhase } from '../../observability/metrics';
 
-export function buildDesignSystem(definition, options = {}) {
+/**
+ * `context.targets` is the project's target resolution record (CE-01.1). When
+ * present, the snapshot records it and the target facts of the design
+ * system's own emitted rules.
+ */
+export function buildDesignSystem(definition, options = {}, context = {}) {
   count('design_system_builds');
   const registry = perfPhase('ds_build_registry_ms', () =>
     buildRegistry(definition),
@@ -110,6 +121,20 @@ export function buildDesignSystem(definition, options = {}) {
       }),
     );
 
+  const targets = context.targets ?? null;
+  const targetFacts =
+    targets == null
+      ? null
+      : perfPhase('ds_target_facts_ms', () =>
+          designSystemTargetFacts({
+            resolution: targets,
+            summary: unitSummary(injected, () =>
+              designSystemTargetSources(injected, varsByToken),
+            ),
+            enhancements: registry.enhancements,
+          }),
+        );
+
   const snapshot = perfPhase('ds_snapshot_build_ms', () =>
     createCanonicalDesignSystemSnapshot({
       registry,
@@ -119,6 +144,8 @@ export function buildDesignSystem(definition, options = {}) {
       recipes,
       cssRules: injected,
       supportedProperties: supportedProperties(),
+      targets,
+      targetFacts: targetFacts == null ? null : designSystemFacts(targetFacts),
     }),
   );
   const manifest = perfPhase('ds_manifest_ms', () => snapshot.tooling.manifest);
@@ -137,4 +164,65 @@ export function buildDesignSystem(definition, options = {}) {
     renderCss: () => renderCss(injected),
     injected,
   };
+}
+
+/**
+ * The design system's own rules as target-evaluation sources. Each carries
+ * the value grammar of the token custom properties it may declare (from the
+ * token's category), so a token keyword is read where it is consumed.
+ */
+export function designSystemTargetSources(injected, varsByToken = null) {
+  const grammars = tokenGrammars(varsByToken);
+  const sources = [];
+  for (const key of Object.keys(injected)) {
+    const { ltr, rtl } = injected[key];
+    const owner = {
+      role: 'design-system',
+      file: null,
+      line: null,
+      column: null,
+      label: 'design-system',
+    };
+    if (typeof ltr === 'string') sources.push({ owner, css: ltr, grammars });
+    if (typeof rtl === 'string') sources.push({ owner, css: rtl, grammars });
+  }
+  return sources;
+}
+
+/**
+ * Registry conditions as `{ name, definition }` (the registry stores
+ * `{ name, definition, kind }`), for diagnostics context.
+ */
+export function conditionDefinitions(registry) {
+  return (registry.conditionOrder ?? []).map((name) => ({
+    name,
+    definition: registry.conditions[name]?.definition ?? null,
+  }));
+}
+
+/**
+ * Admitted structural values of a CSS (kebab-case) property, or null. Used for
+ * structured repair candidates of target diagnostics.
+ */
+export function structuralDomainOfCss(cssProperty) {
+  const key = String(cssProperty).replace(/-([a-z])/g, (_, c) =>
+    c.toUpperCase(),
+  );
+  return propertyKind(key) === 'structural-set' ? structuralDomain(key) : null;
+}
+
+const designSystemFactsCache = new WeakMap();
+
+/**
+ * The design-system scope of evaluated facts, deep-frozen once per facts
+ * object: unchanged facts (a token value edit) keep the same frozen record,
+ * which the snapshot does not walk again.
+ */
+function designSystemFacts(facts) {
+  let scoped = designSystemFactsCache.get(facts);
+  if (scoped == null) {
+    scoped = deepFreeze({ ...facts, scope: 'design-system' });
+    designSystemFactsCache.set(facts, scoped);
+  }
+  return scoped;
 }

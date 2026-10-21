@@ -460,7 +460,12 @@ function differential(harness, label, changes = {}) {
   let fullOk = true;
   let fullDiagnostics = [];
   try {
-    harness.full();
+    // A successful rebuild still reports its non-blocking diagnostics (CE-01.1
+    // target warnings and infos); the session reports the same ones.
+    const result = harness.full();
+    fullDiagnostics = (result?.targetDiagnostics ?? [])
+      .map((d) => d.code)
+      .sort();
   } catch (err) {
     fullOk = false;
     fullDiagnostics = (err.diagnostics ?? []).map((d) => d.code).sort();

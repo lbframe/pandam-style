@@ -1,0 +1,26 @@
+{
+  "kind": "pandamstyle-inapplicable-reviews",
+  "schemaVersion": 1,
+  "policy": [
+    "An entry states that an engine has no mode or input in which the feature could act, so ignoring it ('no effect') is the correct platform behavior. The outcome is equivalent-fallback with reason platform-inapplicable, recorded with the data answer it replaces.",
+    "An entry applies only where the data answer is incompatible or unknown. A feature that merely lacks support on a platform where it could act is never listed.",
+    "Keep the list short; anything uncertain keeps its normal state."
+  ],
+  "entries": [
+    {
+      "features": ["value:cursor/*"],
+      "engines": ["safari_ios"],
+      "reason": "Safari on iOS/iPadOS is touch-first: a touch has no cursor, and with an external pointing device iPadOS draws its own adaptive pointer, showing the default pointer for these keywords (BCD notes on css.properties.cursor.*). The keyword cannot change behavior, only the absent cursor shape."
+    },
+    {
+      "features": ["property:forced-color-adjust", "value:forced-color-adjust/*"],
+      "engines": ["safari", "safari_ios"],
+      "reason": "WebKit has no forced-colors mode: @media (forced-colors: active) never matches there (css.at-rules.media.forced-colors is supported since 16 and evaluates to none). forced-color-adjust only opts an element out of forced colors, so with no forced colors it has nothing to adjust."
+    },
+    {
+      "features": ["property:resize", "value:resize/*"],
+      "engines": ["safari_ios", "firefox_android"],
+      "reason": "Mobile Safari and Firefox for Android expose no resize handle: users cannot resize elements, so the property has no input to act on (BCD: recognized without effect on Safari iOS; removed in Firefox for Android 79). The element keeps its authored size, which is the platform's behavior for every element."
+    }
+  ]
+}

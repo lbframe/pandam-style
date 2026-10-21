@@ -128,6 +128,8 @@ export function createCanonicalDesignSystemSnapshot({
   recipes,
   cssRules,
   supportedProperties,
+  targets = null,
+  targetFacts = null,
 }) {
   const tokens = tokenRowsOf(registry);
   const publicTokens = tokens.filter((token) => token.visibility === 'public');
@@ -250,44 +252,98 @@ export function createCanonicalDesignSystemSnapshot({
     patterns: { ids: [...PATTERN_IDS], byPattern: PATTERN_CATALOG },
   };
 
-  return deepFreeze({
-    documentKind: 'pandamstyle-canonical-design-system',
-    identity,
-    capabilities,
-    registry,
-    vocabulary: {
-      tokens,
-      publicTokenPaths: publicTokens.map((token) => token.tokenId),
-      tokenCategories,
-      tokenPathsByCategory,
-      semanticTokens,
-      conditions,
-      conditionNames,
-      themes: themeIds,
-      themeDetails,
-      publicRecipeIds,
-      recipes: recipesCatalog,
-      patterns: PATTERN_CATALOG,
-    },
-    compiled: {
-      varsByToken: { ...varsByToken },
-      themeClasses: { ...themeClasses },
-      themes: { ...themes },
-      recipes: { ...recipes },
-      cssRules: cloneRules(cssRules),
-    },
-    tooling: {
-      manifest,
-      candidateDomains,
-      repairDomains: {
-        tokensByCategory: tokenPathsByCategory,
-        recipeAxes: candidateDomains.recipes.byRecipe,
-        themes: candidateDomains.themes,
-        conditions: candidateDomains.conditions,
-        patterns: candidateDomains.patterns,
+  // The target members arrive deep-frozen from their producers (resolution
+  // and evaluation); the snapshot freeze does not walk them again.
+  const frozenMembers = new WeakSet();
+  for (const member of [targets, targetFacts]) {
+    if (member != null && Object.isFrozen(member)) frozenMembers.add(member);
+  }
+  return deepFreeze(
+    {
+      documentKind: 'pandamstyle-canonical-design-system',
+      identity,
+      capabilities,
+      // CE-01.1, additive: the target resolution record of the project and the
+      // target facts of the design system's own emitted CSS. Each carries its own
+      // schemaVersion. Null when the snapshot is built without targets.
+      targets,
+      targetFacts,
+      registry,
+      vocabulary: {
+        tokens,
+        publicTokenPaths: publicTokens.map((token) => token.tokenId),
+        tokenCategories,
+        tokenPathsByCategory,
+        semanticTokens,
+        conditions,
+        conditionNames,
+        themes: themeIds,
+        themeDetails,
+        publicRecipeIds,
+        recipes: recipesCatalog,
+        patterns: PATTERN_CATALOG,
+      },
+      compiled: {
+        varsByToken: { ...varsByToken },
+        themeClasses: { ...themeClasses },
+        themes: { ...themes },
+        recipes: { ...recipes },
+        cssRules: cloneRules(cssRules),
+      },
+      tooling: {
+        manifest,
+        candidateDomains,
+        repairDomains: {
+          tokensByCategory: tokenPathsByCategory,
+          recipeAxes: candidateDomains.recipes.byRecipe,
+          themes: candidateDomains.themes,
+          conditions: candidateDomains.conditions,
+          patterns: candidateDomains.patterns,
+        },
       },
     },
-  });
+    frozenMembers,
+  );
+}
+
+/**
+ * The `manifest.json` document: the vocabulary manifest plus, additively, the
+ * target summary and the design system's target requirements (D-BP-13).
+ *
+ * The generated design module keeps embedding `tooling.manifest` itself, so
+ * the module bytes do not depend on targets.
+ */
+export function manifestDocumentOf(snapshot) {
+  const base = snapshot.tooling.manifest;
+  if (snapshot.targets == null) return base;
+  const record = snapshot.targets;
+  return {
+    ...base,
+    targets: {
+      schemaVersion: 1,
+      digest: record.digest,
+      enforcement:
+        record.provenance.origin === 'default' ? 'advisory' : 'enforced',
+      origin: record.provenance.origin,
+      profiles: record.profiles.map((profile) => ({
+        ref: profile.ref,
+        query: profile.query,
+        platform: profile.platform,
+        engines: profile.engines.map((target) => ({
+          engine: target.engine,
+          floor: target.floor,
+        })),
+        excluded: profile.excluded.length,
+      })),
+    },
+    targetRequirements: {
+      schemaVersion: 1,
+      digest: snapshot.targetFacts?.digest ?? null,
+      features: (snapshot.targetFacts?.features ?? [])
+        .filter((feature) => feature.required)
+        .map((feature) => feature.feature),
+    },
+  };
 }
 
 /** Read an agent candidate domain without consulting generated catalog data. */

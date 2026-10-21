@@ -83,3 +83,61 @@ test('real Rsbuild/Rspack composes authored JavaScript and extracted CSS source 
     await fs.readFile(path.join(root, 'generated/styles.css'), 'utf8'),
   );
 });
+
+test('the plugin forwards `targets` to the Project Service (CE-01.1)', async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'pms-ce011-rsbuild-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  await fs.symlink(
+    fileURLToPath(new URL('../../../node_modules', import.meta.url)),
+    path.join(root, 'node_modules'),
+    'dir',
+  );
+  await fs.mkdir(path.join(root, 'src'));
+  await fs.writeFile(path.join(root, 'package.json'), '{"type":"module"}');
+  await fs.writeFile(
+    path.join(root, 'src/index.js'),
+    "import { create, props } from '../generated/design.js';\nconst styles = create({ box: { display: 'flex' } });\ndocument.body.setAttribute('class', props(styles.box).className);\n",
+  );
+  const instance = await createRsbuild({
+    cwd: root,
+    rsbuildConfig: {
+      mode: 'production',
+      source: { entry: { index: './src/index.js' } },
+      output: { minify: false },
+      plugins: [
+        pandamstyle({
+          definition: {
+            systemId: 'rsbuild-targets@1',
+            tokens: {},
+            themes: {},
+            recipes: {},
+            conditions: {},
+          },
+          roots: ['src'],
+          outDir: 'generated',
+          designSystemFile: 'design.js',
+          targets: { profiles: ['pandamstyle:electron@1'] },
+        }),
+      ],
+    },
+  });
+  const result = await instance.build();
+  try {
+    assert.equal(result.stats.hasErrors(), false);
+  } finally {
+    await result.close();
+  }
+  const manifest = JSON.parse(
+    await fs.readFile(path.join(root, 'generated/manifest.json'), 'utf8'),
+  );
+  assert.equal(manifest.targets.origin, 'project-config');
+  assert.deepEqual(manifest.targets.profiles, [
+    {
+      ref: 'pandamstyle:electron@1',
+      query: 'electron 44.7',
+      platform: 'electron',
+      engines: [{ engine: 'electron', floor: '152' }],
+      excluded: 0,
+    },
+  ]);
+});

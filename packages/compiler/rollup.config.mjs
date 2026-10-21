@@ -15,6 +15,8 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { babel } from '@rollup/plugin-babel';
+import crypto from 'crypto';
+import fs from 'fs';
 import path from 'path';
 
 const __dirname = new URL('.', import.meta.url).pathname;
@@ -34,6 +36,11 @@ const external = [
   '@pandamstyle/core',
   '@csstools/css-tokenizer',
   'postcss-value-parser',
+  // CE-01.1: exact-pinned target data, loaded from the installed packages.
+  'baseline-browser-mapping',
+  'browserslist',
+  'caniuse-lite',
+  'electron-to-chromium',
   'node:crypto',
   'node:fs',
   'node:module',
@@ -56,8 +63,59 @@ const inspectionExternal = external.filter(
 // The owned engine retains Flow annotations; no donor tree enters this build.
 const includeGlobs = ['src/**/*'];
 
-function plugins() {
+// CE-01.1 target data. The generated compat data is ~0.6 MB of JSON; every
+// public entry reads ONE shared copy emitted next to the bundles instead of
+// inlining it into each of them. The private CommonJS test bundle has no
+// `import.meta.url`, so it inlines the text. Either way the bytes are the
+// committed file, which is what the data digest is computed over.
+const COMPAT_DATA_ID = 'pandamstyle:compat-data';
+const COMPAT_DATA_FILE = 'compat-data.v1.json';
+const COMPAT_DATA_SOURCE = path.resolve(
+  __dirname,
+  'src/targets/data/compat-data.v1.json',
+);
+
+function compatData({ inline }) {
+  return {
+    name: 'pandamstyle-compat-data',
+    resolveId(id) {
+      return id === COMPAT_DATA_ID ? `\0${COMPAT_DATA_ID}` : null;
+    },
+    load(id) {
+      if (id !== `\0${COMPAT_DATA_ID}`) return null;
+      const bytes = fs.readFileSync(COMPAT_DATA_SOURCE);
+      const text = bytes.toString('utf8');
+      if (inline) {
+        return [
+          `export default function compatDataText() { return ${JSON.stringify(text)}; }`,
+          // The test bundle hashes its inlined text at run time.
+          'export const compatDataDigest = null;',
+        ].join('\n');
+      }
+      this.emitFile({
+        type: 'asset',
+        fileName: COMPAT_DATA_FILE,
+        source: bytes,
+      });
+      // The digest of exactly the bytes emitted next to the bundle, so the
+      // first evaluation does not hash 0.6 MB; a test checks it against the
+      // shipped file.
+      const digest =
+        'sha256:' + crypto.createHash('sha256').update(bytes).digest('hex');
+      return [
+        "import { readFileSync } from 'node:fs';",
+        'export default function compatDataText() {',
+        `  return readFileSync(new URL('./${COMPAT_DATA_FILE}', import.meta.url));`,
+        '}',
+        `export const compatDataDigest = ${JSON.stringify(digest)};`,
+      ].join('\n');
+    },
+  };
+}
+
+function plugins({ inlineCompatData = false } = {}) {
   return [
+    compatData({ inline: inlineCompatData }),
     babel({
       babelHelpers: 'bundled',
       extensions,
@@ -78,7 +136,7 @@ function plugins() {
       rootDir,
     }),
     commonjs(),
-    json(),
+    json({ exclude: [COMPAT_DATA_SOURCE] }),
   ];
 }
 
@@ -118,6 +176,6 @@ export default [
         exports: 'named',
       },
     ],
-    plugins: plugins(),
+    plugins: plugins({ inlineCompatData: true }),
   },
 ];
