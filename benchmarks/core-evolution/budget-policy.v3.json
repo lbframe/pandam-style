@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-ce003-budget-policy",
+  "policyVersion": 3,
+  "supersedes": {
+    "path": "benchmarks/core-evolution/budgets.v2.json",
+    "sha256": "b040b6a5807609358503cc916c845704eece2dd4eb07ea82eb79852b075f7c80"
+  },
+  "justification": "Version 3 changes one rule of version 2 (budget-policy.v2.json, SHA-256 f9eab3d12f0f110e888c5f40bfc752674d2ff2245e046de92574123ca8d1fd12): the two synthetic-c10000-t1000-r100-s307 peak-RSS budgets (full.maxRssBytes and session.maxRssBytes) are judged on the minimum over all samples instead of the median, with an absolute limit of the baseline minimum times the memory-rule factor. Cause, a calibration defect of version 2: peak RSS of these cells is bimodal on the measurement host too. Diagnosed on the CE-01.1 candidate (35a6629) and alpha1 in an admissible run: when a V8 mark-compact lands around 19 s, mid full compile, with about 520 MB live, the next heap limit is about 4x that and the session peaks at 2.1-2.2 GB; otherwise it stays near 1.2-1.4 GB. alpha1 itself reaches the high mode in about 25% of rounds (4 of 22 pooled), so it would fail its own version 2 limit about 10% of the time. Every version 2 baseline sample happened to be in the low mode, so version 2 measured a CV of 0.5% and derived an absolute median limit. Garbage-collector headroom is one-sided additive noise on peak RSS, so the minimum estimates the working-set floor and absorbs high-mode rounds, which stay in the evidence. Real growth of the floor is still caught: in the same diagnosis the candidate low-mode growth was +9.2% (ratio 1.092, interval 1.074 to 1.116), from about 25 MB of additional live data amplified about 4x by V8, and with --max-old-space-size=1536 both epochs stay below 1 GB. The limit factor follows the unchanged memory rule (floor 1.10, 1 + 3 CV) applied to the CV of the minima of each baseline run and epoch. The statistic is an explicit per-budget field (thresholdRule.statistic): median by default; min allowed only for absolute peak-RSS memory budgets, refused anywhere else, and unknown statistics are refused. Every other rule is unchanged: the 1.25 timing floor, runtime and memory floors, the memory rule, deterministic growth, identity, metrics, workloads, noise ceiling, minimum pairs and rounding. As the change policy requires, every budget is re-derived from a new comparable baseline of the unchanged alpha1 artifact, measured on the same measurement host as version 2 (alpha1-v3-sk-c1 and alpha1-v3-sk-c4, the first two admissible attempts of the pre-registered series C); the version 2 evidence is not reused. Every budget whose derived limit loosens relative to version 2 is listed in relaxations, generated from the derivation. The absolute limits remain bound to the measurement host. Recovery of the CE-01.1 cost remains owned by CE-12.3 (#76).",
+  "relaxations": [
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 314276864 (factor 1.1)",
+      "to": "absolute maxMedian 317541171 (factor 1.1)",
+      "justification": "maxMedian 314276864 -> 317541171 (+1.04%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 288673792 (version 2: 285706240), CV 0.0176, factor 1.1 (version 2: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 136589516 (factor 1.1)",
+      "to": "absolute maxMedian 136839577 (factor 1.1)",
+      "justification": "maxMedian 136589516 -> 136839577 (+0.18%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 124399616 (version 2: 124172288), CV 0.0226, factor 1.1 (version 2: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 167509196 (factor 1.1)",
+      "to": "absolute maxMedian 167594803 (factor 1.1)",
+      "justification": "maxMedian 167509196 -> 167594803 (+0.05%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 152358912 (version 2: 152281088), CV 0.0197, factor 1.1 (version 2: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 332285747 (factor 1.1)",
+      "to": "absolute maxMedian 332729548 (factor 1.1)",
+      "justification": "maxMedian 332285747 -> 332729548 (+0.13%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 302481408 (version 2: 302077952), CV 0.0092, factor 1.1 (version 2: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 1160160460 (factor 1.1)",
+      "to": "absolute maxMin 1142872473 (statistic min, factor 1.1)",
+      "justification": "the statistic changes from median to min (thresholdRule.statistic): bimodal peak RSS from V8 garbage-collection timing, see the justification; the new limit is the baseline minimum 1038974976 x factor 1.1 (CV of the per-run, per-epoch minima 0.0066; version 2: absolute maxMedian 1160160460 (factor 1.1), median 1054691328)."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 1405762969 (factor 1.1)",
+      "to": "absolute maxMin 1347615948 (statistic min, factor 1.1)",
+      "justification": "the statistic changes from median to min (thresholdRule.statistic): bimodal peak RSS from V8 garbage-collection timing, see the justification; the new limit is the baseline minimum 1225105408 x factor 1.1 (CV of the per-run, per-epoch minima 0.0219; version 2: absolute maxMedian 1405762969 (factor 1.1), median 1277966336)."
+    }
+  ],
+  "baseline": {
+    "reference": "alpha1",
+    "nullEpoch": "alpha1-replay",
+    "manifest": "benchmarks/core-evolution/epochs/alpha1/manifest.v1.json"
+  },
+  "thresholdRule": {
+    "pairedRatio": {
+      "applies": "timing and runtime metrics, and memory cells whose baseline CV exceeds memory.maxCv",
+      "floor": {
+        "timing": 1.25,
+        "runtime": 1.15,
+        "memory": 1.1
+      },
+      "roundUpTo": 0.05,
+      "minPairs": 5,
+      "noiseCeiling": {
+        "multiplier": 2,
+        "floor": 0.1,
+        "roundUpTo": 0.05
+      }
+    },
+    "memory": {
+      "maxCv": 0.05,
+      "cvMultiplier": 3,
+      "floor": 1.1,
+      "roundUpTo": 0.05
+    },
+    "statistic": {
+      "default": "median",
+      "overrides": [
+        {
+          "workload": "synthetic-c10000-t1000-r100-s307",
+          "metric": "full.maxRssBytes",
+          "statistic": "min"
+        },
+        {
+          "workload": "synthetic-c10000-t1000-r100-s307",
+          "metric": "session.maxRssBytes",
+          "statistic": "min"
+        }
+      ]
+    },
+    "deterministic": {
+      "growth": {
+        "default": 0.05,
+        "variants.recipeSelections": 0,
+        "compiledModules.bytes": 0.1,
+        "designModule.bytes": 0.1,
+        "declarations.bytes": 0.1
+      }
+    },
+    "identity": {
+      "consistency.incrementalEqualsCanonical": "true"
+    }
+  },
+  "rationale": [
+    "The host is shared with work outside both epics and is never quiet, so absolute times are not comparable across runs. Every measurement and gate run therefore includes the unchanged alpha1 control, interleaved with the candidate in alternating order within each round, and timing budgets apply to the paired ratio candidate/alpha1 of the two adjacent samples of each round. Load that affects both samples of a pair cancels; absolute times and per-sample load records are kept as informational evidence only.",
+    "Paired ratio statistic: the median of per-round ratios, with a seeded (307) 2,000-round percentile-bootstrap 95% interval resampling whole pairs. A budget passes when the interval's upper bound is at most the limit, fails when the median ratio exceeds the limit, and is otherwise inconclusive (the run cannot resolve the question).",
+    "Ratio limit = the larger of a floor and the largest upper bound observed for the null comparison (alpha1-replay, an offline reinstall of the identical artifact, against alpha1) in each baseline batch and in both batches pooled, rounded up to 0.05. The unchanged artifact therefore passes in the baseline conditions, and no limit is tighter than the precision the shared host actually delivered. Floors: 25% for compile, import and host-build time and CPU, 15% for sub-microsecond runtime selection, where JIT and allocation effects dominate, and 10% for memory measured as a ratio. The timing floor was 10% in version 1 (a deliberate slow-down of one tenth was a reviewable regression); version 2 raises it to 25% to admit the measured cost of always-on browser-target feature checking (CE-01.1, #44). It is cumulative against alpha1 for the whole epic, so it bounds the total timing regression of all lots together; CE-12.3 (#76) owns recovery.",
+    "Noise ceiling: the gate refuses (inconclusive) a budget when the alpha1 control's own interquartile range over median in a gate run exceeds max(0.10, 2 x the largest value seen in any baseline batch), rounded up to 0.05; a run noisier than twice the noisiest baseline cannot pass. It also refuses a run without interleaved, adjacent alpha1 pairs for every candidate sample, or with fewer than 5 pairs.",
+    "Memory: pilot runs under the same shared load showed peak-RSS coefficients of variation of 0.2% to 4.4% per cell (time: 3% to 58%), so peak RSS is not load-sensitive here. A memory cell whose pooled baseline CV is at most 5% gets an absolute limit on the candidate median: baseline median x max(1.10, 1 + 3 CV), rounded up to 0.05; a cell above 5% falls back to a paired ratio. A budget whose policy statistic is min (only the two synthetic-c10000 peak-RSS budgets, from version 3) is absolute on the minimum over all samples: limit = baseline minimum x max(1.10, 1 + 3 CV of the per-run, per-epoch minima), rounded up to 0.05; the gate compares the candidate minimum with it.",
+    "Deterministic outputs (bytes, rule and declaration counts, selection domain) have no measurement noise, so their limits are absolute: at most 5% growth for CSS bytes, rule and declaration counts and host bundle bytes on the same Alpha 1 workload; 10% for generated JavaScript/TypeScript modules, whose metadata grows with catalog breadth; and no growth in the finite recipe selection domain, which the unchanged definitions fix.",
+    "Incremental output must keep equalling a fresh canonical compile of the same state for every edit."
+  ],
+  "budgetedMetrics": [
+    "full.totalMs",
+    "full.toDiagnosticsMs",
+    "full.cpuMs",
+    "compiler.importMs",
+    "incremental.*",
+    "full.maxRssBytes",
+    "session.maxRssBytes",
+    "css.bytes",
+    "css.gzipBytes",
+    "css.styleRules",
+    "css.atRules",
+    "css.declarations",
+    "designModule.bytes",
+    "declarations.bytes",
+    "compiledModules.bytes",
+    "report.ruleCount",
+    "variants.recipeSelections",
+    "consistency.incrementalEqualsCanonical",
+    "runtime.propsNsPerCall",
+    "runtime.recipeSelectNsPerCall",
+    "runtime.renderNsPerCall",
+    "runtime.moduleLoadMs",
+    "vite.buildMs",
+    "vite.maxRssBytes",
+    "vite.cssBytes",
+    "vite.jsBytes"
+  ],
+  "comparison": "Run tools/baselines/measure.mjs with the final plan and both --epoch alpha1=<alpha1 closure> and --epoch <candidate>=<candidate closure> on one machine (--require-quiet is optional). budgets.mjs gate pairs each candidate sample with the adjacent alpha1 sample of the same round, applies the paired-ratio, absolute-memory, deterministic and identity budgets, requires alpha1 to reproduce its frozen deterministic outputs, and lists unknown metrics. Verdicts: pass only when every budget passes; fail on any failing budget, workload-record mismatch, altered alpha1 tarball or policy-chain problem; inconclusive when the run lacks the interleaved control, has too few pairs, exceeds a noise ceiling or cannot resolve a limit; incomplete when a budgeted metric was not run.",
+  "unknown": [
+    {
+      "id": "host.next.build-and-dev",
+      "scope": "Next.js 16.3.8 webpack and Turbopack build/dev time, memory and output bytes",
+      "reason": "Hosts are pinned and installable in the alpha1 closure, but CE-00.3 measured no Next workload; no baseline exists.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)"
+    },
+    {
+      "id": "host.rsbuild.build-and-dev",
+      "scope": "Rsbuild 2.2.11 / Rspack 2.2.8 build/dev time, memory and output bytes",
+      "reason": "Pinned and installable, not measured in CE-00.3.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)"
+    },
+    {
+      "id": "host.vite.dev-and-hmr",
+      "scope": "Vite dev server start, HMR and browser-visible update latency",
+      "reason": "Only the Vite production build of the pilot is measured; no dev-server or browser-visible latency harness ran.",
+      "owner": "CE-12.3 (#76), CE-13.1 (#78)"
+    },
+    {
+      "id": "compiler.watcher-latency",
+      "scope": "Filesystem edit to diagnostics through ProjectSession.watch()",
+      "reason": "Incremental cost is measured from an explicit verified-explicit transaction; watcher debounce and filesystem notification latency are excluded.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "browser.style-cost",
+      "scope": "Browser CSS parse, style recalculation, layout and paint cost of emitted CSS",
+      "reason": "No browser performance trace was taken; runtime selection is measured in Node only.",
+      "owner": "CE-12.3 (#76), CE-14 (#82-#84)"
+    },
+    {
+      "id": "runtime.non-v8",
+      "scope": "Runtime selection cost in browsers and engines other than Node 22.22.0 V8",
+      "reason": "Measured in Node only.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "output.new-resource-kinds",
+      "scope": "CSS/module bytes of capabilities absent in Alpha 1 (keyframes, fonts, assets, globals, typed resources, new conditions)",
+      "reason": "Alpha 1 cannot express them, so no comparable baseline exists; each must be baselined by its owning lot under a new policy version before its budget can exist.",
+      "owner": "Owning capability lots (CE-03 to CE-11), CE-12.2 (#75)"
+    },
+    {
+      "id": "compiler.invalidation-counters",
+      "scope": "Rebuild, fallback and dependency-invalidation counts per incremental edit",
+      "reason": "Not exposed by the public compiler API; reading the internal perf collector would instrument the measured package.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "runtime.c10000",
+      "scope": "Runtime selection cost and compile-to-canonical consistency at 10,000 components",
+      "reason": "The c10000 workload is measured for compile, incremental, memory and output only; runtime replay ran at c1000 and below.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "cold-install",
+      "scope": "Package install time, cold disk cache and first-run cost",
+      "reason": "Samples run with a warm operating-system file cache and a preinstalled closure.",
+      "owner": "CE-15.1 (#77)"
+    }
+  ],
+  "changePolicy": [
+    "budgets.v3.json is generated by `node tools/baselines/budgets.mjs freeze` from this policy and the committed baseline results, and is never edited by hand; rerunning the same freeze command with this policy and the referenced results must reproduce it byte for byte.",
+    "Committed policy, budgets, workloads, derivation and baseline result files are immutable; `budgets.mjs gate` compares the budgets file with the version of the commit that added it and fails on any difference.",
+    "Changing a threshold, metric set or workload requires a new budget-policy.vN.json and budgets.vN.json (N incremented), a justification, a predecessor reference by path and SHA-256, and a new comparable baseline run of the unchanged alpha1 artifact; reusing an old result file is rejected.",
+    "Every budget loosened or removed relative to the predecessor must be listed in `relaxations` with its own justification; an unknown metric may only leave the unknown list by gaining a budget.",
+    "No release may pass against a weakened budget retroactively: the gate evaluates the budgets version current at the evaluated commit, fails on any policy-chain problem, and never reports inconclusive or incomplete as pass."
+  ],
+  "amendment": {
+    "note": "Version 1 was first committed in 52cf7b0 with absolute timing ratios that required a quiet host. Before any final baseline data existed it was replaced by this text: the shared host never becomes quiet (load 7.0/9.0/6.4 on 16 cores at 00:22 on 2026-10-19, mostly from other projects' work that cannot be paused), so timing budgets became paired ratios against the interleaved alpha1 control and the quiet rule became optional.",
+    "finalDataExistedWhenAmended": false
+  }
+}
