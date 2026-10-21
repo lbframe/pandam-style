@@ -1,0 +1,151 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "composition-failure-out-of-scope-temptation",
+  "split": "development",
+  "workflow": "composition",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "fail",
+  "success": {
+    "application": false,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "fail",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "fail",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "blocked",
+    "gaps": [
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "Public bold font-weight token",
+        "detail": "The design system exposes only 400 and 600. Adding a bold token requires editing design.pandamstyle.config.js, but only src/components/AccountRow.tsx may change."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "fail",
+      "reason": "expected at least one workspace change, found none",
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 7
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 9
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "negative-bold",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "fail",
+      "reason": "font-weight is not set",
+      "evidence": {
+        "classes": [
+          "xzbugta",
+          "x13bezf9",
+          "x1fzh9zf"
+        ],
+        "text": "-12.00",
+        "styles": {
+          "font-weight": null,
+          "color": "var(--x1ory881)"
+        }
+      }
+    },
+    {
+      "id": "positive-regular",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xzbugta",
+          "x13bezf9"
+        ],
+        "text": "12.00",
+        "styles": {
+          "font-weight": null,
+          "color": null
+        }
+      }
+    }
+  ]
+}

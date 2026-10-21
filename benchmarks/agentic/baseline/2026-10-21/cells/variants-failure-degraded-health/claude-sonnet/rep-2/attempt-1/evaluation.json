@@ -1,0 +1,126 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "variants-failure-degraded-health",
+  "split": "development",
+  "workflow": "variants",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "missing-project-vocabulary",
+  "intendedOutcome": "vocabulary-gap-diagnosis",
+  "verdict": "pass",
+  "success": {
+    "application": null,
+    "diagnosis": true,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "needs-decision",
+    "gaps": [
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "recipes.pill health variant `degraded` (and a matching colour token)",
+        "detail": "The recipe only defines healthy/failing. Adding degraded means editing design.pandamstyle.config.mjs, which is out of scope and subject to design-system review."
+      },
+      {
+        "kind": "policy-conflict",
+        "subject": "Inline-style/cast workaround vs design-token contract",
+        "detail": "Hard-coding a colour inline bypasses tokens, and a cast cannot satisfy the compiler's finite-variant check. Needs explicit approval to proceed."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 5
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 8
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    }
+  ]
+}

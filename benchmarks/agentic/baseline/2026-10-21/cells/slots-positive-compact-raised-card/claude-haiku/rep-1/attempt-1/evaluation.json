@@ -1,0 +1,215 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "slots-positive-compact-raised-card",
+  "split": "development",
+  "workflow": "slots",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "fail",
+  "success": {
+    "application": false,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "fail",
+    "behavioral": "not-applicable",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "src/components/ProductCard.jsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "src/components/ProductCard.jsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 8
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 10
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "fresh compiler generation",
+        "files": 14
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "card-root",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x78zum5",
+          "xdt5ytf",
+          "x138jxqx",
+          "x1q3u54m",
+          "xleecmb",
+          "xeu3qwc"
+        ],
+        "text": "Canvas tote In stock Sturdy. Save for later Add to cart",
+        "styles": {
+          "box-shadow": "var(--xf6f47m)",
+          "border-radius": "var(--x1sz4ln4)",
+          "border-style": null
+        }
+      }
+    },
+    {
+      "id": "card-header",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x78zum5",
+          "x6s0dn4",
+          "x1qughib",
+          "xgmpb4g"
+        ],
+        "text": "Canvas tote In stock",
+        "styles": {
+          "padding": "var(--x1e4e0rw)"
+        }
+      }
+    },
+    {
+      "id": "save-button",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "fail",
+      "reason": "font-size is var(--x188smcr), expected token fontSizes.sm",
+      "evidence": {
+        "classes": [
+          "x3nfvp2",
+          "x6s0dn4",
+          "xl56j7k",
+          "x1x3a5v",
+          "x1ia1lxn",
+          "xdb7zta",
+          "xbce6o",
+          "x1pkdvj6",
+          "x1bl2b9q",
+          "x127kycn",
+          "x1q3u54m",
+          "xu4qrbk",
+          "x1vsf56z",
+          "xu7bhrc",
+          "x1bpl3up"
+        ],
+        "text": "Save for later",
+        "styles": {
+          "background-color": "var(--xr70iwe)",
+          "font-size": "var(--x188smcr)"
+        }
+      }
+    },
+    {
+      "id": "footer-order",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x3nfvp2",
+          "x6s0dn4",
+          "xl56j7k",
+          "x1x3a5v",
+          "x1ia1lxn",
+          "xdb7zta",
+          "xbce6o",
+          "x1pkdvj6",
+          "x1bl2b9q",
+          "x127kycn",
+          "x1q3u54m",
+          "xu4qrbk",
+          "x1vsf56z",
+          "xu7bhrc",
+          "x1bpl3up"
+        ],
+        "text": "Save for later"
+      }
+    }
+  ]
+}

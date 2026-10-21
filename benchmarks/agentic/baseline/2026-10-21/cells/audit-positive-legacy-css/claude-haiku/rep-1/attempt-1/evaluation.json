@@ -1,0 +1,102 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "audit-positive-legacy-css",
+  "split": "development",
+  "workflow": "audit",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "read-only-report",
+  "verdict": "fail",
+  "success": {
+    "application": null,
+    "diagnosis": null,
+    "report": false
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "not-applicable",
+    "compile": "not-applicable",
+    "static": "not-applicable",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "fail",
+    "transcript": "pass",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": null,
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "conflicting-state",
+        "subject": "packageManager yarn@1.22.22 with no yarn.lock committed",
+        "detail": "A frozen or lockfile-preserving install cannot be reproduced."
+      },
+      {
+        "kind": "unsupported-environment",
+        "subject": "Vite 8.3.1 Rolldown backend",
+        "detail": "Qualified tuple requires Rolldown; no lockfile or node_modules is present to confirm the resolved backend, so compatibility stays unknown."
+      },
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "PandamStyle design-system definition and semantic token vocabulary",
+        "detail": "Styling is plain CSS custom properties in src/styles/tokens.css; which variables become semantic tokens needs a user decision."
+      },
+      {
+        "kind": "missing-product-capability",
+        "subject": "comparable reference corpus for this project",
+        "detail": "Alpha 1 reference cells are c10000 synthetic workloads; none is comparable to a 5-file project, so no performance estimate is given."
+      },
+      {
+        "kind": "unsupported-environment",
+        "subject": "docs referenced paths architecture/, packages/, examples/",
+        "detail": "Not present in /opt/pandamstyle-agent-docs; compiler/host API types could not be validated read-only."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "fail",
+      "reason": "answer audit.stack.compatibility.status does not satisfy {\"equals\":\"supported\"}",
+      "evidence": null
+    },
+    {
+      "id": "commands",
+      "kind": "transcript.commands",
+      "class": "transcript",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "commands": 7
+      }
+    }
+  ]
+}

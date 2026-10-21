@@ -1,0 +1,90 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "composition-boundary-ambiguous-settings",
+  "split": "development",
+  "workflow": "composition",
+  "caseType": "boundary",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "clarification",
+  "verdict": "fail",
+  "success": {
+    "application": null,
+    "diagnosis": false,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "fail",
+    "integrity": "pass",
+    "compile": "not-applicable",
+    "static": "not-applicable",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "fail",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "app/settings/page.jsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "blocked",
+    "gaps": [
+      {
+        "kind": "unsupported-environment",
+        "subject": ".pandamstyle/design.pandamstyle.js generated module is missing",
+        "detail": "PMS_COVERAGE_GAP for every file importing the generated module; no documented way found in the repo to generate it; generated output must not be hand-edited."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "fail",
+      "reason": "expected no workspace change, found 1",
+      "evidence": {
+        "added": [],
+        "modified": [
+          "app/settings/page.jsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "fail",
+      "reason": "outcome blocked not in needs-decision; missing gap ambiguous-request matching /./i",
+      "evidence": null
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    }
+  ]
+}

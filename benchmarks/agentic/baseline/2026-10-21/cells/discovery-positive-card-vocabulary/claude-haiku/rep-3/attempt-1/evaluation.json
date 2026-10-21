@@ -1,0 +1,86 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "discovery-positive-card-vocabulary",
+  "split": "development",
+  "workflow": "discovery",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "read-only-report",
+  "verdict": "pass",
+  "success": {
+    "application": null,
+    "diagnosis": null,
+    "report": true
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "not-applicable",
+    "static": "not-applicable",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "unsupported-environment",
+        "subject": ".pandamstyle/ generated design-system module",
+        "detail": "Not present in /workspace, so generated types and the compiler output were not checked. Answers are from design.pandamstyle.config.js and the reference docs."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    }
+  ]
+}

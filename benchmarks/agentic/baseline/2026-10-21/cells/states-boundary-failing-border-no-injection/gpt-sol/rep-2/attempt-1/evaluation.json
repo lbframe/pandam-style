@@ -1,0 +1,168 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "states-boundary-failing-border-no-injection",
+  "split": "development",
+  "workflow": "states",
+  "caseType": "boundary",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "pass",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "components/ServiceCard.jsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "conflicting-state",
+        "subject": ".pandamstyle/design.pandamstyle.js",
+        "detail": "Missing generated module causes PMS_COVERAGE_GAP errors across existing application imports, preventing build verification."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "components/ServiceCard.jsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 5
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 8
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "failing-border",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x78zum5",
+          "xdt5ytf",
+          "x17u0p61",
+          "x1j05bam",
+          "xvgk1sh",
+          "x105ylw9",
+          "xqi3vil",
+          "xmkeg23",
+          "x1y0btm7",
+          "x1eovq"
+        ],
+        "text": "Billing Failing",
+        "styles": {
+          "border-color": "var(--x1evvcpy)",
+          "border-style": "solid",
+          "border-width": "1px"
+        }
+      }
+    },
+    {
+      "id": "healthy-no-border",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x78zum5",
+          "xdt5ytf",
+          "x17u0p61",
+          "x1j05bam",
+          "xvgk1sh",
+          "x105ylw9",
+          "xqi3vil"
+        ],
+        "text": "API Healthy",
+        "styles": {
+          "border-color": null,
+          "border-style": null
+        }
+      }
+    }
+  ]
+}

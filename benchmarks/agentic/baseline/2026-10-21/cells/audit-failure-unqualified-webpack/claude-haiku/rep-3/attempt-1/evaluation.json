@@ -1,0 +1,92 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "audit-failure-unqualified-webpack",
+  "split": "development",
+  "workflow": "audit",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "read-only-report",
+  "verdict": "pass",
+  "success": {
+    "application": null,
+    "diagnosis": null,
+    "report": true
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "not-applicable",
+    "compile": "not-applicable",
+    "static": "not-applicable",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "pass",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": null,
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "missing-product-capability",
+        "subject": "webpack 5.97.1 custom build (no Next.js) is not a qualified PandamStyle host",
+        "detail": "Qualified hosts are Vite 8.3.1 on Rolldown, Next.js 16.3.8 (webpack or Turbopack), and Rsbuild 2.2.11 / Rspack 2.2.8. Webpack is only qualified inside Next.js."
+      },
+      {
+        "kind": "conflicting-state",
+        "subject": "no lockfile despite packageManager npm@10.9.2",
+        "detail": "Install would have to resolve dependencies without a pinned tree."
+      },
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "no design-system definition (design.pandamstyle.config.js)",
+        "detail": "Only a single Sass variable ($danger) exists; no semantic tokens, themes, recipes, or patterns."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    },
+    {
+      "id": "commands",
+      "kind": "transcript.commands",
+      "class": "transcript",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "commands": 4
+      }
+    }
+  ]
+}

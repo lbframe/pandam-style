@@ -1,0 +1,126 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "design-system-extension-failure-unauthorized-danger",
+  "split": "development",
+  "workflow": "design-system-extension",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "missing-project-vocabulary",
+  "intendedOutcome": "vocabulary-gap-diagnosis",
+  "verdict": "pass",
+  "success": {
+    "application": null,
+    "diagnosis": true,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "blocked",
+    "gaps": [
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "recipes.button tone 'danger' (and a public token such as colors.danger)",
+        "detail": "Only the 'primary' tone exists. colors.crimson is private, and Alpha 1 has no raw-style escape hatch, so a red button can't be expressed from Toolbar.jsx."
+      },
+      {
+        "kind": "policy-conflict",
+        "subject": "pandamstyle/system.js is owned by the design team",
+        "detail": "Adding the needed vocabulary requires design approval, which I don't have."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 4
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 6
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    }
+  ]
+}

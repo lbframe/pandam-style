@@ -1,0 +1,185 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "composition-boundary-grid-columns",
+  "split": "development",
+  "workflow": "composition",
+  "caseType": "boundary",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "pass",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "app/page.jsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "unsupported-environment",
+        "subject": ".pandamstyle/design.pandamstyle.js (generated compiler output) is absent",
+        "detail": "Build fails with PMS_COVERAGE_GAP unresolved-import errors for all covered files. I did not run the build on the unmodified code or try to regenerate the folder."
+      },
+      {
+        "kind": "ambiguous-request",
+        "subject": "'small screens' maps to the base condition",
+        "detail": "The config defines only the desktop condition (min-width 1024px), so I used base for small screens."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "app/page.jsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 5
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 8
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "grid-desktop",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xrvj5dj",
+          "xnby9oq",
+          "x89zmtc",
+          "x1qjc9v5",
+          "xexz95c"
+        ],
+        "text": "Public API Healthy Billing worker Failing Search indexer Healthy",
+        "styles": {
+          "grid-template-columns": "repeat(6,minmax(0,1fr))",
+          "gap": "var(--xidfqru)"
+        }
+      }
+    },
+    {
+      "id": "grid-breakpoint",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xrvj5dj",
+          "xnby9oq",
+          "x89zmtc",
+          "x1qjc9v5",
+          "xexz95c"
+        ],
+        "text": "Public API Healthy Billing worker Failing Search indexer Healthy",
+        "styles": {
+          "grid-template-columns": "repeat(6,minmax(0,1fr))"
+        }
+      }
+    },
+    {
+      "id": "grid-small",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xrvj5dj",
+          "xnby9oq",
+          "x89zmtc",
+          "x1qjc9v5",
+          "xexz95c"
+        ],
+        "text": "Public API Healthy Billing worker Failing Search indexer Healthy",
+        "styles": {
+          "grid-template-columns": "repeat(2,minmax(0,1fr))"
+        }
+      }
+    }
+  ]
+}

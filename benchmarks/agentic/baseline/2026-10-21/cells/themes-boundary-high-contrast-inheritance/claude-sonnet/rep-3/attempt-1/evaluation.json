@@ -1,0 +1,169 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "themes-boundary-high-contrast-inheritance",
+  "split": "development",
+  "workflow": "themes",
+  "caseType": "boundary",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "fail",
+  "success": {
+    "application": false,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "fail",
+    "static": "pass",
+    "rendered": "blocked",
+    "behavioral": "blocked",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "src/App.tsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": false,
+    "diagnosticCodes": [
+      "PMS_UNVERIFIED_PROPS_SOURCE"
+    ],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "src/App.tsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "fail",
+      "reason": "diagnostics: PMS_UNVERIFIED_PROPS_SOURCE",
+      "evidence": [
+        {
+          "code": "PMS_UNVERIFIED_PROPS_SOURCE",
+          "severity": "error",
+          "message": "props() argument 0 has no demonstrated PandamStyle provenance (the member key is not resolvable). The fork runtime accepts uncompiled objects and would emit inline styles, so only compiled styles, themes, recipe selections and proven compositions are admitted.",
+          "source": {
+            "file": "src/App.tsx",
+            "line": 17,
+            "column": 45,
+            "endLine": null,
+            "endColumn": null,
+            "label": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 9
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "hc-canvas",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "blocked",
+      "reason": "compilation failed; nothing was rendered",
+      "evidence": null
+    },
+    {
+      "id": "hc-inherited",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "blocked",
+      "reason": "compilation failed; nothing was rendered",
+      "evidence": null
+    },
+    {
+      "id": "hc-panel",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "blocked",
+      "reason": "compilation failed; nothing was rendered",
+      "evidence": null
+    },
+    {
+      "id": "dark-canvas",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "blocked",
+      "reason": "compilation failed; nothing was rendered",
+      "evidence": null
+    },
+    {
+      "id": "light-default",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "blocked",
+      "reason": "compilation failed; nothing was rendered",
+      "evidence": null
+    }
+  ]
+}

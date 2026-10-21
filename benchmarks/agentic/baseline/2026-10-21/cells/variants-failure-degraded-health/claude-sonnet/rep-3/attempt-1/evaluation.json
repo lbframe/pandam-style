@@ -1,0 +1,126 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "variants-failure-degraded-health",
+  "split": "development",
+  "workflow": "variants",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "missing-project-vocabulary",
+  "intendedOutcome": "vocabulary-gap-diagnosis",
+  "verdict": "fail",
+  "success": {
+    "application": null,
+    "diagnosis": false,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "fail",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "needs-decision",
+    "gaps": [
+      {
+        "kind": "missing-product-capability",
+        "subject": "pill recipe health variant 'degraded' and a degraded color token",
+        "detail": "Only healthy/failing exist in design.pandamstyle.config.mjs, which goes through design-system review and is outside the allowed file scope."
+      },
+      {
+        "kind": "policy-conflict",
+        "subject": "Request to cast or use inline style versus PandamStyle docs",
+        "detail": "Docs say do not cast away rejected types, and Alpha 1 has no raw-style escape hatch (rawDynamicStyles: false)."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 5
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 8
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "fail",
+      "reason": "missing gap missing-project-vocabulary matching /degraded/i",
+      "evidence": null
+    }
+  ]
+}

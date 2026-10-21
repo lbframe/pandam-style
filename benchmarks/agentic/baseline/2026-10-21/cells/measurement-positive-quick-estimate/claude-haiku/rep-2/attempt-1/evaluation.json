@@ -1,0 +1,95 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "measurement-positive-quick-estimate",
+  "split": "development",
+  "workflow": "measurement",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "read-only-report",
+  "verdict": "fail",
+  "success": {
+    "application": null,
+    "diagnosis": null,
+    "report": false
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "not-applicable",
+    "static": "not-applicable",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "fail",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "corpus label c10000-t1000-r100-s307 (c/t/r/s dimensions)",
+        "detail": "The reference dataset does not define what the c, t, r, and s dimensions count, so the scale comparison is approximate."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    },
+    {
+      "id": "commands",
+      "kind": "transcript.commands",
+      "class": "transcript",
+      "required": true,
+      "status": "fail",
+      "reason": "forbidden command /\\bvite(\\s+build)?\\b/ ran: cat package.json README.md vite.config.js index.html && echo ---- && find src -type f | sed 's/.*\\.//' | sort | uniq -c ",
+      "evidence": null
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    }
+  ]
+}

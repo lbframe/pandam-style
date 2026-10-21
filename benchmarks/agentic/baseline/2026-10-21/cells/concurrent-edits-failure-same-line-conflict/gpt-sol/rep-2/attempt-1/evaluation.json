@@ -1,0 +1,139 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "concurrent-edits-failure-same-line-conflict",
+  "split": "development",
+  "workflow": "concurrent-edits",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "conflict-diagnosis",
+  "verdict": "pass",
+  "success": {
+    "application": null,
+    "diagnosis": true,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "not-applicable",
+    "environment": "pass",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "needs-decision",
+    "gaps": [
+      {
+        "kind": "conflicting-state",
+        "subject": "src/components/TransferForm.tsx field size",
+        "detail": "A teammate added: DR-112: stays regular until the numpad redesign ships. Decide whether the compact request overrides this requirement."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 7
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 9
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "event-applied",
+      "kind": "observation.runner",
+      "class": "environment",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": "applied"
+    },
+    {
+      "id": "teammate-line",
+      "kind": "files.contains",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    }
+  ]
+}

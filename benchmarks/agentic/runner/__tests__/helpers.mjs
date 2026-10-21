@@ -16,7 +16,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { LocalFixtureExecutor } from '../src/executors/local.mjs';
 import { harnessIdentity, hostFacts } from '../src/identity.mjs';
-import { runMatrix } from '../src/matrix.mjs';
+import { contestedOnDisk, runMatrix } from '../src/matrix.mjs';
 import { buildReport, loadMatrix } from '../src/report.mjs';
 import { validate } from '../../src/json-schema.mjs';
 import {
@@ -362,7 +362,47 @@ export async function runFixture({
     ...(clock ? { clock } : {}),
   });
   assertDocumentsValid(out.matrixDir);
+  assertContestedAgrees(out.matrixDir);
   return { ...out, root };
+}
+
+/**
+ * Section 5.3: every repetition's `contested` status is derived once, from
+ * its attempt history. outcomes.json, a fresh resume scan and the report
+ * agree on it, after every fixture run (before and after a resume).
+ */
+export function assertContestedAgrees(matrixDir) {
+  const loaded = loadMatrix(matrixDir);
+  const report = buildReport(loaded);
+  for (const o of loaded.outcomes.outcomes) {
+    if (o.status === 'unsupported') continue;
+    assert.equal(
+      typeof o.contested,
+      'boolean',
+      `outcome ${o.taskId}/${o.model}#${o.repetition} states contested`,
+    );
+    const cell = report.cells.find(
+      (c) => c.taskId === o.taskId && c.modelKey === o.model,
+    );
+    const rep = cell.repetitions.find((r) => r.repetition === o.repetition);
+    assert.equal(
+      rep.contested,
+      o.contested,
+      `report and outcomes.json agree on ${o.taskId}/${o.model}#${o.repetition}`,
+    );
+    const cellDir = path.join(
+      matrixDir,
+      'cells',
+      o.taskId,
+      o.model,
+      `rep-${o.repetition}`,
+    );
+    assert.equal(
+      contestedOnDisk(cellDir),
+      o.contested,
+      `a resume scan agrees on ${o.taskId}/${o.model}#${o.repetition}`,
+    );
+  }
 }
 
 const SCHEMAS = {};

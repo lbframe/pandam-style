@@ -1,0 +1,91 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "measurement-boundary-theme-edit-estimate",
+  "split": "development",
+  "workflow": "measurement",
+  "caseType": "boundary",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "read-only-report",
+  "verdict": "fail",
+  "success": {
+    "application": null,
+    "diagnosis": null,
+    "report": false
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "not-applicable",
+    "static": "not-applicable",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "fail",
+    "transcript": "pass",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "fail",
+      "reason": "answer referenceCorpus does not satisfy {\"equals\":\"c10000-t1000-r100-s307\"}",
+      "evidence": null
+    },
+    {
+      "id": "commands",
+      "kind": "transcript.commands",
+      "class": "transcript",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "commands": 3
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    }
+  ]
+}

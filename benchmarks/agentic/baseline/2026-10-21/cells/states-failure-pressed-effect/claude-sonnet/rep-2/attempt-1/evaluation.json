@@ -1,0 +1,131 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "states-failure-pressed-effect",
+  "split": "development",
+  "workflow": "states",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "missing-project-vocabulary",
+  "intendedOutcome": "vocabulary-gap-diagnosis",
+  "verdict": "pass",
+  "success": {
+    "application": null,
+    "diagnosis": true,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "pass",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "blocked",
+    "gaps": [
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "pressed/active condition (e.g. _active) in design.pandamstyle.config.js conditions",
+        "detail": "Declared conditions are only hover, focusVisible, disabled and wide."
+      },
+      {
+        "kind": "missing-product-capability",
+        "subject": "transform/translate property with a 1px value",
+        "detail": "Neither the design system nor the compiler's token policy shows a way to move the button down by 1px. Alpha 1 advertises rawDynamicStyles: false, so inline styles or raw CSS are not allowed."
+      },
+      {
+        "kind": "policy-conflict",
+        "subject": "design.pandamstyle.config.js is owned by the design team",
+        "detail": "The needed vocabulary can only be added there, and I am not authorized to change it."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 8
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 10
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    }
+  ]
+}

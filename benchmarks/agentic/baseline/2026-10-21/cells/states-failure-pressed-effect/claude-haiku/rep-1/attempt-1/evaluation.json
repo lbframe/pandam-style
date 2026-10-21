@@ -1,0 +1,127 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "states-failure-pressed-effect",
+  "split": "development",
+  "workflow": "states",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "missing-project-vocabulary",
+  "intendedOutcome": "vocabulary-gap-diagnosis",
+  "verdict": "fail",
+  "success": {
+    "application": null,
+    "diagnosis": false,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "fail",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "blocked",
+    "gaps": [
+      {
+        "kind": "missing-product-capability",
+        "subject": "active (pressed) condition",
+        "detail": "conditions in design.pandamstyle.config.js are hover, focusVisible, disabled and wide; no :active selector is declared, so recipes.button cannot express a pressed state."
+      },
+      {
+        "kind": "missing-product-capability",
+        "subject": "transform: translateY(1px) for the button pressed state",
+        "detail": "transform is not a declared token category and is not confirmed in the compiler property policy; a consumer-side style would bypass the design system, which the agent contract forbids."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 8
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 10
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "fresh compiler generation",
+        "files": 14
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "fail",
+      "reason": "missing gap missing-project-vocabulary matching /active|press/i",
+      "evidence": null
+    }
+  ]
+}

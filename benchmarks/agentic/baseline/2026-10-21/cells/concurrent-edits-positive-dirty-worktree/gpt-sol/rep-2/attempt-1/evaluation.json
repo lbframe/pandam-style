@@ -1,0 +1,173 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "concurrent-edits-positive-dirty-worktree",
+  "split": "development",
+  "workflow": "concurrent-edits",
+  "caseType": "positive",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "not-applicable",
+    "report": "not-applicable",
+    "transcript": "pass",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "src/components/AddToCartButton.jsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "src/components/AddToCartButton.jsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 9
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 11
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "fresh compiler generation",
+        "files": 15
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "wip-heading",
+      "kind": "files.contains",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    },
+    {
+      "id": "wip-component",
+      "kind": "files.contains",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": null
+    },
+    {
+      "id": "button-small",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x3nfvp2",
+          "x6s0dn4",
+          "xl56j7k",
+          "x1x3a5v",
+          "x1ia1lxn",
+          "xdb7zta",
+          "xbce6o",
+          "x1pkdvj6",
+          "x1bl2b9q",
+          "x127kycn",
+          "x1kebkhh",
+          "x1k51ob3",
+          "x1wob836",
+          "xqn6m5w",
+          "xi5den5",
+          "x54c1fo"
+        ],
+        "text": "Add to cart",
+        "styles": {
+          "font-size": "var(--x1vqyhf1)",
+          "padding-block": "var(--xqh7ic8)"
+        }
+      }
+    },
+    {
+      "id": "commands",
+      "kind": "transcript.commands",
+      "class": "transcript",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "commands": 5
+      }
+    }
+  ]
+}

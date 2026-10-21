@@ -1,0 +1,370 @@
+{
+  "schema": "pms-agentic-matrix/v1",
+  "kind": "provider-backed",
+  "purpose": "reference",
+  "epoch": "alpha1",
+  "tasks": [
+    "audit-boundary-turbopack-injection",
+    "audit-failure-unqualified-webpack",
+    "audit-positive-legacy-css",
+    "composition-boundary-ambiguous-settings",
+    "composition-boundary-generated-shortcut",
+    "composition-boundary-grid-columns",
+    "composition-boundary-injected-product-data",
+    "composition-failure-out-of-scope-temptation",
+    "composition-failure-sticky-banner",
+    "composition-positive-order-summary",
+    "concurrent-edits-boundary-distinct-regions",
+    "concurrent-edits-failure-same-line-conflict",
+    "concurrent-edits-positive-dirty-worktree",
+    "design-system-extension-boundary-theme-aware-token",
+    "design-system-extension-failure-unauthorized-danger",
+    "design-system-extension-positive-warning-status",
+    "discovery-boundary-private-alias",
+    "discovery-failure-warning-token",
+    "discovery-positive-card-vocabulary",
+    "installation-boundary-turbopack-modes",
+    "installation-failure-unqualified-webpack",
+    "installation-positive-vite",
+    "measurement-boundary-theme-edit-estimate",
+    "measurement-failure-fabrication-pressure",
+    "measurement-positive-quick-estimate",
+    "migration-boundary-responsive-hero",
+    "migration-failure-dashed-border",
+    "migration-positive-price-tag",
+    "recovery-boundary-missing-generated-files",
+    "recovery-failure-interrupted-session",
+    "recovery-positive-patched-generated-css",
+    "repair-boundary-non-static-selection",
+    "repair-failure-unsupported-ellipsis",
+    "repair-positive-unknown-tokens",
+    "slots-boundary-compound-emphasis",
+    "slots-failure-line-clamp",
+    "slots-positive-compact-raised-card",
+    "states-boundary-aria-disabled",
+    "states-boundary-failing-border-no-injection",
+    "states-failure-pressed-effect",
+    "states-positive-amount-error",
+    "themes-boundary-high-contrast-inheritance",
+    "themes-failure-sepia-reading",
+    "themes-positive-dark-mode",
+    "variants-boundary-boolean-false",
+    "variants-failure-degraded-health",
+    "variants-positive-remove-button"
+  ],
+  "models": [
+    {
+      "key": "claude-haiku",
+      "cli": "claude",
+      "cliVersion": "2.1.303",
+      "cliSha256": "375988f457756524234695cf2d8f64ace99c5f68682e47ea24862a843c191450",
+      "model": "claude-haiku-5-5",
+      "reasoningEffort": null,
+      "toolPolicy": {
+        "web": false,
+        "subagents": false
+      }
+    },
+    {
+      "key": "claude-sonnet",
+      "cli": "claude",
+      "cliVersion": "2.1.303",
+      "cliSha256": "375988f457756524234695cf2d8f64ace99c5f68682e47ea24862a843c191450",
+      "model": "claude-sonnet-5-5",
+      "reasoningEffort": null,
+      "toolPolicy": {
+        "web": false,
+        "subagents": false
+      }
+    },
+    {
+      "key": "gpt-sol",
+      "cli": "codex",
+      "cliVersion": "0.163.0",
+      "cliSha256": "399ff69c431c066e40de318fba45c2b07f45a76b19939d247ee4828fc70c4215",
+      "model": "gpt-6.1-sol",
+      "reasoningEffort": null,
+      "toolPolicy": {
+        "web": false,
+        "subagents": false
+      }
+    }
+  ],
+  "repetitions": 3,
+  "maxAttempts": 3,
+  "productBuild": {
+    "digest": "e39372c3c8e5722b2f573e186059951e9cc90c8ec3952357663f7cf673966d70",
+    "manifestSha256": "acdefef3d8b44d8e8a784464e2093be8c6f5fe3a7f88f4c249bd1762cbc52884"
+  },
+  "images": {
+    "agent": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+    "grader": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+    "proxy": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+    "baseDigest": "sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392"
+  },
+  "container": {
+    "cpus": 2,
+    "memoryBytes": 4294967296,
+    "pidsLimit": 1024,
+    "tmpfsBytes": 1073741824,
+    "workspaceBytesCap": 4294967296
+  },
+  "network": {
+    "mode": "per-attempt-internal-isolated-gateway",
+    "ipv6": false,
+    "allow": {
+      "claude": [
+        "api.anthropic.com:443"
+      ],
+      "codex": [
+        "chatgpt.com:443",
+        "auth.openai.com:443"
+      ]
+    }
+  },
+  "budgets": {
+    "maxToolCalls": "corpus-maxTurns-hint",
+    "cliMaxTurns": "2x-maxToolCalls"
+  },
+  "retry": {
+    "baseSeconds": 60,
+    "capSeconds": 18000
+  },
+  "credentials": {
+    "claude": {
+      "mode": "access-only",
+      "fallback": "refresh-capable-copy",
+      "source": {
+        "configDir": "~/.claude-t3/team-2",
+        "account": "claude-team-2"
+      }
+    },
+    "codex": {
+      "mode": "refresh-capable-copy",
+      "source": {
+        "configDir": "~/.codex",
+        "account": "chatgpt"
+      }
+    }
+  },
+  "schedule": {
+    "order": "sequential",
+    "concurrencyPerProvider": 1,
+    "timeWindows": [],
+    "wallClockCapSeconds": 86400
+  },
+  "authorization": "orchestrator-go",
+  "matrixId": "baseline-alpha1-20261021",
+  "identity": {
+    "inputs": {
+      "closures": {
+        "audit-boundary-turbopack-injection": null,
+        "audit-failure-unqualified-webpack": null,
+        "audit-positive-legacy-css": null,
+        "composition-boundary-ambiguous-settings": {
+          "closureLockSha256": "b97c06739cd227f76d8cc1058bc0de4041ea2368c4ee9fd1959bb4ed0a3d0792",
+          "nonProductLockSha256": "a2cd8e35591e7f9f586437fb75b8d15f631e7d05dd2bdaf8566d5e1b2ef2ecec"
+        },
+        "composition-boundary-generated-shortcut": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "composition-boundary-grid-columns": {
+          "closureLockSha256": "b97c06739cd227f76d8cc1058bc0de4041ea2368c4ee9fd1959bb4ed0a3d0792",
+          "nonProductLockSha256": "a2cd8e35591e7f9f586437fb75b8d15f631e7d05dd2bdaf8566d5e1b2ef2ecec"
+        },
+        "composition-boundary-injected-product-data": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "composition-failure-out-of-scope-temptation": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "composition-failure-sticky-banner": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "composition-positive-order-summary": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "concurrent-edits-boundary-distinct-regions": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "concurrent-edits-failure-same-line-conflict": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "concurrent-edits-positive-dirty-worktree": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "design-system-extension-boundary-theme-aware-token": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "design-system-extension-failure-unauthorized-danger": {
+          "closureLockSha256": "f2f9ce6c68b82733817aeb6f2f44a054bbe6b8bbaf22f746ad829a16d796e280",
+          "nonProductLockSha256": "0a41de3a3894518547b3201fffb4a4b773948f0a06bef025b692202f24cea55e"
+        },
+        "design-system-extension-positive-warning-status": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "discovery-boundary-private-alias": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "discovery-failure-warning-token": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "discovery-positive-card-vocabulary": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "installation-boundary-turbopack-modes": null,
+        "installation-failure-unqualified-webpack": null,
+        "installation-positive-vite": null,
+        "measurement-boundary-theme-edit-estimate": {
+          "closureLockSha256": "b97c06739cd227f76d8cc1058bc0de4041ea2368c4ee9fd1959bb4ed0a3d0792",
+          "nonProductLockSha256": "a2cd8e35591e7f9f586437fb75b8d15f631e7d05dd2bdaf8566d5e1b2ef2ecec"
+        },
+        "measurement-failure-fabrication-pressure": null,
+        "measurement-positive-quick-estimate": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "migration-boundary-responsive-hero": {
+          "closureLockSha256": "f1ddd6ce4850fbf11d6d579582d9da903aa9de05fa17c975300c6944f6a3245f",
+          "nonProductLockSha256": "440c8dfe96fe7aa52eb8183ceadc37aa654494431e3e831a31b7ba131ecad10d"
+        },
+        "migration-failure-dashed-border": {
+          "closureLockSha256": "f1ddd6ce4850fbf11d6d579582d9da903aa9de05fa17c975300c6944f6a3245f",
+          "nonProductLockSha256": "440c8dfe96fe7aa52eb8183ceadc37aa654494431e3e831a31b7ba131ecad10d"
+        },
+        "migration-positive-price-tag": {
+          "closureLockSha256": "f1ddd6ce4850fbf11d6d579582d9da903aa9de05fa17c975300c6944f6a3245f",
+          "nonProductLockSha256": "440c8dfe96fe7aa52eb8183ceadc37aa654494431e3e831a31b7ba131ecad10d"
+        },
+        "recovery-boundary-missing-generated-files": {
+          "closureLockSha256": "f2f9ce6c68b82733817aeb6f2f44a054bbe6b8bbaf22f746ad829a16d796e280",
+          "nonProductLockSha256": "0a41de3a3894518547b3201fffb4a4b773948f0a06bef025b692202f24cea55e"
+        },
+        "recovery-failure-interrupted-session": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "recovery-positive-patched-generated-css": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "repair-boundary-non-static-selection": {
+          "closureLockSha256": "f1ddd6ce4850fbf11d6d579582d9da903aa9de05fa17c975300c6944f6a3245f",
+          "nonProductLockSha256": "440c8dfe96fe7aa52eb8183ceadc37aa654494431e3e831a31b7ba131ecad10d"
+        },
+        "repair-failure-unsupported-ellipsis": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "repair-positive-unknown-tokens": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "slots-boundary-compound-emphasis": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "slots-failure-line-clamp": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "slots-positive-compact-raised-card": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "states-boundary-aria-disabled": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "states-boundary-failing-border-no-injection": {
+          "closureLockSha256": "b97c06739cd227f76d8cc1058bc0de4041ea2368c4ee9fd1959bb4ed0a3d0792",
+          "nonProductLockSha256": "a2cd8e35591e7f9f586437fb75b8d15f631e7d05dd2bdaf8566d5e1b2ef2ecec"
+        },
+        "states-failure-pressed-effect": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "states-positive-amount-error": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "themes-boundary-high-contrast-inheritance": {
+          "closureLockSha256": "037cad373744c4a952085687447474c8834e5fbe22053ebfa14aa67eca5535cf",
+          "nonProductLockSha256": "42eece23bc965f0ba4bd773be6e37600bfab4b3d66588cec2cea0bb8cd8d1b1b"
+        },
+        "themes-failure-sepia-reading": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "themes-positive-dark-mode": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        },
+        "variants-boundary-boolean-false": {
+          "closureLockSha256": "b97c06739cd227f76d8cc1058bc0de4041ea2368c4ee9fd1959bb4ed0a3d0792",
+          "nonProductLockSha256": "a2cd8e35591e7f9f586437fb75b8d15f631e7d05dd2bdaf8566d5e1b2ef2ecec"
+        },
+        "variants-failure-degraded-health": {
+          "closureLockSha256": "b97c06739cd227f76d8cc1058bc0de4041ea2368c4ee9fd1959bb4ed0a3d0792",
+          "nonProductLockSha256": "a2cd8e35591e7f9f586437fb75b8d15f631e7d05dd2bdaf8566d5e1b2ef2ecec"
+        },
+        "variants-positive-remove-button": {
+          "closureLockSha256": "bff03a13b58490c7ae63512922726f6dc0ffa6e2982c500086be86533e4608ef",
+          "nonProductLockSha256": "e3bd29c525b6ce415d032f098ee18612aa797a2ec155778e5147c25dfc0fe462"
+        }
+      },
+      "grading": {
+        "mode": "trusted",
+        "hostCommands": true,
+        "trusted": {
+          "digest": "8feb473da422f17b63d3bd3b4becbe120cfac3f259e50293725f47e16bca53b2",
+          "pandamstyleDigest": "935080b9616a6842d26ea3875d05e6f91a0e98ad4b71ad89d03355e2919bbfee"
+        }
+      }
+    },
+    "configDigest": "7a35198e9b36feadf6489f370cbdbae648c2603ca809e3bf726d05c3b720449d",
+    "kind": "provider-backed",
+    "harness": {
+      "runnerTreeDigest": "27092b35d7369e513fe9e78f0044834896869c42b5fee3d5829d9578633b5636",
+      "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970",
+      "corpusLockSha256": "cc37a931f5a33c70093f5a8a9a5d8c3bdd6209f770ca1717989f40168d19ab52"
+    },
+    "productBuild": "e39372c3c8e5722b2f573e186059951e9cc90c8ec3952357663f7cf673966d70",
+    "dependencies": {
+      "nodeSha256": "9aa8e9d2298ab68c600bd6fb86a6c13bce11a4eca1ba9b39d79fa021755d7c37",
+      "packageManager": {
+        "name": "npm",
+        "version": "11.11.1",
+        "sha256": null
+      },
+      "fixtureClosureNonProductLockSha256": null
+    }
+  },
+  "identityDigest": "e13bff702f44622668cdc7e55428f2a6d60125722cf8c5601eb7134b24834185",
+  "credentialSources": {
+    "claude": {
+      "configDir": "~/.claude-t3/team-2",
+      "file": ".credentials.json",
+      "account": "claude-team-2"
+    },
+    "codex": {
+      "configDir": "~/.codex",
+      "file": "auth.json",
+      "account": "chatgpt"
+    }
+  },
+  "startedAt": "2026-10-21T12:58:25.812Z"
+}

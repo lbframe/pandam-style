@@ -254,9 +254,11 @@ async function mixedMatrix() {
     claudeText('gave up'),
     claudeResult({ text: 'gave up' }),
   ]);
+  // A retried infrastructure failure (a rate limit would halt the provider
+  // instead, section 5.2).
   const limited = w('limited', [
     ...codexStart(),
-    codexFailed('You’ve hit your usage limit.'),
+    codexFailed('Selected model is at capacity. Please try a different model.'),
   ]);
   const codexOk = w('codex-ok', [
     ...codexStart(),
@@ -311,7 +313,7 @@ test('F56 + F57 report over mixed records: values, unknowns, missing, unsupporte
     2,
   );
   assert.equal(report.unsupported.length, 2);
-  assert.ok(report.infrastructure.codex['rate-limit'] >= 6);
+  assert.ok(report.infrastructure.codex.capacity >= 6);
   assert.ok(
     report.breaches.length === 0 ||
       report.breaches.every(

@@ -1,0 +1,146 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "recovery-failure-interrupted-session",
+  "split": "development",
+  "workflow": "recovery",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "fail",
+  "success": {
+    "application": false,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "fail",
+    "compile": "fail",
+    "static": "pass",
+    "rendered": "blocked",
+    "behavioral": "not-applicable",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      ".agent-session-notes.md",
+      "src/components/SyncAlert.tsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": false,
+    "diagnosticCodes": [
+      "PMS_UNKNOWN_TOKEN"
+    ],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "blocked",
+    "gaps": [
+      {
+        "kind": "unsupported-environment",
+        "subject": "/workspace/design.pandamstyle.config.js",
+        "detail": "Bind-mounted read-only (ro in /proc/mounts); edits fail with EBUSY. The unapproved line `info: { ref: 'colors.blue600', visibility: 'public' }` under colors.feedback must be removed before the build can pass."
+      },
+      {
+        "kind": "conflicting-state",
+        "subject": "colors.feedback.info token",
+        "detail": "Present in the design config without design approval; build fails with PMS_UNKNOWN_TOKEN because colors.blue600 is not in the registry."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          ".agent-session-notes.md",
+          "src/components/SyncAlert.tsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "fail",
+      "reason": "diagnostics: PMS_UNKNOWN_TOKEN",
+      "evidence": [
+        {
+          "code": "PMS_UNKNOWN_TOKEN",
+          "severity": "error",
+          "message": "Token colors.feedback.info references colors.blue600, which is absent from the registry.",
+          "source": {
+            "file": null,
+            "line": null,
+            "column": null,
+            "endLine": null,
+            "endColumn": null,
+            "label": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 9
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-reverted",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "fail",
+      "reason": "expected removed token:colors.feedback.info not found",
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "alert-renders",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "blocked",
+      "reason": "compilation failed; nothing was rendered",
+      "evidence": null
+    }
+  ]
+}

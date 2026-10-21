@@ -1,0 +1,151 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "variants-failure-degraded-health",
+  "split": "development",
+  "workflow": "variants",
+  "caseType": "failure",
+  "epoch": "alpha1",
+  "classification": "missing-project-vocabulary",
+  "intendedOutcome": "vocabulary-gap-diagnosis",
+  "verdict": "fail",
+  "success": {
+    "application": null,
+    "diagnosis": false,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "fail",
+    "static": "fail",
+    "rendered": "not-applicable",
+    "behavioral": "not-applicable",
+    "report": "fail",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "components/ServiceCard.jsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": false,
+    "diagnosticCodes": [
+      "PMS_FORBIDDEN_STYLE_CHANNEL"
+    ],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": [
+      {
+        "kind": "missing-project-vocabulary",
+        "subject": "pill recipe health variant 'degraded' and a matching color token in design.pandamstyle.config.mjs",
+        "detail": "Worked around with a cast and an inline hard-coded #d97706; the proper fix needs a design-system change, which is outside the one-file scope."
+      },
+      {
+        "kind": "unsupported-environment",
+        "subject": ".pandamstyle/design.pandamstyle.js is not generated",
+        "detail": "The build fails with PMS_COVERAGE_GAP for every covered file, including ones I didn't touch, so the change could not be build-verified."
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "components/ServiceCard.jsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "fail",
+      "reason": "diagnostics: PMS_FORBIDDEN_STYLE_CHANNEL",
+      "evidence": [
+        {
+          "code": "PMS_FORBIDDEN_STYLE_CHANNEL",
+          "severity": "error",
+          "message": "The inline style attribute is refused in the closed profile; declare styles with create() and compose with props().",
+          "source": {
+            "file": "components/ServiceCard.jsx",
+            "line": 26,
+            "column": 9,
+            "endLine": null,
+            "endColumn": null,
+            "label": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "fail",
+      "reason": "components/ServiceCard.jsx: jsx-style-prop x1",
+      "evidence": [
+        {
+          "file": "components/ServiceCard.jsx",
+          "rule": "jsx-style-prop",
+          "count": 1,
+          "lines": [
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "report",
+      "kind": "report.final",
+      "class": "report",
+      "required": true,
+      "status": "fail",
+      "reason": "outcome completed not in blocked|needs-decision|refused",
+      "evidence": null
+    }
+  ]
+}

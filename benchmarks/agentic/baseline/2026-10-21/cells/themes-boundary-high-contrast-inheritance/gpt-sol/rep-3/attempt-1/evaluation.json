@@ -1,0 +1,223 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "themes-boundary-high-contrast-inheritance",
+  "split": "development",
+  "workflow": "themes",
+  "caseType": "boundary",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "pass",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "not-applicable",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "src/App.tsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "src/App.tsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 7
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 9
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "fresh compiler generation",
+        "files": 13
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "hc-canvas",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x6220xq",
+          "x16nq34m",
+          "x12vknhc",
+          "x1xy2bl7",
+          "xwhjr6g",
+          "xbg677t",
+          "x1eov263"
+        ],
+        "text": "! Bank sync Balances may be out of date. Checking 1245.00 Savings 9800.00 Credit card -320.75 Amount Transfers settle in one business day.",
+        "styles": {
+          "background-color": "var(--x3gdnid)",
+          "color": "var(--x1idyqkv)"
+        }
+      }
+    },
+    {
+      "id": "hc-inherited",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xw4jnvo",
+          "x1qx5ct2",
+          "x6zbn7c"
+        ],
+        "text": "!",
+        "styles": {
+          "color": "var(--x127jt67)"
+        }
+      }
+    },
+    {
+      "id": "hc-panel",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x78zum5",
+          "x167nubf",
+          "xbg677t",
+          "x8vdnou",
+          "xmkeg23",
+          "x1y0btm7",
+          "x11ru1we",
+          "xrjqu5t"
+        ],
+        "text": "! Bank sync Balances may be out of date.",
+        "styles": {
+          "background-color": "var(--x16msgfy)"
+        }
+      }
+    },
+    {
+      "id": "dark-canvas",
+      "kind": "render.styles",
+      "class": "behavioral",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x1bcx5br",
+          "x16nq34m",
+          "x12vknhc",
+          "x1xy2bl7",
+          "xwhjr6g",
+          "xbg677t",
+          "x1eov263"
+        ],
+        "text": "! Bank sync Balances may be out of date. Checking 1245.00 Savings 9800.00 Credit card -320.75 Amount Transfers settle in one business day.",
+        "styles": {
+          "background-color": "var(--x3gdnid)"
+        }
+      }
+    },
+    {
+      "id": "light-default",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "x16nq34m",
+          "x12vknhc",
+          "x1xy2bl7",
+          "xwhjr6g",
+          "xbg677t",
+          "x1eov263"
+        ],
+        "text": "! Bank sync Balances may be out of date. Checking 1245.00 Savings 9800.00 Credit card -320.75 Amount Transfers settle in one business day.",
+        "styles": {
+          "background-color": "var(--x3gdnid)"
+        }
+      }
+    }
+  ]
+}

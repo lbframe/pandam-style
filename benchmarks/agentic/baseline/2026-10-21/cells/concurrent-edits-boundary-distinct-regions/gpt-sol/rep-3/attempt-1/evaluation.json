@@ -1,0 +1,149 @@
+{
+  "schema": "pms-eval-result/v1",
+  "taskId": "concurrent-edits-boundary-distinct-regions",
+  "split": "development",
+  "workflow": "concurrent-edits",
+  "caseType": "boundary",
+  "epoch": "alpha1",
+  "classification": "expressible",
+  "intendedOutcome": "application-success",
+  "verdict": "pass",
+  "success": {
+    "application": true,
+    "diagnosis": null,
+    "report": null
+  },
+  "outcomes": {
+    "scope": "pass",
+    "integrity": "pass",
+    "compile": "pass",
+    "static": "pass",
+    "rendered": "pass",
+    "behavioral": "not-applicable",
+    "report": "not-applicable",
+    "transcript": "not-applicable",
+    "environment": "pass",
+    "visual": "not-applicable"
+  },
+  "scope": {
+    "added": [],
+    "modified": [
+      "src/components/TransferForm.tsx"
+    ],
+    "deleted": [],
+    "symlinks": []
+  },
+  "compile": {
+    "ok": true,
+    "diagnosticCodes": [],
+    "compilerVersion": "0.1.0-alpha.1"
+  },
+  "report": {
+    "present": true,
+    "outcome": "completed",
+    "gaps": []
+  },
+  "checks": [
+    {
+      "id": "scope",
+      "kind": "scope.diff",
+      "class": "scope",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "modified": [
+          "src/components/TransferForm.tsx"
+        ],
+        "deleted": [],
+        "symlinks": []
+      }
+    },
+    {
+      "id": "compile",
+      "kind": "compile.project",
+      "class": "compile",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "coveredModules": 7
+      }
+    },
+    {
+      "id": "no-bypass",
+      "kind": "static.forbidden",
+      "class": "static",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "filesInspected": 9
+      }
+    },
+    {
+      "id": "generated-untouched",
+      "kind": "generated.consistent",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "note": "never generated (the baseline had no generation either)"
+      }
+    },
+    {
+      "id": "vocabulary-unchanged",
+      "kind": "definition.diff",
+      "class": "integrity",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "added": [],
+        "removed": [],
+        "changed": []
+      }
+    },
+    {
+      "id": "event-applied",
+      "kind": "observation.runner",
+      "class": "environment",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": "applied"
+    },
+    {
+      "id": "memo-kept",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [],
+        "text": ""
+      }
+    },
+    {
+      "id": "hint-text",
+      "kind": "render.styles",
+      "class": "rendered",
+      "required": true,
+      "status": "pass",
+      "reason": null,
+      "evidence": {
+        "classes": [
+          "xpmzdu9",
+          "xjya7n8"
+        ],
+        "text": "Transfers settle in one to two business days.",
+        "styles": {
+          "color": "var(--x1w5rq2e)"
+        }
+      }
+    }
+  ]
+}

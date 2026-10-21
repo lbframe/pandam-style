@@ -1,0 +1,712 @@
+{
+  "schema": "pms-agentic-run-record/v1",
+  "kind": "provider-backed",
+  "matrixId": "baseline-alpha1-20261021",
+  "cell": {
+    "taskId": "migration-boundary-responsive-hero",
+    "modelKey": "gpt-sol"
+  },
+  "repetition": 2,
+  "attempt": 1,
+  "comparability": {
+    "key": "4ccc995aa1f9f828c38e6ceeabec0c0ec823804a5ff4e844a84bd2b4ba682129",
+    "projectionVersion": "pms-agentic-comparability/v1",
+    "projection": {
+      "version": "pms-agentic-comparability/v1",
+      "task": {
+        "id": "migration-boundary-responsive-hero",
+        "taskDigest": "cca79f050813c02949fb7c591a249f05326e883ded28dbb4b9e5e612bff85944",
+        "epoch": "alpha1",
+        "corpusVersion": "1.4.5",
+        "corpusLockSha256": "cc37a931f5a33c70093f5a8a9a5d8c3bdd6209f770ca1717989f40168d19ab52"
+      },
+      "harness": {
+        "runnerTreeDigest": "27092b35d7369e513fe9e78f0044834896869c42b5fee3d5829d9578633b5636",
+        "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970"
+      },
+      "prompt": {
+        "sha256": "7a80a90b754fb1829af545c42c000e77aed0b0d0ac1a6734b5d2b3f86b2f53ef"
+      },
+      "model": {
+        "cli": "codex",
+        "cliVersion": "0.163.0",
+        "cliSha256": "399ff69c431c066e40de318fba45c2b07f45a76b19939d247ee4828fc70c4215",
+        "requestedModel": "gpt-6.1-sol",
+        "reasoningEffort": null,
+        "normalizedArgv": [
+          "codex",
+          "exec",
+          "-",
+          "--json",
+          "--strict-config",
+          "--ephemeral",
+          "--ignore-rules",
+          "-m",
+          "gpt-6.1-sol",
+          "-c",
+          "web_search=\"disabled\"",
+          "-c",
+          "agents.enabled=false",
+          "--dangerously-bypass-approvals-and-sandbox",
+          "--skip-git-repo-check",
+          "-C",
+          "/workspace",
+          "-o",
+          "/run/agent/last-message.txt"
+        ],
+        "nonSecretEnv": {},
+        "cliConfigSha256": null
+      },
+      "policy": {
+        "effectiveToolPolicy": {
+          "web": false,
+          "subagents": false
+        },
+        "capabilityEnforcementMatrixSha256": "60216200631cba3fd6cd90826a3c34146677ee5063c366025979e3f917a86a0d",
+        "egressAllowlistSha256": "9d55abf902f7e8b5c07c24d26378522783913b217f99241ee9243d205bff41fc",
+        "proxyImageId": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+        "networkMode": "per-attempt-internal-isolated-gateway"
+      },
+      "budgets": {
+        "timeoutSeconds": 900,
+        "maxToolCalls": 60,
+        "cliMaxTurns": null
+      },
+      "containers": {
+        "agentImageId": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+        "graderImageId": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+        "cpus": 2,
+        "memoryBytes": 4294967296,
+        "pidsLimit": 1024,
+        "tmpfsBytes": 1073741824,
+        "workspaceBytesCap": 4294967296
+      },
+      "dependencies": {
+        "nodeSha256": "9aa8e9d2298ab68c600bd6fb86a6c13bce11a4eca1ba9b39d79fa021755d7c37",
+        "packageManager": {
+          "name": "npm",
+          "version": "11.11.1",
+          "sha256": null
+        },
+        "fixtureClosureNonProductLockSha256": "440c8dfe96fe7aa52eb8183ceadc37aa654494431e3e831a31b7ba131ecad10d"
+      }
+    }
+  },
+  "task": {
+    "id": "migration-boundary-responsive-hero",
+    "split": "development",
+    "workflow": "migration",
+    "caseType": "boundary",
+    "epoch": "alpha1",
+    "corpusVersion": "1.4.5",
+    "corpusLockSha256": "cc37a931f5a33c70093f5a8a9a5d8c3bdd6209f770ca1717989f40168d19ab52",
+    "taskDigest": "cca79f050813c02949fb7c591a249f05326e883ded28dbb4b9e5e612bff85944"
+  },
+  "harness": {
+    "commit": "d38dbf50cf55d4a1060540dba1f040c7f57fd456",
+    "clean": true,
+    "corpusLockSha256": "cc37a931f5a33c70093f5a8a9a5d8c3bdd6209f770ca1717989f40168d19ab52",
+    "runnerTreeDigest": "27092b35d7369e513fe9e78f0044834896869c42b5fee3d5829d9578633b5636",
+    "harnessDepsLockSha256": "66395a2d9088bfdb973885f7f49678c52d3a0f95c6f70618a4aad1bbefca1970"
+  },
+  "prompt": {
+    "file": "prompt.md",
+    "sha256": "7a80a90b754fb1829af545c42c000e77aed0b0d0ac1a6734b5d2b3f86b2f53ef",
+    "docsPath": "/opt/pandamstyle-agent-docs",
+    "channel": "stdin"
+  },
+  "modelConfig": {
+    "requestedModel": "gpt-6.1-sol",
+    "reasoningEffort": {
+      "requested": null,
+      "effective": null
+    },
+    "rawArgv": [
+      "codex",
+      "exec",
+      "-",
+      "--json",
+      "--strict-config",
+      "--ephemeral",
+      "--ignore-rules",
+      "-m",
+      "gpt-6.1-sol",
+      "-c",
+      "web_search=\"disabled\"",
+      "-c",
+      "agents.enabled=false",
+      "--dangerously-bypass-approvals-and-sandbox",
+      "--skip-git-repo-check",
+      "-C",
+      "/workspace",
+      "-o",
+      "/run/agent/last-message.txt"
+    ],
+    "normalizedArgv": [
+      "codex",
+      "exec",
+      "-",
+      "--json",
+      "--strict-config",
+      "--ephemeral",
+      "--ignore-rules",
+      "-m",
+      "gpt-6.1-sol",
+      "-c",
+      "web_search=\"disabled\"",
+      "-c",
+      "agents.enabled=false",
+      "--dangerously-bypass-approvals-and-sandbox",
+      "--skip-git-repo-check",
+      "-C",
+      "/workspace",
+      "-o",
+      "/run/agent/last-message.txt"
+    ],
+    "env": {},
+    "configFiles": [],
+    "effectiveConfig": {
+      "source": "codex.debug.prompt-input",
+      "tools": null,
+      "subagents": "disabled-evidenced",
+      "web": "disabled-configured",
+      "builtins": [],
+      "effort": null,
+      "model": null,
+      "matchesRequest": true
+    }
+  },
+  "cli": {
+    "name": "codex",
+    "version": "0.163.0",
+    "sha256": "399ff69c431c066e40de318fba45c2b07f45a76b19939d247ee4828fc70c4215",
+    "executeOnly": true
+  },
+  "provider": {
+    "sessionId": "01a15f18-ad66-7311-9a53-b780e05d3098",
+    "primaryModelFidelity": "no-reroute-surfaced",
+    "servedModels": "unknown",
+    "auxiliaryModels": [],
+    "reroutes": [],
+    "apiRetries": 0,
+    "reconnects": 0,
+    "rateLimit": null
+  },
+  "budgets": {
+    "corpusTimeoutSeconds": 900,
+    "corpusMaxTurnsHint": 60,
+    "timeoutSeconds": 900,
+    "maxToolCalls": 60,
+    "cliMaxTurns": null,
+    "workspaceBytesCap": 4294967296,
+    "limitFired": null
+  },
+  "productBuild": {
+    "digest": "e39372c3c8e5722b2f573e186059951e9cc90c8ec3952357663f7cf673966d70",
+    "epoch": "alpha1",
+    "sourceCommit": "415e05539fcb5d36a78226112b5cf488b200b1aa"
+  },
+  "install": {
+    "closureLockSha256": "f1ddd6ce4850fbf11d6d579582d9da903aa9de05fa17c975300c6944f6a3245f",
+    "nonProductLockSha256": "440c8dfe96fe7aa52eb8183ceadc37aa654494431e3e831a31b7ba131ecad10d",
+    "nodeModulesDigest": "ec2ee0d1f96f546023a971dae8d3a790b2269f0d10b5769402cdd4d96fd34e7f",
+    "productPackagesVerified": true
+  },
+  "trustedTree": {
+    "mode": "trusted",
+    "digest": "8feb473da422f17b63d3bd3b4becbe120cfac3f259e50293725f47e16bca53b2",
+    "pandamstyleDigest": "935080b9616a6842d26ea3875d05e6f91a0e98ad4b71ad89d03355e2919bbfee",
+    "matchesProductTarballs": true,
+    "checkedBeforeGrading": true
+  },
+  "environment": {
+    "images": {
+      "agent": "sha256:cb52099e182cb906d36e2f400be917e1198a0e11d38aed2c6f1c1775c3e70c73",
+      "grader": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b",
+      "proxy": "sha256:ee37058be20fbaf8259f760ce19b1e8d09d477774d597c570318a3bfd46b069b"
+    },
+    "dockerVersion": "29.2.1",
+    "kernel": "6.8.0-146-generic",
+    "cpuModel": "AMD Ryzen 7 5800X3D 8-Core Processor",
+    "cpus": 16,
+    "memoryBytes": 33555574784,
+    "cgroup": null,
+    "isolationSelfTest": "078997ab046ae7a81cc6af581593c6fbe62b147dbde8f18828109fd89f7f764c",
+    "load": {
+      "samples": 20,
+      "min": 2.84,
+      "max": 3.98,
+      "median": 3.48
+    }
+  },
+  "integrity": {
+    "stream": "cli-unattested",
+    "channelAudit": {
+      "samples": 9,
+      "cliNonDumpable": true,
+      "foreignStreamHolders": 0,
+      "controlSocketConnections": null
+    },
+    "anomalies": [],
+    "proxy": {
+      "connections": 40,
+      "denied": 14,
+      "bytesUp": 353670,
+      "bytesDown": 38093794,
+      "targets": {
+        "sdmntprsouthcentralus.oaiusercontent.com:443": 6,
+        "sdmntprcentralus.oaiusercontent.com:443": 2,
+        "sdmntprnorthcentralus.oaiusercontent.com:443": 1,
+        "sdmntprcentralindia.oaiusercontent.com:443": 1,
+        "sdmntprnortheu.oaiusercontent.com:443": 1,
+        "chatgpt.com:443": 26,
+        "registry.npmjs.org:443": 1,
+        "ab.chatgpt.com:443": 2
+      },
+      "unparseableLines": 0
+    },
+    "contested": false
+  },
+  "timestamps": {
+    "prepare": {
+      "startedAt": "2026-10-21T15:33:24.340Z",
+      "endedAt": "2026-10-21T15:33:25.441Z",
+      "durationMs": 1101
+    },
+    "agent": {
+      "startedAt": "2026-10-21T15:33:25.991Z",
+      "endedAt": "2026-10-21T15:35:04.460Z",
+      "durationMs": 98469
+    },
+    "stage": {
+      "startedAt": "2026-10-21T15:35:05.306Z",
+      "endedAt": "2026-10-21T15:35:05.311Z",
+      "durationMs": 5
+    },
+    "archive-baseline": {
+      "startedAt": "2026-10-21T15:35:05.535Z",
+      "endedAt": "2026-10-21T15:35:05.609Z",
+      "durationMs": 74
+    },
+    "archive-final": {
+      "startedAt": "2026-10-21T15:35:05.609Z",
+      "endedAt": "2026-10-21T15:35:05.661Z",
+      "durationMs": 52
+    },
+    "grading": {
+      "startedAt": "2026-10-21T15:35:05.661Z",
+      "endedAt": "2026-10-21T15:35:08.657Z",
+      "durationMs": 2996
+    }
+  },
+  "outcome": {
+    "termination": "completed",
+    "class": "agent",
+    "code": "completed",
+    "valid": true,
+    "retry": {
+      "scheduled": false,
+      "backoffSeconds": null
+    },
+    "taskSuccess": true,
+    "breaches": []
+  },
+  "grading": {
+    "verdict": "pass",
+    "passes": [
+      {
+        "pass": "G1",
+        "status": "completed",
+        "verdict": "pass",
+        "resultSha256": "e3afb559517aa5b3dba7afcdced7bd22dcf036f0caaa54b99855db861a2fe332"
+      }
+    ],
+    "failingRequiredChecks": []
+  },
+  "metrics": {
+    "toolCalls": {
+      "total": {
+        "status": "estimate",
+        "value": 15,
+        "source": "codex.stream tool calls",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "calls"
+      },
+      "command": {
+        "status": "estimate",
+        "value": 13,
+        "source": "codex.stream tool calls",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "calls"
+      },
+      "file-write": {
+        "status": "estimate",
+        "value": 2,
+        "source": "codex.stream tool calls",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "calls"
+      },
+      "file-read": {
+        "status": "estimate",
+        "value": 0,
+        "source": "codex.stream tool calls",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "calls"
+      },
+      "search": {
+        "status": "estimate",
+        "value": 0,
+        "source": "codex.stream tool calls",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "calls"
+      },
+      "web": {
+        "status": "estimate",
+        "value": 0,
+        "source": "codex.stream tool calls",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "calls"
+      },
+      "subagent": {
+        "status": "estimate",
+        "value": 0,
+        "source": "codex.stream tool calls",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "calls"
+      },
+      "mcp": {
+        "status": "estimate",
+        "value": 0,
+        "source": "codex.stream tool calls",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "calls"
+      },
+      "other": {
+        "status": "estimate",
+        "value": 0,
+        "source": "codex.stream tool calls",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "calls"
+      }
+    },
+    "agentSteps": {
+      "status": "unknown",
+      "value": null,
+      "source": "codex (no step count)",
+      "integrity": null,
+      "method": null,
+      "unit": "api-round-trips"
+    },
+    "repairCycles": {
+      "status": "estimate",
+      "value": 0,
+      "source": "transcript+workspace-deltas",
+      "integrity": "cli-unattested",
+      "method": "cli-stream-unattested+transcript-heuristic/v1",
+      "lowerBound": 0,
+      "unit": "cycles"
+    },
+    "firstPassSuccess": "unknown",
+    "coverage": {
+      "complete": false,
+      "reasons": [
+        "opaque:0",
+        "opaque:1",
+        "opaque:2",
+        "opaque:3",
+        "opaque:4",
+        "opaque:5",
+        "opaque:6",
+        "opaque:8",
+        "opaque:9",
+        "opaque:10",
+        "opaque:11",
+        "opaque:12",
+        "opaque:14"
+      ]
+    },
+    "tokens": {
+      "raw": {
+        "usage": {
+          "input_tokens": 301064,
+          "cached_input_tokens": 259456,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 2760,
+          "reasoning_output_tokens": 168
+        }
+      },
+      "normalized": {
+        "total": {
+          "inputUncached": {
+            "status": "estimate",
+            "value": 41608,
+            "source": "codex.input_tokens-cached_input_tokens",
+            "integrity": "cli-unattested",
+            "method": "cli-stream-unattested",
+            "unit": "tokens"
+          },
+          "inputCacheRead": {
+            "status": "estimate",
+            "value": 259456,
+            "source": "codex.turn.completed.usage.cached_input_tokens",
+            "integrity": "cli-unattested",
+            "method": "cli-stream-unattested",
+            "unit": "tokens"
+          },
+          "inputCacheWrite": {
+            "status": "unknown",
+            "value": null,
+            "source": "codex.turn.completed.usage.cache_write_input_tokens",
+            "integrity": null,
+            "method": null,
+            "unit": "tokens",
+            "reason": "zero not established"
+          },
+          "inputTotal": {
+            "status": "estimate",
+            "value": 301064,
+            "source": "codex.turn.completed.usage.input_tokens",
+            "integrity": "cli-unattested",
+            "method": "cli-stream-unattested",
+            "unit": "tokens"
+          },
+          "outputTotal": {
+            "status": "estimate",
+            "value": 2760,
+            "source": "codex.turn.completed.usage.output_tokens",
+            "integrity": "cli-unattested",
+            "method": "cli-stream-unattested",
+            "unit": "tokens"
+          },
+          "outputReasoning": {
+            "status": "estimate",
+            "value": 168,
+            "source": "codex.turn.completed.usage.reasoning_output_tokens",
+            "integrity": "cli-unattested",
+            "method": "cli-stream-unattested",
+            "unit": "tokens"
+          }
+        },
+        "perModel": {}
+      },
+      "discrepancy": null
+    },
+    "cost": {
+      "status": "unknown",
+      "value": null,
+      "source": "codex (no cost field)",
+      "integrity": null,
+      "method": null,
+      "unit": "usd"
+    },
+    "elapsed": {
+      "agentPhaseMs": {
+        "status": "observed",
+        "value": 98469,
+        "source": "harness monotonic clock",
+        "integrity": "harness",
+        "method": null,
+        "unit": "ms"
+      },
+      "cliDurationMs": {
+        "status": "unknown",
+        "value": null,
+        "source": "codex (no duration)",
+        "integrity": null,
+        "method": null,
+        "unit": "ms"
+      },
+      "cliApiDurationMs": {
+        "status": "unknown",
+        "value": null,
+        "source": "codex (no duration)",
+        "integrity": null,
+        "method": null,
+        "unit": "ms"
+      }
+    },
+    "toolCost": {
+      "outputBytes": {
+        "status": "estimate",
+        "value": 63844,
+        "source": "codex.stream tool output",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested",
+        "unit": "bytes"
+      },
+      "wallMs": {
+        "status": "estimate",
+        "value": 3265,
+        "source": "harness receive times of stream tool events",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested+harness-receive-time",
+        "unit": "ms"
+      },
+      "containerCpuUsec": {
+        "status": "observed",
+        "value": 5595675,
+        "source": "cgroup cpu.stat",
+        "integrity": "harness",
+        "method": null,
+        "unit": "usec"
+      }
+    },
+    "compilerCost": {
+      "agentVerifyCommands": {
+        "status": "estimate",
+        "value": 0,
+        "source": "transcript",
+        "integrity": "cli-unattested",
+        "method": "cli-stream-unattested+transcript-heuristic/v1",
+        "unit": "commands"
+      },
+      "agentAttributedCommands": {
+        "status": "unknown",
+        "value": null,
+        "source": "transcript",
+        "integrity": null,
+        "method": null,
+        "unit": "commands",
+        "reason": "opaque commands present"
+      },
+      "harnessPrepareMs": {
+        "status": "observed",
+        "value": 1101,
+        "source": "harness monotonic clock",
+        "integrity": "harness",
+        "method": null,
+        "unit": "ms"
+      },
+      "harnessGradingMs": {
+        "status": "observed",
+        "value": 2996,
+        "source": "harness monotonic clock",
+        "integrity": "harness",
+        "method": null,
+        "unit": "ms"
+      }
+    },
+    "peakWorkspaceBytes": {
+      "status": "observed",
+      "value": 56016061,
+      "source": "confined workspace samples",
+      "integrity": "harness",
+      "method": null,
+      "unit": "bytes"
+    },
+    "visualFidelity": "unmeasured",
+    "vocabularyCompliance": "pass",
+    "scopeViolations": {
+      "realized": [],
+      "prevented": [],
+      "detected": []
+    }
+  },
+  "credential": {
+    "mode": "refresh-capable-copy",
+    "export": "unchanged",
+    "haltProvider": false,
+    "source": {
+      "configDir": "~/.codex",
+      "file": "auth.json",
+      "account": "chatgpt"
+    }
+  },
+  "evidence": {
+    "completeness": "complete",
+    "replay": "exact",
+    "affectedPaths": [],
+    "gradedSetDigest": "1b4402034781578902ab9e78bf222590f1e3dc17945f3f8f3344afbf9676e952",
+    "baselineSetDigest": "ccade1b457d92437900eb7ebe2920674c617fdaf32281fc566c06454b676c075",
+    "manifests": {
+      "final": "9bd82a72f66d3622c0141abe9cb4a472747929281dbc8505dd5569f9f87f6dca",
+      "baseline": "ce15f998bd4c328a146f9e64d0ff9f2f210f87594c062509c6f4bb28a25c31b9"
+    },
+    "stagedBytes": {
+      "final": 327237,
+      "baseline": 66903
+    },
+    "purged": [],
+    "artifacts": [
+      {
+        "file": "prompt.md",
+        "sha256": "7a80a90b754fb1829af545c42c000e77aed0b0d0ac1a6734b5d2b3f86b2f53ef",
+        "bytes": 1779,
+        "truncated": false,
+        "originalBytes": 1779,
+        "redacted": false
+      },
+      {
+        "file": "stream.jsonl",
+        "sha256": "476e5c05303bb6581a968fc522d2fae969b6ec1f19382c63f1acebbf3ad8cf35",
+        "bytes": 82586,
+        "truncated": false,
+        "originalBytes": 82586,
+        "redacted": false
+      },
+      {
+        "file": "stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "truncated": false,
+        "originalBytes": 0,
+        "redacted": false
+      },
+      {
+        "file": "transcript.jsonl",
+        "sha256": "93f73c0a27d323a81e913be215e559aac592a33c6740d9973c2872d736150dad",
+        "bytes": 5498,
+        "truncated": false,
+        "originalBytes": 5498,
+        "redacted": false
+      },
+      {
+        "file": "final-message.txt",
+        "sha256": "cc20a9197a4e21a5437731affddb1b0fdee957dd591cdc7f7080743219693fc0",
+        "bytes": 863,
+        "truncated": false,
+        "originalBytes": 863,
+        "redacted": false
+      },
+      {
+        "file": "observations.json",
+        "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "bytes": 2,
+        "truncated": false,
+        "originalBytes": 2,
+        "redacted": false
+      },
+      {
+        "file": "proxy.jsonl",
+        "sha256": "74ebfc2d8e9c710936652057686fe475ced05b8837cf4c589bf839b472295cdc",
+        "bytes": 4395,
+        "truncated": false,
+        "originalBytes": 4395,
+        "redacted": false
+      },
+      {
+        "file": "evaluation.json",
+        "sha256": "4f8cffca08d9ea44789a19891ecb5127c306349ceab62e31d32290d6aaf5de8b",
+        "bytes": 4889,
+        "truncated": false,
+        "originalBytes": 4889,
+        "redacted": false
+      }
+    ]
+  },
+  "eventErrors": {},
+  "classificationDetail": {
+    "haltProvider": false,
+    "haltMatrix": false,
+    "retry": false
+  }
+}
