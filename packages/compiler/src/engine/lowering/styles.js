@@ -24,6 +24,7 @@ import { tokenPathOf } from '../../design-system/tokens/ref';
 import {
   admittedValues,
   effectivePropertiesOf,
+  isPrototypeName,
   literalAllowed,
   propertyDomainsOf,
   propertyRow,
@@ -143,6 +144,11 @@ function admittedTokens(registry, categories, allowPrivateTokens) {
   return list;
 }
 
+/** A registered condition name: an own key of the registry's conditions. */
+function hasCondition(registry, name) {
+  return typeof name === 'string' && Object.hasOwn(registry.conditions, name);
+}
+
 /**
  * Normalizes a declaration value into { condition, tokenRef|literal } entries.
  * Property-oriented public form ({ base, <cond> }) normalized into blocks (D-05).
@@ -167,7 +173,7 @@ function expandValue(property, value, registry, source, refKind, diagnostics) {
         condName === 'base' || condName === 'default'
           ? BASE_CONDITION
           : condName;
-      if (cond !== BASE_CONDITION && registry.conditions[cond] == null) {
+      if (cond !== BASE_CONDITION && !hasCondition(registry, cond)) {
         diagnostics.push(
           diagnostic({
             code: Codes.UNKNOWN_CONDITION,
@@ -448,11 +454,26 @@ export function compileStyles({
     const outNs = {};
     for (const key of Object.keys(ns)) {
       const value = ns[key];
+      // An Object.prototype name is never a property nor a condition block:
+      // refused here, before the `_condition` and `:`/`@`/`[` dispatch.
+      if (isPrototypeName(key)) {
+        diagnostics.push(
+          unsupportedProperty(
+            key,
+            effectivePropertiesOf(registry),
+            null,
+            locate?.(nsName, key, null) ?? source,
+          ),
+        );
+        continue;
+      }
       // Author syntax `_hover` (carried over from Panda): named condition resolved
       // to its canonical definition before lowering.
       if (key.startsWith('_') && value !== null && typeof value === 'object') {
         const condName = key.slice(1);
-        const condDef = registry.conditions[condName]?.definition;
+        const condDef = hasCondition(registry, condName)
+          ? registry.conditions[condName].definition
+          : null;
         if (condDef == null) {
           diagnostics.push(
             diagnostic({
@@ -537,7 +558,9 @@ export function compileStyles({
         diagnostics,
       )) {
         const condDef =
-          condName == null ? null : registry.conditions[condName]?.definition;
+          condName == null || !hasCondition(registry, condName)
+            ? null
+            : registry.conditions[condName].definition;
         const lowered = checkValue({
           property: key,
           value: inner,
