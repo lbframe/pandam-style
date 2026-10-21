@@ -7,8 +7,8 @@
 
 // Committed CE-00.3 record validation.
 //
-//   node tools/baselines/validate-records.mjs [--json]
-//   node tools/baselines/validate-records.mjs --mutations
+//   node tools/baselines/validate-records.mjs [--base <rev>] [--json]
+//   node tools/baselines/validate-records.mjs --mutations [--base <rev>]
 //
 // Rechecks, from Git objects and committed files only (no store, no network,
 // full Git history required), through the existing commands:
@@ -20,26 +20,32 @@
 // - ce-corpus derivation: the CE-00.2 corpus record is the pinned accounting
 //   and policy candidates (derive-ce-corpus.mjs `candidates` and `prune`),
 //   less its recorded exclusions;
-// - results: every committed run's summary.json re-derives byte for byte
-//   (`summarize.mjs`), and every committed gate report re-derives from its
-//   runs at its recorded commit (`budgets.mjs gate`; only `provenance.rev`,
-//   the revision name it was invoked with, is not compared);
 // - budgets: every budgets.vN.json re-freezes byte for byte from its policy
-//   and baseline runs (`budgets.mjs freeze`), and the gate at HEAD verifies
-//   the budgets in force and passes on their own baseline runs;
-// - frozen: every file ever added under benchmarks/core-evolution, except
-//   README.md, is still present, with the bytes of the first-parent commit
-//   that added it, at HEAD and in the working tree.
+//   and baseline runs (`budgets.mjs freeze`). This couples the derivation to
+//   the committed policies on purpose: a derivation change must keep every
+//   committed version reproducible;
+// - frozen: every file under benchmarks/core-evolution, except README.md,
+//   that is published in the base is byte-identical at HEAD and in the
+//   working tree. The base is `--base <rev>`, else the merge base of HEAD
+//   and origin/main, or HEAD's first parent when HEAD is already on
+//   origin/main. Files absent from the base are unpublished and unconstrained
+//   by this rule.
+//
+// Committed results, summaries and gate reports are evidence: the frozen
+// rule protects their bytes, and they are not recomputed with today's
+// scripts.
 //
 // Local-only, because they need the archived alpha1 store: the store digests
 // (`archive.mjs verify --store <copy> --replay`), and the CE-00.2 corpus
 // exclusions, which only the Alpha 1 compiler decides
-// (`derive-ce-corpus.mjs --closure <store>/closure`, then `git diff`). The
-// measurements themselves are evidence and cannot be re-observed.
+// (`derive-ce-corpus.mjs --closure <store>/closure`, then `git diff`).
 //
 // --mutations commits one edit per class to a temporary clone of HEAD and
-// requires the validator of that clone to fail the checks of that class; an
-// unmutated clone must pass. Uncommitted changes are not part of the clone.
+// requires the validator of that clone, with the same base, to fail the
+// checks of that class; an unmutated clone must pass. It then runs the frozen
+// rule on temporary repositories built with real Git histories (branch,
+// merge, squash, rebase, detached HEAD). Uncommitted changes are not part of
+// the clone.
 
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -58,8 +64,7 @@ import {
 } from './derive-ce-corpus.mjs';
 
 const BENCH_DIR = path.relative(REPO, BENCH);
-const RESULTS = path.join(BENCH, 'results');
-const GATE_KIND = 'pandamstyle-ce003-gate';
+const README = `${BENCH_DIR}/README.md`;
 
 const tool = (script, args) =>
   spawnSync(
@@ -71,8 +76,8 @@ const tool = (script, args) =>
       maxBuffer: 1 << 30,
     },
   );
-const git = (args) =>
-  spawnSync('git', args, { cwd: REPO, encoding: 'utf8', maxBuffer: 1 << 30 });
+const git = (args, root = REPO) =>
+  spawnSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 1 << 30 });
 const rel = (file) => path.relative(REPO, file);
 const declarationsOf = (derivation) =>
   derivation.stylesheets.flatMap((s) => s.declarations);
@@ -152,73 +157,6 @@ async function derivationCheck() {
   return problems;
 }
 
-function resultFiles(dir = RESULTS) {
-  return fs
-    .readdirSync(dir, { withFileTypes: true })
-    .flatMap((e) =>
-      e.isDirectory()
-        ? resultFiles(path.join(dir, e.name))
-        : [path.join(dir, e.name)],
-    )
-    .sort();
-}
-
-function resultsCheck(work) {
-  const problems = [];
-  const files = resultFiles();
-  for (const raw of files.filter((f) => path.basename(f) === 'raw.json')) {
-    const summary = path.join(path.dirname(raw), 'summary.json');
-    const out = path.join(
-      work,
-      `summary-${problems.length}-${Date.now()}.json`,
-    );
-    const r = tool('summarize.mjs', [raw, '--out', out]);
-    if (r.status !== 0 || !fs.existsSync(out))
-      problems.push(`${rel(raw)}: summarize.mjs exited ${r.status}`);
-    else if (!fs.existsSync(summary))
-      problems.push(`${rel(summary)} is not committed`);
-    else if (!fs.readFileSync(out).equals(fs.readFileSync(summary)))
-      problems.push(`${rel(summary)} does not re-derive from ${rel(raw)}`);
-  }
-  const reports = files.filter((f) => {
-    if (!f.endsWith('.json') || /\/(raw|summary)\.json$/.test(f)) return false;
-    try {
-      return readJson(f).kind === GATE_KIND;
-    } catch {
-      return false;
-    }
-  });
-  if (reports.length === 0) problems.push('no committed gate report');
-  for (const file of reports) {
-    const report = readJson(file);
-    const args = [
-      'gate',
-      '--rev',
-      String(report.provenance?.commit),
-      '--candidate',
-      String(report.candidate),
-      '--reference',
-      String(report.reference),
-    ];
-    for (const { label } of report.load ?? [])
-      args.push('--results', path.join(RESULTS, String(label), 'raw.json'));
-    const r = tool('budgets.mjs', args);
-    let regenerated = null;
-    try {
-      regenerated = JSON.parse(r.stdout);
-      regenerated.provenance.rev = report.provenance.rev;
-    } catch {
-      problems.push(`${rel(file)}: the gate produced no report (${r.stderr})`);
-      continue;
-    }
-    if (JSON.stringify(regenerated) !== JSON.stringify(report))
-      problems.push(
-        `${rel(file)} does not re-derive from its runs at ${String(report.provenance?.commit).slice(0, 12)}`,
-      );
-  }
-  return problems;
-}
-
 function budgetsCheck(work) {
   const problems = [];
   const versions = fs
@@ -239,89 +177,77 @@ function budgetsCheck(work) {
     else if (!fs.readFileSync(out).equals(fs.readFileSync(file)))
       problems.push(`${rel(file)} does not re-freeze byte for byte`);
   }
-  // The gate at HEAD verifies the budgets in force back to version 1 from
-  // Git; a null comparison of their own baseline runs must pass.
-  const inForce = versions.at(-1);
-  if (inForce != null) {
-    const refs = readJson(path.join(BENCH, inForce)).baseline.results;
-    const raws = refs.map((ref) => readJson(path.join(REPO, ref.path)));
-    const candidates = [
-      ...new Set(
-        raws.flatMap((raw) =>
-          raw.epochs.map((e) => e.name).filter((n) => n !== 'alpha1'),
-        ),
-      ),
-    ];
-    if (candidates.length !== 1)
-      problems.push(
-        `${inForce}: baseline runs name ${candidates.length} candidates`,
-      );
-    else {
-      const args = ['gate', '--rev', 'HEAD', '--candidate', candidates[0]];
-      for (const ref of refs) args.push('--results', path.join(REPO, ref.path));
-      const r = tool('budgets.mjs', args);
-      let verdict = null;
-      try {
-        verdict = JSON.parse(r.stdout).verdict;
-      } catch {}
-      if (verdict !== 'pass')
-        problems.push(
-          `gate at HEAD on the ${inForce} baseline runs: ${verdict ?? r.stderr.trim()}`,
-        );
-    }
-  }
   return problems;
 }
 
-function frozenCheck() {
-  if (git(['rev-parse', '--is-shallow-repository']).stdout.trim() !== 'false')
-    return ['shallow clone: the frozen check needs the full Git history'];
-  const log = git([
-    'log',
-    '--first-parent',
-    '--diff-merges=first-parent',
-    '--no-renames',
-    '--diff-filter=A',
-    '--format=%x00%H',
-    '--name-only',
-    'HEAD',
-    '--',
-    BENCH_DIR,
-  ]);
-  if (log.status !== 0) return [`git log failed: ${log.stderr}`];
-  // Newest first: the last commit seen for a path is the one that added it.
-  const added = new Map();
-  for (const chunk of log.stdout.split('\0').filter(Boolean)) {
-    const [commit, ...names] = chunk.split('\n').filter(Boolean);
-    for (const name of names) added.set(name, commit);
-  }
-  added.delete(`${BENCH_DIR}/README.md`);
-  if (added.size === 0) return ['no frozen file in the first-parent history'];
-  const blob = (spec) => {
-    const r = git(['rev-parse', '--verify', '--quiet', spec]);
+// The base whose published files are frozen.
+export function baseOf(root = REPO, explicit = null) {
+  const commit = (spec) => {
+    const r = git(
+      ['rev-parse', '--verify', '--quiet', `${spec}^{commit}`],
+      root,
+    );
     return r.status === 0 ? r.stdout.trim() : null;
   };
+  if (explicit != null) {
+    const base = commit(explicit);
+    if (base == null) throw new Error(`unknown base ${explicit}`);
+    return base;
+  }
+  if (commit('origin/main') == null)
+    throw new Error('no origin/main: fetch it or pass --base <rev>');
+  const mb = git(['merge-base', 'HEAD', 'origin/main'], root);
+  if (mb.status !== 0) throw new Error('HEAD and origin/main share no history');
+  const base = mb.stdout.trim();
+  if (base !== commit('HEAD')) return base;
+  const parent = commit('HEAD^1');
+  if (parent == null) throw new Error('HEAD has no first parent');
+  return parent;
+}
+
+export function frozenProblems(root = REPO, explicitBase = null) {
+  if (
+    git(['rev-parse', '--is-shallow-repository'], root).stdout.trim() !==
+    'false'
+  )
+    return ['shallow clone: the frozen check needs the full Git history'];
+  let base;
+  try {
+    base = baseOf(root, explicitBase);
+  } catch (error) {
+    return [error.message];
+  }
+  const listing = git(['ls-tree', '-r', '-z', base, '--', BENCH_DIR], root);
+  if (listing.status !== 0) return [`git ls-tree failed: ${listing.stderr}`];
+  const published = listing.stdout
+    .split('\0')
+    .filter(Boolean)
+    .map((line) => {
+      const [meta, name] = line.split('\t');
+      return { name, blob: meta.split(' ')[2] };
+    })
+    .filter(({ name }) => name !== README);
   const problems = [];
-  for (const [name, commit] of [...added].sort()) {
-    const first = blob(`${commit}:${name}`);
-    const head = blob(`HEAD:${name}`);
-    const file = path.join(REPO, name);
+  for (const { name, blob } of published) {
+    const r = git(['rev-parse', '--verify', '--quiet', `HEAD:${name}`], root);
+    const head = r.status === 0 ? r.stdout.trim() : null;
+    const file = path.join(root, name);
     const tree = fs.existsSync(file)
       ? execFileSync('git', ['hash-object', '--', file], {
-          cwd: REPO,
+          cwd: root,
           encoding: 'utf8',
         }).trim()
       : null;
-    if (head == null) problems.push(`${name} was removed`);
-    else if (head !== first)
-      problems.push(`${name} changed since ${commit.slice(0, 12)}`);
-    if (tree !== first && head === first)
+    if (head == null) problems.push(`${name} was removed or renamed`);
+    else if (head !== blob)
+      problems.push(`${name} differs from the base ${base.slice(0, 12)}`);
+    else if (tree !== blob)
       problems.push(`${name} differs in the working tree`);
   }
   return problems;
 }
 
-export async function validate() {
+export async function validate({ base = null } = {}) {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'ce003-records-'));
   try {
     const groups = [];
@@ -337,9 +263,8 @@ export async function validate() {
     await run('manifest', manifestCheck);
     await run('workloads', workloadsCheck);
     await run('ce-corpus derivation', derivationCheck);
-    await run('results', () => resultsCheck(work));
     await run('budgets', () => budgetsCheck(work));
-    await run('frozen', frozenCheck);
+    await run('frozen', () => frozenProblems(REPO, base));
     return groups;
   } finally {
     fs.rmSync(work, { recursive: true, force: true });
@@ -413,7 +338,7 @@ const MUTATIONS = [
   },
   {
     name: 'result sample of a gate run',
-    expect: ['results'],
+    expect: ['frozen'],
     edit: (dir) =>
       editJson(dir, `${B}/results/gate-injected-slowdown/raw.json`, (raw) => {
         raw.samples[0].result.moduleLoadMs *= 2;
@@ -421,7 +346,7 @@ const MUTATIONS = [
   },
   {
     name: 'result sample of a baseline run',
-    expect: ['results', 'budgets'],
+    expect: ['budgets', 'frozen'],
     edit: (dir) =>
       editJson(dir, `${B}/results/alpha1-v3-sk-c1/raw.json`, (raw) => {
         raw.samples[0].result.moduleLoadMs *= 2;
@@ -429,7 +354,7 @@ const MUTATIONS = [
   },
   {
     name: 'committed summary',
-    expect: ['results'],
+    expect: ['frozen'],
     edit: (dir) =>
       editJson(dir, `${B}/results/alpha1-final-1/summary.json`, (summary) => {
         summary.sampleCount += 1;
@@ -437,7 +362,7 @@ const MUTATIONS = [
   },
   {
     name: 'committed gate report',
-    expect: ['results'],
+    expect: ['frozen'],
     edit: (dir) =>
       editJson(
         dir,
@@ -449,7 +374,7 @@ const MUTATIONS = [
   },
   {
     name: 'budget limit',
-    expect: ['budgets'],
+    expect: ['budgets', 'frozen'],
     edit: (dir) =>
       editJson(dir, `${B}/budgets.v3.json`, (b) => {
         b.budgets.find((x) => x.limit?.maxRatio != null).limit.maxRatio += 0.05;
@@ -482,6 +407,247 @@ const MUTATIONS = [
   },
 ];
 
+// ------------------------------------------------ frozen-rule topologies
+
+// Each fixture is a temporary repository with a real history: `main`
+// publishes A (and the README), then the scenario runs. `origin/main` is a
+// real ref set to the published tip, as a fetch would leave it.
+const FA = `${BENCH_DIR}/a.json`;
+const FB = `${BENCH_DIR}/b.json`;
+
+function fixtureRepo(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+  const g = (...args) =>
+    execFileSync(
+      'git',
+      ['-c', 'user.name=fixture', '-c', 'user.email=fixture@invalid', ...args],
+      { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+    ).trim();
+  const write = (file, text) => {
+    fs.mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });
+    fs.writeFileSync(path.join(dir, file), text);
+  };
+  const commit = (message, files = {}) => {
+    for (const [file, text] of Object.entries(files)) write(file, text);
+    g('add', '--all');
+    g('commit', '--quiet', '--allow-empty', '-m', message);
+  };
+  g('init', '--quiet', '--initial-branch=main');
+  commit('publish', { [FA]: 'a1\n', [README]: 'r1\n' });
+  const publish = () => g('update-ref', 'refs/remotes/origin/main', 'main');
+  publish();
+  return { g, write, commit, publish };
+}
+
+const TOPOLOGIES = [
+  {
+    name: 'branch: published file edited',
+    expect: 'reject',
+    because: 'differs from the base',
+    run: ({ g, commit }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('edit A', { [FA]: 'a2\n' });
+    },
+  },
+  {
+    name: 'branch: file added then edited before merge',
+    expect: 'accept',
+    run: ({ g, commit }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('add B', { [FB]: 'b1\n' });
+      commit('edit B', { [FB]: 'b2\n' });
+    },
+  },
+  {
+    name: 'branch: README edited',
+    expect: 'accept',
+    run: ({ g, commit }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('edit README', { [README]: 'r2\n' });
+    },
+  },
+  {
+    name: 'branch: published file removed',
+    expect: 'reject',
+    because: 'removed or renamed',
+    run: ({ g, commit }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      g('rm', '--quiet', FA);
+      commit('remove A');
+    },
+  },
+  {
+    name: 'branch: published file renamed',
+    expect: 'reject',
+    because: 'removed or renamed',
+    run: ({ g, commit }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      g('mv', FA, `${BENCH_DIR}/renamed.json`);
+      commit('rename A');
+    },
+  },
+  {
+    name: 'branch: published file edited, not committed',
+    expect: 'reject',
+    because: 'differs in the working tree',
+    run: ({ g, commit, write }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('other', { 'other.txt': 'o\n' });
+      write(FA, 'a2\n');
+    },
+  },
+  {
+    name: 'PR merge ref: published file edited on the branch',
+    expect: 'reject',
+    because: 'differs from the base',
+    run: ({ g, commit }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('edit A', { [FA]: 'a2\n' });
+      g('checkout', '--quiet', '--detach', 'main');
+      g('merge', '--quiet', '--no-ff', '-m', 'merge ref', 'topic');
+    },
+  },
+  {
+    name: 'merge commit on main: file added then edited before merge',
+    expect: 'accept',
+    run: ({ g, commit, publish }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('add B', { [FB]: 'b1\n' });
+      commit('edit B', { [FB]: 'b2\n' });
+      g('checkout', '--quiet', 'main');
+      g('merge', '--quiet', '--no-ff', '-m', 'merge topic', 'topic');
+      publish();
+    },
+  },
+  {
+    name: 'merge commit on main, then the merged file edited',
+    expect: 'reject',
+    because: 'differs from the base',
+    run: ({ g, commit, publish }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('add B', { [FB]: 'b1\n' });
+      g('checkout', '--quiet', 'main');
+      g('merge', '--quiet', '--no-ff', '-m', 'merge topic', 'topic');
+      publish();
+      commit('edit B', { [FB]: 'b2\n' });
+      publish();
+    },
+  },
+  {
+    name: 'squash on main: file added then edited before merge',
+    expect: 'accept',
+    run: ({ g, commit, publish }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('add B', { [FB]: 'b1\n' });
+      commit('edit B', { [FB]: 'b2\n' });
+      g('checkout', '--quiet', 'main');
+      g('merge', '--quiet', '--squash', 'topic');
+      commit('squash topic');
+      publish();
+    },
+  },
+  {
+    name: 'squash on main: published file edited',
+    expect: 'reject',
+    because: 'differs from the base',
+    run: ({ g, commit, publish }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('edit A', { [FA]: 'a2\n' });
+      g('checkout', '--quiet', 'main');
+      g('merge', '--quiet', '--squash', 'topic');
+      commit('squash topic');
+      publish();
+    },
+  },
+  {
+    name: 'rebased branch: published file edited in an earlier commit',
+    expect: 'reject',
+    because: 'differs from the base',
+    run: ({ g, commit, publish }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('edit A', { [FA]: 'a2\n' });
+      commit('other', { 'other.txt': 'o\n' });
+      g('checkout', '--quiet', 'main');
+      commit('main moves', { 'main.txt': 'm\n' });
+      publish();
+      g('checkout', '--quiet', 'topic');
+      g('rebase', '--quiet', 'main');
+    },
+  },
+  {
+    name: 'rebased branch: file added then edited before merge',
+    expect: 'accept',
+    run: ({ g, commit, publish }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('add B', { [FB]: 'b1\n' });
+      commit('edit B', { [FB]: 'b2\n' });
+      g('checkout', '--quiet', 'main');
+      commit('main moves', { 'main.txt': 'm\n' });
+      publish();
+      g('checkout', '--quiet', 'topic');
+      g('rebase', '--quiet', 'main');
+    },
+  },
+  {
+    name: 'rebase merge pushed to main, published file edited in an earlier commit, --base <tip before the push>',
+    expect: 'reject',
+    because: 'differs from the base',
+    run: ({ g, commit, publish }) => {
+      const before = g('rev-parse', 'main');
+      commit('edit A', { [FA]: 'a2\n' });
+      commit('other', { 'other.txt': 'o\n' });
+      publish();
+      return before;
+    },
+  },
+  {
+    name: 'detached HEAD: published file edited',
+    expect: 'reject',
+    because: 'differs from the base',
+    run: ({ g, commit }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('edit A', { [FA]: 'a2\n' });
+      g('checkout', '--quiet', '--detach', 'topic');
+    },
+  },
+  {
+    name: 'detached HEAD: unchanged',
+    expect: 'accept',
+    run: ({ g, commit }) => {
+      g('checkout', '--quiet', '-b', 'topic');
+      commit('other', { 'other.txt': 'o\n' });
+      g('checkout', '--quiet', '--detach', 'topic');
+    },
+  },
+  {
+    name: 'no origin/main and no --base',
+    expect: 'reject',
+    because: 'no origin/main',
+    run: ({ g }) => {
+      g('update-ref', '-d', 'refs/remotes/origin/main');
+    },
+  },
+];
+
+function topologies(work) {
+  return TOPOLOGIES.map((t, i) => {
+    let problems;
+    try {
+      const base = t.run(fixtureRepo(path.join(work, `topology-${i}`)));
+      problems = frozenProblems(path.join(work, `topology-${i}`), base ?? null);
+    } catch (error) {
+      problems = [`fixture error: ${error.message}`];
+      return { t, ok: false, problems };
+    }
+    // A rejection counts only for its expected reason.
+    const ok =
+      t.expect === 'reject'
+        ? problems.length > 0 && problems.every((p) => p.includes(t.because))
+        : problems.length === 0;
+    return { t, ok, problems };
+  });
+}
+
 function runAsync(args, cwd) {
   return new Promise((resolve) => {
     const child = spawn(process.execPath, args, { cwd });
@@ -493,9 +659,10 @@ function runAsync(args, cwd) {
   });
 }
 
-async function mutations() {
+async function mutations(explicitBase) {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'ce003-records-mut-'));
   try {
+    const base = baseOf(REPO, explicitBase);
     const outcomes = await Promise.all(
       MUTATIONS.map(async (m, i) => {
         const dir = path.join(work, `clone-${i}`);
@@ -521,7 +688,12 @@ async function mutations() {
           execFileSync('git', commit, { cwd: dir });
         }
         const r = await runAsync(
-          [path.join(dir, 'tools/baselines/validate-records.mjs'), '--json'],
+          [
+            path.join(dir, 'tools/baselines/validate-records.mjs'),
+            '--json',
+            '--base',
+            base,
+          ],
           dir,
         );
         let groups;
@@ -550,7 +722,16 @@ async function mutations() {
     console.log(
       `record mutations: ${outcomes.length - bad}/${outcomes.length} as expected`,
     );
-    return bad === 0;
+    const fixtures = topologies(work);
+    for (const { t, ok, problems } of fixtures)
+      console.log(
+        `${ok ? 'ok  ' : 'FAIL'} ${t.name}: expected ${t.expect}, ${problems.length === 0 ? 'accepted' : `rejected (${problems[0]})`}`,
+      );
+    const badFixtures = fixtures.filter((f) => !f.ok).length;
+    console.log(
+      `frozen-rule topologies: ${fixtures.length - badFixtures}/${fixtures.length} as expected`,
+    );
+    return bad === 0 && badFixtures === 0;
   } finally {
     fs.rmSync(work, { recursive: true, force: true });
   }
@@ -559,11 +740,13 @@ async function mutations() {
 // -------------------------------------------------------------------- cli
 
 async function main() {
+  const at = process.argv.indexOf('--base');
+  const base = at >= 0 ? process.argv[at + 1] : null;
   if (process.argv.includes('--mutations')) {
-    if (!(await mutations())) process.exitCode = 1;
+    if (!(await mutations(base))) process.exitCode = 1;
     return;
   }
-  const groups = await validate();
+  const groups = await validate({ base });
   if (process.argv.includes('--json'))
     process.stdout.write(`${JSON.stringify(groups)}\n`);
   else {

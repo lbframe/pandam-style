@@ -39,11 +39,21 @@ jobs:
       - run: yarn install --frozen-lockfile
       # CE-00.3 committed records, from committed files and Git only (no
       # archived store, no network), then one mutation per checked class.
+      # Frozen files are those published in the base: origin/main for a pull
+      # request, the tip before the push for a push to main (a rebase merge
+      # can push several commits at once).
       - name: baseline records
         if: ${{ !cancelled() }}
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
         run: |
-          node tools/baselines/validate-records.mjs
-          node tools/baselines/validate-records.mjs --mutations
+          base=()
+          if [ "$EVENT" = push ] && [ -n "$BEFORE" ] && [ "${BEFORE//0/}" != "" ]; then
+            base=(--base "$BEFORE")
+          fi
+          node tools/baselines/validate-records.mjs "${base[@]}"
+          node tools/baselines/validate-records.mjs --mutations "${base[@]}"
       - name: flow
         if: ${{ !cancelled() }}
         run: yarn flow

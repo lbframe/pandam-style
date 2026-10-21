@@ -48,8 +48,8 @@ node tools/baselines/gate-regression.mjs
 
 # Committed records, without the store (CI), and their mutation tests.
 node tools/baselines/archive.mjs verify --committed
-node tools/baselines/validate-records.mjs
-node tools/baselines/validate-records.mjs --mutations
+node tools/baselines/validate-records.mjs [--base <rev>]
+node tools/baselines/validate-records.mjs --mutations [--base <rev>]
 ```
 
 With `--require-quiet`, `measure.mjs` exits with status 3 and writes

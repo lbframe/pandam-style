@@ -625,20 +625,47 @@ node tools/baselines/budgets.mjs gate --rev <evaluated revision> \
 the CI `static` job. It needs the full Git history, but no store and no network.
 It reuses the existing commands:
 
-| Check                  | What it proves                                                                                                                                                 |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `manifest`             | `archive.mjs verify --committed` passes                                                                                                                        |
-| `workloads`            | `workloads.mjs digest` reports every frozen workload as `frozen`                                                                                               |
-| `ce-corpus derivation` | `workloads/ce-corpus.v1.json` equals the candidates of the pinned accounting and policy less its recorded exclusions, with matching inputs and totals          |
-| `results`              | every `summary.json` re-derives from its `raw.json`, and every committed gate report re-derives from its runs at its recorded commit (except `provenance.rev`) |
-| `budgets`              | every `budgets.vN.json` re-freezes byte for byte, and the gate at `HEAD` verifies the budgets in force and passes on their baseline runs                       |
-| `frozen`               | every file ever added here, except this README, keeps the bytes of the first-parent commit that added it, at `HEAD` and in the working tree                    |
+| Check                  | What it proves                                                                                                                                        |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `manifest`             | `archive.mjs verify --committed` passes                                                                                                               |
+| `workloads`            | `workloads.mjs digest` reports every frozen workload as `frozen`                                                                                      |
+| `ce-corpus derivation` | `workloads/ce-corpus.v1.json` equals the candidates of the pinned accounting and policy less its recorded exclusions, with matching inputs and totals |
+| `budgets`              | every `budgets.vN.json` re-freezes byte for byte from its policy and baseline runs with the current derivation                                        |
+| `frozen`               | every file here except this README that is published in the base is byte-identical at `HEAD` and in the working tree                                  |
 
-`--mutations` commits one edit per class to a temporary clone and requires the
-clone's validator to fail that class: a manifest digest and source tree, a
-frozen workload (also with its digest re-bound), a synthetic workload seed, a
-result sample, a summary, a gate report, a budget limit, and a frozen file
-edited, left uncommitted or removed. An unmutated clone must pass.
+- **Intended coupling.** The `budgets` check binds the current derivation to
+  every committed policy version on purpose. A derivation change must keep each
+  committed `budgets.vN.json` reproducible, as the version 3 change did.
+- **Evidence is not recomputed.** Committed results, summaries and gate reports
+  are evidence. The `frozen` rule protects their bytes, and they are not
+  re-derived with today's scripts.
+- **Base.** The base of the `frozen` rule is the merge base of `HEAD` and
+  `origin/main`, or `HEAD`'s first parent when `HEAD` is already on
+  `origin/main`. On a push to `main`, CI passes the tip before the push
+  (`--base`), because a rebase merge can push several commits at once.
+- **Unpublished files.** Files absent from the base are not constrained by
+  `frozen`: they may change until they merge. Their other checks still apply.
+  Removing or renaming a published file fails.
+
+`--mutations` commits one edit per class to a temporary clone, with the same
+base, and requires the clone's validator to fail that class. The classes are:
+
+- a manifest digest and the source tree;
+- a frozen workload, also with its digest re-bound;
+- a synthetic workload seed;
+- result samples, a summary and a gate report;
+- a budget limit;
+- a frozen file edited, left uncommitted or removed.
+
+An unmutated clone must pass. The run then applies the `frozen` rule to
+temporary repositories with real Git histories:
+
+- direct branches;
+- a pull-request merge ref and a merge commit;
+- squash and rebase;
+- a multi-commit push to `main`;
+- detached `HEAD`;
+- a file added then edited before its merge (accepted), or after it (rejected).
 
 Two checks stay local-only, because they need the archived store:
 
