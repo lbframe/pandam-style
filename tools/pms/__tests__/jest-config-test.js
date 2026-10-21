@@ -222,6 +222,8 @@ describe('the root jest configuration is not a broad ignore', () => {
         'packages/compiler/__tests__/pandamstyle/targets-transform-test.js',
         // #130 Babel path-cache eviction.
         'packages/compiler/__tests__/pandamstyle/babel-path-cache-test.js',
+        // CE-02.1 property descriptors.
+        'packages/compiler/__tests__/pandamstyle/property-descriptors-test.js',
       ].sort(),
     );
   });

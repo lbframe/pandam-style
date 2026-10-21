@@ -15,10 +15,13 @@
  */
 
 import { PATTERN_CATALOG, PATTERN_IDS } from '../patterns/compile';
+import { propertyDomainsOf, propertyManifestOf } from '../policy/domains';
 
 const ABI_VERSION = 1;
 const COMPILER_CONTRACT_VERSION = 'pms-0.1';
-const MANIFEST_SCHEMA_VERSION = 1;
+// Version 2 (CE-02.1): `supportedProperties` is replaced by `properties`, the
+// projection of the effective property table.
+export const MANIFEST_SCHEMA_VERSION = 2;
 const lexicalCompare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
 export const DESIGN_SYSTEM_CAPABILITIES = Object.freeze({
@@ -127,7 +130,7 @@ export function createCanonicalDesignSystemSnapshot({
   themes,
   recipes,
   cssRules,
-  supportedProperties,
+  properties,
   targets = null,
   targetFacts = null,
 }) {
@@ -219,8 +222,9 @@ export function createCanonicalDesignSystemSnapshot({
     themeDetails,
     recipes: recipesCatalog,
     patterns: PATTERN_CATALOG,
-    supportedProperties,
+    properties: propertyManifestOf(properties),
   };
+  const propertyDomains = propertyDomainsOf(properties);
   const publicConditions = [...conditionNames];
   const candidateDomains = {
     tokens: {
@@ -250,12 +254,19 @@ export function createCanonicalDesignSystemSnapshot({
     themes: themeIds.filter((name) => name !== 'base'),
     conditions: publicConditions,
     patterns: { ids: [...PATTERN_IDS], byPattern: PATTERN_CATALOG },
+    properties: propertyDomains,
   };
 
   // The target members arrive deep-frozen from their producers (resolution
   // and evaluation); the snapshot freeze does not walk them again.
   const frozenMembers = new WeakSet();
-  for (const member of [targets, targetFacts]) {
+  for (const member of [
+    targets,
+    targetFacts,
+    properties,
+    manifest.properties,
+    propertyDomains,
+  ]) {
     if (member != null && Object.isFrozen(member)) frozenMembers.add(member);
   }
   return deepFreeze(
@@ -268,6 +279,10 @@ export function createCanonicalDesignSystemSnapshot({
       // schemaVersion. Null when the snapshot is built without targets.
       targets,
       targetFacts,
+      // CE-02.1: the effective property table, the only source of property
+      // domains for policy, types, the manifest and candidates. Pre-frozen and
+      // shared while no design system overrides a domain.
+      properties,
       registry,
       vocabulary: {
         tokens,
@@ -299,6 +314,7 @@ export function createCanonicalDesignSystemSnapshot({
           themes: candidateDomains.themes,
           conditions: candidateDomains.conditions,
           patterns: candidateDomains.patterns,
+          properties: propertyDomains.byProperty,
         },
       },
     },
@@ -383,6 +399,13 @@ export function repairDomainOf(snapshot, query = {}) {
       return query.patternId == null
         ? domains.patterns
         : (domains.patterns.byPattern[query.patternId] ?? null);
+    case 'property':
+      return query.property == null
+        ? domains.properties
+        : typeof query.property === 'string' &&
+            Object.hasOwn(domains.properties, query.property)
+          ? domains.properties[query.property]
+          : null;
     default:
       return null;
   }
