@@ -7,6 +7,7 @@
 
 import { createHash } from 'crypto';
 import { diagnostic, Codes, PmsError } from '../../protocol/diagnostics';
+import { MANIFEST_SCHEMA_VERSION } from '../../design-system/registry/snapshot';
 
 const ARTIFACTS = ['designModule', 'declarations', 'manifest', 'css'];
 
@@ -104,7 +105,7 @@ export function validateArtifactSet(metadata, contents) {
     metadata.schemaVersion !== 1 ||
     metadata.abiVersion !== 1 ||
     metadata.compilerContractVersion !== 'pms-0.1' ||
-    metadata.manifestSchemaVersion !== 1
+    metadata.manifestSchemaVersion !== MANIFEST_SCHEMA_VERSION
   ) {
     mismatch('artifacts.json', 'unsupported schema or compiler identity');
   }

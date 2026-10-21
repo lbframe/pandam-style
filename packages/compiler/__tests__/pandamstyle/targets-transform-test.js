@@ -59,6 +59,16 @@ const ENGINES = [
 ];
 const camel = (name) => name.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 const kebab = (name) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+// The admitted property domains, read from a canonical snapshot (CE-02.1).
+const propertyDomains = compiler.repairDomainOf(
+  compiler.buildDesignSystem({ systemId: 'transform-domains', tokens: {} })
+    .snapshot,
+  { kind: 'property' },
+);
+const admittedValuesOf = (property) =>
+  Object.hasOwn(propertyDomains, property)
+    ? propertyDomains[property].values
+    : [];
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
 function outcomesOf(record, query) {
@@ -201,7 +211,7 @@ describe('proof obligations of every entry, executed', () => {
   test.each(TABLE.entries.map((e) => [e.id, e]))(
     '%s: every admitted value of the base is paired',
     (_, entry) => {
-      const admitted = compiler.structuralDomain(camel(entry.property));
+      const admitted = admittedValuesOf(camel(entry.property));
       expect(admitted.length).toBeGreaterThan(0);
       for (const value of admitted) expect(entry.values).toContain(value);
     },
@@ -245,14 +255,13 @@ describe('the rewrite class', () => {
   });
 
   test('over the whole admitted structural vocabulary, the stage only inserts table variants', () => {
-    const properties = Object.keys(
-      compiler.supportedProperties().structuralSets,
+    const properties = Object.keys(propertyDomains).filter(
+      (property) => propertyDomains[property].values.length > 0,
     );
     expect(properties.length).toBeGreaterThan(20);
     let paired = 0;
     for (const property of properties) {
-      for (const value of compiler.structuralDomain(property)) {
-        if (value.startsWith('number in')) continue;
+      for (const value of admittedValuesOf(property)) {
         const css = `.x{${kebab(property)}:${value}}`;
         const entry = targets.transformOfProperty(kebab(property));
         const out = targets.applyTransforms(css);

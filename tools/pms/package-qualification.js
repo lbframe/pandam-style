@@ -2610,8 +2610,8 @@ async function runExternalConsumer(
   const compilerPackage = packages['@pandamstyle/compiler'].first;
   const compiledImports = [
     ...new Set(
-      // Code files only: lib also ships the compat-data JSON asset (CE-01.1),
-      // which has no imports.
+      // Code files only: lib also ships JSON data assets with no imports (the
+      // CE-01.1 compat data and the CE-02.1 recognized property names).
       listFiles(path.join(compilerPackage.packageDir, 'lib'))
         .filter((file) => CODE_FILE_RE.test(file))
         .flatMap((file) => importsOf(fs.readFileSync(file, 'utf8'))),

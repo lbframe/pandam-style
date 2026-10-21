@@ -265,7 +265,7 @@ describe('Phase 6 canonical design-system projections', () => {
       registryDigest: ds.registry.registryDigest,
       abiVersion: 1,
       compilerContractVersion: 'pms-0.1',
-      manifestSchemaVersion: 1,
+      manifestSchemaVersion: 2,
     });
     expect(snapshot.capabilities).toEqual({
       slots: true,
