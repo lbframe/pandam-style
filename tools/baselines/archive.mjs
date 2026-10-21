@@ -10,6 +10,7 @@
 //   node tools/baselines/archive.mjs build    [--store <dir>]
 //   node tools/baselines/archive.mjs manifest [--store <dir>]
 //   node tools/baselines/archive.mjs verify   [--store <dir>] [--replay]
+//   node tools/baselines/archive.mjs verify   --committed
 //   node tools/baselines/archive.mjs closure  --dest <dir> [--store <dir>]
 //
 // The store holds large binaries outside Git (default
@@ -20,6 +21,8 @@
 // store's identities; `verify` recomputes every recorded digest, and with
 // --replay also reinstalls the closure offline from the committed lockfile and
 // the archived npm cache, re-creates the source archive and compares both.
+// `verify --committed` runs only the checks that Git objects and committed
+// files can prove, without a store or network.
 
 import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
@@ -562,6 +565,27 @@ function corpusRecord(id, commit, prefixes, description) {
   };
 }
 
+const PRODUCT_PATHS = [
+  'packages/*/src',
+  'packages/*/types',
+  'packages/*/package.json',
+  'packages/*/bin',
+  'packages/*/README.md',
+  'packages/*/LICENSE',
+  'packages/*/ATTRIBUTIONS.md',
+  'packages/compiler/rollup.config.mjs',
+  'package.json',
+  'yarn.lock',
+];
+
+function productDifference() {
+  return execFileSync(
+    'git',
+    ['diff', '--stat', RELEASE_TAG, COMMIT, '--', ...PRODUCT_PATHS],
+    { cwd: REPO, encoding: 'utf8' },
+  ).trim();
+}
+
 function manifest(store) {
   const closure = path.join(store, 'closure');
   const lock = readJson(path.join(CLOSURE_DIR, 'package-lock.json'));
@@ -653,28 +677,8 @@ function manifest(store) {
       productEquivalence: {
         statement:
           'Package sources, types, manifests, build configuration, lockfile and package READMEs/licenses are identical at the release tag commit, f3e8803 and the baseline commit; the commits differ in documentation, AgentDoc catalog, CI metadata, .gitignore and typos configuration only.',
-        command: `git diff --stat ${RELEASE_TAG} ${COMMIT} -- packages/*/src packages/*/types packages/*/package.json packages/*/bin packages/*/README.md packages/*/LICENSE packages/*/ATTRIBUTIONS.md packages/compiler/rollup.config.mjs package.json yarn.lock`,
-        output: execFileSync(
-          'git',
-          [
-            'diff',
-            '--stat',
-            RELEASE_TAG,
-            COMMIT,
-            '--',
-            'packages/*/src',
-            'packages/*/types',
-            'packages/*/package.json',
-            'packages/*/bin',
-            'packages/*/README.md',
-            'packages/*/LICENSE',
-            'packages/*/ATTRIBUTIONS.md',
-            'packages/compiler/rollup.config.mjs',
-            'package.json',
-            'yarn.lock',
-          ],
-          { cwd: REPO, encoding: 'utf8' },
-        ).trim(),
+        command: `git diff --stat ${RELEASE_TAG} ${COMMIT} -- ${PRODUCT_PATHS.join(' ')}`,
+        output: productDifference(),
       },
     },
     lockfiles: [
@@ -829,17 +833,25 @@ export function installClosure(store, dest) {
   return tree;
 }
 
-export function verify(store, { replay = false, rebuilt = false } = {}) {
-  const record = readJson(MANIFEST);
+// The manifest records that Git objects and committed files prove: the
+// source tree, the release tag and product equivalence, the lockfiles, the
+// closure lockfile entries of the packages, and the file-by-file assets and
+// corpora. Everything else needs the store.
+export function verifyCommitted(record = readJson(MANIFEST)) {
   const checks = [];
-  const notes = [];
   const check = (name, actual, expected) =>
     checks.push({ name, ok: actual === expected, actual, expected });
-  check(
-    'source archive',
-    fileSha256(path.join(store, record.source.archive.file)),
-    record.source.archive.sha256,
-  );
+  const git = (args) => {
+    try {
+      return execFileSync('git', args, {
+        cwd: REPO,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }).trim();
+    } catch {
+      return `unavailable: git ${args.join(' ')}`;
+    }
+  };
   check(
     'source tree',
     execFileSync('git', ['rev-parse', `${record.source.commit}^{tree}`], {
@@ -847,6 +859,19 @@ export function verify(store, { replay = false, rebuilt = false } = {}) {
       encoding: 'utf8',
     }).trim(),
     record.source.tree,
+  );
+  check(
+    `release tag ${record.source.release.gitTag}`,
+    git(['rev-parse', `${record.source.release.gitTag}^{commit}`]),
+    record.source.release.gitTagCommit,
+  );
+  check(
+    'product equivalence',
+    record.source.productEquivalence.command ===
+      `git diff --stat ${RELEASE_TAG} ${COMMIT} -- ${PRODUCT_PATHS.join(' ')}`
+      ? productDifference()
+      : 'a different command',
+    record.source.productEquivalence.output,
   );
   for (const lockfile of record.lockfiles) {
     const actual =
@@ -861,6 +886,47 @@ export function verify(store, { replay = false, rebuilt = false } = {}) {
         : fileSha256(path.join(REPO, lockfile.path));
     check(`lockfile ${lockfile.path}`, actual, lockfile.sha256);
   }
+  const lock = readJson(path.join(CLOSURE_DIR, 'package-lock.json'));
+  for (const pkg of record.packages) {
+    check(
+      `${pkg.name} closure lock integrity`,
+      pkg.closureLock.integrity,
+      pkg.registry.registryIntegrity,
+    );
+    const locked = lock.packages[`node_modules/${pkg.name}`] ?? {};
+    check(
+      `${pkg.name} committed closure lockfile entry`,
+      `${locked.resolved} ${locked.integrity}`,
+      `${pkg.closureLock.resolved} ${pkg.closureLock.integrity}`,
+    );
+  }
+  for (const [name, args, recorded] of [
+    ['assets', CORPORA.assets, record.assets],
+    ...CORPORA.corpora.map((args, i) => [
+      `corpus ${args[0]}`,
+      args,
+      record.corpora[i],
+    ]),
+  ])
+    check(
+      name,
+      JSON.stringify(corpusRecord(...args)),
+      JSON.stringify(recorded),
+    );
+  return checks;
+}
+
+export function verify(store, { replay = false, rebuilt = false } = {}) {
+  const record = readJson(MANIFEST);
+  const checks = verifyCommitted(record);
+  const notes = [];
+  const check = (name, actual, expected) =>
+    checks.push({ name, ok: actual === expected, actual, expected });
+  check(
+    'source archive',
+    fileSha256(path.join(store, record.source.archive.file)),
+    record.source.archive.sha256,
+  );
   for (const pkg of record.packages) {
     const registryBytes = fs.readFileSync(path.join(store, pkg.registry.file));
     check(
@@ -871,11 +937,6 @@ export function verify(store, { replay = false, rebuilt = false } = {}) {
     check(
       `${pkg.name} registry integrity`,
       sha512Integrity(registryBytes),
-      pkg.registry.registryIntegrity,
-    );
-    check(
-      `${pkg.name} closure lock integrity`,
-      pkg.closureLock.integrity,
       pkg.registry.registryIntegrity,
     );
     check(
@@ -1059,10 +1120,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       `wrote ${path.relative(REPO, NPM_CACHE_RECORD)}: ${JSON.stringify(inventory.contentTree)}`,
     );
   } else if (command === 'verify') {
-    const checks = verify(store, {
-      replay: argv.includes('--replay'),
-      rebuilt: argv.includes('--rebuilt'),
-    });
+    const checks = argv.includes('--committed')
+      ? Object.assign(verifyCommitted(), { notes: [] })
+      : verify(store, {
+          replay: argv.includes('--replay'),
+          rebuilt: argv.includes('--rebuilt'),
+        });
     for (const c of checks)
       console.log(
         `${c.ok ? 'ok  ' : 'FAIL'} ${c.name}${c.ok ? '' : ` (actual ${c.actual}, expected ${c.expected})`}`,
@@ -1073,7 +1136,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     if (failed > 0) process.exitCode = 1;
   } else {
     console.error(
-      'usage: archive.mjs build|manifest|npm-cache-record|verify|closure [--store <dir>] [--replay] [--rebuilt] [--dest <dir>]',
+      'usage: archive.mjs build|manifest|npm-cache-record|verify|closure [--store <dir>] [--replay] [--rebuilt] [--committed] [--dest <dir>]',
     );
     process.exitCode = 2;
   }

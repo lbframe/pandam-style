@@ -24,6 +24,10 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - uses: actions/checkout@v6
+        with:
+          # The committed-record check reads the frozen CE-00.3 records and
+          # their pinned inputs from Git history and tags.
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: '22.x'
@@ -33,6 +37,13 @@ jobs:
           corepack enable && corepack prepare yarn@1.22.22 --activate
           echo "YARN_CACHE_FOLDER=$RUNNER_TOOL_CACHE/yarn-cache" >> "$GITHUB_ENV"
       - run: yarn install --frozen-lockfile
+      # CE-00.3 committed records, from committed files and Git only (no
+      # archived store, no network), then one mutation per checked class.
+      - name: baseline records
+        if: ${{ !cancelled() }}
+        run: |
+          node tools/baselines/validate-records.mjs
+          node tools/baselines/validate-records.mjs --mutations
       - name: flow
         if: ${{ !cancelled() }}
         run: yarn flow

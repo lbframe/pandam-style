@@ -10,7 +10,7 @@ classifier, which needs the repository install.
 | File                         | Purpose                                                                                                                                                                                    |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `lib.mjs`                    | Digests, tree digests, statistics (median, nearest-rank p95, order-statistic intervals, paired-ratio bootstrap, spread, CV), environment and machine-load records, the optional quiet rule |
-| `archive.mjs`                | `build`, `manifest`, `npm-cache-record`, `verify [--replay]` and `closure --dest` for the digest-bound Alpha 1 store, with non-vacuous file-level tree digests                             |
+| `archive.mjs`                | `build`, `manifest`, `npm-cache-record`, `verify [--replay \| --committed]` and `closure --dest` for the digest-bound Alpha 1 store, with non-vacuous file-level tree digests              |
 | `tree-digest-regression.mjs` | Regression test for vacuous tree digests (`--store <copy>` adds the real store)                                                                                                            |
 | `workloads.mjs`              | Materializes frozen workloads from Git objects, the derived corpus record or the seeded generator, and refuses any other digest; `digest` and `materialize` subcommands                    |
 | `derive-ce-corpus.mjs`       | Derives `workloads/ce-corpus.v1.json` from the CE-00.2 accounting and the Alpha 1 policy at pinned commits, excluding what the Alpha 1 compiler rejects                                    |
@@ -19,6 +19,7 @@ classifier, which needs the repository install.
 | `summarize.mjs`              | Metric definitions and summaries; pools runs and compares epochs                                                                                                                           |
 | `budgets.mjs`                | `freeze` (policy + baseline runs → budgets) and `gate` (candidate against `alpha1`, same run), with budgets provenance, control identity and observation validation                        |
 | `gate-regression.mjs`        | Class-level regression matrix of the gate's input validation, with a seeded omission and perturbation fuzzer (`--fuzz-samples <n>`, `--no-fuzz`)                                           |
+| `validate-records.mjs`       | Rechecks the committed records from Git only, through the commands above; `--mutations` proves each check fails its class                                                                  |
 
 ## Commands
 
@@ -44,6 +45,11 @@ node tools/baselines/budgets.mjs gate [--rev <revision>] \
 
 # Gate input-validation regression matrix.
 node tools/baselines/gate-regression.mjs
+
+# Committed records, without the store (CI), and their mutation tests.
+node tools/baselines/archive.mjs verify --committed
+node tools/baselines/validate-records.mjs
+node tools/baselines/validate-records.mjs --mutations
 ```
 
 With `--require-quiet`, `measure.mjs` exits with status 3 and writes

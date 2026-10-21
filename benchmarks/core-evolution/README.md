@@ -68,12 +68,16 @@ node tools/baselines/archive.mjs build --store <empty dir>  # registry, nodejs.o
 node tools/baselines/archive.mjs verify --store <dir> --replay --rebuilt  # a rebuilt store
 node tools/baselines/archive.mjs verify --store <copy of the archived store> --replay
 node tools/baselines/archive.mjs closure --store <dir> --dest <dir>  # offline closure copy
+node tools/baselines/archive.mjs verify --committed  # no store: what Git proves
 ```
 
 `verify` recomputes every digest of the manifest. `--replay` then re-creates the
 source archive and reinstalls the closure offline with `npm ci --offline`. The
 reinstalled tree must be byte-identical to the recorded one, apart from npm's
-hidden `.package-lock.json`.
+hidden `.package-lock.json`. `verify --committed` needs no store: it runs only
+the checks that Git objects and committed files can prove. Those are the source
+tree, the release tag commit, product equivalence, the lockfiles, the packages'
+closure lockfile entries, and the assets and corpora file by file.
 
 The store and `manifest.v1.json` are immutable. Run `verify --replay` and any
 digest recomputation on a copy of the store, because an offline `npm ci` writes
@@ -616,3 +620,30 @@ node tools/baselines/budgets.mjs gate --rev <evaluated revision> \
   - the exact predecessor, by path and SHA-256;
   - a new comparable baseline run, because reused result files are rejected;
   - a justified relaxation entry for every loosened or removed budget.
+
+**Committed-record check.** `node tools/baselines/validate-records.mjs` runs in
+the CI `static` job. It needs the full Git history, but no store and no network.
+It reuses the existing commands:
+
+| Check                  | What it proves                                                                                                                                                 |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `manifest`             | `archive.mjs verify --committed` passes                                                                                                                        |
+| `workloads`            | `workloads.mjs digest` reports every frozen workload as `frozen`                                                                                               |
+| `ce-corpus derivation` | `workloads/ce-corpus.v1.json` equals the candidates of the pinned accounting and policy less its recorded exclusions, with matching inputs and totals          |
+| `results`              | every `summary.json` re-derives from its `raw.json`, and every committed gate report re-derives from its runs at its recorded commit (except `provenance.rev`) |
+| `budgets`              | every `budgets.vN.json` re-freezes byte for byte, and the gate at `HEAD` verifies the budgets in force and passes on their baseline runs                       |
+| `frozen`               | every file ever added here, except this README, keeps the bytes of the first-parent commit that added it, at `HEAD` and in the working tree                    |
+
+`--mutations` commits one edit per class to a temporary clone and requires the
+clone's validator to fail that class: a manifest digest and source tree, a
+frozen workload (also with its digest re-bound), a synthetic workload seed, a
+result sample, a summary, a gate report, a budget limit, and a frozen file
+edited, left uncommitted or removed. An unmutated clone must pass.
+
+Two checks stay local-only, because they need the archived store:
+
+- the store digests: `archive.mjs verify --store <copy> --replay`;
+- the CE-00.2 corpus exclusions, which only the Alpha 1 compiler decides:
+  `derive-ce-corpus.mjs --closure <store>/closure`, then `git diff`.
+
+The measurements themselves cannot be re-observed.
