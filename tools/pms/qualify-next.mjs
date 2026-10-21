@@ -18,9 +18,11 @@ import net from 'node:net';
 import { createRequire, isBuiltin } from 'node:module';
 import { writeSemanticDevPerformance } from './next-semantic-dev-performance.mjs';
 import nextBrowserProfile from './next-browser-profile.js';
+import browserTooling from './browser.js';
 import { cssIdentityProblems, hostCssIdentity } from './host-css-identity.mjs';
 
 const { createNextBrowserProfile } = nextBrowserProfile;
+const { nextBrowserExecutable, qualifyBrowser } = browserTooling;
 
 async function main() {
   const runId = randomUUID();
@@ -28,6 +30,10 @@ async function main() {
     path.dirname(fileURLToPath(import.meta.url)),
     '../..',
   );
+  // Before any build or temporary app: an unexpected CI browser fails here.
+  const browserIdentity = qualifyBrowser({
+    executable: nextBrowserExecutable(),
+  });
   const output = path.resolve(process.argv[2]);
   const app = process.argv[3]
     ? path.resolve(process.argv[3])
@@ -41,6 +47,7 @@ async function main() {
     runId,
     app,
     node: process.version,
+    browser: browserIdentity,
     packages: {},
     production: [],
     dev: [],
@@ -640,10 +647,7 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
 
     try {
       browser = await puppeteer.launch({
-        executablePath:
-          process.env.PMS_NEXT_CHROMIUM ??
-          process.env.PMS_CHROMIUM ??
-          '/usr/local/bin/chromium',
+        executablePath: browserIdentity.executable,
         headless: true,
         userDataDir: browserProfile.userDataDir,
         args: ['--no-sandbox'],

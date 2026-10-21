@@ -13,8 +13,11 @@ const path = require('node:path');
 const os = require('node:os');
 const { createHash } = require('node:crypto');
 const { spawnSync } = require('node:child_process');
+const { qualifyBrowser } = require('../pms/browser');
 
 const repo = path.resolve(__dirname, '../..');
+// Before any install: an unexpected CI browser fails here.
+const browser = qualifyBrowser();
 const output = path.resolve(
   process.argv[2] ?? path.join(repo, 'evidence/phase-11-rsbuild/qualification'),
 );
@@ -22,7 +25,7 @@ const consumer = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-phase11-rsbuild-'));
 fs.mkdirSync(output, { recursive: true });
 const tarballs = path.join(consumer, '.tarballs');
 fs.mkdirSync(tarballs);
-const env = { ...process.env };
+const env = { ...process.env, PMS_CHROMIUM: browser.executable };
 delete env.NODE_PATH;
 function run(command, args, cwd = consumer) {
   const result = spawnSync(command, args, {

@@ -99,9 +99,18 @@ regression test for this class.
   - **`contentTree` (archived identity):** the content-addressed entries of the
     archived store's cache (`_cacache/content-v2`): 314 files, 460,115,581
     bytes, SHA-256 `4fa28496…`. The original `npm install` also cached 212
-    registry-metadata entries, so a rebuilt store holds only the 102 tarballs
-    (135,164,055 bytes). `verify --rebuilt` reports that difference as a note; a
-    plain `verify` requires the archived inventory.
+    registry-metadata entries, which a rebuilt store does not reproduce.
+    `verify --rebuilt` reports that difference as a note; a plain `verify`
+    requires the archived inventory.
+- **A rebuilt cache is not a fixed inventory.**
+  - A rebuild must contain the **102 required installed-package tarballs**
+    (135,164,055 bytes). It may contain additional optional entries.
+  - The exact rebuilt inventory depends on npm behavior. In the PR #103
+    review, a fresh build with the archived Node 22.22.0 and npm 10.9.4 cached
+    106 files: the 102 tarballs and 4 uninstalled WASM dependencies of the
+    Rspack binding. All 106 match their lockfile integrity values.
+  - `verify --rebuilt` proves the 102 tarballs only. It is never evidence of
+    full archived-store identity.
 - `verify` reports the manifest field as a note, never as a check.
 - The offline replay was sound throughout: npm checks every tarball against the
   lockfile integrity, and the reinstalled tree digest was compared with the

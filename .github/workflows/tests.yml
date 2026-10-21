@@ -15,7 +15,7 @@ jobs:
   # One install for every static check (one dedicated runner). Each check
   # still runs and reports when an earlier one fails.
   static:
-    runs-on: [self-hosted, lbframe-ci, sk]
+    runs-on: [self-hosted, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
     # Fork PRs never run on the self-hosted runner (this repository is public).
     if: >-
@@ -51,7 +51,7 @@ jobs:
           config: .github/workflows/typos.toml
 
   pandamstyle:
-    runs-on: [self-hosted, lbframe-ci, sk]
+    runs-on: [self-hosted, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
     # Fork PRs never run on the self-hosted runner (this repository is public).
     if: >-
@@ -91,16 +91,23 @@ jobs:
       # devDependency) plugins forwarding `targets`, the Next semantic-dev
       # suites and the source-map type check.
       - run: node tools/pms/verify-dx-runtime.mjs
-      # Step logs stay on the self-hosted host; keep them when a step fails.
-      - if: failure()
+      # The run's evidence stays on the self-hosted host: keep it on every run,
+      # passed or failed. Regenerated build artifacts and the pilot work tree
+      # are left out; the pilot reports are kept from artifacts/.
+      - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: verify-pms-evidence
-          path: evidence/native/*.log
+          path: |
+            evidence/native/
+            !evidence/native/artifacts/**
+            !evidence/native/pilot/**
+            evidence/native/artifacts/*.json
+            evidence/native/artifacts/digests.txt
           retention-days: 7
 
   agentic-corpus:
-    runs-on: [self-hosted, lbframe-ci, sk]
+    runs-on: [self-hosted, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
     # Fork PRs never run on the self-hosted runner (this repository is public).
     if: >-

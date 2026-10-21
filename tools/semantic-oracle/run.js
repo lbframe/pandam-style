@@ -15,11 +15,12 @@ const {
   catalog,
   outputDirectory,
 } = require('./integrity');
+const { qualifyBrowser } = require('../pms/browser');
 const repo = path.resolve(__dirname, '../..');
 const manifest = require('../../tests/semantic/inventory.json');
 const { cases } = require('../../tests/semantic/cases');
 
-function report(out) {
+function report(out, browser = null) {
   const rows = cases.map((spec) => {
     const p = path.join(out, 'cases', spec.id + '.json');
     return fs.existsSync(p)
@@ -80,6 +81,8 @@ function report(out) {
       cwd: repo,
       encoding: 'utf8',
     }).trim(),
+    // The executable the browser cases launched and the identity it reported.
+    browser,
     caseCount: rows.length,
     mustPreserveCount: preserve.length,
     knownGapCount: rows.filter((c) => c.status === 'KNOWN_GAP').length,
@@ -115,6 +118,8 @@ function run(out) {
   fs.rmSync(path.join(out, 'semantic-oracle.json'), { force: true });
   fs.rmSync(path.join(out, 'cases'), { recursive: true, force: true });
   catalog(manifest, cases, repo);
+  // Before any case runs: an unexpected CI browser fails here.
+  const browser = qualifyBrowser();
   const expected = inventory(repo, manifest);
   fs.writeFileSync(
     path.join(out, 'semantic-inventory.json'),
@@ -144,10 +149,14 @@ function run(out) {
     {
       cwd: repo,
       stdio: 'inherit',
-      env: { ...process.env, PMS_SEMANTIC_REPORT_DIR: out },
+      env: {
+        ...process.env,
+        PMS_SEMANTIC_REPORT_DIR: out,
+        PMS_CHROMIUM: browser.executable,
+      },
     },
   );
-  const data = report(out);
+  const data = report(out, browser);
   if (result.status !== 0) return result.status ?? 1;
   const counts = execution(
     repo,

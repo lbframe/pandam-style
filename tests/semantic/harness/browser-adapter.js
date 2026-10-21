@@ -13,6 +13,10 @@ const { spawnSync } = require('child_process');
 const esbuild = require('esbuild');
 const React = require('react');
 const { renderToString } = require('react-dom/server');
+const {
+  browserExecutable,
+  boundedTail,
+} = require('../../../tools/pms/browser');
 
 function observeBrowser(root, out, spec, exports, css) {
   const browser = spec.observe.browser;
@@ -60,8 +64,9 @@ function observeBrowser(root, out, spec, exports, css) {
     htmlPath,
     `<!doctype html><html><head><style>${css}</style></head><body><div id="mount">${markup}</div><script>${script.replaceAll('</script', '<\\/script')}${read}</script></body></html>`,
   );
+  const executable = browserExecutable();
   const child = spawnSync(
-    process.env.PMS_CHROMIUM ?? 'chromium',
+    executable,
     [
       '--headless',
       '--disable-gpu',
@@ -76,14 +81,16 @@ function observeBrowser(root, out, spec, exports, css) {
   fs.rmSync(scratch, { recursive: true, force: true });
   if (child.status !== 0)
     throw new Error(
-      'Semantic browser execution failed: ' + child.stderr.slice(-1200),
+      `Semantic browser execution failed (${executable}, exit ${child.status ?? child.signal ?? child.error?.message}): ` +
+        boundedTail(child.stderr ?? ''),
     );
   const encoded = child.stdout.match(
     /<title>PMS_RESULT_([A-Za-z0-9+/=]+)<\/title>/,
   )?.[1];
   if (!encoded)
     throw new Error(
-      'Semantic browser produced no result: ' + child.stderr.slice(-1200),
+      `Semantic browser produced no result (${executable}): ` +
+        boundedTail(child.stderr ?? ''),
     );
   const result = JSON.parse(Buffer.from(encoded, 'base64').toString());
   return {
