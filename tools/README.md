@@ -27,9 +27,9 @@ browser. [`pms/browser.js`](pms/browser.js) resolves it for all of them.
 - `PMS_NEXT_CHROMIUM` overrides it for the Next qualification only, for
   example with a profile-storage wrapper.
 - The tooling reads the browser identity from `<executable> --version` and
-  records the executable, product and version in its reports: the semantic
-  oracle in `semantic-oracle.json`, the Next qualification in its
-  `report.json`.
+  records the executable, product, version and pin in its reports: the
+  semantic oracle in `semantic-oracle.json`, the Next and Rsbuild
+  qualifications in their `report.json`.
 - [`pms/ci-browser.json`](pms/ci-browser.json) commits the expected CI browser
   product and full version. The CI host manages that browser, outside this
   repository. When `CI` is set, the semantic oracle and the Next and Rsbuild
@@ -37,6 +37,12 @@ browser. [`pms/browser.js`](pms/browser.js) resolves it for all of them.
   identity. Locally, they only print a warning. After a deliberate browser
   upgrade on the CI host, update `product` and `version` in that file from the
   host's `--version` output.
+- `PMS_BROWSER_PIN` names another committed pin, as a path inside this
+  repository (relative paths resolve from its root). The pin replaces the CI
+  pin, and a browser with another identity fails even outside CI.
+  [`epochs/alpha1/browser.v1.json`](../benchmarks/core-evolution/epochs/alpha1/browser.v1.json)
+  pins the archived Chromium engine of the `alpha1` store; see
+  [Browser evidence on the archived engine](../benchmarks/core-evolution/README.md#browser-evidence-on-the-archived-engine).
 - A semantic-oracle browser failure keeps the last 65,536 characters of the
   browser's stderr in its case report. A longer stream is cut with an explicit
   truncation line.

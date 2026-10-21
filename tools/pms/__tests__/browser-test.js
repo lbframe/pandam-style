@@ -16,6 +16,7 @@ const {
   browserExecutable,
   nextBrowserExecutable,
   isCI,
+  browserPin,
   expectedBrowser,
   readBrowserIdentity,
   qualifyBrowser,
@@ -124,6 +125,7 @@ test('the expected browser passes silently, in CI and locally', () => {
       product: 'Google Chrome',
       version: '155.0.8059.84',
       expected: EXPECTED,
+      pin: 'tools/pms/ci-browser.json',
       matchesExpected: true,
     });
     expect(warnings).toEqual([]);
@@ -157,6 +159,118 @@ test('an unexpected version or product fails in CI and only warns locally', () =
     });
     expect(warnings).toEqual([error.message]);
   }
+});
+
+test('PMS_BROWSER_PIN names a committed pin, or the CI pin applies', () => {
+  const ALPHA1 = 'benchmarks/core-evolution/epochs/alpha1/browser.v1.json';
+  expect(browserPin({})).toBe('tools/pms/ci-browser.json');
+  expect(browserPin({ PMS_BROWSER_PIN: '' })).toBe('tools/pms/ci-browser.json');
+  expect(browserPin({ PMS_BROWSER_PIN: ALPHA1 })).toBe(ALPHA1);
+  expect(browserPin({ PMS_BROWSER_PIN: path.join(ROOT, ALPHA1) })).toBe(ALPHA1);
+  // Class-level: any path that leaves the repository is rejected, so the
+  // recorded pin always names a file reviewers can read.
+  for (const outside of [
+    path.join(scratch, 'pin.json'),
+    '../pin.json',
+    'tools/../../pin.json',
+    '/pin.json',
+  ])
+    expect(() => browserPin({ PMS_BROWSER_PIN: outside })).toThrow(
+      /^BROWSER_PIN_OUTSIDE_REPOSITORY: /,
+    );
+  expect(expectedBrowser(ALPHA1)).toEqual({
+    product: 'Google Chrome for Testing',
+    version: '148.0.7778.96',
+  });
+});
+
+test('a named pin is enforced locally and recorded in the identity', () => {
+  const ALPHA1 = 'benchmarks/core-evolution/epochs/alpha1/browser.v1.json';
+  const env = { PMS_BROWSER_PIN: ALPHA1 };
+  const pinned = fakeBrowser(
+    'echo "Google Chrome for Testing 148.0.7778.96 "',
+    'pinned',
+  );
+  const warnings = [];
+  const identity = qualifyBrowser({
+    env,
+    executable: pinned,
+    warn: (message) => warnings.push(message),
+  });
+  expect(identity).toEqual({
+    executable: pinned,
+    product: 'Google Chrome for Testing',
+    version: '148.0.7778.96',
+    expected: {
+      product: 'Google Chrome for Testing',
+      version: '148.0.7778.96',
+    },
+    pin: ALPHA1,
+    matchesExpected: true,
+  });
+  expect(warnings).toEqual([]);
+  // Another version, another product, or the CI browser itself all fail
+  // without CI being set.
+  for (const [index, output] of [
+    'Google Chrome for Testing 148.0.7778.97',
+    'Chromium 148.0.7778.96',
+    'Google Chrome 155.0.8059.84',
+  ].entries()) {
+    const other = fakeBrowser(`echo "${output}"`, `other-${index}`);
+    expect(() =>
+      qualifyBrowser({ env, executable: other, warn: () => {} }),
+    ).toThrow(
+      new RegExp(
+        `^BROWSER_VERSION_UNEXPECTED: .*${output}; ${ALPHA1} pins Google Chrome for Testing 148\\.0\\.7778\\.96`,
+      ),
+    );
+  }
+  expect(() =>
+    qualifyBrowser({
+      env,
+      executable: path.join(scratch, 'missing'),
+      warn: () => {},
+    }),
+  ).toThrow(/BROWSER_IDENTITY_UNAVAILABLE/);
+  // The harnesses read the pin from the environment they run in.
+  const previous = process.env.PMS_BROWSER_PIN;
+  process.env.PMS_BROWSER_PIN = ALPHA1;
+  try {
+    expect(qualifyBrowser({ executable: pinned })).toMatchObject({
+      pin: ALPHA1,
+      matchesExpected: true,
+    });
+  } finally {
+    if (previous === undefined) delete process.env.PMS_BROWSER_PIN;
+    else process.env.PMS_BROWSER_PIN = previous;
+  }
+});
+
+test('the alpha1 browser pin names the archived engine of the frozen manifest', () => {
+  const pin = JSON.parse(
+    fs.readFileSync(
+      path.join(
+        ROOT,
+        'benchmarks/core-evolution/epochs/alpha1/browser.v1.json',
+      ),
+      'utf8',
+    ),
+  );
+  const manifest = JSON.parse(
+    fs.readFileSync(
+      path.join(
+        ROOT,
+        'benchmarks/core-evolution/epochs/alpha1/manifest.v1.json',
+      ),
+      'utf8',
+    ),
+  );
+  const engine = manifest.engines.find((item) => item.name === pin.engine);
+  expect(pin.epoch).toBe(manifest.epoch);
+  expect(engine).toBeDefined();
+  expect(pin.version).toBe(engine.browserVersion);
+  expect(pin.executable.startsWith(engine.path + '/')).toBe(true);
+  expect(pin.product).toMatch(/\S/);
 });
 
 test('an unreadable browser identity fails in CI and is recorded locally', () => {
