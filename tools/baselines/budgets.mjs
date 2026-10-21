@@ -617,7 +617,15 @@ const SNAPSHOT = {
   foreignBusyCores: T.nonneg,
   foreignHeavyCores: T.nonneg,
 };
-const USAGE = { maxRssBytes: T.pos, userCpuMs: T.pos, systemCpuMs: T.pos };
+// CPU times come from process.resourceUsage(), which the kernel may account
+// in ticks: a process can legitimately record zero system (or user) time.
+// Zero is valid; negative, non-finite and missing values stay invalid. Peak
+// RSS of a running process cannot be zero.
+const USAGE = {
+  maxRssBytes: T.pos,
+  userCpuMs: T.nonneg,
+  systemCpuMs: T.nonneg,
+};
 const SIZES = { bytes: T.pos, gzipBytes: T.pos, brotliBytes: T.pos };
 const ITERATION_TIMES = [
   'applyMs',

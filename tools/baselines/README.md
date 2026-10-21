@@ -56,9 +56,10 @@ with `npm install --ignore-scripts`. Measure it in the same run as `alpha1`. The
 gate rejects results without both epochs.
 
 Rerunning `budgets.mjs freeze` with the committed policy and the committed
-baseline results must reproduce `budgets.v1.json` byte for byte. `gate` reads
-the budgets in force from Git at `--rev` and verifies them back to version 1;
-`--budgets <file>` only selects them when the file is byte-identical, and is
-otherwise evaluated in `not-release` mode, which never passes. See the
+baseline results must reproduce each committed `budgets.vN.json` byte for byte
+(version 2 is in force). `gate` reads the budgets in force from Git at `--rev`
+and verifies them back to version 1; `--budgets <file>` only selects them when
+the file is byte-identical, and is otherwise evaluated in `not-release` mode,
+which never passes. See the
 [benchmark README](../../benchmarks/core-evolution/README.md#budgets) for the
 validated inputs and verdicts.
