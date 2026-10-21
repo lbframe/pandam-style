@@ -15,7 +15,7 @@ jobs:
   # One install for every static check (one dedicated runner). Each check
   # still runs and reports when an earlier one fails.
   static:
-    runs-on: [self-hosted, lbframe-ci, sk]
+    runs-on: [self-hosted, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
     # Fork PRs never run on the self-hosted runner (this repository is public).
     if: >-
@@ -51,7 +51,7 @@ jobs:
           config: .github/workflows/typos.toml
 
   pandamstyle:
-    runs-on: [self-hosted, lbframe-ci, sk]
+    runs-on: [self-hosted, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
     # Fork PRs never run on the self-hosted runner (this repository is public).
     if: >-
@@ -92,7 +92,7 @@ jobs:
           retention-days: 7
 
   agentic-corpus:
-    runs-on: [self-hosted, lbframe-ci, sk]
+    runs-on: [self-hosted, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
     # Fork PRs never run on the self-hosted runner (this repository is public).
     if: >-
