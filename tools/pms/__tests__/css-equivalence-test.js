@@ -647,3 +647,150 @@ describe('canonical micro-syntax, by the specification', () => {
     );
   });
 });
+
+// CE-01.2 bounded verification (PR #117): a canonicaliser equates two
+// spellings only when both are valid under its strict grammar; otherwise the
+// tokens are compared (fail-closed). B11, B12 and one invalid form per
+// canonicaliser, each against its valid spelling.
+describe('fail-closed canonicalisers (B11, B12)', () => {
+  test.each([
+    [
+      'B11 font-family: generic first',
+      '.a{font-family:"serif foo"}',
+      '.a{font-family:serif foo}',
+    ],
+    [
+      'B11 font-family: hyphenated generic first',
+      '.a{font-family:"sans-serif foo"}',
+      '.a{font-family:sans-serif foo}',
+    ],
+    [
+      'B11 font-family: monospace first',
+      '.a{font-family:"monospace bar"}',
+      '.a{font-family:monospace bar}',
+    ],
+    [
+      'font-family invalid: default in a sequence',
+      '.a{font-family:"default foo"}',
+      '.a{font-family:default foo}',
+    ],
+    [
+      'font-family invalid: a CSS-wide keyword in a sequence',
+      '.a{font-family:"Foo inherit"}',
+      '.a{font-family:Foo inherit}',
+    ],
+    [
+      'font-family invalid: a ui-* identifier in a sequence',
+      '.a{font-family:"ui-x foo"}',
+      '.a{font-family:ui-x foo}',
+    ],
+    [
+      'B12 attribute: space before | after *',
+      '[*|x]{color:red}',
+      '[* |x]{color:red}',
+    ],
+    [
+      'B12 attribute: space after a lone |',
+      '[|x]{color:red}',
+      '[| x]{color:red}',
+    ],
+    ['B12 attribute: space after *|', '[*|x]{color:red}', '[*| x]{color:red}'],
+    [
+      'attribute invalid: space around a named namespace',
+      '[a|x]{color:red}',
+      '[a |x]{color:red}',
+    ],
+    [
+      'attribute invalid: an unknown modifier',
+      '[x="a" i]{color:red}',
+      '[x="a" j]{color:red}',
+    ],
+    [
+      'attribute invalid: an unquoted value with a space',
+      '[x="a b"]{color:red}',
+      '[x=a b]{color:red}',
+    ],
+    [
+      'An+B invalid: two signs',
+      '.a:nth-child(2n+1){color:red}',
+      '.a:nth-child(2n + +1){color:red}',
+    ],
+    [
+      'An+B invalid: a sign apart from n',
+      '.a:nth-child(-n){color:red}',
+      '.a:nth-child(- n){color:red}',
+    ],
+    [
+      'An+B invalid: an empty of S',
+      '.a:nth-child(2n+1 of .b){color:red}',
+      '.a:nth-child(2n+1 of){color:red}',
+    ],
+    [
+      'An+B invalid: an empty of S entry',
+      '.a:nth-child(2n+1 of .b, .c){color:red}',
+      '.a:nth-child(2n+1 of .b,){color:red}',
+    ],
+    [
+      'url invalid: two arguments',
+      '.a{background:url(a)}',
+      '.a{background:url("a" x)}',
+    ],
+    [
+      'pseudo-element invalid inside :is()',
+      '.a:is(::before){color:red}',
+      '.a:is(:before){color:red}',
+    ],
+    [
+      'keyframes invalid: two keywords in one selector',
+      '@keyframes k{from,to{opacity:0}}',
+      '@keyframes k{0% 100%{opacity:0}}',
+    ],
+    [
+      'keyframes invalid: from and to as one selector',
+      '@keyframes k{from to{opacity:0}}',
+      '@keyframes k{0% 100%{opacity:0}}',
+    ],
+    [
+      'prelude invalid: after ) inside selector() is a descendant combinator',
+      '@supports selector(:is(.a) .b){.a{color:red}}',
+      '@supports selector(:is(.a).b){.a{color:red}}',
+    ],
+    [
+      'prelude invalid: inside a range operator',
+      '@media (width >= 1px){.a{color:red}}',
+      '@media (width > = 1px){.a{color:red}}',
+    ],
+  ])('%s is rejected', (_, canonical, delivered) => {
+    expect(declarationEquivalence(canonical, delivered).equivalent).toBe(false);
+  });
+
+  test.each([
+    [
+      'font-family: a valid identifier sequence',
+      '.a{font-family:"Helvetica Neue", Arial}',
+      '.a{font-family:Helvetica Neue,Arial}',
+    ],
+    [
+      'font-family: a lone generic stays a keyword',
+      '.a{font-family:system-ui, sans-serif}',
+      '.a{font-family:system-ui,sans-serif}',
+    ],
+    [
+      'attribute: a namespace without whitespace',
+      '[*|x="a"]{color:red}',
+      '[*|x=a]{color:red}',
+    ],
+    [
+      'pseudo-element at the top level',
+      '.a::before{content:"a"}',
+      '.a:before{content:"a"}',
+    ],
+    [
+      'keyframes: one keyword per selector',
+      '@keyframes k{from{opacity:0}}',
+      '@keyframes k{0%{opacity:0}}',
+    ],
+  ])('%s is still accepted', (_, canonical, delivered) => {
+    expect(declarationEquivalence(canonical, delivered).equivalent).toBe(true);
+  });
+});

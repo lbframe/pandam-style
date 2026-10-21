@@ -255,10 +255,15 @@ function attributeOf(list) {
   let namespace = null;
   const isDelim = (entry, value) =>
     entry?.[0][0] === 'delim-token' && entry[0][4].value === value;
+  // No whitespace around the namespace `|` (Selectors 4 §6.6).
+  const tight = (...entries) =>
+    entries.every((entry) => entry != null && !entry[1]);
   if (isDelim(t[k], '*') && isDelim(t[k + 1], '|')) {
+    if (!tight(t[k + 1], t[k + 2])) return null;
     namespace = '*';
     k += 2;
   } else if (isDelim(t[k], '|')) {
+    if (!tight(t[k + 1])) return null;
     namespace = '';
     k += 1;
   } else if (
@@ -266,6 +271,7 @@ function attributeOf(list) {
     isDelim(t[k + 1], '|') &&
     !isDelim(t[k + 2], '=')
   ) {
+    if (!tight(t[k + 1], t[k + 2])) return null;
     namespace = t[k][0][4].value;
     k += 2;
   }
@@ -320,11 +326,17 @@ const LEGACY_PSEUDO_ELEMENTS = new Set([
  */
 function canonicalize(run, context) {
   const out = [];
+  let depth = 0;
   for (let i = 0; i < run.length; i += 1) {
     const token = run[i];
-    // Selectors 4 §3.6.3: the CSS 2 pseudo-elements keep their one-colon form.
+    if (token[0] === 'function-token' || token[0] === '(-token') depth += 1;
+    else if (token[0] === ')-token') depth -= 1;
+    // Selectors 4 §3.6.3: the CSS 2 pseudo-elements keep their one-colon form,
+    // at the top level of a selector only (neither form is valid inside
+    // `:is()` or `:not()`).
     if (
       context === 'selector' &&
+      depth === 0 &&
       token[0] === 'colon-token' &&
       run[i - 1]?.[0] !== 'colon-token' &&
       run[i + 1]?.[0] === 'ident-token' &&
@@ -333,8 +345,12 @@ function canonicalize(run, context) {
       out.push(token, token);
       continue;
     }
-    // CSS Animations 1 §3: `from` is 0% and `to` is 100%.
-    if (context === 'keyframe-selector' && token[0] === 'ident-token') {
+    // CSS Animations 1 §3: a keyframe selector `from` is 0% and `to` is 100%.
+    if (
+      context === 'keyframe-selector' &&
+      run.length === 1 &&
+      token[0] === 'ident-token'
+    ) {
       const name = lowerOf(token);
       if (name === 'from' || name === 'to') {
         out.push(
@@ -349,6 +365,7 @@ function canonicalize(run, context) {
       if (inner.length === 1 && inner[0][0] === 'string-token') {
         out.push(synthetic('canonical-url', { value: inner[0][4].value }));
         i = close;
+        depth -= 1;
         continue;
       }
     }
@@ -375,24 +392,25 @@ function canonicalize(run, context) {
         );
       }
       const ab = anPlusB(ofAt === -1 ? inner : inner.slice(0, ofAt));
-      if (ab != null) {
-        const of =
-          ofAt === -1
-            ? null
-            : splitTop(inner, ofAt + 1, inner.length, 'comma-token')
-                .map(([s, e]) =>
-                  JSON.stringify(componentKeys(inner, s, e, 'selector')),
-                )
-                .sort();
+      const of =
+        ofAt === -1
+          ? null
+          : splitTop(inner, ofAt + 1, inner.length, 'comma-token').map(
+              ([s, e]) => componentKeys(inner, s, e, 'selector'),
+            );
+      // `of S` needs a selector in every list entry.
+      if (ab != null && (of == null || of.every((keys) => keys.length > 0))) {
         out.push(
           synthetic('canonical-nth', {
             name: lowerOf(token),
             a: ab[0],
             b: ab[1],
-            of,
+            of:
+              of == null ? null : of.map((keys) => JSON.stringify(keys)).sort(),
           }),
         );
         i = close;
+        depth -= 1;
         continue;
       }
     }
@@ -413,7 +431,7 @@ function canonicalize(run, context) {
  * The edges of a value, selector or prelude are trimmed by `componentKeys`;
  * `{`, `}` and `;` delimit components and never reach this list.
  */
-function insignificant(tokens, i, context) {
+function insignificant(tokens, i, context, inFunction) {
   const prev = tokens[i - 1];
   const next = tokens[i + 1];
   if (prev[0] === 'comma-token' || next[0] === 'comma-token') return true;
@@ -427,7 +445,9 @@ function insignificant(tokens, i, context) {
   if (prev[0] === '(-token' || prev[0] === 'function-token') return true;
   if (next[0] === ')-token') return true;
   if (featureColon(tokens, i - 1) || featureColon(tokens, i + 1)) return true;
-  if (context === 'prelude') {
+  if (context === 'prelude' && !inFunction[i]) {
+    // Outside function arguments (inside `selector(…)`, whitespace after `)`
+    // is a descendant combinator).
     // `(a)and (b)`: after `)` nothing can merge with what follows.
     if (prev[0] === ')-token') return true;
     // Around a range operator (`width >= 1px`), never inside `>=`.
@@ -466,9 +486,24 @@ function componentKeys(tokens, start, end, context) {
   while (run.length > 0 && isWs(run[0])) run.shift();
   while (run.length > 0 && isWs(run[run.length - 1])) run.pop();
   const canonical = canonicalize(run, context);
+  // Whether each position is inside a function's arguments.
+  const inFunction = [];
+  const openers = [];
+  for (const token of canonical) {
+    if (token[0] === ')-token') openers.pop();
+    inFunction.push(openers.includes('function-token'));
+    if (token[0] === 'function-token' || token[0] === '(-token') {
+      openers.push(token[0]);
+    }
+  }
   const keys = [];
   for (let i = 0; i < canonical.length; i += 1) {
-    if (isWs(canonical[i]) && insignificant(canonical, i, context)) continue;
+    if (
+      isWs(canonical[i]) &&
+      insignificant(canonical, i, context, inFunction)
+    ) {
+      continue;
+    }
     keys.push(keyOf(canonical[i]));
   }
   return keys;
@@ -563,19 +598,27 @@ const GENERIC_FAMILIES = new Set([
   'ui-sans-serif',
   'ui-monospace',
   'ui-rounded',
+]);
+const CSS_WIDE_AND_DEFAULT = new Set([
   'inherit',
   'initial',
   'unset',
   'revert',
   'revert-layer',
+  'default',
 ]);
+const reservedFamilyIdent = (name) =>
+  GENERIC_FAMILIES.has(name) ||
+  CSS_WIDE_AND_DEFAULT.has(name) ||
+  name.startsWith('ui-');
 
 /**
- * A `font-family` list (CSS Fonts 4 §2.1): a family name is a string or a
- * sequence of identifiers, which names the family of those identifiers
- * joined by single spaces. A lone generic family or CSS-wide keyword is a
+ * A `font-family` list (CSS Fonts 4 §2.1): a family name is a string, or a
+ * sequence of identifiers naming the family of those identifiers joined by
+ * single spaces, valid only when none of them is a generic family (`ui-*`
+ * included), a CSS-wide keyword or `default`. A lone generic family is a
  * keyword, never the family of that name (`"serif"` is not `serif`). Any
- * other entry is compared as tokens.
+ * other entry, an invalid sequence included, is compared as tokens.
  */
 function familyKeys(tokens, start, end) {
   return splitTop(tokens, start, end, 'comma-token').map(([s, e]) => {
@@ -590,10 +633,12 @@ function familyKeys(tokens, start, end) {
       if (parts.length === 1 && GENERIC_FAMILIES.has(lowerOf(parts[0]))) {
         return JSON.stringify(['generic', lowerOf(parts[0])]);
       }
-      return JSON.stringify([
-        'family',
-        parts.map((token) => token[4].value).join(' '),
-      ]);
+      if (!parts.some((token) => reservedFamilyIdent(lowerOf(token)))) {
+        return JSON.stringify([
+          'family',
+          parts.map((token) => token[4].value).join(' '),
+        ]);
+      }
     }
     return JSON.stringify(componentKeys(tokens, s, e, 'value'));
   });
