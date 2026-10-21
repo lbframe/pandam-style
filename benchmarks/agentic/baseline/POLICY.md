@@ -510,7 +510,10 @@ sorted, and the Monte Carlo seeds are those of section 5.2. An existing
 
 - the record's method constants or `stats.mjs` sha256 differ from the
   checkout's;
-- the record's reference accounting does not recompute;
+- any field of a recorded reference accounting (`status`, `planned`,
+  `dropped`, `maxDropped`, `insufficientTasks`) differs from the one
+  `referenceEvidence` recomputes from the record's values, or a field is
+  added or missing;
 - kind, repetitions or epoch differ;
 - a candidate or control record's comparability key differs from its
   cell's key (the differing projection fields are listed);
@@ -531,7 +534,11 @@ gate is never a pass. Exit status 0 is `pass`, 2 any other verdict.
 - **Latency:** the gates are `insufficient-reference` without `--control`.
   They are also `insufficient-reference` when the baseline's own latency
   values lack the minimum of section 5.1, because the medians and cuts are
-  then not frozen. A pair is the candidate's repetition `r` and the
+  then not frozen. The control is their reference: before its repetitions
+  become pairs, `referenceEvidence` is applied to them grouped by task, and
+  the gates are `insufficient-reference`, naming the tasks, unless every
+  task keeps 2 of its 3 control repetitions clean and the dropped cap
+  holds. A pair is the candidate's repetition `r` and the
   control's repetition `r` of the same task and model. The tool does not
   check that the two matrices were interleaved, or the order inside a
   pair. Counterbalancing that order in the runner is a follow-up; until

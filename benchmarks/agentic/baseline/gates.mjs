@@ -343,6 +343,34 @@ function bindMatrix(m) {
   return { cellKeys, perModel, all };
 }
 
+// ------------------------------------------------------ reference accounting
+
+/**
+ * The reference accounting of one gate (POLICY.md section 5.1), from
+ * `stats.mjs` `referenceEvidence` over the reference repetitions grouped by
+ * task, with the insufficient strata named by task id. One derivation for
+ * the baseline in `derive`, its verification in `check`, and the
+ * interleaved control of the latency gates.
+ *
+ * @param {string[]} tasks the gate's task set, in order
+ * @param {object[][]} reference per task, its reps (`{ clean, value? }`)
+ */
+export function referenceAccounting(tasks, reference) {
+  if (reference.length !== tasks.length)
+    throw new Error('one reference list per task');
+  const ev = referenceEvidence(
+    reference.map((reps) => ({ reference: reps, candidate: [] })),
+    'between-runs',
+  );
+  return {
+    status: ev.sufficient ? 'sufficient' : 'insufficient-reference',
+    planned: ev.planned,
+    dropped: ev.dropped,
+    maxDropped: ev.maxDropped,
+    insufficientTasks: ev.insufficientStrata.map((i) => tasks[i]),
+  };
+}
+
 // ------------------------------------------------------- repetition values
 
 /**
@@ -615,14 +643,11 @@ export function deriveGates(baselineDir) {
       }
       // The baseline side of every gate, latency included (its cuts and
       // medians), needs the minimum clean evidence of section 5.1.
-      const ev = referenceEvidence(units, 'between-runs');
-      const reference = {
-        status: ev.sufficient ? 'sufficient' : 'insufficient-reference',
-        planned: ev.planned,
-        dropped: ev.dropped,
-        maxDropped: ev.maxDropped,
-        insufficientTasks: ev.insufficientStrata.map((i) => tasks[i]),
-      };
+      const reference = referenceAccounting(
+        tasks,
+        units.map((u) => u.reference),
+      );
+      const sufficient = reference.status === 'sufficient';
       const entry = {
         scale: spec.scale,
         design: spec.design,
@@ -664,7 +689,7 @@ export function deriveGates(baselineDir) {
             : null;
         }
       }
-      if (!ev.sufficient) {
+      if (!sufficient) {
         insufficientGates.push({ modelKey: model.key, gate });
         for (const t of recollectFor(entry, uncleanByTask)) {
           const k = cellKey(t, model.key);
@@ -833,12 +858,21 @@ function verifyGateRecord(g) {
         }
       }
       if (!complete) continue;
-      // The recorded accounting is the method's, recomputed.
-      const ev = referenceEvidence(referenceUnits(e), 'between-runs');
-      const status = ev.sufficient ? 'sufficient' : 'insufficient-reference';
-      if (status !== e.reference?.status)
+      // The recorded accounting is the method's, recomputed: every field,
+      // and no other one.
+      const expected = referenceAccounting(
+        e.tasks,
+        referenceUnits(e).map((u) => u.reference),
+      );
+      const recorded = e.reference ?? {};
+      const fields = [
+        ...new Set([...Object.keys(expected), ...Object.keys(recorded)]),
+      ]
+        .filter((f) => serialize(expected[f]) !== serialize(recorded[f]))
+        .sort(byId);
+      if (fields.length > 0)
         problems.push(
-          `${model} ${gate}: recorded reference ${e.reference?.status}, recomputed ${status}`,
+          `${model} ${gate}: recorded reference accounting does not recompute (${fields.map((f) => `${f}: recorded ${JSON.stringify(recorded[f] ?? null)}, recomputed ${JSON.stringify(expected[f] ?? null)}`).join('; ')})`,
         );
     }
   if (problems.length > 0)
@@ -989,14 +1023,36 @@ export function checkGates(
           );
           continue;
         }
+        // The control is the reference: before its repetitions become
+        // pairs, every task keeps the minimum clean evidence of section 5.1
+        // (and the dropped cap holds), from the control alone.
+        const controlValues = new Map(
+          e.tasks.map((t) => [
+            t,
+            repetitionsOf(control, t, modelKey, R).map((rep) =>
+              repetitionValue(rep, gate),
+            ),
+          ]),
+        );
+        const controlReference = referenceAccounting(
+          e.tasks,
+          e.tasks.map((t) => controlValues.get(t).map(forStats)),
+        );
+        if (controlReference.status !== 'sufficient') {
+          results.push(
+            insufficient(
+              `the interleaved control lacks the minimum clean evidence (POLICY.md section 5.1)${controlReference.insufficientTasks.length > 0 ? `: ${controlReference.insufficientTasks.join(', ')}` : ''}`,
+              controlReference,
+            ),
+          );
+          continue;
+        }
         const units = [];
         const ctrl = [];
         const candNorm = [];
         for (const t of e.tasks) {
           const cv = candidateValues.get(t);
-          const kv = repetitionsOf(control, t, modelKey, R).map((rep) =>
-            repetitionValue(rep, gate),
-          );
+          const kv = controlValues.get(t);
           for (let i = 0; i < R; i += 1) {
             const c = normalizeLatency(forStats(cv[i]), t, mg.latency.medians);
             const k = normalizeLatency(forStats(kv[i]), t, mg.latency.medians);
@@ -1026,6 +1082,7 @@ export function checkGates(
           observed: d.observed ?? null,
           alpha: d.alpha,
           reference: d.reference,
+          controlReference,
           cut: { name: spec.cut, value: mg.latency.cuts[spec.cut] },
           // Reported, never deciding (POLICY.md section 5.4).
           ratioCandidateOverControl: { p50: ratio(0.5), p95: ratio(0.95) },

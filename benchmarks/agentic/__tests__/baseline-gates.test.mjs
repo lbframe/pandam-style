@@ -736,6 +736,172 @@ test('check: latency blocks a slower candidate against the control, and a contro
   );
 });
 
+// Review r1, R1: the interleaved control is the latency gates' reference,
+// so each task needs 2 of its 3 control repetitions clean (POLICY.md
+// section 5.1), whatever makes a repetition unclean.
+const CONTROL_UNCLEAN = {
+  unknown: { ms: null },
+  missing: { missing: true },
+  contested: { contested: true },
+  invalid: { invalid: true },
+  unclassified: { unclassified: true },
+  crashed: { crashed: true },
+};
+
+test('R1 check: a control task with fewer than 2 clean repetitions makes both latency gates insufficient-reference, for every unclean state', async () => {
+  const { record: g } = await cleanBaseline();
+  const cand = await buildMatrix('r1-candidate');
+  const [a, b] = APPLICATION;
+  for (const [state, degrade] of Object.entries(CONTROL_UNCLEAN))
+    for (const unclean of [1, 2, 3]) {
+      const control = await buildMatrix(`r1-control-${state}-${unclean}`, {
+        spec: (t, _m, rep) => (t === a && rep <= unclean ? degrade : {}),
+      });
+      const r = checkGates(g, cand, { controlDir: control });
+      for (const gate of ['latency.p50', 'latency.p95']) {
+        const x = gateOf(r, gate);
+        const what = `${state} x${unclean} ${gate}`;
+        if (unclean === 1) {
+          // 2 of 3 clean: decided, with the pair accounting.
+          assert.equal(x.outcome, 'pass', what);
+          assert.equal(x.reference.dropped, 1, what);
+          assert.equal(x.controlReference.status, 'sufficient', what);
+        } else {
+          assert.equal(x.outcome, 'insufficient-reference', what);
+          assert.equal(x.pValue, null, what);
+          assert.deepEqual(
+            x.reference,
+            {
+              status: 'insufficient-reference',
+              planned: 132,
+              dropped: unclean,
+              maxDropped: 13,
+              insufficientTasks: [a],
+            },
+            what,
+          );
+          assert.match(x.reason, new RegExp(`minimum clean evidence.*${a}`));
+        }
+      }
+      assert.equal(
+        r.verdict,
+        unclean === 1 ? 'pass' : 'insufficient-reference',
+        `${state} x${unclean} verdict`,
+      );
+    }
+  // Two tasks short at once are both named; a slow candidate cannot be
+  // decided (blocked or passed) against such a control.
+  const two = await buildMatrix('r1-control-two', {
+    spec: (t, _m, rep) =>
+      (t === a || t === b) && rep >= 2 ? { ms: null } : {},
+  });
+  const slow = await buildMatrix('r1-slow', {
+    spec: (_t, _m, rep, i) => ({ ms: 3 * baseMs(i, rep) }),
+  });
+  const r = checkGates(g, slow, { controlDir: two });
+  for (const gate of ['latency.p50', 'latency.p95']) {
+    assert.equal(gateOf(r, gate).outcome, 'insufficient-reference');
+    assert.deepEqual(gateOf(r, gate).reference.insufficientTasks, [a, b]);
+  }
+  // A control that did not plan a task at all.
+  const without = await buildMatrix('r1-control-without', {
+    tasks: TASKS.map((t) => t.id).filter((t) => t !== a),
+  });
+  const rw = checkGates(g, cand, { controlDir: without });
+  assert.deepEqual(gateOf(rw, 'latency.p50').reference.insufficientTasks, [a]);
+  assert.equal(rw.verdict, 'insufficient-reference');
+});
+
+// Review r1, R2: every field of every recorded reference accounting is
+// recomputed through stats.mjs; any difference is a refusal.
+test('R2 check refuses a gate record whose reference accounting does not recompute, field by field, for every gate', async () => {
+  const { record: clean } = await cleanBaseline();
+  const [a] = APPLICATION;
+  const insufficient = deriveGates(
+    await buildMatrix('r2-insufficient-base', {
+      spec: (t, _m, rep) => (t === a && rep <= 2 ? { missing: true } : {}),
+    }),
+  );
+  const cand = await buildMatrix('r2-candidate');
+  const control = await buildMatrix('r2-control');
+  // Unchanged records are accepted.
+  checkGates(clean, cand, { controlDir: control });
+  checkGates(insufficient, cand, { controlDir: control });
+  const mutations = (ref) => ({
+    status:
+      ref.status === 'sufficient' ? 'insufficient-reference' : 'sufficient',
+    planned: ref.planned + 1,
+    dropped: ref.dropped + 1,
+    maxDropped: ref.maxDropped + 1,
+    insufficientTasks: ref.insufficientTasks.length > 0 ? [] : ['not-a-task'],
+  });
+  let refusals = 0;
+  for (const [label, record] of [
+    ['clean', clean],
+    ['insufficient', insufficient],
+  ])
+    for (const gate of Object.keys(GATES)) {
+      const ref = record.models['claude-haiku'].gates[gate].reference;
+      const cases = { ...mutations(ref) };
+      if (ref.insufficientTasks.length > 0)
+        cases.insufficientTaskRenamed = ['not-a-task'];
+      for (const [field, value] of Object.entries(cases)) {
+        const f =
+          field === 'insufficientTaskRenamed' ? 'insufficientTasks' : field;
+        const tampered = structuredClone(record);
+        tampered.models['claude-haiku'].gates[gate].reference[f] = value;
+        assert.throws(
+          () => checkGates(tampered, cand, { controlDir: control }),
+          (e) => {
+            assert.ok(e instanceof GatesRefusal, `${label} ${gate} ${field}`);
+            assert.match(
+              e.message,
+              new RegExp(
+                `${gate.replace('.', '\\.')}: recorded reference accounting does not recompute \\(${f}: `,
+              ),
+              `${label} ${gate} ${field}`,
+            );
+            return true;
+          },
+        );
+        refusals += 1;
+      }
+      // An extra or a missing field is refused too.
+      const extra = structuredClone(record);
+      extra.models['claude-haiku'].gates[gate].reference.usable = [0];
+      assert.throws(() => checkGates(extra, cand), /usable: recorded \[0\]/);
+      const missing = structuredClone(record);
+      delete missing.models['claude-haiku'].gates[gate].reference.maxDropped;
+      assert.throws(
+        () => checkGates(missing, cand),
+        /maxDropped: recorded null/,
+      );
+      refusals += 2;
+    }
+  // 7 cases per gate and record, plus the renamed insufficient task of
+  // every gate that task a makes insufficient.
+  const renamed = Object.values(
+    insufficient.models['claude-haiku'].gates,
+  ).filter((x) => x.reference.insufficientTasks.length > 0).length;
+  assert.ok(renamed >= 6, 'every gate containing task a');
+  assert.equal(refusals, 2 * 9 * 7 + renamed);
+  // The review's probe: every field changed at once.
+  const probe = structuredClone(clean);
+  Object.assign(
+    probe.models['claude-haiku'].gates['success.application'].reference,
+    {
+      planned: 999,
+      dropped: 999,
+      maxDropped: 999,
+      insufficientTasks: ['not-a-task'],
+    },
+  );
+  assert.throws(
+    () => checkGates(probe, cand, { controlDir: control }),
+    /dropped: recorded 999, recomputed 0; insufficientTasks: recorded \["not-a-task"\], recomputed \[\]; maxDropped: recorded 999, recomputed 7; planned: recorded 999, recomputed 75/,
+  );
+});
+
 test('check refuses a candidate or control outside the binding', async () => {
   const { record: g } = await cleanBaseline();
   const [a] = APPLICATION;
@@ -800,7 +966,10 @@ test('check refuses a candidate or control outside the binding', async () => {
   const relabeled = structuredClone(g);
   relabeled.models['claude-haiku'].gates.safety.reference.status =
     'insufficient-reference';
-  assert.throws(() => checkGates(relabeled, cand), /recomputed sufficient/);
+  assert.throws(
+    () => checkGates(relabeled, cand),
+    /safety: recorded reference accounting does not recompute \(status: recorded "insufficient-reference", recomputed "sufficient"\)/,
+  );
 });
 
 test('check: overall verdict is the worst blocking outcome; non-blocking small sets never decide it', async () => {
