@@ -903,6 +903,39 @@ r2('missing-cpu-component', 'inconclusive', (raws) =>
       .forEach((s) => (s.result.afterFull.systemCpuMs = null)),
   ),
 );
+
+// CPU times may legitimately be zero (tick-based kernel accounting); every
+// other invalid value of every CPU field of every usage record stays a
+// reconciliation error. One candidate compile sample carries both records.
+const cpuVictim = (raws) =>
+  raws[0].samples.find(
+    (s) => fixtureOf(s) && s.kind === 'compile' && s.epoch === 'alpha1-replay',
+  );
+for (const record of ['afterFull', 'final'])
+  for (const field of ['userCpuMs', 'systemCpuMs']) {
+    add('cpu-time', `${record}.${field} zero is accepted`, 'pass', () => {
+      const raws = fresh();
+      cpuVictim(raws).result[record][field] = 0;
+      return gateOn(raws);
+    });
+    for (const [name, value] of [
+      ['negative', -1],
+      ['NaN (null in the run file)', Number.NaN],
+      ['missing', undefined],
+    ])
+      add(
+        'cpu-time',
+        `${record}.${field} ${name} is rejected`,
+        'inconclusive',
+        () => {
+          const raws = fresh();
+          const usage = cpuVictim(raws).result[record];
+          if (value === undefined) delete usage[field];
+          else usage[field] = value;
+          return gateOn(raws);
+        },
+      );
+  }
 r2(
   'stale-revision-harness-same (identical committed inputs at f4a7106)',
   'pass',
