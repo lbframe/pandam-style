@@ -36,22 +36,40 @@ function isCI(env = process.env) {
   return env.CI !== undefined && !['', '0', 'false'].includes(env.CI);
 }
 
-// A reproduction binds its evidence to another committed pin, such as the
-// archived engine of a baseline epoch, with PMS_BROWSER_PIN.
-function browserPin(env = process.env) {
-  if (!env.PMS_BROWSER_PIN) return CI_PIN;
-  const file = path.resolve(REPO, env.PMS_BROWSER_PIN);
-  const relative = path.relative(REPO, file);
-  if (relative.startsWith('..') || path.isAbsolute(relative))
+// A pin is the canonical file it names: symlinks, in the pin or in any
+// parent including the repository root, are resolved before containment is
+// checked, and the file is read from that canonical path.
+function pinFile(pin, repo = REPO) {
+  let root;
+  let file;
+  try {
+    root = fs.realpathSync(repo);
+    file = fs.realpathSync(path.resolve(repo, pin));
+  } catch (error) {
+    throw new Error(`BROWSER_PIN_UNAVAILABLE: ${pin}: ${error.message}`);
+  }
+  const relative = path.relative(root, file);
+  if (
+    relative === '..' ||
+    relative.startsWith('..' + path.sep) ||
+    path.isAbsolute(relative)
+  )
     throw new Error(
-      `BROWSER_PIN_OUTSIDE_REPOSITORY: ${env.PMS_BROWSER_PIN} must name a pin committed in this repository`,
+      `BROWSER_PIN_OUTSIDE_REPOSITORY: ${pin} must name a pin committed in this repository`,
     );
-  return relative.split(path.sep).join('/');
+  return { file, relative: relative.split(path.sep).join('/') };
 }
 
-function expectedBrowser(pin = CI_PIN) {
+// A reproduction binds its evidence to another committed pin, such as the
+// archived engine of a baseline epoch, with PMS_BROWSER_PIN.
+function browserPin(env = process.env, repo = REPO) {
+  if (!env.PMS_BROWSER_PIN) return CI_PIN;
+  return pinFile(env.PMS_BROWSER_PIN, repo).relative;
+}
+
+function expectedBrowser(pin = CI_PIN, repo = REPO) {
   const { product, version } = JSON.parse(
-    fs.readFileSync(path.join(REPO, pin), 'utf8'),
+    fs.readFileSync(pinFile(pin, repo).file, 'utf8'),
   );
   return { product, version };
 }

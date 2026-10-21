@@ -167,21 +167,105 @@ test('PMS_BROWSER_PIN names a committed pin, or the CI pin applies', () => {
   expect(browserPin({ PMS_BROWSER_PIN: '' })).toBe('tools/pms/ci-browser.json');
   expect(browserPin({ PMS_BROWSER_PIN: ALPHA1 })).toBe(ALPHA1);
   expect(browserPin({ PMS_BROWSER_PIN: path.join(ROOT, ALPHA1) })).toBe(ALPHA1);
-  // Class-level: any path that leaves the repository is rejected, so the
-  // recorded pin always names a file reviewers can read.
-  for (const outside of [
-    path.join(scratch, 'pin.json'),
-    '../pin.json',
-    'tools/../../pin.json',
-    '/pin.json',
-  ])
-    expect(() => browserPin({ PMS_BROWSER_PIN: outside })).toThrow(
-      /^BROWSER_PIN_OUTSIDE_REPOSITORY: /,
-    );
   expect(expectedBrowser(ALPHA1)).toEqual({
     product: 'Google Chrome for Testing',
     version: '148.0.7778.96',
   });
+});
+
+test('a pin is contained by its canonical path, through any symlink', () => {
+  // A scratch repository: outside.json is a valid pin outside of it.
+  const repo = path.join(scratch, 'repo');
+  const outside = path.join(scratch, 'outside');
+  fs.mkdirSync(path.join(repo, 'pins'), { recursive: true });
+  fs.mkdirSync(path.join(repo, '..pins'));
+  fs.mkdirSync(outside);
+  const pin = (product) =>
+    JSON.stringify({ product, version: '1.2.3.4' }) + '\n';
+  fs.writeFileSync(path.join(outside, 'pin.json'), pin('Outside'));
+  fs.writeFileSync(path.join(repo, 'pins/pin.json'), pin('Inside'));
+  fs.writeFileSync(path.join(repo, '..pins/pin.json'), pin('Dotted'));
+  fs.symlinkSync(
+    path.join(outside, 'pin.json'),
+    path.join(repo, 'pins/file-out.json'),
+  );
+  fs.symlinkSync(outside, path.join(repo, 'dir-out'));
+  fs.symlinkSync(
+    path.join(repo, 'pins/pin.json'),
+    path.join(repo, 'pins/inward.json'),
+  );
+  const linkedRepo = path.join(scratch, 'linked-repo');
+  fs.symlinkSync(repo, linkedRepo);
+
+  for (const root of [repo, linkedRepo]) {
+    const rejected = [
+      // Lexical escapes.
+      path.join(outside, 'pin.json'),
+      path.relative(root, path.join(outside, 'pin.json')),
+      'pins/../../outside/pin.json',
+      // A symlinked file and a symlinked parent directory pointing out.
+      'pins/file-out.json',
+      'dir-out/pin.json',
+      path.join(root, 'pins/file-out.json'),
+    ];
+    for (const value of rejected) {
+      expect(() => browserPin({ PMS_BROWSER_PIN: value }, root)).toThrow(
+        /^BROWSER_PIN_OUTSIDE_REPOSITORY: /,
+      );
+      expect(() => expectedBrowser(value, root)).toThrow(
+        /^BROWSER_PIN_OUTSIDE_REPOSITORY: /,
+      );
+    }
+    // In-repository pins, including one reached by a symlink pointing in, a
+    // name that begins with `..`, and a path through the symlinked root.
+    for (const [value, relative, product] of [
+      ['pins/pin.json', 'pins/pin.json', 'Inside'],
+      ['pins/inward.json', 'pins/pin.json', 'Inside'],
+      [path.join(linkedRepo, 'pins/pin.json'), 'pins/pin.json', 'Inside'],
+      ['..pins/pin.json', '..pins/pin.json', 'Dotted'],
+    ]) {
+      expect(browserPin({ PMS_BROWSER_PIN: value }, root)).toBe(relative);
+      expect(expectedBrowser(value, root)).toEqual({
+        product,
+        version: '1.2.3.4',
+      });
+    }
+    expect(() =>
+      browserPin({ PMS_BROWSER_PIN: 'pins/missing.json' }, root),
+    ).toThrow(/^BROWSER_PIN_UNAVAILABLE: pins\/missing\.json: .*ENOENT/);
+  }
+});
+
+test('a symlinked pin inside this repository cannot load an external identity', () => {
+  // End to end through qualifyBrowser, as the harnesses call it, in CI and
+  // locally. The link lives in an ignored test-support directory.
+  const support = path.join(ROOT, '.pms-test-support');
+  fs.mkdirSync(support, { recursive: true });
+  const links = fs.mkdtempSync(path.join(support, 'browser-pin-'));
+  try {
+    const external = path.join(scratch, 'external.json');
+    fs.writeFileSync(
+      external,
+      JSON.stringify({ product: 'Google Chrome', version: '155.0.8059.84' }),
+    );
+    fs.symlinkSync(external, path.join(links, 'file.json'));
+    fs.symlinkSync(scratch, path.join(links, 'dir'));
+    const chrome = fakeBrowser('echo "Google Chrome 155.0.8059.84"', 'ci');
+    for (const link of ['file.json', 'dir/external.json'])
+      for (const env of [{}, { CI: '1' }])
+        expect(() =>
+          qualifyBrowser({
+            env: {
+              ...env,
+              PMS_BROWSER_PIN: path.relative(ROOT, path.join(links, link)),
+            },
+            executable: chrome,
+            warn: () => {},
+          }),
+        ).toThrow(/^BROWSER_PIN_OUTSIDE_REPOSITORY: /);
+  } finally {
+    fs.rmSync(links, { recursive: true, force: true });
+  }
 });
 
 test('a named pin is enforced locally and recorded in the identity', () => {
