@@ -1,0 +1,2905 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-ce003-budgets",
+  "policyVersion": 3,
+  "supersedes": {
+    "path": "benchmarks/core-evolution/budgets.v2.json",
+    "sha256": "b040b6a5807609358503cc916c845704eece2dd4eb07ea82eb79852b075f7c80"
+  },
+  "justification": "Version 3 changes one rule of version 2 (budget-policy.v2.json, SHA-256 f9eab3d12f0f110e888c5f40bfc752674d2ff2245e046de92574123ca8d1fd12): the two synthetic-c10000-t1000-r100-s307 peak-RSS budgets (full.maxRssBytes and session.maxRssBytes) are judged on the minimum over all samples instead of the median, with an absolute limit of the baseline minimum times the memory-rule factor. Cause, a calibration defect of version 2: peak RSS of these cells is bimodal on the measurement host too. Diagnosed on the CE-01.1 candidate (35a6629) and alpha1 in an admissible run: when a V8 mark-compact lands around 19 s, mid full compile, with about 520 MB live, the next heap limit is about 4x that and the session peaks at 2.1-2.2 GB; otherwise it stays near 1.2-1.4 GB. alpha1 itself reaches the high mode in about 25% of rounds (4 of 22 pooled), so it would fail its own version 2 limit about 10% of the time. Every version 2 baseline sample happened to be in the low mode, so version 2 measured a CV of 0.5% and derived an absolute median limit. Garbage-collector headroom is one-sided additive noise on peak RSS, so the minimum estimates the working-set floor and absorbs high-mode rounds, which stay in the evidence. Real growth of the floor is still caught: in the same diagnosis the candidate low-mode growth was +9.2% (ratio 1.092, interval 1.074 to 1.116), from about 25 MB of additional live data amplified about 4x by V8, and with --max-old-space-size=1536 both epochs stay below 1 GB. The limit factor follows the unchanged memory rule (floor 1.10, 1 + 3 CV) applied to the CV of the minima of each baseline run and epoch. The statistic is an explicit per-budget field (thresholdRule.statistic): median by default; min allowed only for absolute peak-RSS memory budgets, refused anywhere else, and unknown statistics are refused. Every other rule is unchanged: the 1.25 timing floor, runtime and memory floors, the memory rule, deterministic growth, identity, metrics, workloads, noise ceiling, minimum pairs and rounding. As the change policy requires, every budget is re-derived from a new comparable baseline of the unchanged alpha1 artifact, measured on the same measurement host as version 2 (alpha1-v3-sk-c1 and alpha1-v3-sk-c4, the first two admissible attempts of the pre-registered series C); the version 2 evidence is not reused. Every budget whose derived limit loosens relative to version 2 is listed in relaxations, generated from the derivation. The absolute limits remain bound to the measurement host. Recovery of the CE-01.1 cost remains owned by CE-12.3 (#76).",
+  "relaxations": [
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 314276864 (factor 1.1)",
+      "to": "absolute maxMedian 317541171 (factor 1.1)",
+      "justification": "maxMedian 314276864 -> 317541171 (+1.04%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 288673792 (version 2: 285706240), CV 0.0176, factor 1.1 (version 2: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 136589516 (factor 1.1)",
+      "to": "absolute maxMedian 136839577 (factor 1.1)",
+      "justification": "maxMedian 136589516 -> 136839577 (+0.18%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 124399616 (version 2: 124172288), CV 0.0226, factor 1.1 (version 2: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 167509196 (factor 1.1)",
+      "to": "absolute maxMedian 167594803 (factor 1.1)",
+      "justification": "maxMedian 167509196 -> 167594803 (+0.05%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 152358912 (version 2: 152281088), CV 0.0197, factor 1.1 (version 2: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 332285747 (factor 1.1)",
+      "to": "absolute maxMedian 332729548 (factor 1.1)",
+      "justification": "maxMedian 332285747 -> 332729548 (+0.13%) is re-derived under the unchanged memory rule from the new alpha1 baseline: median 302481408 (version 2: 302077952), CV 0.0092, factor 1.1 (version 2: 1.1); the difference is the measurement variation of the identical artifact between baseline runs."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 1160160460 (factor 1.1)",
+      "to": "absolute maxMin 1142872473 (statistic min, factor 1.1)",
+      "justification": "the statistic changes from median to min (thresholdRule.statistic): bimodal peak RSS from V8 garbage-collection timing, see the justification; the new limit is the baseline minimum 1038974976 x factor 1.1 (CV of the per-run, per-epoch minima 0.0066; version 2: absolute maxMedian 1160160460 (factor 1.1), median 1054691328)."
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "from": "absolute maxMedian 1405762969 (factor 1.1)",
+      "to": "absolute maxMin 1347615948 (statistic min, factor 1.1)",
+      "justification": "the statistic changes from median to min (thresholdRule.statistic): bimodal peak RSS from V8 garbage-collection timing, see the justification; the new limit is the baseline minimum 1225105408 x factor 1.1 (CV of the per-run, per-epoch minima 0.0219; version 2: absolute maxMedian 1405762969 (factor 1.1), median 1277966336)."
+    }
+  ],
+  "policy": {
+    "path": "benchmarks/core-evolution/budget-policy.v3.json",
+    "sha256": "bc9c1d063b4f9d5cac17b851a5ea547638bb4feeab796a9a7292a99e92c9d7c5"
+  },
+  "baseline": {
+    "epoch": "alpha1",
+    "nullEpoch": "alpha1-replay",
+    "pooledEpochs": [
+      "alpha1",
+      "alpha1-replay"
+    ],
+    "manifest": {
+      "path": "benchmarks/core-evolution/epochs/alpha1/manifest.v1.json",
+      "sha256": "acdefef3d8b44d8e8a784464e2093be8c6f5fe3a7f88f4c249bd1762cbc52884"
+    },
+    "workloads": {
+      "path": "benchmarks/core-evolution/workloads.v1.json",
+      "sha256": "cb61b4d5c28e2df0aec962236c7c4550dc3599634fbe061da2105ac196468b8e"
+    },
+    "results": [
+      {
+        "path": "benchmarks/core-evolution/results/alpha1-v3-sk-c1/raw.json",
+        "sha256": "0106790627c40297789448e0e8d15548bc95ae475e3449c302904906e477489b",
+        "label": "alpha1-v3-sk-c1"
+      },
+      {
+        "path": "benchmarks/core-evolution/results/alpha1-v3-sk-c4/raw.json",
+        "sha256": "0c72e77baa6e2ecd9c0a14001c209c060966e4dfa5760ccac38a867761a69e1b",
+        "label": "alpha1-v3-sk-c4"
+      }
+    ],
+    "environment": {
+      "cpu": "AMD Ryzen 7 9800X3D 8-Core Processor",
+      "logicalCores": 16,
+      "os": "Ubuntu 24.04.5 LTS",
+      "kernel": "7.0.0-31-generic",
+      "node": "v22.22.0",
+      "nodeBinarySha256": "1bec56ef7cfa9a76f3e0b7c0a87f220eb73f23102b9c0b4c7529a3f7c3ce7c31",
+      "filesystem": "ext2/ext3"
+    }
+  },
+  "thresholdRule": {
+    "pairedRatio": {
+      "applies": "timing and runtime metrics, and memory cells whose baseline CV exceeds memory.maxCv",
+      "floor": {
+        "timing": 1.25,
+        "runtime": 1.15,
+        "memory": 1.1
+      },
+      "roundUpTo": 0.05,
+      "minPairs": 5,
+      "noiseCeiling": {
+        "multiplier": 2,
+        "floor": 0.1,
+        "roundUpTo": 0.05
+      }
+    },
+    "memory": {
+      "maxCv": 0.05,
+      "cvMultiplier": 3,
+      "floor": 1.1,
+      "roundUpTo": 0.05
+    },
+    "statistic": {
+      "default": "median",
+      "overrides": [
+        {
+          "workload": "synthetic-c10000-t1000-r100-s307",
+          "metric": "full.maxRssBytes",
+          "statistic": "min"
+        },
+        {
+          "workload": "synthetic-c10000-t1000-r100-s307",
+          "metric": "session.maxRssBytes",
+          "statistic": "min"
+        }
+      ]
+    },
+    "deterministic": {
+      "growth": {
+        "default": 0.05,
+        "variants.recipeSelections": 0,
+        "compiledModules.bytes": 0.1,
+        "designModule.bytes": 0.1,
+        "declarations.bytes": 0.1
+      }
+    },
+    "identity": {
+      "consistency.incrementalEqualsCanonical": "true"
+    }
+  },
+  "comparison": "Run tools/baselines/measure.mjs with the final plan and both --epoch alpha1=<alpha1 closure> and --epoch <candidate>=<candidate closure> on one machine (--require-quiet is optional). budgets.mjs gate pairs each candidate sample with the adjacent alpha1 sample of the same round, applies the paired-ratio, absolute-memory, deterministic and identity budgets, requires alpha1 to reproduce its frozen deterministic outputs, and lists unknown metrics. Verdicts: pass only when every budget passes; fail on any failing budget, workload-record mismatch, altered alpha1 tarball or policy-chain problem; inconclusive when the run lacks the interleaved control, has too few pairs, exceeds a noise ceiling or cannot resolve a limit; incomplete when a budgeted metric was not run.",
+  "budgets": [
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.buildMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 60,
+        "median": 246.609,
+        "p95": 250.744,
+        "medianCi95": [
+          245.07,
+          247.443
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 30,
+          "median": 1.0001,
+          "lower": 0.9955,
+          "upper": 1.0056,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0181,
+        "maxControlSpread": 0.0218
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "baseline": {
+        "informational": false,
+        "n": 60,
+        "median": 288673792,
+        "p95": 295014400,
+        "medianCi95": [
+          285495296,
+          289628160
+        ],
+        "cv": 0.0176
+      },
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 317541171,
+        "factor": 1.1
+      }
+    },
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.cssBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 2053
+      },
+      "limit": {
+        "maxValue": 2155,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "alpha1-pilot-vite",
+      "metric": "vite.jsBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 224963
+      },
+      "limit": {
+        "maxValue": 236211,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 104.92,
+        "p95": 108.877,
+        "medianCi95": [
+          104.664,
+          105.278
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9964,
+          "lower": 0.9911,
+          "upper": 1.0014,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0038,
+        "maxControlSpread": 0.0351
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 93.6015,
+        "p95": 97.52,
+        "medianCi95": [
+          93.318,
+          93.883
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9942,
+          "lower": 0.9901,
+          "upper": 1.0015,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.008,
+        "maxControlSpread": 0.0292
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 93.8555,
+        "p95": 100.182,
+        "medianCi95": [
+          93.467,
+          94.398
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9979,
+          "lower": 0.9922,
+          "upper": 1.0068,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0156,
+        "maxControlSpread": 0.0278
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 395.68,
+        "p95": 407.642,
+        "medianCi95": [
+          393.583,
+          397.79200000000003
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9841,
+          "lower": 0.9768,
+          "upper": 0.9946,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0066,
+        "maxControlSpread": 0.0287
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "baseline": {
+        "informational": false,
+        "n": 80,
+        "median": 124399616,
+        "p95": 129576960,
+        "medianCi95": [
+          123813888,
+          125030400
+        ],
+        "cv": 0.0226
+      },
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 136839577,
+        "factor": 1.1
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "baseline": {
+        "informational": false,
+        "n": 80,
+        "median": 152358912,
+        "p95": 157593600,
+        "medianCi95": [
+          151670784,
+          153726976
+        ],
+        "cv": 0.0197
+      },
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 167594803,
+        "factor": 1.1
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 2657
+      },
+      "limit": {
+        "maxValue": 2789,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 1024
+      },
+      "limit": {
+        "maxValue": 1075,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 32
+      },
+      "limit": {
+        "maxValue": 33,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 1
+      },
+      "limit": {
+        "maxValue": 1,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 66
+      },
+      "limit": {
+        "maxValue": 69,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 17250
+      },
+      "limit": {
+        "maxValue": 18975,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 24182
+      },
+      "limit": {
+        "maxValue": 26600,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 9142
+      },
+      "limit": {
+        "maxValue": 10056,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 44
+      },
+      "limit": {
+        "maxValue": 46,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 4
+      },
+      "limit": {
+        "maxValue": 4,
+        "growth": 0
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "baseline": {
+        "value": "true"
+      },
+      "limit": {
+        "equals": "true"
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "baseline": {
+        "informational": true,
+        "n": 60,
+        "median": 976.5999999999999,
+        "p95": 993.4,
+        "medianCi95": [
+          972.6,
+          981.8
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 30,
+          "median": 1.0037,
+          "lower": 0.9957,
+          "upper": 1.0105,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0187,
+        "maxControlSpread": 0.0165
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "baseline": {
+        "informational": true,
+        "n": 60,
+        "median": 1636,
+        "p95": 1661.7,
+        "medianCi95": [
+          1631.5,
+          1646.6
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 30,
+          "median": 0.9991,
+          "lower": 0.9967,
+          "upper": 1.0022,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0038,
+        "maxControlSpread": 0.0151
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.renderNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "baseline": {
+        "informational": true,
+        "n": 60,
+        "median": 3001.35,
+        "p95": 3046.8,
+        "medianCi95": [
+          2995.9,
+          3010.4
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 30,
+          "median": 0.9994,
+          "lower": 0.9974,
+          "upper": 1.0048,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0109,
+        "maxControlSpread": 0.0083
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 60,
+        "median": 3.7584999999999997,
+        "p95": 3.863,
+        "medianCi95": [
+          3.744,
+          3.772
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 30,
+          "median": 1.0072,
+          "lower": 1.001,
+          "upper": 1.0229,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0262,
+        "maxControlSpread": 0.0096
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 7.3545,
+        "p95": 7.578,
+        "medianCi95": [
+          7.341,
+          7.377
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9976,
+          "lower": 0.9934,
+          "upper": 0.9995,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0076,
+        "maxControlSpread": 0.0122
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 3.5065,
+        "p95": 3.566,
+        "medianCi95": [
+          3.494,
+          3.521
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9987,
+          "lower": 0.9926,
+          "upper": 1.0036,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0078,
+        "maxControlSpread": 0.0179
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 13.281,
+        "p95": 13.565,
+        "medianCi95": [
+          13.232,
+          13.339
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9996,
+          "lower": 0.995,
+          "upper": 1.0092,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0119,
+        "maxControlSpread": 0.0158
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 8.545,
+        "p95": 8.978,
+        "medianCi95": [
+          8.49,
+          8.779
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 1.0086,
+          "lower": 0.9838,
+          "upper": 1.0272,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0525,
+        "maxControlSpread": 0.0481
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 14.372,
+        "p95": 14.63,
+        "medianCi95": [
+          14.324,
+          14.392
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 1.0016,
+          "lower": 0.9958,
+          "upper": 1.0066,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0106,
+        "maxControlSpread": 0.012
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 9.9585,
+        "p95": 10.16,
+        "medianCi95": [
+          9.923,
+          10.026
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 1.0069,
+          "lower": 0.9961,
+          "upper": 1.0133,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0594,
+        "maxControlSpread": 0.0658
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 5.439,
+        "p95": 5.598,
+        "medianCi95": [
+          5.421,
+          5.457
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.992,
+          "lower": 0.9879,
+          "upper": 1.0018,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0082,
+        "maxControlSpread": 0.0202
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "alpha1-valid-fixture",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 1.614,
+        "p95": 1.666,
+        "medianCi95": [
+          1.608,
+          1.619
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9988,
+          "lower": 0.996,
+          "upper": 1.0056,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.016,
+        "maxControlSpread": 0.0259
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 126.28649999999999,
+        "p95": 132.831,
+        "medianCi95": [
+          125.998,
+          126.831
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 1.0058,
+          "lower": 0.9985,
+          "upper": 1.0124,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0445,
+        "maxControlSpread": 0.0084
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 113.798,
+        "p95": 120.38,
+        "medianCi95": [
+          113.554,
+          114.301
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 1.0059,
+          "lower": 0.9984,
+          "upper": 1.014,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0494,
+        "maxControlSpread": 0.0087
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 94.2115,
+        "p95": 98.032,
+        "medianCi95": [
+          93.685,
+          94.776
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 1.0017,
+          "lower": 0.9841,
+          "upper": 1.0068,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0188,
+        "maxControlSpread": 0.0259
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 479.34950000000003,
+        "p95": 494.755,
+        "medianCi95": [
+          476.331,
+          481.243
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9889,
+          "lower": 0.9813,
+          "upper": 0.9975,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0142,
+        "maxControlSpread": 0.0164
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "baseline": {
+        "informational": false,
+        "n": 80,
+        "median": 126330880,
+        "p95": 132112384,
+        "medianCi95": [
+          125628416,
+          126877696
+        ],
+        "cv": 0.0224
+      },
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 138963968,
+        "factor": 1.1
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "baseline": {
+        "informational": false,
+        "n": 80,
+        "median": 140853248,
+        "p95": 146112512,
+        "medianCi95": [
+          139751424,
+          141479936
+        ],
+        "cv": 0.0189
+      },
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 154938572,
+        "factor": 1.1
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 14612
+      },
+      "limit": {
+        "maxValue": 15342,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 3731
+      },
+      "limit": {
+        "maxValue": 3917,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 206
+      },
+      "limit": {
+        "maxValue": 216,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 0
+      },
+      "limit": {
+        "maxValue": 0,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 315
+      },
+      "limit": {
+        "maxValue": 330,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 17777
+      },
+      "limit": {
+        "maxValue": 19554,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 35400
+      },
+      "limit": {
+        "maxValue": 38940,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 25687
+      },
+      "limit": {
+        "maxValue": 28255,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 428
+      },
+      "limit": {
+        "maxValue": 449,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 0
+      },
+      "limit": {
+        "maxValue": 0,
+        "growth": 0
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "baseline": {
+        "value": "true"
+      },
+      "limit": {
+        "equals": "true"
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "baseline": {
+        "informational": true,
+        "n": 60,
+        "median": 832.95,
+        "p95": 845.7,
+        "medianCi95": [
+          827.7,
+          835.9
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 30,
+          "median": 0.9978,
+          "lower": 0.992,
+          "upper": 1.0087,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0134,
+        "maxControlSpread": 0.0189
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 60,
+        "median": 2.4945000000000004,
+        "p95": 2.536,
+        "medianCi95": [
+          2.479,
+          2.502
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 30,
+          "median": 1.0081,
+          "lower": 0.9976,
+          "upper": 1.0165,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0206,
+        "maxControlSpread": 0.0165
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 8.394,
+        "p95": 8.596,
+        "medianCi95": [
+          8.38,
+          8.412
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 1.0026,
+          "lower": 0.9963,
+          "upper": 1.0064,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0085,
+        "maxControlSpread": 0.0119
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 4.745,
+        "p95": 4.952,
+        "medianCi95": [
+          4.724,
+          4.759
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9961,
+          "lower": 0.9891,
+          "upper": 1.001,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.003,
+        "maxControlSpread": 0.0138
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 4.23,
+        "p95": 4.284,
+        "medianCi95": [
+          4.214,
+          4.239
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 1.0011,
+          "lower": 0.998,
+          "upper": 1.0081,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0133,
+        "maxControlSpread": 0.0203
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "ce-corpus",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 80,
+        "median": 1.7955,
+        "p95": 1.812,
+        "medianCi95": [
+          1.793,
+          1.801
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 40,
+          "median": 0.9972,
+          "lower": 0.9945,
+          "upper": 1.0003,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0022,
+        "maxControlSpread": 0.0089
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 2901.8864999999996,
+        "p95": 2932.138,
+        "medianCi95": [
+          2898.179,
+          2908.875
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 0.9991,
+          "lower": 0.9935,
+          "upper": 1.0022,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0051,
+        "maxControlSpread": 0.0082
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 2788.3135,
+        "p95": 2818.048,
+        "medianCi95": [
+          2783.814,
+          2795.584
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 0.9989,
+          "lower": 0.9932,
+          "upper": 1.0022,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0053,
+        "maxControlSpread": 0.0078
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 94.41900000000001,
+        "p95": 95.932,
+        "medianCi95": [
+          93.987,
+          94.721
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 1.0036,
+          "lower": 0.9969,
+          "upper": 1.0164,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0188,
+        "maxControlSpread": 0.022
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 5001.2654999999995,
+        "p95": 5064.872,
+        "medianCi95": [
+          4991.9169999999995,
+          5013.624
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 0.9979,
+          "lower": 0.9952,
+          "upper": 1.0058,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0068,
+        "maxControlSpread": 0.0067
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "baseline": {
+        "informational": false,
+        "n": 40,
+        "median": 302481408,
+        "p95": 308543488,
+        "medianCi95": [
+          301813760,
+          304181248
+        ],
+        "cv": 0.0092
+      },
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 332729548,
+        "factor": 1.1
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "baseline": {
+        "informational": false,
+        "n": 40,
+        "median": 357529600,
+        "p95": 362401792,
+        "medianCi95": [
+          356315136,
+          357883904
+        ],
+        "cv": 0.0081
+      },
+      "limit": {
+        "mode": "absolute",
+        "maxMedian": 393282560,
+        "factor": 1.1
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 46998
+      },
+      "limit": {
+        "maxValue": 49347,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 9045
+      },
+      "limit": {
+        "maxValue": 9497,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 693
+      },
+      "limit": {
+        "maxValue": 727,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 47
+      },
+      "limit": {
+        "maxValue": 49,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 903
+      },
+      "limit": {
+        "maxValue": 948,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 102320
+      },
+      "limit": {
+        "maxValue": 112552,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 82323
+      },
+      "limit": {
+        "maxValue": 90555,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 2099147
+      },
+      "limit": {
+        "maxValue": 2309061,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 16757
+      },
+      "limit": {
+        "maxValue": 17594,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 176
+      },
+      "limit": {
+        "maxValue": 176,
+        "growth": 0
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "baseline": {
+        "value": "true"
+      },
+      "limit": {
+        "equals": "true"
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.propsNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "baseline": {
+        "informational": true,
+        "n": 48,
+        "median": 1598.4,
+        "p95": 1617.9,
+        "medianCi95": [
+          1591.3,
+          1604.3
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 24,
+          "median": 1.0001,
+          "lower": 0.9957,
+          "upper": 1.0073,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0091,
+        "maxControlSpread": 0.014
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.recipeSelectNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "baseline": {
+        "informational": true,
+        "n": 48,
+        "median": 2403.5,
+        "p95": 2457,
+        "medianCi95": [
+          2398.4,
+          2413.1
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 24,
+          "median": 1.0026,
+          "lower": 0.9995,
+          "upper": 1.0069,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0125,
+        "maxControlSpread": 0.0131
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.renderNsPerCall",
+      "class": "runtime",
+      "unit": "ns",
+      "baseline": {
+        "informational": true,
+        "n": 48,
+        "median": 9815.150000000001,
+        "p95": 9938.5,
+        "medianCi95": [
+          9796.3,
+          9838
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 24,
+          "median": 1.0008,
+          "lower": 0.9977,
+          "upper": 1.0047,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0078,
+        "maxControlSpread": 0.007
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.15,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "runtime.moduleLoadMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 48,
+        "median": 167.683,
+        "p95": 172.699,
+        "medianCi95": [
+          166.846,
+          168.728
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 24,
+          "median": 1.0047,
+          "lower": 0.9947,
+          "upper": 1.0107,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0226,
+        "maxControlSpread": 0.0279
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 79.58850000000001,
+        "p95": 80.98,
+        "medianCi95": [
+          79.327,
+          79.804
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 1.0081,
+          "lower": 0.9989,
+          "upper": 1.0108,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0157,
+        "maxControlSpread": 0.0133
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 6.864000000000001,
+        "p95": 7.006,
+        "medianCi95": [
+          6.79,
+          6.906
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 1.0102,
+          "lower": 0.9977,
+          "upper": 1.0217,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0263,
+        "maxControlSpread": 0.0236
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 669.8385000000001,
+        "p95": 677.751,
+        "medianCi95": [
+          668.601,
+          671.778
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 0.9984,
+          "lower": 0.9946,
+          "upper": 1.003,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0097,
+        "maxControlSpread": 0.0089
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 586.1895,
+        "p95": 594.226,
+        "medianCi95": [
+          584.247,
+          588.926
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 0.9952,
+          "lower": 0.9921,
+          "upper": 1.0022,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0086,
+        "maxControlSpread": 0.0149
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 847.252,
+        "p95": 858.209,
+        "medianCi95": [
+          845.885,
+          849.223
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 0.9945,
+          "lower": 0.9901,
+          "upper": 1.0024,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0034,
+        "maxControlSpread": 0.0124
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 759.818,
+        "p95": 770.481,
+        "medianCi95": [
+          758.526,
+          761.089
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 0.9955,
+          "lower": 0.99,
+          "upper": 1.0013,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0036,
+        "maxControlSpread": 0.0152
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 80.609,
+        "p95": 81.758,
+        "medianCi95": [
+          80.402,
+          80.782
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 1.0017,
+          "lower": 0.9984,
+          "upper": 1.0112,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0148,
+        "maxControlSpread": 0.0058
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c1000-t200-r20-s307",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 40,
+        "median": 9.5495,
+        "p95": 9.805,
+        "medianCi95": [
+          9.445,
+          9.598
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 20,
+          "median": 1.0029,
+          "lower": 0.9908,
+          "upper": 1.0232,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0347,
+        "maxControlSpread": 0.033
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 24271.177499999998,
+        "p95": 24435.329,
+        "medianCi95": [
+          24170.211,
+          24333.768
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 0.9965,
+          "lower": 0.9928,
+          "upper": 1.0039,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0359,
+        "maxControlSpread": 0.007
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 23237.483,
+        "p95": 23388.133,
+        "medianCi95": [
+          23133.445,
+          23301.296
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 0.9962,
+          "lower": 0.9921,
+          "upper": 1.0035,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0368,
+        "maxControlSpread": 0.0073
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "compiler.importMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 95.1825,
+        "p95": 95.952,
+        "medianCi95": [
+          94.721,
+          95.45
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 1.0028,
+          "lower": 0.9926,
+          "upper": 1.0118,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.02,
+        "maxControlSpread": 0.0168
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.cpuMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 33664.527,
+        "p95": 33914.593,
+        "medianCi95": [
+          33604.632,
+          33756.53
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 0.998,
+          "lower": 0.9941,
+          "upper": 1.0024,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0375,
+        "maxControlSpread": 0.0062
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "full.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "baseline": {
+        "informational": false,
+        "n": 20,
+        "median": 1053841408,
+        "p95": 1070710784,
+        "medianCi95": [
+          1048748032,
+          1057525760
+        ],
+        "statistic": "min",
+        "min": 1038974976,
+        "minima": [
+          1048399872,
+          1055051776,
+          1038974976,
+          1043324928
+        ],
+        "cv": 0.269,
+        "minimaCv": 0.0066
+      },
+      "limit": {
+        "mode": "absolute",
+        "statistic": "min",
+        "maxMin": 1142872473,
+        "factor": 1.1
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "session.maxRssBytes",
+      "class": "memory",
+      "unit": "bytes",
+      "baseline": {
+        "informational": false,
+        "n": 20,
+        "median": 1274511360,
+        "p95": 1304170496,
+        "medianCi95": [
+          1234305024,
+          1282707456
+        ],
+        "statistic": "min",
+        "min": 1225105408,
+        "minima": [
+          1225105408,
+          1279369216,
+          1232252928,
+          1271681024
+        ],
+        "cv": 0.2203,
+        "minimaCv": 0.0219
+      },
+      "limit": {
+        "mode": "absolute",
+        "statistic": "min",
+        "maxMin": 1347615948,
+        "factor": 1.1
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 227208
+      },
+      "limit": {
+        "maxValue": 238568,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.gzipBytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 44116
+      },
+      "limit": {
+        "maxValue": 46321,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.styleRules",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 3314
+      },
+      "limit": {
+        "maxValue": 3479,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.atRules",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 240
+      },
+      "limit": {
+        "maxValue": 252,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "css.declarations",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 4362
+      },
+      "limit": {
+        "maxValue": 4580,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "designModule.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 465591
+      },
+      "limit": {
+        "maxValue": 512150,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "declarations.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 349941
+      },
+      "limit": {
+        "maxValue": 384935,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "compiledModules.bytes",
+      "class": "deterministic",
+      "unit": "bytes",
+      "baseline": {
+        "value": 21157045
+      },
+      "limit": {
+        "maxValue": 23272749,
+        "growth": 0.1
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "report.ruleCount",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 167344
+      },
+      "limit": {
+        "maxValue": 175711,
+        "growth": 0.05
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "variants.recipeSelections",
+      "class": "deterministic",
+      "unit": "count",
+      "baseline": {
+        "value": 895
+      },
+      "limit": {
+        "maxValue": 895,
+        "growth": 0
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "consistency.incrementalEqualsCanonical",
+      "class": "identity",
+      "unit": null,
+      "baseline": {
+        "value": "true"
+      },
+      "limit": {
+        "equals": "true"
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.local-style.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 887.1904999999999,
+        "p95": 896.834,
+        "medianCi95": [
+          883.998,
+          891.155
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 1.0069,
+          "lower": 1.0037,
+          "upper": 1.0106,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0146,
+        "maxControlSpread": 0.0113
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.local-style.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 51.482,
+        "p95": 53.783,
+        "medianCi95": [
+          50.864,
+          52.053
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 1.0154,
+          "lower": 0.9919,
+          "upper": 1.0571,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0909,
+        "maxControlSpread": 0.0514
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.15,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.recipe-branch.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 3305.1800000000003,
+        "p95": 3502.45,
+        "medianCi95": [
+          3289.201,
+          3330.714
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 1.0032,
+          "lower": 0.9916,
+          "upper": 1.0116,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0516,
+        "maxControlSpread": 0.0141
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.recipe-branch.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 2439.1279999999997,
+        "p95": 2616.201,
+        "medianCi95": [
+          2428.349,
+          2462.64
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 1.0115,
+          "lower": 0.9869,
+          "upper": 1.0233,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0567,
+        "maxControlSpread": 0.0301
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.theme-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 8526.021,
+        "p95": 8583.852,
+        "medianCi95": [
+          8482.991,
+          8558.829
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 1.0018,
+          "lower": 0.9965,
+          "upper": 1.005,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0216,
+        "maxControlSpread": 0.0083
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.theme-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 7625.987,
+        "p95": 7674.927,
+        "medianCi95": [
+          7589.243,
+          7649.032
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 1.0024,
+          "lower": 0.9965,
+          "upper": 1.0064,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0241,
+        "maxControlSpread": 0.0111
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.token-value.totalMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 894.5654999999999,
+        "p95": 907.591,
+        "medianCi95": [
+          893.015,
+          899.93
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 1.0022,
+          "lower": 0.9998,
+          "upper": 1.0094,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0165,
+        "maxControlSpread": 0.005
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    },
+    {
+      "workload": "synthetic-c10000-t1000-r100-s307",
+      "metric": "incremental.token-value.toDiagnosticsMs",
+      "class": "timing",
+      "unit": "ms",
+      "baseline": {
+        "informational": true,
+        "n": 20,
+        "median": 74.0035,
+        "p95": 75.725,
+        "medianCi95": [
+          73.695,
+          74.663
+        ]
+      },
+      "null": {
+        "pooled": {
+          "n": 10,
+          "median": 1.0086,
+          "lower": 1.0007,
+          "upper": 1.0137,
+          "rounds": 2000,
+          "seed": 307
+        },
+        "maxUpper": 1.0233,
+        "maxControlSpread": 0.0195
+      },
+      "limit": {
+        "mode": "paired-ratio",
+        "maxRatio": 1.25,
+        "noiseCeiling": 0.1,
+        "minPairs": 5
+      }
+    }
+  ],
+  "unknown": [
+    {
+      "id": "host.next.build-and-dev",
+      "scope": "Next.js 16.3.8 webpack and Turbopack build/dev time, memory and output bytes",
+      "reason": "Hosts are pinned and installable in the alpha1 closure, but CE-00.3 measured no Next workload; no baseline exists.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)"
+    },
+    {
+      "id": "host.rsbuild.build-and-dev",
+      "scope": "Rsbuild 2.2.11 / Rspack 2.2.8 build/dev time, memory and output bytes",
+      "reason": "Pinned and installable, not measured in CE-00.3.",
+      "owner": "CE-13 host requalification (#78-#81), CE-12.3 (#76)"
+    },
+    {
+      "id": "host.vite.dev-and-hmr",
+      "scope": "Vite dev server start, HMR and browser-visible update latency",
+      "reason": "Only the Vite production build of the pilot is measured; no dev-server or browser-visible latency harness ran.",
+      "owner": "CE-12.3 (#76), CE-13.1 (#78)"
+    },
+    {
+      "id": "compiler.watcher-latency",
+      "scope": "Filesystem edit to diagnostics through ProjectSession.watch()",
+      "reason": "Incremental cost is measured from an explicit verified-explicit transaction; watcher debounce and filesystem notification latency are excluded.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "browser.style-cost",
+      "scope": "Browser CSS parse, style recalculation, layout and paint cost of emitted CSS",
+      "reason": "No browser performance trace was taken; runtime selection is measured in Node only.",
+      "owner": "CE-12.3 (#76), CE-14 (#82-#84)"
+    },
+    {
+      "id": "runtime.non-v8",
+      "scope": "Runtime selection cost in browsers and engines other than Node 22.22.0 V8",
+      "reason": "Measured in Node only.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "output.new-resource-kinds",
+      "scope": "CSS/module bytes of capabilities absent in Alpha 1 (keyframes, fonts, assets, globals, typed resources, new conditions)",
+      "reason": "Alpha 1 cannot express them, so no comparable baseline exists; each must be baselined by its owning lot under a new policy version before its budget can exist.",
+      "owner": "Owning capability lots (CE-03 to CE-11), CE-12.2 (#75)"
+    },
+    {
+      "id": "compiler.invalidation-counters",
+      "scope": "Rebuild, fallback and dependency-invalidation counts per incremental edit",
+      "reason": "Not exposed by the public compiler API; reading the internal perf collector would instrument the measured package.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "runtime.c10000",
+      "scope": "Runtime selection cost and compile-to-canonical consistency at 10,000 components",
+      "reason": "The c10000 workload is measured for compile, incremental, memory and output only; runtime replay ran at c1000 and below.",
+      "owner": "CE-12.3 (#76)"
+    },
+    {
+      "id": "cold-install",
+      "scope": "Package install time, cold disk cache and first-run cost",
+      "reason": "Samples run with a warm operating-system file cache and a preinstalled closure.",
+      "owner": "CE-15.1 (#77)"
+    }
+  ],
+  "changePolicy": [
+    "budgets.v3.json is generated by `node tools/baselines/budgets.mjs freeze` from this policy and the committed baseline results, and is never edited by hand; rerunning the same freeze command with this policy and the referenced results must reproduce it byte for byte.",
+    "Committed policy, budgets, workloads, derivation and baseline result files are immutable; `budgets.mjs gate` compares the budgets file with the version of the commit that added it and fails on any difference.",
+    "Changing a threshold, metric set or workload requires a new budget-policy.vN.json and budgets.vN.json (N incremented), a justification, a predecessor reference by path and SHA-256, and a new comparable baseline run of the unchanged alpha1 artifact; reusing an old result file is rejected.",
+    "Every budget loosened or removed relative to the predecessor must be listed in `relaxations` with its own justification; an unknown metric may only leave the unknown list by gaining a budget.",
+    "No release may pass against a weakened budget retroactively: the gate evaluates the budgets version current at the evaluated commit, fails on any policy-chain problem, and never reports inconclusive or incomplete as pass."
+  ]
+}
