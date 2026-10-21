@@ -465,7 +465,8 @@ sorted, and the Monte Carlo seeds are those of section 5.2. An existing
   - `runnerTreeDigest`, `harnessDepsLockSha256` and the recorded commits;
   - the reference product (build digest, epoch, source commit, trusted tree
     and `@pandamstyle` subtree digests);
-  - the shared projection groups;
+  - the shared projection groups, with the task-dependent fields replaced
+    by the placeholder `<task>` (below);
   - per runnable cell, its comparability key and projection.
 - `inputs`: the sha256 of `matrix.json`, `outcomes.json` and every record,
   and every attempt directory without a record.
@@ -492,11 +493,33 @@ sorted, and the Monte Carlo seeds are those of section 5.2. An existing
   count is within the cap. The list depends only on which repetitions are
   unclean.
 
+**Task-dependent fields.** Two fields inside the shared groups are a
+function of the task (runner DESIGN.md sections 1.4, 3.8 and 4.5):
+
+- in `model.normalizedArgv`, the value after `--max-turns`: Claude's
+  `cliMaxTurns`, derived from the task's budget. Codex passes no
+  `--max-turns`;
+- `policy.capabilityEnforcementMatrixSha256`: the digest of the task's
+  capability enforcement plan.
+
+They are compared per cell instead of across a model's cells, and never
+ignored. The argv value must equal the cell's `budgets.cliMaxTurns`, and be
+absent when that is null. The plan digest must equal the plan that the
+runner's `enforcementPlan` derives from the task and its fixture in the
+checkout's corpus. Every other field of the shared groups stays identical
+across a model's cells, including the rest of the argv. The list is
+`TASK_DEPENDENT_FIELDS` in `gates.mjs`. A test computes the runner's
+`projectionFor` over every development task and checks that the shared
+groups vary in exactly these fields.
+
 `derive` refuses (exit 1) when any of these holds:
 
 - a cell has more than one comparability key;
 - one model's cells differ in a shared projection group (harness, model,
-  policy, containers, task epoch, corpus version or lock);
+  policy, containers, task epoch, corpus version or lock), outside its
+  task-dependent fields;
+- a record's task-dependent field is not the value its task and cell
+  determine;
 - a key is not the digest of its projection;
 - the records name more than one reference product;
 - a record contradicts its matrix (matrix id, kind, split, epoch), its
@@ -531,16 +554,21 @@ sorted, and the Monte Carlo seeds are those of section 5.2. An existing
     with each task's family gate, and `latency.p50` with `latency.p95`;
   - the latency medians and cuts;
   - the models' shared projection groups, the cells (one per runnable task
-    and model, each key its projection's digest) and `binding.shared`;
+    and model, each key its projection's digest, each task-dependent field
+    its task's) and `binding.shared`;
   - `synthetic`, and `freeze.status`, `reasons`, `insufficientGates` and
     the missing repetitions;
   - `minimumDetectable`, point estimates, unclean counts, `recollectCells`
     and the input digests are neither used nor reported by `check`, and
     are not verified;
 - kind, repetitions or epoch differ;
+- a candidate or control record's task-dependent field is not the value
+  its task and cell determine;
 - a candidate or control record's comparability key differs from its
-  cell's key (the differing projection fields are listed);
-- a cell without a baseline key differs from its model's shared groups;
+  cell's key (the differing projection fields are listed). The key covers
+  the task-dependent fields, so each must equal the baseline cell's;
+- a cell without a baseline key differs from its model's shared groups,
+  outside the task-dependent fields;
 - the control is not the reference product (trusted tree, `@pandamstyle`
   subtree, source commit, epoch);
 - the control is the candidate matrix.

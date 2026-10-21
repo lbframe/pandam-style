@@ -28,6 +28,7 @@ import {
   comparabilityKey,
   diffProjections,
 } from '../runner/src/comparability.mjs';
+import { enforcementPlan } from '../runner/src/capabilities.mjs';
 import { buildReport, loadMatrix } from '../runner/src/report.mjs';
 import {
   DRAWS,
@@ -102,6 +103,39 @@ const SHARED_PER_MODEL = [
 const SHARED_ALL = ['version', 'harness'];
 const SHARED_TASK_FIELDS = ['epoch', 'corpusVersion', 'corpusLockSha256'];
 
+/**
+ * The fields inside the shared groups whose value is a function of the task
+ * (runner DESIGN.md sections 1.4, 3.8 and 4.5; `projectionFor` in
+ * `runner/src/matrix.mjs`). Every other field of those groups is
+ * configuration of the model or the matrix. These two are left out of the
+ * comparison across a model's cells and bound per cell instead
+ * (`taskBindingProblems`), never ignored:
+ *
+ * - `model.normalizedArgv`: the value after `--max-turns`, the Claude
+ *   adapter's `cliMaxTurns` (section 3.8), derived from the task's budget.
+ *   It must equal the cell's `budgets.cliMaxTurns` (absent when that is
+ *   null, as for Codex). The rest of the argv stays shared.
+ * - `policy.capabilityEnforcementMatrixSha256`: the digest of the task's
+ *   capability enforcement plan (section 4.5). It must equal the plan the
+ *   runner's `enforcementPlan` derives from the task and its fixture.
+ *
+ * `baseline-gates.test.mjs` checks this list against the runner: over every
+ * development task, the runner's `projectionFor` differs inside the shared
+ * groups in exactly these fields.
+ */
+export const TASK_DEPENDENT_FIELDS = [
+  'model.normalizedArgv[--max-turns]',
+  'policy.capabilityEnforcementMatrixSha256',
+];
+const MAX_TURNS_FLAG = '--max-turns';
+const TASK_PLACEHOLDER = '<task>';
+
+/** The argv with the value after `--max-turns` replaced by a placeholder. */
+const maskMaxTurns = (argv) =>
+  argv.map((a, i) =>
+    i > 0 && argv[i - 1] === MAX_TURNS_FLAG ? TASK_PLACEHOLDER : a,
+  );
+
 /** Refusal of an input: never a comparison. */
 export class GatesRefusal extends Error {
   constructor(message, details = []) {
@@ -140,9 +174,28 @@ export function serialize(doc) {
 
 const projectionDigest = (x) => sha256(JSON.stringify(canonical(x ?? null)));
 
+/**
+ * The shared groups of a projection, with the task-dependent fields
+ * (`TASK_DEPENDENT_FIELDS`) replaced by a placeholder: one derivation for
+ * a model's groups, `binding.shared` and the candidate check.
+ */
 function sharedProjection(projection, groups) {
   const out = {};
   for (const g of groups) out[g] = projection[g] ?? null;
+  if (Array.isArray(out.model?.normalizedArgv))
+    out.model = {
+      ...out.model,
+      normalizedArgv: maskMaxTurns(out.model.normalizedArgv),
+    };
+  if (
+    out.policy != null &&
+    typeof out.policy === 'object' &&
+    'capabilityEnforcementMatrixSha256' in out.policy
+  )
+    out.policy = {
+      ...out.policy,
+      capabilityEnforcementMatrixSha256: TASK_PLACEHOLDER,
+    };
   out.task = {};
   for (const f of SHARED_TASK_FIELDS)
     out.task[f] = projection.task?.[f] ?? null;
@@ -157,6 +210,45 @@ function sharedDiff(a, b) {
         if (a.task[f] !== b.task?.[f]) out.push(`task.${f}`);
     } else if (projectionDigest(a[g]) !== projectionDigest(b[g])) out.push(g);
   return out;
+}
+
+/**
+ * Per-cell binding of the task-dependent fields (`TASK_DEPENDENT_FIELDS`)
+ * of one projection: each must be the value its task and cell determine.
+ * `loaded` is the checkout's corpus, whose `corpus.lock.json` the callers
+ * have bound to the records.
+ */
+function taskBindingProblems(projection, loaded) {
+  const problems = [];
+  const argv = projection.model?.normalizedArgv;
+  const budget = projection.budgets?.cliMaxTurns ?? null;
+  if (!Array.isArray(argv)) problems.push('model.normalizedArgv is not a list');
+  else {
+    const at = argv.flatMap((a, i) => (a === MAX_TURNS_FLAG ? [i] : []));
+    const value = at.length === 1 ? (argv[at[0] + 1] ?? null) : null;
+    if (at.length > 1)
+      problems.push(`model.normalizedArgv has ${at.length} ${MAX_TURNS_FLAG}`);
+    else if (value !== (budget == null ? null : String(budget)))
+      problems.push(
+        `model.normalizedArgv ${MAX_TURNS_FLAG} ${show(value)} is not budgets.cliMaxTurns ${show(budget)}`,
+      );
+  }
+  const taskId = projection.task?.id;
+  const entry = findTask(loaded, taskId);
+  if (entry == null || !loaded.development.includes(entry))
+    problems.push(
+      `task ${show(taskId)} is not a development task of the corpus`,
+    );
+  else {
+    const fixture = loaded.fixtures.get(entry.task.workspace?.fixture);
+    const plan = enforcementPlan(entry.task, fixture?.meta);
+    const recorded = projection.policy?.capabilityEnforcementMatrixSha256;
+    if (recorded !== plan.matrixSha256)
+      problems.push(
+        `policy.capabilityEnforcementMatrixSha256 ${show(recorded)} is not task ${taskId}'s capability enforcement plan ${plan.matrixSha256}`,
+      );
+  }
+  return problems;
 }
 
 // ------------------------------------------------------------ matrix input
@@ -298,11 +390,14 @@ export function readMatrix(matrixDir) {
 
 /**
  * Comparability of one matrix's records with itself: one key per cell, and
- * the groups every cell of a model (or of the matrix) shares are equal.
- * Returns each cell's key and projection and each model's shared groups.
+ * the groups every cell of a model (or of the matrix) shares are equal but
+ * for the task-dependent fields, which every record binds to its own task
+ * and budget instead (`taskBindingProblems`). Returns each cell's key and
+ * projection and each model's shared groups.
  */
-function bindMatrix(m) {
+function bindMatrix(m, loaded) {
   const problems = [];
+  const taskProblems = [];
   const cellKeys = new Map();
   const perModel = new Map();
   let all = null;
@@ -315,6 +410,10 @@ function bindMatrix(m) {
     else if (prior.key !== r.comparability.key)
       problems.push(
         `${r.cell.taskId}/${r.cell.modelKey}: mixed comparability keys (${diffProjections(prior.projection, p).join(', ')})`,
+      );
+    for (const d of taskBindingProblems(p, loaded))
+      taskProblems.push(
+        `${r.cell.taskId}/${r.cell.modelKey} rep ${r.repetition} attempt ${r.attempt}: ${d}`,
       );
     const shared = sharedProjection(p, SHARED_PER_MODEL);
     const pm = perModel.get(r.cell.modelKey);
@@ -340,6 +439,11 @@ function bindMatrix(m) {
     throw new GatesRefusal(
       `mixed comparability keys in ${m.dir}`,
       [...new Set(problems)].sort(byId),
+    );
+  if (taskProblems.length > 0)
+    throw new GatesRefusal(
+      `task-dependent projection fields do not match their task in ${m.dir}`,
+      [...new Set(taskProblems)].sort(byId),
     );
   return { cellKeys, perModel, all };
 }
@@ -626,7 +730,6 @@ function recollectFor(gateEntry, uncleanByTask) {
 export function deriveGates(baselineDir) {
   const m = readMatrix(baselineDir);
   const { matrix } = m;
-  const bound = bindMatrix(m);
   const loaded = loadCorpus(CORPUS_ROOT);
   const R = matrix.repetitions;
   const problems = [];
@@ -656,6 +759,9 @@ export function deriveGates(baselineDir) {
       'the baseline does not match its binding',
       [...new Set(problems)].sort(byId),
     );
+  // After the corpus lock check: the task-dependent fields are bound to
+  // the checkout's corpus.
+  const bound = bindMatrix(m, loaded);
   const first = m.records[0] ?? null;
 
   const models = {};
@@ -1154,6 +1260,8 @@ function verifyGateRecord(g, loaded) {
         problems.push(
           `${at}: the projection is of task ${c.projection.task?.id}`,
         );
+      for (const d of taskBindingProblems(c.projection, loaded))
+        problems.push(`${at}: ${d}`);
     }
   }
   const keyed = (b.cells ?? []).filter((c) => c.projection != null);
@@ -1244,13 +1352,17 @@ function verifyBinding(g, m, role) {
     }
     const p = r.comparability.projection;
     if (c.comparabilityKey != null) {
+      // The key covers the whole projection: the task-dependent fields of
+      // the candidate's cell must equal the baseline cell's.
       if (r.comparability.key !== c.comparabilityKey)
         problems.push(
           `${where}: comparability key differs (${diffProjections(c.projection, p).join(', ') || 'key'})`,
         );
     } else {
       // No baseline record for that cell: its gates are insufficient, but
-      // the groups every cell of the model shares still bind it.
+      // the groups every cell of the model shares still bind it. Its
+      // task-dependent fields are bound to its task by `bindMatrix`, which
+      // runs on every candidate and control record before this check.
       const shared = g.models[r.cell.modelKey]?.projection;
       const d =
         shared == null
@@ -1310,18 +1422,19 @@ export function checkGates(
   candidateDir,
   { controlDir = null } = {},
 ) {
-  verifyGateRecord(gateRecord, loadCorpus(CORPUS_ROOT));
+  const loaded = loadCorpus(CORPUS_ROOT);
+  verifyGateRecord(gateRecord, loaded);
   const R = gateRecord.binding.repetitions;
   const cand = readMatrix(candidateDir);
-  bindMatrix(cand);
-  const ignored = verifyBinding(gateRecord, cand, 'candidate');
+  bindMatrix(cand, loaded);
+  const ignored = verifyBinding(gateRecord, cand, 'candidate', loaded);
   let control = null;
   if (controlDir != null) {
     control = readMatrix(controlDir);
     if (control.matrix.matrixId === cand.matrix.matrixId)
       throw new GatesRefusal('the control is the candidate matrix');
-    bindMatrix(control);
-    verifyBinding(gateRecord, control, 'control');
+    bindMatrix(control, loaded);
+    verifyBinding(gateRecord, control, 'control', loaded);
   }
 
   const results = [];

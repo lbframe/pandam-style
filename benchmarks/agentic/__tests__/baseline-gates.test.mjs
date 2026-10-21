@@ -29,12 +29,21 @@ import {
   tmpDir,
   writeScenario,
 } from '../runner/__tests__/helpers.mjs';
+import { enforcementPlan } from '../runner/src/capabilities.mjs';
 import { comparabilityKey } from '../runner/src/comparability.mjs';
+import * as claudeAdapter from '../runner/src/adapters/claude.mjs';
+import * as codexAdapter from '../runner/src/adapters/codex.mjs';
+import {
+  cliMaxTurnsFor,
+  maxToolCallsFor,
+  projectionFor,
+} from '../runner/src/matrix.mjs';
 import { validate } from '../src/json-schema.mjs';
 import { CORPUS_ROOT, loadCorpus } from '../src/corpus.mjs';
 import {
   FAMILY_OF_KIND,
   GatesRefusal,
+  TASK_DEPENDENT_FIELDS,
   checkGates,
   deriveGates,
   serialize,
@@ -67,6 +76,9 @@ const REPORT = RUNNABLE.filter((t) => familyOf(t) === 'report').map(
   (t) => t.id,
 );
 const rank = (o) => OUTCOMES.indexOf(o);
+/** The runner's capability enforcement plan of a task (DESIGN.md 4.5). */
+const planOf = (task) =>
+  enforcementPlan(task, CORPUS.fixtures.get(task.workspace.fixture)?.meta);
 
 // ------------------------------------------------------------ fixtures
 
@@ -136,10 +148,22 @@ function recordFor(t, { matrixId, taskId, modelKey, rep, attempt, kind }) {
   p.task.id = taskId;
   p.task.taskDigest = LOCK.development[taskId];
   p.model.requestedModel = MODEL_KEYS[modelKey];
-  p.model.normalizedArgv = p.model.normalizedArgv.map((a) =>
-    a.startsWith('claude-') ? MODEL_KEYS[modelKey] : a,
+  // The task-dependent fields as the runner derives them (DESIGN.md
+  // sections 3.8 and 4.5): the budgets and Claude's `--max-turns` from the
+  // task's budget, and the task's capability enforcement plan.
+  const maxToolCalls = maxToolCallsFor({}, task);
+  const cliMaxTurns = cliMaxTurnsFor({}, maxToolCalls);
+  p.model.normalizedArgv = p.model.normalizedArgv.map((a, i, argv) =>
+    a.startsWith('claude-')
+      ? MODEL_KEYS[modelKey]
+      : argv[i - 1] === '--max-turns'
+        ? String(cliMaxTurns)
+        : a,
   );
   p.budgets.timeoutSeconds = task.budget.timeoutSeconds;
+  p.budgets.maxToolCalls = maxToolCalls;
+  p.budgets.cliMaxTurns = cliMaxTurns;
+  p.policy.capabilityEnforcementMatrixSha256 = planOf(task).matrixSha256;
   return r;
 }
 
@@ -684,6 +708,324 @@ test('derive refuses mixed comparability keys and inconsistent records', async (
     },
   });
   assert.throws(() => deriveGates(lying), /taskSuccess without a normal pass/);
+});
+
+// Task-dependent fields of the shared groups (gates.mjs
+// TASK_DEPENDENT_FIELDS): they vary by task in real records and are bound
+// per cell, never ignored.
+
+test('the task-dependent fields are exactly those of the runner projection that vary by task', () => {
+  const info = {
+    taskDigests: LOCK.development,
+    epoch: 'alpha1',
+    corpusVersion: LOCK.corpusVersion ?? 'v',
+    corpusLockSha256: 'c'.repeat(64),
+  };
+  const identity = {
+    harness: {
+      runnerTreeDigest: 'a'.repeat(64),
+      harnessDepsLockSha256: 'b'.repeat(64),
+    },
+    cliConfigSha256: { claude: null, codex: 'd'.repeat(64) },
+    dependencies: { nodeSha256: 'e'.repeat(64), packageManager: null },
+  };
+  const config = {
+    network: { mode: 'proxy', allow: ['api.example.test'] },
+    images: { agent: 'sha256:1', grader: 'sha256:2', proxy: 'sha256:3' },
+    container: {
+      cpus: 2,
+      memoryBytes: 1,
+      pidsLimit: 1,
+      tmpfsBytes: 1,
+      workspaceBytesCap: 1,
+    },
+  };
+  const models = {
+    claude: {
+      cli: 'claude',
+      model: 'claude-haiku-5-5',
+      cliVersion: '1',
+      cliSha256: 'f'.repeat(64),
+      reasoningEffort: 'low',
+      toolPolicy: { web: false, subagents: false },
+    },
+    codex: {
+      cli: 'codex',
+      model: 'gpt-6.1-sol',
+      cliVersion: '1',
+      cliSha256: '0'.repeat(64),
+      reasoningEffort: 'low',
+      toolPolicy: { web: false, subagents: false },
+    },
+  };
+  const adapters = { claude: claudeAdapter, codex: codexAdapter };
+  const shared = ['version', 'harness', 'model', 'policy', 'containers'];
+  const leaves = (v, at, out) => {
+    if (v != null && typeof v === 'object' && !Array.isArray(v))
+      for (const k of Object.keys(v)) leaves(v[k], `${at}.${k}`, out);
+    else out[at] = JSON.stringify(v);
+    return out;
+  };
+  const found = {};
+  for (const [cli, modelConfig] of Object.entries(models)) {
+    const varying = new Set();
+    let first = null;
+    let runnable = 0;
+    for (const entry of CORPUS.development) {
+      const plan = planOf(entry.task);
+      if (plan.refusals.length > 0) continue;
+      runnable += 1;
+      const maxToolCalls = maxToolCallsFor({}, entry.task);
+      const budgets = {
+        timeoutSeconds: entry.task.budget.timeoutSeconds,
+        maxToolCalls,
+        cliMaxTurns: cli === 'claude' ? cliMaxTurnsFor({}, maxToolCalls) : null,
+      };
+      const invocation = adapters[cli].buildInvocation({
+        model: modelConfig.model,
+        effort: modelConfig.reasoningEffort,
+        prompt: 'P',
+        cliMaxTurns: budgets.cliMaxTurns,
+        sessionId: '00000000-0000-4000-8000-000000000000',
+      });
+      const { projection: p } = projectionFor({
+        task: entry,
+        plan,
+        invocation,
+        prompt: 'P',
+        modelConfig,
+        config,
+        identity,
+        info,
+        budgets,
+      });
+      const flat = {};
+      for (const g of shared)
+        if (g === 'version') flat.version = p.version;
+        else leaves(p[g], g, flat);
+      for (const f of ['epoch', 'corpusVersion', 'corpusLockSha256'])
+        flat[`task.${f}`] = p.task[f];
+      if (first == null) {
+        first = { flat, argv: p.model.normalizedArgv };
+        continue;
+      }
+      for (const [k, v] of Object.entries(flat)) {
+        if (k === 'model.normalizedArgv') {
+          const a = first.argv;
+          const b = p.model.normalizedArgv;
+          assert.equal(
+            b.length,
+            a.length,
+            `${cli}: argv length varies by task`,
+          );
+          b.forEach((x, i) => {
+            if (x !== a[i])
+              varying.add(
+                b[i - 1] === '--max-turns'
+                  ? 'model.normalizedArgv[--max-turns]'
+                  : `model.normalizedArgv[${i}]`,
+              );
+          });
+        } else if (v !== first.flat[k]) varying.add(k);
+      }
+    }
+    assert.equal(runnable, 44, cli);
+    found[cli] = [...varying].sort();
+  }
+  assert.deepEqual(found.claude, [...TASK_DEPENDENT_FIELDS].sort());
+  // Codex passes no --max-turns (DESIGN.md section 3.8).
+  assert.deepEqual(found.codex, ['policy.capabilityEnforcementMatrixSha256']);
+});
+
+test("derive accepts projections that vary by task as the runner's do, and binds them per cell", async () => {
+  const { record: g } = await cleanBaseline();
+  const keyed = g.binding.cells.filter((c) => c.projection != null);
+  assert.equal(keyed.length, 44);
+  const turns = new Set(
+    keyed.map((c) => {
+      const a = c.projection.model.normalizedArgv;
+      return a[a.indexOf('--max-turns') + 1];
+    }),
+  );
+  const plans = new Set(
+    keyed.map((c) => c.projection.policy.capabilityEnforcementMatrixSha256),
+  );
+  assert.ok(turns.size >= 3, `distinct --max-turns: ${[...turns]}`);
+  assert.ok(plans.size >= 5, `distinct capability plans: ${plans.size}`);
+  assert.equal(g.freeze.status, 'freezable');
+  // The model's shared groups hold placeholders, not one task's values.
+  const mp = g.models['claude-haiku'].projection;
+  assert.equal(mp.policy.capabilityEnforcementMatrixSha256, '<task>');
+  const argv = mp.model.normalizedArgv;
+  assert.equal(argv[argv.indexOf('--max-turns') + 1], '<task>');
+  // Every cell keeps its own value, bound to its task.
+  for (const c of keyed) {
+    const task = TASKS.find((t) => t.id === c.taskId);
+    assert.equal(
+      c.projection.policy.capabilityEnforcementMatrixSha256,
+      planOf(task).matrixSha256,
+    );
+    const a = c.projection.model.normalizedArgv;
+    assert.equal(
+      a[a.indexOf('--max-turns') + 1],
+      String(c.projection.budgets.cliMaxTurns),
+    );
+  }
+});
+
+test('derive still refuses a mixed model configuration, and task-dependent values that do not match their task', async () => {
+  const [a] = APPLICATION;
+  const b = REPORT[0];
+  const refuses = async (name, edit, pattern) => {
+    const dir = await buildMatrix(`task-dep-${name}`, { edit });
+    assert.throws(
+      () => deriveGates(dir),
+      (e) => {
+        assert.ok(e instanceof GatesRefusal, name);
+        assert.match(e.message, pattern, name);
+        return true;
+      },
+      name,
+    );
+  };
+  const argvOf = (r) => r.comparability.projection.model.normalizedArgv;
+  // Another model id for one task.
+  await refuses(
+    'model-id',
+    (r, c) => {
+      if (c.taskId !== a) return;
+      const p = r.comparability.projection;
+      p.model.requestedModel = 'claude-opus-5-5';
+      p.model.normalizedArgv = argvOf(r).map((x) =>
+        x === 'claude-haiku-5-5' ? 'claude-opus-5-5' : x,
+      );
+    },
+    new RegExp(`${a}/claude-haiku: model claude-haiku has mixed model`),
+  );
+  // Another flag for one task, the rest of the argv unchanged.
+  await refuses(
+    'flag',
+    (r, c) => {
+      if (c.taskId !== a) return;
+      const argv = argvOf(r);
+      argv[argv.indexOf('--permission-mode') + 1] = 'default';
+    },
+    new RegExp(`${a}/claude-haiku: model claude-haiku has mixed model`),
+  );
+  // The --max-turns flag dropped for one task.
+  await refuses(
+    'no-max-turns',
+    (r, c) => {
+      if (c.taskId !== a) return;
+      const argv = argvOf(r);
+      argv.splice(argv.indexOf('--max-turns'), 2);
+    },
+    /mixed model/,
+  );
+  // Another shared policy field for one task.
+  await refuses(
+    'egress',
+    (r, c) => {
+      if (c.taskId === a)
+        r.comparability.projection.policy.egressAllowlistSha256 = '8'.repeat(
+          64,
+        );
+    },
+    new RegExp(`${a}/claude-haiku: model claude-haiku has mixed policy`),
+  );
+  // A --max-turns that is not the cell's budget, in every repetition.
+  await refuses(
+    'max-turns-off-budget',
+    (r, c) => {
+      if (c.taskId !== a) return;
+      const argv = argvOf(r);
+      const i = argv.indexOf('--max-turns') + 1;
+      argv[i] = String(Number(argv[i]) + 1);
+    },
+    new RegExp(
+      `task-dependent projection fields do not match their task[\\s\\S]*${a}/claude-haiku rep 1 attempt 1: model\\.normalizedArgv --max-turns "\\d+" is not budgets\\.cliMaxTurns \\d+`,
+    ),
+  );
+  // A budget that is not the argv's, in every repetition.
+  await refuses(
+    'budget-off-argv',
+    (r, c) => {
+      if (c.taskId === a) r.comparability.projection.budgets.cliMaxTurns = 7;
+    },
+    /is not budgets\.cliMaxTurns 7/,
+  );
+  // Two --max-turns.
+  await refuses(
+    'two-max-turns',
+    (r, c) => {
+      if (c.taskId !== a) return;
+      const argv = argvOf(r);
+      const i = argv.indexOf('--max-turns');
+      argv.splice(i, 0, '--max-turns', argv[i + 1]);
+    },
+    /mixed model|has 2 --max-turns/,
+  );
+  // Another task's capability plan, in every repetition of one cell.
+  const taskA = TASKS.find((t) => t.id === a);
+  const taskB = TASKS.find((t) => t.id === b);
+  assert.notEqual(planOf(taskA).matrixSha256, planOf(taskB).matrixSha256);
+  await refuses(
+    'capability-plan',
+    (r, c) => {
+      if (c.taskId === a)
+        r.comparability.projection.policy.capabilityEnforcementMatrixSha256 =
+          planOf(taskB).matrixSha256;
+    },
+    new RegExp(
+      `${a}/claude-haiku rep 1 attempt 1: policy\\.capabilityEnforcementMatrixSha256 "${planOf(taskB).matrixSha256}" is not task ${a}'s capability enforcement plan`,
+    ),
+  );
+});
+
+test("check refuses a candidate cell whose task-dependent value differs from the baseline cell's", async () => {
+  const { record: g } = await cleanBaseline();
+  const [a] = APPLICATION;
+  const b = REPORT[0];
+  // Consistent with itself (argv equals budget), but not the baseline cell.
+  const turns = await buildMatrix('cand-max-turns', {
+    edit: (r, c) => {
+      if (c.taskId !== a) return;
+      const p = r.comparability.projection;
+      p.budgets.cliMaxTurns += 2;
+      const argv = p.model.normalizedArgv;
+      argv[argv.indexOf('--max-turns') + 1] = String(p.budgets.cliMaxTurns);
+    },
+  });
+  assert.throws(
+    () => checkGates(g, turns),
+    (e) => {
+      assert.ok(e instanceof GatesRefusal);
+      assert.match(
+        e.message,
+        new RegExp(
+          `${a}/claude-haiku rep 1 attempt 1: comparability key differs \\(model\\.normalizedArgv, budgets\\.cliMaxTurns\\)`,
+        ),
+      );
+      return true;
+    },
+  );
+  // Another task's capability plan.
+  const plan = await buildMatrix('cand-plan', {
+    edit: (r, c) => {
+      if (c.taskId === a)
+        r.comparability.projection.policy.capabilityEnforcementMatrixSha256 =
+          planOf(TASKS.find((t) => t.id === b)).matrixSha256;
+    },
+  });
+  assert.throws(
+    () => checkGates(g, plan),
+    /policy\.capabilityEnforcementMatrixSha256 .* is not task .*'s capability enforcement plan/,
+  );
+  // An unchanged candidate, whose cells vary by task, is accepted.
+  assert.equal(
+    checkGates(g, await buildMatrix('cand-varying')).gates.length,
+    9,
+  );
 });
 
 test('derive: unmeasured baseline metric is insufficient-reference, never a pass', async () => {
@@ -1406,6 +1748,39 @@ test('check refuses a gate record any value of which it relies on does not recom
         c.comparabilityKey = comparabilityKey(c.projection);
       },
       /differs in a shared projection group/,
+    ],
+    [
+      'cell capability plan of another task, rekeyed',
+      (g) => {
+        const c = g.binding.cells.find((x) => x.taskId === REPORT[0]);
+        const other = g.binding.cells.find(
+          (x) =>
+            x.projection.policy.capabilityEnforcementMatrixSha256 !==
+            c.projection.policy.capabilityEnforcementMatrixSha256,
+        );
+        c.projection.policy.capabilityEnforcementMatrixSha256 =
+          other.projection.policy.capabilityEnforcementMatrixSha256;
+        c.comparabilityKey = comparabilityKey(c.projection);
+      },
+      /policy\.capabilityEnforcementMatrixSha256 .* is not task .*'s capability enforcement plan/,
+    ],
+    [
+      'cell --max-turns off its budget, rekeyed',
+      (g) => {
+        const c = g.binding.cells[3];
+        const argv = c.projection.model.normalizedArgv;
+        const i = argv.indexOf('--max-turns') + 1;
+        argv[i] = String(Number(argv[i]) + 1);
+        c.comparabilityKey = comparabilityKey(c.projection);
+      },
+      /--max-turns "\d+" is not budgets\.cliMaxTurns \d+/,
+    ],
+    [
+      'model projection with a task value instead of the placeholder',
+      (g) =>
+        (g.models[H].projection.policy.capabilityEnforcementMatrixSha256 =
+          g.binding.cells[0].projection.policy.capabilityEnforcementMatrixSha256),
+      /claude-haiku: projection does not recompute/,
     ],
     [
       'cell projection of another task',
