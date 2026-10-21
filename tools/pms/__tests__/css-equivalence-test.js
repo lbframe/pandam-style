@@ -158,7 +158,15 @@ describe('the normal form', () => {
         ],
         declarations: [
           ['color', [ident('red')], false],
-          ['--v', '1px 2px', false],
+          [
+            '--v',
+            [
+              JSON.stringify(['dimension-token', 1, 'integer', '', 'px']),
+              JSON.stringify(['ws', ' ']),
+              JSON.stringify(['dimension-token', 2, 'integer', '', 'px']),
+            ],
+            false,
+          ],
         ],
       },
     ]);
@@ -401,6 +409,238 @@ describe('tokens compare by decoded value', () => {
       false,
     ],
     ['  an integer is not a number', '.a{z-index:1}', '.a{z-index:1.0}', false],
+  ])('%s', (_, canonical, delivered, equivalent) => {
+    expect(declarationEquivalence(canonical, delivered).equivalent).toBe(
+      equivalent,
+    );
+  });
+});
+
+// CE-01.2 review round 2 (PR #117): token identity (B7, B8) and the
+// micro-syntaxes minifiers rewrite (B9, B10), each with its sibling mutation.
+describe('review findings B7 to B10', () => {
+  const R = String.raw;
+  test.each([
+    [
+      'B7 custom property: comment between identifiers',
+      R`.a{--x:foo/**/bar;font-family:var(--x)}`,
+      '.a{--x:foobar;font-family:var(--x)}',
+    ],
+    [
+      'B7 custom property: comment inside an identifier',
+      R`.a{--x:re/**/d}`,
+      '.a{--x:red}',
+    ],
+    [
+      'B7 custom property: comment between a number and a unit',
+      R`.a{--x:1/**/px}`,
+      '.a{--x:1px}',
+    ],
+    [
+      'B7 outside: comment between identifiers',
+      R`.a{font-family:foo/**/bar}`,
+      '.a{font-family:foobar}',
+    ],
+    [
+      'B7 outside: comment inside an identifier',
+      R`.a{color:re/**/d}`,
+      '.a{color:red}',
+    ],
+    [
+      'B7 outside: comment between a number and a unit',
+      R`.a{width:1/**/px}`,
+      '.a{width:1px}',
+    ],
+    [
+      'B8 an escaped digit id is not an unrestricted hash',
+      R`#\31{color:red}`,
+      '#1{color:red}',
+    ],
+    [
+      'B8 an escaped digit then a letter',
+      R`#\32 a{color:red}`,
+      '#2a{color:red}',
+    ],
+    [
+      'B8 an escaped hyphen then a digit',
+      R`#\2d 1{color:red}`,
+      '#-1{color:red}',
+    ],
+    [
+      '  paired: An+B 2n+1 vs 2n-1',
+      '.a:nth-child(2n+1){color:red}',
+      '.a:nth-child(2n-1){color:red}',
+    ],
+    [
+      '  paired: attribute value a vs b',
+      '[x=a]{color:red}',
+      '[x=b]{color:red}',
+    ],
+    [
+      '  paired: a dropped attribute modifier',
+      '[x="a" i]{color:red}',
+      '[x=a]{color:red}',
+    ],
+    [
+      '  paired: url(a) vs url(b)',
+      '.a{background:url(a)}',
+      '.a{background:url(b)}',
+    ],
+    ['  paired: #\\31 vs #\\32', R`#\31{color:red}`, R`#\32{color:red}`],
+  ])('%s is rejected', (_, canonical, delivered) => {
+    expect(declarationEquivalence(canonical, delivered).equivalent).toBe(false);
+  });
+
+  test.each([
+    [
+      'B9 An+B whitespace',
+      '.a:nth-child(2n + 1){color:red}',
+      '.a:nth-child(2n+1){color:red}',
+    ],
+    [
+      'B10 attribute string vs identifier, modifier kept',
+      '.a[data-x="a" i]{color:red}',
+      '.a[data-x=a i]{color:red}',
+    ],
+    [
+      'B10 url() string vs url token',
+      '.a{background:url("https://example.com/a.png")}',
+      '.a{background:url(https://example.com/a.png)}',
+    ],
+  ])('%s is accepted', (_, canonical, delivered) => {
+    expect(declarationEquivalence(canonical, delivered).equivalent).toBe(true);
+  });
+});
+
+// Each canonical micro-syntax, accepted, with the sibling that stays rejected.
+describe('canonical micro-syntax, by the specification', () => {
+  test.each([
+    ['An+B odd is 2n+1', '.a:nth-child(odd){}', '.a:nth-child(2n+1){}', true],
+    ['An+B even is 2n', '.a:nth-of-type(even){}', '.a:nth-of-type(2n){}', true],
+    [
+      'An+B -n + 3',
+      '.a:nth-last-child(-n + 3){}',
+      '.a:nth-last-child(-n+3){}',
+      true,
+    ],
+    [
+      'An+B n-2 dimension',
+      '.a:nth-last-of-type(3n - 2){}',
+      '.a:nth-last-of-type(3n-2){}',
+      true,
+    ],
+    [
+      '  paired: An+B on another pseudo-class',
+      '.a:nth-child(2n+1){}',
+      '.a:nth-of-type(2n+1){}',
+      false,
+    ],
+    [
+      '  paired: + separated from n',
+      '.a:nth-child(+n){}',
+      '.a:nth-child(+ n){}',
+      false,
+    ],
+    [
+      'An+B of S, list order and whitespace',
+      '.a:nth-child(2n + 1 of .b, .c){}',
+      '.a:nth-child(2n+1 of.c,.b){}',
+      true,
+    ],
+    [
+      '  paired: a different of S',
+      '.a:nth-child(2n+1 of .b){}',
+      '.a:nth-child(2n+1 of .c){}',
+      false,
+    ],
+    ['attribute whitespace', '[ x = "a" ]{}', '[x=a]{}', true],
+    ['attribute string needing quotes', '[x="a b"]{}', "[x='a b']{}", true],
+    ['  paired: a different matcher', '[x^=a]{}', '[x$=a]{}', false],
+    ['  paired: whitespace inside a matcher', '[x^=a]{}', '[x^ =a]{}', false],
+    [
+      'url whitespace and function case',
+      '.a{b:url( "a" )}',
+      '.a{b:URL(a)}',
+      true,
+    ],
+    [
+      'legacy one-colon pseudo-element',
+      '.a::before{content:"a"}',
+      '.a:before{content:"a"}',
+      true,
+    ],
+    [
+      '  paired: a one-colon pseudo-class stays one',
+      '.a:hover{}',
+      '.a::hover{}',
+      false,
+    ],
+    [
+      'font family string vs identifiers',
+      '.a{font-family:"Helvetica Neue", Arial}',
+      '.a{font-family:Helvetica Neue,Arial}',
+      true,
+    ],
+    [
+      'font family identifiers separated by a comment',
+      '.a{font-family:foo/**/bar}',
+      '.a{font-family:foo bar}',
+      true,
+    ],
+    [
+      '  paired: a generic family is not its quoted name',
+      '.a{font-family:sans-serif}',
+      '.a{font-family:"sans-serif"}',
+      false,
+    ],
+    [
+      '  paired: a different family',
+      '.a{font-family:"Helvetica Neue"}',
+      '.a{font-family:Helvetica}',
+      false,
+    ],
+    [
+      'keyframe from and to',
+      '@keyframes k{from{opacity:0}to{opacity:1}}',
+      '@keyframes k{0%{opacity:0}100%{opacity:1}}',
+      true,
+    ],
+    [
+      '  paired: from and to swapped',
+      '@keyframes k{from{opacity:0}to{opacity:1}}',
+      '@keyframes k{to{opacity:0}from{opacity:1}}',
+      false,
+    ],
+    [
+      '  paired: from outside keyframes',
+      '.from{color:red}',
+      '.0%{color:red}',
+      false,
+    ],
+    [
+      'prelude: after ) before and',
+      '@media (a:b) and (c:d){.a{color:red}}',
+      '@media (a:b)and (c:d){.a{color:red}}',
+      true,
+    ],
+    [
+      'prelude: around a range operator',
+      '@media (width >= 600px){.a{color:red}}',
+      '@media (width>=600px){.a{color:red}}',
+      true,
+    ],
+    [
+      '  paired: inside a range operator',
+      '@media (width >= 600px){.a{color:red}}',
+      '@media (width > = 600px){.a{color:red}}',
+      false,
+    ],
+    [
+      '  paired: a different range operator',
+      '@media (width >= 600px){.a{color:red}}',
+      '@media (width > 600px){.a{color:red}}',
+      false,
+    ],
   ])('%s', (_, canonical, delivered, equivalent) => {
     expect(declarationEquivalence(canonical, delivered).equivalent).toBe(
       equivalent,
