@@ -218,13 +218,19 @@ test('a host browserslist cannot redefine the delivered stylesheet (CE-01.2)', a
     // One delivered asset, as before: frameworks link CSS per JS chunk.
     assert.equal(links.length, 1, JSON.stringify(links));
     const rules = normalizeCss(files[0]);
-    const app = rules.filter((rule) => rule.selectors?.includes('.app'));
-    const ours = rules.filter((rule) => !rule.selectors?.includes('.app'));
+    // `.app` as the normaliser's token keys.
+    const appSelector = JSON.stringify([
+      JSON.stringify(['delim-token', '.']),
+      JSON.stringify(['ident-token', 'app']),
+    ]);
+    const isApp = (rule) => rule.rule?.includes(appSelector) === true;
+    const app = rules.filter(isApp);
+    const ours = rules.filter((rule) => !isApp(rule));
     assert.deepEqual(ours, normalizeCss(canonical));
     // The application's CSS still follows its own browserslist.
     assert.equal(app.length, 1);
     assert.equal(
-      app[0].declarations.includes('-webkit-user-select:none'),
+      app[0].declarations.some(([name]) => name === '-webkit-user-select'),
       output.overrideBrowserslist == null,
       JSON.stringify(app[0]),
     );

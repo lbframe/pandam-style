@@ -48,6 +48,19 @@ export function hostCssIdentity({ host, mode, canonical, assets }) {
     assets.length === 0
       ? { equivalent: false, rules: null, difference: 'no delivered CSS asset' }
       : cssEquivalence.declarationEquivalence(canonical, delivered);
+  // Mutation guard on the real delivered CSS: without its first
+  // `-webkit-user-select` declaration it must be rejected.
+  let mutation = null;
+  const pair = /-webkit-user-select\s*:[^;}]*;/;
+  if (equivalence.equivalent && pair.test(delivered)) {
+    mutation = {
+      dropped: '-webkit-user-select',
+      rejected: !cssEquivalence.declarationEquivalence(
+        canonical,
+        delivered.replace(pair, ''),
+      ).equivalent,
+    };
+  }
   return {
     kind: CSS_IDENTITY_KIND,
     schemaVersion: 2,
@@ -64,6 +77,7 @@ export function hostCssIdentity({ host, mode, canonical, assets }) {
       : equivalence.equivalent
         ? 'declaration-equivalent'
         : 'non-equivalent',
+    mutation,
     ...(equivalence.equivalent ? {} : { difference: equivalence.difference }),
   };
 }
@@ -72,6 +86,11 @@ export function hostCssIdentity({ host, mode, canonical, assets }) {
 export function cssIdentityProblems(record) {
   if (record == null || record.kind !== CSS_IDENTITY_KIND) {
     return ['no css identity record'];
+  }
+  if (record.mutation != null && record.mutation.rejected !== true) {
+    return [
+      `${record.host} ${record.mode}: dropping ${record.mutation.dropped} from the delivered CSS was not rejected`,
+    ];
   }
   if (
     record.status === 'canonical' ||

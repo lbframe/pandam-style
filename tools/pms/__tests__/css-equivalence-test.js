@@ -126,33 +126,284 @@ describe('rejected: a host redefining the CSS', () => {
 });
 
 describe('the normal form', () => {
-  test('flattens at-rule conditions and keeps declarations in order', () => {
-    expect(
-      normalizeCss(
-        '@layer a, b;\n@layer a{@media (hover: hover){.x , .y>z{color : red ;--v:1px 2px}}}@property --p{syntax:"<length>";inherits:true}',
-      ),
-    ).toEqual([
-      { at: ['@layer a,b'], selectors: null, declarations: [] },
+  const ident = (value) => JSON.stringify(['ident-token', value]);
+  const delim = (value) => JSON.stringify(['delim-token', value]);
+
+  test('keeps block structure and declarations in order', () => {
+    const [statement, layer, property] = normalizeCss(
+      '@layer a, b;\n@layer a{@media (hover: hover){.x , .y>z{color : red ;--v:1px 2px}}}@property --p{syntax:"<length>";inherits:true}',
+    );
+    expect(statement).toEqual({
+      at: 'layer',
+      prelude: [ident('a'), 'comma-token', ident('b')],
+      block: null,
+    });
+    expect(layer.at).toBe('layer');
+    const [media] = layer.block.rules;
+    expect(media).toMatchObject({
+      at: 'media',
+      prelude: [
+        '(-token',
+        ident('hover'),
+        'colon-token',
+        ident('hover'),
+        ')-token',
+      ],
+    });
+    expect(media.block.rules).toEqual([
       {
-        at: ['@layer a', '@media (hover:hover)'],
-        selectors: ['.x', '.y>z'],
-        declarations: ['color:red', '--v:1px 2px'],
-      },
-      {
-        at: ['@property --p'],
-        selectors: null,
-        declarations: ['syntax:"<length>"', 'inherits:true'],
+        rule: [
+          JSON.stringify([delim('.'), ident('x')]),
+          JSON.stringify([delim('.'), ident('y'), delim('>'), ident('z')]),
+        ],
+        declarations: [
+          ['color', [ident('red')], false],
+          ['--v', '1px 2px', false],
+        ],
       },
     ]);
+    expect(property).toMatchObject({
+      at: 'property',
+      block: {
+        declarations: [
+          ['syntax', [JSON.stringify(['string-token', '<length>'])], false],
+          ['inherits', [ident('true')], false],
+        ],
+      },
+    });
   });
 
   test('a selector list inside a function is not split', () => {
-    expect(normalizeCss('.a:is(.b, .c){color:red}')[0].selectors).toEqual([
-      '.a:is(.b,.c)',
-    ]);
+    expect(normalizeCss('.a:is(.b, .c){color:red}')[0].rule).toHaveLength(1);
   });
 
   test('an unbalanced stylesheet is refused, never compared', () => {
     expect(() => normalizeCss('.a{color:red')).toThrow(/unbalanced/);
+  });
+});
+
+// CE-01.2 review round 1 (PR #117): each finding, reproduced.
+describe('review findings B1 to B6', () => {
+  test.each([
+    [
+      'B1 a descendant combinator after ]',
+      '[title] .a{color:red}',
+      '[title].a{color:red}',
+    ],
+    [
+      'B1 a descendant combinator after )',
+      '.a:is(:where(.b) .c){color:red}',
+      '.a:is(:where(.b).c){color:red}',
+    ],
+    [
+      'B2 a comment between identifiers',
+      '.a{font-family:foo/**/bar}',
+      '.a{font-family:foobar}',
+    ],
+    ['B2 a comment inside an identifier', '.a{color:re/**/d}', '.a{color:red}'],
+    [
+      'B2 a comment between a number and a unit',
+      '.a{width:1/**/px}',
+      '.a{width:1px}',
+    ],
+    ['B3 custom property whitespace', '.a{--x: a  b}', '.a{--x:a b}'],
+    [
+      'B4 two anonymous layers merged into one',
+      '@layer{.a{color:red!important}}@layer{.a{color:blue!important}}',
+      '@layer{.a{color:red!important}.a{color:blue!important}}',
+    ],
+  ])('%s is rejected', (_, canonical, delivered) => {
+    expect(declarationEquivalence(canonical, delivered).equivalent).toBe(false);
+  });
+
+  // Produced at test time by the minifiers the review executed.
+  const esbuild = require('esbuild');
+  const lightningcss = require('lightningcss');
+  const esbuildMinified = (css) =>
+    esbuild.transformSync(css, { loader: 'css', minifyWhitespace: true }).code;
+  const lightningMinified = (css) =>
+    lightningcss
+      .transform({ filename: 'x.css', code: Buffer.from(css), minify: true })
+      .code.toString();
+
+  test.each([
+    [
+      'B5 esbuild minifyWhitespace',
+      '@media (width: 1px){.a{color: red}}',
+      esbuildMinified,
+      '@media(width:1px){.a{color:red}}\n',
+    ],
+    [
+      'B6 Lightning CSS lowercases a property name',
+      '.a{COLOR:red}',
+      lightningMinified,
+      '.a{color:red}',
+    ],
+    [
+      'B6 Lightning CSS decodes an escaped class',
+      '.\\61{color:red}',
+      lightningMinified,
+      '.a{color:red}',
+    ],
+  ])('%s is accepted', (_, canonical, minify, observed) => {
+    const delivered = minify(canonical);
+    expect(delivered).toBe(observed);
+    expect(declarationEquivalence(canonical, delivered).equivalent).toBe(true);
+  });
+});
+
+// Whitespace is significant by default. Each grammar position where it is
+// not is accepted, and the same shape is rejected where it is significant.
+describe('the whitespace allow-list, with paired rejections', () => {
+  test.each([
+    [
+      'next to a selector-list comma',
+      '.a, .b{color:red}',
+      '.a,.b{color:red}',
+      true,
+    ],
+    [
+      'next to a value comma',
+      '.a{transition-property:color, opacity}',
+      '.a{transition-property:color,opacity}',
+      true,
+    ],
+    [
+      'around a child combinator',
+      '.a > .b{color:red}',
+      '.a>.b{color:red}',
+      true,
+    ],
+    [
+      'around a sibling combinator',
+      '.a ~ .b + .c{color:red}',
+      '.a~.b+.c{color:red}',
+      true,
+    ],
+    [
+      '  paired: the descendant combinator',
+      '.a .b{color:red}',
+      '.a.b{color:red}',
+      false,
+    ],
+    [
+      '  paired: + inside a value is not a combinator',
+      '.a{width:calc(1px + 2px)}',
+      '.a{width:calc(1px +2px)}',
+      false,
+    ],
+    [
+      'after an opening parenthesis and before a closing one',
+      '.a{width:calc( 1px )}',
+      '.a{width:calc(1px)}',
+      true,
+    ],
+    [
+      '  paired: after a closing parenthesis',
+      '.a{margin:var(--a) var(--b)}',
+      '.a{margin:var(--a)var(--b)}',
+      false,
+    ],
+    [
+      'next to a colon inside parentheses',
+      '@media (min-width : 1px){.a{color:red}}',
+      '@media (min-width:1px){.a{color:red}}',
+      true,
+    ],
+    [
+      '  paired: a pseudo-class colon inside :is()',
+      '.x:is(.a :hover){color:red}',
+      '.x:is(.a:hover){color:red}',
+      false,
+    ],
+    [
+      '  paired: before a colon outside parentheses',
+      '.a :hover{color:red}',
+      '.a:hover{color:red}',
+      false,
+    ],
+    [
+      'after an at-keyword before (',
+      '@media (hover:hover){.a{color:red}}',
+      '@media(hover:hover){.a{color:red}}',
+      true,
+    ],
+    [
+      '  paired: between an identifier and (',
+      '@media screen and (hover:hover){.a{color:red}}',
+      '@media screen and(hover:hover){.a{color:red}}',
+      false,
+    ],
+    ['at the edges of a value', '.a{ color : red }', '.a{color:red}', true],
+    [
+      '  paired: between identifiers inside a value',
+      '.a{margin:0 auto}',
+      '.a{margin:0auto}',
+      false,
+    ],
+    [
+      '  paired: between numbers inside a value',
+      '.a{margin:1px 2px}',
+      '.a{margin:1px/**/2px}',
+      false,
+    ],
+    [
+      'at the edges of a custom property value',
+      '.a{--x: a b }',
+      '.a{--x:a b}',
+      true,
+    ],
+    [
+      '  paired: inside a custom property value',
+      '.a{--x:a b}',
+      '.a{--x:a  b}',
+      false,
+    ],
+    [
+      'before !important',
+      '.a{color:red !important}',
+      '.a{color:red!important}',
+      true,
+    ],
+  ])('%s', (_, canonical, delivered, equivalent) => {
+    expect(declarationEquivalence(canonical, delivered).equivalent).toBe(
+      equivalent,
+    );
+  });
+});
+
+describe('tokens compare by decoded value', () => {
+  test.each([
+    ['an escaped identifier', '.a{color:red}', '.\\61{color:red}', true],
+    ['quote style of a string', ".a{content:'x'}", '.a{content:"x"}', true],
+    [
+      'an ASCII-uppercase at-rule name',
+      '@MEDIA (hover:hover){.a{color:red}}',
+      '@media (hover:hover){.a{color:red}}',
+      true,
+    ],
+    [
+      '  class names stay case-sensitive',
+      '.A{color:red}',
+      '.a{color:red}',
+      false,
+    ],
+    [
+      '  custom property names stay case-sensitive',
+      '.a{--X:1}',
+      '.a{--x:1}',
+      false,
+    ],
+    [
+      '  value identifiers stay case-sensitive',
+      '.a{color:RED}',
+      '.a{color:red}',
+      false,
+    ],
+    ['  an integer is not a number', '.a{z-index:1}', '.a{z-index:1.0}', false],
+  ])('%s', (_, canonical, delivered, equivalent) => {
+    expect(declarationEquivalence(canonical, delivered).equivalent).toBe(
+      equivalent,
+    );
   });
 });
