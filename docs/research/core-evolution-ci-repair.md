@@ -139,14 +139,32 @@ verbatim.
   a variable the harness already reads. No case, expectation, timeout or
   launch flag changes. The browser that ran is the runner image's Google
   Chrome; Next qualification reports `Chrome/155.0.8059.39` for it. The
-  semantic oracle does not record a version.
+  semantic oracle did not record a version then; since #95,
+  `semantic-oracle.json` records the browser executable and its version.
 - **Before → after [executed].**
   - Tests: 148/154 → 154/154; suites: 19/20 → 20/20.
   - Oracle `failedCount`: 6 → 0; `unknownCount`: 0 → 0.
   - The same 135 case IDs, with statuses of 133 `MUST_PRESERVE` and 2
     `DEFERRED`.
   - Only the 6 `browser.*` rows changed their match flags, to all `true`.
-    Every other row, including the deferred ones, is identical.
+    Every other row, including the deferred ones, is identical in the
+    compared fields.
+  - **Compared fields.** In `semantic-oracle.json`, for each entry of
+    `cases[]`:
+    - identity: `id` and `area`;
+    - disposition: `status`, `gapId` and `classificationVerified`;
+    - match results: `freshMatchesExpected`, `incrementalMatchesExpected` and
+      `freshMatchesIncremental`, and the same three flags for each
+      `revisions[]` row.
+  - **Not compared: variable provenance.** The projected observations in
+    `revisions[].fresh` and `revisions[].incremental` carry fields that differ
+    between runs of the same tree. Two runs of the oracle on one tree, made
+    for #96 **[executed]**, differed only in:
+    - `publicationDigests` (`build-report.json`, `coverage.json`);
+    - `protocol.generation.artifactDigest`;
+    - `protocol.generation.artifactRevision.sessionId`.
+
+    Every compared field was identical between those two runs.
 - **Not a vacuous pass (class-level) [executed].** A temporary mutation set
   the expected `gap` of `browser.token-values` to `17px`, run with
   `PMS_CHROMIUM=/opt/google/chrome/chrome`. Exactly that case failed, in both

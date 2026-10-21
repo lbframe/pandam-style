@@ -15,6 +15,9 @@ import { spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
+import browserTooling from './browser.js';
+
+const { browserExecutable } = browserTooling;
 
 async function main() {
   const output = path.resolve(
@@ -510,8 +513,9 @@ export default function Page() { return <main><p id="lazy" className={className}
     const puppeteer = await import(
       pathToFileURL(require.resolve('puppeteer-core')).href
     );
+    report.browserExecutable = browserExecutable();
     browser = await puppeteer.default.launch({
-      executablePath: process.env.PMS_CHROMIUM ?? '/usr/local/bin/chromium',
+      executablePath: report.browserExecutable,
       headless: true,
       protocolTimeout: 15000,
       args: ['--no-sandbox', '--disable-dev-shm-usage'],

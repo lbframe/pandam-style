@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   agentdoc:
-    runs-on: [self-hosted, lbframe-ci, sk]
+    runs-on: [self-hosted, sk]
     # Draft PRs are verified locally; CI runs once they are ready for review.
     # Fork PRs never run on the self-hosted runner (this repository is public).
     if: >-

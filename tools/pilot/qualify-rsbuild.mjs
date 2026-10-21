@@ -15,7 +15,7 @@ import { createRsbuild } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pandamstyle } from '@pandamstyle/rsbuild';
 import { chromium } from 'playwright-core';
-import { qualifyStart } from './qualify-rsbuild-start.mjs';
+import { launcherBrowser, qualifyStart } from './qualify-rsbuild-start.mjs';
 import { qualifyFailures } from './qualify-rsbuild-failures.mjs';
 import { createProjectSession, Codes } from '@pandamstyle/compiler';
 import { createHostBridge } from '@pandamstyle/compiler/host';
@@ -592,7 +592,7 @@ async function main() {
     await fs.rm(root, { recursive: true, force: true });
     await plainFixture(root);
     browser = await chromium.launch({
-      executablePath: process.env.PMS_CHROMIUM ?? '/opt/google/chrome/chrome',
+      executablePath: launcherBrowser(),
       headless: true,
       chromiumSandbox: true,
     });

@@ -21,6 +21,17 @@ const styles = create({ main: { padding: token('spacing.md'), display: 'flex' } 
 export const Route = createFileRoute('/')({ component: Home, loader: () => getValue() });
 function Home() { const value = Route.useLoaderData(); const [count, setCount] = React.useState(0); return <div id="home" {...props(styles.main)}><p id="server-value">{value}</p><button id="count" onClick={() => setCount(count + 1)}>Count {count}</button></div>; }`;
 
+// These files run from a copy in an external consumer, outside the repository.
+// run-rsbuild-qualification.js resolves and checks the shared browser
+// (tools/pms/browser.js) and passes its executable here.
+export function launcherBrowser() {
+  assert(
+    process.env.PMS_CHROMIUM,
+    'PMS_CHROMIUM must be set by run-rsbuild-qualification.js',
+  );
+  return process.env.PMS_CHROMIUM;
+}
+
 export async function qualifyStart({
   base,
   browser,
