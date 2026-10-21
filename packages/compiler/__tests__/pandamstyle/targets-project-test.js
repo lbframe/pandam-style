@@ -244,8 +244,9 @@ describe('consistency of the published target records', () => {
     expect(manifest.targetRequirements.features).toEqual(
       expect.arrayContaining(['property:custom-property', 'selector::is']),
     );
-    // Schema versions are unchanged: the members are additive.
-    expect(manifest.manifestSchemaVersion).toBe(1);
+    // The target members are additive; manifest version 2 is CE-02.1's
+    // `properties` table, not a target change.
+    expect(manifest.manifestSchemaVersion).toBe(2);
     expect(artifacts.schemaVersion).toBe(1);
     expect(report.schemaVersion).toBe(2);
   });

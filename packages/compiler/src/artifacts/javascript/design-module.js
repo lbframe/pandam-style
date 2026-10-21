@@ -43,6 +43,21 @@ function jsonLiteral(value) {
   return JSON.stringify(value, null, 2);
 }
 
+const PROPERTIES_SLOT = '\u0000pandamstyle:manifest.properties\u0000';
+
+/**
+ * The manifest, indented, except its `properties` table, which is written on
+ * one line: one row per property would otherwise dominate the module bytes.
+ * The parsed value is the same object either way.
+ */
+function manifestLiteral(manifest) {
+  if (manifest.properties == null) return jsonLiteral(manifest);
+  return jsonLiteral({ ...manifest, properties: PROPERTIES_SLOT }).replace(
+    JSON.stringify(PROPERTIES_SLOT),
+    () => JSON.stringify(manifest.properties),
+  );
+}
+
 export function generateDesignSystemModule({ designSystem }) {
   const runtime = runtimeProjectionOf(designSystem.snapshot);
   const systemId = runtime.identity.systemId;
@@ -82,7 +97,7 @@ export function generateDesignSystemModule({ designSystem }) {
     '',
     `export const ${DESIGN_SYSTEM_MARKER} = ${jsonLiteral(marker)};`,
     '',
-    `export const manifest = ${jsonLiteral(runtime.manifest)};`,
+    `export const manifest = ${manifestLiteral(runtime.manifest)};`,
     '',
     'export const props = __pmsProps;',
     '',

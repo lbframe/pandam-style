@@ -30,6 +30,17 @@ The tools in this directory support PandamStyle development and qualification.
   `lightningcss-probe.mjs` runs the Vite-installed Lightning CSS on the same
   probes.
 
+- `tools/policy/` contains the CE-02.1 property-descriptor tools:
+  `build-recognized.mjs` regenerates the recognized property names
+  (`packages/compiler/src/design-system/policy/recognized.v1.json`) from the
+  CE-00.1 registry (`--check` requires byte identity);
+  `alpha1-equivalence.mjs --alpha1 <closure>` compiles the same probes with an
+  installed Alpha 1 compiler (such as the CE-00.3 store closure, read only)
+  and the workspace build, and fails on any difference other than the
+  CE-02.1 rule suffixes; `measure-catalog.mjs [--base <root>] [--definition
+  <design.mjs>]` reports the catalog's bundle bytes and heap/RSS costs in the
+  built compiler, with no verdict.
+
 ## Qualification browser
 
 The semantic oracle and the Next and Rsbuild qualifications launch a system

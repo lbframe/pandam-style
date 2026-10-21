@@ -333,20 +333,10 @@ export function generateDesignSystemDeclarations(snapshot) {
   const capabilities = snapshot.capabilities ?? {};
   const capabilityLiteral = `Readonly<{ slots: ${literal(capabilities.slots === true)}; compoundVariants: ${literal(capabilities.compoundVariants === true)}; patterns: ${literal(capabilities.patterns === true)}; rawDynamicStyles: false }>`;
   const categories = snapshot.vocabulary.tokenCategories;
-  const categoryProperties = Object.entries(
-    snapshot.tooling.manifest.supportedProperties.categories,
+  // Every property type is a projection of the effective property table.
+  const propertyRows = Object.values(snapshot.properties.descriptors).filter(
+    (row) => row.domain != null,
   );
-  const structuralSets = Object.entries(
-    snapshot.tooling.manifest.supportedProperties.structuralSets,
-  );
-  const structuralNumbers = Object.keys(
-    snapshot.tooling.manifest.supportedProperties.structuralNumbers,
-  );
-  const structuralNumberRows = Object.entries(
-    snapshot.tooling.manifest.supportedProperties.structuralNumbers,
-  );
-  const compositeFormsRejected =
-    snapshot.tooling.manifest.supportedProperties.compositeFormsRejected;
   const conditions = snapshot.vocabulary.conditionNames;
   const recipeIds = snapshot.vocabulary.publicRecipeIds;
   const recipeAxisNames = [
@@ -383,16 +373,34 @@ export function generateDesignSystemDeclarations(snapshot) {
     ]),
     (paths) => union(paths),
   );
-  const propertyCategories = typeRecord(categoryProperties, (category) =>
-    literal(category),
-  );
-  const structuralPropertyValues = typeRecord(structuralSets, (values) =>
-    union(values),
-  );
-  const structuralNumberTypes = typeRecord(
-    structuralNumberRows,
-    (range) => `Readonly<{ min: ${literal(range.min)}; max: number }>`,
-  );
+  // One alias holds the three admission members. A property may appear in
+  // several of them (a mixed domain); `PropertyValue` is their union.
+  const propertyDomains = [
+    '{',
+    `  tokens: ${typeRecord(
+      propertyRows
+        .filter((row) => row.domain.tokens.length > 0)
+        .map((row) => [row.key, row.domain.tokens]),
+      (tokens) => union(tokens),
+    )};`,
+    `  values: ${typeRecord(
+      propertyRows
+        .filter((row) => row.domain.values.length > 0)
+        .map((row) => [row.key, row.domain.values]),
+      (values) => union(values),
+    )};`,
+    // A legacy continuous range (CE-02.2 replaces it): any number.
+    `  ranges: ${union(
+      propertyRows
+        .filter((row) => row.domain.range != null)
+        .map((row) => row.key),
+    )};`,
+    '}',
+  ].join('\n');
+  // Manifest rows: every admitted property, plus the refused composite forms.
+  const refusedForms = Object.values(snapshot.properties.descriptors)
+    .filter((row) => row.form === 'rejected-composite')
+    .map((row) => row.key);
   const recipeMap = typeRecord(
     recipeIds.map((recipeId, index) => [recipeId, index]),
     (index) => `RecipeRef_${index}`,
@@ -410,7 +418,7 @@ export function generateDesignSystemDeclarations(snapshot) {
   abiVersion: 1;
   compilerContractVersion: ${literal(identity.compilerContractVersion)};
   designSystem: Readonly<{ systemId: ${literal(identity.systemId)}; registryDigest: ${literal(identity.registryDigest)} }>;
-  manifestSchemaVersion: 1;
+  manifestSchemaVersion: ${literal(identity.manifestSchemaVersion)};
   capabilities: ${capabilityLiteral};
 }>`;
   const manifestLiteral = `Readonly<{
@@ -419,7 +427,7 @@ export function generateDesignSystemDeclarations(snapshot) {
   registryDigest: ${literal(identity.registryDigest)};
   abiVersion: 1;
   compilerContractVersion: 'pms-0.1';
-  manifestSchemaVersion: 1;
+  manifestSchemaVersion: ${literal(identity.manifestSchemaVersion)};
   capabilities: ${capabilityLiteral};
   tokens: ${manifestTokenType(snapshot)};
   semanticTokens: ${manifestSemanticTokenType(snapshot)};
@@ -429,7 +437,7 @@ export function generateDesignSystemDeclarations(snapshot) {
   themeDetails: ${themeDetailsType(snapshot, false)};
   ${manifestPatternsField.trimStart()}
   recipes: ${manifestRecipeType(snapshot)};
-  supportedProperties: Readonly<{ categories: PropertyCategories; structuralSets: StructuralPropertyValues; structuralNumbers: ${structuralNumberTypes}; compositeFormsRejected: readonly [${compositeFormsRejected.map(literal).join(', ')}] }>;
+  properties: Readonly<{ catalogVersion: ${literal(snapshot.tooling.manifest.properties.catalogVersion)}; digest: ${literal(snapshot.tooling.manifest.properties.digest)}; byProperty: Readonly<{ [Property in ManifestProperty]: ManifestPropertyEntry<Property> }> }>;
 }>`;
   const categorySpecificTypes = categories
     .map((category) => {
@@ -470,14 +478,13 @@ export function generateDesignSystemDeclarations(snapshot) {
     `export type RecipeAxisName = ${union(recipeAxisNames)};`,
     `export type RecipeAxisValue = ${recipeAxisValueTypes.length === 0 ? 'never' : recipeAxisValueTypes.join(' | ')};`,
     '',
-    `type PropertyCategories = ${propertyCategories};`,
-    `type StructuralPropertyValues = ${structuralPropertyValues};`,
-    `type StructuralNumberProperties = ${union(structuralNumbers)};`,
-    'type StyleProperty = keyof PropertyCategories | keyof StructuralPropertyValues | StructuralNumberProperties;',
+    `type PropertyDomains = ${propertyDomains};`,
+    "type StyleProperty = keyof PropertyDomains['tokens'] | keyof PropertyDomains['values'] | PropertyDomains['ranges'];",
     'type CategoryTokenReference<Category extends string> = Category extends PublicTokenCategory ? CoreTokenRef<Category, TokenPathByCategory<Category>> : never;',
-    'type CategoryValue<Property extends keyof PropertyCategories> = CategoryTokenReference<PropertyCategories[Property]>;',
-    'type PropertyValue<Property extends StyleProperty> = Property extends keyof PropertyCategories ? CategoryValue<Property> : Property extends keyof StructuralPropertyValues ? StructuralPropertyValues[Property] : number;',
+    "type PropertyValue<Property extends StyleProperty> = (Property extends keyof PropertyDomains['tokens'] ? CategoryTokenReference<PropertyDomains['tokens'][Property]> : never) | (Property extends keyof PropertyDomains['values'] ? PropertyDomains['values'][Property] : never) | (Property extends PropertyDomains['ranges'] ? number : never);",
     "type ConditionValue<Property extends StyleProperty> = Partial<Record<PmsConditionName | 'base' | 'default', PropertyValue<Property>>>;",
+    `type ManifestProperty = StyleProperty | ${union(refusedForms)};`,
+    "type ManifestPropertyEntry<Property extends string> = Readonly<{ css?: string; form?: 'rejected-composite'; origin?: 'approved' | 'narrowed' } & (Property extends keyof PropertyDomains['tokens'] ? { tokens: readonly PropertyDomains['tokens'][Property][] } : {}) & (Property extends keyof PropertyDomains['values'] ? { values: readonly PropertyDomains['values'][Property][] } : {}) & (Property extends PropertyDomains['ranges'] ? { range: Readonly<{ min: number; max: number; legacy: true }> } : {})>;",
     'export type PmsStyleRule = { [Property in StyleProperty]?: PropertyValue<Property> | ConditionValue<Property> };',
     'export type PmsStyleSheet = Readonly<Record<string, PmsStyleRule>>;',
     '',

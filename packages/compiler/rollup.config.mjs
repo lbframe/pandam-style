@@ -74,48 +74,75 @@ const COMPAT_DATA_SOURCE = path.resolve(
   __dirname,
   'src/targets/data/compat-data.v1.json',
 );
+// CE-02.1 recognized property names (~0.1 MB of JSON), read only on an
+// unsupported-property diagnostic; shipped the same way as the compat data.
+const RECOGNIZED_ID = 'pandamstyle:recognized-properties';
+const RECOGNIZED_FILE = 'recognized-properties.v1.json';
+const RECOGNIZED_SOURCE = path.resolve(
+  __dirname,
+  'src/design-system/policy/recognized.v1.json',
+);
 
-function compatData({ inline }) {
+function dataAsset({ id, file, source, inline, withDigest }) {
   return {
-    name: 'pandamstyle-compat-data',
-    resolveId(id) {
-      return id === COMPAT_DATA_ID ? `\0${COMPAT_DATA_ID}` : null;
+    name: `pandamstyle-data:${file}`,
+    resolveId(request) {
+      return request === id ? `\0${id}` : null;
     },
-    load(id) {
-      if (id !== `\0${COMPAT_DATA_ID}`) return null;
-      const bytes = fs.readFileSync(COMPAT_DATA_SOURCE);
+    load(request) {
+      if (request !== `\0${id}`) return null;
+      const bytes = fs.readFileSync(source);
       const text = bytes.toString('utf8');
       if (inline) {
         return [
-          `export default function compatDataText() { return ${JSON.stringify(text)}; }`,
+          `export default function dataText() { return ${JSON.stringify(text)}; }`,
           // The test bundle hashes its inlined text at run time.
-          'export const compatDataDigest = null;',
+          ...(withDigest ? ['export const compatDataDigest = null;'] : []),
         ].join('\n');
       }
-      this.emitFile({
-        type: 'asset',
-        fileName: COMPAT_DATA_FILE,
-        source: bytes,
-      });
+      this.emitFile({ type: 'asset', fileName: file, source: bytes });
       // The digest of exactly the bytes emitted next to the bundle, so the
-      // first evaluation does not hash 0.6 MB; a test checks it against the
+      // first evaluation does not hash the file; a test checks it against the
       // shipped file.
       const digest =
         'sha256:' + crypto.createHash('sha256').update(bytes).digest('hex');
       return [
         "import { readFileSync } from 'node:fs';",
-        'export default function compatDataText() {',
-        `  return readFileSync(new URL('./${COMPAT_DATA_FILE}', import.meta.url));`,
+        'export default function dataText() {',
+        `  return readFileSync(new URL('./${file}', import.meta.url));`,
         '}',
-        `export const compatDataDigest = ${JSON.stringify(digest)};`,
+        ...(withDigest
+          ? [`export const compatDataDigest = ${JSON.stringify(digest)};`]
+          : []),
       ].join('\n');
     },
   };
 }
 
+function compatData({ inline }) {
+  return dataAsset({
+    id: COMPAT_DATA_ID,
+    file: COMPAT_DATA_FILE,
+    source: COMPAT_DATA_SOURCE,
+    inline,
+    withDigest: true,
+  });
+}
+
+function recognizedProperties({ inline }) {
+  return dataAsset({
+    id: RECOGNIZED_ID,
+    file: RECOGNIZED_FILE,
+    source: RECOGNIZED_SOURCE,
+    inline,
+    withDigest: false,
+  });
+}
+
 function plugins({ inlineCompatData = false } = {}) {
   return [
     compatData({ inline: inlineCompatData }),
+    recognizedProperties({ inline: inlineCompatData }),
     babel({
       babelHelpers: 'bundled',
       extensions,
@@ -136,7 +163,7 @@ function plugins({ inlineCompatData = false } = {}) {
       rootDir,
     }),
     commonjs(),
-    json({ exclude: [COMPAT_DATA_SOURCE] }),
+    json({ exclude: [COMPAT_DATA_SOURCE, RECOGNIZED_SOURCE] }),
   ];
 }
 
