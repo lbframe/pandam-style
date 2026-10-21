@@ -1,6 +1,8 @@
 # AG-00.3 baseline and qualification gates: policy
 
-Status: **draft for review, before the baseline run.** Nothing here is frozen.
+Status: **frozen (v1, 2026-10-21).** The baseline ran on 2026-10-21 (section 12)
+and its gate record [`gates.v1.json`](gates.v1.json) passed the freezing
+review with no finding. Changes follow section 7.
 This note covers deliverables 2–4 of
 [issue #7](https://github.com/lbframe/pandam-style/issues/7): which metrics get
 thresholds, the statistical method for three repetitions, how thresholds are
@@ -817,6 +819,16 @@ ends with `EXIT=143`. That exit happened after the outputs were complete.
 `freeze.status` `freezable`. It is byte-identical to the derivation from
 the local run directory, because the record holds no path. Its
 `binding.policySha256` and `binding.toolSha256` are those of this file
-and `gates.mjs` at commit `0ffc81e`, before this section was added. Status:
-**derived, pending the freezing review** (section 6, step 4). Its gate
+and `gates.mjs` at commit `0ffc81e`, before this section was added. Its gate
 values and point estimates are in the record.
+
+**Freezing review (2026-10-21):** an independent review (Codex gpt-6.1-sol)
+re-derived the record from the published directory and from the run
+directory. Both are byte-identical to the committed file under the policy
+bytes it binds. Sections 4 to 6.2 are byte-identical to those bytes, so the
+later edits to this file (this section and the status line) are
+non-normative, and `gates check` reporting `policyMatchesCheckout: false` is
+expected. The review checked that the published files match the run
+directory, the leak scan, the binding and all 27 gates. It found nothing.
+Status: **frozen**, sha256
+`1b33386bf0262b1113f5c0ec904dd991d1dad3f8c6fe265a40409ead1f9faf59`.
