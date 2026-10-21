@@ -30,7 +30,10 @@ entry:      { css?, values?, tokens?, range?, form?, origin? }
   token categories. A property can have both: its domain is their union.
 - `range` exists only on the four Alpha 1 rows `opacity`, `flex`, `flexGrow`
   and `flexShrink`. It is a continuous legacy interval
-  (`{ min, max, legacy: true }`), not a finite domain.
+  (`{ min, max?, legacy: true }`), not a finite domain. Both bounds are finite
+  numbers; an interval with no upper bound omits `max` (`flex` is
+  `{ min: 0, legacy: true }`). An artifact set whose manifest has a `null` or
+  non-finite bound is invalid.
 - `form: 'rejected-composite'` marks a refused composite form.
 - Members are omitted when empty, `css` when it is the kebab-case key, and
   `origin` when it is `default`.

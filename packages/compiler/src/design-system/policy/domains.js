@@ -87,6 +87,20 @@ export function effectivePropertiesOf(_registry) {
   return defaultProperties;
 }
 
+const PROTOTYPE_NAMES = new Set([
+  ...Object.getOwnPropertyNames(Object.prototype),
+  'prototype',
+]);
+
+/**
+ * True for `__proto__`, `constructor`, `prototype` and every other
+ * Object.prototype member name: never a property, refused before any
+ * condition dispatch.
+ */
+export function isPrototypeName(key) {
+  return typeof key === 'string' && PROTOTYPE_NAMES.has(key);
+}
+
 /** The effective row of an authoring key, or null. Own keys only. */
 export function propertyRow(properties, key) {
   return typeof key === 'string' && Object.hasOwn(properties.descriptors, key)
@@ -111,7 +125,7 @@ export function literalAllowed(domain, value) {
     typeof value === 'number' &&
     Number.isFinite(value) &&
     value >= range.min &&
-    value <= range.max
+    (range.max == null || value <= range.max)
   );
 }
 
@@ -125,7 +139,8 @@ export function admittedValues(domain) {
     ? [...domain.values]
     : [
         ...domain.values,
-        `number in [${domain.range.min}, ${domain.range.max}]`,
+        // Alpha 1's text; an unbounded range reads `Infinity` here, as before.
+        `number in [${domain.range.min}, ${domain.range.max ?? Infinity}]`,
       ];
 }
 
@@ -184,6 +199,7 @@ export function propertyManifestOf(properties) {
         if (row.domain.values.length > 0) entry.values = [...row.domain.values];
         if (row.domain.tokens.length > 0) entry.tokens = [...row.domain.tokens];
         if (row.domain.range != null) {
+          // `max` is absent for an unbounded range, as in the domain.
           entry.range = { ...row.domain.range, legacy: true };
         }
       }

@@ -40,6 +40,7 @@ const RECOGNIZED = readJson(path.join(POLICY_DIR, 'recognized.v1.json'));
 const camel = (name) => name.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
 const PROTOTYPE_KEYS = Object.getOwnPropertyNames(Object.prototype);
+const PROTOTYPE_NAMES = [...PROTOTYPE_KEYS, 'prototype'];
 
 const properties = compiler.effectivePropertiesOf(null);
 const rows = Object.values(properties.descriptors);
@@ -280,6 +281,48 @@ describe('the effective property table', () => {
     ).toEqual(['flex', 'flexGrow', 'flexShrink', 'opacity']);
   });
 
+  // An unbounded range omits `max`: no Infinity anywhere it is published.
+  test.each([
+    ['opacity', { min: 0, max: 1 }],
+    ['flex', { min: 0 }],
+    ['flexGrow', { min: 0 }],
+    ['flexShrink', { min: 0 }],
+  ])('%s range round-trips through every serialization', (key, range) => {
+    expect(rowOf(key).domain.range).toEqual(range);
+    const manifest = ds.snapshot.tooling.manifest;
+    const entry = { ...range, legacy: true };
+    expect(manifest.properties.byProperty[key].range).toEqual(entry);
+    // manifest.json and the embedded module manifest parse back to the same
+    // range, with no `null` bound.
+    expect(
+      JSON.parse(JSON.stringify(manifest)).properties.byProperty[key].range,
+    ).toEqual(entry);
+    const module = compiler.generateDesignSystemModule({ designSystem: ds });
+    const embedded = JSON.parse(
+      /export const manifest = ([\s\S]*?);\n\nexport const props/.exec(
+        module,
+      )[1],
+    );
+    expect(embedded.properties.byProperty[key].range).toEqual(entry);
+    expect(
+      JSON.parse(
+        JSON.stringify(
+          compiler.repairDomainOf(ds.snapshot, {
+            kind: 'property',
+            property: key,
+          }),
+        ),
+      ).range,
+    ).toEqual(range);
+    const declarations = compiler.generateDesignSystemDeclarations(ds.snapshot);
+    expect(declarations).toContain(
+      'range: Readonly<{ min: number; max?: number; legacy: true }>',
+    );
+    for (const text of [JSON.stringify(manifest), module]) {
+      expect(text).not.toMatch(/"max":\s*null/);
+    }
+  });
+
   test('the manifest is the projection of the table, as manifest version 2', () => {
     const manifest = ds.snapshot.tooling.manifest;
     expect(manifest.manifestSchemaVersion).toBe(2);
@@ -349,6 +392,56 @@ describe('the effective property table', () => {
     expect(domainOf('color')).toBe(null);
     expect(domainOf('opacity')).toBe(null);
     expect(domainOf('constructor')).toBe(null);
+  });
+});
+
+describe('validateArtifactSet and legacy range bounds', () => {
+  const setWith = (manifestText) =>
+    compiler.createArtifactSet(ds.snapshot, {
+      designModuleFile: 'design.js',
+      declarationsFile: 'design.d.ts',
+      designModule: compiler.generateDesignSystemModule({ designSystem: ds }),
+      declarations: compiler.generateDesignSystemDeclarations(ds.snapshot),
+      manifest: manifestText,
+      css: compiler.withDesignSystemCssIdentity(
+        ds.renderCss(),
+        ds.snapshot.identity,
+      ),
+    });
+  const manifestText = `${JSON.stringify(ds.snapshot.tooling.manifest, null, 2)}\n`;
+
+  test('the generated manifest is valid', () => {
+    const set = setWith(manifestText);
+    expect(compiler.validateArtifactSet(set.metadata, set.contents)).toBe(true);
+  });
+
+  test.each([
+    ['flex max null', 'flex', (r) => ({ ...r, max: null })],
+    ['opacity max null', 'opacity', (r) => ({ ...r, max: null })],
+    ['flexGrow max as text', 'flexGrow', (r) => ({ ...r, max: 'Infinity' })],
+    ['flexShrink min null', 'flexShrink', (r) => ({ ...r, min: null })],
+    ['opacity min absent', 'opacity', ({ min: _min, ...r }) => r],
+  ])('%s is refused', (_, key, tamper) => {
+    const manifest = JSON.parse(manifestText);
+    manifest.properties.byProperty[key].range = tamper(
+      manifest.properties.byProperty[key].range,
+    );
+    // createArtifactSet validates the set it builds (validateArtifactSet):
+    // a manifest with such a bound cannot become an artifact set.
+    expect(() => setWith(`${JSON.stringify(manifest, null, 2)}\n`)).toThrow(
+      /range bounds of .* are not finite numbers/,
+    );
+  });
+
+  test('a bound that parses to Infinity is refused', () => {
+    const tampered = manifestText.replace(
+      /("flex": \{[^}]*"range": \{\s*"min": 0)/,
+      '$1,\n        "max": 1e999',
+    );
+    expect(tampered).not.toBe(manifestText);
+    expect(() => setWith(tampered)).toThrow(
+      /range bounds of flex are not finite numbers/,
+    );
   });
 });
 
@@ -659,20 +752,29 @@ describe('Alpha 1 equivalence', () => {
   );
 
   // The intended delta: Alpha 1 resolved prototype keys as category
-  // properties; they are now unrecognized names. An object under a key that
-  // starts with `_` is a named-condition block (`_hover`), as before.
-  test.each(PROTOTYPE_KEYS.map((key) => [key]))(
-    'prototype key %s is an unrecognized property',
+  // properties; they are now unrecognized names, whatever the value, refused
+  // before any condition dispatch.
+  test.each(PROTOTYPE_NAMES.map((key) => [key]))(
+    'prototype name %s is an unrecognized property for every value kind',
     (key) => {
-      expect(newOutcome(key, 'x')).toEqual([
-        'PMS_UNSUPPORTED_PROPERTY',
-        'supported-properties.unrecognized',
-      ]);
-      expect(newOutcome(key, compiler.token('colors.a'))).toEqual(
-        key.startsWith('_')
-          ? ['PMS_UNKNOWN_CONDITION', 'conditions.named-only']
-          : ['PMS_UNSUPPORTED_PROPERTY', 'supported-properties.unrecognized'],
-      );
+      for (const value of [
+        'x',
+        0,
+        compiler.token('colors.a'),
+        { color: compiler.token('colors.a') },
+        {},
+      ]) {
+        expect({
+          value: describeValue(value),
+          outcome: newOutcome(key, value),
+        }).toEqual({
+          value: describeValue(value),
+          outcome: [
+            'PMS_UNSUPPORTED_PROPERTY',
+            'supported-properties.unrecognized',
+          ],
+        });
+      }
     },
   );
 
@@ -762,6 +864,176 @@ describe('platform extensions stay rejected under a matching profile', () => {
         key,
       ]),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Prototype names in real page source: preserved through evaluation and
+// spreads, then refused. One create() call per line; outcomes read by line.
+
+describe('prototype names in page source never vanish', () => {
+  const T = "token('colors.text.primary')";
+  const CASES = [
+    [
+      'literal __proto__',
+      "create({ n: { __proto__: 'x' } })",
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'computed __proto__',
+      "create({ n: { ['__proto__']: 'x' } })",
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'token value',
+      `create({ n: { __proto__: ${T} } })`,
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'object value',
+      `create({ n: { __proto__: { color: ${T} } } })`,
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'empty object value',
+      "create({ n: { ['__proto__']: {} } })",
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'spread of a computed key',
+      'create({ n: { ...COMPUTED } })',
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'spread of a literal key',
+      'create({ n: { ...LITERAL } })',
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'nested condition block',
+      `create({ n: { _hover: { __proto__: ${T} } } })`,
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'condition-map key',
+      `create({ n: { color: { base: ${T}, __proto__: ${T} } } })`,
+      'PMS_UNKNOWN_CONDITION',
+      'conditions.named-only',
+    ],
+    [
+      'constructor',
+      "create({ n: { constructor: 'x' } })",
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'toString',
+      `create({ n: { toString: ${T} } })`,
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'prototype',
+      "create({ n: { prototype: 'x' } })",
+      'PMS_UNSUPPORTED_PROPERTY',
+      'supported-properties.unrecognized',
+    ],
+    [
+      'namespace __proto__',
+      `create({ __proto__: { color: ${T} } })`,
+      'PMS_UNSUPPORTED_FEATURE',
+      'static-resolution.prototype-name',
+    ],
+    [
+      'computed namespace __proto__',
+      `create({ ['__proto__']: { color: ${T} } })`,
+      'PMS_UNSUPPORTED_FEATURE',
+      'static-resolution.prototype-name',
+    ],
+    [
+      'namespace spread',
+      'create({ ...NAMESPACES })',
+      'PMS_UNSUPPORTED_FEATURE',
+      'static-resolution.prototype-name',
+    ],
+  ];
+  const HEADER = [
+    "import { create, token } from '../generated/design.pandamstyle';",
+    "const COMPUTED = { ['__proto__']: 'x' };",
+    "const LITERAL = { __proto__: 'x' };",
+    `const NAMESPACES = { ['__proto__']: { color: ${T} } };`,
+  ];
+  let byLine;
+  let unlocated;
+  let page;
+  beforeAll(() => {
+    const h = openProject('valid');
+    page = h.src('src/prototype-names.js');
+    fs.writeFileSync(
+      page,
+      [
+        ...HEADER,
+        ...CASES.map(([, call], i) => `export const s${i} = ${call};`),
+        '',
+      ].join('\n'),
+    );
+    h.session.applyChanges({
+      definition: h.reloadDefinition(),
+      mutation: undefined,
+    });
+    const validation = h.session.validate();
+    expect(validation.ok).toBe(false);
+    byLine = new Map();
+    unlocated = validation.diagnostics.filter((d) => d.location?.line == null);
+    for (const d of validation.diagnostics) {
+      if (d.location?.file !== page) continue;
+      if (!byLine.has(d.location.line)) byLine.set(d.location.line, []);
+      byLine.get(d.location.line).push([d.code, d.rule]);
+    }
+  });
+
+  // A spread reports at the declaration that defines the key; a condition-map
+  // key's PMS_UNKNOWN_CONDITION carries no source line (existing behavior).
+  const LINE = new Map(
+    Object.entries({
+      'spread of a computed key': 2,
+      'spread of a literal key': 3,
+    }),
+  );
+  test.each(CASES.map((c, i) => [c[0], i, c[2], c[3]]))(
+    '%s is refused, not dropped',
+    (name, index, code, rule) => {
+      if (name === 'condition-map key') {
+        expect(
+          unlocated
+            .filter((d) => d.context?.condition === '__proto__')
+            .map((d) => [d.code, d.rule, d.context.property]),
+        ).toEqual([[code, rule, 'color']]);
+        return;
+      }
+      const line = LINE.get(name) ?? HEADER.length + index + 1;
+      expect(byLine.get(line)).toContainEqual([code, rule]);
+      // The call's own line holds nothing else: the key was not dropped
+      // silently while another diagnostic was reported.
+      if (!LINE.has(name)) expect(byLine.get(line)).toEqual([[code, rule]]);
+    },
+  );
+
+  test('every case is rejected and none is accepted silently', () => {
+    const lines = new Set(byLine.keys());
+    for (let i = 0; i < CASES.length; i++) {
+      const [name] = CASES[i];
+      if (LINE.has(name) || name === 'condition-map key') continue;
+      expect(lines.has(HEADER.length + i + 1)).toBe(true);
+    }
   });
 });
 

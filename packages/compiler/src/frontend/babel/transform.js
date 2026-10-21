@@ -28,6 +28,7 @@ import {
 import {
   FAIL,
   addSemanticUnit,
+  assignOwn,
   evaluateValue,
   isCreateCall,
   isPropsCall,
@@ -35,7 +36,9 @@ import {
   locateOrigin,
   resolveDesignAccess,
   resolvePmsAccess,
+  setOwnKey,
 } from './evaluate';
+import { isPrototypeName } from '../../design-system/policy/domains';
 import { isAdmitted, provenanceOf } from '../../semantics/provenance/index';
 // Benchmark-only measurement hooks (Spike 1).
 import { phase as perfPhase } from '../../observability/metrics';
@@ -188,7 +191,7 @@ function transformCreateCall(callPath, ctx, ds) {
         const v = evaluateValue(prop.get('argument'), ctx, null);
         if (v === FAIL) return;
         if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
-          Object.assign(namespaces, v);
+          assignOwn(namespaces, v);
         }
         continue;
       }
@@ -204,7 +207,7 @@ function transformCreateCall(callPath, ctx, ds) {
       const v = evaluateValue(prop.get('value'), ctx, null, 'declaration');
       ctx.currentNs = prev;
       if (v === FAIL) return;
-      namespaces[nsName] = v;
+      setOwnKey(namespaces, nsName, v);
     }
   } else {
     // An object built outside a literal is not resolvable in P0.
@@ -220,12 +223,27 @@ function transformCreateCall(callPath, ctx, ds) {
       );
       return;
     }
-    Object.assign(namespaces, v);
+    assignOwn(namespaces, v);
   }
 
   // Report this call's own verdict even if an earlier one already failed, so a
   // single build lists every distinct violation in the file.
   const priorCount = ctx.diags.length;
+
+  // A namespace named after an Object.prototype member would be emitted as a
+  // `__proto__`-style key of the generated object: refused, never dropped.
+  for (const nsName of Object.keys(namespaces)) {
+    if (isPrototypeName(nsName)) {
+      reject(
+        ctx,
+        Codes.UNSUPPORTED_FEATURE,
+        `A style namespace cannot be named "${nsName}" (an Object.prototype member).`,
+        argPath,
+        'static-resolution.prototype-name',
+      );
+      return;
+    }
+  }
 
   let result;
   try {
@@ -555,7 +573,7 @@ function tryStaticSelection(argPath, ctx) {
     if (valuePath.isIdentifier()) return null; // depends on props
     const v = evaluateValue(valuePath, ctx, null);
     if (v === FAIL) return null;
-    out[name] = v;
+    setOwnKey(out, name, v);
   }
   return out;
 }
