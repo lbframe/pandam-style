@@ -37,6 +37,7 @@ const FINAL = [1, 2].map((n) => `${R}/alpha1-final-${n}/raw.json`);
 const SLOW = `${R}/gate-injected-slowdown/raw.json`;
 // Cases are relative to the budgets version in force at HEAD (N), its
 // predecessors (1..N) and the next version (N+1), never to a fixed version.
+// Mutation cases start from the baseline evidence of version N.
 const budgetsPath = (n) => `benchmarks/core-evolution/budgets.v${n}.json`;
 const policyPath = (n) => `benchmarks/core-evolution/budget-policy.v${n}.json`;
 const BUDGETS = inForceBudgets(gitSource('HEAD'));
@@ -47,7 +48,12 @@ const CHAIN = Array.from({ length: VERSION }, (_, i) => i + 1);
 const evidenceOf = (n) =>
   readJson(path.join(REPO, budgetsPath(n))).baseline.results.map((r) => r.path);
 const work = fs.mkdtempSync(path.join(os.tmpdir(), 'ce003-gate-regression-'));
-const originals = FINAL.map((f) => readJson(path.join(REPO, f)));
+// The base runs are the baseline evidence of the version in force: a null
+// comparison is only expected to pass under the budgets derived from its own
+// host and conditions (v2 absolute memory limits are bound to its host).
+const originals = evidenceOf(VERSION).map((f) => readJson(path.join(REPO, f)));
+// The version 1 evidence, for probes at revisions where version 1 is in force.
+const v1Final = () => FINAL.map((f) => readJson(path.join(REPO, f)));
 const slowRun = readJson(path.join(REPO, SLOW));
 let written = 0;
 
@@ -87,13 +93,6 @@ const gateOn = (raws, options = {}) =>
 add('control', 'null comparison (alpha1-replay) at HEAD', 'pass', () =>
   gateOn(fresh()),
 );
-for (const n of CHAIN)
-  add(
-    'control',
-    `null comparison on the v${n} baseline evidence, v${VERSION} in force`,
-    'pass',
-    () => gateOn(evidenceOf(n).map((f) => readJson(path.join(REPO, f)))),
-  );
 add('control', 'injected 30% compiler slowdown', 'fail', () =>
   gateOn([structuredClone(slowRun)], { candidate: 'injected-slowdown' }),
 );
@@ -936,11 +935,11 @@ for (const record of ['afterFull', 'final'])
         },
       );
   }
-r2(
-  'stale-revision-harness-same (identical committed inputs at f4a7106)',
+add(
+  'review-r2',
+  'stale-revision-harness-same (identical committed inputs at f4a7106, v1 evidence)',
   'pass',
-  null,
-  { rev: 'f4a7106' },
+  () => gateOn(v1Final(), { rev: 'f4a7106' }),
 );
 r2('revision-before-budgets', 'fail', null, { rev: '172b5bf' });
 r2('head-budget-before-budgets', 'inconclusive', null, {
