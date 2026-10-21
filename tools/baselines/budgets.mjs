@@ -163,6 +163,7 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
         class: metric.class,
         unit: metric.unit ?? null,
       };
+      const key = `${workload}\0${metric.id}`;
       if (MEASURED_CLASSES.has(metric.class)) {
         const stats = summarize(values);
         entry.baseline = {
@@ -174,12 +175,10 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
         };
         const memory = policy.thresholdRule.memory;
         const cv = coefficientOfVariation(values);
-        const key = `${workload}\0${metric.id}`;
         if (statistics.get(key) === 'min') {
           // Absolute by declaration. The factor follows the memory rule on
           // the reproducibility of the minimum itself: the CV of the minima
           // of each baseline run and epoch.
-          used.add(key);
           const minima = [];
           for (const raw of raws)
             for (const epoch of epochs) {
@@ -291,6 +290,9 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
           equals: policy.thresholdRule.identity[metric.id] ?? distinct[0],
         };
       } else continue;
+      // An override is matched by the budget it names, whatever its
+      // statistic; an explicit `median` derives exactly like no override.
+      if (statistics.has(key)) used.add(key);
       budgets.push(entry);
     }
   for (const key of statistics.keys())

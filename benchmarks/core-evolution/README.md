@@ -429,9 +429,11 @@ unchanged: the gate verifies the chain from version 3 back to version 1.
     (`thresholdRule.statistic`). The default is the median. `min` is allowed
     only for absolute peak-RSS budgets: limit = baseline minimum × max(1.10, 1 +
     3 CV of the minima of each baseline run and epoch), rounded up to 0.05, and
-    the gate compares the candidate's minimum with it. The gate refuses `min`
-    anywhere else and any unknown statistic, and treats a statistic change as a
-    loosening that needs a relaxation.
+    the gate compares the candidate's minimum with it. An explicit `median`
+    override derives and gates exactly like no override. The gate refuses `min`
+    anywhere else, any unknown statistic, a duplicate override and an override
+    that matches no budget, and treats a statistic change as a loosening that
+    needs a relaxation.
   - c10000 peak RSS: on the version 1 host it is bimodal (about 1.05 GB or about
     2.3 GB, in both epochs of the identical artifact), so in version 1 its two
     cells fell back to paired ratios with limits of 2.15 and 2.30 and noise

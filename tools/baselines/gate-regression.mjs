@@ -29,6 +29,7 @@ import {
   gitSource,
   inForceBudgets,
   judge,
+  policyChainProblems,
   prepareGate,
 } from './budgets.mjs';
 
@@ -762,8 +763,9 @@ add(
 // refuse to treat any superseded version as release budgets.
 // With `mutate`, the committed policy is the mutated one while the budgets are
 // derived from the unmutated rules and bound to the mutated policy's digest:
-// the gate's own re-derivation must then judge the mutated policy.
-function honestNext(dir, mutate) {
+// the gate's own re-derivation must then judge the mutated policy. With
+// `deriveMutated`, the budgets are derived from the mutated policy itself.
+function honestNext(dir, mutate, { deriveMutated = false } = {}) {
   const policyFile = policyPath(NEXT);
   const policy = {
     ...readJson(path.join(dir, POLICY)),
@@ -775,11 +777,8 @@ function honestNext(dir, mutate) {
     justification: `Regression-matrix version ${NEXT} resting on new committed baseline evidence.`,
     relaxations: [],
   };
-  writeIn(
-    dir,
-    policyFile,
-    `${JSON.stringify(mutate ? mutate(structuredClone(policy)) : policy, null, 2)}\n`,
-  );
+  const committedPolicy = mutate ? mutate(structuredClone(policy)) : policy;
+  writeIn(dir, policyFile, `${JSON.stringify(committedPolicy, null, 2)}\n`);
   const refs = [];
   const raws = [];
   for (const [n, file] of evidenceOf(VERSION).entries()) {
@@ -796,7 +795,11 @@ function honestNext(dir, mutate) {
     path.join(dir, 'benchmarks/core-evolution/epochs/alpha1/manifest.v1.json'),
   );
   const budgets = deriveBudgets(
-    { ...policy, __path: policyFile, __sha256: sha256(policyBytes) },
+    {
+      ...(deriveMutated ? committedPolicy : policy),
+      __path: policyFile,
+      __sha256: sha256(policyBytes),
+    },
     raws,
     refs,
     { manifestSha256: sha256(manifest) },
@@ -1077,6 +1080,162 @@ for (const [name, budget, statistic, text] of [
     return expectProblem(gateOn(fresh(), { budgets: writeBudgets(b) }), text);
   });
 }
+// An explicit `median` override behaves exactly like no override, for every
+// budget class; duplicate and unmatched overrides are refused whatever their
+// statistic.
+const overrideOf = (budget, statistic) => ({
+  workload: budget.workload,
+  metric: budget.metric,
+  statistic,
+});
+const addOverrides =
+  (...overrides) =>
+  (policy) => {
+    policy.thresholdRule.statistic ??= { default: 'median', overrides: [] };
+    policy.thresholdRule.statistic.overrides.push(...overrides);
+    return policy;
+  };
+for (const [klass, budget] of [
+  [
+    'memory',
+    committedBudgets.budgets.find(
+      (b) =>
+        b.class === 'memory' &&
+        b.limit.mode === 'absolute' &&
+        !b.limit.statistic,
+    ),
+  ],
+  ['timing', timingBudget],
+  [
+    'deterministic',
+    committedBudgets.budgets.find((b) => b.class === 'deterministic'),
+  ],
+])
+  add(
+    'statistic',
+    `explicit median override on a ${klass} budget (${budget.metric}) derives and gates like no override`,
+    'pass',
+    () => {
+      const dir = clone(`statistic-median-${klass}`);
+      honestNext(dir, addOverrides(overrideOf(budget, 'median')), {
+        deriveMutated: true,
+      });
+      const report = gateIn(dir);
+      const derived = readJson(path.join(dir, budgetsPath(NEXT))).budgets;
+      return JSON.stringify(derived) ===
+        JSON.stringify(committedBudgets.budgets)
+        ? report
+        : { ...report, verdict: 'budgets differ from no override' };
+    },
+  );
+for (const [name, mutate, text] of [
+  [
+    'a duplicate override',
+    addOverrides(
+      overrideOf(timingBudget, 'median'),
+      overrideOf(timingBudget, 'median'),
+    ),
+    'statistic given twice',
+  ],
+  [
+    'an unmatched median override',
+    addOverrides({
+      workload: 'no-such-workload',
+      metric: timingBudget.metric,
+      statistic: 'median',
+    }),
+    'matches no derived budget',
+  ],
+  [
+    'an unmatched min override',
+    addOverrides({
+      workload: 'no-such-workload',
+      metric: 'full.maxRssBytes',
+      statistic: 'min',
+    }),
+    'matches no derived budget',
+  ],
+])
+  add(
+    'statistic',
+    `committed v${NEXT} policy with ${name} is refused`,
+    'fail',
+    () => {
+      const dir = clone(`statistic-${name.replaceAll(' ', '-')}`);
+      honestNext(dir, mutate);
+      return expectProblem(gateIn(dir), text);
+    },
+  );
+// Loosening: a statistic change counts, an explicit `median` equals no
+// statistic, a raised maxMin counts, an unchanged min limit does not.
+const loosening = (previous, next) => {
+  const entry = (limit) => ({
+    workload: 'w',
+    metric: 'session.maxRssBytes',
+    limit,
+  });
+  const problems = policyChainProblems(
+    {
+      policyVersion: 2,
+      justification: 'regression-matrix loosening probe, no relaxations listed',
+      supersedes: { path: 'previous', sha256: 'digest' },
+      baseline: { results: [{ sha256: 'new' }] },
+      budgets: [entry(next)],
+      relaxations: [],
+      unknown: [],
+    },
+    () => ({
+      policyVersion: 1,
+      baseline: { results: [{ sha256: 'old' }] },
+      budgets: [entry(previous)],
+      unknown: [],
+    }),
+    () => 'digest',
+  );
+  if (problems.some((p) => p.includes('loosened')))
+    return { verdict: 'loosened' };
+  return problems.length > 0
+    ? { verdict: `other problems: ${problems.join('; ')}` }
+    : { verdict: 'not-loosened' };
+};
+const absoluteMedian = { mode: 'absolute', maxMedian: 100, factor: 1.1 };
+const absoluteMin = (maxMin) => ({
+  mode: 'absolute',
+  statistic: 'min',
+  maxMin,
+  factor: 1.1,
+});
+for (const [name, previous, next, expected] of [
+  [
+    'median -> min, even with a lower number',
+    absoluteMedian,
+    absoluteMin(90),
+    'loosened',
+  ],
+  ['min -> median', absoluteMin(90), absoluteMedian, 'loosened'],
+  ['min, raised maxMin', absoluteMin(100), absoluteMin(101), 'loosened'],
+  [
+    'min -> min, same maxMin',
+    absoluteMin(100),
+    absoluteMin(100),
+    'not-loosened',
+  ],
+  [
+    'min -> min, lower maxMin',
+    absoluteMin(100),
+    absoluteMin(99),
+    'not-loosened',
+  ],
+  [
+    'no statistic -> explicit median, same maxMedian',
+    absoluteMedian,
+    { ...absoluteMedian, statistic: 'median' },
+    'not-loosened',
+  ],
+])
+  add('statistic', `loosening: ${name}`, expected, () =>
+    loosening(previous, next),
+  );
 add(
   'review-r2',
   'stale-revision-harness-same (identical committed inputs at f4a7106, v1 evidence)',
