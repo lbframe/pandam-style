@@ -8,7 +8,8 @@
 // False-block calibration of the gate method (POLICY.md section 5.6): an
 // unchanged candidate (reference and candidate drawn from the same
 // distribution) over representative scenarios, including the review's
-// zero-variance and Gaussian cases. Deterministic (seeded).
+// zero-variance and Gaussian cases and unclean reference repetitions (review
+// r2, R5). Deterministic (seeded).
 //
 //   node benchmarks/agentic/baseline/simulate.mjs [--sims N] [--mc-sims N]
 
@@ -31,7 +32,7 @@ const bernoulli = (rand, p) => (rand() < p ? 1 : 0);
 const rep = (value) => ({ clean: true, value });
 
 /** Scenarios: each draws one repetition's value for a task (and side). */
-export const SCENARIOS = [
+const CLEAN_SCENARIOS = [
   {
     id: 'success-25-mixed',
     gate: 'success.application',
@@ -106,6 +107,56 @@ export const SCENARIOS = [
     draw: (rand) => 4 + 0.4 * normal(rand) + (rand() < 0.05 ? 1.5 : 0),
   },
 ];
+
+// Unclean reference repetitions (review r2, R5), dropped by the method:
+// `count` of them, at most one per task, so that the minimum clean evidence
+// holds (the review's 10 where the cap allows it, otherwise the cap).
+// `at-random`: independent of the values, the case the test is exact for.
+// `on-failures`: stress, outside that assumption: each falls on a worst
+// value of a task whose reference values differ (a reference failure
+// contested more often than a success).
+const contaminated = (id, count, select) => ({
+  ...CLEAN_SCENARIOS.find((s) => s.id === id),
+  id: `${id}-reference-${select}-${count}`,
+  contaminate: { count, select },
+  stress: select === 'on-failures',
+});
+
+export const SCENARIOS = [
+  ...CLEAN_SCENARIOS,
+  contaminated('success-25-mixed', 7, 'at-random'),
+  contaminated('repairs-25-geometric', 7, 'at-random'),
+  contaminated('tokens-44-heavy-tail', 10, 'at-random'),
+  contaminated('latency-132-pairs-p50', 10, 'at-random'),
+  contaminated('success-25-mixed', 7, 'on-failures'),
+  contaminated('repairs-25-geometric', 7, 'on-failures'),
+];
+
+/** Marks `count` reference repetitions unclean, at most one per stratum. */
+function contaminate(units, { count, select }, rand) {
+  const order = units.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rand() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  let picked = order;
+  if (select === 'on-failures') {
+    const spread = (u) => {
+      const v = u.reference.map((r) => r.value);
+      return Math.max(...v) - Math.min(...v);
+    };
+    picked = order
+      .filter((i) => spread(units[i]) > 0)
+      .sort((a, b) => spread(units[b]) - spread(units[a]));
+  }
+  for (const i of picked.slice(0, count)) {
+    const ref = units[i].reference;
+    let k = Math.floor(rand() * ref.length);
+    if (select === 'on-failures')
+      k = ref.reduce((m, r, j) => (r.value > ref[m].value ? j : m), 0);
+    ref[k] = { clean: false };
+  }
+}
 
 // P(X <= x) for X ~ Binomial(n, p), summed in log space (no underflow).
 function binomialCdf(x, n, p) {
@@ -182,6 +233,7 @@ function runScenario(s, sims, draws) {
         candidate: [0, 1, 2].map(() => rep(s.draw(rand, p))),
       };
     });
+    if (s.contaminate) contaminate(units, s.contaminate, rand);
     const d = decideGate({
       gate: s.gate,
       model: `sim-${i}`,
@@ -189,12 +241,17 @@ function runScenario(s, sims, draws) {
       cuts: s.cuts,
       draws,
     });
+    if (d.outcome === 'insufficient-reference')
+      throw new Error(`${s.id}: the reference must stay sufficient`);
     if (d.blocks) blocks += 1;
     if (d.pValue <= 0.05) nominal += 1;
   }
   return {
     id: s.id,
     gate: s.gate,
+    ...(s.contaminate
+      ? { uncleanReference: s.contaminate, stress: s.stress }
+      : {}),
     sims,
     falseBlocks: rate(blocks, sims, GATE_ALPHA),
     // The same tests at a per-gate level of 0.05, where a size violation
@@ -208,6 +265,8 @@ export function simulate({ sims = 20000, mcSims = 2000, draws = DRAWS } = {}) {
     const real = s.gate === 'context.input';
     return runScenario(s, real ? mcSims : sims, draws);
   });
+  const violates = (r) =>
+    r.falseBlocks.exceedsAlpha || r.atNominal005.exceedsAlpha;
   return {
     alpha: GATE_ALPHA,
     gates: GATE_COUNT,
@@ -215,7 +274,12 @@ export function simulate({ sims = 20000, mcSims = 2000, draws = DRAWS } = {}) {
     draws,
     results,
     sizeViolations: results
-      .filter((r) => r.falseBlocks.exceedsAlpha || r.atNominal005.exceedsAlpha)
+      .filter((r) => !r.stress && violates(r))
+      .map((r) => r.id),
+    // Outside the exchangeability the guarantee assumes: reported, never
+    // hidden (POLICY.md section 5.6).
+    stressViolations: results
+      .filter((r) => r.stress && violates(r))
       .map((r) => r.id),
   };
 }

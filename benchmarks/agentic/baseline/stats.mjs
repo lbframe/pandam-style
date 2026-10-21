@@ -9,16 +9,21 @@
 // one implementation of the method: `gates derive` and `gates check` (planned
 // under #7) call it, and nothing else decides a gate.
 //
-// - Every planned repetition has one value, oriented so that a higher value
-//   is worse for the candidate. A repetition that is not clean (missing,
-//   contested, unclassified, unknown value) takes the worst bound on the
-//   candidate side and the best bound on the reference side (section 5.1).
+// - Every planned candidate repetition has one value, oriented so that a
+//   higher value is worse for the candidate. A candidate repetition that is
+//   not clean (missing, contested, unclassified, unknown value) takes the
+//   worst bound (section 5.1).
+// - A reference (baseline or control) repetition that is not clean is never
+//   imputed: it is dropped. A gate is decided only with the minimum clean
+//   reference evidence (`referenceEvidence`); otherwise its outcome is
+//   `insufficient-reference`, which is neither a pass nor a block.
 // - A gate is a one-sided stratified permutation test of "no change": within
 //   a task (between runs) or within a pair (interleaved control), the
 //   reference and candidate values are exchangeable. Integer contributions
 //   get the exact distribution, real ones a seeded Monte Carlo one.
-// - The decision is monotone: a worse candidate value or a better reference
-//   value never raises the p-value (section 5.3).
+// - The decision is monotone in the candidate: which reference repetitions
+//   are dropped depends on the reference alone, and a worse candidate value
+//   never raises the p-value (section 5.2).
 
 import crypto from 'node:crypto';
 
@@ -31,6 +36,17 @@ export const GATE_ALPHA = FAMILY_ALPHA / GATE_COUNT;
 
 /** Monte Carlo draws for real-valued gates (section 5.3). */
 export const DRAWS = 9999;
+
+/**
+ * Minimum clean reference evidence (section 5.1): a task (between runs)
+ * needs at least this many clean reference repetitions ...
+ */
+export const MIN_CLEAN_REFERENCE_PER_TASK = 2;
+/** ... and a gate drops at most one in this many planned reference ones. */
+export const MAX_DROPPED_REFERENCE_PER = 10;
+
+/** Gate outcomes, best first. Only `pass` passes a qualification. */
+export const OUTCOMES = ['pass', 'insufficient-reference', 'block'];
 
 /**
  * Stand-in for an unbounded worst (or best) value. Every real observation
@@ -78,7 +94,14 @@ export const GATES = {
  */
 export function orient(rep, side, scale) {
   const { bounds } = SCALES[scale];
-  if (!rep.clean) return side === 'candidate' ? bounds[1] : bounds[0];
+  if (!rep.clean) {
+    // Reference uncertainty is never evidence of a regression.
+    if (side !== 'candidate')
+      throw new Error(
+        'an unclean reference repetition is dropped, never bounded',
+      );
+    return bounds[1];
+  }
   const v = rep.value;
   if (typeof v !== 'number' || !Number.isFinite(v))
     throw new Error(`a clean repetition needs a finite value, got ${v}`);
@@ -219,6 +242,48 @@ export function gateSeed(model, gate) {
 }
 
 /**
+ * Clean reference evidence of one gate (section 5.1). Unclean reference
+ * repetitions are dropped. Between runs, a task with fewer than
+ * `MIN_CLEAN_REFERENCE_PER_TASK` clean ones is insufficient; paired, a pair
+ * whose control is unclean is dropped. The gate is `sufficient` only when no
+ * task is insufficient, at least one stratum remains, and at most one in
+ * `MAX_DROPPED_REFERENCE_PER` planned reference repetitions is dropped. Only
+ * the reference is read: no candidate value changes the result.
+ *
+ * @param {{reference: object[]}[]} units see `decideGate`
+ * @param {'between-runs'|'paired'} design
+ */
+export function referenceEvidence(units, design) {
+  let planned = 0;
+  let dropped = 0;
+  const usable = [];
+  const insufficientStrata = [];
+  units.forEach((u, i) => {
+    if (design === 'paired' && u.reference.length !== 1)
+      throw new Error('a paired stratum has one reference and one candidate');
+    const clean = u.reference.filter((rep) => rep.clean).length;
+    planned += u.reference.length;
+    dropped += u.reference.length - clean;
+    if (design === 'paired') {
+      if (clean === 1) usable.push(i);
+    } else if (clean >= MIN_CLEAN_REFERENCE_PER_TASK) usable.push(i);
+    else insufficientStrata.push(i);
+  });
+  const maxDropped = Math.floor(planned / MAX_DROPPED_REFERENCE_PER);
+  return {
+    planned,
+    dropped,
+    maxDropped,
+    insufficientStrata,
+    usable,
+    sufficient:
+      insufficientStrata.length === 0 &&
+      usable.length > 0 &&
+      dropped <= maxDropped,
+  };
+}
+
+/**
  * Decision of one gate for one model.
  *
  * @param {object} input
@@ -230,44 +295,85 @@ export function gateSeed(model, gate) {
  *   latency values normalized by `normalizeLatency`)
  * @param {{p50: number, p95: number}} [input.cuts] latency gates: the
  *   frozen cuts of `latencyCuts`
+ * @returns {object} `outcome` (one of OUTCOMES), `passes` and `blocks`
+ *   (`outcome` is `pass`, `block`), the p-value (null when the reference is
+ *   insufficient) and the reference accounting.
  */
 export function decideGate({ gate, model, units, cuts, alpha, draws }) {
   const g = GATES[gate];
   if (g == null) throw new Error(`unknown gate ${gate}`);
-  const strata = units.map((u) => ({
-    reference: u.reference.map((rep) => orient(rep, 'reference', g.scale)),
-    candidate: u.candidate.map((rep) => orient(rep, 'candidate', g.scale)),
+  if (units.length === 0) throw new Error('a gate needs at least one stratum');
+  const evidence = referenceEvidence(units, g.design);
+  const { usable, ...reference } = evidence;
+  // Candidate values are checked even when the gate is not decided.
+  const candidates = units.map((u) =>
+    u.candidate.map((rep) => orient(rep, 'candidate', g.scale)),
+  );
+  if (!evidence.sufficient)
+    return {
+      gate,
+      model,
+      outcome: 'insufficient-reference',
+      passes: false,
+      blocks: false,
+      method: null,
+      pValue: null,
+      alpha: alpha ?? GATE_ALPHA,
+      reference,
+    };
+  const strata = usable.map((i) => ({
+    reference: units[i].reference
+      .filter((rep) => rep.clean)
+      .map((rep) => orient(rep, 'reference', g.scale)),
+    candidate: candidates[i],
   }));
+  const test = permutationTest({
+    strata,
+    design: g.design,
+    cut: g.cut == null ? undefined : cuts?.[g.cut],
+    integer: SCALES[g.scale].integer,
+    alpha,
+    draws,
+    seed: gateSeed(model, gate),
+  });
   return {
     gate,
     model,
-    ...permutationTest({
-      strata,
-      design: g.design,
-      cut: g.cut == null ? undefined : cuts?.[g.cut],
-      integer: SCALES[g.scale].integer,
-      alpha,
-      draws,
-      seed: gateSeed(model, gate),
-    }),
+    outcome: test.blocks ? 'block' : 'pass',
+    passes: !test.blocks,
+    ...test,
+    reference,
   };
 }
 
 /**
  * Indicative minimum detectable regression of a between-runs gate, stated
- * in the gate record before any candidate is seen (section 5.3). Binary
- * scale: the fewest baseline successes turned into failures (round-robin
- * over tasks, most successful first) that block. Count and log scales: the
- * smallest shift added to every baseline value that blocks (counts: whole
- * cycles per repetition; log: to 0.01, as a ratio exp(shift)). Null when no
- * regression of that pattern blocks.
+ * in the gate record before any candidate is seen (section 5.3), on the
+ * clean baseline values (an unclean one is dropped, as in a decision).
+ * Binary scale: the fewest baseline successes turned into failures
+ * (round-robin over tasks, most successful first) that block. Count and log
+ * scales: the smallest shift added to every baseline value that blocks
+ * (counts: whole cycles per repetition; log: to 0.01, as a ratio
+ * exp(shift)). Null when no regression of that pattern blocks;
+ * `{ insufficientReference }` when the baseline lacks the minimum clean
+ * evidence.
  */
 export function minimumDetectable({ gate, model, reference, alpha, draws }) {
   const g = GATES[gate];
   if (g.design !== 'between-runs')
     throw new Error('stated for between-runs gates only');
+  const evidence = referenceEvidence(
+    reference.map((reps) => ({ reference: reps })),
+    g.design,
+  );
+  if (!evidence.sufficient) {
+    const { usable: _usable, ...insufficientReference } = evidence;
+    return { insufficientReference };
+  }
   const ref = reference.map((reps) =>
-    reps.map((rep) => orient(rep, 'reference', g.scale)),
+    reps
+      .filter((rep) => rep.clean)
+      .map((rep) => orient(rep, 'reference', g.scale)),
   );
   const test = (candidate) =>
     permutationTest({

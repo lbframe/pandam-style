@@ -105,8 +105,9 @@ results: every runnable task with an `adversarial:*` tag (13) plus the
 ## 4. Gates
 
 Blocking gates are evaluated per model (3 × 9 = 27 gates). Each compares the
-candidate with a reference over the same tasks, every planned repetition
-included, with the test of section 5.
+candidate with a reference over the same tasks, every planned candidate
+repetition and every clean reference repetition included, with the test of
+section 5.
 
 | Gate | Value per planned repetition | Task set | Reference | Test statistic (higher is worse) |
 | --- | --- | --- | --- | --- |
@@ -145,29 +146,65 @@ The method is implemented once, in [`stats.mjs`](stats.mjs) (`decideGate`).
 themselves. Its tests are `benchmarks/agentic/__tests__/baseline-stats.test.mjs`
 (`yarn bench:agentic:test`).
 
-### 5.1 One value per planned repetition
+### 5.1 Clean values, worst-case candidate, dropped reference
 
-Every planned repetition of the gate's task set has exactly one value,
-oriented so that a higher value is worse for the candidate. A repetition is
-**clean** when it is valid, not `contested` (DESIGN.md §5.3) and, for a
-measured value, known. Otherwise its value is a bound:
+A repetition is **clean** when it is valid, not `contested` (DESIGN.md §5.3)
+and, for a measured value, known. Values are oriented so that a higher value
+is worse for the candidate. The two sides are treated differently:
 
 | Repetition not clean (missing, contested, `unclassified`, unknown value) | Candidate side | Reference side (baseline or control) |
 | --- | --- | --- |
-| success-type (`success.*`, `safety`) | failure (1) | success (0) |
-| `repair.cycles` | worst: an unbounded count | best: 0 |
-| `context.input`, latency | worst: an unbounded value | best: an unbounded low value |
+| success-type (`success.*`, `safety`) | failure (1) | dropped |
+| `repair.cycles` | worst: an unbounded count | dropped |
+| `context.input` | worst: an unbounded value | dropped |
+| latency | worst: an unbounded value | the pair is dropped |
 
 - **One count decides.** There is no separate point computation. A candidate
   failure that becomes contested (a retry that then succeeds), missing, or an
-  unknown value stays the worst case. A contested or missing baseline
-  repetition takes the best case, so contamination can only make the gate
-  harder to pass, never easier.
-- **Every omission is included.** Entirely missing cells, discarded attempts
-  (a retried repetition is contested) and unknown telemetry all take the
-  bound. A candidate cannot pass a cost gate by making telemetry unknown or by
-  getting an expensive attempt retried. There is no separate known-share
-  check.
+  unknown value stays the worst case.
+- **Every candidate omission is included.** Entirely missing cells,
+  discarded attempts (a retried repetition is contested) and unknown
+  telemetry all take the worst bound. A candidate cannot pass a cost gate by
+  making telemetry unknown or by getting an expensive attempt retried. There
+  is no separate known-share check.
+- **Reference uncertainty is never evidence.** An unclean reference
+  repetition has no value: it is left out of its task's stratum, and a pair
+  whose control is unclean is left out of the latency gates, exactly as if
+  it had not been planned. It is never imputed, in either direction (review
+  r2, R5: imputing the best case blocked an unchanged candidate).
+- **Minimum clean reference evidence.** A gate is decided only when every
+  task of its task set keeps at least 2 of its 3 planned reference
+  repetitions clean, at least one stratum remains, and at most one in ten of
+  the gate's planned reference repetitions (pairs, for latency) is dropped:
+  7 of 75 for 25 tasks, 13 of 132 for 44 tasks or 132 pairs, 2 of 21 for the
+  7 report tasks. Otherwise its outcome is **`insufficient-reference`**,
+  with the insufficient tasks and the dropped count. Whether a gate has
+  enough reference evidence is computed from the reference alone, so it is
+  known before any candidate is seen.
+- **Three outcomes.** `pass`, `insufficient-reference` and `block`, in that
+  order from best to worst. Only `pass` passes a qualification.
+  `insufficient-reference` is reported separately, never as a pass or a
+  block. On the baseline, the affected cells must be collected again
+  (section 6, step 2) before `gates.v1.json` can be frozen. For a
+  qualification's interleaved control, the control is run again.
+- **Loosening.** Which reference repetitions are dropped depends on the
+  reference attempts alone: the baseline is frozen before any candidate, and
+  the evaluated agent of a qualification does not run in a control attempt.
+  A candidate therefore cannot make the gate easier by choosing what is
+  dropped (tested: any other candidate gets the same reference accounting).
+  Within the reference itself, contamination that depends on the outcome
+  shifts the gate. Dropped reference failures never loosen it: a dropped
+  value at least as bad as every value of its task, or a control above the
+  cut, never raises the p-value (tested). Dropped reference successes can
+  loosen it, and contamination concentrated on failures makes false blocks
+  more likely (section 5.6, stress rows). That residual is bounded by the
+  minimum above, and the gate record lists every dropped reference
+  repetition with its recorded value where one exists, so the freezing
+  review can see whether contamination concentrated on one outcome. The one
+  path from a candidate attempt to a control's cleanliness is the shared
+  provider quota: a rate limit that hits the control's attempt makes that
+  repetition contested (section 6.1). Each such halt drops at most that
+  pair, which counts against the minimum and is listed.
 - **Unmeasured** oracle checks make the verdict non-`pass`, never a success.
 - **Unsupported** tasks are outside every task set and listed. A task becoming
   runnable later (installation) has no baseline and gets gates only through a
@@ -178,38 +215,48 @@ measured value, known. Otherwise its value is a bound:
 Each gate is a one-sided, stratified **permutation test** of "no change".
 
 - **Baseline gates** (success, safety, context, repair): under no change, a
-  task's three baseline values and three candidate values are exchangeable.
-  The statistic is the candidate's sum of values over the task set. Its null
-  distribution comes from every way of choosing which three of a task's six
-  values are the candidate's (20 per task), independently per task.
+  task's clean baseline values (three, or two after a drop) and its three
+  candidate values are exchangeable. The statistic is the candidate's sum of
+  values over the task set. Its null distribution comes from every way of
+  choosing which three of a task's pooled values are the candidate's (20 per
+  task, 10 after a drop), independently per task.
 - **Latency gates**: the reference is the interleaved Alpha 1 control of the
   same qualification run (section 5.4). Under no change, the candidate and
   control values of a pair are exchangeable. The statistic is the number of
   candidate values above the frozen cut minus the number of control values
-  above it, and its null distribution swaps each pair.
+  above it, and its null distribution swaps each kept pair.
 - **Exact or seeded.** Integer contributions (success, safety, repair,
   latency exceedances) get the exact distribution by convolution. Real values
   (`context.input`) get `B = 9999` Monte Carlo draws from a seed fixed per
   model and gate (`pms-agentic-stats/v1:<model>:<gate>`), with the p-value
   `(1 + #{T* ≥ T}) / (B + 1)`.
-- **Decision.** A gate blocks when its p-value is at most `α / G`, with
-  `α = 0.05` and `G = 27` frozen blocking gates (`0.00185`). Each test is
+- **Decision.** A gate with the minimum clean reference evidence (section
+  5.1) blocks when its p-value is at most `α / G` and passes otherwise, with
+  `α = 0.05` and `G = 27` frozen blocking gates (`0.00185`). Any other gate
+  is `insufficient-reference` and has no p-value. Each test is
   valid at that level for any per-task distribution, three repetitions,
   zero variance, discrete and skewed values included: it conditions on the
   observed values and never estimates a variance. A task whose six values
   are equal contributes no evidence either way. By the union bound, the
   probability that an unchanged candidate is blocked by any gate is at most
-  5%, for exchangeable runs (section 5.6). Contamination handled by section
-  5.1 can only raise that rate; the gate record lists it.
-- **Monotone.** A worse candidate value or a better reference value never
-  raises the p-value, also for each Monte Carlo draw. So no failure becoming
-  contested, missing, retried or unknown can turn a block into a pass
-  (tested exhaustively over one task and by seeded property tests).
+  5%, for exchangeable runs (section 5.6). Unclean candidate repetitions
+  (section 5.1) can only raise that rate. Dropped reference repetitions keep
+  it when their dropping does not depend on their value. Otherwise they can
+  shift it within the minimum of section 5.1, and the gate record lists
+  them.
+- **Monotone in the candidate.** The dropped reference repetitions and the
+  `insufficient-reference` outcome do not depend on the candidate. A worse
+  candidate value never raises the p-value, also for each Monte Carlo draw.
+  So no failure becoming contested, missing, retried or unknown can improve
+  the outcome (`pass` over `insufficient-reference` over `block`). This is
+  tested exhaustively over one task beside ten clean ones, and by seeded
+  property tests for every gate class.
 
 ### 5.3 What the baseline can detect
 
 The gate record states, before any candidate is seen, each baseline gate's
-indicative minimum detectable regression (`minimumDetectable`). For success
+indicative minimum detectable regression (`minimumDetectable`), on its clean
+values (an unclean one is dropped as in a decision). For success
 gates it is the fewest baseline successes turned into failures, one per
 task round-robin from the most successful tasks, that block; for
 `repair.cycles` the fewest cycles added to every repetition; for
@@ -248,8 +295,10 @@ slice.
 
 `node benchmarks/agentic/baseline/simulate.mjs` draws an unchanged candidate
 and its reference from the same distribution and counts blocks
-(deterministic seeds). Run on 2026-10-20 with `--sims 20000 --mc-sims 4000`
-(`B = 9999`; 49 s). Each cell gives the count of rejections, the rate and its
+(deterministic seeds). Run on 2026-10-21 with `--sims 20000 --mc-sims 4000`
+(`B = 9999`; 111 s). The rows of clean data are identical to the run of
+2026-10-20, before reference repetitions were dropped. Each cell gives the
+count of rejections, the rate and its
 one-sided 95% Clopper–Pearson bounds, at the gate level `α / G = 0.00185` and,
 where a size violation would be visible with this many runs, at a per-gate
 level of 0.05.
@@ -264,6 +313,12 @@ level of 0.05.
 | `tokens-44-heavy-tail` | `context.input` | 4000 | 7 (0.00175; 0.00082–0.00328) | 202 (0.0505; 0.0449–0.0566) |
 | `latency-132-pairs-p50` | `latency.p50` | 20000 | 19 (0.00095; 0.00062–0.00139) | 743 (0.0372; 0.0350–0.0394) |
 | `latency-132-pairs-p95` | `latency.p95` | 20000 | 7 (0.00035; 0.00016–0.00066) | 505 (0.0253; 0.0235–0.0272) |
+| `success-25-mixed-reference-at-random-7` | `success.application` | 20000 | 9 (0.00045; 0.00023–0.00079) | 541 (0.0271; 0.0252–0.0290) |
+| `repairs-25-geometric-reference-at-random-7` | `repair.cycles` | 20000 | 23 (0.00115; 0.00079–0.00163) | 859 (0.0430; 0.0406–0.0454) |
+| `tokens-44-heavy-tail-reference-at-random-10` | `context.input` | 4000 | 7 (0.00175; 0.00082–0.00328) | 180 (0.0450; 0.0397–0.0508) |
+| `latency-132-pairs-p50-reference-at-random-10` | `latency.p50` | 20000 | 22 (0.00110; 0.00074–0.00157) | 715 (0.0357; 0.0336–0.0380) |
+| stress: `success-25-mixed-reference-on-failures-7` | `success.application` | 20000 | 596 (0.02980; 0.02785–0.03185) | 5023 (0.2511; 0.2461–0.2562) |
+| stress: `repairs-25-geometric-reference-on-failures-7` | `repair.cycles` | 20000 | 1709 (0.08545; 0.08222–0.08877) | 9373 (0.4687; 0.4628–0.4745) |
 
 No rate is significantly above its level (`sizeViolations: []`: no lower
 bound exceeds the level). `repairs-25-geometric` observed 0.00195 against
@@ -276,6 +331,26 @@ and `tokens-25-gaussian-review` (the review's Gaussian log-cost case) stays
 at its level. The method's validity
 does not rest on these scenarios: they check the implementation against the
 guarantee of section 5.2.
+
+The `reference-*` rows make reference repetitions unclean, at most one per
+task: the review r2 case (10 of them, R5) where the cap allows it, else the
+cap (7). In the `at-random` rows, which repetitions are unclean does not
+depend on their values. They stay at their level, as the test is exact
+there. The round-1 method, which gave an unclean reference repetition the
+best case, blocked the same unchanged candidates at 0.00325, 0.00375,
+0.99875 and 0.00915 (`simulate.mjs` re-run against the round-1
+`stats.mjs`). The two `stress` rows are outside the guarantee: each unclean
+repetition falls on a worst value of a task whose reference values differ,
+as if reference failures were contested more often than successes. They
+show the residual of section 5.1: 0.0298 and 0.0855 per gate at the cap,
+against 0.0989 and 0.2159 for the round-1 method. `simulate.mjs` reports
+them as `stressViolations`, apart from `sizeViolations`. The opposite
+concentration (on reference successes) loosens the gate instead. The gate
+record's list of dropped repetitions is how the freezing review sees either
+concentration. On identical candidate and reference data, unclean reference
+repetitions put on the worst values up to the cap never came close to
+blocking (smallest p-value 0.032 over 50 datasets each for `context.input`,
+`repair.cycles` and `success.application`; scratch run, not a test).
 
 ## 6. Deriving and freezing
 
@@ -293,14 +368,21 @@ guarantee of section 5.2.
    - A cell that still cannot be collected is excluded only by an explicit,
      recorded decision of the user or the delegated orchestrator. It is listed
      in the gate record.
+   - A gate that is `insufficient-reference` (section 5.1) cannot be frozen.
+     The cells of its insufficient tasks, or enough cells to bring its dropped
+     repetitions within the cap, are collected again: all three repetitions of
+     a cell, by a supplementary matrix as above. The choice of cells depends
+     only on which repetitions are unclean, never on their values. The
+     replaced records are kept and listed.
 3. Derive every gate value with a deterministic, tested tool from the published
    records alone (planned under #7: `gates derive` and `gates check`), which
    calls `stats.mjs` (section 5). The gate record holds, per model and gate,
-   each task's oriented baseline values (section 5.1), the contaminated
-   baseline repetitions (contested or missing, with their bound), the latency
-   medians and cuts, `α`, `G`, the Monte Carlo seeds and `B`, the minimum
-   detectable regression, task counts and unknown counts. Point estimates are
-   reported beside them.
+   each task's oriented clean baseline values (section 5.1), every dropped
+   baseline repetition (missing, contested, unclassified or unknown, with its
+   recorded value where one exists), the dropped count against the cap, the
+   latency medians and cuts, `α`, `G`, the Monte Carlo seeds and `B`, the
+   minimum detectable regression, task counts and unknown counts. Point
+   estimates are reported beside them.
 4. Write `gates.v1.json` (machine-readable, digests of every input record) and
    get it independently reviewed. The gates are frozen when that review is
    accepted, before any product change of lot AG-01 or later (#8 onwards).
