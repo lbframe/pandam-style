@@ -132,29 +132,54 @@ const asciiLower = (text) =>
 
 const fail = (reason, offset, extra = {}) => ({ reason, offset, ...extra });
 
-/** Why an author text is unsafe, or null (see the module comment). */
-export function unsafeValueClass(input, kind = 'value') {
-  if (typeof input === 'number') {
-    return Number.isFinite(input) && Math.abs(input) <= MAGNITUDE
-      ? null
-      : fail('non-finite', 0);
-  }
-  if (typeof input !== 'string') return fail('token-kind', 0);
-  const text = input;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (c === '\\') return fail('escape', i);
-    if (c === ';' || c === '{' || c === '}') return fail('breakout', i);
+/** The canonical text of an author input: a JS number as `String(v)`. */
+export function authorText(input) {
+  if (typeof input === 'string') return input;
+  if (typeof input === 'number') return String(input);
+  return null;
+}
+
+/**
+ * S1 on one author text: `{ text, tokens, unsafe }`. The complete text is
+ * tokenized exactly once, before any verdict, accepted or refused (a JS
+ * number from its canonical text, `String(v)`); every check runs on that
+ * tokenization or after it. `tokens` is null only for an input that is
+ * neither a string nor a number. Callers that also read the tokens (the
+ * numeric facts of token values) reuse them instead of tokenizing again.
+ */
+export function inspectAuthorText(input, kind = 'value') {
+  const text = authorText(input);
+  if (text == null) {
+    return { text: null, tokens: null, unsafe: fail('token-kind', 0) };
   }
   const errors = [];
-  let tokens;
+  let tokens = null;
   try {
     tokens = tokenize(
       { css: text },
       { onParseError: (error) => errors.push(error) },
     );
   } catch (error) {
-    return fail('tokenizer-error', 0);
+    return { text, tokens: null, unsafe: fail('tokenizer-error', 0) };
+  }
+  return { text, tokens, unsafe: verdict(input, text, tokens, errors, kind) };
+}
+
+/** Why an author text is unsafe, or null (see the module comment). */
+export function unsafeValueClass(input, kind = 'value') {
+  return inspectAuthorText(input, kind).unsafe;
+}
+
+function verdict(input, text, tokens, errors, kind) {
+  if (typeof input === 'number') {
+    if (!Number.isFinite(input) || Math.abs(input) > MAGNITUDE) {
+      return fail('non-finite', 0);
+    }
+  }
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '\\') return fail('escape', i);
+    if (c === ';' || c === '{' || c === '}') return fail('breakout', i);
   }
   if (errors.length > 0) {
     const first = errors[0];

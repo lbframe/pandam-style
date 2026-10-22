@@ -34,11 +34,11 @@ export const NON_FINITE = Object.freeze({ nonFinite: true });
 const NON_FINITE_NAMES = new Set(['nan', 'infinity', '-infinity']);
 
 /** The numeric facts of one value text, or null (an unchecked shape). */
-export function numericFactsOfValue(text) {
+export function numericFactsOfValue(text, tokens = null) {
   if (typeof text !== 'string') return null;
   const components = [];
   let nonFinite = false;
-  for (const token of tokenize({ css: text })) {
+  for (const token of tokens ?? tokenize({ css: text })) {
     const [type, , , , data] = token;
     if (type === 'whitespace-token' || type === 'EOF-token') continue;
     if (type === 'number-token') {
@@ -69,19 +69,26 @@ const factsByRegistry = new WeakMap();
 /**
  * Records the numeric facts of a registry's token values: tokenId ->
  * frozen list of `{ theme, facts }` (`theme` null for the base value), only
- * the values with facts. Called by buildRegistry.
+ * the values with facts. Called by buildRegistry with `tokensByText`, the
+ * tokens S1 (policy/value-safety.js) already produced for each token text,
+ * so a value is tokenized once; a text absent from it is tokenized here.
  */
-export function recordNumericFacts(registry) {
+export function recordNumericFacts(registry, tokensByText = null) {
   const table = new Map();
   const themes = registry.themes ?? {};
   const themeNames = Object.keys(themes).sort();
   for (const tokenId of Object.keys(registry.tokens ?? {})) {
     const entries = [];
-    const base = numericFactsOfValue(registry.resolvedValues?.[tokenId]);
+    const value = registry.resolvedValues?.[tokenId];
+    const base = numericFactsOfValue(value, tokensByText?.get(value) ?? null);
     if (base != null) entries.push(Object.freeze({ theme: null, facts: base }));
     for (const theme of themeNames) {
       if (!Object.hasOwn(themes[theme], tokenId)) continue;
-      const facts = numericFactsOfValue(themes[theme][tokenId]);
+      const themed = themes[theme][tokenId];
+      const facts = numericFactsOfValue(
+        themed,
+        tokensByText?.get(themed) ?? null,
+      );
       if (facts != null) entries.push(Object.freeze({ theme, facts }));
     }
     if (entries.length > 0) table.set(tokenId, Object.freeze(entries));

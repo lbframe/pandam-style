@@ -298,6 +298,7 @@ describe('G1: value acceptance never parses grammar', () => {
       path.join(SRC, 'design-system/registry/index.js'),
       'utf8',
     );
-    expect(text).toMatch(/recordNumericFacts\(registry\)/);
+    // With the tokens S1 produced for each token value (CE-02.2 PR B).
+    expect(text).toMatch(/recordNumericFacts\(registry, tokensByText\)/);
   });
 });

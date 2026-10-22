@@ -24,7 +24,7 @@ import { createHash } from 'crypto';
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 import { validateRecipeDefinition } from '../recipes/validate';
 import { recordNumericFacts } from '../policy/numeric-facts';
-import { unsafeValueClass } from '../policy/value-safety';
+import { inspectAuthorText, unsafeValueClass } from '../policy/value-safety';
 
 const lexicalCompare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -74,6 +74,7 @@ function flattenTokens(
   diagnostics,
   source,
   theme = null,
+  tokensByText = null,
 ) {
   for (const key of Object.keys(node)) {
     if (key === '') {
@@ -97,8 +98,13 @@ function flattenTokens(
         typeof entry.ref === 'string')
     ) {
       const tokenId = `${category}.${path}`;
-      const unsafe =
-        entry.value == null ? null : unsafeValueClass(entry.value, 'value');
+      // S1 tokenizes the value once; its numeric facts reuse the tokens.
+      const inspected =
+        entry.value == null ? null : inspectAuthorText(entry.value, 'value');
+      const unsafe = inspected?.unsafe ?? null;
+      if (inspected != null && unsafe == null) {
+        tokensByText?.set(inspected.text, inspected.tokens);
+      }
       if (unsafe != null) {
         diagnostics.push(
           valueSafetyDiagnostic(
@@ -132,7 +138,16 @@ function flattenTokens(
         ref: typeof entry.ref === 'string' ? entry.ref : null,
       };
     } else if (entry !== null && typeof entry === 'object') {
-      flattenTokens(category, entry, path, out, diagnostics, source, theme);
+      flattenTokens(
+        category,
+        entry,
+        path,
+        out,
+        diagnostics,
+        source,
+        theme,
+        tokensByText,
+      );
     } else {
       diagnostics.push(
         diagnostic({
@@ -182,6 +197,8 @@ export function buildRegistry(definition) {
     recipes = {},
   } = definition;
   const tokensOut = {};
+  // The tokens S1 produced for each safe token text (base and themes).
+  const tokensByText = new Map();
 
   for (const category of Object.keys(tokens)) {
     flattenTokens(
@@ -191,6 +208,8 @@ export function buildRegistry(definition) {
       tokensOut,
       diagnostics,
       definition.__source ?? 'design-system',
+      null,
+      tokensByText,
     );
   }
 
@@ -335,6 +354,7 @@ export function buildRegistry(definition) {
         diagnostics,
         themeSource(themeName),
         themeName,
+        tokensByText,
       );
     }
     themeOverrides[themeName] = flat;
@@ -616,6 +636,6 @@ export function buildRegistry(definition) {
     registryDigest: registryDigest(payload),
   };
   // CE-02.2: the numeric facts of token values, derived once per registry.
-  recordNumericFacts(registry);
+  recordNumericFacts(registry, tokensByText);
   return registry;
 }

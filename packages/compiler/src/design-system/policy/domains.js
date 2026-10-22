@@ -244,10 +244,15 @@ function approvableValue(descriptor, value) {
   const { standard } = descriptor;
   const property = descriptor.key;
   const shown = JSON.stringify(value);
-  // S1 (CE-02.2 §4.2): an approved literal is emitted as written.
-  if (typeof value === 'string') {
+  // S1 (CE-02.2 §4.2): an approved literal is emitted as written; a number
+  // as its canonical text. A number's magnitude is the numeric rules' to
+  // name (non-finite, out-of-bounds) below.
+  if (typeof value === 'string' || typeof value === 'number') {
     const unsafe = unsafeValueClass(value, 'value');
-    if (unsafe != null) {
+    if (
+      unsafe != null &&
+      !(typeof value === 'number' && unsafe.reason === 'non-finite')
+    ) {
       return {
         rule: 'unsafe-text',
         message: `${shown} is not safe CSS (${unsafe.reason}${unsafe.function === undefined ? '' : `: ${unsafe.function}`}).`,

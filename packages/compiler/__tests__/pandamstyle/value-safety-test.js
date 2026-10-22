@@ -18,6 +18,8 @@
  *     definitions, condition-block keys for consumers and recipes (the
  *     breakout key `':hover}body{display:none}/*'`), `propertyDomains`
  *     literals; the S1 call sites are pinned;
+ *   - S1 tokenizes each author text exactly once, before any verdict (a JS
+ *     number from its canonical text), at every entry point;
  *   - every compiler-owned standard, default and opaque value passes S1;
  *   - S2: every emitted rule re-reads, alone and inside the whole stylesheet,
  *     as the same prelude and declarations, one declaration per property,
@@ -530,7 +532,9 @@ describe('the S1 call sites', () => {
         if (entry.isDirectory()) walk(file);
         else if (entry.name.endsWith('.js')) {
           const text = fs.readFileSync(file, 'utf8');
-          const count = (text.match(/unsafeValueClass\(/g) ?? []).length;
+          const count = (
+            text.match(/(?:unsafeValueClass|inspectAuthorText)\(/g) ?? []
+          ).length;
           if (count > 0) out.push([path.relative(SRC, file), count]);
         }
       }
@@ -543,9 +547,11 @@ describe('the S1 call sites', () => {
     expect(callers()).toEqual([
       // propertyDomains literals; a refused consumer literal's reason.
       ['design-system/policy/domains.js', 2],
-      // The definition and its documentation comment.
-      ['design-system/policy/value-safety.js', 2],
-      // Token and theme values; condition definitions.
+      // The two definitions, their documentation comment and the one call
+      // of inspectAuthorText by unsafeValueClass.
+      ['design-system/policy/value-safety.js', 4],
+      // Token and theme values (inspectAuthorText, whose tokens the numeric
+      // facts reuse); condition definitions.
       ['design-system/registry/index.js', 2],
       // Condition-block keys of style objects (consumers, recipes).
       ['engine/lowering/styles.js', 1],
@@ -566,6 +572,134 @@ describe('the S1 call sites', () => {
         .map((s) => s.trim().split(/\s|=/)[0])
         .filter(Boolean),
     ).toEqual(['systemId', 'tokens', 'themes', 'conditions', 'recipes']);
+  });
+});
+
+// Codex round 1: S1 tokenizes the complete text before any verdict, a JS
+// number from its canonical text; no entry point skips or repeats it.
+describe('S1 tokenizes every author text exactly once', () => {
+  const cssTokenizer = require('@csstools/css-tokenizer');
+  /** The texts tokenized while `fn` runs, and its result or error. */
+  const tokenizations = (fn) => {
+    const spy = jest.spyOn(cssTokenizer, 'tokenize');
+    try {
+      let result;
+      try {
+        result = fn();
+      } catch (error) {
+        result = error;
+      }
+      return { texts: spy.mock.calls.map(([input]) => input.css), result };
+    } finally {
+      spy.mockRestore();
+    }
+  };
+  const countIn = (texts, text) => texts.filter((t) => t === text).length;
+
+  test.each([
+    ['value', 'red'],
+    ['value', 'calc(1px + 2px)'],
+    ['value', 0.5],
+    ['value', 12],
+    ['value', NaN],
+    ['value', 1e7],
+    ['value', 'a\\62 c'],
+    ['value', 'red;}body{x:y'],
+    ['value', 'var(--x)'],
+    ['value', 'red !important'],
+    ['condition', ':hover'],
+    ['condition', ':hover}body{display:none}/*'],
+  ])(
+    'unsafeValueClass(%s, %p): one tokenization of its text',
+    (kind, input) => {
+      const { texts } = tokenizations(() => unsafeValueClass(input, kind));
+      expect(texts).toEqual([String(input)]);
+    },
+  );
+
+  test('a design system: every token, theme and condition text once', () => {
+    const definition = {
+      systemId: 'ce022-once',
+      conditions: {
+        hover: ':hover:not(.s1-once)',
+        wide: '@media (width>=31rem)',
+      },
+      tokens: {
+        colors: {
+          a: { value: 'rgb(1 2 3 / 0.25)', visibility: 'public' },
+          b: { value: 'oklch(0.7 0.1 31)', visibility: 'public' },
+        },
+        spacing: { a: { value: 'calc(1rem + 3px)', visibility: 'public' } },
+      },
+      themes: {
+        dark: { tokens: { colors: { a: { value: 'rgb(3 2 1 / 0.75)' } } } },
+      },
+    };
+    const { texts, result } = tokenizations(() =>
+      compiler.buildDesignSystem(definition),
+    );
+    expect(result).not.toBeInstanceOf(Error);
+    for (const text of [
+      ':hover:not(.s1-once)',
+      '@media (width>=31rem)',
+      'rgb(1 2 3 / 0.25)',
+      'oklch(0.7 0.1 31)',
+      'calc(1rem + 3px)',
+      'rgb(3 2 1 / 0.75)',
+    ]) {
+      expect([text, countIn(texts, text)]).toEqual([text, 1]);
+    }
+  });
+
+  test('a refused token value: tokenized once, then refused', () => {
+    const { texts, result } = tokenizations(() =>
+      compiler.buildDesignSystem({
+        ...BASE,
+        tokens: {
+          colors: { a: { value: 'rgb(9 9 9);x', visibility: 'public' } },
+        },
+      }),
+    );
+    expect(result.diagnostics.map((d) => d.rule)).toEqual([
+      'value-safety.breakout',
+    ]);
+    expect(countIn(texts, 'rgb(9 9 9);x')).toBe(1);
+  });
+
+  test('propertyDomains literals, string and number', () => {
+    const { texts, result } = tokenizations(() =>
+      compiler.buildDesignSystem({
+        ...BASE,
+        propertyDomains: {
+          display: {
+            values: ['flex', 'inline-flex', 'grid', 'inline-grid'],
+          },
+          opacity: { values: [0.35, 0.65] },
+        },
+      }),
+    );
+    expect(result).not.toBeInstanceOf(Error);
+    for (const text of ['inline-grid', '0.35', '0.65']) {
+      expect([text, countIn(texts, text)]).toEqual([text, 1]);
+    }
+  });
+
+  test('a raw condition-block key: once per design system', () => {
+    const ds = compiler.buildDesignSystem(BASE);
+    const key = '[data-once="1"] &';
+    const { texts, result } = tokenizations(() =>
+      compiler.compileStyles({
+        registry: ds.registry,
+        varsByToken: ds.varsByToken,
+        namespaces: {
+          a: { [key]: { color: compiler.token('colors.a') } },
+          b: { [key]: { display: 'flex' } },
+        },
+        role: 'consumer',
+      }),
+    );
+    expect(result).not.toBeInstanceOf(Error);
+    expect(countIn(texts, key)).toBe(1);
   });
 });
 
