@@ -751,6 +751,8 @@ describe('AG-01.1 outcomes (§3.6)', () => {
       'revision-mismatch',
       'session-closed',
       'ticket-stale',
+      // AG-01.2: `audit.materialize` against another generation.
+      'generation-changed',
     ];
     for (const site of sites) {
       const call = site.slice(0, site.indexOf(');'));

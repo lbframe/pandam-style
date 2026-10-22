@@ -216,6 +216,9 @@ describe('the root jest configuration is not a broad ignore', () => {
         'packages/compiler/__tests__/pandamstyle/agent-protocol-test.js',
         'packages/compiler/__tests__/pandamstyle/agent-reachability-test.js',
         'packages/compiler/__tests__/pandamstyle/agent-registry-test.js',
+        // AG-01.2 audit read, compute and materialize.
+        'packages/compiler/__tests__/pandamstyle/agent-audit-io-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-audit-test.js',
       ].sort(),
     );
   });

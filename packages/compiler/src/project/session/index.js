@@ -200,6 +200,79 @@ function sha256(text) {
   return crypto.createHash('sha256').update(text).digest('hex');
 }
 
+// ------------------------------------------------ AG-01.2 audit helpers ----
+
+// The module-private step hook of the anchored audit writer and reader
+// (AG-01.2 §5.2). It is null in production and set only through the private
+// inspection bundle. A hook that throws makes the step it precedes fail as that
+// system call would; before a `write`, a positive integer it returns caps the
+// chunk, so a test can force short writes.
+let auditStepHook = null;
+
+export function setAuditStepHook(hook) {
+  auditStepHook = typeof hook === 'function' ? hook : null;
+}
+
+function auditStep(step, at) {
+  return auditStepHook == null ? undefined : auditStepHook(step, at);
+}
+
+/** One name under a directory descriptor (AG-01.2 §3.8). */
+const anchoredPath = (fd, name) => `/proc/self/fd/${fd}/${name}`;
+
+const MISSING_ENTRY = new Set(['ENOENT', 'ENOTDIR']);
+const NOT_A_DIRECTORY = new Set(['ELOOP', 'ENOTDIR', 'ENOENT']);
+const NOT_A_FILE = new Set(['ELOOP', 'ENXIO', 'EISDIR', 'EOPNOTSUPP']);
+const RENAME_ONTO_DIRECTORY = new Set([
+  'EISDIR',
+  'ENOTEMPTY',
+  'EEXIST',
+  'ENOTDIR',
+]);
+
+const UNSAFE_AUDIT_MESSAGES = {
+  'anchoring-unavailable':
+    'The coverage audit needs directory-anchored file access (/proc/self/fd), which this platform or session does not provide.',
+  'audit-directory-not-directory':
+    'The audit directory is a symbolic link or not a directory.',
+  'audit-temp-exists': "The audit writer's temporary file name already exists.",
+  'audit-file-not-file': 'The audit file name is a directory.',
+  'audit-directory-moved':
+    'The audit directory was moved or replaced while the document was written.',
+  'audit-file-replaced':
+    'The written audit file was replaced before it could be verified.',
+  'audit-content-mismatch':
+    'The written audit file does not hold the canonical document.',
+  'audit-write-failed': 'The coverage audit document could not be written.',
+};
+
+/**
+ * `PMS_UNSAFE_AUDIT_PATH`: the audit document was not written, and nothing
+ * this call created is left. `context.reason` is closed; `errno` is a system
+ * error code only, never a path or message.
+ */
+function unsafeAuditPath(reason, errno = null) {
+  return new PmsError([
+    diagnostic({
+      code: Codes.UNSAFE_AUDIT_PATH,
+      phase: 'audit',
+      rule: 'audit.anchored-io',
+      message: UNSAFE_AUDIT_MESSAGES[reason],
+      context: {
+        reason,
+        ...(reason === 'audit-write-failed'
+          ? {
+              errno:
+                typeof errno === 'string' && /^E[A-Z0-9]{1,15}$/.test(errno)
+                  ? errno
+                  : null,
+            }
+          : {}),
+      },
+    }),
+  ]);
+}
+
 function stableJson(value) {
   if (value === undefined) return 'undefined';
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
@@ -2098,6 +2171,11 @@ export function createProjectSession(config) {
       auditRequested: false,
       audit: null,
       agentResult: null,
+      // AG-01.2: how far this revision's own coverage analysis got, and the
+      // array it built, kept even when the revision fails. Both belong to this
+      // revision object, so a value never describes another revision.
+      coverageStage: 'none',
+      analysisCoverage: null,
     };
     state.active = active;
     bump('session_revisions');
@@ -2493,6 +2571,8 @@ export function createProjectSession(config) {
 
       const closure = refreshClosure(active);
       state.covered = closure;
+      active.coverageStage =
+        closure.unresolved.length > 0 ? 'closure-partial' : 'closure';
       // The SIZE of the covered set, recorded as soon as the closure is known
       // and BEFORE the analysis can fail.
       //
@@ -2578,6 +2658,8 @@ export function createProjectSession(config) {
       const analysis = phase('session_compile_files_ms', () =>
         analyseCoveredFiles(closure, active),
       );
+      active.analysisCoverage = analysis.coverage;
+      active.coverageStage = 'analysed';
       if (analysis.failures.length > 0) throw new PmsError(analysis.failures);
       if (!analysis.consistency.ok) {
         throw new PmsError(
@@ -2688,6 +2770,26 @@ export function createProjectSession(config) {
     }
   }
 
+  /**
+   * The covered files in the order the analysis visits them: the closure, with
+   * the generated design-system module relabelled in place or appended (see
+   * `analyseCoveredFiles`). The AG-01.2 audit list reuses it for the files a
+   * revision did not analyse, so both lists share one order.
+   */
+  function analysisOrderOf(closure) {
+    const designSystemPath = state.generatedModulePath;
+    const coveredEntries = [...closure.covered];
+    const generatedIndex = coveredEntries.findIndex(
+      ([file]) => file === designSystemPath,
+    );
+    if (generatedIndex === -1) {
+      coveredEntries.push([designSystemPath, 'generated']);
+    } else {
+      coveredEntries[generatedIndex] = [designSystemPath, 'generated'];
+    }
+    return coveredEntries;
+  }
+
   function analyseCoveredFiles(closure, active) {
     const cfg = state.config;
     // One content check per revision, shared by all covered file guards.
@@ -2742,15 +2844,7 @@ export function createProjectSession(config) {
     // already, and the pre-Phase-D `Map.set` overwrote that entry's origin IN
     // PLACE rather than adding a second one. Appending unconditionally
     // therefore added a file the full build has no entry for.
-    const coveredEntries = [...closure.covered];
-    const generatedIndex = coveredEntries.findIndex(
-      ([file]) => file === designSystemPath,
-    );
-    if (generatedIndex === -1) {
-      coveredEntries.push([designSystemPath, 'generated']);
-    } else {
-      coveredEntries[generatedIndex] = [designSystemPath, 'generated'];
-    }
+    const coveredEntries = analysisOrderOf(closure);
     const coveredFileNames = coveredEntries.map(([file]) => file);
 
     // ---------------------------------------------------------------
@@ -3562,6 +3656,7 @@ export function createProjectSession(config) {
       generationId: state.generationId,
       registryDigest: result.registryDigest,
     };
+    pinAuditParent();
 
     const delta = committed?.delta ?? {
       added: 0,
@@ -3924,6 +4019,41 @@ export function createProjectSession(config) {
   // ------------------------------------------------------------ full audit ----
 
   /**
+   * The identity fields of a coverage document for the active design system.
+   * `generationId` is the published generation, or null before publication.
+   */
+  function auditContractOf(active) {
+    const designSystem = state.designSystem;
+    return {
+      contractVersion: designSystem.manifest.compilerContractVersion,
+      systemId: designSystem.registry.systemId,
+      registryDigest: designSystem.registry.registryDigest,
+      generationId: active.published ? state.generationId : null,
+      coveredRoots: state.config.roots,
+    };
+  }
+
+  /** The coverage document over `entries`: pure, no counter (AG-01.2 §3.3). */
+  function coverageDocumentOf(
+    active,
+    entries,
+    { contractVersion, systemId, registryDigest, generationId, coveredRoots },
+  ) {
+    return buildCoverageReport({
+      contractVersion,
+      systemId,
+      registryDigest,
+      revisionId: active.revisionId,
+      generationId:
+        generationId ?? (active.published ? state.generationId : null),
+      coveredRoots,
+      entries,
+    });
+  }
+
+  const coverageTextOf = (doc) => JSON.stringify(doc, null, 2) + '\n';
+
+  /**
    * Builds the project-wide coverage document for a revision.
    *
    * `active.coverage` is the array the analysis already produced this revision.
@@ -3932,25 +4062,13 @@ export function createProjectSession(config) {
    * inline, and the audit oracle compares them directly rather than through a
    * semantic translation.
    */
-  function materializeCoverageReport(
-    active,
-    { contractVersion, systemId, registryDigest, generationId, coveredRoots },
-  ) {
+  function materializeCoverageReport(active, contract) {
     const buildStart = perfNow();
-    const doc = buildCoverageReport({
-      contractVersion,
-      systemId,
-      registryDigest,
-      revisionId: active.revisionId,
-      generationId:
-        generationId ?? (active.published ? state.generationId : null),
-      coveredRoots,
-      entries: active.coverage,
-    });
+    const doc = coverageDocumentOf(active, active.coverage, contract);
     count('coverage_report_build_ms', (perfNow() - buildStart) / 1e6);
 
     const serializeStart = perfNow();
-    const text = JSON.stringify(doc, null, 2) + '\n';
+    const text = coverageTextOf(doc);
     const bytes = Buffer.byteLength(text, 'utf8');
     count('coverage_report_serialize_ms', (perfNow() - serializeStart) / 1e6);
     count('coverage_report_bytes', bytes);
@@ -3971,32 +4089,419 @@ export function createProjectSession(config) {
   }
 
   /**
-   * The directory audit documents are written to.
-   *
-   * A SIBLING of the output directory, derived the same way `generation.js`
-   * derives its staging and state paths, and for the same reason: the output
-   * directory is replaced by a rename on every publication, so anything written
-   * inside it either travels with the generation or is destroyed by the swap.
-   * An audit document that must outlive the generation it describes cannot live
-   * there.
+   * The canonical coverage document of a valid revision (AG-01.2 §3.3): the
+   * bytes `requestFullAudit` writes for it now, built without a counter. It is
+   * the only definition of "fresh": an artifact is fresh exactly when its bytes
+   * equal these. Null for a revision that is not validated and valid.
    */
-  function auditDir() {
-    const absOut = path.resolve(state.config.outDir);
-    return path.join(
-      path.dirname(absOut),
-      `.${path.basename(absOut)}.pms-audit`,
+  function canonicalAuditOf(active) {
+    if (active == null || active.validated !== true || active.ok !== true)
+      return null;
+    const document = coverageDocumentOf(
+      active,
+      active.analysisCoverage,
+      auditContractOf(active),
     );
+    const buffer = Buffer.from(coverageTextOf(document), 'utf8');
+    return {
+      buffer,
+      documentKind: document.documentKind,
+      schemaVersion: document.schemaVersion,
+      generationId: document.generationId,
+      entryCount: document.entryCount,
+      bytes: buffer.length,
+      sha256: sha256(buffer),
+    };
   }
 
-  function writeCoverageStandalone(active, text) {
-    const dir = auditDir();
-    const file = path.join(dir, `coverage-rev-${active.revisionId}.json`);
-    const writeStart = perfNow();
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(file, text, 'utf8');
-    count('coverage_report_write_ms', (perfNow() - writeStart) / 1e6);
-    count('full_report_write_ms', (perfNow() - writeStart) / 1e6);
-    return file;
+  const canonicalAuditMeta = (canonical) =>
+    canonical == null
+      ? null
+      : {
+          documentKind: canonical.documentKind,
+          schemaVersion: canonical.schemaVersion,
+          generationId: canonical.generationId,
+          bytes: canonical.bytes,
+          sha256: canonical.sha256,
+        };
+
+  /**
+   * The audit list of a revision (AG-01.2 §3.3): its own analysis entries,
+   * then an `unknown` record for every covered file without one, in analysis
+   * order. It reads only the revision's own fields, the closure and the
+   * generated module's path; never a file state, which may hold an earlier
+   * revision's contribution.
+   */
+  function auditListOf(active) {
+    const stage = active?.coverageStage ?? 'none';
+    if (stage === 'none' || state.covered == null)
+      return { stage: 'none', coveredFiles: null, known: [], unknown: [] };
+    const order = analysisOrderOf(state.covered).filter(
+      ([file]) => file != null,
+    );
+    const known = stage === 'analysed' ? active.analysisCoverage : [];
+    const unknown = [];
+    if (known.length !== order.length) {
+      const reason = stage === 'analysed' ? 'not-analysed' : 'analysis-not-run';
+      const seen = new Set(known.map((entry) => entry.file));
+      for (const [file, origin] of order) {
+        const name = relativeToCwd(file);
+        if (!seen.has(name))
+          unknown.push({ file: name, origin, analysed: false, reason });
+      }
+    }
+    return { stage, coveredFiles: order.length, known, unknown };
+  }
+
+  // The audit directory is a SIBLING of the output directory, derived the same
+  // way `generation.js` derives its staging and state paths, and for the same
+  // reason: the output directory is replaced by a rename on every publication,
+  // so anything written inside it either travels with the generation or is
+  // destroyed by the swap. An audit document that must outlive the generation
+  // it describes cannot live there.
+  function auditNames() {
+    const absOut = path.resolve(state.config.outDir);
+    return {
+      parent: path.dirname(absOut),
+      out: path.basename(absOut),
+      audit: `.${path.basename(absOut)}.pms-audit`,
+    };
+  }
+
+  const auditFileName = (revisionId) => `coverage-rev-${revisionId}.json`;
+
+  // ------------------------------------------- anchored audit filesystem ----
+  //
+  // AG-01.2 §3.8. Every audit read and write is a single name under a
+  // directory descriptor: `/proc/self/fd/<fd>/<name>` makes the kernel resolve
+  // the descriptor's directory object, wherever it now is, then one component
+  // in it. `auditParent` is the parent of `outDir`, opened once when the host
+  // starts the session (or after the first commit creates it) and closed with
+  // the session. Where that anchoring is unavailable, audit filesystem access
+  // fails closed.
+  let auditParent = null;
+
+  function pinAuditParent() {
+    if (auditParent != null) return;
+    try {
+      auditParent = fs.openSync(
+        auditNames().parent,
+        fs.constants.O_RDONLY | fs.constants.O_DIRECTORY,
+      );
+    } catch {
+      auditParent = null;
+    }
+  }
+
+  function releaseAuditParent() {
+    const fd = auditParent;
+    auditParent = null;
+    if (fd == null) return;
+    try {
+      fs.closeSync(fd);
+    } catch {
+      /* already closed */
+    }
+  }
+
+  /** The pinned parent, if `/proc/self/fd` resolves it to the same directory. */
+  function auditAnchor() {
+    const fd = auditParent;
+    if (fd == null) return null;
+    try {
+      auditStep('anchor', { fd });
+      const held = fs.fstatSync(fd);
+      const named = fs.statSync(`/proc/self/fd/${fd}`);
+      return held.isDirectory() &&
+        named.isDirectory() &&
+        held.dev === named.dev &&
+        held.ino === named.ino
+        ? fd
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Writes the canonical document to `<auditDir>/coverage-rev-<N>.json`
+   * through the anchored sequence of AG-01.2 §3.5, and returns the nominal
+   * path. It succeeds only after reading the installed file back through the
+   * directory descriptor and matching the canonical length and digest. A
+   * failure leaves no file this call created.
+   */
+  function writeAuditAnchored(revisionId, buffer, digest) {
+    const names = auditNames();
+    const finalName = auditFileName(revisionId);
+    const P = auditAnchor();
+    if (P == null) throw unsafeAuditPath('anchoring-unavailable');
+    const C = fs.constants;
+    let D = null;
+    let T = null;
+    let tmpName = null;
+    let identity = null;
+    let created = false;
+    let renamed = false;
+    let ok = false;
+    const isOurs = (stat) =>
+      stat != null &&
+      stat.isFile() &&
+      stat.dev === identity.dev &&
+      stat.ino === identity.ino &&
+      stat.size === buffer.length;
+    const lstatOrNull = (name) => {
+      try {
+        return fs.lstatSync(anchoredPath(D, name));
+      } catch (error) {
+        if (MISSING_ENTRY.has(error?.code)) return null;
+        throw error;
+      }
+    };
+    try {
+      auditStep('mkdir', { fd: P, name: names.audit });
+      try {
+        fs.mkdirSync(anchoredPath(P, names.audit));
+      } catch (error) {
+        if (error?.code !== 'EEXIST') throw error;
+      }
+      auditStep('open-dir', { fd: P, name: names.audit });
+      try {
+        D = fs.openSync(
+          anchoredPath(P, names.audit),
+          C.O_RDONLY | C.O_DIRECTORY | C.O_NOFOLLOW,
+        );
+      } catch (error) {
+        if (NOT_A_DIRECTORY.has(error?.code))
+          throw unsafeAuditPath('audit-directory-not-directory');
+        throw error;
+      }
+      tmpName = `${finalName}.${process.pid}.${crypto.randomUUID()}.tmp`;
+      const at = { fd: D, tmp: tmpName, final: finalName };
+      auditStep('create', at);
+      try {
+        T = fs.openSync(
+          anchoredPath(D, tmpName),
+          C.O_WRONLY | C.O_CREAT | C.O_EXCL | C.O_NOFOLLOW,
+          0o644,
+        );
+      } catch (error) {
+        if (error?.code === 'EEXIST' || error?.code === 'ELOOP')
+          throw unsafeAuditPath('audit-temp-exists');
+        throw error;
+      }
+      created = true;
+      // The identity is captured before any other step that can fail, so
+      // every later failure path can remove exactly this file.
+      auditStep('identity', at);
+      identity = fs.fstatSync(T);
+      let offset = 0;
+      while (offset < buffer.length) {
+        const cap = auditStep('write', at);
+        const length =
+          Number.isSafeInteger(cap) && cap > 0
+            ? Math.min(cap, buffer.length - offset)
+            : buffer.length - offset;
+        offset += fs.writeSync(T, buffer, offset, length, offset);
+      }
+      auditStep('fsync', at);
+      fs.fsyncSync(T);
+      auditStep('close', at);
+      const written = T;
+      T = null;
+      fs.closeSync(written);
+      auditStep('rename', at);
+      try {
+        fs.renameSync(anchoredPath(D, tmpName), anchoredPath(D, finalName));
+        renamed = true;
+      } catch (error) {
+        if (RENAME_ONTO_DIRECTORY.has(error?.code))
+          throw unsafeAuditPath('audit-file-not-file');
+        throw error;
+      }
+
+      // Nominal check (metadata only): the reported path names this file in
+      // the directory this call opened.
+      auditStep('nominal-check', at);
+      const nominalDir = path.join(names.parent, names.audit);
+      const nominalFile = path.join(nominalDir, finalName);
+      let sameDirectory = false;
+      try {
+        const held = fs.fstatSync(D);
+        const dir = fs.lstatSync(nominalDir);
+        sameDirectory =
+          dir.isDirectory() && dir.dev === held.dev && dir.ino === held.ino;
+      } catch (error) {
+        if (!MISSING_ENTRY.has(error?.code)) throw error;
+      }
+      if (!sameDirectory) throw unsafeAuditPath('audit-directory-moved');
+      // The directory is the one written: a different file at the name was
+      // substituted after the temporary file was created.
+      if (!isOurs(lstatOrNull(finalName)))
+        throw unsafeAuditPath('audit-file-replaced');
+
+      // Publication point, the last step before success: the entry names the
+      // file this call created, and its content is the canonical document.
+      auditStep('verify-lstat', at);
+      if (!isOurs(lstatOrNull(finalName)))
+        throw unsafeAuditPath('audit-file-replaced');
+      auditStep('verify-open', at);
+      let R;
+      try {
+        R = fs.openSync(
+          anchoredPath(D, finalName),
+          C.O_RDONLY | C.O_NOFOLLOW | C.O_NONBLOCK,
+        );
+      } catch (error) {
+        if (MISSING_ENTRY.has(error?.code) || NOT_A_FILE.has(error?.code))
+          throw unsafeAuditPath('audit-file-replaced');
+        throw error;
+      }
+      try {
+        auditStep('verify-fstat', at);
+        if (!isOurs(fs.fstatSync(R)))
+          throw unsafeAuditPath('audit-file-replaced');
+        // One byte past the canonical size, so an append is seen.
+        const read = Buffer.alloc(buffer.length + 1);
+        let got = 0;
+        while (got <= buffer.length) {
+          auditStep('verify-read', at);
+          const n = fs.readSync(R, read, got, read.length - got, got);
+          if (n === 0) break;
+          got += n;
+        }
+        if (got !== buffer.length || sha256(read.subarray(0, got)) !== digest)
+          throw unsafeAuditPath('audit-content-mismatch');
+        auditStep('verify-after', at);
+        if (!isOurs(fs.fstatSync(R)))
+          throw unsafeAuditPath('audit-content-mismatch');
+      } finally {
+        fs.closeSync(R);
+      }
+      if (!isOurs(lstatOrNull(finalName)))
+        throw unsafeAuditPath('audit-file-replaced');
+      ok = true;
+      return nominalFile;
+    } catch (error) {
+      if (error instanceof PmsError) throw error;
+      throw unsafeAuditPath('audit-write-failed', error?.code);
+    } finally {
+      if (T != null) {
+        try {
+          fs.closeSync(T);
+        } catch {
+          /* the descriptor is released either way */
+        }
+      }
+      if (!ok && created) {
+        // Only this call's entry, identified by inode, and only inside `D`.
+        // Without a recorded identity, the random temporary name is ours.
+        const name = renamed ? finalName : tmpName;
+        try {
+          const entry = fs.lstatSync(anchoredPath(D, name));
+          if (
+            identity == null ||
+            (entry.dev === identity.dev && entry.ino === identity.ino)
+          )
+            fs.unlinkSync(anchoredPath(D, name));
+        } catch {
+          /* nothing of ours is left at that name */
+        }
+      }
+      if (D != null) {
+        try {
+          fs.closeSync(D);
+        } catch {
+          /* the descriptor is released either way */
+        }
+      }
+    }
+  }
+
+  /**
+   * Verifies one audit location against the canonical document (AG-01.2
+   * §3.4). It opens only a regular file of the canonical size, never follows a
+   * link, never blocks, and never parses or returns the content.
+   */
+  function readAuditAnchored(dirName, name, canonical) {
+    const result = (status, reason, bytes = null) => ({
+      status,
+      reason,
+      bytes,
+      sha256: status === 'fresh' ? canonical.sha256 : null,
+    });
+    const P = auditAnchor();
+    if (P == null) return result('unreadable', 'anchoring-unavailable');
+    const C = fs.constants;
+    let O = null;
+    try {
+      try {
+        auditStep('read-open-dir', { fd: P, name: dirName });
+        O = fs.openSync(
+          anchoredPath(P, dirName),
+          C.O_RDONLY | C.O_DIRECTORY | C.O_NOFOLLOW,
+        );
+      } catch (error) {
+        if (error?.code === 'ENOENT') return result('missing', null);
+        if (NOT_A_DIRECTORY.has(error?.code))
+          return result('unreadable', 'directory-not-directory');
+        return result('unreadable', 'read-failed');
+      }
+      const at = { fd: O, final: name };
+      let entry;
+      try {
+        auditStep('read-lstat', at);
+        entry = fs.lstatSync(anchoredPath(O, name));
+      } catch (error) {
+        if (MISSING_ENTRY.has(error?.code)) return result('missing', null);
+        return result('unreadable', 'read-failed');
+      }
+      if (!entry.isFile()) return result('unreadable', 'not-regular-file');
+      const bytes = entry.size;
+      if (canonical == null) return result('stale', 'revision-invalid', bytes);
+      if (bytes !== canonical.bytes)
+        return result('stale', 'size-differs', bytes);
+      let F;
+      try {
+        auditStep('read-open', at);
+        F = fs.openSync(
+          anchoredPath(O, name),
+          C.O_RDONLY | C.O_NOFOLLOW | C.O_NONBLOCK,
+        );
+      } catch (error) {
+        if (MISSING_ENTRY.has(error?.code)) return result('missing', null);
+        if (NOT_A_FILE.has(error?.code))
+          return result('unreadable', 'not-regular-file', bytes);
+        return result('unreadable', 'read-failed', bytes);
+      }
+      try {
+        const held = fs.fstatSync(F);
+        if (
+          !held.isFile() ||
+          held.dev !== entry.dev ||
+          held.ino !== entry.ino ||
+          held.size !== bytes
+        )
+          return result('unreadable', 'not-regular-file', bytes);
+        const data = Buffer.alloc(bytes);
+        let got = 0;
+        while (got < bytes) {
+          auditStep('read', at);
+          const n = fs.readSync(F, data, got, bytes - got, got);
+          if (n === 0) break;
+          got += n;
+        }
+        if (got !== bytes) return result('stale', 'size-differs', bytes);
+        return sha256(data) === canonical.sha256
+          ? result('fresh', null, bytes)
+          : result('stale', 'content-differs', bytes);
+      } catch {
+        return result('unreadable', 'read-failed', bytes);
+      } finally {
+        fs.closeSync(F);
+      }
+    } finally {
+      if (O != null) fs.closeSync(O);
+    }
   }
 
   // ----------------------------------------------------------------- API ----
@@ -4011,6 +4516,10 @@ export function createProjectSession(config) {
      * that had been running for a while would be in.
      */
     initialize() {
+      // AG-01.2 §3.8: the audit anchor is pinned when the host starts the
+      // session. A parent that does not exist yet is pinned after the first
+      // commit creates it.
+      pinAuditParent();
       return api.applyChanges({ initial: true });
     },
 
@@ -4195,14 +4704,7 @@ export function createProjectSession(config) {
         );
       }
 
-      const designSystem = state.designSystem;
-      const contract = {
-        contractVersion: designSystem.manifest.compilerContractVersion,
-        systemId: designSystem.registry.systemId,
-        registryDigest: designSystem.registry.registryDigest,
-        generationId: active.published ? state.generationId : null,
-        coveredRoots: state.config.roots,
-      };
+      const contract = auditContractOf(active);
 
       if (!active.published) {
         // Requested before publication: stage it. The write happens inside the
@@ -4223,7 +4725,15 @@ export function createProjectSession(config) {
       }
 
       const doc = materializeCoverageReport(active, contract);
-      const file = writeCoverageStandalone(active, doc.text);
+      // AG-01.2 §3.5: the anchored writer, shared with `audit.materialize`.
+      const writeStart = perfNow();
+      const file = writeAuditAnchored(
+        active.revisionId,
+        Buffer.from(doc.text, 'utf8'),
+        sha256(doc.text),
+      );
+      count('coverage_report_write_ms', (perfNow() - writeStart) / 1e6);
+      count('full_report_write_ms', (perfNow() - writeStart) / 1e6);
       doc.receipt.path = file;
       doc.receipt.materialized = true;
       doc.receipt.inGeneration = false;
@@ -4320,6 +4830,121 @@ export function createProjectSession(config) {
       return {
         total: entries.length,
         entries: entries.slice(offset, offset + limit),
+      };
+    },
+
+    /**
+     * One page of the current revision's audit list, with its stage and totals
+     * (AG-01.2 §3.3). It reads the revision and assigns nothing: no counter,
+     * no validation, no file state. `summary` and `canonical` are computed
+     * only when asked for (offset 0).
+     */
+    _auditCoverage({
+      offset = 0,
+      limit = 0,
+      summary = false,
+      canonical = false,
+    } = {}) {
+      const active = state.active;
+      const list = auditListOf(active);
+      const total = list.known.length + list.unknown.length;
+      const end = Math.min(total, offset + limit);
+      const entries = [];
+      for (let index = offset; index < end; index += 1)
+        entries.push(
+          index < list.known.length
+            ? list.known[index]
+            : list.unknown[index - list.known.length],
+        );
+      return {
+        stage: list.stage,
+        ok: active?.ok === true,
+        // The design-system build runs before discovery: a scan error with no
+        // current design system is that build's failure, not the scan's.
+        scanFailed:
+          active?.scanError != null && state.designSystemCurrent === true,
+        coveredFiles: list.coveredFiles,
+        knownEntries: list.known.length,
+        unknownEntries: list.unknown.length,
+        total,
+        entries,
+        summary: summary ? coverageSummary(list.known) : null,
+        canonical: canonical
+          ? canonicalAuditMeta(canonicalAuditOf(active))
+          : null,
+      };
+    },
+
+    /**
+     * Both audit locations of the current revision, each verified against the
+     * canonical document (AG-01.2 §3.4).
+     */
+    _auditArtifacts() {
+      const active = state.active;
+      const canonical = canonicalAuditOf(active);
+      const names = auditNames();
+      const fileName = auditFileName(active.revisionId);
+      return {
+        canonical: canonicalAuditMeta(canonical),
+        artifacts: [
+          {
+            location: 'generation',
+            path: path.join(names.parent, names.out, COVERAGE_REPORT_FILE),
+            ...readAuditAnchored(names.out, COVERAGE_REPORT_FILE, canonical),
+          },
+          {
+            location: 'audit-directory',
+            path: path.join(names.parent, names.audit, fileName),
+            ...readAuditAnchored(names.audit, fileName, canonical),
+          },
+        ],
+      };
+    },
+
+    /** The generation a document of the current revision names now. */
+    _auditGenerationId() {
+      return state.active?.published === true ? state.generationId : null;
+    },
+
+    /**
+     * Writes the canonical document of the current valid revision to the audit
+     * directory and records it on the revision, as the post-publication branch
+     * of `requestFullAudit` does, without staging anything (AG-01.2 §3.5).
+     */
+    _materializeAudit() {
+      const active = state.active;
+      const canonical = canonicalAuditOf(active);
+      if (canonical == null) {
+        throw new Error(
+          'pandamstyle: _materializeAudit() requires a validated, valid revision.',
+        );
+      }
+      const file = writeAuditAnchored(
+        active.revisionId,
+        canonical.buffer,
+        canonical.sha256,
+      );
+      active.audit = {
+        revisionId: active.revisionId,
+        bytes: canonical.bytes,
+        path: file,
+        documentKind: canonical.documentKind,
+        schemaVersion: canonical.schemaVersion,
+        entryCount: canonical.entryCount,
+        materialized: true,
+        inGeneration: false,
+        materializedAt: 'audit-directory',
+      };
+      active.auditReportReadyNs = perfNow();
+      active.agentResult = buildResultFor(active);
+      return {
+        path: file,
+        bytes: canonical.bytes,
+        sha256: canonical.sha256,
+        entryCount: canonical.entryCount,
+        generationId: canonical.generationId,
+        documentKind: canonical.documentKind,
+        schemaVersion: canonical.schemaVersion,
       };
     },
 
@@ -4813,6 +5438,7 @@ export function createProjectSession(config) {
 
     close() {
       state.closed = true;
+      releaseAuditParent();
       setRelayAnswerStore(null);
       clearModuleOverlay();
       clearModuleCache();

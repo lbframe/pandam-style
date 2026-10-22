@@ -432,6 +432,72 @@ describe('AG-01.1 exhaustive paging of every list kind (I10, T15)', () => {
     }
   });
 
+  // AG-01.2: the audit list of an invalid 300-file project, in both views,
+  // with the read and materialize responses recorded for the type check.
+  test('audit-entries: 310 entries of an invalid revision, every page and view', async () => {
+    const project = await openAgentProject('valid', {
+      prepare: (fixture) => writePages(fixture, 300, forbidden, 'bad'),
+    });
+    try {
+      const rev = await project.revision();
+      await project.session.validate(rev);
+      const lists = [];
+      for (const [view, limit] of [
+        ['compact', 1],
+        ['compact', 7],
+        ['detail', 256],
+      ]) {
+        const all = await readList(
+          project,
+          'audit.compute',
+          { rev },
+          view,
+          limit,
+        );
+        expect(all).toHaveLength(310);
+        lists.push(all);
+      }
+      expect(lists[1]).toEqual(lists[0]);
+      expect(lists[2]).toEqual(lists[0]);
+      checkResponse(
+        'audit.read',
+        await project.dispatch('audit.read', { rev }),
+      );
+      const write = project.binding.mintCapability({
+        grants: ['materialize-audit'],
+      });
+      const refused = checkResponse(
+        'audit.materialize',
+        await project.binding.dispatch(
+          request('audit.materialize', { rev, expectedGenerationId: null }),
+          { capability: write },
+        ),
+      );
+      expect(refused.failure.reason).toBe('revision-invalid');
+    } finally {
+      await project.close();
+    }
+    const valid = await openAgentProject('valid');
+    try {
+      const rev = await valid.revision();
+      await valid.session.validate(rev);
+      const write = valid.binding.mintCapability({
+        grants: ['materialize-audit'],
+      });
+      const receipt = checkResponse(
+        'audit.materialize',
+        await valid.binding.dispatch(
+          request('audit.materialize', { rev, expectedGenerationId: null }),
+          { capability: write },
+        ),
+      );
+      expect(receipt.outcome).toBe('success');
+      checkResponse('audit.read', await valid.dispatch('audit.read', { rev }));
+    } finally {
+      await valid.close();
+    }
+  });
+
   test('operations: protocol.operations pages the whole registry', async () => {
     const project = await openAgentProject('valid');
     try {

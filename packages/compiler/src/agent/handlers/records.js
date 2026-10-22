@@ -49,6 +49,17 @@ async function recordAt(ctx) {
     if (value.entries.length === 0) throw rejectRequest('index-out-of-range');
     return { identities, record: value.entries[0] };
   }
+  if (address.kind === 'audit-entry') {
+    // The current revision's audit list (AG-01.2 §3.2), as `audit.compute`
+    // pages it.
+    const { identities, value } = await hooks.auditCompute(
+      input.rev,
+      { offset: address.index, limit: 1 },
+      ctx.beforeStart,
+    );
+    if (value.entries.length === 0) throw rejectRequest('index-out-of-range');
+    return { identities, record: value.entries[0] };
+  }
   const { identities, value } = await hooks.affected(
     input.rev,
     { offset: address.index, limit: 1 },

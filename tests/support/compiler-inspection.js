@@ -208,3 +208,5 @@ export {
   OUTCOMES,
 } from '../../packages/compiler/src/protocol/envelope.js';
 export { AGENT_SESSION_HOOKS } from '../../packages/compiler/src/api/project.js';
+// AG-01.2 §5.2: the anchored audit step hook, for the injection matrix only.
+export { setAuditStepHook } from '../../packages/compiler/src/project/session/index.js';

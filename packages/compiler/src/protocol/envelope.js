@@ -229,6 +229,22 @@ export function classifyError(error, { stage = 'execution' } = {}) {
         };
       case Codes.SESSION_CLOSED:
         return { ...base, outcome: 'stale-revision', reason: 'session-closed' };
+      case Codes.UNSAFE_AUDIT_PATH:
+        // AG-01.2 §3.5: the specific reason stays in the diagnostic context.
+        if (reason === 'anchoring-unavailable')
+          return {
+            ...base,
+            outcome: 'unsupported-capability',
+            reason,
+            capability: 'feature:anchored-audit-io',
+          };
+        if (reason === 'audit-write-failed')
+          return { ...base, outcome: 'internal-error', reason };
+        return {
+          ...base,
+          outcome: 'constraint-violation',
+          reason: 'unsafe-audit-path',
+        };
       default:
         if (COMPILER_FAULT_CODES.has(first?.code)) {
           return {

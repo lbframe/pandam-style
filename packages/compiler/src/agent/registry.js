@@ -21,6 +21,10 @@ import { own, ownIndex, recordInfo } from '../protocol/envelope.js';
 import { compileSchema, maxJsonBytes } from './schema.js';
 import {
   AGENT_PAGE,
+  AUDIT_ARTIFACT,
+  AUDIT_OUTPUT,
+  AUDIT_RECEIPT,
+  CANONICAL_AUDIT,
   arr,
   bool,
   BOUNDS,
@@ -53,6 +57,13 @@ import { DEFAULT_REQUEST_LIMITS, SNAPSHOT_REASONS } from './snapshot.js';
  * breaks a rule of §3.2.3, planned or implemented alike (I12).
  */
 
+/**
+ * `writes-audit` (AG-01.2 §3.2) writes one compiler-derived coverage document
+ * in the audit directory and records that document on the revision, so the v1
+ * `audit` block stays true. It never stages an audit, never changes the
+ * publication candidate and never revokes a ticket: `session-state:
+ * stages-audit` stays forbidden to every grant.
+ */
 export const EFFECT_KINDS = Object.freeze([
   'reads-registry',
   'reads-sources',
@@ -965,55 +976,80 @@ const ENTRIES = [
   }),
   sessionEntry({
     name: 'audit.read',
-    status: 'planned',
+    status: 'implemented',
     owner: 'AG-01.2 #9',
     summary:
-      'Reads a materialized audit for the revision or a generation. Missing and stale audits are explicit results.',
+      "Verifies both coverage audit locations of the validated current revision, in the generation and in the audit directory, against the canonical document by bytes: fresh, stale, missing or unreadable, with a reason. Never parses or returns a file's content.",
     requires: { grant: 'consult', binding: 'session', revision: 'current' },
-    effects: [{ kind: 'reads-generated' }],
-    input: obj({ rev: REVISION_INPUT, generationId: int(1) }, ['rev']),
-    output: obj({ present: bool, fresh: bool, page: AGENT_PAGE }),
-    errors: [...REVISION_IDENTITY_ERRORS],
+    preconditions: [{ id: 'revision-validated', outcome: 'invalid-input' }],
+    effects: [{ kind: 'reads-generated' }, { kind: 'computes' }],
+    input: obj({ rev: REVISION_INPUT }),
+    output: obj({
+      canonical: CANONICAL_AUDIT,
+      artifacts: arr(AUDIT_ARTIFACT, 2),
+    }),
+    errors: [...REVISION_IDENTITY_ERRORS, NOT_VALIDATED],
     retry: SAFE,
   }),
   sessionEntry({
     name: 'audit.compute',
-    status: 'planned',
+    status: 'implemented',
     owner: 'AG-01.2 #9',
     summary:
-      'Computes the coverage audit in memory for a valid or invalid revision, with its known limitations. Stages nothing.',
+      'Computes the coverage audit of the validated current revision in memory, valid or invalid: stage, completeness, closed limitations and the canonical document digest at offset 0, then pages of audit entries. Files the revision did not analyse are unknown records. Stages nothing.',
     requires: { grant: 'consult', binding: 'session', revision: 'current' },
+    preconditions: [{ id: 'revision-validated', outcome: 'invalid-input' }],
     effects: [{ kind: 'computes' }],
     input: obj({ rev: REVISION_INPUT, page: PAGE_INPUT }, ['rev']),
-    output: obj({ page: AGENT_PAGE }),
-    errors: [...REVISION_IDENTITY_ERRORS],
+    output: obj({ audit: AUDIT_OUTPUT, page: AGENT_PAGE }, ['page']),
+    pagination: { kind: 'offset', boundTo: 'revision' },
+    errors: [...REVISION_IDENTITY_ERRORS, NOT_VALIDATED],
     retry: SAFE,
   }),
   sessionEntry({
     name: 'audit.materialize',
-    status: 'planned',
+    status: 'implemented',
     owner: 'AG-01.2 #9',
     summary:
-      'Writes the audit of the revision for an expected generation and returns a receipt with path, bytes, digest and identities.',
+      'Writes the canonical coverage audit of the valid current revision to the audit directory for the expected generation (null before publication), verifies it, and returns a receipt with path, bytes, digest and identities. Never stages, never revokes a ticket.',
     requires: {
       grant: 'materialize-audit',
       binding: 'session',
       revision: 'current',
     },
-    effects: [{ kind: 'writes-audit' }],
-    input: obj({ rev: REVISION_INPUT, expectedGenerationId: int(1) }),
-    output: obj({
-      path: str(BOUNDS.auditPath),
-      bytes: int(0),
-      digest: { type: 'string', format: 'sha256' },
-      identities: RECEIPT_IDENTITIES,
-    }),
+    preconditions: [
+      { id: 'revision-validated', outcome: 'invalid-input' },
+      { id: 'revision-valid', outcome: 'constraint-violation' },
+    ],
+    effects: [{ kind: 'computes' }, { kind: 'writes-audit' }],
+    input: obj({ rev: REVISION_INPUT, expectedGenerationId: nullable(int(1)) }),
+    output: AUDIT_RECEIPT,
     errors: [
-      contract('stale-revision', Codes.STALE_REVISION, ['generation-changed']),
+      ...REVISION_IDENTITY_ERRORS,
+      NOT_VALIDATED,
       contract(
         'constraint-violation',
         Codes.INVALID_REVISION,
         ['revision-invalid'],
+        ['precondition:revision-valid'],
+      ),
+      contract('stale-revision', Codes.STALE_REVISION, ['generation-changed']),
+      contract(
+        'constraint-violation',
+        Codes.UNSAFE_AUDIT_PATH,
+        ['unsafe-audit-path'],
+        ['effect:writes-audit'],
+      ),
+      contract(
+        'unsupported-capability',
+        Codes.UNSAFE_AUDIT_PATH,
+        ['anchoring-unavailable'],
+        ['effect:writes-audit'],
+      ),
+      contract(
+        'internal-error',
+        Codes.UNSAFE_AUDIT_PATH,
+        ['audit-write-failed'],
         ['effect:writes-audit'],
       ),
     ],
@@ -1135,6 +1171,7 @@ const ENTRIES = [
 
 const REFERENCE_TARGETS = [
   'check',
+  'audit.compute',
   'diagnostics.candidates',
   'diagnostics.affected',
   'records.read',
