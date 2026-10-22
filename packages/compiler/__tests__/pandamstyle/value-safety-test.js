@@ -785,6 +785,28 @@ describe('the strict CSS reader', () => {
     ['trailing garbage', '.a{color:red} junk', /trailing text/],
     ['a bracket closed twice', '.a{color:red)}', /unbalanced bracket/],
     ['mismatched brackets', '.a{color:rgb(1 2 3]}', /unbalanced bracket/],
+    // Brackets in a prelude match as in declarations (Codex round 2).
+    [
+      'a stray ) in a prelude',
+      '.a){color:red}',
+      /unbalanced bracket in a prelude/,
+    ],
+    [
+      'an unclosed [ before {',
+      '.a[foo="x"{color:red}',
+      /unclosed bracket in a prelude/,
+    ],
+    [
+      'a ( closed by ] in an at-rule prelude',
+      '@media (width > 1px]{.a{color:red}}',
+      /unbalanced bracket in a prelude/,
+    ],
+    ['an unclosed ( at the end', '.a(', /unclosed bracket in a prelude/],
+    [
+      'an unclosed [ in an at-rule prelude',
+      '@media [x{.a{color:red}}',
+      /unclosed bracket in a prelude/,
+    ],
     ['} inside a bracket', '.a{color:(red}}', /inside a bracket/],
     ['a tokenizer error', '.a{content:"x}', /tokenizer error/],
   ])('refuses %s', (_, css, message) => {

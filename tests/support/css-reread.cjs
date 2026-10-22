@@ -16,8 +16,8 @@ const { tokenize } = require('@csstools/css-tokenizer');
  * Parses CSS text into `[{ prelude: [...], declarations: [[property, value
  * tokens]] }]`, nested at-rules flattened with their prelude path. Strict:
  * it throws unless it consumes the whole input as balanced rules, so a
- * tokenizer error, a stray `}`, an unclosed `{`, an unbalanced bracket or
- * trailing text is an error, never a silently dropped rule. A prelude keeps
+ * tokenizer error, a stray `}`, an unclosed `{`, an unbalanced bracket (in
+ * a prelude or in declarations) or trailing text is an error, never a silently dropped rule. A prelude keeps
  * every token's text exactly (quoted strings included); only whitespace
  * tokens are written as one space.
  */
@@ -34,11 +34,25 @@ function readCss(css) {
       .map((t) => (t[0] === 'whitespace-token' ? ' ' : t[1]))
       .join('')
       .trim();
+  // Brackets match pairwise: `(` and a function close with `)`, `[` with
+  // `]`. Throws on a closing bracket that does not match the last opened.
+  function track(open, type, where) {
+    if (type === '(-token' || type === 'function-token') open.push(')-token');
+    if (type === '[-token') open.push(']-token');
+    if (type === ')-token' || type === ']-token') {
+      if (open.pop() !== type)
+        throw new Error(`unbalanced bracket in ${where}`);
+    }
+  }
   function block(start, path) {
     let i = start;
     let prelude = [];
+    let open = [];
     while (i < tokens.length) {
       const [type] = tokens[i];
+      if (open.length > 0 && (type === '{-token' || type === '}-token')) {
+        throw new Error('unclosed bracket in a prelude');
+      }
       if (type === '}-token') {
         if (path.length === 0) throw new Error(`stray } at token ${i}`);
         if (text(prelude) !== '') {
@@ -55,11 +69,14 @@ function readCss(css) {
           i = declarations(i + 1, [...path, head]);
         }
         prelude = [];
+        open = [];
         continue;
       }
+      track(open, type, 'a prelude');
       prelude.push(tokens[i]);
       i += 1;
     }
+    if (open.length > 0) throw new Error('unclosed bracket in a prelude');
     if (path.length > 0) throw new Error('unbalanced block');
     if (text(prelude) !== '') throw new Error(`trailing text ${text(prelude)}`);
     return i;
@@ -80,13 +97,7 @@ function readCss(css) {
     };
     for (; i < tokens.length; i++) {
       const [type] = tokens[i];
-      if (type === '(-token' || type === 'function-token') open.push(')-token');
-      if (type === '[-token') open.push(']-token');
-      if (type === ')-token' || type === ']-token') {
-        if (open.pop() !== type) {
-          throw new Error('unbalanced bracket in declarations');
-        }
-      }
+      track(open, type, 'declarations');
       const depth = open.length;
       if (depth > 0 && type === '}-token') {
         throw new Error('} inside a bracket in declarations');
