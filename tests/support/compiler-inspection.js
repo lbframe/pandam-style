@@ -250,3 +250,5 @@ export {
   OUTCOMES,
 } from '../../packages/compiler/src/protocol/envelope.js';
 export { AGENT_SESSION_HOOKS } from '../../packages/compiler/src/api/project.js';
+// CE-02.2: the session's token file inputs and their memo.
+export { tokenFileInputs } from '../../packages/compiler/src/project/session/token-inputs.js';

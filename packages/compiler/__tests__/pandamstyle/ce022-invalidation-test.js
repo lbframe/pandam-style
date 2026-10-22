@@ -31,7 +31,12 @@ const fs = require('fs');
 const path = require('path');
 const v8 = require('v8');
 const vm = require('vm');
-const { openProject, fingerprint, loadCompiler } = require('./session-helpers');
+const {
+  openProject,
+  fingerprint,
+  loadCompiler,
+  measure,
+} = require('./session-helpers');
 
 const VERIFIED = {
   changed: [],
@@ -230,6 +235,18 @@ describe('CE-02.2 incremental validity equals a full rebuild', () => {
     ).toEqual([REFUSED, OK, REFUSED, REFUSED, OK]);
   });
 
+  test('a rebuild recomputes the input of the edited token only', () => {
+    const { h, definition } = project();
+    const wider = edited(definition, (d) => {
+      d.tokens.spacing.xl.value = '40px';
+    });
+    const { counters } = measure(() => {
+      h.session.applyChanges({ definition: wider, mutation: VERIFIED });
+      h.session.validate();
+    });
+    expect(counters.token_inputs_recomputed).toBe(1);
+  });
+
   test('an edit that flips no verdict revalidates nothing; a flip, its users', () => {
     const { h, definition } = project();
     const revision = (next) => {
@@ -261,6 +278,34 @@ describe('CE-02.2 incremental validity equals a full rebuild', () => {
       OK,
       REFUSED,
     ]);
+  });
+
+  test('a theme added and removed flips the verdict, both ways', () => {
+    const { h, definition } = project();
+    const added = edited(definition, (d) => {
+      d.themes.contrast = { tokens: { spacing: { xl: { value: '-2px' } } } };
+    });
+    expect(flips(h, [added, definition, added, definition])).toEqual([
+      REFUSED,
+      OK,
+      REFUSED,
+      OK,
+    ]);
+  });
+
+  test('a token visibility flips its users, both ways', () => {
+    const { h, definition } = project();
+    const hidden = edited(definition, (d) => {
+      d.tokens.spacing.xl.visibility = 'private';
+    });
+    const flipped = flips(h, [hidden, definition, hidden, definition]);
+    expect(flipped.map((f) => [f.ok, f.mismatches])).toEqual([
+      [false, []],
+      [true, []],
+      [false, []],
+      [true, []],
+    ]);
+    expect(flipped[0].rules).toEqual(['visibility.consumer']);
   });
 
   test('a reference flips the verdict through its target, both ways', () => {
@@ -371,6 +416,73 @@ describe('CE-02.2 incremental validity equals a full rebuild', () => {
       [true, []],
       [false, []],
     ]);
+  });
+});
+
+describe('the token file inputs memo', () => {
+  test('equals a computation without it after every kind of edit', () => {
+    const compiler = loadCompiler();
+    const digest = (value) => JSON.stringify(value);
+    const base = {
+      systemId: 'ce022-memo',
+      tokens: {
+        spacing: {
+          a: { value: '4px', visibility: 'public' },
+          n: { value: '-8px', visibility: 'public' },
+        },
+        colors: { c: { value: '#fff', visibility: 'public' } },
+      },
+      themes: { dark: { tokens: { spacing: { a: { value: '6px' } } } } },
+    };
+    // Each step edits the base once; the tokens whose input it changes.
+    const steps = [
+      [(d) => (d.tokens.spacing.a.value = '-4px'), ['spacing.a']],
+      [(d) => (d.themes.dark.tokens.spacing.a.value = '-6px'), ['spacing.a']],
+      // The same value under another theme name: a verdict names its theme.
+      [
+        (d) => {
+          d.themes = {
+            night: { tokens: { spacing: { a: { value: '-6px' } } } },
+          };
+        },
+        ['spacing.a'],
+      ],
+      [
+        (d) => {
+          d.themes.contrast = { tokens: { spacing: { a: { value: '-1px' } } } };
+        },
+        ['spacing.a'],
+      ],
+      [(d) => (d.tokens.spacing.a.visibility = 'private'), ['spacing.a']],
+      [
+        (d) => (d.systemId = 'ce022-memo-renamed'),
+        ['spacing.a', 'spacing.n', 'colors.c'],
+      ],
+      [
+        (d) => {
+          d.propertyDomains = { columnGap: { values: ['0'] } };
+        },
+        ['spacing.n'],
+      ],
+    ];
+    const baseInputs = compiler.tokenFileInputs(
+      compiler.buildDesignSystem(base),
+      null,
+      digest,
+    ).inputs;
+    let memo = null;
+    const sequence = [base, ...steps.map(([edit]) => edited(base, edit)), base];
+    const changed = sequence.map((definition) => {
+      const ds = compiler.buildDesignSystem(definition);
+      const memoised = compiler.tokenFileInputs(ds, memo, digest);
+      const fresh = compiler.tokenFileInputs(ds, null, digest);
+      expect([...memoised.inputs]).toEqual([...fresh.inputs]);
+      memo = memoised.memo;
+      return [...fresh.inputs.keys()].filter(
+        (id) => fresh.inputs.get(id) !== baseInputs.get(id),
+      );
+    });
+    expect(changed).toEqual([[], ...steps.map(([, ids]) => ids), []]);
   });
 });
 
