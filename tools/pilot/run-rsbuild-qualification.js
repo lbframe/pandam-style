@@ -272,6 +272,7 @@ try {
   } catch (error) {
     report.experimentalCompatibility.error = error.message;
   }
+  report.browser = browser;
   json('report.json', report);
   fs.copyFileSync(
     path.join(consumer, 'package-lock.json'),

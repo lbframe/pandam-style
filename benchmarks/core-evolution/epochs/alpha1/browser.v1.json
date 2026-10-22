@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-baseline-browser-pin",
+  "epoch": "alpha1",
+  "description": "Identity of the archived Chromium engine of the alpha1 store, for PMS_BROWSER_PIN. The manifest binds the engine bytes (engines[name=chromium].tree); this record adds the identity the binary reports.",
+  "engine": "chromium",
+  "executable": "engines/ms-playwright/chromium-1223/chrome-linux64/chrome",
+  "product": "Google Chrome for Testing",
+  "version": "148.0.7778.96",
+  "observedBy": "<store>/engines/ms-playwright/chromium-1223/chrome-linux64/chrome --version"
+}

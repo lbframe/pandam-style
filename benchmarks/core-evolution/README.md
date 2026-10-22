@@ -41,7 +41,9 @@ digest-bound identity of the baseline. It records:
 Some system browsers float and are not pinned: `/usr/local/bin/chromium` and
 `/opt/google/chrome/chrome`, which the Alpha 1 qualification scripts launch
 unless `PMS_CHROMIUM` is set. The manifest records their observed versions as
-unpinned. A reproduction sets `PMS_CHROMIUM` to the archived engine.
+unpinned. A reproduction sets `PMS_CHROMIUM` to the archived engine and
+`PMS_BROWSER_PIN` to its pin; see
+[Browser evidence on the archived engine](#browser-evidence-on-the-archived-engine).
 
 ### Store and reconstruction
 
@@ -66,12 +68,16 @@ node tools/baselines/archive.mjs build --store <empty dir>  # registry, nodejs.o
 node tools/baselines/archive.mjs verify --store <dir> --replay --rebuilt  # a rebuilt store
 node tools/baselines/archive.mjs verify --store <copy of the archived store> --replay
 node tools/baselines/archive.mjs closure --store <dir> --dest <dir>  # offline closure copy
+node tools/baselines/archive.mjs verify --committed  # no store: what Git proves
 ```
 
 `verify` recomputes every digest of the manifest. `--replay` then re-creates the
 source archive and reinstalls the closure offline with `npm ci --offline`. The
 reinstalled tree must be byte-identical to the recorded one, apart from npm's
-hidden `.package-lock.json`.
+hidden `.package-lock.json`. `verify --committed` needs no store: it runs only
+the checks that Git objects and committed files can prove. Those are the source
+tree, the release tag commit, product equivalence, the lockfiles, the packages'
+closure lockfile entries, and the assets and corpora file by file.
 
 The store and `manifest.v1.json` are immutable. Run `verify --replay` and any
 digest recomputation on a copy of the store, because an offline `npm ci` writes
@@ -115,6 +121,69 @@ regression test for this class.
 - The offline replay was sound throughout: npm checks every tarball against the
   lockfile integrity, and the reinstalled tree digest was compared with the
   manifest.
+
+### Browser evidence on the archived engine
+
+[`epochs/alpha1/browser.v1.json`](epochs/alpha1/browser.v1.json) pins the
+identity that the archived Chromium engine reports: `Google Chrome for Testing
+148.0.7778.96`. The manifest binds the engine bytes; this record is a separate
+versioned file, and the manifest is unchanged. A tooling test checks that the
+pin names the manifest's `chromium` engine and its `browserVersion`.
+
+Run a qualification harness against the archived engine from the repository
+root:
+
+```sh
+PMS_CHROMIUM=<store>/engines/ms-playwright/chromium-1223/chrome-linux64/chrome \
+PMS_BROWSER_PIN=benchmarks/core-evolution/epochs/alpha1/browser.v1.json \
+  node tools/semantic-oracle/run.js .pms-bench/<dir>
+```
+
+The same variables apply to `tools/pms/qualify-next.mjs` and
+`tools/pilot/run-rsbuild-qualification.js`. Each harness records `browser`
+(executable, product, version, `expected` and `pin`) in its report. It stops
+before any case or build if the binary reports another identity.
+
+**First runs (#94), 2026-10-21, at `03f1bfd` plus this change [executed].**
+
+- **Engine bytes.** Before the runs, the engine trees were recomputed read-only
+  with `fileTreeDigest` and `ENGINE_FILES` from `tools/baselines/archive.mjs`.
+  Both match the manifest: `chromium` `f003730a…` (303 files) and
+  `chromium-headless-shell` `d8c653b0…` (287 files).
+- **Identity.** All three harnesses recorded `Google Chrome for Testing
+  148.0.7778.96` with `matchesExpected: true` against the alpha1 pin.
+- **Semantic oracle.** 148 of 154 tests passed. The 6 `browser.*` cases failed,
+  and `failedCount` is 6. Each of those cases aborts with `FATAL
+  zygote_host_impl_linux.cc:128 No usable sandbox!`.
+- **Rsbuild qualification.** The run stops at its first browser launch
+  (`chromiumSandbox: true`) with the same abort.
+- **Next qualification.** It launches with `--no-sandbox`, so it runs on the
+  archived engine. The production lanes passed. The Turbopack semantic-dev
+  matrix failed in two runs, each time with "unobserved condition" browser
+  timeouts on different rows: 2 of 80, then 10 of 80. A control run with the
+  workstation's Google Chrome 145.0.7632.116 passed that matrix 80 of 80. It
+  then failed the readiness assertion of the performance report
+  (`nextReadyObservedAt`). Other jobs loaded the workstation during these
+  runs, with a load average from 7 to 20 on 16 threads. These runs do not show
+  whether the matrix failures come from the engine or from the load.
+  **[unresolved]**
+
+**Cause of the sandbox abort.** The cause is the same as F2 in the
+[CI repair record](../../docs/research/core-evolution-ci-repair.md). Ubuntu
+24.04 sets `kernel.apparmor_restrict_unprivileged_userns = 1`. Only binaries
+with an AppArmor profile that grants `userns` can create the browser sandbox.
+Google Chrome has such a profile for `/opt/google/chrome/chrome`; the store
+path has none. The store is read-only, so its `chrome_sandbox` SUID helper is
+not installed.
+
+**Remaining work.** It is not done in this repository, because it needs host
+access or a change in launch policy:
+
+- Grant `userns` to the store's engine path with a host AppArmor profile, of
+  the same form as Chrome's. This keeps the harness launch flags and the
+  sandbox unchanged.
+- Rerun the Next qualification on an otherwise idle host, to settle the
+  Turbopack matrix result.
 
 ## Executable baseline and agentic-optimizations reuse
 
@@ -524,8 +593,10 @@ altered history, and through a seeded omission and perturbation fuzzer:
 - **Coverage:** every node outside the samples, and every normalized sample
   path, at least once per applicable mutation, plus a random sample.
 - **Invariant:** a failing run never becomes `pass`. A passing run stays `pass`
-  only for a provable no-op: a field the gate never reads, with identical budget
-  results.
+  only for a verdict- and budget-invariant mutation of an informational field:
+  the verdict and every budget result are identical, compared field by field.
+  The gate does read some informational fields: `label` for duplicate-run
+  detection, and `load.before`, which it copies into its report.
 
 The trust boundary is unchanged: complete, well-formed values produced by the
 harness are trusted.
@@ -549,3 +620,57 @@ node tools/baselines/budgets.mjs gate --rev <evaluated revision> \
   - the exact predecessor, by path and SHA-256;
   - a new comparable baseline run, because reused result files are rejected;
   - a justified relaxation entry for every loosened or removed budget.
+
+**Committed-record check.** `node tools/baselines/validate-records.mjs` runs in
+the CI `static` job. It needs the full Git history, but no store and no network.
+It reuses the existing commands:
+
+| Check                  | What it proves                                                                                                                                        |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `manifest`             | `archive.mjs verify --committed` passes                                                                                                               |
+| `workloads`            | `workloads.mjs digest` reports every frozen workload as `frozen`                                                                                      |
+| `ce-corpus derivation` | `workloads/ce-corpus.v1.json` equals the candidates of the pinned accounting and policy less its recorded exclusions, with matching inputs and totals |
+| `budgets`              | every `budgets.vN.json` re-freezes byte for byte from its policy and baseline runs with the current derivation                                        |
+| `frozen`               | every file here except this README that is published in the base is byte-identical at `HEAD` and in the working tree                                  |
+
+- **Intended coupling.** The `budgets` check binds the current derivation to
+  every committed policy version on purpose. A derivation change must keep each
+  committed `budgets.vN.json` reproducible, as the version 3 change did.
+- **Evidence is not recomputed.** Committed results, summaries and gate reports
+  are evidence. The `frozen` rule protects their bytes, and they are not
+  re-derived with today's scripts.
+- **Base.** The base of the `frozen` rule is the merge base of `HEAD` and
+  `origin/main`, or `HEAD`'s first parent when `HEAD` is already on
+  `origin/main`. On a push to `main`, CI passes the tip before the push
+  (`--base`), because a rebase merge can push several commits at once.
+- **Unpublished files.** Files absent from the base are not constrained by
+  `frozen`: they may change until they merge. Their other checks still apply.
+  Removing or renaming a published file fails.
+
+`--mutations` commits one edit per class to a temporary clone, with the same
+base, and requires the clone's validator to fail that class. The classes are:
+
+- a manifest digest and the source tree;
+- a frozen workload, also with its digest re-bound;
+- a synthetic workload seed;
+- result samples, a summary and a gate report;
+- a budget limit;
+- a frozen file edited, left uncommitted or removed.
+
+An unmutated clone must pass. The run then applies the `frozen` rule to
+temporary repositories with real Git histories:
+
+- direct branches;
+- a pull-request merge ref and a merge commit;
+- squash and rebase;
+- a multi-commit push to `main`;
+- detached `HEAD`;
+- a file added then edited before its merge (accepted), or after it (rejected).
+
+Two checks stay local-only, because they need the archived store:
+
+- the store digests: `archive.mjs verify --store <copy> --replay`;
+- the CE-00.2 corpus exclusions, which only the Alpha 1 compiler decides:
+  `derive-ce-corpus.mjs --closure <store>/closure`, then `git diff`.
+
+The measurements themselves cannot be re-observed.
