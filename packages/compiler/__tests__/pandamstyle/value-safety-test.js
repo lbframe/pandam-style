@@ -535,7 +535,9 @@ describe('the S1 call sites', () => {
         else if (entry.name.endsWith('.js')) {
           const text = fs.readFileSync(file, 'utf8');
           const count = (
-            text.match(/(?:unsafeValueClass|inspectAuthorText)\(/g) ?? []
+            text.match(
+              /(?:unsafeValueClass|inspectAuthorText|authorTextInspector)\(/g,
+            ) ?? []
           ).length;
           if (count > 0) out.push([path.relative(SRC, file), count]);
         }
@@ -549,11 +551,12 @@ describe('the S1 call sites', () => {
     expect(callers()).toEqual([
       // propertyDomains literals; a refused consumer literal's reason.
       ['design-system/policy/domains.js', 2],
-      // The two definitions, their documentation comment and the one call
-      // of inspectAuthorText by unsafeValueClass.
-      ['design-system/policy/value-safety.js', 4],
-      // Token and theme values (inspectAuthorText, whose tokens the numeric
-      // facts reuse); condition definitions.
+      // The three definitions, their documentation comment, the call of
+      // inspectAuthorText by unsafeValueClass and its two calls by the
+      // memoising inspector.
+      ['design-system/policy/value-safety.js', 7],
+      // The registry's inspector (token, theme and condition texts, kept
+      // across a session's rebuilds) and flattenTokens' default.
       ['design-system/registry/index.js', 2],
       // Condition-block keys of style objects (consumers, recipes).
       ['engine/lowering/styles.js', 1],
@@ -684,6 +687,145 @@ describe('S1 tokenizes every author text exactly once', () => {
     for (const text of ['inline-grid', '0.35', '0.65']) {
       expect([text, countIn(texts, text)]).toEqual([text, 1]);
     }
+  });
+
+  // CE-02.2 performance: a session rebuilds its design system on every
+  // definition edit; the texts an edit did not change are not tokenized
+  // again, and a changed text never reuses a stale verdict or fact.
+  const withSpacing = (definition, name, value) => ({
+    ...definition,
+    tokens: {
+      ...definition.tokens,
+      spacing: {
+        ...definition.tokens.spacing,
+        [name]: { ...definition.tokens.spacing[name], value },
+      },
+    },
+  });
+
+  test('rebuilds tokenize only the texts an edit changed', () => {
+    const before = {
+      systemId: 'ce022-rebuild',
+      conditions: { hover: ':hover:not(.s1-rebuild)' },
+      tokens: {
+        colors: { a: { value: 'rgb(4 5 6 / 0.5)', visibility: 'public' } },
+        spacing: {
+          a: { value: 'calc(1rem + 5px)', visibility: 'public' },
+          b: { value: '7px', visibility: 'public' },
+        },
+      },
+      themes: { dark: { tokens: { colors: { a: { value: 'rgb(6 5 4)' } } } } },
+    };
+    const after = withSpacing(before, 'b', '9px');
+    const texts = [
+      ':hover:not(.s1-rebuild)',
+      'rgb(4 5 6 / 0.5)',
+      'calc(1rem + 5px)',
+      'rgb(6 5 4)',
+    ];
+    const holder = {};
+    const build = (definition) =>
+      tokenizations(() =>
+        compiler.buildDesignSystem(definition, {}, { authorTexts: holder }),
+      );
+    const first = build(before);
+    expect(first.result).not.toBeInstanceOf(Error);
+    for (const text of [...texts, '7px']) {
+      expect([text, countIn(first.texts, text)]).toEqual([text, 1]);
+    }
+    const second = build(after);
+    expect(second.result).not.toBeInstanceOf(Error);
+    for (const text of texts) {
+      expect([text, countIn(second.texts, text)]).toEqual([text, 0]);
+    }
+    expect(countIn(second.texts, '9px')).toBe(1);
+    // The memo keeps one build's texts: `7px` left it and is read again.
+    const third = build(before);
+    expect(countIn(third.texts, '7px')).toBe(1);
+    expect(countIn(third.texts, '9px')).toBe(0);
+    // Without a holder, every build reads its texts.
+    const alone = tokenizations(() => compiler.buildDesignSystem(before));
+    for (const text of [...texts, '7px']) {
+      expect([text, countIn(alone.texts, text)]).toEqual([text, 1]);
+    }
+  });
+
+  test('a rebuild keeps the facts of an unchanged token, never of a changed one', () => {
+    const before = {
+      systemId: 'ce022-facts-rebuild',
+      tokens: {
+        spacing: {
+          a: { value: '4px', visibility: 'public' },
+          b: { value: '6px', visibility: 'public' },
+        },
+      },
+    };
+    const holder = {};
+    const build = (definition) =>
+      compiler.buildDesignSystem(definition, {}, { authorTexts: holder });
+    const first = build(before);
+    const a = compiler.numericFactsOf(first.registry, 'spacing.a');
+    const b = compiler.numericFactsOf(first.registry, 'spacing.b');
+    const second = build(withSpacing(before, 'b', '-6px'));
+    expect(compiler.numericFactsOf(second.registry, 'spacing.a')).toBe(a);
+    expect(compiler.numericFactsOf(second.registry, 'spacing.b')).not.toBe(b);
+    expect(compiler.numericFactsOf(second.registry, 'spacing.b')).toEqual([
+      { theme: null, facts: [{ value: -6, unit: 'px' }] },
+    ]);
+    expect(compiler.numericFactsOf(first.registry, 'spacing.b')).toEqual([
+      { theme: null, facts: [{ value: 6, unit: 'px' }] },
+    ]);
+    // The use-site verdict follows the new value, never a kept one.
+    const paddingOf = (ds) => {
+      try {
+        compiler.compileStyles({
+          registry: ds.registry,
+          varsByToken: ds.varsByToken,
+          namespaces: { n: { paddingTop: compiler.token('spacing.b') } },
+          role: 'consumer',
+        });
+        return [];
+      } catch (error) {
+        return error.diagnostics.map((d) => d.context?.reason);
+      }
+    };
+    const third = build(before);
+    expect(paddingOf(first)).toEqual([]);
+    expect(paddingOf(second)).toEqual(['token-value-out-of-domain']);
+    expect(paddingOf(third)).toEqual([]);
+    expect(paddingOf(build(withSpacing(before, 'b', '-6px')))).toEqual([
+      'token-value-out-of-domain',
+    ]);
+  });
+
+  test('the memo keeps kinds, numbers and texts apart', () => {
+    const inspect = compiler.authorTextInspector({});
+    expect(inspect(1e7, 'value').unsafe).toMatchObject({
+      reason: 'non-finite',
+    });
+    expect(inspect('10000000', 'value').unsafe).toBe(null);
+    expect(inspect(0.5, 'value').unsafe).toBe(null);
+    expect(inspect('0.5', 'value')).toBe(inspect(0.5, 'value'));
+    expect(inspect(':hover', 'condition').unsafe).toBe(null);
+    expect(inspect(':hover', 'value').unsafe).toMatchObject({
+      reason: 'token-kind',
+    });
+    expect(inspect(':hover', 'condition').unsafe).toBe(null);
+  });
+
+  test('a Project Service token edit tokenizes only the edited text', () => {
+    const h = openProject('valid');
+    const original = h.reloadDefinition();
+    const apply = (definition) =>
+      tokenizations(() =>
+        h.session.applyChanges({ definition, mutation: undefined }),
+      ).texts;
+    const first = apply(original);
+    expect(countIn(first, '16px')).toBe(1);
+    const edited = apply(withSpacing(original, 'xl', '40px'));
+    expect(countIn(edited, '40px')).toBe(1);
+    expect(countIn(edited, '16px')).toBe(0);
+    expect(countIn(edited, '32px')).toBe(0);
   });
 
   test('a raw condition-block key: once per design system', () => {

@@ -85,6 +85,7 @@ export {
 export { unitsOfType } from '../../packages/compiler/src/targets/units.js';
 export {
   unsafeValueClass,
+  authorTextInspector,
   APPROVED_FUNCTIONS,
 } from '../../packages/compiler/src/design-system/policy/value-safety.js';
 // Engine tables the descriptor parity tests compare against (CE-02.3 owns

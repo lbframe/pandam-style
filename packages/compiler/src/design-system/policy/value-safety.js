@@ -165,6 +165,42 @@ export function inspectAuthorText(input, kind = 'value') {
   return { text, tokens, unsafe: verdict(input, text, tokens, errors, kind) };
 }
 
+/**
+ * S1 through a memo of results by kind and text, for a definition rebuilt
+ * again and again (a Project Service session rebuilds its design system on
+ * every definition edit). `holder` is the caller's `{ texts }`: the inspector
+ * returns the previous build's result for a text it already inspected, so an
+ * unchanged text is not tokenized again, and records in a new map only the
+ * texts this build inspects, so a text that changed (or disappeared) leaves
+ * the memo, which stays the size of one definition. A result is a pure
+ * function of its key; its tokens are shared and never mutated. Without a
+ * holder, the memo still inspects each distinct text of one build once.
+ */
+export function authorTextInspector(holder = null) {
+  const previous = holder?.texts ?? null;
+  // Keyed by the input itself, one map per kind: a Map keeps a number and
+  // its text apart (`1e7` and `'10000000'` differ in S1).
+  const texts = { value: new Map(), condition: new Map() };
+  if (holder != null) holder.texts = texts;
+  return (input, kind = 'value') => {
+    if (typeof input !== 'string' && typeof input !== 'number') {
+      return inspectAuthorText(input, kind);
+    }
+    const current = texts[kind];
+    let inspected = current.get(input);
+    if (inspected === undefined) {
+      inspected = previous?.[kind].get(input) ?? inspectAuthorText(input, kind);
+      current.set(input, inspected);
+      // A safe number's text is safe with the same tokens; the registry
+      // stores token values as text and finds them under it.
+      if (typeof input === 'number' && inspected.unsafe == null) {
+        current.set(inspected.text, inspected);
+      }
+    }
+    return inspected;
+  };
+}
+
 /** Why an author text is unsafe, or null (see the module comment). */
 export function unsafeValueClass(input, kind = 'value') {
   return inspectAuthorText(input, kind).unsafe;

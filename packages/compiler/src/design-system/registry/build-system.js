@@ -33,12 +33,13 @@ import { count, phase as perfPhase } from '../../observability/metrics';
 /**
  * `context.targets` is the project's target resolution record (CE-01.1). When
  * present, the snapshot records it and the target facts of the design
- * system's own emitted rules.
+ * system's own emitted rules. `context.authorTexts` is a holder a session
+ * keeps across rebuilds; see buildRegistry.
  */
 export function buildDesignSystem(definition, options = {}, context = {}) {
   count('design_system_builds');
   const registry = perfPhase('ds_build_registry_ms', () =>
-    buildRegistry(definition),
+    buildRegistry(definition, { authorTexts: context.authorTexts ?? null }),
   );
   if (registry.diagnostics.some((d) => d.severity === 'error')) {
     throw new PmsError(registry.diagnostics);

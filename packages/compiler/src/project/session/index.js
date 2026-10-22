@@ -394,6 +394,9 @@ export function createProjectSession(config) {
     designSystemSource: null,
     designDeclarationsFile: null,
     designDeclarationsSource: null,
+    // S1 results and numeric facts of the definition's token texts, reused
+    // by the next rebuild for the texts an edit did not change (CE-02.2).
+    authorTexts: { texts: null, facts: null, entries: null },
     generatedModulePath: null,
     overlay: new Map(),
     // Source text explicitly supplied by a host is scoped to this Project
@@ -674,7 +677,7 @@ export function createProjectSession(config) {
       buildDesignSystem(
         cfg.definition,
         { ...cfg.engineOptions },
-        { targets: targetResolution.record },
+        { targets: targetResolution.record, authorTexts: state.authorTexts },
       ),
     );
     state.targetResolution = targetResolution;

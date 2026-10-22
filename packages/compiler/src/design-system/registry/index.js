@@ -24,7 +24,7 @@ import { createHash } from 'crypto';
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 import { validateRecipeDefinition } from '../recipes/validate';
 import { recordNumericFacts } from '../policy/numeric-facts';
-import { inspectAuthorText, unsafeValueClass } from '../policy/value-safety';
+import { authorTextInspector } from '../policy/value-safety';
 
 const lexicalCompare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -74,7 +74,7 @@ function flattenTokens(
   diagnostics,
   source,
   theme = null,
-  tokensByText = null,
+  inspect = authorTextInspector(),
 ) {
   for (const key of Object.keys(node)) {
     if (key === '') {
@@ -99,12 +99,8 @@ function flattenTokens(
     ) {
       const tokenId = `${category}.${path}`;
       // S1 tokenizes the value once; its numeric facts reuse the tokens.
-      const inspected =
-        entry.value == null ? null : inspectAuthorText(entry.value, 'value');
-      const unsafe = inspected?.unsafe ?? null;
-      if (inspected != null && unsafe == null) {
-        tokensByText?.set(inspected.text, inspected.tokens);
-      }
+      const unsafe =
+        entry.value == null ? null : inspect(entry.value, 'value').unsafe;
       if (unsafe != null) {
         diagnostics.push(
           valueSafetyDiagnostic(
@@ -146,7 +142,7 @@ function flattenTokens(
         diagnostics,
         source,
         theme,
-        tokensByText,
+        inspect,
       );
     } else {
       diagnostics.push(
@@ -186,7 +182,13 @@ function assertSystemId(definition) {
   ]);
 }
 
-export function buildRegistry(definition) {
+/**
+ * `options.authorTexts` is a holder the caller keeps across builds of one
+ * definition (a session): S1 results and numeric facts of the token texts
+ * that did not change are reused (policy/value-safety.js
+ * `authorTextInspector`, policy/numeric-facts.js `recordNumericFacts`).
+ */
+export function buildRegistry(definition, options = {}) {
   assertSystemId(definition);
   const diagnostics = [];
   const {
@@ -197,8 +199,10 @@ export function buildRegistry(definition) {
     recipes = {},
   } = definition;
   const tokensOut = {};
-  // The tokens S1 produced for each safe token text (base and themes).
-  const tokensByText = new Map();
+  // S1 for the token, theme and condition texts; the numeric facts reuse
+  // its tokens.
+  const authorTexts = options.authorTexts ?? null;
+  const inspect = authorTextInspector(authorTexts);
 
   for (const category of Object.keys(tokens)) {
     flattenTokens(
@@ -209,7 +213,7 @@ export function buildRegistry(definition) {
       diagnostics,
       definition.__source ?? 'design-system',
       null,
-      tokensByText,
+      inspect,
     );
   }
 
@@ -354,7 +358,7 @@ export function buildRegistry(definition) {
         diagnostics,
         themeSource(themeName),
         themeName,
-        tokensByText,
+        inspect,
       );
     }
     themeOverrides[themeName] = flat;
@@ -530,7 +534,7 @@ export function buildRegistry(definition) {
         : def.trimStart().startsWith('@')
           ? 'at-rule'
           : 'selector';
-    const unsafe = unsafeValueClass(def, 'condition');
+    const unsafe = inspect(def, 'condition').unsafe;
     if (unsafe != null) {
       diagnostics.push(
         valueSafetyDiagnostic(
@@ -635,7 +639,8 @@ export function buildRegistry(definition) {
     diagnostics,
     registryDigest: registryDigest(payload),
   };
-  // CE-02.2: the numeric facts of token values, derived once per registry.
-  recordNumericFacts(registry, tokensByText);
+  // CE-02.2: the numeric facts of token values, derived from the S1 tokens on
+  // a token's first use.
+  recordNumericFacts(registry, inspect, authorTexts);
   return registry;
 }
