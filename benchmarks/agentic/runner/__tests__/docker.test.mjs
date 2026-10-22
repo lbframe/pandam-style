@@ -15,11 +15,22 @@
 // Opt-in (images are built, containers started): PMS_RUNNER_DOCKER_TESTS=1
 // `yarn bench:agentic:runner:docker-test`. Needs Docker 28 or later (isolated
 // gateway mode) and the pinned node base image.
+//
+// Concurrent runs share one Docker daemon (CI jobs on the self-hosted
+// runner). With the containerd image store, `docker build -t <tag>` deletes
+// the image the tag pointed to, and every rebuild yields a new image id, so a
+// fixed tag lets another run delete the images this run uses by id. Every
+// image tag and Docker name the suite creates is therefore unique to the run,
+// the run removes only its own tags (never forced, never a prune), and each
+// assertion on leftovers is scoped to the run's own resources. Concurrency
+// check (separate checkouts or one):
+//   for i in 1 2 3; do (sleep $((i * 30 - 30)); \
+//     yarn bench:agentic:runner:docker-test) & done; wait
 
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import test from 'node:test';
+import test, { after } from 'node:test';
 import {
   MODELS,
   claudeInit,
@@ -52,17 +63,42 @@ import { REPO_ROOT, readJson } from '../src/util.mjs';
 const ENABLED = process.env.PMS_RUNNER_DOCKER_TESTS === '1';
 const DISCOVERY = 'discovery-positive-card-vocabulary';
 
+const RUN_ID = `${process.pid}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+
+/** Tags of one run's fixture images (`runId` names the run). */
+const tagsOf = (runId) => ({
+  harness: `pms-agentic-test-harness:${runId}`,
+  agent: `pms-agentic-test-agent:${runId}`,
+});
+
+function buildFixtureImages(tags) {
+  const harness = buildHarnessImage({ tag: tags.harness });
+  const agent = buildFixtureAgentImage({
+    tag: tags.agent,
+    harnessTag: tags.harness,
+  });
+  return { agent, proxy: harness, grader: harness, baseDigest: null };
+}
+
+/**
+ * Untags a run's own images; Docker deletes an image when its last tag goes
+ * and refuses while a container uses it (no force, no prune).
+ */
+function removeTags(tags) {
+  const r = docker(['image', 'rm', tags.agent, tags.harness]);
+  if (r.status !== 0)
+    process.stderr.write(`image cleanup: ${r.stderr.trim()}\n`);
+}
+
 let images = null;
 function fixtureImages() {
-  if (images) return images;
-  const harness = buildHarnessImage({ tag: 'pms-agentic-test-harness:local' });
-  const agent = buildFixtureAgentImage({
-    tag: 'pms-agentic-test-agent:local',
-    harnessTag: 'pms-agentic-test-harness:local',
-  });
-  images = { agent, proxy: harness, grader: harness, baseDigest: null };
+  images ??= buildFixtureImages(tagsOf(RUN_ID));
   return images;
 }
+
+after(() => {
+  if (images) removeTags(tagsOf(RUN_ID));
+});
 
 function dockerConfig(over = {}) {
   return fixtureConfig({
@@ -137,7 +173,7 @@ test(
     // Docker churn between the self-test and preflight (a new bridge and a
     // container's veth, then their removal) keeps the binding: only stable
     // routable host addresses are bound (no timing assumption).
-    const churn = `pms-st-churn-${Date.now().toString(36)}`;
+    const churn = `pms-st-churn-${RUN_ID}`;
     try {
       assert.equal(
         docker(['network', 'create', '--label', 'pms-agentic=selftest', churn])
@@ -187,6 +223,27 @@ test(
   },
 );
 
+const exists = (r) => ({
+  container: docker(['container', 'inspect', r.container]).status === 0,
+  proxy: docker(['container', 'inspect', r.proxy]).status === 0,
+  network: docker(['network', 'inspect', r.network]).status === 0,
+});
+
+/** Records the Docker resources of every attempt `ex` starts. */
+function recordResources(ex) {
+  const resources = [];
+  const start = ex.start.bind(ex);
+  ex.start = (args) =>
+    start({
+      ...args,
+      onResources: (r) => {
+        resources.push(r);
+        args.onResources(r);
+      },
+    });
+  return resources;
+}
+
 async function dockerAttempt({
   model,
   steps,
@@ -208,6 +265,7 @@ async function dockerAttempt({
     fixtureScenario: scenario,
     auditIntervalMs: 2000,
   });
+  const resources = recordResources(executor);
   const root = tmpDir('docker-runs');
   const out = await runMatrix({
     config,
@@ -250,14 +308,14 @@ async function dockerAttempt({
         },
   });
   assertDocumentsValid(out.matrixDir);
-  return { out, record: recordsOf(out.matrixDir)[0] };
+  return { out, record: recordsOf(out.matrixDir)[0], resources };
 }
 
 test(
   'B6 + B7 Codex in the agent container: -C /workspace, cwd /workspace, graded in the grader container',
   { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
   async () => {
-    const { out, record } = await dockerAttempt({
+    const { out, record, resources } = await dockerAttempt({
       model: MODELS.sol,
       // Alive across several channel-audit samples (at 1 s, then every
       // 2 s), whatever the start-up latency of `docker exec` and the sidecar.
@@ -305,16 +363,14 @@ test(
     assert.ok(record.integrity.channelAudit.samples >= 1);
     assert.equal(record.integrity.channelAudit.cliNonDumpable, true);
     assert.equal(record.integrity.channelAudit.foreignStreamHolders, 0);
-    // Nothing left behind: containers, networks, working copies.
-    assert.equal(
-      docker([
-        'ps',
-        '-aq',
-        '--filter',
-        'label=pms-agentic=agent',
-      ]).stdout.trim(),
-      '',
-    );
+    // Nothing left behind: containers, networks, working copies. Scoped to
+    // this attempt: a concurrent run's containers carry the same labels.
+    assert.equal(resources.length, 1);
+    assert.deepEqual(exists(resources[0]), {
+      container: false,
+      proxy: false,
+      network: false,
+    });
     assert.equal(fs.existsSync(path.join(out.matrixDir, '.work')), false);
   },
 );
@@ -378,7 +434,6 @@ function startFailureExecutor({
       return { status: 1, stdout: '', stderr: 'injected removal failure' };
     return docker(args, opts);
   };
-  const resources = [];
   const ex = new DockerExecutor({
     images: { agent: config.images.agent, harness: config.images.proxy },
     limits: limits ?? config.container,
@@ -387,23 +442,8 @@ function startFailureExecutor({
     fixtureScenario: scenario,
     run,
   });
-  const start = ex.start.bind(ex);
-  ex.start = (args) =>
-    start({
-      ...args,
-      onResources: (r) => {
-        resources.push(r);
-        args.onResources(r);
-      },
-    });
-  return { ex, resources, config };
+  return { ex, resources: recordResources(ex), config };
 }
-
-const exists = (r) => ({
-  container: docker(['container', 'inspect', r.container]).status === 0,
-  proxy: docker(['container', 'inspect', r.proxy]).status === 0,
-  network: docker(['network', 'inspect', r.network]).status === 0,
-});
 
 async function runStartFailure(opts) {
   const { ex, resources, config } = startFailureExecutor(opts);
@@ -519,7 +559,6 @@ test(
         down = true;
       return r;
     };
-    const resources = [];
     const ex = new DockerExecutor({
       images: { agent: config.images.agent, harness: config.images.proxy },
       limits: { ...config.container, cpus: -1 },
@@ -528,15 +567,7 @@ test(
       fixtureScenario: scenario,
       run,
     });
-    const start = ex.start.bind(ex);
-    ex.start = (args) =>
-      start({
-        ...args,
-        onResources: (r) => {
-          resources.push(r);
-          args.onResources(r);
-        },
-      });
+    const resources = recordResources(ex);
     const root = tmpDir('b4druns');
     const stateDir = path.join(root, '.state');
     try {
@@ -672,5 +703,38 @@ test(
         label,
       );
     }
+  },
+);
+
+test(
+  "a concurrent run's image build leaves this run's images: tags are unique per run",
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  () => {
+    const own = fixtureImages();
+    const peerTags = tagsOf(`${RUN_ID}-peer`);
+    assert.notDeepEqual(peerTags, tagsOf(RUN_ID));
+    let peer = null;
+    try {
+      // Another run's suite builds its fixture images on the same daemon.
+      peer = buildFixtureImages(peerTags);
+      for (const id of new Set([own.agent, own.proxy])) {
+        const r = docker([
+          'run',
+          '--rm',
+          '--network',
+          'none',
+          id,
+          '/opt/node/bin/node',
+          '-e',
+          '',
+        ]);
+        assert.equal(r.status, 0, `${id}: ${r.stderr}`);
+      }
+    } finally {
+      if (peer) removeTags(peerTags);
+    }
+    // The peer's cleanup removed only the peer's tags.
+    for (const id of new Set([own.agent, own.proxy]))
+      assert.equal(docker(['image', 'inspect', id]).status, 0, id);
   },
 );
