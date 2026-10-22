@@ -426,6 +426,8 @@ export async function createAgentBinding({
         view,
         viewLimits,
         registry,
+        // Echoed only by a receipt, and only once it passed the format.
+        requestId,
         hooks: entry.requires.binding === 'session' ? hooks : null,
         beforeStart,
         budget: { remaining: maxResponseBytes - viewLimits.frameMax },

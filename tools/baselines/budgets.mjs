@@ -111,6 +111,30 @@ function statisticOverrides(policy, metrics) {
   return overrides;
 }
 
+// The policy's per-budget memory floors (thresholdRule.memoryFloor): a floor
+// replacing memory.floor in the factor of one named absolute memory budget
+// (median or min). Validated here; a floor that matches no absolute memory
+// budget is refused by deriveBudgets. A policy without the field uses
+// memory.floor everywhere.
+function memoryFloorOverrides(policy) {
+  const rule = policy.thresholdRule.memoryFloor;
+  const overrides = new Map();
+  if (rule == null) return overrides;
+  for (const o of rule.overrides ?? []) {
+    if (
+      !(typeof o.floor === 'number' && Number.isFinite(o.floor) && o.floor > 1)
+    )
+      throw new Error(
+        `${o.workload} ${o.metric}: memory floor must be a finite number above 1, not ${o.floor}`,
+      );
+    const key = `${o.workload}\0${o.metric}`;
+    if (overrides.has(key))
+      throw new Error(`${o.workload} ${o.metric}: memory floor given twice`);
+    overrides.set(key, o.floor);
+  }
+  return overrides;
+}
+
 // Statistic problems of a budgets file, checked by the gate whatever its
 // origin: an unknown statistic, or `min` outside absolute peak-RSS budgets.
 export function statisticProblems(budgets) {
@@ -143,6 +167,8 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
   const metrics = metricsFor(samples);
   const statistics = statisticOverrides(policy, metrics);
   const used = new Set();
+  const floors = memoryFloorOverrides(policy);
+  const floorsUsed = new Set();
   const budgets = [];
   const workloads = [...new Set(samples.map((s) => s.workload))].sort();
   for (const workload of workloads)
@@ -174,6 +200,9 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
           medianCi95: [stats.medianCi95.lower, stats.medianCi95.upper],
         };
         const memory = policy.thresholdRule.memory;
+        const floor = floors.get(key) ?? memory.floor;
+        // An override equal to memory.floor derives exactly like none.
+        const floorField = floor !== memory.floor ? { floor } : {};
         const cv = coefficientOfVariation(values);
         if (statistics.get(key) === 'min') {
           // Absolute by declaration. The factor follows the memory rule on
@@ -194,14 +223,16 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
           entry.baseline.cv = cv;
           entry.baseline.minimaCv = minimaCv;
           const factor = roundUp(
-            Math.max(memory.floor, 1 + memory.cvMultiplier * minimaCv),
+            Math.max(floor, 1 + memory.cvMultiplier * minimaCv),
             memory.roundUpTo,
           );
+          if (floors.has(key)) floorsUsed.add(key);
           entry.limit = {
             mode: 'absolute',
             statistic: 'min',
             maxMin: Math.floor(min * factor),
             factor,
+            ...floorField,
           };
         } else if (
           metric.class === 'memory' &&
@@ -211,13 +242,15 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
           entry.baseline.informational = false;
           entry.baseline.cv = cv;
           const factor = roundUp(
-            Math.max(memory.floor, 1 + memory.cvMultiplier * cv),
+            Math.max(floor, 1 + memory.cvMultiplier * cv),
             memory.roundUpTo,
           );
+          if (floors.has(key)) floorsUsed.add(key);
           entry.limit = {
             mode: 'absolute',
             maxMedian: Math.floor(stats.median * factor),
             factor,
+            ...floorField,
           };
         } else {
           const rule = policy.thresholdRule.pairedRatio;
@@ -299,6 +332,11 @@ export function deriveBudgets(policy, raws, resultRefs, options = {}) {
     if (!used.has(key))
       throw new Error(
         `statistic override for ${key.replace('\0', ' ')} matches no derived budget`,
+      );
+  for (const key of floors.keys())
+    if (!floorsUsed.has(key))
+      throw new Error(
+        `memory floor override for ${key.replace('\0', ' ')} matches no absolute memory budget`,
       );
   const environments = raws.map((r) => r.environment);
   return {

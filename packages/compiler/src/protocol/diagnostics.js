@@ -148,6 +148,9 @@ export const Codes = {
   INVALID_PROPERTY_DOMAIN: 'PMS_INVALID_PROPERTY_DOMAIN',
   // AG-03.1: design-system `meta` the compiler refuses (rules `metadata.*`).
   INVALID_METADATA: 'PMS_INVALID_METADATA',
+  // AG-01.2: an audit document was not written, because its directory or file
+  // is not the one the session pinned, or the write failed.
+  UNSAFE_AUDIT_PATH: 'PMS_UNSAFE_AUDIT_PATH',
 };
 
 /** Stable single-line rendering of a diagnostic (used by the build report). */

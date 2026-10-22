@@ -37,6 +37,7 @@ export const RECORD_LISTS = Object.freeze([
   'affected',
   'bootstrap',
   'operations',
+  'audit-entries',
 ]);
 
 export const VIEWS = Object.freeze(['compact', 'detail']);
@@ -128,6 +129,7 @@ export const RECORD_ADDRESS = oneOf(
   }),
   obj({ kind: constant('affected'), index: int(0) }),
   obj({ kind: constant('bootstrap'), index: int(0) }),
+  obj({ kind: constant('audit-entry'), index: int(0) }),
 );
 
 export const SEVERITIES = Object.freeze(['error', 'warning', 'info']);
@@ -209,4 +211,115 @@ export const V1_DOCUMENT = obj({
     fullFallback: bool,
     reason: nullable(str(BOUNDS.reason)),
   }),
+});
+
+// ------------------------------------------------------- AG-01.2 audit ----
+
+export const AUDIT_STAGES = Object.freeze([
+  'none',
+  'closure-partial',
+  'closure',
+  'analysed',
+]);
+
+/** The closed limitations of an audit (AG-01.2 §3.3), in this order. */
+export const AUDIT_LIMITATIONS = Object.freeze([
+  'validation-failed',
+  'design-system-unavailable',
+  'scan-failed',
+  'closure-not-computed',
+  'closure-incomplete',
+  'analysis-not-run',
+  'files-not-analysed',
+  'failed-files-without-rules',
+]);
+
+export const AUDIT_ARTIFACT_STATUSES = Object.freeze([
+  'fresh',
+  'stale',
+  'missing',
+  'unreadable',
+]);
+
+export const AUDIT_ARTIFACT_REASONS = Object.freeze([
+  'revision-invalid',
+  'size-differs',
+  'content-differs',
+  'not-regular-file',
+  'directory-not-directory',
+  'read-failed',
+  'anchoring-unavailable',
+]);
+
+const SHA256 = Object.freeze({ type: 'string', format: 'sha256' });
+
+/** The document `audit.materialize` would write now, by size and digest. */
+export const CANONICAL_AUDIT = nullable(
+  obj({
+    documentKind: constant('pandamstyle-coverage-report'),
+    schemaVersion: constant(1),
+    generationId: nullable(int(1)),
+    bytes: int(0),
+    sha256: SHA256,
+  }),
+);
+
+/** `coverageSummary()` over the known entries. */
+const COVERAGE_SUMMARY = obj({
+  entries: int(0),
+  pages: int(0),
+  designSystem: int(0),
+  failed: int(0),
+  withDiagnostics: int(0),
+  usedDesignSystem: int(0),
+  usedPmsHelpers: int(0),
+  ruleTotal: int(0),
+  relayChainEntries: int(0),
+  maxRelayChain: int(0),
+});
+
+export const AUDIT_OUTPUT = obj({
+  kind: constant('pandamstyle-agent-audit'),
+  version: constant(1),
+  validation: obj({ ok: bool }),
+  coverage: obj({
+    stage: enumOf(AUDIT_STAGES),
+    completeness: enumOf(['complete', 'partial', 'unknown']),
+    coveredFiles: nullable(int(0)),
+    knownEntries: int(0),
+    unknownEntries: int(0),
+    summary: COVERAGE_SUMMARY,
+  }),
+  limitations: arr(enumOf(AUDIT_LIMITATIONS), AUDIT_LIMITATIONS.length),
+  canonical: CANONICAL_AUDIT,
+});
+
+export const AUDIT_ARTIFACT = obj({
+  location: enumOf(['generation', 'audit-directory']),
+  path: str(BOUNDS.auditPath),
+  status: enumOf(AUDIT_ARTIFACT_STATUSES),
+  reason: nullable(enumOf(AUDIT_ARTIFACT_REASONS)),
+  bytes: nullable(int(0)),
+  sha256: nullable(SHA256),
+});
+
+/**
+ * The receipt of `audit.materialize` (AG-01.2 §3.5): evidence, never
+ * authority. No operation accepts one.
+ */
+export const AUDIT_RECEIPT = obj({
+  receiptKind: constant('pandamstyle-audit-receipt'),
+  receiptVersion: constant(1),
+  operation: constant('audit.materialize'),
+  requestId: nullable({ type: 'string', format: 'request-id' }),
+  revision: REVISION_OUTPUT,
+  designSystem: DESIGN_SYSTEM_OUTPUT,
+  generationId: nullable(int(1)),
+  location: constant('audit-directory'),
+  path: str(BOUNDS.auditPath),
+  documentKind: constant('pandamstyle-coverage-report'),
+  schemaVersion: constant(1),
+  bytes: int(0),
+  sha256: SHA256,
+  entryCount: int(0),
 });
