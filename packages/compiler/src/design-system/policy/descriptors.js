@@ -209,8 +209,8 @@ const sides = (prefix, suffix = '') =>
 const PADDING = "<'padding-top'>";
 const MARGIN = "<'margin-top'>";
 const INSET = "<'top'>";
-const LENGTH_PERCENTAGE_0 = '<length-percentage [0,∞]>';
-const RADIUS = '<length-percentage [0,∞]>{1,2}';
+const LENGTH_PERCENTAGE_0 = '<length-percentage [0,\u221E]>';
+const RADIUS = '<length-percentage [0,\u221E]>{1,2}';
 
 const ROWS = [
   // Colors (Alpha 1: token category `colors`).
@@ -459,7 +459,7 @@ const ROWS = [
   ],
   [
     'lineHeight',
-    `normal | <number [0,∞]> | ${LENGTH_PERCENTAGE_0}`,
+    `normal | <number [0,\u221E]> | ${LENGTH_PERCENTAGE_0}`,
     'text-basic',
     {
       def: { tokens: ['lineHeights'] },
@@ -497,10 +497,10 @@ const ROWS = [
   ],
 
   // Motion.
-  DURATION('transitionDuration', '<time [0s,∞]>#'),
+  DURATION('transitionDuration', '<time [0s,\u221E]>#'),
   DURATION('transitionDelay', '<time>#'),
   EASING('transitionTimingFunction'),
-  DURATION('animationDuration', '[ auto | <time [0s,∞]> ]#'),
+  DURATION('animationDuration', '[ auto | <time [0s,\u221E]> ]#'),
   DURATION('animationDelay', '<time>#'),
   EASING('animationTimingFunction'),
 
@@ -698,9 +698,12 @@ const ROWS = [
     ['spin', 'pulse'],
     ['none'],
   ),
-  SET('animationIterationCount', 'infinite | <number [0,∞]>', 'animations', [
-    'infinite',
-  ]),
+  SET(
+    'animationIterationCount',
+    'infinite | <number [0,\u221E]>',
+    'animations',
+    ['infinite'],
+  ),
   SET(
     'alignSelf',
     'auto | normal | stretch | <baseline-position> | <overflow-position>? <self-position>',
@@ -742,8 +745,8 @@ const ROWS = [
     Infinity,
     shorthand(['flex-grow', 'flex-shrink', 'flex-basis']),
   ),
-  RANGE('flexGrow', '<number [0,∞]>', 'flex', 0, Infinity),
-  RANGE('flexShrink', '<number [0,∞]>', 'flex', 0, Infinity),
+  RANGE('flexGrow', '<number [0,\u221E]>', 'flex', 0, Infinity),
+  RANGE('flexShrink', '<number [0,\u221E]>', 'flex', 0, Infinity),
 
   // Composite forms, refused (Alpha 1 `COMPOSITE_FORMS`).
   COMPOSITE('background', '<bg-layer>#? , <final-bg-layer>', 'backgrounds', [
