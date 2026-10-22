@@ -25,15 +25,18 @@
 // assertion on leftovers is scoped to the run's own resources. The runner
 // also enumerates daemon-wide state (the self-test lists every network, then
 // inspects them), so the suite holds a daemon-wide lock for all of its Docker
-// work (docker-lock.mjs): concurrent suites queue, bounded by LOCK_WAIT_MS.
+// work (docker-lock.mjs): concurrent suites queue, bounded by LOCK_WAIT_MS,
+// and a suite that loses the lock stops its Docker work and fails.
 // Concurrency check (separate checkouts or one):
 //   for i in 1 2 3; do (sleep $((i * 30 - 30)); \
 //     yarn bench:agentic:runner:docker-test) & done; wait
 
 import assert from 'node:assert/strict';
+import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import test, { after, before } from 'node:test';
+import test, { after, before, beforeEach } from 'node:test';
+import { setTimeout as delay } from 'node:timers/promises';
 import {
   MODELS,
   claudeInit,
@@ -52,7 +55,11 @@ import {
   writeScenario,
   assertDocumentsValid,
 } from './helpers.mjs';
-import { acquireDockerLock, releaseDockerLock } from './docker-lock.mjs';
+import {
+  acquireDockerLock,
+  assertDockerLockHeld,
+  releaseDockerLock,
+} from './docker-lock.mjs';
 import { DockerExecutor, containerEvaluator, docker } from '../src/docker.mjs';
 import {
   IMAGE_PATH,
@@ -108,24 +115,32 @@ function buildFixtureImages(
   }
 }
 
-let images = null;
-function fixtureImages() {
-  images ??= buildFixtureImages(tagsOf(RUN_ID));
-  return images;
-}
-
 let lock = null;
 before(async () => {
   if (ENABLED) lock = await acquireDockerLock({ owner: RUN_ID });
 });
 
+// No Docker work without the lock: each test and the image build start only
+// while this run still holds it.
+beforeEach(() => {
+  if (lock) assertDockerLockHeld(lock);
+});
+
 after(() => {
+  // The run's own tags only: removed whether or not the lock is still held.
   removeTags([...ownTags]);
   if (lock && !releaseDockerLock(lock))
-    process.stderr.write(
-      'docker lock: expired before release; another suite may have run concurrently\n',
+    throw new Error(
+      `lost the docker lock ${lock.name} before release: another suite may have run concurrently`,
     );
 });
+
+let images = null;
+function fixtureImages() {
+  if (!images && lock) assertDockerLockHeld(lock);
+  images ??= buildFixtureImages(tagsOf(RUN_ID));
+  return images;
+}
 
 function dockerConfig(over = {}) {
   return fixtureConfig({
@@ -788,57 +803,170 @@ test(
   },
 );
 
+const LOCK_MODULE = new URL('./docker-lock.mjs', import.meta.url).href;
+
+/** A separate holder process of lock `name`; resolves once it holds it. */
+function spawnHolder(name, owner, { detached = false } = {}) {
+  const child = spawn(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      `import { acquireDockerLock } from ${JSON.stringify(LOCK_MODULE)};
+const l = await acquireDockerLock({ owner: ${JSON.stringify(owner)}, name: ${JSON.stringify(name)}, pollMs: 200 });
+console.log(JSON.stringify({ id: l.id, cli: l.child.pid }));
+setInterval(() => {}, 1000);`,
+    ],
+    { stdio: ['ignore', 'pipe', 'inherit'], detached },
+  );
+  return new Promise((resolve, reject) => {
+    let out = '';
+    child.stdout.on('data', (b) => {
+      out += b;
+      if (out.includes('\n')) resolve({ child, ...JSON.parse(out) });
+    });
+    child.on('exit', (code) => reject(new Error(`holder exited ${code}`)));
+  });
+}
+
+const lockName = (suffix) => `pms-agentic-docker-test-lock-${RUN_ID}-${suffix}`;
+
 test(
-  'the daemon-wide lock: exclusive, bounded wait, expires after a lost holder, released by id',
+  'the daemon-wide lock: a live holder blocked in synchronous work keeps it (no lease to outlive)',
   { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
   async () => {
-    // Its own lock name: the suite lock is held by this run.
-    const name = `pms-agentic-docker-test-lock-${RUN_ID}`;
-    const holders = [];
+    const name = lockName('live');
+    const a = await acquireDockerLock({ owner: 'a', name });
     try {
-      const a = await acquireDockerLock({ owner: 'a', name, holdSeconds: 60 });
-      holders.push(a);
-      await assert.rejects(
-        acquireDockerLock({ owner: 'b', name, waitMs: 1500, pollMs: 200 }),
-        /still held by a until /,
+      // This process is blocked (as in a long `docker build`): it renews
+      // nothing while another suite tries for longer than the old lease.
+      const b = spawnSync(
+        process.execPath,
+        [
+          '--input-type=module',
+          '-e',
+          `import { acquireDockerLock } from ${JSON.stringify(LOCK_MODULE)};
+try { await acquireDockerLock({ owner: 'b', name: ${JSON.stringify(name)}, waitMs: 8000, pollMs: 200 }); console.log('ACQUIRED'); }
+catch (e) { console.log(e.message); }`,
+        ],
+        { encoding: 'utf8' },
       );
+      assert.match(b.stdout, /still held by a after 8000 ms/, b.stderr);
+      assertDockerLockHeld(a);
+    } finally {
       assert.equal(releaseDockerLock(a), true);
-      const b = await acquireDockerLock({
+    }
+    assert.notEqual(docker(['container', 'inspect', name]).status, 0);
+  },
+);
+
+test(
+  'the daemon-wide lock: an abandoned holder is reclaimed in bounded time, then racing acquirers take turns',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    // SIGKILL of the holder alone (its docker client sees the pipe close) and
+    // of its whole process group (the client dies with it).
+    for (const group of [false, true]) {
+      const name = lockName(group ? 'group' : 'holder');
+      const holder = await spawnHolder(name, 'killed', { detached: group });
+      const locks = [];
+      try {
+        assert.equal(
+          docker([
+            'container',
+            'inspect',
+            '-f',
+            '{{.State.Running}}',
+            holder.id,
+          ]).stdout.trim(),
+          'true',
+        );
+        process.kill(group ? -holder.child.pid : holder.child.pid, 'SIGKILL');
+        const killedAt = Date.now();
+        const order = [];
+        let reclaimedMs = null;
+        const compete = async (owner) => {
+          const l = await acquireDockerLock({
+            owner,
+            name,
+            waitMs: 60000,
+            pollMs: 200,
+          });
+          locks.push(l);
+          reclaimedMs ??= Date.now() - killedAt;
+          order.push(`acquire ${owner}`);
+          assertDockerLockHeld(l);
+          assert.equal(
+            docker([
+              'container',
+              'inspect',
+              '-f',
+              '{{.Id}}',
+              name,
+            ]).stdout.trim(),
+            l.id,
+          );
+          await delay(500);
+          order.push(`release ${owner}`);
+          assert.equal(releaseDockerLock(l), true);
+        };
+        const results = await Promise.allSettled([compete('b'), compete('c')]);
+        for (const r of results) if (r.status === 'rejected') throw r.reason;
+        assert.deepEqual(
+          order.map((o) => o.split(' ')[0]),
+          ['acquire', 'release', 'acquire', 'release'],
+        );
+        assert.ok(reclaimedMs < 60000, `reclaimed after ${reclaimedMs} ms`);
+        assert.notEqual(
+          docker(['container', 'inspect', holder.id]).status,
+          0,
+          'the abandoned lock container is gone',
+        );
+      } finally {
+        try {
+          process.kill(group ? -holder.child.pid : holder.child.pid, 'SIGKILL');
+        } catch {
+          // Already gone.
+        }
+        for (const l of locks) releaseDockerLock(l);
+      }
+    }
+  },
+);
+
+test(
+  'the daemon-wide lock: a holder that lost it stops with a clear error and cannot release another holder',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const name = lockName('lost');
+    const a = await acquireDockerLock({ owner: 'a', name });
+    let b = null;
+    try {
+      assertDockerLockHeld(a);
+      // Lost under a live holder (removed by someone else).
+      docker(['rm', '-f', a.id]);
+      assert.throws(() => assertDockerLockHeld(a), /lost the docker lock/);
+      b = await acquireDockerLock({
         owner: 'b',
         name,
-        holdSeconds: 2,
-        waitMs: 5000,
-        pollMs: 200,
-      });
-      holders.push(b);
-      // b is lost (never released, as after SIGKILL): the daemon frees the
-      // lock when its hold ends.
-      const c = await acquireDockerLock({
-        owner: 'c',
-        name,
-        holdSeconds: 60,
         waitMs: 30000,
         pollMs: 200,
       });
-      holders.push(c);
-      // b's late release cannot remove c's lock.
-      assert.equal(releaseDockerLock(b), false);
-      assert.equal(
-        docker(['container', 'inspect', '-f', '{{.Id}}', name]).stdout.trim(),
-        c.id,
-      );
+      assert.throws(() => assertDockerLockHeld(a), /lost the docker lock/);
+      assert.equal(releaseDockerLock(a), false);
+      assertDockerLockHeld(b);
       assert.equal(
         docker([
           'container',
           'inspect',
           '-f',
           '{{.HostConfig.NetworkMode}}',
-          c.id,
+          b.id,
         ]).stdout.trim(),
         'none',
       );
     } finally {
-      for (const h of holders) releaseDockerLock(h);
+      if (b) assert.equal(releaseDockerLock(b), true);
     }
     assert.notEqual(docker(['container', 'inspect', name]).status, 0);
   },
