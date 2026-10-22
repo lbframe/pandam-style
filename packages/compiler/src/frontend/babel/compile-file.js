@@ -6,7 +6,6 @@
  */
 
 import babel from '@babel/core';
-import babelTraverse from '@babel/traverse';
 import path from 'node:path';
 import presetTypeScript from '@babel/preset-typescript';
 import presetReact from '@babel/preset-react';
@@ -23,28 +22,9 @@ import {
 // Babel presets ship as CommonJS; normalize the interop shape once.
 const tsPreset = presetTypeScript?.default ?? presetTypeScript;
 const reactPreset = presetReact?.default ?? presetReact;
-const traverseCache = (babelTraverse?.default ?? babelTraverse).cache;
 
-/**
- * Runs both Babel passes for one source module.
- *
- * Babel caches the NodePaths of every AST it traverses in one process-wide
- * WeakMap. Entries die with their AST, but the table keeps the capacity of the
- * most nodes created between two garbage collections, which depends on GC
- * timing, and the collector sizes the heap from it (issue #130). Nothing
- * traverses a file's AST after its compile, so the cache starts empty for each
- * file. Paths are a cache: a later traversal of a module-graph AST builds equal
- * ones.
- */
-export function compileFile(...args) {
-  try {
-    return compileFileUncached(...args);
-  } finally {
-    traverseCache.clearPath();
-  }
-}
-
-function compileFileUncached(
+/** Runs both Babel passes for one source module. */
+export function compileFile(
   code,
   filename,
   designSystem,
