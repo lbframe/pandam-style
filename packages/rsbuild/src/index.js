@@ -33,6 +33,86 @@ function canonical(file) {
   }
 }
 
+// CE-01.2 (AC3): the canonical stylesheet must reach the page with the
+// declarations the compiler emitted. Rsbuild's `.css` rule runs
+// `builtin:lightningcss-loader` (and PostCSS when configured), and its CSS
+// minimizer runs Lightning CSS, both with the application's browserslist,
+// which can drop or add prefixes: that would let a host redefine targets.
+//   - The stylesheet gets its own `oneOf` branch, a copy of the rule's main
+//     branch without those loaders, so extraction and CSS loading stay
+//     Rsbuild's.
+//   - A CSS asset that carries it is marked `minimized` before the minimizer
+//     stage, so Lightning CSS does not rewrite it. The asset stays where it
+//     was (frameworks such as TanStack Start link CSS per JS chunk); other
+//     CSS in that asset keeps its loader transforms but is not minified.
+// This holds whatever `output.overrideBrowserslist` says.
+const TARGET_TRANSFORM_LOADER =
+  /(?:^builtin:lightningcss-loader$|[\\/]postcss-loader[\\/])/;
+
+function loaderOf(use) {
+  return typeof use === 'string' ? use : (use?.loader ?? '');
+}
+
+/** A `oneOf` branch for the stylesheet: the main `.css` branch, minus loaders. */
+function excludeFromTargetLoaders(config, cssFile) {
+  for (const rule of config.module?.rules ?? []) {
+    if (
+      rule == null ||
+      !Array.isArray(rule.oneOf) ||
+      !(rule.test instanceof RegExp) ||
+      !rule.test.test('styles.css')
+    )
+      continue;
+    const main = rule.oneOf.find(
+      (branch) =>
+        branch.resourceQuery == null &&
+        branch.with == null &&
+        Array.isArray(branch.use) &&
+        branch.use.some((use) => TARGET_TRANSFORM_LOADER.test(loaderOf(use))),
+    );
+    if (main == null) continue;
+    // Right before the main branch: the `?url`, `?inline`, `?raw` and
+    // `with { type }` branches that precede it keep matching first.
+    rule.oneOf.splice(rule.oneOf.indexOf(main), 0, {
+      ...main,
+      resource: (file) => canonical(file) === cssFile,
+      use: main.use.filter(
+        (use) => !TARGET_TRANSFORM_LOADER.test(loaderOf(use)),
+      ),
+    });
+  }
+}
+
+/** Marks every CSS asset of a chunk holding the stylesheet as minimized. */
+function markStylesheetAssetsMinimized(compilation, cssFile) {
+  for (const chunk of compilation.chunks) {
+    const holds = compilation.chunkGraph
+      .getChunkModules(chunk)
+      .some((module) => {
+        const name =
+          typeof module?.nameForCondition === 'function'
+            ? module.nameForCondition()
+            : module?.resource;
+        return (
+          typeof name === 'string' && canonical(name.split('?')[0]) === cssFile
+        );
+      });
+    if (!holds) continue;
+    for (const file of chunk.files) {
+      if (!file.endsWith('.css') || compilation.getAsset(file) == null)
+        continue;
+      compilation.updateAsset(
+        file,
+        (source) => source,
+        (info) => ({
+          ...info,
+          minimized: true,
+        }),
+      );
+    }
+  }
+}
+
 function inside(root, file) {
   const relative = path.relative(root, file);
   return (
@@ -590,6 +670,7 @@ export function pandamstyle(options = {}) {
         }
       });
       api.modifyRspackConfig(async (config, { rspack, environment }) => {
+        excludeFromTargetLoaders(config, cssFile);
         if (api.context.action === 'dev') {
           // A rejected compilation must not replace the last valid browser
           // bundle with error stubs that can destroy its reload client.
@@ -931,6 +1012,9 @@ export function pandamstyle(options = {}) {
           };
         }),
       );
+      api.processAssets({ stage: 'optimize' }, ({ compilation }) => {
+        markStylesheetAssetsMinimized(compilation, cssFile);
+      });
       api.processAssets({ stage: 'report' }, async ({ compilation, sources }) =>
         enqueue(async () => {
           if (compilationRounds.get(compilation) !== round) {

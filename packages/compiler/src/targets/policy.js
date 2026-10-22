@@ -16,9 +16,11 @@
  *   degrade            the engine ignores the construct; the author accepts
  *                      the degraded result. Reported as degraded, never as
  *                      equivalent.
- *   alternative-value  part of the schema; its CSS emission is deferred to
- *                      CE-01.2 (#45) because it changes CSS bytes and identity.
- *                      Refused until then.
+ *   alternative-value  part of the schema; its CSS emission (ordered
+ *                      system-owned fallbacks) is re-deferred by CE-01.2 to
+ *                      CE-07.3 (#62): declaration level only, never through a
+ *                      custom property, reported as degraded. Refused until
+ *                      then.
  */
 
 import { featureByKey } from './catalog';
@@ -130,8 +132,8 @@ export function normalizeEnhancements(value) {
     if (fallback.kind === 'alternative-value') {
       diagnostics.push(
         policyError(
-          `Fallback "alternative-value" for ${policy.feature} is not emitted yet: its CSS emission is deferred to CE-01.2 (#45). Use "degrade" or keep the feature required.`,
-          { index, feature: policy.feature, fallback, deferredTo: 'CE-01.2' },
+          `Fallback "alternative-value" for ${policy.feature} is not emitted yet: its CSS emission is deferred to CE-07.3 (#62). Use "degrade" or keep the feature required.`,
+          { index, feature: policy.feature, fallback, deferredTo: 'CE-07.3' },
         ),
       );
       return;

@@ -443,6 +443,47 @@ export function featureOutcome(
       worst.caveats = [...worst.caveats, ...outcome.caveats];
     }
   }
+  // A transform-table pair: where the base form is not acceptable, the
+  // emitted variant carries the declaration if its own statements are native
+  // at this floor. The proof is the committed table entry (transforms.js).
+  if (
+    record.transform != null &&
+    (worst.state === 'incompatible' || worst.state === 'unknown')
+  ) {
+    const engineKey = target.dataEngine ?? target.engine;
+    const variantNative = record.bcd.every(({ path }) => {
+      const entry = data.entry(path);
+      return (
+        statementOutcome({
+          path,
+          engine: engineKey,
+          statements: entry?.e?.[engineKey],
+          match: { prefix: record.transform.prefix },
+          range: target,
+          scope: record.scope ?? null,
+          reviews,
+        }).state === 'native'
+      );
+    });
+    if (variantNative) {
+      return {
+        ...base,
+        ...worst,
+        state: 'transformed-with-proof',
+        reason: 'transformation-proven',
+        basis:
+          target.basis === 'derived-from-electron'
+            ? 'derived-from-electron'
+            : 'compat-data',
+        proof: {
+          transform: record.transform.id,
+          kind: record.transform.kind,
+          variant: record.transform.variant,
+          data: { state: worst.state, reason: worst.reason },
+        },
+      };
+    }
+  }
   // Reviewed platform inapplicability turns a non-native answer into an
   // equivalent: "no effect" is what the platform correctly does.
   if (worst.state === 'incompatible' || worst.state === 'unknown') {

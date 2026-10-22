@@ -50,6 +50,7 @@ export {
 export {
   propertyCategory,
   propertyKind,
+  structuralDomain,
   supportedProperties,
 } from '../../packages/compiler/src/design-system/policy/properties.js';
 export {

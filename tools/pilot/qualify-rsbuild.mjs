@@ -19,6 +19,8 @@ import { launcherBrowser, qualifyStart } from './qualify-rsbuild-start.mjs';
 import { qualifyFailures } from './qualify-rsbuild-failures.mjs';
 import { createProjectSession, Codes } from '@pandamstyle/compiler';
 import { createHostBridge } from '@pandamstyle/compiler/host';
+// Staged next to this script by run-rsbuild-qualification.js.
+import { cssIdentityProblems, hostCssIdentity } from './host-css-identity.mjs';
 
 const base = path.dirname(fileURLToPath(import.meta.url));
 const reportPath = process.argv[2] ?? path.join(base, 'rsbuild-report.json');
@@ -84,7 +86,7 @@ export default {
 };`;
 const pageSource = `import React from 'react';
 import { create, token, props, recipes, themes } from './bridge.js';
-const styles = create({ main: { padding: token('spacing.md'), display: 'flex', marginLeft: { base: token('spacing.sm'), wide: token('spacing.lg') } }, preview: { color: token('colors.surface') } });
+const styles = create({ main: { padding: token('spacing.md'), display: 'flex', userSelect: 'none', marginLeft: { base: token('spacing.sm'), wide: token('spacing.lg') } }, preview: { color: token('colors.surface') } });
 export function App() { const [count, setCount] = React.useState(0); return <div {...props(styles.main)}><button id="count" {...props(recipes.button())} onClick={() => setCount(count + 1)}>Count {count}</button><div {...props(themes.dark)}><span id="themed" {...props(styles.preview)}>Theme preview</span></div></div>; }
 `;
 const bridgeSource =
@@ -865,13 +867,75 @@ async function main() {
     for (const name of ['clean', 'repeat', 'changed', 'restored']) {
       if (name === 'changed') await write(root, 'src/App.jsx', changed);
       if (name === 'restored') await write(root, 'src/App.jsx', pageSource);
-      const result = await build(root);
+      // CE-01.2 (AC3): a host browserslist knob on the repeat build; the
+      // canonical digests below must still agree with the clean build.
+      const result = await build(
+        root,
+        name === 'repeat'
+          ? [
+              {
+                name: 'qualification-host-targets-knob',
+                setup(api) {
+                  api.modifyRsbuildConfig((config) => {
+                    config.output = {
+                      ...config.output,
+                      overrideBrowserslist: ['chrome >= 100'],
+                    };
+                  });
+                },
+              },
+            ]
+          : [],
+      );
+      if (name === 'repeat') {
+        report.hostTargetsKnob = {
+          option: 'output.overrideBrowserslist',
+          value: ['chrome >= 100'],
+        };
+      }
       report.plain.production.push({
         name,
         ms: result.ms,
         digest: result.canonical.digest,
         cssDigest: result.canonical.cssDigest,
       });
+      if (name === 'clean' || name === 'repeat') {
+        // CE-01.2 (AC3): the CSS the page loads is declaration-equivalent
+        // to the canonical member (the adapter also writes a dist copy), with
+        // and without the host browserslist knob.
+        const html = await fs.readFile(
+          path.join(root, 'dist/index.html'),
+          'utf8',
+        );
+        const assets = [];
+        for (const [, href] of html.matchAll(/href="\/?([^"]+\.css)"/g)) {
+          assets.push({
+            file: `dist/${href}`,
+            content: await fs.readFile(path.join(root, 'dist', href), 'utf8'),
+          });
+        }
+        const identity = hostCssIdentity({
+          host: 'rsbuild',
+          mode:
+            name === 'clean' ? 'production' : 'production-host-browserslist',
+          canonical: result.canonical.files['styles.css'],
+          assets,
+        });
+        assert.deepEqual(cssIdentityProblems(identity), []);
+        assert.ok(
+          result.canonical.files['styles.css'].includes(
+            '-webkit-user-select:none;user-select:none',
+          ),
+        );
+        assert.ok(
+          assets.some((asset) =>
+            asset.content.includes('-webkit-user-select:none'),
+          ),
+          'the delivered stylesheet lost the -webkit-user-select pair',
+        );
+        if (name === 'clean') report.cssIdentity = identity;
+        else report.hostTargetsKnob.cssIdentity = identity;
+      }
     }
     assert.equal(
       report.plain.production[0].digest,

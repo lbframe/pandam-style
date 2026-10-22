@@ -22,6 +22,7 @@
 
 import crypto from 'crypto';
 
+import { applyTransforms } from './transforms';
 import { featuresOf } from './catalog';
 import { constructKey, extractConstructs } from './extract';
 import { featureOutcome, summarize, worseState } from './outcome';
@@ -189,9 +190,13 @@ function conditionsUsing(context, conditions) {
     .sort(compareStrings);
 }
 
+// A candidate passes where the compiler's own emission of it does: natively,
+// or through a proven transformation of the stage.
 function nativeEverywhere(cssText, resolution) {
-  return featuresOfCss(cssText).every(({ record }) =>
-    profileOutcomes(record, resolution).every((p) => p.state === 'native'),
+  return featuresOfCss(applyTransforms(cssText)).every(({ record }) =>
+    profileOutcomes(record, resolution).every(
+      (p) => p.state === 'native' || p.state === 'transformed-with-proof',
+    ),
   );
 }
 
@@ -226,7 +231,8 @@ function ownerGroupsOf(sources) {
   for (const { owner, css, grammars } of sources) {
     const oKey = ownerKey(owner);
     const gKey = `${owner.role}|${owner.file ?? ''}|${roleOf(owner)}`;
-    for (const entry of featuresOfCss(css, grammars)) {
+    // Claims attach to the CSS the compiler emits: the transformed text.
+    for (const entry of featuresOfCss(applyTransforms(css), grammars)) {
       const key = useKeyOf(entry.record);
       let use = building.get(key);
       if (use == null) {
@@ -269,12 +275,13 @@ function ownerGroupsOf(sources) {
  * A unit's feature uses in the compact form a live unit keeps: parallel
  * arrays of use keys and (shared) records, occurrence and owner counts in one
  * typed array, and the owner role once when the unit has a single one. The
- * owner groups a diagnostic reads come from `groupsSource`: kept for small
- * units, rebuilt from the unit's sources for pages, which the session holds
- * anyway.
+ * owner groups a diagnostic reads are kept for small units (`sourcesOf` is
+ * null) and rebuilt from `sourcesOf()` for pages, whose sources the session
+ * holds anyway. The function itself is kept, not a closure over it: one less
+ * object per live page.
  */
 class UnitSummary {
-  constructor(rich, groupsSource) {
+  constructor(rich, sourcesOf = null) {
     const n = rich.size;
     this.keys = new Array(n);
     this.records = new Array(n);
@@ -302,8 +309,14 @@ class UnitSummary {
     // or per-use role counts.
     this.role = single ? (role ?? null) : null;
     this.roles = single ? null : perUse;
-    this.groupsSource = groupsSource;
+    this.kept = sourcesOf == null ? rich : null;
+    this.sourcesOf = sourcesOf;
     this.groupCache = null;
+  }
+
+  /** The unit's uses with their owner groups. */
+  richUses() {
+    return this.kept ?? ownerGroupsOf(this.sourcesOf());
   }
 
   get size() {
@@ -327,7 +340,7 @@ class UnitSummary {
     if (!this.keys.includes(useKey)) return [];
     let groups = this.groupCache?.get(useKey);
     if (groups === undefined) {
-      groups = this.groupsSource().get(useKey)?.groups ?? [];
+      groups = this.richUses().get(useKey)?.groups ?? [];
       this.groupCache ??= new Map();
       this.groupCache.set(useKey, groups);
     }
@@ -346,7 +359,8 @@ class UnitSummary {
     view.counts = this.counts;
     view.role = this.role;
     view.roles = this.roles;
-    view.groupsSource = () => ownerGroupsOf(sourcesOf());
+    view.kept = null;
+    view.sourcesOf = sourcesOf;
     view.groupCache = null;
     return view;
   }
@@ -375,8 +389,7 @@ export function structureKey(summary) {
 
 /** The unit summary of a list of sources, keeping its owner groups. */
 export function summarizeSources(sources) {
-  const rich = ownerGroupsOf(sources);
-  return new UnitSummary(rich, () => rich);
+  return new UnitSummary(ownerGroupsOf(sources));
 }
 
 /**
@@ -384,9 +397,7 @@ export function summarizeSources(sources) {
  * when a diagnostic needs them instead of being kept.
  */
 export function summarizePage(sourcesOf) {
-  return new UnitSummary(ownerGroupsOf(sourcesOf()), () =>
-    ownerGroupsOf(sourcesOf()),
-  );
+  return new UnitSummary(ownerGroupsOf(sourcesOf()), sourcesOf);
 }
 
 const unitCache = new WeakMap();
@@ -663,6 +674,7 @@ function featureEntry(resolution, use, mapKey, policy, keys) {
         ...(outcome.restriction == null
           ? {}
           : { restriction: outcome.restriction }),
+        ...(outcome.proof == null ? {} : { proof: outcome.proof }),
       })),
     })),
   });
@@ -1106,6 +1118,9 @@ function engineJson(outcome) {
     `,"engine":${stableJson(outcome.engine)}` +
     `,"floor":${stableJson(outcome.floor)}` +
     (outcome.path === undefined ? '' : `,"path":${stableJson(outcome.path)}`) +
+    (outcome.proof === undefined
+      ? ''
+      : `,"proof":${stableJson(outcome.proof)}`) +
     `,"reason":${stableJson(outcome.reason)}` +
     (outcome.restriction === undefined
       ? ''

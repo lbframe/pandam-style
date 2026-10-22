@@ -8,7 +8,7 @@
   "iosQuery": "ios_saf >= 18.2",
   "androidWebViewQuery": "android >= 120",
   "measurement": {
-    "method": "Floor = max over the floor set of the earliest Browserslist release whose outcome is native or equivalent-fallback; features never acceptable on some default engine set no floor (tools/targets/measure-floor.mjs).",
+    "method": "Floor = max over the floor set of the earliest Browserslist release whose outcome is native, transformed-with-proof or equivalent-fallback; features never acceptable on some default engine set no floor (tools/targets/measure-floor.mjs).",
     "variant": "designed",
     "groups": [
       "ce-00.2-corpus",
@@ -179,11 +179,6 @@
           "reason": "platform-scoped"
         },
         {
-          "feature": "property:user-select",
-          "state": "incompatible",
-          "reason": "prefixed-only"
-        },
-        {
           "feature": "value:--xb5a8fl/mark",
           "state": "incompatible",
           "reason": "no-support"
@@ -209,11 +204,6 @@
           "feature": "platform:electron/-webkit-app-region",
           "state": "incompatible",
           "reason": "platform-scoped"
-        },
-        {
-          "feature": "property:user-select",
-          "state": "incompatible",
-          "reason": "prefixed-only"
         },
         {
           "feature": "value:--xb5a8fl/mark",
@@ -247,7 +237,6 @@
     "nonBinding": [
       "combination:selector:::marker+property:font-weight",
       "platform:electron/-webkit-app-region",
-      "property:user-select",
       "value:--xb5a8fl/mark",
       "value:border-color/mark",
       "value:break-after/avoid",

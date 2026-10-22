@@ -19,6 +19,7 @@ import { createRequire, isBuiltin } from 'node:module';
 import { writeSemanticDevPerformance } from './next-semantic-dev-performance.mjs';
 import nextBrowserProfile from './next-browser-profile.js';
 import browserTooling from './browser.js';
+import { cssIdentityProblems, hostCssIdentity } from './host-css-identity.mjs';
 
 const { createNextBrowserProfile } = nextBrowserProfile;
 const { nextBrowserExecutable, qualifyBrowser } = browserTooling;
@@ -38,6 +39,8 @@ async function main() {
     ? path.resolve(process.argv[3])
     : await fs.mkdtemp(path.join(os.tmpdir(), 'pms-next-external-'));
   const env = { ...process.env, NEXT_TELEMETRY_DISABLED: '1', CI: '1' };
+  // The clean build's canonical bytes, compared after the host targets knob.
+  let canonicalBeforeKnob = null;
   delete env.NODE_PATH;
   const report = {
     scope: 'pandamstyle-next-external-qualification',
@@ -262,7 +265,7 @@ export default function Layout({ children }) { return <html {...props(themes.lig
       app,
       'app/shared.jsx',
       `import { create, token, props } from '../.pandamstyle/design.js';
-const styles = create({ panel: { display: 'block', padding: token('spacing.md'), color: token('colors.text') } });
+const styles = create({ panel: { display: 'block', padding: token('spacing.md'), color: token('colors.text'), userSelect: 'none' } });
 export default function Shared() { return <p id="server-style" {...props(styles.panel)}>shared server component</p>; }
 `,
     );
@@ -422,6 +425,17 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
     );
     report.production.push({ case: 'clean', code: built.code, ms: built.ms });
     assert.equal(built.code, 0, built.text);
+    // CE-01.2 (AC3): Next imports styles.css into its CSS pipeline; the
+    // delivered asset must be declaration-equivalent to the canonical member.
+    report.cssIdentity = await deliveredCssIdentity('webpack-production');
+    assert.deepEqual(cssIdentityProblems(report.cssIdentity), []);
+    canonicalBeforeKnob = {
+      css: await fs.readFile(path.join(app, '.pandamstyle/styles.css'), 'utf8'),
+      manifest: await fs.readFile(
+        path.join(app, '.pandamstyle/manifest.json'),
+        'utf8',
+      ),
+    };
     report.events = (
       await fs.readFile(path.join(app, 'host-events.jsonl'), 'utf8')
     )
@@ -553,6 +567,26 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
         browserProfile: report.browserProfile,
       }),
     );
+  }
+
+  /** The delivered CSS assets of the last production build, as a record. */
+  async function deliveredCssIdentity(mode) {
+    const cssDir = path.join(app, '.next/static/css');
+    const assets = [];
+    for (const file of (await fs.readdir(cssDir, { recursive: true }))
+      .filter((name) => name.endsWith('.css'))
+      .sort()) {
+      assets.push({
+        file: `.next/static/css/${file}`,
+        content: await fs.readFile(path.join(cssDir, file), 'utf8'),
+      });
+    }
+    const canonical = await fs.readFile(
+      path.join(app, '.pandamstyle/styles.css'),
+      'utf8',
+    );
+    assert.ok(canonical.includes('-webkit-user-select:none;user-select:none'));
+    return hostCssIdentity({ host: 'next', mode, canonical, assets });
   }
 
   async function qualifyRuntime() {
@@ -803,6 +837,19 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
       await server.stop();
       server = null;
       for (let sample = 0; sample < 2; sample++) {
+        // CE-01.2 (AC3): a host browserslist on the second repeat changes no
+        // canonical byte and no target resolution.
+        const packageFile = path.join(app, 'package.json');
+        const packageBytes = await fs.readFile(packageFile, 'utf8');
+        if (sample === 1) {
+          await fs.writeFile(
+            packageFile,
+            JSON.stringify({
+              ...JSON.parse(packageBytes),
+              browserslist: ['chrome 100'],
+            }),
+          );
+        }
         const repeated = await run(
           app,
           process.execPath,
@@ -816,6 +863,35 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
           code: repeated.code,
         });
         assert.equal(repeated.code, 0, repeated.text);
+        if (sample === 1) {
+          await fs.writeFile(packageFile, packageBytes);
+          assert.equal(
+            await fs.readFile(
+              path.join(app, '.pandamstyle/styles.css'),
+              'utf8',
+            ),
+            canonicalBeforeKnob.css,
+          );
+          assert.equal(
+            await fs.readFile(
+              path.join(app, '.pandamstyle/manifest.json'),
+              'utf8',
+            ),
+            canonicalBeforeKnob.manifest,
+          );
+          report.hostTargetsKnob = {
+            option: 'package.json#browserslist',
+            value: ['chrome 100'],
+            canonicalUnchanged: true,
+            cssIdentity: await deliveredCssIdentity(
+              'webpack-production-host-browserslist',
+            ),
+          };
+          assert.deepEqual(
+            cssIdentityProblems(report.hostTargetsKnob.cssIdentity),
+            [],
+          );
+        }
       }
       const minimumNode = path.join(app, 'node_modules/node22-next/bin/node');
       const nodeVersion = await run(
