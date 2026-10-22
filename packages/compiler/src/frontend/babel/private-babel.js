@@ -25,6 +25,12 @@
  * normally, so nothing is duplicated but the modules that hold state or
  * require ones that do. The files, versions and code are the installed ones:
  * no new dependency, no copy.
+ *
+ * Private or shared is decided by package identity (the owning
+ * `package.json` name, from the real path), never by path spelling. Before
+ * any clear, the instance must be proven not to be the host's; otherwise the
+ * cache is never cleared and the compiler only forgoes the memory bound
+ * (fail closed, #156 review round 1).
  */
 
 import fs from 'node:fs';
@@ -33,26 +39,57 @@ import vm from 'node:vm';
 import { createRequire } from 'node:module';
 
 // Packages a private module may share with the process: no module state.
-const SHARED_PACKAGES = new Set(['@babel/parser', '@babel/types']);
+// Every other `@babel/*` package is loaded privately.
+const DEFAULT_SHARED_PACKAGES = Object.freeze([
+  '@babel/parser',
+  '@babel/types',
+]);
 
-const BABEL_SEGMENT = `${path.sep}node_modules${path.sep}@babel${path.sep}`;
-
-/** Whether `filename` belongs to an `@babel/*` package loaded privately. */
-function isPrivateFile(filename) {
-  const at = filename.lastIndexOf(BABEL_SEGMENT);
-  if (at === -1) return false;
-  const name = filename.slice(at + BABEL_SEGMENT.length).split(path.sep, 1)[0];
-  return !SHARED_PACKAGES.has(`@babel/${name}`);
+/**
+ * The package name owning a directory: the `name` of the nearest
+ * `package.json` that has one, walking up from the canonical (real) path.
+ * Nested `package.json` files that only set `type` are skipped. Decided by
+ * package identity, never by how the path is spelled: vendored, symlinked,
+ * pnpm and workspace layouts place Babel outside `node_modules/@babel/`.
+ */
+function packageNameResolver() {
+  const byDirectory = new Map();
+  const nameOf = (directory) => {
+    if (byDirectory.has(directory)) return byDirectory.get(directory);
+    let name = null;
+    try {
+      const manifest = JSON.parse(
+        fs.readFileSync(path.join(directory, 'package.json'), 'utf8'),
+      );
+      if (typeof manifest?.name === 'string') name = manifest.name;
+    } catch {
+      // No (readable) manifest here: look further up.
+    }
+    if (name == null) {
+      const parent = path.dirname(directory);
+      name = parent === directory ? null : nameOf(parent);
+    }
+    byDirectory.set(directory, name);
+    return name;
+  };
+  return (filename) => nameOf(path.dirname(fs.realpathSync(filename)));
 }
 
 /**
  * A CommonJS `require` whose `@babel/*` modules (except the shared ones) come
  * from a module cache of its own, with Node's resolution and semantics:
  * cycles see the partial `exports`, JSON is parsed, everything else is the
- * process's own module.
+ * process's own module. `owned` collects every `exports` object it created.
  */
-function createPrivateRequire(anchor) {
+function createPrivateRequire(anchor, sharedPackages) {
+  const shared = new Set(sharedPackages);
+  const packageOf = packageNameResolver();
+  const isPrivateFile = (filename) => {
+    const name = packageOf(filename);
+    return name != null && name.startsWith('@babel/') && !shared.has(name);
+  };
   const modules = new Map();
+  const owned = new WeakSet();
   const load = (filename) => {
     const cached = modules.get(filename);
     if (cached != null) return cached.exports;
@@ -76,6 +113,13 @@ function createPrivateRequire(anchor) {
       );
     }
     module.loaded = true;
+    const value = module.exports;
+    if (
+      value !== null &&
+      (typeof value === 'object' || typeof value === 'function')
+    ) {
+      owned.add(value);
+    }
     return module.exports;
   };
   const requireFrom = (from) => {
@@ -92,32 +136,87 @@ function createPrivateRequire(anchor) {
     privateRequire.resolve = real.resolve;
     return privateRequire;
   };
-  return requireFrom(anchor);
+  return { require: requireFrom(anchor), requireFrom, owned };
+}
+
+const interop = (module) => module?.default ?? module;
+
+/**
+ * Whether `traverse` (with its path cache) is provably this loader's own:
+ * created by it, and not the module Node's cache holds for `@babel/traverse`
+ * as resolved from any of `bases`. Reads Node's module cache only, so it
+ * never loads the host's Babel. Anything unproven is `false`.
+ */
+function provenPrivate(traverseModule, owned, bases) {
+  try {
+    const traverse = interop(traverseModule);
+    if (!owned.has(traverseModule) || !owned.has(traverse.cache)) {
+      return { isolated: false, reason: 'traverse not loaded privately' };
+    }
+    for (const base of bases) {
+      const host = createRequire(base);
+      const filename = host.resolve('@babel/traverse');
+      const loaded = host.cache[filename]?.exports;
+      if (
+        loaded != null &&
+        (loaded === traverseModule || interop(loaded) === traverse)
+      ) {
+        return { isolated: false, reason: 'traverse is the host instance' };
+      }
+    }
+    return { isolated: true, reason: null };
+  } catch (error) {
+    return { isolated: false, reason: `unproven: ${error?.message ?? error}` };
+  }
+}
+
+/**
+ * A private Babel resolved from `anchor`: `{ core, traverse,
+ * presetTypeScript, presetReact, isolation, clearPaths }`. `traverse` is the
+ * one `@babel/core` itself resolves, so it owns the cache core fills.
+ * `clearPaths()` drops that cache only when `isolation.isolated`: otherwise
+ * it is a no-op (the compiler works, without the memory bound). Options are
+ * a test seam.
+ */
+export function createPrivateBabel(
+  anchor,
+  { sharedPackages = DEFAULT_SHARED_PACKAGES } = {},
+) {
+  const loader = createPrivateRequire(anchor, sharedPackages);
+  const coreFile = loader.require.resolve('@babel/core');
+  const core = interop(loader.require('@babel/core'));
+  const traverseModule = loader.requireFrom(coreFile)('@babel/traverse');
+  const traverse = interop(traverseModule);
+  const isolation = Object.freeze(
+    provenPrivate(traverseModule, loader.owned, [anchor, coreFile]),
+  );
+  return Object.freeze({
+    core,
+    traverse,
+    presetTypeScript: interop(loader.require('@babel/preset-typescript')),
+    presetReact: interop(loader.require('@babel/preset-react')),
+    // Debug only: never a diagnostic.
+    isolation,
+    clearPaths: isolation.isolated
+      ? () => traverse.cache.clearPath()
+      : () => {},
+  });
 }
 
 let instance = null;
 
-/** `{ core, traverse, presetTypeScript, presetReact }`, loaded once. */
+/** The compiler's private Babel, loaded once. */
 export function privateBabel() {
-  if (instance == null) {
-    // Resolved from this module, exactly as its former static imports were.
-    const privateRequire = createPrivateRequire(import.meta.url);
-    const interop = (module) => module?.default ?? module;
-    instance = Object.freeze({
-      core: interop(privateRequire('@babel/core')),
-      traverse: interop(privateRequire('@babel/traverse')),
-      presetTypeScript: interop(privateRequire('@babel/preset-typescript')),
-      presetReact: interop(privateRequire('@babel/preset-react')),
-    });
-  }
+  // Resolved from this module, exactly as its former static imports were.
+  instance ??= createPrivateBabel(import.meta.url);
   return instance;
 }
 
 /**
- * Drops the private instance's cached NodePaths. Only the compiler holds
- * paths of this instance, and it calls this between files, when it holds
- * none of a finished file's paths.
+ * Drops the private instance's cached NodePaths, when isolation is proven.
+ * Only the compiler holds paths of this instance, and it calls this between
+ * files, when it holds none of a finished file's paths.
  */
 export function clearPrivatePaths() {
-  instance?.traverse.cache.clearPath();
+  instance?.clearPaths();
 }

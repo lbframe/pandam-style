@@ -223,4 +223,7 @@ export {
 } from '../../packages/compiler/src/protocol/envelope.js';
 export { AGENT_SESSION_HOOKS } from '../../packages/compiler/src/api/project.js';
 // #150: the compiler's private Babel instance, for its isolation tests.
-export { privateBabel } from '../../packages/compiler/src/frontend/babel/private-babel.js';
+export {
+  createPrivateBabel,
+  privateBabel,
+} from '../../packages/compiler/src/frontend/babel/private-babel.js';

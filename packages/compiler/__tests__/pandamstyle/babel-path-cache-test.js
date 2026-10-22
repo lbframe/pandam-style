@@ -152,3 +152,189 @@ describe('the compiler Babel instance is private (#150)', () => {
     });
   });
 });
+
+// #156 review round 1: private or shared is decided by package identity, so
+// isolation holds when Babel lives outside a `node_modules/@babel/` path, and
+// nothing is cleared unless the instance is proven not to be the host's.
+describe('private Babel isolation across package layouts (#156)', () => {
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+
+  // The installed packages every fixture copies or links.
+  const installed = path.dirname(
+    path.dirname(path.dirname(require.resolve('@babel/core/package.json'))),
+  );
+  const babelDir = (name) => path.join(installed, '@babel', name);
+  const link = (target, at) => {
+    fs.mkdirSync(path.dirname(at), { recursive: true });
+    fs.symlinkSync(target, at, 'dir');
+  };
+  const copy = (name, to) => fs.cpSync(babelDir(name), to, { recursive: true });
+  const fixtures = [];
+  afterAll(() => {
+    for (const dir of fixtures)
+      fs.rmSync(dir, { recursive: true, force: true });
+  });
+  const fixture = () => {
+    const dir = fs.realpathSync(
+      fs.mkdtempSync(path.join(os.tmpdir(), 'pms156-')),
+    );
+    fixtures.push(dir);
+    return dir;
+  };
+  /** The app every layout shares: presets from the install, a manifest. */
+  const app = (dir, babel) => {
+    const appDir = path.join(dir, 'app');
+    fs.mkdirSync(appDir, { recursive: true });
+    fs.writeFileSync(path.join(appDir, 'package.json'), '{"name":"app"}');
+    for (const [name, target] of Object.entries({
+      core: babel.core,
+      traverse: babel.traverse,
+      'preset-typescript': babelDir('preset-typescript'),
+      'preset-react': babelDir('preset-react'),
+    })) {
+      link(target, path.join(appDir, 'node_modules', '@babel', name));
+    }
+    return path.join(appDir, 'package.json');
+  };
+
+  const LAYOUTS = {
+    // Vendored copies linked into the app: real paths without node_modules.
+    'symlink to vendor': () => {
+      const dir = fixture();
+      const vendor = path.join(dir, 'vendor');
+      copy('core', path.join(vendor, 'core'));
+      copy('traverse', path.join(vendor, 'traverse'));
+      link(
+        path.join(vendor, 'traverse'),
+        path.join(vendor, 'core', 'node_modules', '@babel', 'traverse'),
+      );
+      link(installed, path.join(vendor, 'node_modules'));
+      return app(dir, {
+        core: path.join(vendor, 'core'),
+        traverse: path.join(vendor, 'traverse'),
+      });
+    },
+    // pnpm: one store directory per package version, siblings linked.
+    pnpm: () => {
+      const dir = fixture();
+      const store = path.join(dir, 'node_modules', '.pnpm');
+      const at = (pkg) =>
+        path.join(store, `@babel+${pkg}@7.0.0`, 'node_modules', '@babel', pkg);
+      copy('core', at('core'));
+      copy('traverse', at('traverse'));
+      link(
+        at('traverse'),
+        path.join(
+          store,
+          '@babel+core@7.0.0',
+          'node_modules',
+          '@babel',
+          'traverse',
+        ),
+      );
+      link(installed, path.join(store, 'node_modules'));
+      return app(dir, { core: at('core'), traverse: at('traverse') });
+    },
+    // A workspace: Babel packages are workspace packages, linked by name.
+    'workspace symlink': () => {
+      const dir = fixture();
+      const packages = path.join(dir, 'packages');
+      copy('core', path.join(packages, 'babel-core'));
+      copy('traverse', path.join(packages, 'babel-traverse'));
+      link(
+        path.join(packages, 'babel-traverse'),
+        path.join(packages, 'babel-core', 'node_modules', '@babel', 'traverse'),
+      );
+      link(installed, path.join(packages, 'node_modules'));
+      return app(dir, {
+        core: path.join(packages, 'babel-core'),
+        traverse: path.join(packages, 'babel-traverse'),
+      });
+    },
+  };
+
+  /** A host path held in `traverse`'s cache, and a check that it survives. */
+  function holdHostPath(hostRequire) {
+    const traverse = hostRequire('@babel/traverse').default;
+    const ast = require('@babel/parser').parse('const held = 1;');
+    let held = null;
+    traverse(ast, {
+      VariableDeclarator(p) {
+        held = p;
+      },
+    });
+    const table = traverse.cache.path;
+    return {
+      traverse,
+      untouched: () =>
+        traverse.cache.path === table &&
+        traverse.cache.path.get(held.parent)?.get(held.node) === held,
+    };
+  }
+
+  function compileWith(babel) {
+    return babel.core.transformSync(
+      'const value: number = 2; export const el = <div>{value}</div>;',
+      {
+        filename: '/virtual/page.tsx',
+        babelrc: false,
+        configFile: false,
+        presets: [
+          [babel.presetTypeScript, { allExtensions: true, isTSX: true }],
+          babel.presetReact,
+        ],
+      },
+    ).code;
+  }
+
+  for (const [layout, build] of Object.entries(LAYOUTS)) {
+    test(`${layout}: private, cleared, host cache untouched`, () => {
+      const { createPrivateBabel } = loadCompiler();
+      const anchor = build();
+      const hostRequire = createRequire(anchor);
+      // The layout really places core's traverse outside node_modules/@babel
+      // (except pnpm, which keeps the segment inside its store).
+      const ownTraverseFile = fs.realpathSync(
+        createRequire(hostRequire.resolve('@babel/core')).resolve(
+          '@babel/traverse',
+        ),
+      );
+      expect(
+        ownTraverseFile.startsWith(path.dirname(path.dirname(anchor))),
+      ).toBe(true);
+      const host = holdHostPath(hostRequire);
+
+      const babel = createPrivateBabel(anchor);
+      expect(babel.isolation).toEqual({ isolated: true, reason: null });
+      expect(babel.traverse === host.traverse).toBe(false);
+      expect(compileWith(babel)).toContain('React.createElement("div"');
+      const before = babel.traverse.cache.path;
+      babel.clearPaths();
+      expect(babel.traverse.cache.path === before).toBe(false);
+      expect(host.untouched()).toBe(true);
+    });
+  }
+
+  test('an instance not proven private is never cleared (fail closed)', () => {
+    const { createPrivateBabel } = loadCompiler();
+    const anchor = LAYOUTS['symlink to vendor']();
+    const hostRequire = createRequire(anchor);
+    const host = holdHostPath(hostRequire);
+    // Core and traverse forced shared: the "private" instance is the host's.
+    const babel = createPrivateBabel(anchor, {
+      sharedPackages: [
+        '@babel/parser',
+        '@babel/types',
+        '@babel/core',
+        '@babel/traverse',
+      ],
+    });
+    expect(babel.traverse === host.traverse).toBe(true);
+    expect(babel.isolation.isolated).toBe(false);
+    compileWith(babel);
+    babel.clearPaths();
+    expect(host.untouched()).toBe(true);
+  });
+});
