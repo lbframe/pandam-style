@@ -746,12 +746,14 @@ describe('ce021-unauthorized consumer', () => {
     expect(codes).toEqual([
       [['PMS_FORBIDDEN_VALUE', 'structural-domain']],
       [['PMS_FORBIDDEN_VALUE', 'property-domain']],
-      [['PMS_UNSUPPORTED_PROPERTY', 'supported-properties.unrecognized']],
+      // An object value under a key is read as a condition map, as in Alpha
+      // 1 (CE-00.2 negative CE-NEG-UNKNOWN-SELECTOR-01 records it): the
+      // `propertyDomains` key and the object imitating a token reference
+      // are refused as unknown conditions, which carry no source line
+      // (existing behavior), asserted below.
+      [],
       [['PMS_UNSUPPORTED_PROPERTY', 'supported-properties.unrecognized']],
       [['PMS_TOKEN_NOT_PUBLIC', 'visibility.consumer']],
-      // An object imitating a token reference is read as a condition map of
-      // unknown conditions; that refusal carries no source line (existing
-      // behavior), asserted below.
       [],
       [['PMS_FORBIDDEN_VALUE', 'property-domain']],
     ]);
@@ -761,6 +763,7 @@ describe('ce021-unauthorized consumer', () => {
         .map((d) => [d.context.property, d.context.condition])
         .sort(),
     ).toEqual([
+      ['propertyDomains', 'width'],
       ['width', 'kind'],
       ['width', 'path'],
     ]);
@@ -778,8 +781,6 @@ describe('ce021-unauthorized consumer', () => {
 // The `property-domains` incremental unit.
 
 describe('a propertyDomains edit revalidates exactly the dependent files', () => {
-  const PATTERN_ONLY =
-    "import { patterns } from '../generated/design.pandamstyle';\nexport const g = patterns.stack({ gap: undefined });\n";
   test('create() and pattern-only files recompile; the others keep validity', () => {
     const h = openWith({
       domains: '',
@@ -789,7 +790,6 @@ describe('a propertyDomains edit revalidates exactly the dependent files', () =>
           "import { patterns } from '../generated/design.pandamstyle';\nexport const g = patterns.stack({ align: 'center' });\n",
       },
     });
-    void PATTERN_ONLY;
     let validation = h.session.validate();
     // width: 'auto' is not in the Alpha 1 default.
     expect(
