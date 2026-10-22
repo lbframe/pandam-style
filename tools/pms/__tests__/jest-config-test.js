@@ -232,6 +232,9 @@ describe('the root jest configuration is not a broad ignore', () => {
         'packages/compiler/__tests__/pandamstyle/numeric-domains-test.js',
         'packages/compiler/__tests__/pandamstyle/numeric-token-facts-test.js',
         'packages/compiler/__tests__/pandamstyle/value-grammar-test.js',
+        // CE-02.2 PR B value safety and incremental validity.
+        'packages/compiler/__tests__/pandamstyle/value-safety-test.js',
+        'packages/compiler/__tests__/pandamstyle/ce022-invalidation-test.js',
       ].sort(),
     );
   });

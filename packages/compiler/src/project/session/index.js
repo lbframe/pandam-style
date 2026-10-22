@@ -104,6 +104,7 @@ import {
 } from '../../targets/project';
 import { createTargetAccumulator } from '../../targets/evaluate';
 import { PATTERN_CATALOG } from '../../design-system/patterns/compile';
+import { tokenUseVerdicts } from '../../design-system/policy/numeric-facts';
 import { isTokenRef, tokenRefPath } from '../../design-system/tokens/ref';
 import { generateDesignSystemModule } from '../../artifacts/javascript/design-module';
 import {
@@ -394,6 +395,9 @@ export function createProjectSession(config) {
     designSystemSource: null,
     designDeclarationsFile: null,
     designDeclarationsSource: null,
+    // S1 results and numeric facts of the definition's token texts, reused
+    // by the next rebuild for the texts an edit did not change (CE-02.2).
+    authorTexts: { texts: null, facts: null, entries: null },
     generatedModulePath: null,
     overlay: new Map(),
     // Source text explicitly supplied by a host is scoped to this Project
@@ -548,6 +552,7 @@ export function createProjectSession(config) {
     set(semanticUnits, 'runtime-identity', systemId);
     set(fileInputs, 'runtime-identity', systemId);
 
+    const properties = designSystem.snapshot.properties;
     for (const [tokenId, token] of Object.entries(registry.tokens)) {
       set(semanticUnits, `token:${tokenId}`, {
         token,
@@ -555,11 +560,17 @@ export function createProjectSession(config) {
       });
       // A source transform emits a variable reference and validates category,
       // visibility, and existence. The token's current CSS value is owned by
-      // the design-system stylesheet and does not change that emitted source.
+      // the design-system stylesheet and does not change that emitted source;
+      // since CE-02.2 its numeric value decides each use site's verdict, so
+      // the verdicts are part of the key (never the value itself: an edit
+      // that changes no verdict revalidates nothing). A refusal's
+      // `candidates` (the other tokens' verdicts) need no key: a file with
+      // diagnostics is compiled again at every revision.
       set(fileInputs, `token:${tokenId}`, {
         category: token.category,
         visibility: token.visibility,
         variable: designSystem.varsByToken[tokenId] ?? null,
+        verdicts: tokenUseVerdicts(registry, tokenId, properties),
       });
     }
 
@@ -617,7 +628,6 @@ export function createProjectSession(config) {
     // CE-02.1: the effective property domains every compiled declaration is
     // checked against. One coarse unit (design note D9): a domain edit
     // revalidates every file that compiles declarations, and nothing else.
-    const properties = designSystem.snapshot.properties;
     set(semanticUnits, 'property-domains', properties.digest);
     set(fileInputs, 'property-domains', properties.digest);
 
@@ -674,7 +684,7 @@ export function createProjectSession(config) {
       buildDesignSystem(
         cfg.definition,
         { ...cfg.engineOptions },
-        { targets: targetResolution.record },
+        { targets: targetResolution.record, authorTexts: state.authorTexts },
       ),
     );
     state.targetResolution = targetResolution;

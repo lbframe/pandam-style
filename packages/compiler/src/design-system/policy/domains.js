@@ -38,6 +38,7 @@ import {
 } from './descriptors';
 import { Codes, diagnostic } from '../../protocol/diagnostics';
 import { patternEmissions } from '../patterns/compile';
+import { unsafeValueClass } from './value-safety';
 import {
   CSS_ZERO,
   checkNumericLiteral,
@@ -243,6 +244,22 @@ function approvableValue(descriptor, value) {
   const { standard } = descriptor;
   const property = descriptor.key;
   const shown = JSON.stringify(value);
+  // S1 (CE-02.2 §4.2): an approved literal is emitted as written; a number
+  // as its canonical text. A number's magnitude is the numeric rules' to
+  // name (non-finite, out-of-bounds) below.
+  if (typeof value === 'string' || typeof value === 'number') {
+    const unsafe = unsafeValueClass(value, 'value');
+    if (
+      unsafe != null &&
+      !(typeof value === 'number' && unsafe.reason === 'non-finite')
+    ) {
+      return {
+        rule: 'unsafe-text',
+        message: `${shown} is not safe CSS (${unsafe.reason}${unsafe.function === undefined ? '' : `: ${unsafe.function}`}).`,
+        reason: unsafe.reason,
+      };
+    }
+  }
   // A reviewed standard value, exactly; the CSS zero in both spellings only
   // where the standard domain lists the CSS zero (a numeric row's 0 is a
   // number, never '0').
@@ -504,6 +521,7 @@ export function normalizePropertyDomains(input, tokens = {}) {
               ...(verdict.constraint == null
                 ? {}
                 : { constraint: verdict.constraint }),
+              ...(verdict.reason == null ? {} : { reason: verdict.reason }),
               admitted: [...standard.values],
             });
             ok = false;
@@ -641,8 +659,8 @@ export function admittedValues(domain) {
  * Why a literal is not in a row's effective domain (CE-02.2), computed on the
  * refusal path only: `{ reason, canonical? }`. `canonical` is the in-domain
  * spelling of a value written differently. Reasons: `null-value`,
- * `css-wide-keyword`, `non-finite`, `non-canonical`, `number-not-length`,
- * `precision`, `not-in-domain`.
+ * `css-wide-keyword`, `non-finite`, `unsafe-text`, `non-canonical`,
+ * `number-not-length`, `precision`, `not-in-domain`.
  */
 export function refusalReason(row, value) {
   if (value === null || value === undefined) return { reason: 'null-value' };
@@ -650,6 +668,9 @@ export function refusalReason(row, value) {
   const descriptor = descriptorOf(row.key);
   if (typeof value === 'number' && !Number.isFinite(value)) {
     return { reason: 'non-finite' };
+  }
+  if (typeof value === 'string' && unsafeValueClass(value, 'value') != null) {
+    return { reason: 'unsafe-text' };
   }
   if (typeof value === 'string') {
     const lower = value.trim().toLowerCase();

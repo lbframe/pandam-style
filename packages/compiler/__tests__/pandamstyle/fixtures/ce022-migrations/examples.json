@@ -7,8 +7,14 @@
     "systemId": "ce022-migration",
     "tokens": {
       "spacing": {
-        "sm": { "value": "8px", "visibility": "public" },
-        "neg": { "value": "-4px", "visibility": "public" }
+        "sm": {
+          "value": "8px",
+          "visibility": "public"
+        },
+        "neg": {
+          "value": "-4px",
+          "visibility": "public"
+        }
       }
     }
   },
@@ -18,8 +24,12 @@
       "title": "an opacity off the 0.05 grid",
       "baseline": "alpha1",
       "before": {
-        "page": ["create({ n: { opacity: 0.33 } })"],
-        "expect": { "accepted": true }
+        "page": [
+          "create({ n: { opacity: 0.33 } })"
+        ],
+        "expect": {
+          "accepted": true
+        }
       },
       "ce022": {
         "expect": {
@@ -30,8 +40,19 @@
       },
       "after": {
         "role": "design-system",
-        "propertyDomains": { "opacity": { "values": [0, 0.33, 1] } },
-        "expect": { "accepted": true, "cssEqualsBaseline": true }
+        "propertyDomains": {
+          "opacity": {
+            "values": [
+              0,
+              0.33,
+              1
+            ]
+          }
+        },
+        "expect": {
+          "accepted": true,
+          "cssEqualsBaseline": true
+        }
       }
     },
     {
@@ -39,8 +60,12 @@
       "title": "a fractional flex factor",
       "baseline": "alpha1",
       "before": {
-        "page": ["create({ n: { flexGrow: 1.5 } })"],
-        "expect": { "accepted": true }
+        "page": [
+          "create({ n: { flexGrow: 1.5 } })"
+        ],
+        "expect": {
+          "accepted": true
+        }
       },
       "ce022": {
         "expect": {
@@ -51,8 +76,19 @@
       },
       "after": {
         "role": "design-system",
-        "propertyDomains": { "flexGrow": { "values": [0, 1, 1.5] } },
-        "expect": { "accepted": true, "cssEqualsBaseline": true }
+        "propertyDomains": {
+          "flexGrow": {
+            "values": [
+              0,
+              1,
+              1.5
+            ]
+          }
+        },
+        "expect": {
+          "accepted": true,
+          "cssEqualsBaseline": true
+        }
       }
     },
     {
@@ -60,8 +96,15 @@
       "title": "a flex factor that overflowed to Infinity",
       "baseline": "alpha1",
       "before": {
-        "page": ["create({ n: { flex: 1e308 } })"],
-        "expect": { "accepted": true, "cssContains": ["{flex:Infinity}"] }
+        "page": [
+          "create({ n: { flex: 1e308 } })"
+        ],
+        "expect": {
+          "accepted": true,
+          "cssContains": [
+            "{flex:Infinity}"
+          ]
+        }
       },
       "ce022": {
         "expect": {
@@ -72,11 +115,17 @@
       },
       "after": {
         "role": "page",
-        "page": ["create({ n: { flex: 1 } })"],
+        "page": [
+          "create({ n: { flex: 1 } })"
+        ],
         "expect": {
           "accepted": true,
-          "cssContains": ["{flex:1}"],
-          "cssNotContains": ["Infinity"]
+          "cssContains": [
+            "{flex:1}"
+          ],
+          "cssNotContains": [
+            "Infinity"
+          ]
         }
       }
     },
@@ -85,9 +134,20 @@
       "title": "a CE-02.1 range override",
       "baseline": "ce021",
       "before": {
-        "propertyDomains": { "opacity": { "range": { "min": 0, "max": 1 } } },
-        "page": ["create({ n: { opacity: 0.5 } })"],
-        "expect": { "accepted": true }
+        "propertyDomains": {
+          "opacity": {
+            "range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        },
+        "page": [
+          "create({ n: { opacity: 0.5 } })"
+        ],
+        "expect": {
+          "accepted": true
+        }
       },
       "ce022": {
         "expect": {
@@ -97,8 +157,19 @@
       },
       "after": {
         "role": "design-system",
-        "propertyDomains": { "opacity": { "values": [0, 0.5, 1] } },
-        "expect": { "accepted": true, "cssEqualsBaseline": true }
+        "propertyDomains": {
+          "opacity": {
+            "values": [
+              0,
+              0.5,
+              1
+            ]
+          }
+        },
+        "expect": {
+          "accepted": true,
+          "cssEqualsBaseline": true
+        }
       }
     },
     {
@@ -106,11 +177,18 @@
       "title": "a negative spacing token on a margin",
       "baseline": "alpha1",
       "before": {
-        "page": ["create({ n: { marginTop: token('spacing.neg') } })"],
-        "expect": { "accepted": true }
+        "page": [
+          "create({ n: { marginTop: token('spacing.neg') } })"
+        ],
+        "expect": {
+          "accepted": true
+        }
       },
       "ce022": {
-        "expect": { "accepted": true, "cssEqualsBaseline": true }
+        "expect": {
+          "accepted": true,
+          "cssEqualsBaseline": true
+        }
       }
     },
     {
@@ -118,23 +196,86 @@
       "title": "a negative spacing token on a padding",
       "baseline": "alpha1",
       "before": {
-        "page": ["create({ n: { paddingTop: token('spacing.neg') } })"],
-        "expect": { "accepted": true }
+        "page": [
+          "create({ n: { paddingTop: token('spacing.neg') } })"
+        ],
+        "expect": {
+          "accepted": true
+        }
       },
       "ce022": {
         "expect": {
           "code": "PMS_FORBIDDEN_VALUE",
           "rule": "category-strict",
           "reason": "token-value-out-of-domain",
-          "candidates": ["spacing.sm"]
+          "candidates": [
+            "spacing.sm"
+          ]
         }
       },
       "after": {
         "role": "page",
-        "page": ["create({ n: { paddingTop: token('spacing.sm') } })"],
+        "page": [
+          "create({ n: { paddingTop: token('spacing.sm') } })"
+        ],
         "expect": {
           "accepted": true,
-          "cssDeclarationUsesToken": { "property": "padding-top", "tokenValue": "8px" },
+          "cssDeclarationUsesToken": {
+            "property": "padding-top",
+            "tokenValue": "8px"
+          },
+          "cssDiffersFromBaseline": true
+        }
+      }
+    },
+    {
+      "id": "M6",
+      "title": "a token value with !important",
+      "baseline": "alpha1",
+      "before": {
+        "tokens": {
+          "colors": {
+            "accent": {
+              "value": "red !important",
+              "visibility": "public"
+            }
+          }
+        },
+        "page": [
+          "create({ n: { color: token('colors.accent') } })"
+        ],
+        "expect": {
+          "accepted": true,
+          "cssContains": [
+            ":red !important;"
+          ]
+        }
+      },
+      "ce022": {
+        "expect": {
+          "code": "PMS_FORBIDDEN_VALUE",
+          "rule": "value-safety.important",
+          "reason": "important"
+        }
+      },
+      "after": {
+        "role": "design-system",
+        "tokens": {
+          "colors": {
+            "accent": {
+              "value": "red",
+              "visibility": "public"
+            }
+          }
+        },
+        "expect": {
+          "accepted": true,
+          "cssContains": [
+            ":red;"
+          ],
+          "cssNotContains": [
+            "!important"
+          ],
           "cssDiffersFromBaseline": true
         }
       }
@@ -144,7 +285,13 @@
       "title": "an author length literal",
       "baseline": "ce021",
       "before": {
-        "propertyDomains": { "width": { "values": ["18px"] } },
+        "propertyDomains": {
+          "width": {
+            "values": [
+              "18px"
+            ]
+          }
+        },
         "page": [],
         "expect": {
           "code": "PMS_INVALID_PROPERTY_DOMAIN",
@@ -152,7 +299,13 @@
         }
       },
       "ce022": {
-        "propertyDomains": { "width": { "values": ["18.0px"] } },
+        "propertyDomains": {
+          "width": {
+            "values": [
+              "18.0px"
+            ]
+          }
+        },
         "expect": {
           "code": "PMS_INVALID_PROPERTY_DOMAIN",
           "rule": "property-domains.non-canonical",
@@ -161,9 +314,22 @@
       },
       "after": {
         "role": "design-system",
-        "propertyDomains": { "width": { "values": ["18px"] } },
-        "page": ["create({ n: { width: '18px' } })"],
-        "expect": { "accepted": true, "cssContains": ["{width:18px}"] }
+        "propertyDomains": {
+          "width": {
+            "values": [
+              "18px"
+            ]
+          }
+        },
+        "page": [
+          "create({ n: { width: '18px' } })"
+        ],
+        "expect": {
+          "accepted": true,
+          "cssContains": [
+            "{width:18px}"
+          ]
+        }
       }
     }
   ]

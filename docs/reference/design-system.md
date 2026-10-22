@@ -150,12 +150,36 @@ A refusal is `PMS_FORBIDDEN_VALUE` / `category-strict` with
 not plain numbers (`calc()`, colors, mixed lists) are not checked yet
 (typed category grammar is CE-03).
 
+Every author text that can reach the emitted CSS must be safe CSS (CE-02.2,
+S1): token values, theme override values, condition definitions and
+`propertyDomains` literals. A text is refused when it holds a raw `;`, `{`,
+`}` or `\` (inside strings too), a comment, `<!--`/`-->`, `!` (so no
+`!important`), a `url(...)`, an unbalanced bracket or a tokenizer error, or a
+function outside the approved list. Approved value functions: `rgb`, `rgba`,
+`hsl`, `hsla`, `hwb`, `lab`, `lch`, `oklab`, `oklch`, `color`, `color-mix`,
+`light-dark`, `cubic-bezier`, `steps`, `linear`, `calc`, `min`, `max`,
+`clamp`, `repeat`, `minmax`, `inset`, `translate`, `translateX`,
+`translateY`, `scale`, `rotate`, `grayscale`, `blur`. Approved condition
+functions: `is`, `not`, `where`, `has`, `nth-child`, `nth-last-child`,
+`nth-of-type`, `nth-last-of-type`, `dir`, `lang`, `selector`,
+`scroll-state`. Names compare ASCII case-insensitively; a vendor-prefixed or
+look-alike name is not approved. `var()`, `env()`, `attr()`, `url()` and
+other reference functions are never approved: a token aliases another with
+`ref`, and the compiler owns every custom property. A numeric token value is
+finite with a magnitude of at most 1e6. A refused token or theme value is
+`PMS_FORBIDDEN_VALUE`, a refused condition `PMS_UNKNOWN_CONDITION`, both with
+rule `value-safety.<reason>` in phase `registry`.
+
 ## Conditions
 
 `conditions` maps a finite name to selector or at-rule text. Consumers use the
 name in responsive style maps or state keys. Inspect whether a condition is a
 media query or selector before using it. `base` is the default responsive key;
-other keys must be declared. Unknown names fail compilation.
+other keys must be declared. Unknown names fail compilation. A condition
+definition, and a raw condition-block key (`':hover'`, `'@media …'`,
+`'[…] &'`) written in a style object, must also be safe CSS (S1 above); a raw
+key that is not is refused where it is written
+(`PMS_UNKNOWN_CONDITION` / `value-safety.<reason>`).
 
 ## Themes
 
