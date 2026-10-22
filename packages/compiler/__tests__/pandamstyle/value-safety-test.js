@@ -24,9 +24,9 @@
  *   - the strict CSS reader refuses malformed CSS (stray `}`, unclosed
  *     blocks, unbalanced brackets, trailing text) and keeps strings exactly;
  *   - S2: every emitted rule re-reads, alone and inside the whole stylesheet,
- *     as the same prelude and declarations, one declaration per property,
- *     with the approved value's tokens; before and after the CE-01.2
- *     transform stage.
+ *     as the prelude, properties and value tokens derived independently from
+ *     its source declaration (selector or condition, approved value, token
+ *     definition); before and after the CE-01.2 transform stage.
  */
 
 const fs = require('fs');
@@ -725,12 +725,57 @@ describe('compiler-owned values', () => {
 });
 
 // ---------------------------------------------------------------------------
-// S2: re-read emitted CSS.
+// S2: re-read emitted CSS against independently derived expectations.
 
 const {
   readCss,
   valueForm,
 } = require('../../../../tests/support/css-reread.cjs');
+
+/** The comparable value tokens of a text written by the test. */
+const formOf = (text) =>
+  valueForm(
+    tokenize({ css: String(text) }).filter((t) => t[0] !== 'EOF-token'),
+  );
+
+/**
+ * Every disagreement between emitted rules (`{ key: rule text }`) and the
+ * expected rules (`{ key: [{ prelude, declarations }] }`): each rule read
+ * alone must be exactly its expectation (prelude path, property list, value
+ * tokens), every expected rule must be emitted, and the whole sheet must read
+ * as the rules read alone. Empty when S2 holds.
+ */
+function s2Mismatches(texts, expected) {
+  const mismatches = [];
+  const alone = [];
+  for (const [key, text] of Object.entries(texts)) {
+    let rules;
+    try {
+      rules = readCss(text);
+    } catch (error) {
+      mismatches.push({ key, error: error.message });
+      continue;
+    }
+    alone.push(...rules);
+    if (!Object.hasOwn(expected, key)) {
+      mismatches.push({ key, error: 'an unexpected rule' });
+    } else if (JSON.stringify(rules) !== JSON.stringify(expected[key])) {
+      mismatches.push({ key, got: rules, want: expected[key] });
+    }
+  }
+  for (const key of Object.keys(expected)) {
+    if (!Object.hasOwn(texts, key)) mismatches.push({ key, error: 'missing' });
+  }
+  try {
+    const together = readCss(Object.values(texts).join('\n'));
+    if (JSON.stringify(together) !== JSON.stringify(alone)) {
+      mismatches.push({ error: 'the whole sheet reads differently' });
+    }
+  } catch (error) {
+    mismatches.push({ error: `whole sheet: ${error.message}` });
+  }
+  return mismatches;
+}
 
 describe('the strict CSS reader', () => {
   test.each([
@@ -756,69 +801,77 @@ describe('the strict CSS reader', () => {
   });
 });
 
-function s2(injected, transform) {
-  const texts = Object.values(injected).map((rule) =>
-    transform ? compiler.targets.applyTransforms(rule.ltr) : rule.ltr,
-  );
-  const alone = texts.flatMap((text) => {
-    try {
-      return readCss(text);
-    } catch (error) {
-      throw new Error(`${error.message}: ${text}`);
-    }
-  });
-  const together = readCss(texts.join('\n'));
-  expect(together).toEqual(alone);
-  for (const rule of together) {
-    const names = rule.declarations.map(([name]) => name);
-    expect({
-      prelude: rule.prelude,
-      duplicate: names.length !== new Set(names).size,
-    }).toEqual({ prelude: rule.prelude, duplicate: false });
-  }
-  return together;
-}
+const S2_TOKENS = {
+  colors: { a: { value: 'rgba(0, 0, 0, 0.1)', visibility: 'public' } },
+  fontFamilies: {
+    a: { value: '"Inter", "Fira Code", sans-serif', visibility: 'public' },
+  },
+  shadows: {
+    a: { value: '0 1px 2px rgba(0, 0, 0, 0.1)', visibility: 'public' },
+  },
+  easings: {
+    a: { value: 'cubic-bezier(0.4, 0, 0.2, 1)', visibility: 'public' },
+  },
+  spacing: { a: { value: 'calc(1rem + 2px)', visibility: 'public' } },
+};
+const S2_DARK = { colors: { a: { value: 'light-dark(#fff, #000)' } } };
+const WIDE = '@media (min-width: 40rem)';
+// The engine's preprocess lowers the block-axis logical longhands to their
+// physical side (horizontal writing modes); the inline axis stays logical.
+const BLOCK_AXIS = {
+  'padding-block-start': 'padding-top',
+  'padding-block-end': 'padding-bottom',
+  'margin-block-start': 'margin-top',
+  'margin-block-end': 'margin-bottom',
+  'inset-block-start': 'top',
+  'inset-block-end': 'bottom',
+};
+const RAW_KEY = '[dir=rtl] &';
 
-describe('S2: every emitted rule re-reads as itself', () => {
+describe('S2: every emitted rule re-reads as its source declares', () => {
   const ds = compiler.buildDesignSystem({
     systemId: 'ce022-s2',
-    conditions: {
-      hover: ':hover',
-      wide: '@media (min-width: 40rem)',
-      rtl: '[dir=rtl] &',
-    },
-    tokens: {
-      colors: { a: { value: 'rgba(0, 0, 0, 0.1)', visibility: 'public' } },
-      fontFamilies: {
-        a: { value: '"Inter", "Fira Code", sans-serif', visibility: 'public' },
-      },
-      shadows: {
-        a: { value: '0 1px 2px rgba(0, 0, 0, 0.1)', visibility: 'public' },
-      },
-      easings: {
-        a: { value: 'cubic-bezier(0.4, 0, 0.2, 1)', visibility: 'public' },
-      },
-      spacing: { a: { value: 'calc(1rem + 2px)', visibility: 'public' } },
-    },
-    themes: {
-      dark: { tokens: { colors: { a: { value: 'light-dark(#fff, #000)' } } } },
-    },
+    conditions: { hover: ':hover', wide: WIDE },
+    tokens: S2_TOKENS,
+    themes: { dark: { tokens: S2_DARK } },
   });
   const rows = Object.values(ds.snapshot.properties.descriptors).filter(
     (row) => row.domain != null,
   );
 
-  // Every admitted value of every row, plain, under a named condition, an
-  // at-rule condition and a raw key.
+  // One namespace per (row, value, context): its single class is the rule
+  // whose prelude, property and value tokens follow from that source alone.
+  const CONTEXTS = {
+    base: (key, value) => ({ [key]: value }),
+    hover: (key, value) => ({ [key]: { hover: value } }),
+    wide: (key, value) => ({ [key]: { wide: value } }),
+    raw: (key, value) => ({ [RAW_KEY]: { [key]: value } }),
+  };
+  const preludeOf = (context, cls) =>
+    ({
+      base: [`.${cls}`],
+      hover: [`.${cls}:hover`],
+      // An at-rule condition doubles the class (its specificity step).
+      wide: [WIDE, `.${cls}.${cls}`],
+      raw: [`.${cls}${RAW_KEY}`],
+    })[context];
+
   const namespaces = {};
-  const expected = [];
+  const sources = {};
   for (const row of rows) {
-    row.domain.values.forEach((value, i) => {
-      namespaces[`${row.key}_${i}`] = {
-        [row.key]: { base: value, hover: value, wide: value },
-        '[dir=rtl] &': { [row.key]: value },
-      };
-      expected.push([row.css, value]);
+    const literals = row.domain.values.map((value) => [value, formOf(value)]);
+    const tokens = row.domain.tokens
+      .filter((category) => Object.hasOwn(S2_TOKENS, category))
+      .map((category) => [
+        compiler.token(`${category}.a`),
+        formOf(ds.varsByToken[`${category}.a`]),
+      ]);
+    [...literals, ...tokens].forEach(([value, form], i) => {
+      for (const [context, build] of Object.entries(CONTEXTS)) {
+        const ns = `${row.key}_${i}_${context}`;
+        namespaces[ns] = build(row.key, value);
+        sources[ns] = { row, value, form, context };
+      }
     });
   }
   const out = compiler.compileStyles({
@@ -829,39 +882,150 @@ describe('S2: every emitted rule re-reads as itself', () => {
     allowPrivateTokens: true,
   });
 
+  function expectations(transform) {
+    const expected = {};
+    for (const [ns, { row, value, form, context }] of Object.entries(sources)) {
+      const classes = Object.entries(out.compiled[ns]).filter(
+        ([k]) => k !== '$$css',
+      );
+      expect({ ns, classes: classes.length }).toEqual({ ns, classes: 1 });
+      const cls = classes[0][1];
+      // The CE-02.2 transform table, the committed data the stage applies:
+      // an aliased property gains its prefixed declaration first.
+      const entry = transform
+        ? compiler.targets.transformOfProperty(row.css)
+        : null;
+      const aliased =
+        entry != null &&
+        typeof value === 'string' &&
+        entry.values.includes(value);
+      const property = BLOCK_AXIS[row.css] ?? row.css;
+      expected[cls] = [
+        {
+          prelude: preludeOf(context, cls),
+          declarations: aliased
+            ? [
+                [entry.variant, form],
+                [property, form],
+              ]
+            : [[property, form]],
+        },
+      ];
+    }
+    return expected;
+  }
+  const textsOf = (transform) =>
+    Object.fromEntries(
+      Object.entries(out.injected).map(([cls, rule]) => [
+        cls,
+        transform ? compiler.targets.applyTransforms(rule.ltr) : rule.ltr,
+      ]),
+    );
+
   test.each([
     ['before the transform stage', false],
     ['after the transform stage', true],
   ])('%s', (_, transform) => {
-    const rules = s2(out.injected, transform);
-    expect(rules.length).toBeGreaterThan(expected.length);
-    // Each approved literal appears with its own tokens (the engine may
-    // re-spell a number, `0.5` as `.5`, but never change its value).
-    const seen = new Set(
-      rules.flatMap((rule) =>
-        rule.declarations.map(
-          ([name, value]) => `${name}=${JSON.stringify(value)}`,
-        ),
-      ),
-    );
-    for (const [css, value] of expected) {
-      const form = valueForm(
-        tokenize({ css: String(value) }).filter((t) => t[0] !== 'EOF-token'),
-      );
-      expect({
-        css,
-        value,
-        found: seen.has(`${css}=${JSON.stringify(form)}`),
-      }).toEqual({ css, value, found: true });
-    }
+    const expected = expectations(transform);
+    expect(Object.keys(expected).length).toBeGreaterThan(rows.length * 4);
+    expect(s2Mismatches(textsOf(transform), expected)).toEqual([]);
   });
 
-  test('the design-system token and theme rules re-read as themselves', () => {
-    const rules = s2(ds.injected ?? {}, true);
-    const declared = rules.flatMap((rule) => rule.declarations.map(([n]) => n));
-    expect(declared.filter((n) => n.startsWith('--')).length).toBeGreaterThan(
-      0,
+  test('the transform stage is exercised: an aliased declaration is expected', () => {
+    const expected = expectations(true);
+    expect(
+      Object.values(expected).some(([rule]) => rule.declarations.length === 2),
+    ).toBe(true);
+  });
+
+  // Codex round 1: a mutated selector must fail S2.
+  test.each([
+    ['before', false],
+    ['after', true],
+  ])(
+    'a :hover rule emitted as :focus fails S2 (%s the transform)',
+    (_, transform) => {
+      const texts = textsOf(transform);
+      const mutated = Object.fromEntries(
+        Object.entries(texts).map(([k, text]) => [
+          k,
+          text.replaceAll(':hover', ':focus'),
+        ]),
+      );
+      const hoverRules = Object.values(texts).filter((t) =>
+        t.includes(':hover'),
+      ).length;
+      expect(hoverRules).toBeGreaterThan(100);
+      const mismatches = s2Mismatches(mutated, expectations(transform));
+      expect(mismatches.length).toBe(hoverRules);
+    },
+  );
+
+  // The token and theme rules: the variable of each token, with the value
+  // its definition declares, under the base and theme class.
+  const varOf = (tokenId) =>
+    /^var\((--[^)]+)\)$/.exec(ds.varsByToken[tokenId])[1];
+  const themeClass = (name) =>
+    Object.entries(ds.themes[name])
+      .filter(([k]) => k !== '$$css')[0][1]
+      .split(' ')[0];
+  const flatten = (tree) =>
+    Object.entries(tree).flatMap(([category, entries]) =>
+      Object.entries(entries).map(([name, entry]) => [
+        `${category}.${name}`,
+        entry.value,
+      ]),
     );
+  const themeExpected = () => {
+    const base = themeClass('base');
+    const dark = themeClass('dark');
+    return {
+      [base]: [
+        {
+          prelude: [`:root, .${base}`],
+          declarations: flatten(S2_TOKENS).map(([id, value]) => [
+            varOf(id),
+            formOf(value),
+          ]),
+        },
+      ],
+      [dark]: [
+        {
+          prelude: [`.${dark}, .${dark}:root`],
+          declarations: flatten(S2_DARK).map(([id, value]) => [
+            varOf(id),
+            formOf(value),
+          ]),
+        },
+      ],
+    };
+  };
+  const themeTexts = (transform) =>
+    Object.fromEntries(
+      Object.entries(ds.injected).map(([cls, rule]) => [
+        cls,
+        transform ? compiler.targets.applyTransforms(rule.ltr) : rule.ltr,
+      ]),
+    );
+
+  test.each([
+    ['before', false],
+    ['after', true],
+  ])('the token and theme rules (%s the transform)', (_, transform) => {
+    expect(s2Mismatches(themeTexts(transform), themeExpected())).toEqual([]);
+  });
+
+  // Codex round 1: a token value emitted differently must fail S2.
+  test('a token emitted as `blue` instead of its rgba() value fails S2', () => {
+    const texts = themeTexts(true);
+    const mutated = Object.fromEntries(
+      Object.entries(texts).map(([k, text]) => [
+        k,
+        text.replace('rgba(0, 0, 0, 0.1);', 'blue;'),
+      ]),
+    );
+    expect(mutated).not.toEqual(texts);
+    expect(s2Mismatches(mutated, themeExpected()).length).toBe(1);
   });
 });
 
