@@ -513,6 +513,186 @@ describe('the four legacy ranges under an override', () => {
 });
 
 // ---------------------------------------------------------------------------
+// The CSS zero: one equivalence for acceptance, types, manifest and repair.
+
+describe('the CSS zero', () => {
+  const ZERO_ROWS = admittedRows.filter((d) => d.standard.values.includes('0'));
+  const RANGE_ROWS = admittedRows.filter(
+    (d) => d.standard.range != null && d.standard.range.min <= 0,
+  );
+
+  const typecheck = (declarations, lines) => {
+    const outputRoot = path.join(REPO_ROOT, 'out-pandamstyle');
+    fs.mkdirSync(outputRoot, { recursive: true });
+    const root = fs.mkdtempSync(path.join(outputRoot, 'ce021-zero-'));
+    try {
+      fs.writeFileSync(
+        path.join(root, 'design.pandamstyle.d.ts'),
+        declarations,
+      );
+      const probe = path.join(root, 'probe.ts');
+      fs.writeFileSync(
+        probe,
+        ["import { create } from './design.pandamstyle';", ...lines, ''].join(
+          '\n',
+        ),
+      );
+      const result = spawnSync(
+        path.join(REPO_ROOT, 'node_modules/.bin/tsc'),
+        [
+          '--noEmit',
+          '--strict',
+          '--skipLibCheck',
+          '--target',
+          'ES2022',
+          '--module',
+          'ESNext',
+          '--moduleResolution',
+          'node',
+          probe,
+        ],
+        { cwd: REPO_ROOT, encoding: 'utf8' },
+      );
+      return `${result.stdout}${result.stderr}`;
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  };
+
+  test('the class: every row whose standard domain lists the CSS zero', () => {
+    // 46 rows: margin and padding forms, physical and logical insets, row and
+    // column gaps, border radii, borderWidth, minWidth, textUnderlineOffset.
+    expect(ZERO_ROWS.length).toBe(46);
+    expect(ZERO_ROWS.map((d) => d.key)).toEqual(
+      expect.arrayContaining([
+        'margin',
+        'marginInline',
+        'paddingTop',
+        'insetInlineStart',
+        'top',
+        'rowGap',
+        'columnGap',
+        'borderRadius',
+        'borderStartEndRadius',
+        'borderWidth',
+        'minWidth',
+        'textUnderlineOffset',
+      ]),
+    );
+    expect(RANGE_ROWS.map((d) => d.key).sort()).toEqual([
+      'flex',
+      'flexGrow',
+      'flexShrink',
+      'opacity',
+    ]);
+  });
+
+  test.each([
+    ['numeric 0', 0],
+    ["the string '0'", '0'],
+  ])('an override approving %s admits both spellings everywhere', (_, zero) => {
+    // Restate the standard token categories too, so no pattern conflicts.
+    const overrides = Object.fromEntries(
+      ZERO_ROWS.map((d) => [
+        d.key,
+        {
+          values: [zero],
+          ...(d.standard.tokens.length > 0
+            ? { tokens: [...d.standard.tokens] }
+            : {}),
+        },
+      ]),
+    );
+    const ds = build(overrides);
+    const lines = [];
+    for (const d of ZERO_ROWS) {
+      const row = ds.snapshot.properties.descriptors[d.key];
+      // One stored spelling, in the domain and every projection.
+      expect({ key: d.key, values: row.domain.values }).toEqual({
+        key: d.key,
+        values: ['0'],
+      });
+      expect(
+        ds.snapshot.tooling.manifest.properties.byProperty[d.key].values,
+      ).toEqual(['0']);
+      expect(
+        compiler.repairDomainOf(ds.snapshot, {
+          kind: 'property',
+          property: d.key,
+        }).values,
+      ).toEqual(['0']);
+      // Both consumer spellings are accepted.
+      for (const spelling of [0, '0']) {
+        expect({
+          key: d.key,
+          spelling,
+          out: outcome(ds, d.key, spelling),
+        }).toEqual({
+          key: d.key,
+          spelling,
+          out: null,
+        });
+      }
+      lines.push(
+        `create({ a: { ${d.key}: 0 } });`,
+        `create({ a: { ${d.key}: '0' } });`,
+      );
+    }
+    // And the generated declarations admit exactly both.
+    expect(
+      typecheck(compiler.generateDesignSystemDeclarations(ds.snapshot), lines),
+    ).toBe('');
+  });
+
+  test('without an override, a default listing the zero admits both spellings, typed', () => {
+    const ds = build(undefined);
+    const rows = ZERO_ROWS.filter((d) => d.default.values.includes('0'));
+    expect(rows.length).toBeGreaterThan(0);
+    const lines = [];
+    for (const d of rows) {
+      for (const spelling of [0, '0']) {
+        expect(outcome(ds, d.key, spelling)).toBe(null);
+      }
+      lines.push(
+        `create({ a: { ${d.key}: 0 } });`,
+        `create({ a: { ${d.key}: '0' } });`,
+      );
+    }
+    expect(
+      typecheck(compiler.generateDesignSystemDeclarations(ds.snapshot), lines),
+    ).toBe('');
+  });
+
+  test('a legacy numeric row keeps 0 a number: the string is refused, as in Alpha 1', () => {
+    const ds = build(
+      Object.fromEntries(RANGE_ROWS.map((d) => [d.key, { values: [0, 1] }])),
+    );
+    const lines = [];
+    for (const d of RANGE_ROWS) {
+      expect(ds.snapshot.properties.descriptors[d.key].domain.values).toEqual([
+        0, 1,
+      ]);
+      expect(outcome(ds, d.key, 0)).toBe(null);
+      expect(outcome(ds, d.key, '0')).toEqual([
+        ['PMS_FORBIDDEN_VALUE', 'structural-domain'],
+      ]);
+      lines.push(
+        `create({ a: { ${d.key}: 0 } });`,
+        '// @ts-expect-error the string zero is not a number domain value',
+        `create({ a: { ${d.key}: '0' } });`,
+      );
+    }
+    expect(
+      typecheck(compiler.generateDesignSystemDeclarations(ds.snapshot), lines),
+    ).toBe('');
+    // The string spelling is not an approvable value of a numeric row.
+    expect(refusal({ opacity: { values: ['0'] } }).map((d) => d.rule)).toEqual([
+      'property-domains.outside-standard',
+    ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Fixtures through the Project Service, from real page and recipe source.
 
 const TOKEN = "token('sizes.sm')";
