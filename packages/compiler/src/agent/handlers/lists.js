@@ -19,8 +19,8 @@ function nextReferences(ctx, operation, limit, packed, rev) {
   const references = [];
   if (packed.truncated)
     references.push(continuation(ctx, operation, packed.nextOffset, limit));
-  if (packed.withheld.length > 0)
-    references.push(readReference(ctx.view, rev, packed.withheld[0]));
+  for (const entry of packed.withheld)
+    references.push(readReference(ctx.view, rev, entry));
   return references;
 }
 

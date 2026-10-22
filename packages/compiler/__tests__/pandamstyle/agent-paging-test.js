@@ -539,6 +539,304 @@ describe('AG-01.1 continuations resume their request (R2)', () => {
   });
 });
 
+/**
+ * Follows every reference returned, starting from one request, and rebuilds
+ * each list by identity (list, index) from pages and from records read in
+ * full. Nothing is requested that a response did not return (R3).
+ */
+async function traverse(dispatch, first) {
+  const lists = {
+    diagnostics: new Map(),
+    affected: new Map(),
+    // The v1 document's inline `{ file, role }` projections, by index.
+    affectedInline: new Map(),
+    candidates: new Map(),
+    bootstrap: new Map(),
+  };
+  const put = (list, index, record, key = null) => {
+    const map =
+      key == null
+        ? lists[list]
+        : (lists[list].get(key) ?? lists[list].set(key, new Map()).get(key));
+    if (map.has(index)) expect(map.get(index)).toEqual(record);
+    map.set(index, record);
+  };
+  const texts = new Map();
+  const seen = new Set();
+  const queue = [first];
+  let responses = 0;
+  while (queue.length > 0) {
+    const reference = queue.shift();
+    const key = JSON.stringify(reference);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const response = await follow(dispatch, reference);
+    responses += 1;
+    expect(response.limits.responseBytes).toBeLessThanOrEqual(
+      response.limits.maxResponseBytes,
+    );
+    // Every withheld record has a read of exactly its address.
+    for (const entry of response.withheld) {
+      expect(
+        response.references.filter(
+          (item) =>
+            item.operation === 'records.read' &&
+            JSON.stringify(item.input.address) ===
+              JSON.stringify(entry.address),
+        ),
+      ).toHaveLength(1);
+    }
+    const result = response.result;
+    if (reference.operation === 'records.read') {
+      const address = JSON.stringify(reference.input.address);
+      texts.set(address, (texts.get(address) ?? '') + result.chunk);
+      if (result.nextOffset == null) {
+        const record = JSON.parse(texts.get(address));
+        expect(sha256(texts.get(address))).toBe(result.sha256);
+        const { kind, index } = reference.input.address;
+        if (kind === 'candidate')
+          put(
+            'candidates',
+            index,
+            record,
+            reference.input.address.domain.index,
+          );
+        else put(kind === 'diagnostic' ? 'diagnostics' : kind, index, record);
+      }
+    } else if (result?.document != null) {
+      result.document.diagnostics.forEach((record, index) =>
+        put('diagnostics', index, record),
+      );
+      result.document.affected.entries.forEach((record, index) =>
+        put('affectedInline', index, record),
+      );
+    } else if (result?.page != null) {
+      const { list, offset, records } = result.page;
+      records.forEach((record, index) =>
+        put(
+          list,
+          offset + index,
+          record,
+          list === 'candidates' ? result.categoryIndex : null,
+        ),
+      );
+    } else if (response.failure?.stage === 'bootstrap') {
+      response.diagnostics.forEach((record, index) =>
+        put('bootstrap', index, record),
+      );
+    }
+    queue.push(...response.references);
+  }
+  return { lists, responses };
+}
+
+const deepSegments = (initial) =>
+  Array.from({ length: 14 }, (_, i) => `${initial}${i}${'é'.repeat(120)}`);
+
+describe('AG-01.1 every withheld record is reachable through references alone (R3)', () => {
+  const HUGE = 'x'.repeat(40000);
+  const prepare = (fixture) => {
+    // Three deep files whose affected entry AND diagnostic are withheld, at
+    // the first, a middle and the last position of both lists, with small
+    // diagnostics in between.
+    for (const initial of ['a', 'm', 'z']) {
+      const dir = fixture.src('src', ...deepSegments(initial));
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(
+        path.join(dir, 'deep.js'),
+        `import { create, token } from '${'../'.repeat(15)}generated/design.pandamstyle';\n` +
+          `export const s = create({ a: { padding: token('spacing.${initial}${HUGE}') } });\n`,
+      );
+    }
+    fs.writeFileSync(fixture.src('src/c-err.js'), HEADER + forbidden(1));
+    fs.writeFileSync(fixture.src('src/n-err.js'), HEADER + forbidden(2));
+  };
+
+  test('diagnostics, affected and candidates of one check, in both views', async () => {
+    const base = openProject('valid');
+    const project = await openAgentProject('valid', {
+      prepare,
+      definition: definitionWith(base, (definition) => {
+        for (let i = 0; i < 20; i += 1)
+          definition.tokens.spacing[`extra${i}`] = {
+            value: `${i}px`,
+            visibility: 'public',
+          };
+        definition.tokens.spacing[`w${'w'.repeat(70000)}`] = {
+          value: '1px',
+          visibility: 'public',
+        };
+      }),
+    });
+    try {
+      const rev = await project.revision();
+      for (const view of ['compact', 'detail']) {
+        const first = await project.dispatch('check', { rev }, { view });
+        expect(
+          first.withheld.map((entry) => entry.address.kind).sort(),
+        ).toEqual(
+          // An affected path stays under the detail ceiling (note §5.2).
+          view === 'compact' ? ['affected', 'diagnostic'] : ['diagnostic'],
+        );
+        const { lists } = await traverse(project.dispatch, {
+          operation: 'check',
+          view,
+          input: { rev },
+        });
+        const candidateLimit = view === 'compact' ? 8 : 32;
+        const full = (
+          await project.session.agentResult(rev, { candidateLimit })
+        ).diagnostics;
+        expect(full).toHaveLength(5);
+        expect([...lists.diagnostics.keys()].sort((a, b) => a - b)).toEqual([
+          0, 1, 2, 3, 4,
+        ]);
+        expect(full.map((_, index) => lists.diagnostics.get(index))).toEqual(
+          full,
+        );
+        const withheldDiagnostics = full
+          .map((record, index) => [index, recordInfo(record).bytes])
+          .filter(([, bytes]) => bytes > REGISTRY.views[view].recordCeiling)
+          .map(([index]) => index);
+        // Compact: first, middle and last. Detail: every one, as the small
+        // diagnostics' 32-candidate prefix carries the 70,000-character token.
+        expect(withheldDiagnostics).toEqual(
+          view === 'compact' ? [0, 2, 4] : [0, 1, 2, 3, 4],
+        );
+
+        const total = first.result.document.affected.total;
+        const reached = new Map(lists.affectedInline);
+        for (const [index, entry] of lists.affected) {
+          if (reached.has(index))
+            expect(reached.get(index).file).toBe(entry.file);
+          reached.set(index, entry);
+        }
+        expect([...reached.keys()].sort((a, b) => a - b)).toEqual(
+          Array.from({ length: total }, (_, index) => index),
+        );
+        const files = [...reached.values()].map((entry) => entry.file);
+        expect(new Set(files).size).toBe(total);
+        expect(files.filter((file) => file.endsWith('deep.js'))).toHaveLength(
+          3,
+        );
+
+        const domainTotal = (
+          await project.session.candidateTokens({
+            revision: rev,
+            category: 'spacing',
+            limit: 100000,
+          })
+        ).total;
+        const huge = `spacing.w${'w'.repeat(70000)}`;
+        if (view === 'compact') {
+          // Truncated candidates: the domain is reached from a diagnostic,
+          // including its withheld token.
+          expect(lists.candidates.size).toBe(1);
+          const [domain] = [...lists.candidates.values()];
+          const ids = [...domain.values()].map((entry) => entry.tokenId);
+          expect(ids).toContain(huge);
+          expect(domain.size).toBe(domainTotal);
+        } else {
+          // 32 candidates per diagnostic: the whole domain is inside each
+          // diagnostic record, read in full above, so nothing is truncated.
+          const small = lists.diagnostics.get(1);
+          expect(small.candidatesTruncated).toBe(false);
+          expect(small.candidates).toHaveLength(domainTotal);
+          expect(small.candidates.map((entry) => entry.tokenId)).toContain(
+            huge,
+          );
+          expect(lists.candidates.size).toBe(0);
+        }
+      }
+    } finally {
+      await project.close();
+    }
+  });
+
+  test('the candidate domain of a withheld diagnostic is referenced', async () => {
+    const base = openProject('valid');
+    const project = await openAgentProject('valid', {
+      definition: definitionWith(base, (definition) => {
+        for (let i = 0; i < 20; i += 1)
+          definition.tokens.spacing[`extra${i}`] = {
+            value: `${i}px`,
+            visibility: 'public',
+          };
+      }),
+      prepare: (fixture) =>
+        fs.writeFileSync(
+          fixture.src('src/zz.js'),
+          `${HEADER}export const s = create({ a: { padding: token('spacing.${BIG}') } });\n`,
+        ),
+    });
+    try {
+      const rev = await project.revision();
+      const first = await project.dispatch('check', { rev });
+      expect(first.result.document.diagnostics).toEqual([]);
+      expect(first.withheld[0].address).toEqual({
+        kind: 'diagnostic',
+        index: 0,
+      });
+      const { lists } = await traverse(project.dispatch, {
+        operation: 'check',
+        view: 'compact',
+        input: { rev },
+      });
+      expect(lists.diagnostics.get(0).candidatesTruncated).toBe(true);
+      const [domain] = [...lists.candidates.values()];
+      expect(domain.size).toBe(lists.diagnostics.get(0).candidatesTotal);
+    } finally {
+      await project.close();
+    }
+  });
+
+  test('a bootstrap failure list with withheld records at the middle and the end', async () => {
+    const fixture = openProject('valid');
+    const real = fixture.openPublicSession();
+    const record = (payload) =>
+      compiler.diagnostic({
+        code: 'PMS_INVALID_REVISION',
+        phase: 'lifecycle',
+        rule: 'session.revision-identity',
+        message: 'injected',
+        context: { reason: 'output-owned', payload },
+      });
+    const failure = new compiler.PmsError([
+      record('small'),
+      record('m'.repeat(70000)),
+      record('s'),
+      record('z'.repeat(70000)),
+    ]);
+    const session = Object.create(real, {
+      initialize: { value: async () => Promise.reject(failure) },
+    });
+    const binding = await compiler.createAgentBinding({
+      session,
+      initialize: true,
+    });
+    const capability = binding.mintCapability({ grants: ['consult'] });
+    const dispatch = (operation, input, extra = {}) =>
+      binding.dispatch(request(operation, input, extra), { capability });
+    try {
+      for (const view of ['compact', 'detail']) {
+        const { lists } = await traverse(dispatch, {
+          operation: 'session.status',
+          view,
+          input: {},
+        });
+        expect([...lists.bootstrap.keys()].sort()).toEqual([0, 1, 2, 3]);
+        expect(
+          [0, 1, 2, 3].map(
+            (index) => lists.bootstrap.get(index).context.payload,
+          ),
+        ).toEqual(['small', 'm'.repeat(70000), 's', 'z'.repeat(70000)]);
+      }
+    } finally {
+      await real.close();
+    }
+  });
+});
+
 describe('AG-01.1 oversized values inside records (I11, T14)', () => {
   /** Withheld, under the ceiling, and readable in full in both views. */
   async function expectWithheld(project, response, expectedAddress, rev) {

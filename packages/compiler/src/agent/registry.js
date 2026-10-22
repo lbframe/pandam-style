@@ -1196,7 +1196,10 @@ export function envelopeSchema(resultSchema, operationNames) {
           retry: enumOf(RETRY_HINTS),
         }),
       ),
-      references: arr(REFERENCE, 4),
+      // At most three continuations (`check` at offset 0: its own page, the
+      // affected list, a candidate domain) and one read per withheld record,
+      // of which a response holds at most two (one per list, R3).
+      references: arr(REFERENCE, 5),
       view: enumOf(VIEWS),
       page: nullable(
         obj({

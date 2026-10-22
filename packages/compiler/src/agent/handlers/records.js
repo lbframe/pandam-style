@@ -59,6 +59,29 @@ async function recordAt(ctx) {
 }
 
 /**
+ * The bootstrap list has no paging operation of its own: once one of its
+ * records is read in full, the read refers to the next one, so the whole list
+ * is reachable through returned references alone (R3).
+ */
+function nextBootstrapRecord(ctx) {
+  const { address } = ctx.input;
+  const failure =
+    address.kind === 'bootstrap' ? ctx.binding.bootstrapFailure() : null;
+  if (failure == null || address.index + 1 >= failure.records.length) return [];
+  return [
+    {
+      operation: 'records.read',
+      view: ctx.view,
+      input: {
+        ...ctx.input,
+        address: { kind: 'bootstrap', index: address.index + 1 },
+        page: { offset: 0, limit: ctx.input.page.limit },
+      },
+    },
+  ];
+}
+
+/**
  * `records.read`: one chunk of a record's canonical serialization (§3.10).
  * The chunk is sized to the response budget, so every read with
  * `offset < bytes` returns at least one byte.
@@ -82,9 +105,9 @@ export async function recordsRead(ctx) {
   return {
     identities,
     references:
-      nextOffset == null
-        ? []
-        : [continuation(ctx, 'records.read', nextOffset, ctx.input.page.limit)],
+      nextOffset != null
+        ? [continuation(ctx, 'records.read', nextOffset, ctx.input.page.limit)]
+        : nextBootstrapRecord(ctx),
     result: {
       chunk: info.text.slice(start, stop),
       offset: start,

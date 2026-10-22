@@ -138,8 +138,13 @@ function follow(dispatch, reference) {
  * (every selector, the view and the limit preserved, R2).
  */
 function continuationOf(response, request, nextOffset, limit) {
+  // A read continues the same record; a read of another address (the next
+  // bootstrap record) is a different list member, not this continuation.
   const continuations = response.references.filter(
-    (reference) => reference.operation === request.operation,
+    (reference) =>
+      reference.operation === request.operation &&
+      JSON.stringify(reference.input.address) ===
+        JSON.stringify(request.input.address),
   );
   if (nextOffset == null) {
     expect(continuations).toEqual([]);

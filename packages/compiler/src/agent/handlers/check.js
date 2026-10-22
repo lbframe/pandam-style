@@ -17,6 +17,31 @@ import {
 } from './pages.js';
 
 /**
+ * The candidate domain of the first shown diagnostic whose candidates are
+ * truncated, by its index in the complete list, among the records the page
+ * covers, shown or withheld (R3).
+ * It starts at offset 0: the v1 record orders its candidate prefix by name,
+ * the domain by declaration, so the prefix length is no offset into it.
+ */
+function candidateReference(ctx, rev, covered, offset) {
+  const index = covered.findIndex(
+    (record) => record.candidatesTruncated === true,
+  );
+  if (index < 0) return [];
+  return [
+    {
+      operation: 'diagnostics.candidates',
+      view: ctx.view,
+      input: {
+        rev,
+        domain: { kind: 'from-diagnostic', index: offset + index },
+        page: { offset: 0, limit: ctx.viewLimits.pageLimit },
+      },
+    },
+  ];
+}
+
+/**
  * `check`: the verdict of the exact current revision (§3.9, §3.10).
  *
  * The outcome is classified on the complete document before any list is
@@ -51,8 +76,19 @@ export async function check(ctx) {
   const withheld = [...packed.withheld];
 
   if (offset > 0) {
-    if (withheld.length > 0)
-      references.push(readReference(view, rev, withheld[0]));
+    references.push(
+      ...candidateReference(
+        ctx,
+        rev,
+        document.diagnostics.slice(
+          offset,
+          offset + packed.returned + packed.withheld.length,
+        ),
+        offset,
+      ),
+    );
+    for (const entry of withheld)
+      references.push(readReference(view, rev, entry));
     return {
       identities,
       classified,
@@ -93,25 +129,20 @@ export async function check(ctx) {
       },
     });
   }
-  const truncatedCandidates = packed.records.findIndex(
-    (record) => record.candidatesTruncated === true,
+  references.push(
+    ...candidateReference(
+      ctx,
+      rev,
+      document.diagnostics.slice(
+        offset,
+        offset + packed.returned + packed.withheld.length,
+      ),
+      offset,
+    ),
   );
-  if (truncatedCandidates >= 0) {
-    references.push({
-      operation: 'diagnostics.candidates',
-      view,
-      input: {
-        rev,
-        domain: { kind: 'from-diagnostic', index: truncatedCandidates },
-        page: {
-          offset: packed.records[truncatedCandidates].candidates.length,
-          limit: viewLimits.pageLimit,
-        },
-      },
-    });
-  }
-  if (withheld.length > 0)
-    references.push(readReference(view, rev, withheld[0]));
+  // Every withheld record of every list gets its own reference (R3).
+  for (const entry of withheld)
+    references.push(readReference(view, rev, entry));
 
   return {
     identities,
