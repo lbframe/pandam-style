@@ -100,7 +100,32 @@ function flattenTokens(category, node, prefix, out, diagnostics, source) {
   }
 }
 
+// `systemId` is copied into every identity and generated file, so it is bounded
+// where it enters (AG-01.1). The diagnostic echoes its type and size only.
+const MAX_SYSTEM_ID_BYTES = 128;
+
+function assertSystemId(definition) {
+  const systemId = definition?.systemId;
+  const bytes =
+    typeof systemId === 'string' ? Buffer.byteLength(systemId, 'utf8') : null;
+  if (bytes != null && bytes > 0 && bytes <= MAX_SYSTEM_ID_BYTES) return;
+  throw new PmsError([
+    diagnostic({
+      code: Codes.INVALID_DEFINITION,
+      phase: 'design-system',
+      rule: 'definition.system-id',
+      message: `The design-system definition requires a systemId string of 1 to ${MAX_SYSTEM_ID_BYTES} UTF-8 bytes.`,
+      context: {
+        field: 'systemId',
+        actualType: systemId === null ? 'null' : typeof systemId,
+        bytes,
+      },
+    }),
+  ]);
+}
+
 export function buildRegistry(definition) {
+  assertSystemId(definition);
   const diagnostics = [];
   const {
     systemId,

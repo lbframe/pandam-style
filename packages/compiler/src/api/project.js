@@ -27,6 +27,10 @@ import {
   generatedImportsFor,
 } from './accepted-snapshot.js';
 
+// The agent layer's private access to a session (AG-01.1). The symbol is not
+// exported from `api/index.js`, so no published entry can reach the hooks.
+export const AGENT_SESSION_HOOKS = Symbol('pandamstyle.agentSessionHooks');
+
 // This registry coordinates exclusive output ownership only. It contains no
 // project graph, semantic cache, or session object, and entries are removed by
 // failed initialization or close().
@@ -410,6 +414,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.SESSION_CLOSED,
         'The project session is closed.',
+        { reason: 'session-closed' },
       );
   };
   const requireInitialized = (operation) => {
@@ -418,6 +423,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         `${operation} requires an initialized session.`,
+        { reason: 'not-initialized' },
       );
     }
   };
@@ -433,7 +439,11 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         `${operation} requires a complete project/session/revision identity.`,
-        { expected: expected ?? null, current: revision() },
+        {
+          reason: 'malformed-identity',
+          expected: expected ?? null,
+          current: revision(),
+        },
       );
     }
     if (
@@ -443,14 +453,14 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         `${operation} received a foreign project or session revision.`,
-        { expected, current: revision() },
+        { reason: 'foreign-identity', expected, current: revision() },
       );
     }
     if (!sameRevisionIdentity(expected, revision())) {
       throw lifecycleError(
         Codes.STALE_REVISION,
         `${operation} requires the exact current project/session/revision identity.`,
-        { expected, current: revision() },
+        { reason: 'revision-mismatch', expected, current: revision() },
       );
     }
   };
@@ -463,17 +473,25 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         `${operation} requires validation of the current revision first.`,
+        { reason: 'not-validated' },
       );
     }
     if (requireValid && !validated.ok) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         `${operation} requires a valid current revision.`,
+        { reason: 'revision-invalid' },
       );
     }
   };
+  // A design-system identity is reported for the current revision only when
+  // the current build was derived from its definition and configuration (I9).
+  const currentDesignSystem = () => {
+    const identity = implementation?._designSystemIdentity() ?? null;
+    return identity?.current === true ? identity : null;
+  };
   const protocolResult = (legacy, options = {}) => {
-    const identity = implementation._designSystemIdentity();
+    const identity = currentDesignSystem();
     const generationId = legacy?.generation?.generationId ?? null;
     const committed =
       generationId != null && association?.generationId === generationId
@@ -483,11 +501,14 @@ export function createProjectSession(config) {
       legacy,
       revision: revision(legacy?.revisionId ?? revisionId),
       designSystem: {
-        systemId: identity?.systemId ?? normalized.projectId,
+        systemId: identity?.systemId ?? null,
         registryDigest: identity?.registryDigest ?? null,
       },
       candidateLimit: options.candidateLimit,
-      repairDomain: (query) => implementation._repairDomain(query),
+      repairDomain:
+        identity == null
+          ? null
+          : (query) => implementation._repairDomain(query),
       rootDir: normalized.rootDir,
       artifactRevision: committed?.artifactRevision ?? null,
       artifactDigest: committed?.artifactDigest ?? null,
@@ -512,6 +533,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         'initialize() may be called only once per session.',
+        { reason: 'already-initialized' },
       );
     }
     initializeAttempted = true;
@@ -692,6 +714,7 @@ export function createProjectSession(config) {
               throw lifecycleError(
                 Codes.INVALID_REVISION,
                 'Accepted snapshots cannot retain sources outside rootDir.',
+                { reason: 'outside-root-retention' },
               );
             }
             const compiled = implementation._artifactFor(fileState.file);
@@ -766,8 +789,30 @@ export function createProjectSession(config) {
     return legacy == null ? null : protocolResult(legacy, options);
   }
 
+  const requireCurrentDesignSystem = (operation) => {
+    if (currentDesignSystem() != null) return;
+    const identity = implementation._designSystemIdentity();
+    throw lifecycleError(
+      Codes.INVALID_REVISION,
+      `${operation} requires a design system built for the current revision.`,
+      {
+        reason: 'design-system-unavailable',
+        revision: revision(),
+        lastValidDesignSystem:
+          identity == null
+            ? null
+            : {
+                systemId: identity.systemId,
+                registryDigest: identity.registryDigest,
+                derivedFromRevision: revision(identity.derivedFromRevisionId),
+              },
+      },
+    );
+  };
+
   async function candidateTokens(query = {}) {
     requireRevision(query.revision, 'candidateTokens()');
+    requireCurrentDesignSystem('candidateTokens()');
     const result = implementation.candidateTokens({
       category: query.category,
       offset: query.offset,
@@ -961,9 +1006,10 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         'No validated CSS artifact is available for the current revision.',
+        { reason: 'no-css-artifact' },
       );
     }
-    const identity = implementation._designSystemIdentity();
+    const identity = currentDesignSystem();
     return immutableCopy({
       source: path
         .relative(normalized.rootDir, source)
@@ -995,7 +1041,7 @@ export function createProjectSession(config) {
       dependencies: [...compiled.dependencies],
       revision: revision(),
       designSystem: {
-        systemId: identity?.systemId ?? normalized.projectId,
+        systemId: identity?.systemId ?? null,
         registryDigest: identity?.registryDigest ?? null,
       },
       abiVersion: 1,
@@ -1009,6 +1055,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         'No canonical generated artifacts are available for the current revision.',
+        { reason: 'no-generated-artifacts' },
       );
     }
     return immutableCopy({
@@ -1063,6 +1110,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         'Invalid revisions cannot prepare publication.',
+        { reason: 'revision-invalid' },
       );
     }
     const candidateDigest = implementation._publicationCandidateDigest();
@@ -1071,6 +1119,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         'The validated revision has no publishable artifact candidate.',
+        { reason: 'no-publishable-candidate' },
       );
     }
     revokeTickets();
@@ -1105,6 +1154,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         'Publication ticket belongs to another project or session.',
+        { reason: 'foreign-ticket' },
       );
     }
     const currentTicket = tickets.get(ticket?.ticketId);
@@ -1123,6 +1173,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.STALE_REVISION,
         'Publication ticket is stale, revoked, or no longer matches its candidate.',
+        { reason: 'ticket-stale' },
       );
     }
     tickets.delete(ticket.ticketId);
@@ -1141,6 +1192,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.INVALID_REVISION,
         'Publication ticket belongs to another project or session.',
+        { reason: 'foreign-ticket' },
       );
     }
     const currentTicket = tickets.get(ticket?.ticketId);
@@ -1152,6 +1204,7 @@ export function createProjectSession(config) {
       throw lifecycleError(
         Codes.STALE_REVISION,
         'Publication ticket is stale or does not match the prepared candidate.',
+        { reason: 'ticket-stale' },
       );
     }
     tickets.delete(ticket.ticketId);
@@ -1183,7 +1236,152 @@ export function createProjectSession(config) {
     }
   }
 
+  // ------------------------------------------------- AG-01.1 agent hooks ----
+  //
+  // Each hook is one queued step, so its identities and its value describe the
+  // same session state. `beforeStart` runs first inside the step: the agent
+  // layer cancels there, before any effect. Rejections the agent maps to
+  // invalid input are returned as `{ rejected }`, never thrown as lifecycle
+  // codes. Nothing here runs unless the agent layer calls it.
+  const portableFile = (file) =>
+    typeof file === 'string' && path.isAbsolute(file)
+      ? path.relative(normalized.rootDir, file).split(path.sep).join('/')
+      : file;
+  const agentIdentities = () => {
+    const identity = implementation?._designSystemIdentity() ?? null;
+    const live = initialized && !closed;
+    return {
+      projectId: project.projectId,
+      sessionId: session.sessionId,
+      revision: live ? revision() : null,
+      designSystem:
+        live && identity?.current === true
+          ? {
+              systemId: identity.systemId,
+              registryDigest: identity.registryDigest,
+            }
+          : null,
+      lastValidDesignSystem:
+        live && identity != null && identity.current !== true
+          ? {
+              systemId: identity.systemId,
+              registryDigest: identity.registryDigest,
+              derivedFromRevision: revision(identity.derivedFromRevisionId),
+            }
+          : null,
+    };
+  };
+  const agentStep = (beforeStart, step) =>
+    enqueue(async () => {
+      beforeStart?.();
+      const value = await step();
+      return { identities: agentIdentities(), value };
+    });
+  const affectedPage = (offset, limit) => {
+    const page = implementation._affectedCoverage({ offset, limit });
+    return {
+      total: page.total,
+      entries: page.entries.map((entry) => ({
+        file: portableFile(entry.file),
+        role: entry.role ?? null,
+        analysed: entry.analysed === true,
+        removed: entry.removed === true,
+      })),
+    };
+  };
+  const currentDocument = (candidateLimit) =>
+    protocolResult(implementation.agentResult({ revisionId, candidateLimit }), {
+      candidateLimit,
+    });
+  const candidateCategory = (selector, candidateLimit) => {
+    if (selector.kind === 'category') return { category: selector.category };
+    if (selector.kind === 'category-index') {
+      const categories = implementation._candidateCategories();
+      return selector.index < categories.length
+        ? { category: categories[selector.index] }
+        : { rejected: 'index-out-of-range' };
+    }
+    requireValidated(revision(), 'diagnostics.candidates');
+    const diagnostics = currentDocument(candidateLimit).diagnostics;
+    if (selector.index >= diagnostics.length)
+      return { rejected: 'index-out-of-range' };
+    const category = diagnostics[selector.index].expected?.category ?? null;
+    return category == null
+      ? { rejected: 'no-candidate-domain' }
+      : { category };
+  };
+  const agentHooks = Object.freeze({
+    closed: () => closed,
+    paths: () => ({ rootDir: project.rootDir, outDir: project.outDir }),
+    status: (beforeStart) =>
+      agentStep(beforeStart, () => {
+        requireOpen();
+        return {
+          initialized,
+          generationId: association?.generationId ?? null,
+        };
+      }),
+    check: (expected, options, beforeStart) =>
+      agentStep(beforeStart, async () => {
+        requireRevision(expected, 'check');
+        // A verdict for the exact current revision is reused, so a reader
+        // never revokes a live publication ticket (F1). Without one, no live
+        // ticket can exist: preparing one validates first.
+        if (
+          validated == null ||
+          !sameRevisionIdentity(validated.revision, revision())
+        ) {
+          await validate(revision());
+        }
+        return {
+          document: currentDocument(options.candidateLimit),
+          affected: affectedPage(0, options.affectedLimit).entries,
+        };
+      }),
+    document: (expected, options, beforeStart) =>
+      agentStep(beforeStart, () => {
+        requireValidated(expected, 'records.read');
+        return { document: currentDocument(options.candidateLimit) };
+      }),
+    affected: (expected, { offset, limit }, beforeStart) =>
+      agentStep(beforeStart, () => {
+        requireValidated(expected, 'diagnostics.affected');
+        return affectedPage(offset, limit);
+      }),
+    candidates: (expected, options, beforeStart) =>
+      agentStep(beforeStart, () => {
+        requireRevision(expected, 'diagnostics.candidates');
+        requireCurrentDesignSystem('diagnostics.candidates');
+        const selected = candidateCategory(
+          options.selector,
+          options.candidateLimit,
+        );
+        if (selected.rejected != null) return selected;
+        const categories = implementation._candidateCategories();
+        // Membership is checked against the enumeration, never by property
+        // lookup, so a category such as `constructor` is simply empty.
+        const { tokens, total } = categories.includes(selected.category)
+          ? implementation.candidateTokens({
+              category: selected.category,
+              offset: options.offset,
+              limit: options.limit,
+              allowPrivate: false,
+            })
+          : { tokens: [], total: 0 };
+        const categoryIndex = categories.indexOf(selected.category);
+        return {
+          categoriesTotal: categories.length,
+          categoryIndex: categoryIndex < 0 ? null : categoryIndex,
+          total,
+          entries: implementation
+            ._candidateTokenEntries(tokens)
+            .map(({ tokenId, category }) => ({ tokenId, category })),
+        };
+      }),
+  });
+
   return Object.freeze({
+    [AGENT_SESSION_HOOKS]: agentHooks,
     projectId: project.projectId,
     sessionId: session.sessionId,
     initialize: () => enqueue(initialize),

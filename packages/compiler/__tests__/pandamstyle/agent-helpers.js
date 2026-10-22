@@ -1,0 +1,236 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * Shared helpers for the AG-01.1 agent contract suites. The agent layer is
+ * reached through the private inspection bundle, together with the session
+ * whose module-private hooks it uses: the two must come from one module graph.
+ */
+
+'use strict';
+
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const { openProject } = require('./session-helpers');
+const { evaluateDefinitionText } = require('./pms-helpers');
+
+function loadCompiler() {
+  // eslint-disable-next-line
+  return require(
+    path.resolve(
+      __dirname,
+      '../../../../.pms-test-support/compiler-inspection.cjs',
+    ),
+  );
+}
+
+const compiler = loadCompiler();
+
+/** A request in the agent protocol. */
+function request(operation, input, extra = {}) {
+  return {
+    protocolVersion: 1,
+    operation,
+    ...(input === undefined ? {} : { input }),
+    ...extra,
+  };
+}
+
+/**
+ * A bound project on a fresh fixture copy. `definition` replaces the shared
+ * definition before the session starts; `sessionOptions` reach the session.
+ */
+async function openAgentProject(name = 'valid', options = {}) {
+  const fixture = openProject(name);
+  if (options.prepare != null) {
+    options.prepare(fixture);
+    fixture.reloadDefinition();
+  }
+  const session = fixture.openPublicSession({
+    ...(options.definition === undefined
+      ? {}
+      : { definition: options.definition }),
+    ...(options.sessionOptions ?? {}),
+  });
+  const binding = await compiler.createAgentBinding({
+    session,
+    initialize: options.initialize ?? true,
+    ...(options.limits === undefined ? {} : { limits: options.limits }),
+  });
+  const capability = binding.mintCapability({ grants: ['consult'] });
+  const dispatch = (operation, input, extra = {}, dispatchOptions = {}) =>
+    binding.dispatch(request(operation, input, extra), {
+      capability,
+      ...dispatchOptions,
+    });
+  const status = async () => (await dispatch('session.status', {})).identities;
+  return {
+    fixture,
+    session,
+    binding,
+    capability,
+    dispatch,
+    async revision() {
+      return (await status()).revision;
+    },
+    definition() {
+      return evaluateDefinitionText(fixture.sharedDefinitionPath);
+    },
+    async close() {
+      await session.close();
+    },
+  };
+}
+
+/** The shared fixture definition, freshly evaluated, then edited. */
+function definitionWith(fixture, edit) {
+  const definition = evaluateDefinitionText(fixture.sharedDefinitionPath);
+  edit(definition);
+  return definition;
+}
+
+function emptyMutation(baseRevision) {
+  return {
+    baseRevision,
+    mode: 'full-discovery',
+    changed: [],
+    added: [],
+    removed: [],
+    renamed: [],
+  };
+}
+
+/** SHA-256 of every file under `dir`, keyed by relative path. */
+function hashTree(dir) {
+  const out = {};
+  const walk = (current) => {
+    if (!fs.existsSync(current)) return;
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const abs = path.join(current, entry.name);
+      if (entry.name === 'node_modules') continue;
+      if (entry.isDirectory()) walk(abs);
+      else if (entry.isFile())
+        out[path.relative(dir, abs)] = crypto
+          .createHash('sha256')
+          .update(fs.readFileSync(abs))
+          .digest('hex');
+    }
+  };
+  walk(dir);
+  return out;
+}
+
+/** Dispatches a reference exactly as the response returned it. */
+function follow(dispatch, reference) {
+  return dispatch(reference.operation, reference.input, {
+    view: reference.view,
+  });
+}
+
+/**
+ * The continuation a response returns for `request`: present exactly when the
+ * page is truncated, and equal to the request with only the offset advanced
+ * (every selector, the view and the limit preserved, R2).
+ */
+function continuationOf(response, request, nextOffset, limit) {
+  // A read continues the same record; a read of another address (the next
+  // bootstrap record) is a different list member, not this continuation.
+  const continuations = response.references.filter(
+    (reference) =>
+      reference.operation === request.operation &&
+      JSON.stringify(reference.input.address) ===
+        JSON.stringify(request.input.address),
+  );
+  if (nextOffset == null) {
+    expect(continuations).toEqual([]);
+    return null;
+  }
+  expect(continuations).toEqual([
+    {
+      operation: request.operation,
+      view: request.view,
+      input: { ...request.input, page: { offset: nextOffset, limit } },
+    },
+  ]);
+  return continuations[0];
+}
+
+/**
+ * Reads a whole record through `records.read`, following only the
+ * continuations the responses return.
+ */
+async function readReferenced(dispatch, first) {
+  let reference = first;
+  let text = '';
+  let last = null;
+  for (let guard = 0; guard < 100000; guard += 1) {
+    const response = await follow(dispatch, reference);
+    if (response.outcome !== 'success') return { response, text: null };
+    last = response.result;
+    text += last.chunk;
+    if (last.nextOffset != null)
+      expect(last.nextOffset).toBeGreaterThan(last.offset);
+    reference = continuationOf(
+      response,
+      reference,
+      last.nextOffset,
+      reference.input.page.limit,
+    );
+    if (reference == null) break;
+  }
+  return { text, bytes: last.bytes, sha256: last.sha256 };
+}
+
+/** Reads a record from its first chunk request, then by its references. */
+function readRecord(dispatch, rev, address, chunk, view = 'compact') {
+  return readReferenced(dispatch, {
+    operation: 'records.read',
+    view,
+    input: { rev, address, page: { offset: 0, limit: chunk } },
+  });
+}
+
+function sha256(text) {
+  return crypto.createHash('sha256').update(text).digest('hex');
+}
+
+/** The (outcome, code, reason) triple an envelope reports. */
+function observedTriple(envelope) {
+  return {
+    outcome: envelope.outcome,
+    code: envelope.diagnostics[0]?.code ?? null,
+    reason: envelope.failure?.reason ?? null,
+  };
+}
+
+/** True when `triple` is covered by one of the entry's declared contracts. */
+function declares(entry, triple) {
+  return entry.errors.some(
+    (error) =>
+      error.outcome === triple.outcome &&
+      // A null code stands for the verdict's or definition's own diagnostics.
+      (error.code === triple.code || error.code === null) &&
+      error.reasons.includes(triple.reason),
+  );
+}
+
+module.exports = {
+  compiler,
+  continuationOf,
+  declares,
+  definitionWith,
+  follow,
+  emptyMutation,
+  hashTree,
+  observedTriple,
+  openAgentProject,
+  readRecord,
+  readReferenced,
+  request,
+  sha256,
+};

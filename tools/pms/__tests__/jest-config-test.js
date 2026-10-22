@@ -210,6 +210,12 @@ describe('the root jest configuration is not a broad ignore', () => {
         'packages/compiler/__tests__/pandamstyle/targets-project-test.js',
         'packages/compiler/__tests__/pandamstyle/targets-resolution-test.js',
         'packages/compiler/__tests__/pandamstyle/targets-subfeature-test.js',
+        // AG-01.1 agent operation registry and machine protocol.
+        'packages/compiler/__tests__/pandamstyle/agent-freshness-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-paging-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-protocol-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-reachability-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-registry-test.js',
         // CE-01.2 transformation stage.
         'packages/compiler/__tests__/pandamstyle/host-css-corpus-test.js',
         'packages/compiler/__tests__/pandamstyle/targets-transform-browser-test.js',
