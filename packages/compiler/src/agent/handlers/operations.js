@@ -48,15 +48,21 @@ export function describeOperation(entry, view, availability = null) {
 }
 
 /** The tool descriptions behind `protocol.operations` (and, later, MCP). */
-export function describeOperations(registry, view, { grants = null } = {}) {
+export function describeOperations(
+  registry,
+  view,
+  { grants = null, servedHere = () => true } = {},
+) {
   return registry.entries.map((entry) =>
-    describeOperation(entry, view, availabilityOf(entry, grants)),
+    describeOperation(entry, view, availabilityOf(entry, grants, servedHere)),
   );
 }
 
-function availabilityOf(entry, grants) {
+function availabilityOf(entry, grants, servedHere) {
   if (grants == null) return null;
   if (entry.status === 'planned') return 'planned';
+  // AG-02.1: a host binding is the owner; it serves no workspace operation.
+  if (!servedHere(entry)) return 'unsupported';
   if (entry.requires.grant == null) return 'available';
   return grants.includes(entry.requires.grant) ? 'available' : 'denied';
 }
@@ -90,7 +96,11 @@ export async function protocolOperations(ctx) {
     (entry) => names == null || names.includes(entry.name),
   );
   const records = entries.map((entry) =>
-    describeOperation(entry, view, availabilityOf(entry, grants)),
+    describeOperation(
+      entry,
+      view,
+      availabilityOf(entry, grants, ctx.servedHere ?? (() => true)),
+    ),
   );
   const { offset, limit } = pageWindow(ctx);
   const packed = pack(ctx, {

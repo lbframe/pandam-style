@@ -212,6 +212,19 @@ export {
 export { HANDLERS as AGENT_HANDLERS } from '../../packages/compiler/src/agent/handlers/index.js';
 export { describeOperations } from '../../packages/compiler/src/agent/handlers/operations.js';
 export { generateOperationTypes } from '../../packages/compiler/src/agent/codegen.js';
+// AG-02.1 owner bridge and workspace binding: private bundle only (§3.1).
+export {
+  startOwnerBridge,
+  BRIDGE_GRANTS,
+  START_REFUSALS,
+} from '../../packages/compiler/src/agent/bridge/server.js';
+export { connectOwner } from '../../packages/compiler/src/agent/bridge/client.js';
+export { createWorkspaceBinding } from '../../packages/compiler/src/agent/workspace.js';
+export * as bridgeFrames from '../../packages/compiler/src/agent/bridge/frames.js';
+export * as bridgeDescriptor from '../../packages/compiler/src/agent/bridge/descriptor.js';
+export * as bridgeRuntimeDir from '../../packages/compiler/src/agent/bridge/runtime-dir.js';
+export * as bridgeHandshake from '../../packages/compiler/src/agent/bridge/handshake.js';
+export { WORKSPACE_OPERATIONS } from '../../packages/compiler/src/agent/registry.js';
 export {
   AgentCodes,
   canonicalJson,
