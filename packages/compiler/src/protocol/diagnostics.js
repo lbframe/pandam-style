@@ -146,6 +146,8 @@ export const Codes = {
   INVALID_DEFINITION: 'PMS_INVALID_DEFINITION',
   // CE-02.1: a design-system `propertyDomains` entry the compiler refuses.
   INVALID_PROPERTY_DOMAIN: 'PMS_INVALID_PROPERTY_DOMAIN',
+  // AG-03.1: design-system `meta` the compiler refuses (rules `metadata.*`).
+  INVALID_METADATA: 'PMS_INVALID_METADATA',
 };
 
 /** Stable single-line rendering of a diagnostic (used by the build report). */

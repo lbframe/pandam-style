@@ -199,6 +199,12 @@ describe('the root jest configuration is not a broad ignore', () => {
         'packages/compiler/__tests__/pandamstyle/phase-15c-themes-types-test.js',
         'packages/compiler/__tests__/pandamstyle/global-incremental-test.js',
         'packages/compiler/__tests__/pandamstyle/local-publication-test.js',
+        'packages/compiler/__tests__/pandamstyle/metadata-authority-test.js',
+        'packages/compiler/__tests__/pandamstyle/metadata-classes-test.js',
+        'packages/compiler/__tests__/pandamstyle/metadata-diagnostics-test.js',
+        'packages/compiler/__tests__/pandamstyle/metadata-ingress-test.js',
+        'packages/compiler/__tests__/pandamstyle/metadata-privacy-test.js',
+        'packages/compiler/__tests__/pandamstyle/metadata-roundtrip-test.js',
         'packages/compiler/__tests__/pandamstyle/transaction-backup-test.js',
         'packages/compiler/__tests__/pandamstyle/source-map-test.js',
         // CE-01.1 browser targets.

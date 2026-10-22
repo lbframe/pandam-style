@@ -155,7 +155,9 @@ describe('the propertyDomains schema', () => {
     ['malformed-entry', 'a list entry', { width: ['auto'] }],
     ['malformed-entry', 'a null entry', { width: null }],
     ['malformed-entry', 'a function entry', { width: () => 'auto' }],
-    ['unknown-member', 'meta', { width: { values: ['auto'], meta: {} } }],
+    // AG-03.1: `meta` is accepted beside the domain members (see
+    // metadata-roundtrip-test.js); alone it is still an empty entry.
+    ['empty', 'meta alone', { width: { meta: {} } }],
     [
       'unknown-member',
       'resources',

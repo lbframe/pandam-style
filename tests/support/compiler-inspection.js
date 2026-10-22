@@ -222,3 +222,33 @@ export {
   OUTCOMES,
 } from '../../packages/compiler/src/protocol/envelope.js';
 export { AGENT_SESSION_HOOKS } from '../../packages/compiler/src/api/project.js';
+// AG-03.1 semantic vocabulary metadata.
+export {
+  ownDefinitionOf,
+  snapshotDefinition,
+} from '../../packages/compiler/src/design-system/registry/ingress.js';
+export {
+  META_CAPS,
+  canonicalSize,
+  collectMetaInputs,
+  snapshotMetadata,
+} from '../../packages/compiler/src/design-system/semantics/snapshot.js';
+export {
+  FIELDS,
+  stringClassOf,
+  textReason,
+} from '../../packages/compiler/src/design-system/semantics/schema.js';
+export {
+  normalizeForNames,
+  replacementCycles,
+} from '../../packages/compiler/src/design-system/semantics/references.js';
+export {
+  privateEntityOrder,
+  resolvePrivateEntity,
+} from '../../packages/compiler/src/design-system/semantics/diagnostics.js';
+export {
+  semanticEntities,
+  ownFields,
+} from '../../packages/compiler/src/design-system/semantics/build.js';
+export { semanticsViewOf } from '../../packages/compiler/src/design-system/semantics/views.js';
+export { canonicalAddress } from '../../packages/compiler/src/design-system/semantics/schema.js';

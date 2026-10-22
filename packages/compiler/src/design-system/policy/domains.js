@@ -181,6 +181,11 @@ export function effectivePropertiesOf(registry) {
 // `propertyDomains`: design-system author data.
 
 const MEMBERS = new Set(['values', 'tokens', 'range']);
+// AG-03.1: an entry may also hold `meta`. It is validated and stored by the
+// metadata side table (`registry.semantics.propertyDomains`), never in the
+// normalized entry, the effective table or `snapshot.properties` (design note
+// §3.1.1, agreed with the CE owner, CE note amended by #138).
+const META_MEMBER = 'meta';
 
 function isPlainRecord(value) {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
@@ -285,7 +290,7 @@ export function normalizePropertyDomains(input, tokens = {}) {
       );
       continue;
     }
-    const members = Object.keys(entry);
+    const members = Object.keys(entry).filter((m) => m !== META_MEMBER);
     const unknown = members.filter((m) => !MEMBERS.has(m));
     if (unknown.length > 0) {
       fail(
