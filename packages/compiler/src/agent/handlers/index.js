@@ -10,6 +10,7 @@ import { check } from './check.js';
 import { diagnosticsAffected, diagnosticsCandidates } from './lists.js';
 import { protocolOperations } from './operations.js';
 import { recordsRead } from './records.js';
+import { sessionAttach } from './session-attach.js';
 import { sessionStatus } from './status.js';
 
 /**
@@ -20,6 +21,7 @@ import { sessionStatus } from './status.js';
 export const HANDLERS = Object.freeze({
   'protocol.operations': protocolOperations,
   'session.status': sessionStatus,
+  'session.attach': sessionAttach,
   check,
   'diagnostics.candidates': diagnosticsCandidates,
   'diagnostics.affected': diagnosticsAffected,

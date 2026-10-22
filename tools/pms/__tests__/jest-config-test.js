@@ -228,6 +228,13 @@ describe('the root jest configuration is not a broad ignore', () => {
         // AG-01.2 audit read, compute and materialize.
         'packages/compiler/__tests__/pandamstyle/agent-audit-io-test.js',
         'packages/compiler/__tests__/pandamstyle/agent-audit-test.js',
+        // AG-02.1 owner bridge, attach and owner-required.
+        'packages/compiler/__tests__/pandamstyle/agent-bridge-attack-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-bridge-bounds-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-bridge-flow-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-bridge-placement-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-bridge-process-test.js',
+        'packages/compiler/__tests__/pandamstyle/agent-bridge-test.js',
       ].sort(),
     );
   });

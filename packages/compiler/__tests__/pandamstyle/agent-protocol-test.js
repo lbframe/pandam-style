@@ -1012,9 +1012,14 @@ describe('AG-01.1 consultations have no effect (AC4, I3, F1)', () => {
             inputs[entry.name] ?? { rev },
             { view },
           );
+          // AG-02.1: a host binding serves no workspace operation; the
+          // workspace's own no-effect tests cover `session.attach`.
           expect([entry.name, response.outcome]).toEqual([
             entry.name,
-            entry.status === 'planned' ? 'unsupported-capability' : 'success',
+            entry.status === 'planned' ||
+            compiler.WORKSPACE_OPERATIONS.includes(entry.name)
+              ? 'unsupported-capability'
+              : 'success',
           ]);
         }
       }

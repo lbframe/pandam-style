@@ -49,6 +49,8 @@ export const OUTCOMES = Object.freeze([
   'stale-revision',
   'cancelled',
   'internal-error',
+  // AG-02.1 §3.12: no owner can serve this live operation now.
+  'owner-required',
 ]);
 
 export const STAGES = Object.freeze(['request', 'bootstrap', 'execution']);
@@ -66,6 +68,7 @@ export const AgentCodes = Object.freeze({
   ACCESS_DENIED: 'PMS_ACCESS_DENIED',
   CANCELLED: 'PMS_CANCELLED',
   INTERNAL: 'PMS_INTERNAL',
+  OWNER_REQUIRED: 'PMS_OWNER_REQUIRED',
 });
 
 /** `PMS_INVALID_REVISION` reasons and the outcome each one means (§1.3). */
@@ -102,6 +105,7 @@ const RETRY_OF_OUTCOME = Object.freeze({
   'stale-revision': 'after-refresh',
   cancelled: 'same-request',
   'internal-error': 'never',
+  'owner-required': 'after-refresh',
 });
 
 const COMPILER_FAULT_CODES = new Set([
@@ -157,6 +161,8 @@ const AGENT_ERROR_MESSAGES = Object.freeze({
     'The presented capability does not authorize this operation.',
   [AgentCodes.CANCELLED]: 'The request was cancelled before it started.',
   [AgentCodes.INTERNAL]: 'Internal compiler error.',
+  [AgentCodes.OWNER_REQUIRED]:
+    'No owner of this project can serve the operation now; attach to its owner or start one.',
 });
 
 function agentDiagnostic(error) {

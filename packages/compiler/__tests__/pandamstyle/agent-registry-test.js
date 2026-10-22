@@ -39,6 +39,7 @@ const {
   GRANT_EFFECTS,
   PRECONDITIONS,
   universalErrors,
+  WORKSPACE_OPERATIONS,
 } = compiler;
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -572,10 +573,13 @@ describe('AG-01.1 schema-generation parity', () => {
             entry.name,
             entry.status === 'planned'
               ? 'planned'
-              : entry.requires.grant == null ||
-                  entry.requires.grant === 'consult'
-                ? 'available'
-                : 'denied',
+              : // AG-02.1: a host binding serves no workspace operation.
+                WORKSPACE_OPERATIONS.includes(entry.name)
+                ? 'unsupported'
+                : entry.requires.grant == null ||
+                    entry.requires.grant === 'consult'
+                  ? 'available'
+                  : 'denied',
           ]),
         ),
       );
