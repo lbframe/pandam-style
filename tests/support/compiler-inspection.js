@@ -83,6 +83,10 @@ export {
   NON_FINITE,
 } from '../../packages/compiler/src/design-system/policy/numeric-facts.js';
 export { unitsOfType } from '../../packages/compiler/src/targets/units.js';
+export {
+  unsafeValueClass,
+  APPROVED_FUNCTIONS,
+} from '../../packages/compiler/src/design-system/policy/value-safety.js';
 // Engine tables the descriptor parity tests compare against (CE-02.3 owns
 // rewiring the engine to the descriptors).
 export { default as flatMapExpandedShorthands } from '../../packages/compiler/src/engine/atomic/preprocess-rules/index.js';

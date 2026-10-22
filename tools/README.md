@@ -49,7 +49,12 @@ The tools in this directory support PandamStyle development and qualification.
   CE-02.2 migration examples (M1-M5, M7) against their Alpha 1 or CE-02.1
   baseline and the workspace build, skipping a baseline that is not given
   with its reason (the `migration-examples-test.js` suite reads
-  `PMS_ALPHA1_CLOSURE` and `PMS_CE021_PACK`).
+  `PMS_ALPHA1_CLOSURE` and `PMS_CE021_PACK`);
+  `value-safety-scan.mjs [--emitted]` runs the CE-02.2 S1 predicate over every
+  importable design system (workloads, fixtures, examples, agentic benchmark
+  fixtures) and reports the functions they use and every refusal, the scan
+  that froze `APPROVED_FUNCTIONS`; with `--emitted` it also compiles each
+  workload and re-reads its `styles.css` (S2).
 
 ## Qualification browser
 

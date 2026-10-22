@@ -6,7 +6,7 @@
  */
 
 /**
- * CE-02.2 (#47) AC3: the executable migration examples M1-M5 and M7
+ * CE-02.2 (#47) AC3: the executable migration examples M1-M7
  * (fixtures/ce022-migrations/examples.json), run by
  * tools/policy/migration-examples.mjs through the public Project Service.
  *
@@ -58,7 +58,7 @@ if (report.skipped.length > 0) {
 }
 
 describe('CE-02.2 migration examples', () => {
-  test('cover M1-M5 and M7 against their stated baselines', () => {
+  test('cover M1-M7 against their stated baselines', () => {
     expect(examples.examples.map((e) => [e.id, e.baseline])).toEqual([
       ['M1', 'alpha1'],
       ['M2', 'alpha1'],
@@ -66,6 +66,7 @@ describe('CE-02.2 migration examples', () => {
       ['M4', 'ce021'],
       ['M5-margin', 'alpha1'],
       ['M5-padding', 'alpha1'],
+      ['M6', 'alpha1'],
       ['M7', 'ce021'],
     ]);
   });

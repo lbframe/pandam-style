@@ -110,11 +110,12 @@ async function load(lib) {
 }
 
 /** One project through the Project Service: { ok, diagnostics, css }. */
-async function run(lib, { propertyDomains = null, page = [] }) {
+async function run(lib, { propertyDomains = null, page = [], tokens = null }) {
   const compiler = await load(lib);
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ce022-migration-'));
   const definition = {
     ...record.definition,
+    tokens: { ...record.definition.tokens, ...(tokens ?? {}) },
     ...(propertyDomains == null ? {} : { propertyDomains }),
   };
   fs.mkdirSync(path.join(root, 'src'));
@@ -261,6 +262,7 @@ async function main() {
       propertyDomains:
         example.ce022.propertyDomains ?? example.before.propertyDomains,
       page: example.ce022.page ?? example.before.page,
+      tokens: example.ce022.tokens ?? example.before.tokens,
     };
     const ce022 = await run(candidate.lib, ce022Input);
     checks.push(...checksOf('ce022', example.ce022.expect, ce022, baselineCss));
@@ -268,6 +270,7 @@ async function main() {
       const after = await run(candidate.lib, {
         propertyDomains: example.after.propertyDomains ?? null,
         page: example.after.page ?? example.before.page,
+        tokens: example.after.tokens ?? example.before.tokens,
       });
       checks.push(
         ...checksOf(

@@ -448,10 +448,10 @@ describe('numbers arriving as token values', () => {
     tokens: {
       lineHeights: {
         ok: { value: 1.5, visibility: 'public' },
-        huge: { value: 1e308, visibility: 'public' },
+        big: { value: '1000001', visibility: 'public' },
         neg: { value: -1, visibility: 'public' },
-        nan: { value: NaN, visibility: 'public' },
-        inf: { value: Infinity, visibility: 'public' },
+        nan: { value: 'NaN', visibility: 'public' },
+        inf: { value: 'Infinity', visibility: 'public' },
         precise: { value: 1.23456, visibility: 'public' },
       },
       fontWeights: {
@@ -468,7 +468,7 @@ describe('numbers arriving as token values', () => {
   });
   test.each([
     ['lineHeight', 'lineHeights.ok', null],
-    ['lineHeight', 'lineHeights.huge', REFUSED()],
+    ['lineHeight', 'lineHeights.big', REFUSED()],
     ['lineHeight', 'lineHeights.neg', REFUSED()],
     ['lineHeight', 'lineHeights.nan', REFUSED('non-finite')],
     ['lineHeight', 'lineHeights.inf', REFUSED('non-finite')],
@@ -482,6 +482,34 @@ describe('numbers arriving as token values', () => {
     ['transitionDuration', 'durations.unitless', REFUSED()],
   ])('%s with %s', (property, path, expected) => {
     expect(outcome(ds, property, compiler.token(path))).toEqual(expected);
+  });
+});
+
+// A JS-number token value that is not finite or above 1e6 never reaches use:
+// S1 (value-safety.js, clause 5) refuses it at registry build (note §3.5).
+describe('non-finite JS numbers as token values', () => {
+  test.each([
+    ['NaN', NaN],
+    ['Infinity', Infinity],
+    ['-Infinity', -Infinity],
+    ['1e308', 1e308],
+  ])('%s is a registry error', (_, value) => {
+    let error;
+    try {
+      compiler.buildDesignSystem({
+        systemId: 'ce022-non-finite',
+        tokens: { lineHeights: { x: { value, visibility: 'public' } } },
+      });
+    } catch (e) {
+      error = e;
+    }
+    expect(error.diagnostics.map((d) => [d.code, d.rule, d.phase])).toEqual([
+      ['PMS_FORBIDDEN_VALUE', 'value-safety.non-finite', 'registry'],
+    ]);
+    expect(error.diagnostics[0].context).toMatchObject({
+      tokenId: 'lineHeights.x',
+      reason: 'non-finite',
+    });
   });
 });
 

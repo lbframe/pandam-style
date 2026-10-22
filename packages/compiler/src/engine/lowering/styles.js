@@ -35,6 +35,7 @@ import {
   scalarOf,
   tokenValueRefusal,
 } from '../../design-system/policy/numeric-facts';
+import { unsafeValueClass } from '../../design-system/policy/value-safety';
 import { recognizedProperty } from '../../design-system/policy/recognized';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, perfCollector } from '../../observability/metrics';
@@ -222,8 +223,47 @@ const UNSUPPORTED_RULES = Object.freeze({
  * profile), a recognized name, or an unrecognized one (prototype keys
  * included).
  */
+// CE-02.2 §4.3: a vendor-prefixed authoring key with no recognized row, and
+// the authoring key of the standard property it would prefix.
+const VENDOR_KEY =
+  /^(?:(?:Webkit|Moz|O)(?=[A-Z])|ms(?=[A-Z])|-(?:webkit|moz|ms|o)-)/;
+function unprefixedKey(property) {
+  return property
+    .replace(VENDOR_KEY, '')
+    .replace(/-([a-z])/g, (_, c) => c.toUpperCase())
+    .replace(/^./, (c) => c.toLowerCase());
+}
+
 function unsupportedProperty(property, properties, row, where) {
+  // The compiler owns every emitted custom property: a page or recipe key
+  // `--*` is never a property.
+  if (row == null && property.startsWith('--')) {
+    return diagnostic({
+      code: Codes.UNSUPPORTED_PROPERTY,
+      phase: 'policy',
+      message: `Custom properties are compiler-owned; ${property} cannot be declared.`,
+      source: where,
+      rule: 'supported-properties.custom-property',
+      context: { property },
+    });
+  }
   const recognized = row == null ? recognizedProperty(property) : null;
+  if (row == null && recognized == null && VENDOR_KEY.test(property)) {
+    const standard = propertyRow(properties, unprefixedKey(property));
+    return diagnostic({
+      code: Codes.UNSUPPORTED_PROPERTY,
+      phase: 'policy',
+      message: `The vendor extension ${property} is not a supported property.`,
+      source: where,
+      rule: 'supported-properties.vendor-extension',
+      context: {
+        property,
+        ...(standard != null && standard.status === 'standard'
+          ? { replacement: standard.css }
+          : {}),
+      },
+    });
+  }
   const disposition =
     row != null
       ? 'scoped-platform-extension'
@@ -482,6 +522,20 @@ function checkValue({
   return varsByToken[tokenId];
 }
 
+// CE-02.2 S1 on condition-block keys, the one compile-path entry of the
+// safety predicate: memoised per key string per registry, so each distinct
+// key is tokenized once per design-system revision.
+const conditionKeySafety = new WeakMap();
+function unsafeConditionKey(registry, key) {
+  let byKey = conditionKeySafety.get(registry);
+  if (byKey == null) {
+    byKey = new Map();
+    conditionKeySafety.set(registry, byKey);
+  }
+  if (!byKey.has(key)) byKey.set(key, unsafeValueClass(key, 'condition'));
+  return byKey.get(key);
+}
+
 function setOwnStyleValue(target, key, value) {
   Object.defineProperty(target, key, {
     configurable: true,
@@ -588,6 +642,29 @@ export function compileStyles({
         // Engine condition block: only registered names are admitted
         // on the consumer side; here the internal normalized form already carries the
         // canonical definition - public entries go through expandValue.
+        // Its key reaches the emitted selector verbatim: S1 first (CE-02.2).
+        const unsafe = unsafeConditionKey(registry, key);
+        if (unsafe != null) {
+          diagnostics.push(
+            diagnostic({
+              code: Codes.UNKNOWN_CONDITION,
+              phase: 'policy',
+              message: `The condition block ${JSON.stringify(key)} is not safe CSS (${unsafe.reason}${unsafe.function === undefined ? '' : `: ${unsafe.function}`}).`,
+              source: locate?.(nsName, key, null) ?? source,
+              rule: `value-safety.${unsafe.reason}`,
+              context: {
+                key,
+                reason: unsafe.reason,
+                offset: unsafe.offset,
+                ...(unsafe.function === undefined
+                  ? {}
+                  : { function: unsafe.function }),
+                conditionPath: [key],
+              },
+            }),
+          );
+          continue;
+        }
         for (const prop of Object.keys(value)) {
           const lowered = checkValue({
             property: prop,

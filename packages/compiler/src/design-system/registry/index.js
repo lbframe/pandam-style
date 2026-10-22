@@ -24,6 +24,7 @@ import { createHash } from 'crypto';
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 import { validateRecipeDefinition } from '../recipes/validate';
 import { recordNumericFacts } from '../policy/numeric-facts';
+import { unsafeValueClass } from '../policy/value-safety';
 
 const lexicalCompare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -47,7 +48,33 @@ export function registryDigest(registryPayload) {
   return createHash('sha256').update(json).digest('hex').slice(0, 16);
 }
 
-function flattenTokens(category, node, prefix, out, diagnostics, source) {
+// CE-02.2 S1: an author text that fails the safety predicate never reaches
+// the emitted CSS (policy/value-safety.js).
+function valueSafetyDiagnostic(code, unsafe, message, context, source) {
+  return diagnostic({
+    code,
+    phase: 'registry',
+    message,
+    source,
+    rule: `value-safety.${unsafe.reason}`,
+    context: {
+      ...context,
+      reason: unsafe.reason,
+      offset: unsafe.offset,
+      ...(unsafe.function === undefined ? {} : { function: unsafe.function }),
+    },
+  });
+}
+
+function flattenTokens(
+  category,
+  node,
+  prefix,
+  out,
+  diagnostics,
+  source,
+  theme = null,
+) {
   for (const key of Object.keys(node)) {
     if (key === '') {
       diagnostics.push(
@@ -70,6 +97,20 @@ function flattenTokens(category, node, prefix, out, diagnostics, source) {
         typeof entry.ref === 'string')
     ) {
       const tokenId = `${category}.${path}`;
+      const unsafe =
+        entry.value == null ? null : unsafeValueClass(entry.value, 'value');
+      if (unsafe != null) {
+        diagnostics.push(
+          valueSafetyDiagnostic(
+            Codes.FORBIDDEN_VALUE,
+            unsafe,
+            `The value of ${theme == null ? '' : `${theme}/`}${tokenId} is not safe CSS (${unsafe.reason}${unsafe.function === undefined ? '' : `: ${unsafe.function}`}).`,
+            { tokenId, theme },
+            source,
+          ),
+        );
+        continue;
+      }
       if (out[tokenId] != null) {
         diagnostics.push(
           diagnostic({
@@ -91,7 +132,7 @@ function flattenTokens(category, node, prefix, out, diagnostics, source) {
         ref: typeof entry.ref === 'string' ? entry.ref : null,
       };
     } else if (entry !== null && typeof entry === 'object') {
-      flattenTokens(category, entry, path, out, diagnostics, source);
+      flattenTokens(category, entry, path, out, diagnostics, source, theme);
     } else {
       diagnostics.push(
         diagnostic({
@@ -293,6 +334,7 @@ export function buildRegistry(definition) {
         flat,
         diagnostics,
         themeSource(themeName),
+        themeName,
       );
     }
     themeOverrides[themeName] = flat;
@@ -468,6 +510,19 @@ export function buildRegistry(definition) {
         : def.trimStart().startsWith('@')
           ? 'at-rule'
           : 'selector';
+    const unsafe = unsafeValueClass(def, 'condition');
+    if (unsafe != null) {
+      diagnostics.push(
+        valueSafetyDiagnostic(
+          Codes.UNKNOWN_CONDITION,
+          unsafe,
+          `Condition ${name} is not safe CSS (${unsafe.reason}${unsafe.function === undefined ? '' : `: ${unsafe.function}`}).`,
+          { condition: name },
+          null,
+        ),
+      );
+      continue;
+    }
     conds[name] = { name, definition: def, kind };
     conditionOrder.push(name);
   }

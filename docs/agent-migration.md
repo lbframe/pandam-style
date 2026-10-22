@@ -185,8 +185,17 @@ run by `tools/policy/migration-examples.mjs`); byte equality compares
 | M3 | Alpha 1 accepts `flex: 1e308` and emits `flex:Infinity` | Same rule and reason | Page: an admitted integer, such as `flex: 1` | `flex:1`; no byte equality (the Alpha 1 output was invalid CSS) |
 | M4 | CE-02.1 accepts `propertyDomains: { opacity: { range: { min: 0, max: 1 } } }` | `PMS_INVALID_PROPERTY_DOMAIN` / `property-domains.range-removed` | List the values used: `values: [0, 0.5, 1]` | Byte-equal to CE-02.1 for those values |
 | M5 | Alpha 1 accepts a `-4px` spacing token on `paddingTop` (invalid at computed-value time) and on `marginTop` | Padding: `PMS_FORBIDDEN_VALUE` / `category-strict`, `reason: token-value-out-of-domain`. Margin: unchanged | Page: a non-negative spacing token on the padding | Margin: byte-equal. Padding: the replacement token's variable; an intended behavior change |
+| M6 | Alpha 1 accepts the token value `'red !important'` and emits `--x…:red !important;` | `PMS_FORBIDDEN_VALUE` / `value-safety.important` (phase `registry`) | `value: 'red'` (design system) | `--x…:red;`: the declaration intentionally loses `!important`; no byte equality |
 | M7 | CE-02.1 refuses `propertyDomains: { width: { values: ['18px'] } }` (`outside-standard`) | `'18px'` is admitted; `'18.0px'` is refused with `property-domains.non-canonical`, `canonical: '18px'` | `values: ['18px']`, then page `width: '18px'` | `width:18px`; no earlier output exists |
 
+- Author text must be safe CSS (S1): a token value, theme value or condition
+  with a raw `;`, `{`, `}` or `\`, a comment, `!important`, `url()`, `var()`,
+  `env()` or another unapproved function is refused at registry build, and a
+  raw condition-block key that is not safe is refused where it is written.
+  None of the CE-00.3 workloads, the compiler fixtures, the examples or the
+  agentic benchmark design systems hold such a text.
+- A `--*` key in a style object is `supported-properties.custom-property`,
+  and an unrecognized vendor-prefixed key `supported-properties.vendor-extension`.
 - Numbers: an admitted literal has at most 4 fraction digits, so two distinct
   values never collapse into one class as Alpha 1's rounding allowed.
 - A number is never given a unit: `width: 16` is refused
