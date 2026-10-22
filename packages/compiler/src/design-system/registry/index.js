@@ -23,6 +23,9 @@ import {
 import { createHash } from 'crypto';
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 import { validateRecipeDefinition } from '../recipes/validate';
+import { PATTERN_IDS } from '../patterns/compile';
+import { buildSemantics } from '../semantics/build';
+import { vocabularyOf } from '../semantics/references';
 
 const lexicalCompare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -48,6 +51,9 @@ export function registryDigest(registryPayload) {
 
 function flattenTokens(category, node, prefix, out, diagnostics, source) {
   for (const key of Object.keys(node)) {
+    // AG-03.1: a `meta` key in a token group is never a path segment; it is
+    // reported as `metadata.unsupported-position` (semantics/build.js).
+    if (key === 'meta') continue;
     if (key === '') {
       diagnostics.push(
         diagnostic({
@@ -142,6 +148,7 @@ export function buildRegistry(definition) {
   const tokensOut = {};
 
   for (const category of Object.keys(tokens)) {
+    if (category === 'meta') continue; // AG-03.1: unsupported position
     flattenTokens(
       category,
       tokens[category],
@@ -285,6 +292,7 @@ export function buildRegistry(definition) {
     }
     const flat = {};
     for (const category of Object.keys(overrides)) {
+      if (category === 'meta') continue; // AG-03.1: unsupported position
       flattenTokens(
         category,
         overrides[category],
@@ -498,6 +506,22 @@ export function buildRegistry(definition) {
     );
   }
 
+  // AG-03.1: the canonical metadata side table. It is built from the
+  // definition's `meta` values against the declared vocabulary and is NOT in
+  // the digest payload below: no compiled record holds metadata (design note
+  // §3.1, I2).
+  const semanticPolicy = buildSemantics(definition, () =>
+    vocabularyOf({
+      tokens: tokensOut,
+      themeNames,
+      conditionNames: conditionOrder,
+      recipes: recs,
+      patternIds: PATTERN_IDS,
+      propertyKeys: Object.keys(propertyDomains),
+    }),
+  );
+  diagnostics.push(...semanticPolicy.diagnostics);
+
   const payload = {
     systemId,
     tokens: tokensOut,
@@ -555,6 +579,7 @@ export function buildRegistry(definition) {
     recipes: recs,
     enhancements,
     propertyDomains,
+    semantics: semanticPolicy.semantics,
     vocabularyDomains,
     diagnostics,
     registryDigest: registryDigest(payload),

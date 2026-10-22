@@ -52,12 +52,112 @@ export interface TargetProfileDefinition {
   readonly platform?: 'electron';
 }
 
-/** One `propertyDomains` entry: at least one member, nothing else. */
+/** One `propertyDomains` entry: at least one domain member, and optional `meta`. */
 export interface PropertyDomainDefinition {
   readonly values?: readonly (string | number)[];
   readonly tokens?: readonly string[];
   /** `{ min }` alone has no upper bound. */
   readonly range?: Readonly<{ min: number; max?: number }>;
+  /** AG-03.1 descriptive metadata; never part of the domain. */
+  readonly meta?: EntityMetadata;
+}
+
+/**
+ * AG-03.1: the address of a design-system entity, or of an application
+ * component (a relation target only; declared, never checked).
+ */
+export type EntityAddress =
+  | { readonly token: string }
+  | { readonly theme: string }
+  | { readonly condition: string }
+  | { readonly recipe: string }
+  | { readonly recipe: string; readonly slot: string }
+  | { readonly recipe: string; readonly variant: string }
+  | {
+      readonly recipe: string;
+      readonly variant: string;
+      readonly value: string;
+    }
+  | { readonly pattern: string }
+  | { readonly property: string }
+  | {
+      readonly component: { readonly module: string; readonly export: string };
+    };
+
+/** A JSON scalar, or a token reference written as data. */
+export type MetadataExampleValue =
+  | string
+  | number
+  | boolean
+  | { readonly token: string };
+
+/** An example, compiled by the compiler; its shape depends on the entity kind. */
+export type MetadataExample =
+  | { readonly property: string; readonly condition?: string }
+  | { readonly property: string; readonly value: MetadataExampleValue }
+  | { readonly value: MetadataExampleValue }
+  | {
+      readonly parameters: Readonly<
+        Record<
+          string,
+          MetadataExampleValue | Readonly<Record<string, MetadataExampleValue>>
+        >
+      >;
+    }
+  | {
+      readonly select?: Readonly<Record<string, string | number | boolean>>;
+      readonly slot?: string;
+    };
+
+/**
+ * AG-03.1: declared, descriptive metadata of one entity. Untrusted data: it
+ * never grants a property, value, token, selection or capability, and the
+ * compiler validates it against a closed schema (unknown fields are refused).
+ */
+export interface EntityMetadata {
+  readonly semanticRole?: string;
+  readonly description?: string;
+  readonly usage?: readonly string[];
+  /** Declared guidance, never enforced. */
+  readonly restrictions?: readonly string[];
+  readonly terms?: readonly string[];
+  readonly relations?: readonly {
+    readonly relation:
+      | 'related'
+      | 'pairs-with'
+      | 'alternative'
+      | 'implemented-by';
+    readonly target: EntityAddress;
+  }[];
+  readonly examples?: readonly MetadataExample[];
+  /** Presence means deprecated; descriptive only. */
+  readonly deprecated?: {
+    readonly reason?: string;
+    readonly replacement?: EntityAddress;
+  };
+}
+
+/** A recipe's metadata, with its slots, axes and values. */
+export interface RecipeMetadata extends EntityMetadata {
+  readonly slots?: Readonly<Record<string, EntityMetadata>>;
+  readonly variants?: Readonly<
+    Record<
+      string,
+      {
+        readonly meta?: EntityMetadata;
+        readonly values?: Readonly<Record<string, EntityMetadata>>;
+      }
+    >
+  >;
+}
+
+/** The design system's own metadata, with the compiler patterns it describes. */
+export interface SystemMetadata {
+  readonly description?: string;
+  readonly usage?: readonly string[];
+  readonly restrictions?: readonly string[];
+  readonly terms?: readonly string[];
+  readonly patterns?: Readonly<Record<string, EntityMetadata>>;
 }
 
 /** A design-system author's optional progressive enhancement. */
@@ -77,6 +177,8 @@ export interface Definition {
    * authoring keys (`width`); they are validated by the compiler.
    */
   readonly propertyDomains?: Readonly<Record<string, PropertyDomainDefinition>>;
+  /** AG-03.1: the design system's own metadata (see `SystemMetadata`). */
+  readonly meta?: SystemMetadata;
   readonly [key: string]: unknown;
 }
 

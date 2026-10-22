@@ -99,7 +99,8 @@ propertyDomains: {
 
 - A key is a property authoring key the compiler admits (not a composite form
   or a platform extension). An entry holds at least one of `values`, `tokens`
-  and `range`, and nothing else.
+  and `range`, and nothing else except optional descriptive `meta` (see
+  Validation boundary), which is never part of the domain.
 - Every member must belong to the property's standard domain: standard
   keywords and literals, standard token categories with at least one declared
   token, and, on the four legacy rows (`opacity`, `flex`, `flexGrow`,
@@ -148,3 +149,59 @@ structured `PMS_*` diagnostics. Changing a definition invalidates generated
 styles, manifest and types as one design-system input. If a system change is
 not explicitly authorized, report missing vocabulary instead of amending the
 definition as a side effect of component work.
+
+**Metadata (AG-03.1).** An optional `meta` object describes an entity for agents. It is
+untrusted descriptive data: it never grants a property, value, token, recipe
+selection, visibility or capability, and the compiler interprets none of its
+text. Policy, generated types, the manifest, CSS and the design module are
+identical with or without it, and the registry digest does not change.
+
+`meta` is accepted on the definition itself, on a token leaf (beside `value` or
+`ref`), on a theme, on a condition in object form, on a recipe and on a
+`propertyDomains` entry. Recipe children and compiler patterns are described
+from their parent:
+
+```js
+recipes: {
+  button: {
+    variants: { tone: { neutral: {}, danger: {} } },
+    meta: {
+      description: 'The only clickable action surface.',
+      examples: [{ select: { tone: 'danger' } }],
+      variants: { tone: { values: { danger: { usage: ['Destructive actions.'] } } } },
+    },
+  },
+},
+meta: { patterns: { stack: { usage: ['Vertical rhythm between sections.'] } } },
+```
+
+Slots use `meta.slots.<slot>`; a variant axis uses
+`meta.variants.<axis>.meta`. A `meta` key in a token group or as a category
+name, or on a theme override leaf, is an error.
+
+Each `meta` is closed; nothing has a default and absent fields stay absent.
+Fields, by kind: `description` (one line, at most 512 bytes), `usage` and
+`restrictions` (1–8 lines of at most 256 bytes), `terms` and `semanticRole`
+(lowercase kebab identifiers), `relations` (`related`, `pairs-with`,
+`alternative`, or `implemented-by` an application component
+`{ component: { module, export } }`, which is declared and never checked),
+`examples` (structured data compiled by the unchanged policy, with
+`{ token: '<path>' }` for token references) and `deprecated`
+(`{ reason?, replacement? }`, descriptive only; a replacement has the same kind
+and, for tokens, the same category, and replacements are acyclic). References
+use addresses such as `{ token }`, `{ recipe, slot }` or
+`{ recipe, variant, value }`. Text must be NFC, single-line, without control,
+bidirectional or invisible characters, and without surrounding space; the
+compiler rejects it rather than rewrite it. One entity's own `meta` is at most
+4,096 bytes and all metadata at most 1 MiB, in canonical JSON.
+
+Metadata of a consumer-visible entity may not reference, exemplify or name
+(in any text, term or literal, whatever its case or punctuation) a private
+token or private recipe. Invalid metadata fails the build with
+`PMS_INVALID_METADATA` and a `metadata.*` rule. Its diagnostics show a private
+entity only as `{ kind, visibility: 'private', ordinal }`: the rank among the
+private entities of that kind that declare `meta`, ordered by address.
+
+The definition must be plain data: plain objects, arrays, primitives and
+`token()` marks. An accessor, function, class instance or other non-plain
+object is `PMS_INVALID_DEFINITION`, rule `definition.shape`.
