@@ -551,20 +551,6 @@ export function compileStyles({
         }
         continue;
       }
-      // A property the compiler does not describe is refused as such, before
-      // its value is read as a condition map: an object under an unknown key
-      // is never a condition question (CE-02.1).
-      if (propertyRow(effectivePropertiesOf(registry), key) == null) {
-        diagnostics.push(
-          unsupportedProperty(
-            key,
-            effectivePropertiesOf(registry),
-            null,
-            locate?.(nsName, key, null) ?? source,
-          ),
-        );
-        continue;
-      }
       for (const [condName, inner] of expandValue(
         key,
         value,
