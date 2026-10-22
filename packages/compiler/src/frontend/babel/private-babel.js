@@ -220,3 +220,8 @@ export function privateBabel() {
 export function clearPrivatePaths() {
   instance?.clearPaths();
 }
+
+// Loaded with the compiler, as its former static imports were, so the first
+// validation does not pay for loading Babel (#156: the CE-00.3 full-compile
+// timings exclude import time).
+privateBabel();
