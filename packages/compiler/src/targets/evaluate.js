@@ -275,12 +275,13 @@ function ownerGroupsOf(sources) {
  * A unit's feature uses in the compact form a live unit keeps: parallel
  * arrays of use keys and (shared) records, occurrence and owner counts in one
  * typed array, and the owner role once when the unit has a single one. The
- * owner groups a diagnostic reads come from `groupsSource`: kept for small
- * units, rebuilt from the unit's sources for pages, which the session holds
- * anyway.
+ * owner groups a diagnostic reads are kept for small units (`sourcesOf` is
+ * null) and rebuilt from `sourcesOf()` for pages, whose sources the session
+ * holds anyway. The function itself is kept, not a closure over it: one less
+ * object per live page.
  */
 class UnitSummary {
-  constructor(rich, groupsSource) {
+  constructor(rich, sourcesOf = null) {
     const n = rich.size;
     this.keys = new Array(n);
     this.records = new Array(n);
@@ -308,8 +309,14 @@ class UnitSummary {
     // or per-use role counts.
     this.role = single ? (role ?? null) : null;
     this.roles = single ? null : perUse;
-    this.groupsSource = groupsSource;
+    this.kept = sourcesOf == null ? rich : null;
+    this.sourcesOf = sourcesOf;
     this.groupCache = null;
+  }
+
+  /** The unit's uses with their owner groups. */
+  richUses() {
+    return this.kept ?? ownerGroupsOf(this.sourcesOf());
   }
 
   get size() {
@@ -333,7 +340,7 @@ class UnitSummary {
     if (!this.keys.includes(useKey)) return [];
     let groups = this.groupCache?.get(useKey);
     if (groups === undefined) {
-      groups = this.groupsSource().get(useKey)?.groups ?? [];
+      groups = this.richUses().get(useKey)?.groups ?? [];
       this.groupCache ??= new Map();
       this.groupCache.set(useKey, groups);
     }
@@ -352,7 +359,8 @@ class UnitSummary {
     view.counts = this.counts;
     view.role = this.role;
     view.roles = this.roles;
-    view.groupsSource = () => ownerGroupsOf(sourcesOf());
+    view.kept = null;
+    view.sourcesOf = sourcesOf;
     view.groupCache = null;
     return view;
   }
@@ -381,8 +389,7 @@ export function structureKey(summary) {
 
 /** The unit summary of a list of sources, keeping its owner groups. */
 export function summarizeSources(sources) {
-  const rich = ownerGroupsOf(sources);
-  return new UnitSummary(rich, () => rich);
+  return new UnitSummary(ownerGroupsOf(sources));
 }
 
 /**
@@ -390,9 +397,7 @@ export function summarizeSources(sources) {
  * when a diagnostic needs them instead of being kept.
  */
 export function summarizePage(sourcesOf) {
-  return new UnitSummary(ownerGroupsOf(sourcesOf()), () =>
-    ownerGroupsOf(sourcesOf()),
-  );
+  return new UnitSummary(ownerGroupsOf(sourcesOf()), sourcesOf);
 }
 
 const unitCache = new WeakMap();

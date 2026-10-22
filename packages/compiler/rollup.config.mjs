@@ -113,8 +113,34 @@ function compatData({ inline }) {
   };
 }
 
+// V8 keeps a loaded module's source text for lazy compilation. One character
+// above U+00FF makes that a two-byte string, which doubles what every process
+// that imports the compiler retains (issue #130). Public bundles must stay
+// one-byte: escape such characters in source (`'\u2264'`).
+function oneByteSource() {
+  return {
+    name: 'pandamstyle-one-byte-source',
+    generateBundle(_options, bundle) {
+      for (const chunk of Object.values(bundle)) {
+        if (chunk.type !== 'chunk') continue;
+        const at = chunk.code.search(/[\u0100-\u{10ffff}]/u);
+        if (at === -1) continue;
+        const line = chunk.code.slice(0, at).split('\n').length;
+        this.error(
+          `${chunk.fileName}:${line}: character U+${chunk.code
+            .codePointAt(at)
+            .toString(16)
+            .toUpperCase()} makes the bundle source a two-byte string; escape it.`,
+        );
+      }
+    },
+  };
+}
+
 function plugins({ inlineCompatData = false } = {}) {
   return [
+    // The private test bundle inlines the compat data text, which is UTF-8.
+    ...(inlineCompatData ? [] : [oneByteSource()]),
     compatData({ inline: inlineCompatData }),
     babel({
       babelHelpers: 'bundled',
