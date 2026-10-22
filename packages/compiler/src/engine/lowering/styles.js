@@ -22,11 +22,14 @@ import {
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 import { tokenPathOf } from '../../design-system/tokens/ref';
 import {
-  propertyKind,
-  propertyCategory,
-  structuralAllowed,
-  structuralDomain,
-} from '../../design-system/policy/properties';
+  admittedValues,
+  effectivePropertiesOf,
+  isPrototypeName,
+  literalAllowed,
+  propertyDomainsOf,
+  propertyRow,
+} from '../../design-system/policy/domains';
+import { recognizedProperty } from '../../design-system/policy/recognized';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, perfCollector } from '../../observability/metrics';
 import { applyTransforms } from '../../targets/transforms';
@@ -104,29 +107,46 @@ const BASE_CONDITION = 'default';
  */
 const admittedCache = new WeakMap();
 
-function admittedTokens(registry, category, allowPrivateTokens) {
+function admittedTokens(registry, categories, allowPrivateTokens) {
   let byKey = admittedCache.get(registry);
   if (byKey == null) {
     byKey = new Map();
     admittedCache.set(registry, byKey);
   }
-  const key = `${category}|${allowPrivateTokens ? 'all' : 'public'}`;
-  const hit = byKey.get(key);
+  // `categories` is a row's frozen `domain.tokens`: one array per effective
+  // row, so its identity is the memo key.
+  let byVisibility = byKey.get(categories);
+  if (byVisibility == null) {
+    byVisibility = {};
+    byKey.set(categories, byVisibility);
+  }
+  const key = allowPrivateTokens ? 'all' : 'public';
+  const hit = byVisibility[key];
   if (hit !== undefined) return hit;
   const canonicalDomains = registry.vocabularyDomains;
-  const list = allowPrivateTokens
-    ? (canonicalDomains?.allTokenIdsByCategory?.[category] ??
-      Object.keys(registry.tokens).filter(
-        (id) => registry.tokens[id].category === category,
-      ))
-    : (canonicalDomains?.publicTokenIdsByCategory?.[category] ??
-      Object.keys(registry.tokens).filter(
-        (id) =>
-          registry.tokens[id].category === category &&
-          registry.tokens[id].visibility === 'public',
-      ));
-  byKey.set(key, list);
+  const list = [];
+  for (const category of categories) {
+    list.push(
+      ...(allowPrivateTokens
+        ? (canonicalDomains?.allTokenIdsByCategory?.[category] ??
+          Object.keys(registry.tokens).filter(
+            (id) => registry.tokens[id].category === category,
+          ))
+        : (canonicalDomains?.publicTokenIdsByCategory?.[category] ??
+          Object.keys(registry.tokens).filter(
+            (id) =>
+              registry.tokens[id].category === category &&
+              registry.tokens[id].visibility === 'public',
+          ))),
+    );
+  }
+  byVisibility[key] = list;
   return list;
+}
+
+/** A registered condition name: an own key of the registry's conditions. */
+function hasCondition(registry, name) {
+  return typeof name === 'string' && Object.hasOwn(registry.conditions, name);
 }
 
 /**
@@ -153,7 +173,7 @@ function expandValue(property, value, registry, source, refKind, diagnostics) {
         condName === 'base' || condName === 'default'
           ? BASE_CONDITION
           : condName;
-      if (cond !== BASE_CONDITION && registry.conditions[cond] == null) {
+      if (cond !== BASE_CONDITION && !hasCondition(registry, cond)) {
         diagnostics.push(
           diagnostic({
             code: Codes.UNKNOWN_CONDITION,
@@ -179,6 +199,56 @@ function expandValue(property, value, registry, source, refKind, diagnostics) {
   return [[null, value]];
 }
 
+// Rule of an unsupported property, by its CE-00.1 disposition. Recognition
+// authorizes nothing: every one of these is rejected.
+const UNSUPPORTED_RULES = Object.freeze({
+  'canonical-property': 'supported-properties.not-admitted',
+  'system-resource': 'supported-properties.not-admitted',
+  'incompatible-runtime-requirement': 'supported-properties.not-admitted',
+  'normalized-alias': 'supported-properties.alias',
+  'deprecated-or-experimental': 'supported-properties.deprecated',
+  'scoped-platform-extension': 'supported-properties.platform-extension',
+});
+
+/**
+ * PMS_UNSUPPORTED_PROPERTY for a property without an admitted domain: a
+ * platform-extension row (recognition-only in CE-02.1, whatever the target
+ * profile), a recognized name, or an unrecognized one (prototype keys
+ * included).
+ */
+function unsupportedProperty(property, properties, row, where) {
+  const recognized = row == null ? recognizedProperty(property) : null;
+  const disposition =
+    row != null
+      ? 'scoped-platform-extension'
+      : (recognized?.disposition ?? null);
+  const rule =
+    (disposition == null ? null : UNSUPPORTED_RULES[disposition]) ??
+    'supported-properties.unrecognized';
+  const context = { property };
+  if (rule === 'supported-properties.unrecognized') {
+    if (disposition != null) context.disposition = disposition;
+    context.admitted = propertyDomainsOf(properties).keys;
+  } else {
+    context.css = row?.css ?? recognized.css;
+    context.disposition = disposition;
+    if (recognized?.replacement != null) {
+      context.replacement = recognized.replacement;
+    }
+    if (rule === 'supported-properties.platform-extension') {
+      context.platform = row?.platform ?? null;
+    }
+  }
+  return diagnostic({
+    code: Codes.UNSUPPORTED_PROPERTY,
+    phase: 'policy',
+    message: `Property not covered by the profile: ${property}.`,
+    source: where,
+    rule,
+    context,
+  });
+}
+
 function checkValue({
   property,
   value,
@@ -195,9 +265,10 @@ function checkValue({
 }) {
   // Provenance: the location of the declaration inside the page, when known.
   const where = locate?.() ?? source;
-  const kind = propertyKind(property);
+  const properties = effectivePropertiesOf(registry);
+  const row = propertyRow(properties, property);
 
-  if (kind === 'composite-form') {
+  if (row != null && row.form === 'rejected-composite') {
     diagnostics.push(
       diagnostic({
         code: Codes.UNSUPPORTED_PROPERTY_FORM,
@@ -210,83 +281,78 @@ function checkValue({
     );
     return null;
   }
-  if (kind === 'unsupported') {
-    diagnostics.push(
-      diagnostic({
-        code: Codes.UNSUPPORTED_PROPERTY,
-        phase: 'policy',
-        message: `Property not covered by the profile: ${property}.`,
-        source: where,
-        rule: 'supported-properties',
-        context: { property },
-      }),
-    );
+  if (row == null || row.domain == null) {
+    diagnostics.push(unsupportedProperty(property, properties, row, where));
     return null;
   }
-  if (kind === 'structural-set' || kind === 'structural-number') {
-    if (!structuralAllowed(property, value)) {
+
+  const domain = row.domain;
+  // The rule names the shape of the domain, as Alpha 1 did: `category-strict`
+  // for a token-only domain, `structural-domain` for literal values or a
+  // range, `property-domain` for a domain that mixes both.
+  const tokenOnly =
+    domain.tokens.length > 0 &&
+    domain.values.length === 0 &&
+    domain.range == null;
+  const literalOnly = domain.tokens.length === 0;
+  const valueRule = tokenOnly
+    ? 'category-strict'
+    : literalOnly
+      ? 'structural-domain'
+      : 'property-domain';
+  const categories = domain.tokens;
+  const category = categories.length === 1 ? categories[0] : null;
+
+  // The `compiler` mode accepts ONLY compiler-stamped TokenRefs: a page object
+  // imitating the internal shape is not proof.
+  const tokenId = tokenPathOf(value, refKind);
+  if (tokenId == null || literalOnly) {
+    if (tokenId == null && literalAllowed(domain, value)) return value;
+    if (literalOnly) {
       diagnostics.push(
         diagnostic({
           code: Codes.FORBIDDEN_VALUE,
           phase: 'policy',
           message: `Valeur structurelle interdite : ${property} = ${JSON.stringify(value)}.`,
           source: where,
-          rule: 'structural-domain',
+          rule: valueRule,
           context: {
             property,
             value,
-            admitted: structuralDomain(property),
+            admitted: admittedValues(domain),
             conditionPath,
+            ...(row.origin === 'default' ? {} : { origin: row.origin }),
           },
         }),
       );
       return null;
     }
-    return value;
-  }
-
-  // kind === 'category': a TokenRef of the right category is mandatory.
-  const category = propertyCategory(property);
-
-  // The admissible-token list, DERIVED FROM THE REGISTRY ALREADY IN HAND.
-  //
-  // The baseline rebuilt this array with a full `Object.keys(registry.tokens)`
-  // scan for EVERY declaration it checked, and used it for exactly one thing:
-  // the `candidates` field of a diagnostic that is raised only when the value
-  // was refused. The scan is O(tokens) per declaration, so a registry of 10,000
-  // tokens and a file of 12 declarations costs 120,000 comparisons to produce
-  // zero diagnostics.
-  //
-  // The work-eliminated variant computes it once per (category,
-  // allowPrivateTokens) pair and memoises it on the registry object. The RESULT
-  // is identical: same members, same order, same diagnostic text. Only the
-  // number of times it is computed changes.
-  //
-  const admitted = admittedTokens(registry, category, allowPrivateTokens);
-
-  // The `compiler` mode accepts ONLY compiler-stamped TokenRefs: a page object
-  // imitating the internal shape is not proof.
-  const tokenId = tokenPathOf(value, refKind);
-  if (tokenId == null) {
+    // The admissible-token list, derived from the registry already in hand
+    // and memoised per (registry, domain, visibility): see `admittedTokens`.
     diagnostics.push(
       diagnostic({
         code: Codes.FORBIDDEN_VALUE,
         phase: 'policy',
-        message: `Valeur interdite pour ${property} : ${JSON.stringify(value)}. Un token ${category} est requis.`,
+        message: tokenOnly
+          ? `Valeur interdite pour ${property} : ${JSON.stringify(value)}. Un token ${category ?? categories.join(' | ')} est requis.`
+          : `Valeur interdite pour ${property} : ${JSON.stringify(value)}.`,
         source: where,
-        rule: 'category-strict',
+        rule: valueRule,
         context: {
           property,
           category,
+          ...(tokenOnly ? {} : { admitted: admittedValues(domain) }),
           value,
           systemId,
-          candidates: admitted,
+          candidates: admittedTokens(registry, categories, allowPrivateTokens),
           conditionPath,
+          ...(row.origin === 'default' ? {} : { origin: row.origin }),
         },
       }),
     );
     return null;
   }
+  const admitted = admittedTokens(registry, categories, allowPrivateTokens);
 
   const entry = registry.tokens[tokenId];
   if (entry == null) {
@@ -310,18 +376,18 @@ function checkValue({
     );
     return null;
   }
-  if (entry.category !== category) {
+  if (!categories.includes(entry.category)) {
     diagnostics.push(
       diagnostic({
         code: Codes.INVALID_TOKEN_CATEGORY,
         phase: 'policy',
-        message: `${property} exige un token ${category} ; ${tokenId} est ${entry.category}.`,
+        message: `${property} exige un token ${category ?? categories.join(' | ')} ; ${tokenId} est ${entry.category}.`,
         source: where,
         rule: 'category-strict',
         context: {
           property,
           systemId,
-          expected: category,
+          expected: category ?? [...categories],
           actual: entry.category,
           tokenId,
           visibility: entry.visibility,
@@ -390,11 +456,26 @@ export function compileStyles({
     const outNs = {};
     for (const key of Object.keys(ns)) {
       const value = ns[key];
+      // An Object.prototype name is never a property nor a condition block:
+      // refused here, before the `_condition` and `:`/`@`/`[` dispatch.
+      if (isPrototypeName(key)) {
+        diagnostics.push(
+          unsupportedProperty(
+            key,
+            effectivePropertiesOf(registry),
+            null,
+            locate?.(nsName, key, null) ?? source,
+          ),
+        );
+        continue;
+      }
       // Author syntax `_hover` (carried over from Panda): named condition resolved
       // to its canonical definition before lowering.
       if (key.startsWith('_') && value !== null && typeof value === 'object') {
         const condName = key.slice(1);
-        const condDef = registry.conditions[condName]?.definition;
+        const condDef = hasCondition(registry, condName)
+          ? registry.conditions[condName].definition
+          : null;
         if (condDef == null) {
           diagnostics.push(
             diagnostic({
@@ -479,7 +560,9 @@ export function compileStyles({
         diagnostics,
       )) {
         const condDef =
-          condName == null ? null : registry.conditions[condName]?.definition;
+          condName == null || !hasCondition(registry, condName)
+            ? null
+            : registry.conditions[condName].definition;
         const lowered = checkValue({
           property: key,
           value: inner,

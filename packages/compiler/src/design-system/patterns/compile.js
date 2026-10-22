@@ -277,3 +277,49 @@ export function createPatternIR(patternId, parameters = {}, options = {}) {
 export function patternStyles(patternId, parameters = {}) {
   return createPatternIR(patternId, parameters).declarations;
 }
+
+let emissionsMemo = null;
+
+/**
+ * Every literal value and token category each pattern can emit, by property:
+ * `{ [patternId]: { [property]: { values, tokens } } }`. Enumerated through
+ * `createPatternIR` over the defaults and every finite parameter value, so it
+ * cannot drift from the pattern lowering. A spacing parameter emits its own
+ * property with a `spacing` token.
+ */
+export function patternEmissions() {
+  if (emissionsMemo != null) return emissionsMemo;
+  const out = {};
+  for (const patternId of PATTERN_IDS) {
+    const schema = SCHEMAS[patternId];
+    const byProperty = {};
+    const add = (property, kind, value) => {
+      byProperty[property] ??= { values: [], tokens: [] };
+      if (!byProperty[property][kind].includes(value)) {
+        byProperty[property][kind].push(value);
+      }
+    };
+    const record = (parameters) => {
+      const { declarations } = createPatternIR(patternId, parameters);
+      for (const [property, value] of Object.entries(declarations)) {
+        if (typeof value === 'string' || typeof value === 'number') {
+          add(property, 'values', value);
+        }
+      }
+    };
+    record({});
+    for (const [parameter, domain] of Object.entries(schema)) {
+      if (domain === 'spacing') add(parameter, 'tokens', 'spacing');
+      else if (domain === 'boolean') {
+        for (const value of [false, true]) record({ [parameter]: value });
+      } else if (domain === 'columns') {
+        for (const value of [1, 2, 3, 4, 5, 6]) record({ [parameter]: value });
+      } else {
+        for (const value of Object.keys(domain)) record({ [parameter]: value });
+      }
+    }
+    out[patternId] = byProperty;
+  }
+  emissionsMemo = Object.freeze(out);
+  return emissionsMemo;
+}

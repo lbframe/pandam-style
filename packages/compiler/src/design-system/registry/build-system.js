@@ -23,11 +23,7 @@ import {
 import { defineRecipe } from '../recipes/compile';
 import { toRuntimeRefs, toThemeRefs } from '../../artifacts/javascript/refs';
 import { token } from '../tokens/ref';
-import {
-  propertyKind,
-  structuralDomain,
-  supportedProperties,
-} from '../policy/properties';
+import { effectivePropertiesOf } from '../policy/domains';
 import { designSystemTargetFacts, unitSummary } from '../../targets/evaluate';
 import { tokenGrammars } from '../../targets/catalog';
 import { PmsError } from '../../protocol/diagnostics';
@@ -143,7 +139,7 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
       themes,
       recipes,
       cssRules: injected,
-      supportedProperties: supportedProperties(),
+      properties: effectivePropertiesOf(registry),
       targets,
       targetFacts: targetFacts == null ? null : designSystemFacts(targetFacts),
     }),
@@ -198,17 +194,6 @@ export function conditionDefinitions(registry) {
     name,
     definition: registry.conditions[name]?.definition ?? null,
   }));
-}
-
-/**
- * Admitted structural values of a CSS (kebab-case) property, or null. Used for
- * structured repair candidates of target diagnostics.
- */
-export function structuralDomainOfCss(cssProperty) {
-  const key = String(cssProperty).replace(/-([a-z])/g, (_, c) =>
-    c.toUpperCase(),
-  );
-  return propertyKind(key) === 'structural-set' ? structuralDomain(key) : null;
 }
 
 const designSystemFactsCache = new WeakMap();

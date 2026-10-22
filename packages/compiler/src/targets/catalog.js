@@ -27,6 +27,7 @@ import { transformOfProperty } from './transforms';
 import caveatReviews from './catalog/caveats.v1.json';
 import inapplicableReviews from './catalog/inapplicable.v1.json';
 import subfeatureReviews from './catalog/subfeatures.v1.json';
+import { platformExtensions } from '../design-system/policy/descriptors';
 
 export const CATALOG_KIND = 'pandamstyle-feature-catalog';
 export const CATALOG_SCHEMA_VERSION = 1;
@@ -37,12 +38,9 @@ const OBSOLETE_PREFIXES = ['-ms-', '-o-', '-khtml-'];
 const VENDOR_PREFIXES = ['-webkit-', '-moz-'];
 
 // D-BP-03 / LIM-07: platform-scoped extensions, valid only in a profile that
-// announces their platform.
-export const PLATFORM_FEATURES = Object.freeze({
-  '-webkit-app-region': 'electron',
-  '-webkit-user-drag': 'electron',
-  '-webkit-font-smoothing': 'electron',
-});
+// announces their platform. CSS name -> platform id, read from the property
+// descriptors (CE-02.1), the only property authority.
+export const PLATFORM_FEATURES = platformExtensions();
 
 // Units with their own BCD statement. Units absent here are unrecognized.
 const UNIT_PATHS = Object.freeze({

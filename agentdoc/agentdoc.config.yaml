@@ -67,14 +67,16 @@ reviewedOverrides:
     reason: "Source review finds property/category and finite structural-domain validation, consumer token visibility checks, static transformation and binding-based provenance rejection. This corroborates these constraint mechanisms; it is not execution or exhaustive semantic qualification."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
+      - path: packages/compiler/src/design-system/policy/domains.js
+        sha256: abd33050f9c04ffc577a6d0d8f9747ffd665f897ee39e31acc026d04ab57ad95
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/semantics/provenance/index.js
@@ -87,13 +89,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -129,7 +131,7 @@ reviewedOverrides:
       - path: packages/compiler/src/api/output-lease.js
         sha256: c51b174771841d225abeed23a0ab440517bb0478f72f22ffe370734cd9e8b2e2
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/protocol/identities.js
         sha256: 7ba906018ae2621a6ba24d9264290cd52c3f3ab61a738a7b0843c45590bdc063
       - path: packages/compiler/src/artifacts/publication/transaction.js
@@ -198,7 +200,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: tools/pms/package-qualification.js
-        sha256: 4411838d675328e57fc8936d51beb5a49b9ca6ef7160800a291ea03f4cf64461
+        sha256: b54db6f25c80b4a16e026f3676198137e1ebe13fcb6bdc05bc4a06023a75a442
       - path: tools/pms/donor-closure.js
         sha256: 8dd0932608cb72c425d48c3fb57ec197ed19147a64f294fc4bb620b23937f8b3
       - path: tools/pms/core-package-proof.js
@@ -223,14 +225,16 @@ reviewedOverrides:
     reason: "Source review finds property/category and finite structural-domain validation, consumer token visibility checks, static transformation and binding-based provenance rejection. This corroborates these constraint mechanisms; it is not execution or exhaustive semantic qualification."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
+      - path: packages/compiler/src/design-system/policy/domains.js
+        sha256: abd33050f9c04ffc577a6d0d8f9747ffd665f897ee39e31acc026d04ab57ad95
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/semantics/provenance/index.js
@@ -243,25 +247,25 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/src/api/output-lease.js
         sha256: c51b174771841d225abeed23a0ab440517bb0478f72f22ffe370734cd9e8b2e2
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/protocol/identities.js
         sha256: 7ba906018ae2621a6ba24d9264290cd52c3f3ab61a738a7b0843c45590bdc063
       - path: packages/compiler/__tests__/pandamstyle/transactional-generation-test.js
@@ -406,13 +410,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -423,15 +427,15 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
   - fact: requirement-satisfaction
     subject: component:pandamstyle/compiler
     key: requirement.agent-repair-common-categories-and-local-repair
@@ -440,29 +444,29 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/patterns/compile.js
-        sha256: 573fd2160a85a277f180eb3fceb17ada746c75fd7a447771a086d73a1345ba7b
+        sha256: fecd40a61ec1de98e5c6a1c6654aeccdf19f005ea375377628ddbf9bd9eb98dd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/design-system/recipes/validate.js
         sha256: 417107746772a2f1cd331f28812633cd4c4fed11175dc9150fe8d71f7924033b
       - path: packages/compiler/src/design-system/recipes/compile.js
         sha256: 9ea15c4cabf743485dafe90393b20ff7a7a10f940a7398167d47fa5a9e7a051f
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
   - fact: requirement-satisfaction
     subject: component:pandamstyle/core
     key: requirement.agent-repair-common-categories-and-local-repair
@@ -491,20 +495,20 @@ reviewedOverrides:
     reason: "Source review corroborates the policy, patterns, recipes, themes mechanisms required by this section, using the pinned implementation files. The detailed responsibilities remain in the cited section. This is reviewed source evidence, not a new test, build, browser or host qualification result."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/patterns/compile.js
-        sha256: 573fd2160a85a277f180eb3fceb17ada746c75fd7a447771a086d73a1345ba7b
+        sha256: fecd40a61ec1de98e5c6a1c6654aeccdf19f005ea375377628ddbf9bd9eb98dd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/design-system/recipes/validate.js
         sha256: 417107746772a2f1cd331f28812633cd4c4fed11175dc9150fe8d71f7924033b
       - path: packages/compiler/src/design-system/recipes/compile.js
         sha256: 9ea15c4cabf743485dafe90393b20ff7a7a10f940a7398167d47fa5a9e7a051f
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/design-system/themes/lowering.js
         sha256: 8bba85e2d92045c5f98352702cdb47229c48f584c8734d2cbda5b21d71b4217f
       - path: packages/compiler/src/frontend/babel/plugin.js
@@ -544,25 +548,25 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/frontend/babel/evaluate.js
-        sha256: 32475fce46c5b18c90ab49852c97977e8c5fa83c14cc2352b43ea1680efb19e6
+        sha256: 9a107fb76374c50b9a88032ac1871b659c8b7f93ad4f42d272644ecf96af5482
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/recipes/validate.js
         sha256: 417107746772a2f1cd331f28812633cd4c4fed11175dc9150fe8d71f7924033b
       - path: packages/compiler/src/design-system/recipes/compile.js
         sha256: 9ea15c4cabf743485dafe90393b20ff7a7a10f940a7398167d47fa5a9e7a051f
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
       - path: packages/compiler/__tests__/pandamstyle/phase-15a-recipes-test.js
@@ -595,22 +599,22 @@ reviewedOverrides:
     reason: "Source review corroborates the policy, recipes, generated mechanisms required by this section, using the pinned implementation files. The detailed responsibilities remain in the cited section. This is reviewed source evidence, not a new test, build, browser or host qualification result."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/recipes/validate.js
         sha256: 417107746772a2f1cd331f28812633cd4c4fed11175dc9150fe8d71f7924033b
       - path: packages/compiler/src/design-system/recipes/compile.js
         sha256: 9ea15c4cabf743485dafe90393b20ff7a7a10f940a7398167d47fa5a9e7a051f
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/semantics/provenance/index.js
@@ -618,7 +622,7 @@ reviewedOverrides:
       - path: packages/compiler/__tests__/pandamstyle/phase-15a-recipes-test.js
         sha256: eb2881d123f0cb350c59884685ab56b7a3f2512715ac0159e1365a5815b7335f
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
   - fact: requirement-satisfaction
     subject: component:pandamstyle/core
     key: requirement.agent-use-responsive-behavior-and-finite-selection
@@ -647,24 +651,26 @@ reviewedOverrides:
     reason: "Source review corroborates the policy, imports, patterns mechanisms required by this section, using the pinned implementation files. The detailed responsibilities remain in the cited section. This is reviewed source evidence, not a new test, build, browser or host qualification result."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
+      - path: packages/compiler/src/design-system/policy/domains.js
+        sha256: abd33050f9c04ffc577a6d0d8f9747ffd665f897ee39e31acc026d04ab57ad95
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/frontend/babel/evaluate.js
-        sha256: 32475fce46c5b18c90ab49852c97977e8c5fa83c14cc2352b43ea1680efb19e6
+        sha256: 9a107fb76374c50b9a88032ac1871b659c8b7f93ad4f42d272644ecf96af5482
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/design-system/patterns/compile.js
-        sha256: 573fd2160a85a277f180eb3fceb17ada746c75fd7a447771a086d73a1345ba7b
+        sha256: fecd40a61ec1de98e5c6a1c6654aeccdf19f005ea375377628ddbf9bd9eb98dd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/api/config.js
         sha256: 0c7de47b3737b2d3803fb42fa3b30d9e0192e9f6838356002a2379febcf8fe01
       - path: packages/compiler/__tests__/pandamstyle/phase-15b-patterns-test.js
@@ -685,7 +691,7 @@ reviewedOverrides:
       - path: packages/compiler/src/api/host.js
         sha256: 52f26c38cd7e987d3735867acaeac1b2d259e7e37c00579efbaa5cc2199bad45
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
       - path: packages/compiler/types/config.d.ts
         sha256: 6e01c0a74e0256a48323a7988a9cde04205556635d29213cd27d52718745f4b8
       - path: packages/compiler/types/host.d.ts
@@ -702,7 +708,7 @@ reviewedOverrides:
       - path: packages/core/src/index.js
         sha256: 18cc50fc8f30369d4432fbd3cd1912a9353ccb02d984cbf211967ed5424ce724
       - path: packages/core/src/types.ts
-        sha256: ec1ff431b5dd46fa527f7797351ff4758b22e58d1ebcf04fb2ba7c557c18be2b
+        sha256: 555d849a6876cce34ccb3095ab28696d319e4d155c8731df3a8a2e65a351ab4a
   - fact: requirement-satisfaction
     subject: component:pandamstyle/vite
     key: requirement.adr0001-decision
@@ -758,7 +764,7 @@ reviewedOverrides:
       - path: packages/compiler/src/api/host.js
         sha256: 52f26c38cd7e987d3735867acaeac1b2d259e7e37c00579efbaa5cc2199bad45
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
       - path: packages/compiler/types/config.d.ts
         sha256: 6e01c0a74e0256a48323a7988a9cde04205556635d29213cd27d52718745f4b8
       - path: packages/compiler/types/host.d.ts
@@ -775,7 +781,7 @@ reviewedOverrides:
       - path: packages/core/src/index.js
         sha256: 18cc50fc8f30369d4432fbd3cd1912a9353ccb02d984cbf211967ed5424ce724
       - path: packages/core/src/types.ts
-        sha256: ec1ff431b5dd46fa527f7797351ff4758b22e58d1ebcf04fb2ba7c557c18be2b
+        sha256: 555d849a6876cce34ccb3095ab28696d319e4d155c8731df3a8a2e65a351ab4a
   - fact: requirement-satisfaction
     subject: component:pandamstyle/vite
     key: requirement.adr0001-consequences-and-acceptance-evidence
@@ -823,7 +829,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: tools/pms/package-qualification.js
-        sha256: 4411838d675328e57fc8936d51beb5a49b9ca6ef7160800a291ea03f4cf64461
+        sha256: b54db6f25c80b4a16e026f3676198137e1ebe13fcb6bdc05bc4a06023a75a442
       - path: tools/pms/donor-closure.js
         sha256: 8dd0932608cb72c425d48c3fb57ec197ed19147a64f294fc4bb620b23937f8b3
       - path: tools/pms/core-package-proof.js
@@ -861,13 +867,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -899,13 +905,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -915,20 +921,20 @@ reviewedOverrides:
     reason: "Source review corroborates the policy, recipes, patterns, themes mechanisms required by this section, using the pinned implementation files. The detailed responsibilities remain in the cited section. This is reviewed source evidence, not a new test, build, browser or host qualification result."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/recipes/validate.js
         sha256: 417107746772a2f1cd331f28812633cd4c4fed11175dc9150fe8d71f7924033b
       - path: packages/compiler/src/design-system/recipes/compile.js
         sha256: 9ea15c4cabf743485dafe90393b20ff7a7a10f940a7398167d47fa5a9e7a051f
       - path: packages/compiler/src/design-system/patterns/compile.js
-        sha256: 573fd2160a85a277f180eb3fceb17ada746c75fd7a447771a086d73a1345ba7b
+        sha256: fecd40a61ec1de98e5c6a1c6654aeccdf19f005ea375377628ddbf9bd9eb98dd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/design-system/themes/lowering.js
         sha256: 8bba85e2d92045c5f98352702cdb47229c48f584c8734d2cbda5b21d71b4217f
       - path: packages/compiler/src/frontend/babel/plugin.js
@@ -967,20 +973,20 @@ reviewedOverrides:
     reason: "Source review corroborates the policy, recipes, patterns, themes mechanisms required by this section, using the pinned implementation files. The detailed responsibilities remain in the cited section. This is reviewed source evidence, not a new test, build, browser or host qualification result."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/recipes/validate.js
         sha256: 417107746772a2f1cd331f28812633cd4c4fed11175dc9150fe8d71f7924033b
       - path: packages/compiler/src/design-system/recipes/compile.js
         sha256: 9ea15c4cabf743485dafe90393b20ff7a7a10f940a7398167d47fa5a9e7a051f
       - path: packages/compiler/src/design-system/patterns/compile.js
-        sha256: 573fd2160a85a277f180eb3fceb17ada746c75fd7a447771a086d73a1345ba7b
+        sha256: fecd40a61ec1de98e5c6a1c6654aeccdf19f005ea375377628ddbf9bd9eb98dd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/design-system/themes/lowering.js
         sha256: 8bba85e2d92045c5f98352702cdb47229c48f584c8734d2cbda5b21d71b4217f
       - path: packages/compiler/src/frontend/babel/plugin.js
@@ -1020,7 +1026,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: tools/pms/package-qualification.js
-        sha256: 4411838d675328e57fc8936d51beb5a49b9ca6ef7160800a291ea03f4cf64461
+        sha256: b54db6f25c80b4a16e026f3676198137e1ebe13fcb6bdc05bc4a06023a75a442
       - path: tools/pms/donor-closure.js
         sha256: 8dd0932608cb72c425d48c3fb57ec197ed19147a64f294fc4bb620b23937f8b3
       - path: tools/pms/core-package-proof.js
@@ -1037,15 +1043,15 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/frontend/babel/evaluate.js
-        sha256: 32475fce46c5b18c90ab49852c97977e8c5fa83c14cc2352b43ea1680efb19e6
+        sha256: 9a107fb76374c50b9a88032ac1871b659c8b7f93ad4f42d272644ecf96af5482
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
   - fact: requirement-satisfaction
     subject: component:pandamstyle/compiler
     key: requirement.adr0004-consequences-and-acceptance-evidence
@@ -1054,15 +1060,15 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/frontend/babel/evaluate.js
-        sha256: 32475fce46c5b18c90ab49852c97977e8c5fa83c14cc2352b43ea1680efb19e6
+        sha256: 9a107fb76374c50b9a88032ac1871b659c8b7f93ad4f42d272644ecf96af5482
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
   - fact: requirement-satisfaction
     subject: component:pandamstyle/core
     key: requirement.adr0005-decision
@@ -1092,13 +1098,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -1130,13 +1136,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -1147,7 +1153,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: tools/pms/package-qualification.js
-        sha256: 4411838d675328e57fc8936d51beb5a49b9ca6ef7160800a291ea03f4cf64461
+        sha256: b54db6f25c80b4a16e026f3676198137e1ebe13fcb6bdc05bc4a06023a75a442
       - path: tools/pms/donor-closure.js
         sha256: 8dd0932608cb72c425d48c3fb57ec197ed19147a64f294fc4bb620b23937f8b3
       - path: tools/pms/core-package-proof.js
@@ -1168,7 +1174,7 @@ reviewedOverrides:
       - path: packages/compiler/src/api/output-lease.js
         sha256: c51b174771841d225abeed23a0ab440517bb0478f72f22ffe370734cd9e8b2e2
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/protocol/identities.js
         sha256: 7ba906018ae2621a6ba24d9264290cd52c3f3ab61a738a7b0843c45590bdc063
       - path: packages/compiler/src/artifacts/publication/transaction.js
@@ -1189,7 +1195,7 @@ reviewedOverrides:
       - path: packages/compiler/src/api/output-lease.js
         sha256: c51b174771841d225abeed23a0ab440517bb0478f72f22ffe370734cd9e8b2e2
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/protocol/identities.js
         sha256: 7ba906018ae2621a6ba24d9264290cd52c3f3ab61a738a7b0843c45590bdc063
       - path: packages/compiler/src/artifacts/publication/transaction.js
@@ -1221,7 +1227,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: tools/pms/package-qualification.js
-        sha256: 4411838d675328e57fc8936d51beb5a49b9ca6ef7160800a291ea03f4cf64461
+        sha256: b54db6f25c80b4a16e026f3676198137e1ebe13fcb6bdc05bc4a06023a75a442
       - path: tools/pms/donor-closure.js
         sha256: 8dd0932608cb72c425d48c3fb57ec197ed19147a64f294fc4bb620b23937f8b3
       - path: tools/pms/core-package-proof.js
@@ -1253,7 +1259,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: tools/pms/package-qualification.js
-        sha256: 4411838d675328e57fc8936d51beb5a49b9ca6ef7160800a291ea03f4cf64461
+        sha256: b54db6f25c80b4a16e026f3676198137e1ebe13fcb6bdc05bc4a06023a75a442
       - path: tools/pms/donor-closure.js
         sha256: 8dd0932608cb72c425d48c3fb57ec197ed19147a64f294fc4bb620b23937f8b3
       - path: tools/pms/core-package-proof.js
@@ -1270,15 +1276,15 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
   - fact: requirement-satisfaction
     subject: component:pandamstyle/compiler
     key: requirement.adr0008-consequences-and-acceptance-evidence
@@ -1287,15 +1293,15 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
   - fact: requirement-satisfaction
     subject: component:pandamstyle/compiler
     key: requirement.adr0009-decision
@@ -1304,13 +1310,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -1321,13 +1327,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -1412,7 +1418,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: tools/pms/package-qualification.js
-        sha256: 4411838d675328e57fc8936d51beb5a49b9ca6ef7160800a291ea03f4cf64461
+        sha256: b54db6f25c80b4a16e026f3676198137e1ebe13fcb6bdc05bc4a06023a75a442
       - path: tools/pms/donor-closure.js
         sha256: 8dd0932608cb72c425d48c3fb57ec197ed19147a64f294fc4bb620b23937f8b3
       - path: tools/pms/core-package-proof.js
@@ -1429,15 +1435,15 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
   - fact: requirement-satisfaction
     subject: component:pandamstyle/compiler
     key: requirement.diagnostics-protocol-v1-field-semantics
@@ -1446,15 +1452,15 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
   - fact: requirement-satisfaction
     subject: component:pandamstyle/compiler
     key: requirement.diagnostics-protocol-v1-stable-code-families-and-repairs
@@ -1463,15 +1469,15 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
   - fact: requirement-satisfaction
     subject: component:pandamstyle/core
     key: requirement.diagnostics-protocol-v1-stable-code-families-and-repairs
@@ -1501,7 +1507,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/api/project.js
@@ -1509,11 +1515,11 @@ reviewedOverrides:
       - path: packages/compiler/src/api/output-lease.js
         sha256: c51b174771841d225abeed23a0ab440517bb0478f72f22ffe370734cd9e8b2e2
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/protocol/identities.js
         sha256: 7ba906018ae2621a6ba24d9264290cd52c3f3ab61a738a7b0843c45590bdc063
       - path: packages/compiler/src/artifacts/publication/transaction.js
@@ -1529,14 +1535,16 @@ reviewedOverrides:
     reason: "Source review finds module and declaration generation from canonical registry snapshots, runtime imports from core, artifact identity metadata and staged publication validation. Consumer no-edit instructions are process policy; this evidence covers compiler ownership and identity mechanisms."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
+      - path: packages/compiler/src/design-system/policy/domains.js
+        sha256: abd33050f9c04ffc577a6d0d8f9747ffd665f897ee39e31acc026d04ab57ad95
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -1568,13 +1576,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -1606,13 +1614,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -1681,21 +1689,21 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/src/api/output-lease.js
         sha256: c51b174771841d225abeed23a0ab440517bb0478f72f22ffe370734cd9e8b2e2
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/protocol/identities.js
         sha256: 7ba906018ae2621a6ba24d9264290cd52c3f3ab61a738a7b0843c45590bdc063
       - path: packages/compiler/__tests__/pandamstyle/transactional-generation-test.js
@@ -1725,7 +1733,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: tools/pms/package-qualification.js
-        sha256: 4411838d675328e57fc8936d51beb5a49b9ca6ef7160800a291ea03f4cf64461
+        sha256: b54db6f25c80b4a16e026f3676198137e1ebe13fcb6bdc05bc4a06023a75a442
       - path: tools/pms/donor-closure.js
         sha256: 8dd0932608cb72c425d48c3fb57ec197ed19147a64f294fc4bb620b23937f8b3
       - path: tools/pms/core-package-proof.js
@@ -1773,7 +1781,7 @@ reviewedOverrides:
       - path: packages/compiler/src/engine/ordering/defaults.js
         sha256: 0dc8f62bab9023e1c50b53c4e723aec7767e342d48b0343048e29359a0a3b3e5
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/tokens/lowering.js
         sha256: e53316b46d87b7b963a3e5aa40116a51d350b1dc519ff82b119a2a598056c887
       - path: packages/compiler/src/design-system/themes/lowering.js
@@ -1800,7 +1808,7 @@ reviewedOverrides:
       - path: packages/compiler/src/engine/ordering/defaults.js
         sha256: 0dc8f62bab9023e1c50b53c4e723aec7767e342d48b0343048e29359a0a3b3e5
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/tokens/lowering.js
         sha256: e53316b46d87b7b963a3e5aa40116a51d350b1dc519ff82b119a2a598056c887
       - path: packages/compiler/src/design-system/themes/lowering.js
@@ -1831,7 +1839,7 @@ reviewedOverrides:
       - path: packages/compiler/src/engine/ordering/defaults.js
         sha256: 0dc8f62bab9023e1c50b53c4e723aec7767e342d48b0343048e29359a0a3b3e5
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/tokens/lowering.js
         sha256: e53316b46d87b7b963a3e5aa40116a51d350b1dc519ff82b119a2a598056c887
       - path: packages/compiler/src/design-system/themes/lowering.js
@@ -1861,7 +1869,7 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: tools/pms/package-qualification.js
-        sha256: 4411838d675328e57fc8936d51beb5a49b9ca6ef7160800a291ea03f4cf64461
+        sha256: b54db6f25c80b4a16e026f3676198137e1ebe13fcb6bdc05bc4a06023a75a442
       - path: tools/pms/donor-closure.js
         sha256: 8dd0932608cb72c425d48c3fb57ec197ed19147a64f294fc4bb620b23937f8b3
       - path: tools/pms/core-package-proof.js
@@ -1892,26 +1900,28 @@ reviewedOverrides:
     reason: "Source review corroborates the policy, generated mechanisms required by this section, using the pinned implementation files. The detailed responsibilities remain in the cited section. This is reviewed source evidence, not a new test, build, browser or host qualification result."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
+      - path: packages/compiler/src/design-system/policy/domains.js
+        sha256: abd33050f9c04ffc577a6d0d8f9747ffd665f897ee39e31acc026d04ab57ad95
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -1930,7 +1940,7 @@ reviewedOverrides:
       - path: packages/compiler/src/api/host.js
         sha256: 52f26c38cd7e987d3735867acaeac1b2d259e7e37c00579efbaa5cc2199bad45
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
       - path: packages/compiler/types/config.d.ts
         sha256: 6e01c0a74e0256a48323a7988a9cde04205556635d29213cd27d52718745f4b8
       - path: packages/compiler/types/host.d.ts
@@ -1947,7 +1957,7 @@ reviewedOverrides:
       - path: packages/core/src/index.js
         sha256: 18cc50fc8f30369d4432fbd3cd1912a9353ccb02d984cbf211967ed5424ce724
       - path: packages/core/src/types.ts
-        sha256: ec1ff431b5dd46fa527f7797351ff4758b22e58d1ebcf04fb2ba7c557c18be2b
+        sha256: 555d849a6876cce34ccb3095ab28696d319e4d155c8731df3a8a2e65a351ab4a
   - fact: requirement-satisfaction
     subject: component:pandamstyle/vite
     key: requirement.public-api-v0-1-package-apis
@@ -2003,11 +2013,11 @@ reviewedOverrides:
       - path: packages/compiler/src/api/output-lease.js
         sha256: c51b174771841d225abeed23a0ab440517bb0478f72f22ffe370734cd9e8b2e2
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/protocol/identities.js
         sha256: 7ba906018ae2621a6ba24d9264290cd52c3f3ab61a738a7b0843c45590bdc063
       - path: packages/compiler/src/artifacts/publication/transaction.js
@@ -2017,9 +2027,9 @@ reviewedOverrides:
       - path: packages/compiler/__tests__/pandamstyle/incremental-session-test.js
         sha256: 6e89883b93fba899c530e89c7ba36ad7f7b5002c43f3e817167da9bea30dddc3
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
   - fact: requirement-satisfaction
     subject: component:pandamstyle/tooling
     key: requirement.semantic-oracle-v1-cases-and-expectations
@@ -2043,13 +2053,13 @@ reviewedOverrides:
       - path: packages/compiler/src/project/graph/resolution.js
         sha256: cc67067f41c084cd3a259c6959e22e33a1a5946ad64e1fc1176fdcec0dafd4dc
       - path: packages/compiler/src/frontend/babel/evaluate.js
-        sha256: 32475fce46c5b18c90ab49852c97977e8c5fa83c14cc2352b43ea1680efb19e6
+        sha256: 9a107fb76374c50b9a88032ac1871b659c8b7f93ad4f42d272644ecf96af5482
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/__tests__/pandamstyle/forwarding-semantics-test.js
         sha256: 2bf453f0b9c6bb5d2509e85a63f833af12c7ddbbb52b5bd39ce1f7f081163bc0
   - fact: requirement-satisfaction
@@ -2062,13 +2072,13 @@ reviewedOverrides:
       - path: packages/compiler/src/project/graph/resolution.js
         sha256: cc67067f41c084cd3a259c6959e22e33a1a5946ad64e1fc1176fdcec0dafd4dc
       - path: packages/compiler/src/frontend/babel/evaluate.js
-        sha256: 32475fce46c5b18c90ab49852c97977e8c5fa83c14cc2352b43ea1680efb19e6
+        sha256: 9a107fb76374c50b9a88032ac1871b659c8b7f93ad4f42d272644ecf96af5482
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/__tests__/pandamstyle/forwarding-semantics-test.js
         sha256: 2bf453f0b9c6bb5d2509e85a63f833af12c7ddbbb52b5bd39ce1f7f081163bc0
   - fact: requirement-satisfaction
@@ -2081,13 +2091,13 @@ reviewedOverrides:
       - path: packages/compiler/src/project/graph/resolution.js
         sha256: cc67067f41c084cd3a259c6959e22e33a1a5946ad64e1fc1176fdcec0dafd4dc
       - path: packages/compiler/src/frontend/babel/evaluate.js
-        sha256: 32475fce46c5b18c90ab49852c97977e8c5fa83c14cc2352b43ea1680efb19e6
+        sha256: 9a107fb76374c50b9a88032ac1871b659c8b7f93ad4f42d272644ecf96af5482
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/__tests__/pandamstyle/forwarding-semantics-test.js
         sha256: 2bf453f0b9c6bb5d2509e85a63f833af12c7ddbbb52b5bd39ce1f7f081163bc0
   - fact: requirement-satisfaction
@@ -2097,14 +2107,16 @@ reviewedOverrides:
     reason: "Source review finds property/category and finite structural-domain validation, consumer token visibility checks, static transformation and binding-based provenance rejection. This corroborates these constraint mechanisms; it is not execution or exhaustive semantic qualification."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
+      - path: packages/compiler/src/design-system/policy/domains.js
+        sha256: abd33050f9c04ffc577a6d0d8f9747ffd665f897ee39e31acc026d04ab57ad95
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/semantics/provenance/index.js
@@ -2172,9 +2184,9 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/design-system/patterns/compile.js
-        sha256: 573fd2160a85a277f180eb3fceb17ada746c75fd7a447771a086d73a1345ba7b
+        sha256: fecd40a61ec1de98e5c6a1c6654aeccdf19f005ea375377628ddbf9bd9eb98dd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/api/config.js
         sha256: 0c7de47b3737b2d3803fb42fa3b30d9e0192e9f6838356002a2379febcf8fe01
       - path: packages/compiler/__tests__/pandamstyle/phase-15b-patterns-test.js
@@ -2187,19 +2199,19 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/design-system/themes/lowering.js
         sha256: 8bba85e2d92045c5f98352702cdb47229c48f584c8734d2cbda5b21d71b4217f
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/__tests__/pandamstyle/phase-15c-themes-types-test.js
         sha256: 9d0361479418590fcd239617a3c6242b8c3b61573f15d9f5a9d5b472131b3771
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -2218,7 +2230,7 @@ reviewedOverrides:
       - path: packages/compiler/src/api/host.js
         sha256: 52f26c38cd7e987d3735867acaeac1b2d259e7e37c00579efbaa5cc2199bad45
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
       - path: packages/compiler/types/config.d.ts
         sha256: 6e01c0a74e0256a48323a7988a9cde04205556635d29213cd27d52718745f4b8
       - path: packages/compiler/types/host.d.ts
@@ -2235,7 +2247,7 @@ reviewedOverrides:
       - path: packages/core/src/index.js
         sha256: 18cc50fc8f30369d4432fbd3cd1912a9353ccb02d984cbf211967ed5424ce724
       - path: packages/core/src/types.ts
-        sha256: ec1ff431b5dd46fa527f7797351ff4758b22e58d1ebcf04fb2ba7c557c18be2b
+        sha256: 555d849a6876cce34ccb3095ab28696d319e4d155c8731df3a8a2e65a351ab4a
   - fact: requirement-satisfaction
     subject: component:pandamstyle/vite
     key: requirement.compiler-api-public-package-exports
@@ -2328,7 +2340,7 @@ reviewedOverrides:
       - path: packages/compiler/src/api/index.js
         sha256: 647dd25bc28b187580b69b87456a2967799cdee7355c2b198b21e80524598336
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/protocol/identities.js
         sha256: 7ba906018ae2621a6ba24d9264290cd52c3f3ab61a738a7b0843c45590bdc063
       - path: packages/compiler/src/artifacts/publication/transaction.js
@@ -2342,7 +2354,7 @@ reviewedOverrides:
       - path: packages/compiler/src/api/host.js
         sha256: 52f26c38cd7e987d3735867acaeac1b2d259e7e37c00579efbaa5cc2199bad45
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
   - fact: requirement-satisfaction
     subject: component:pandamstyle/core
     key: requirement.compiler-api-compiler-project-service
@@ -2355,7 +2367,7 @@ reviewedOverrides:
       - path: packages/core/src/index.js
         sha256: 18cc50fc8f30369d4432fbd3cd1912a9353ccb02d984cbf211967ed5424ce724
       - path: packages/core/src/types.ts
-        sha256: ec1ff431b5dd46fa527f7797351ff4758b22e58d1ebcf04fb2ba7c557c18be2b
+        sha256: 555d849a6876cce34ccb3095ab28696d319e4d155c8731df3a8a2e65a351ab4a
   - fact: requirement-satisfaction
     subject: component:pandamstyle/vite
     key: requirement.compiler-api-compiler-project-service
@@ -2403,21 +2415,21 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/protocol/diagnostics-result-v1.js
-        sha256: d7ac813095052b70730556177ab13ec59a7a7d085bba5178f5badfd289c8b13c
+        sha256: 7e8690d93e98afe430efb2c5e5fcfffb6da71c379b6ee8991026f6d9d66e9333
       - path: packages/compiler/src/protocol/diagnostics-result.js
         sha256: 64f495f3f508c8ef1977ca6f6064ed1d9b02916f5605c7d40dc9b87c2945c224
       - path: packages/compiler/src/protocol/diagnostics.js
-        sha256: 79008f5a2ebb760e8c13b287c29f91ebc8138f3bdf1f63e7ee07b7276585aeeb
+        sha256: 0555e5c406576f15a6cd777c04d4080f1a1d901a019f52b2cebe12d01bf44e7f
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/types/index.d.ts
-        sha256: ca2cec7e72e820de39e0edc7ef1804431cb862f04ca58a4a52278a128f669ae5
+        sha256: 681acbda6de8f06ab2e90599e9145b85dfe19862297d34844cd2d5b80e868c9e
       - path: packages/compiler/src/targets/project.js
-        sha256: accc93af63f58be35b2687c2989fd9b59d86897e114e12608d6bdbd73c9a2885
+        sha256: 3a19faabf9e80c39da0cd1eec4b53b082478526a8c5f567d19805c23b28430d4
       - path: packages/compiler/src/targets/evaluate.js
-        sha256: 06adfc767c4ef26b43db928f70b98b9fba6c9da395b1faf511c2974fa8eca9f4
+        sha256: ed0e1080b7de9e4f89cf66706682aaeac3fad3c1fc3007fb42dd07236feb28eb
       - path: packages/compiler/__tests__/pandamstyle/targets-project-test.js
-        sha256: a62273e5dbf2b4f210bf1e7c9edafcb3f05100bdb82f4a7976645fc0d616b6c5
+        sha256: fc4921a55784bea7a1594962f35d6e381c9dbb17e751abbf1c324f14f722f350
   - fact: requirement-satisfaction
     subject: component:pandamstyle/compiler
     key: requirement.compiler-api-generated-artifacts
@@ -2426,13 +2438,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
   - fact: requirement-satisfaction
@@ -2442,26 +2454,26 @@ reviewedOverrides:
     reason: "Source review corroborates the policy, generated mechanisms required by this section, using the pinned implementation files. The detailed responsibilities remain in the cited section. This is reviewed source evidence, not a new test, build, browser or host qualification result."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/artifacts/javascript/design-module.js
-        sha256: b350ca7a22ade7689c59be23cb44e3b10c309d72114af4f03ba6a70e46f94ad9
+        sha256: 55e45e5cd94c18d98df23891a5c5a600f10254fa80a6bdfe0ac3c3b62d5031c5
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/metadata/artifact-set.js
-        sha256: 389ffd405ac9143f0b4d5c3c32fb8d7d4c1c3de5b76b5d39a1dc6b62316cbf09
+        sha256: d1d6b03e498bdebaa049a34038d7aff4df58fbc3f7e02a189b635222711b79b1
       - path: packages/compiler/src/artifacts/publication/transaction.js
         sha256: a030c210b63c9afea9ed64669dbcc4cbe9dbdb05b9442a87021a7e7d0058f8f4
       - path: packages/compiler/src/targets/policy.js
@@ -2473,14 +2485,16 @@ reviewedOverrides:
     reason: "Source review finds property/category and finite structural-domain validation, consumer token visibility checks, static transformation and binding-based provenance rejection. This corroborates these constraint mechanisms; it is not execution or exhaustive semantic qualification."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
+      - path: packages/compiler/src/design-system/policy/domains.js
+        sha256: abd33050f9c04ffc577a6d0d8f9747ffd665f897ee39e31acc026d04ab57ad95
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/semantics/provenance/index.js
@@ -2493,13 +2507,13 @@ reviewedOverrides:
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/design-system/themes/lowering.js
         sha256: 8bba85e2d92045c5f98352702cdb47229c48f584c8734d2cbda5b21d71b4217f
       - path: packages/compiler/src/design-system/registry/snapshot.js
-        sha256: f204b494bfb4ed8cd32cf0497ff2bf10b46595b184247be3e290f01ce9194152
+        sha256: c9372657e2679429e68d0f778122c76d79a7984f60a6395bc590a832c30dde64
       - path: packages/compiler/src/artifacts/types/design-declarations.js
-        sha256: b861876e1bd884313957afeae34a4e6db9bc8f67d9cdcb15636aad2807c038d5
+        sha256: 29a9ae7be2eddd218fc21db2f07617004314bfd3b2a6c3f624670d102d4eec6a
       - path: packages/compiler/__tests__/pandamstyle/phase-15c-themes-types-test.js
         sha256: 9d0361479418590fcd239617a3c6242b8c3b61573f15d9f5a9d5b472131b3771
   - fact: requirement-satisfaction
@@ -2543,24 +2557,24 @@ reviewedOverrides:
     reason: "Source review corroborates the policy, lifecycle mechanisms required by this section, using the pinned implementation files. The detailed responsibilities remain in the cited section. This is reviewed source evidence, not a new test, build, browser or host qualification result."
     reviewWhen: "When any pinned implementation or cited normative section changes; re-review behavior before repinning."
     evidence:
-      - path: packages/compiler/src/design-system/policy/properties.js
-        sha256: f3427cc540f2b9a0fabdcf0af638fc8367ae88eb1bf7658ede0a6d0357470540
+      - path: packages/compiler/src/design-system/policy/descriptors.js
+        sha256: 45c4071b1488e6fa77ffc6fbfbe2d1e9693bd1851f779596703b6442c439e563
       - path: packages/compiler/src/engine/lowering/styles.js
-        sha256: 1226f1eac7564326d967050179f07aae6e9a3cb1a9aacc044d7a7854c5777398
+        sha256: ed3fcfdf79a10686bf00366f266bb302b3a6784da43e5e8319d81a8eaea545bc
       - path: packages/compiler/src/api/project.js
         sha256: 514ab7c9e396c45ea66530d264d949a795cdcde85ab69ed3af999fd2330b03b9
       - path: packages/compiler/src/api/output-lease.js
         sha256: c51b174771841d225abeed23a0ab440517bb0478f72f22ffe370734cd9e8b2e2
       - path: packages/compiler/src/design-system/registry/index.js
-        sha256: e23e1859ab354a1a857f5f4ee25fcf50e418c6660e488568b5713191e03587af
+        sha256: e5b3d9a69ae8bc28e825b098f3fffe2b6d3583acf661c0b5726dbf0310bd95fd
       - path: packages/compiler/src/frontend/babel/transform.js
-        sha256: 5d6aef9dd7c6f89e741034a03368b13226948c8851e111addd2a184edc033c23
+        sha256: 18c4728d782d5b1e014119e93ee86d6d2bf26f26f074843ac40ae7d0f5ae9cda
       - path: packages/compiler/src/frontend/babel/plugin.js
         sha256: 1a5263b148fa4dff19fced64b7e62c2099d5f48f4d55e61f532404d3a7fef20f
       - path: packages/compiler/src/semantics/provenance/index.js
         sha256: 988e858a8c1f438756654ad7c8260ca428a3d6cc6a0e05f83814bdeb7415893b
       - path: packages/compiler/src/project/session/index.js
-        sha256: 3c0caa730f5fbdc37c966739295e4256f1271d2a4c259632de6f59e718a2bcd3
+        sha256: a73f18d87f3d4391d27b38ec0014abc6305c6ea253e9ff528fed96e97ca631b1
       - path: packages/compiler/src/protocol/identities.js
         sha256: 7ba906018ae2621a6ba24d9264290cd52c3f3ab61a738a7b0843c45590bdc063
       - path: packages/compiler/src/artifacts/publication/transaction.js

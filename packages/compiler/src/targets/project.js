@@ -21,8 +21,11 @@
 import {
   conditionDefinitions,
   designSystemTargetSources,
-  structuralDomainOfCss,
 } from '../design-system/registry/build-system';
+import {
+  domainOfCssFor,
+  effectivePropertiesOf,
+} from '../design-system/policy/domains';
 import crypto from 'crypto';
 
 import {
@@ -116,7 +119,7 @@ export function evaluateProjectTargets({
     enhancements: designSystem.registry.enhancements ?? [],
     conditions: conditionDefinitions(designSystem.registry),
     intrinsic: { useCSSLayers, engineOptions },
-    domainOf: structuralDomainOfCss,
+    domainOf: domainOfCssFor(effectivePropertiesOf(designSystem.registry)),
     accumulator,
   });
   // The projected facts depend only on the evaluated facts and enforcement,
