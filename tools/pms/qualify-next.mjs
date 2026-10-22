@@ -20,9 +20,12 @@ import { writeSemanticDevPerformance } from './next-semantic-dev-performance.mjs
 import nextBrowserProfile from './next-browser-profile.js';
 import browserTooling from './browser.js';
 import { cssIdentityProblems, hostCssIdentity } from './host-css-identity.mjs';
+import pageReadiness from './page-readiness.js';
 
 const { createNextBrowserProfile } = nextBrowserProfile;
 const { nextBrowserExecutable, qualifyBrowser } = browserTooling;
+const { gotoQualified, readComputedStyles, trackDocumentResponses } =
+  pageReadiness;
 
 async function main() {
   const runId = randomUUID();
@@ -51,6 +54,8 @@ async function main() {
     packages: {},
     production: [],
     dev: [],
+    // Transient documents re-navigated before a style read (#143).
+    documentRenavigations: [],
     pass: false,
     phase10Complete: false,
     browserProfile: {
@@ -665,6 +670,15 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
       await cleanupRuntime();
       throw error;
     }
+    const documents = trackDocumentResponses(page);
+    // Only before reading styles of a page expected to be valid: its source is
+    // valid and the server already answered HTTP 200. Never in a failure case.
+    const openQualified = async (site) => {
+      report.documentRenavigations.push({
+        site,
+        ...(await gotoQualified(page, documents, server.url)),
+      });
+    };
     const warnings = [];
     page.on('console', (message) => {
       if (['error', 'warning'].includes(message.type()))
@@ -794,7 +808,7 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
       const html = await response.text();
       assert.equal(response.headers.get('x-config-composed'), 'yes');
       assert.match(html, /id="server-style"[^>]*class=/);
-      await page.goto(server.url);
+      await openQualified('production-server');
       await page.waitForSelector('#client-style');
       assert.deepEqual(await styles(), {
         padding: '16px',
@@ -804,7 +818,7 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
       });
       await page.click('#client-style');
       await page.waitForFunction(() =>
-        document.querySelector('#client-style').textContent.includes('loud'),
+        document.querySelector('#client-style')?.textContent.includes('loud'),
       );
       assert.equal((await styles()).opacity, '1');
       await page.click('#navigate');
@@ -814,7 +828,11 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
         'item',
       );
       assert.equal(
-        await page.$eval('#nested', (node) => getComputedStyle(node).margin),
+        (
+          await readComputedStyles(page, documents, {
+            margin: ['#nested', 'margin'],
+          })
+        ).margin,
         '8px',
       );
       assert.equal((await fetch(server.url + '/absent')).status, 404);
@@ -1162,7 +1180,7 @@ export async function load(url, context, nextLoad) {
         firstRelevantCompilationMs: server.firstRelevantCompilationMs,
         pid: server.pid,
       });
-      await page.goto(server.url);
+      await openQualified('dev-server');
       const sourceFile = 'app/shared.jsx';
       const original = await fs.readFile(path.join(app, sourceFile), 'utf8');
       for (const opacity of [0.33, 0.77]) {
@@ -1245,7 +1263,7 @@ export async function load(url, context, nextLoad) {
           async () => (await fetch(devUrl)).status === 200,
           name + '-repair',
         );
-        await page.goto(server.url);
+        await openQualified(name + '-repair');
         assert.equal((await styles()).serverOpacity, '0.77');
         report.dev.push({
           case: name + '-repair',
@@ -1345,7 +1363,7 @@ export async function load(url, context, nextLoad) {
       const definition = await fs.readFile(definitionFile, 'utf8');
       // Start this live-refresh case on a settled document. Navigating during
       // compilation tests a different framework race, not active-page HMR.
-      await page.goto(server.url);
+      await openQualified('definition-mutation');
       assert.equal((await styles()).color, 'rgb(17, 34, 51)');
       const began = performance.now();
       await fs.writeFile(
@@ -1383,13 +1401,13 @@ export async function load(url, context, nextLoad) {
         ms: afterDefinition.ms,
       });
       server = await start('start', 'production-after-definition-server');
-      await page.goto(server.url);
+      await openQualified('production-after-definition-server');
       assert.equal((await styles()).color, 'rgb(34, 68, 102)');
       assert.equal((await styles()).serverOpacity, '0.77');
       await server.stop();
       server = null;
       server = await start('dev', 'minimum-node-dev', minimumNode);
-      await page.goto(server.url);
+      await openQualified('minimum-node-dev');
       assert.equal((await styles()).color, 'rgb(34, 68, 102)');
       report.nodeBoundary.dev = 'startup/render passed';
       report.dev.push({
@@ -1400,7 +1418,7 @@ export async function load(url, context, nextLoad) {
       await server.stop();
       server = null;
       server = await start('dev', 'dev-restart');
-      await page.goto(server.url);
+      await openQualified('dev-restart');
       assert.equal((await styles()).color, 'rgb(34, 68, 102)');
       report.dev.push({
         case: 'restart-cache',
@@ -1528,15 +1546,12 @@ export async function load(url, context, nextLoad) {
       throw cleanupError;
     }
     async function styles() {
-      return page.evaluate(() => ({
-        padding: getComputedStyle(document.querySelector('#server-style'))
-          .padding,
-        color: getComputedStyle(document.querySelector('#server-style')).color,
-        opacity: getComputedStyle(document.querySelector('#client-style'))
-          .opacity,
-        serverOpacity: getComputedStyle(document.querySelector('#server-style'))
-          .opacity,
-      }));
+      return readComputedStyles(page, documents, {
+        padding: ['#server-style', 'padding'],
+        color: ['#server-style', 'color'],
+        opacity: ['#client-style', 'opacity'],
+        serverOpacity: ['#server-style', 'opacity'],
+      });
     }
   }
 
