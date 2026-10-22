@@ -228,6 +228,7 @@ describe('the root jest configuration is not a broad ignore', () => {
         // CE-02.2 grammar and finite numeric domains.
         'packages/compiler/__tests__/pandamstyle/grammar-webref-test.js',
         'packages/compiler/__tests__/pandamstyle/manifest-v2-reader-test.js',
+        'packages/compiler/__tests__/pandamstyle/migration-examples-test.js',
         'packages/compiler/__tests__/pandamstyle/numeric-domains-test.js',
         'packages/compiler/__tests__/pandamstyle/numeric-token-facts-test.js',
         'packages/compiler/__tests__/pandamstyle/value-grammar-test.js',

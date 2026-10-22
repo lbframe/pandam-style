@@ -1,0 +1,170 @@
+{
+  "kind": "pandamstyle-ce022-migration-examples",
+  "schemaVersion": 1,
+  "source": "CE-02.2 design note (f1040b3), AC3 and Appendix B; docs/agent-migration.md",
+  "css": "`css` is generated/styles.css without its first line, the design-system identity header (it names the manifest schema version and the registry digest).",
+  "definition": {
+    "systemId": "ce022-migration",
+    "tokens": {
+      "spacing": {
+        "sm": { "value": "8px", "visibility": "public" },
+        "neg": { "value": "-4px", "visibility": "public" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "id": "M1",
+      "title": "an opacity off the 0.05 grid",
+      "baseline": "alpha1",
+      "before": {
+        "page": ["create({ n: { opacity: 0.33 } })"],
+        "expect": { "accepted": true }
+      },
+      "ce022": {
+        "expect": {
+          "code": "PMS_FORBIDDEN_VALUE",
+          "rule": "structural-domain",
+          "reason": "not-in-domain"
+        }
+      },
+      "after": {
+        "role": "design-system",
+        "propertyDomains": { "opacity": { "values": [0, 0.33, 1] } },
+        "expect": { "accepted": true, "cssEqualsBaseline": true }
+      }
+    },
+    {
+      "id": "M2",
+      "title": "a fractional flex factor",
+      "baseline": "alpha1",
+      "before": {
+        "page": ["create({ n: { flexGrow: 1.5 } })"],
+        "expect": { "accepted": true }
+      },
+      "ce022": {
+        "expect": {
+          "code": "PMS_FORBIDDEN_VALUE",
+          "rule": "structural-domain",
+          "reason": "not-in-domain"
+        }
+      },
+      "after": {
+        "role": "design-system",
+        "propertyDomains": { "flexGrow": { "values": [0, 1, 1.5] } },
+        "expect": { "accepted": true, "cssEqualsBaseline": true }
+      }
+    },
+    {
+      "id": "M3",
+      "title": "a flex factor that overflowed to Infinity",
+      "baseline": "alpha1",
+      "before": {
+        "page": ["create({ n: { flex: 1e308 } })"],
+        "expect": { "accepted": true, "cssContains": ["{flex:Infinity}"] }
+      },
+      "ce022": {
+        "expect": {
+          "code": "PMS_FORBIDDEN_VALUE",
+          "rule": "structural-domain",
+          "reason": "not-in-domain"
+        }
+      },
+      "after": {
+        "role": "page",
+        "page": ["create({ n: { flex: 1 } })"],
+        "expect": {
+          "accepted": true,
+          "cssContains": ["{flex:1}"],
+          "cssNotContains": ["Infinity"]
+        }
+      }
+    },
+    {
+      "id": "M4",
+      "title": "a CE-02.1 range override",
+      "baseline": "ce021",
+      "before": {
+        "propertyDomains": { "opacity": { "range": { "min": 0, "max": 1 } } },
+        "page": ["create({ n: { opacity: 0.5 } })"],
+        "expect": { "accepted": true }
+      },
+      "ce022": {
+        "expect": {
+          "code": "PMS_INVALID_PROPERTY_DOMAIN",
+          "rule": "property-domains.range-removed"
+        }
+      },
+      "after": {
+        "role": "design-system",
+        "propertyDomains": { "opacity": { "values": [0, 0.5, 1] } },
+        "expect": { "accepted": true, "cssEqualsBaseline": true }
+      }
+    },
+    {
+      "id": "M5-margin",
+      "title": "a negative spacing token on a margin",
+      "baseline": "alpha1",
+      "before": {
+        "page": ["create({ n: { marginTop: token('spacing.neg') } })"],
+        "expect": { "accepted": true }
+      },
+      "ce022": {
+        "expect": { "accepted": true, "cssEqualsBaseline": true }
+      }
+    },
+    {
+      "id": "M5-padding",
+      "title": "a negative spacing token on a padding",
+      "baseline": "alpha1",
+      "before": {
+        "page": ["create({ n: { paddingTop: token('spacing.neg') } })"],
+        "expect": { "accepted": true }
+      },
+      "ce022": {
+        "expect": {
+          "code": "PMS_FORBIDDEN_VALUE",
+          "rule": "category-strict",
+          "reason": "token-value-out-of-domain",
+          "candidates": ["spacing.sm"]
+        }
+      },
+      "after": {
+        "role": "page",
+        "page": ["create({ n: { paddingTop: token('spacing.sm') } })"],
+        "expect": {
+          "accepted": true,
+          "cssDeclarationUsesToken": { "property": "padding-top", "tokenValue": "8px" },
+          "cssDiffersFromBaseline": true
+        }
+      }
+    },
+    {
+      "id": "M7",
+      "title": "an author length literal",
+      "baseline": "ce021",
+      "before": {
+        "propertyDomains": { "width": { "values": ["18px"] } },
+        "page": [],
+        "expect": {
+          "code": "PMS_INVALID_PROPERTY_DOMAIN",
+          "rule": "property-domains.outside-standard"
+        }
+      },
+      "ce022": {
+        "propertyDomains": { "width": { "values": ["18.0px"] } },
+        "expect": {
+          "code": "PMS_INVALID_PROPERTY_DOMAIN",
+          "rule": "property-domains.non-canonical",
+          "canonical": "18px"
+        }
+      },
+      "after": {
+        "role": "design-system",
+        "propertyDomains": { "width": { "values": ["18px"] } },
+        "page": ["create({ n: { width: '18px' } })"],
+        "expect": { "accepted": true, "cssContains": ["{width:18px}"] }
+      }
+    }
+  ]
+}

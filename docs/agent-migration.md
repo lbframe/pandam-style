@@ -173,7 +173,10 @@ against the property's grammar
 ([design note](https://github.com/lbframe/pandam-style/blob/f1040b3/docs/research/ce-02.2-design-note.md),
 [definition reference](reference/design-system.md)). Byte-identical CSS is
 expected only where the migration preserves behavior; the expected output of
-each case is stated below.
+each case is stated below. Each case is an executable fixture
+(`packages/compiler/__tests__/pandamstyle/fixtures/ce022-migrations/examples.json`,
+run by `tools/policy/migration-examples.mjs`); byte equality compares
+`styles.css` without its identity header, which names the manifest version.
 
 | Case | Before | After CE-02.2 | Repair (role) | Expected CSS after repair |
 | --- | --- | --- | --- | --- |

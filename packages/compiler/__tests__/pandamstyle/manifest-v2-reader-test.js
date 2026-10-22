@@ -207,11 +207,11 @@ describe('typed readers (tsc)', () => {
     // `schemaVersion` is typed 1 while the manifest carries 2. CE-02.2 types
     // it from the manifest (line 6 reads the whole v3 manifest).
     `const { schemaVersion: _v2Schema, ...v2Rest } = ${lit(v2Manifest)} as const;`,
-    'export const v2ReadsV2: Omit<V2, \'schemaVersion\'> = v2Rest;',
+    `export const v2ReadsV2: Omit<V2, ${lit('schemaVersion')}> = v2Rest;`,
     `export const v3ReadsV3: V3 = ${lit(v3Manifest)};`,
     `export const v2ReadsV3Version: V2['manifestSchemaVersion'] = ${lit(v3Manifest.manifestSchemaVersion)};`,
     `const v3Opacity = ${lit(v3Manifest.properties.byProperty.opacity)} as const;`,
-    'export const v2ReadsV3Opacity: V2[\'properties\'][\'byProperty\'][\'opacity\'] = v3Opacity;',
+    `export const v2ReadsV3Opacity: V2[${lit('properties')}][${lit('byProperty')}][${lit('opacity')}] = v3Opacity;`,
     `export const v3ReadsV2Version: V3['manifestSchemaVersion'] = ${lit(v2Manifest.manifestSchemaVersion)};`,
     `export const v2SchemaField: V2['schemaVersion'] = ${lit(v2Manifest.schemaVersion)};`,
     '',

@@ -44,7 +44,12 @@ The tools in this directory support PandamStyle development and qualification.
   verdict; `numeric-token-report.mjs [<workload id> ...]` reports, for the
   frozen CE-00.3 workloads, the tokens the CE-02.2 token numeric checks would
   refuse on some admitted property and the refusals a validation of the
-  workload's own source raises, with no verdict.
+  workload's own source raises, with no verdict;
+  `migration-examples.mjs [--alpha1 <closure>] [--ce021 <pack dir>]` runs the
+  CE-02.2 migration examples (M1-M5, M7) against their Alpha 1 or CE-02.1
+  baseline and the workspace build, skipping a baseline that is not given
+  with its reason (the `migration-examples-test.js` suite reads
+  `PMS_ALPHA1_CLOSURE` and `PMS_CE021_PACK`).
 
 ## Qualification browser
 
