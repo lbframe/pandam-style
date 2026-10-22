@@ -142,6 +142,8 @@ export const Codes = {
   TARGET_ENHANCEMENT_DEGRADED: 'PMS_TARGET_ENHANCEMENT_DEGRADED',
   TARGET_ENHANCEMENT_INEFFECTIVE: 'PMS_TARGET_ENHANCEMENT_INEFFECTIVE',
   INVALID_ENHANCEMENT_POLICY: 'PMS_INVALID_ENHANCEMENT_POLICY',
+  // CE-02.1: a design-system `propertyDomains` entry the compiler refuses.
+  INVALID_PROPERTY_DOMAIN: 'PMS_INVALID_PROPERTY_DOMAIN',
 };
 
 /** Stable single-line rendering of a diagnostic (used by the build report). */
