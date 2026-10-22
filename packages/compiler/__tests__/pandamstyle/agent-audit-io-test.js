@@ -164,6 +164,7 @@ const WRITER_STEPS = [
   ['verify-read', 1],
   ['verify-read', 2],
   ['verify-after', 1],
+  ['nominal-final', 1],
 ];
 
 /** Swaps `target` for a symlink to `to`; returns the undo. */
@@ -250,26 +251,21 @@ async function writerCase(project, write, outside, hook, undoBox) {
   let result;
   try {
     result = await write(project);
-  } finally {
+  } catch (error) {
+    // Restore before reporting, so the next case starts clean.
     project.module.setAuditStepHook(null);
     for (const undo of undoBox.splice(0).reverse()) undo();
+    throw error;
   }
-  if (JSON.stringify(hashTree(outside)) !== JSON.stringify(outsideBefore))
-    violations.push('outside-changed');
-  if (
-    JSON.stringify(hashTree(project.fixture.src('src'))) !==
-    JSON.stringify(sources)
-  )
-    violations.push('sources-changed');
-  const temps = [
-    ...tempFilesUnder(path.dirname(project.root)),
-    ...tempFilesUnder(outside),
-  ];
-  if (temps.length > 0) violations.push('temp-left');
+  project.module.setAuditStepHook(null);
+  // The receipt is checked against the filesystem exactly as the call left
+  // it, BEFORE any attack is undone: a restored directory must never make a
+  // missing or foreign receipt path look right.
   if (result.ok) {
-    // The receipt's digest is an independent hash of the file at its path.
     let bytes = null;
     try {
+      const entry = fs.lstatSync(result.receipt.path);
+      if (!entry.isFile()) throw new Error('not a regular file');
       bytes = fs.readFileSync(result.receipt.path);
     } catch {
       violations.push('receipt-path-unreadable');
@@ -284,7 +280,21 @@ async function writerCase(project, write, outside, hook, undoBox) {
     }
     if (result.receipt.path !== project.final)
       violations.push('receipt-path-not-nominal');
-  } else {
+  }
+  for (const undo of undoBox.splice(0).reverse()) undo();
+  if (JSON.stringify(hashTree(outside)) !== JSON.stringify(outsideBefore))
+    violations.push('outside-changed');
+  if (
+    JSON.stringify(hashTree(project.fixture.src('src'))) !==
+    JSON.stringify(sources)
+  )
+    violations.push('sources-changed');
+  const temps = [
+    ...tempFilesUnder(path.dirname(project.root)),
+    ...tempFilesUnder(outside),
+  ];
+  if (temps.length > 0) violations.push('temp-left');
+  if (!result.ok) {
     if (result.raw != null || result.code !== 'PMS_UNSAFE_AUDIT_PATH')
       violations.push(`unstructured:${result.raw ?? result.code}`);
     else if (!WRITER_REASONS.includes(result.reason))
@@ -437,6 +447,25 @@ async function readerMatrix(module) {
       'directory moved away': (location) => {
         fs.renameSync(location.dir, `${location.dir}.moved`);
       },
+      // Length and identity races (review round 1, B1).
+      'file appended': (location) => {
+        const file = path.join(location.dir, location.name);
+        if (fs.existsSync(file)) fs.appendFileSync(file, 'noncanonical-append');
+      },
+      'file truncated': (location) => {
+        const file = path.join(location.dir, location.name);
+        if (fs.existsSync(file)) fs.truncateSync(file, canonical.length - 1);
+      },
+      'file replaced by other bytes': (location) => {
+        const file = path.join(location.dir, location.name);
+        fs.writeFileSync(`${file}.swap`, Buffer.alloc(canonical.length, 0x42));
+        fs.renameSync(`${file}.swap`, file);
+      },
+      'file replaced by the canonical bytes': (location) => {
+        const file = path.join(location.dir, location.name);
+        fs.writeFileSync(`${file}.swap`, canonical);
+        fs.renameSync(`${file}.swap`, file);
+      },
     };
     const steps = [
       ['anchor', 1],
@@ -444,31 +473,24 @@ async function readerMatrix(module) {
       ['read-lstat', 1],
       ['read-open', 1],
       ['read', 1],
+      ['read', 2],
+      ['read-after', 1],
     ];
     const report = [];
     let runs = 0;
     for (const location of locations) {
       for (const [attackName, attack] of Object.entries(attacks)) {
-        for (const [step] of steps) {
+        for (const [step, occurrence] of steps) {
           restore();
           const undoBox = [];
-          let fired = false;
-          // At `read` the reader already holds the file it opened: the
-          // pinned location is that file object, whatever its entry becomes.
-          let opened = null;
+          let seen = 0;
           project.module.setAuditStepHook((name, at) => {
             const here =
               name === 'anchor'
                 ? true
                 : (at.name ?? at.final) === location.name ||
                   at.name === path.basename(location.dir);
-            if (!fired && name === step && here) {
-              fired = true;
-              if (name === 'read')
-                opened = fs.openSync(
-                  path.join(location.dir, location.name),
-                  'r',
-                );
+            if (name === step && here && ++seen === occurrence) {
               const undo = attack(location);
               if (typeof undo === 'function') undoBox.push(undo);
             }
@@ -508,20 +530,27 @@ async function readerMatrix(module) {
           } catch {
             holdsCanonical = false;
           }
-          if (opened != null) {
-            const held = Buffer.alloc(canonical.length + 1);
-            const got = fs.readSync(opened, held, 0, held.length, 0);
-            holdsCanonical = held.subarray(0, got).equals(canonical);
-            fs.closeSync(opened);
+          const artifact = response.result?.artifacts?.[location.index];
+          const violations = [];
+          // A same-size rewrite in place after every byte was read is
+          // indistinguishable from one just after the call returns: the
+          // verdict attests the bytes read, and the next read sees the edit.
+          const afterRead =
+            attackName === 'file rewritten, same size' &&
+            ((step === 'read' && occurrence === 2) || step === 'read-after');
+          if (artifact?.status === 'fresh' && !holdsCanonical) {
+            if (!afterRead) violations.push('false-fresh');
+            else {
+              const again = (
+                await project.dispatch('audit.read', { rev: project.rev })
+              ).result.artifacts[location.index];
+              if (again.status === 'fresh') violations.push('undetected');
+            }
           }
           for (const undo of undoBox.splice(0).reverse()) undo();
           runs += 1;
-          const artifact = response.result?.artifacts?.[location.index];
-          const violations = [];
           if (response.outcome !== 'success') violations.push('outcome');
           if (elapsed > 2000) violations.push('slow');
-          if (artifact?.status === 'fresh' && !holdsCanonical)
-            violations.push('false-fresh');
           if ((artifact?.sha256 != null) !== (artifact?.status === 'fresh'))
             violations.push('digest-disclosed');
           if (violations.length > 0)
@@ -529,13 +558,18 @@ async function readerMatrix(module) {
               location: location.name,
               attackName,
               step,
+              occurrence,
               violations,
               artifact,
             });
         }
       }
     }
-    return { runs, report, expectedRuns: 2 * 7 * steps.length };
+    return {
+      runs,
+      report,
+      expectedRuns: 2 * Object.keys(attacks).length * steps.length,
+    };
   } finally {
     fs.rmSync(outside, { recursive: true, force: true });
     await project.close();
@@ -630,7 +664,8 @@ describe('§5.2 content at the publication point (writer step 8)', () => {
           // detects the later difference.
           const afterRead =
             (step === 'verify-read' && occurrence === 2) ||
-            step === 'verify-after';
+            step === 'verify-after' ||
+            step === 'nominal-final';
           if (result.ok && afterRead) {
             const hashed = violations.indexOf('file-not-canonical');
             if (hashed >= 0) {
@@ -764,14 +799,24 @@ describe('§5.2 failures at every step: cleanup', () => {
 // --------------------------------------------------------- mutations ----
 
 /** A build of the inspection bundle with one textual mutation. */
-function mutantBuild(label, from, to) {
-  const source = fs.readFileSync(BUNDLE, 'utf8');
-  expect(source.split(from).length).toBe(2);
+function mutantBuild(label, from, to, ...more) {
+  let source = fs.readFileSync(BUNDLE, 'utf8');
+  for (const [a, b] of [
+    [from, to],
+    ...more.reduce((pairs, value, index) => {
+      if (index % 2 === 0) pairs.push([value]);
+      else pairs[pairs.length - 1].push(value);
+      return pairs;
+    }, []),
+  ]) {
+    expect(source.split(a).length).toBe(2);
+    source = source.replace(a, b);
+  }
   const file = path.join(
     path.dirname(BUNDLE),
     `compiler-inspection.${label}.${process.pid}.cjs`,
   );
-  fs.writeFileSync(file, source.replace(from, to));
+  fs.writeFileSync(file, source);
   try {
     // eslint-disable-next-line
     return require(file);
@@ -829,6 +874,58 @@ describe('mutation checks: the harnesses see their class', () => {
     expect(
       report.filter((item) => item.violations.includes('false-fresh')).length,
     ).toBeGreaterThan(0);
+  });
+
+  // Review round 1, B2: the writer without the final nominal re-check
+  // succeeds with a receipt path that no longer names the written file; the
+  // oracle checks the receipt before undoing the attack, so it sees it.
+  test.each(Object.keys(WRITERS))(
+    '%s: without the final nominal re-check, a late relocation is caught by the oracle',
+    async (writerName) => {
+      const mutant = mutantBuild(
+        'no-final-nominal-check',
+        "auditStep('nominal-final', at);\n      nominalCheck();\n      ok = true;",
+        'ok = true;',
+      );
+      const { report } = await writerMatrix(mutant, writerName, {
+        steps: [
+          ['verify-lstat', 1],
+          ['verify-after', 1],
+        ],
+      });
+      const caught = report.filter((item) =>
+        item.violations.includes('receipt-path-unreadable'),
+      );
+      expect(caught.length).toBeGreaterThan(0);
+      expect(
+        caught.some(
+          (item) =>
+            item.attackName === 'audit directory → symlink to outside' &&
+            item.step === 'verify-lstat',
+        ),
+      ).toBe(true);
+    },
+  );
+
+  // Review round 1, B1: the reader bounded at the expected size and without
+  // the post-read length and identity check reports growth as fresh.
+  test('a reader without the end-of-file read and the post-read check fails the fresh assertion', async () => {
+    const mutant = mutantBuild(
+      'reader-bounded-read',
+      'while (got <= bytes) {',
+      'while (got < bytes) {',
+      "if (after.size !== bytes || named.size !== bytes) return result('stale', 'size-differs', bytes);",
+      '',
+      "if (!named.isFile() || after.dev !== entry.dev || after.ino !== entry.ino || named.dev !== entry.dev || named.ino !== entry.ino) return result('stale', 'content-differs', bytes);",
+      '',
+    );
+    const { report } = await readerMatrix(mutant);
+    const growth = report.filter(
+      (item) =>
+        item.attackName === 'file appended' &&
+        item.violations.includes('false-fresh'),
+    );
+    expect(growth.length).toBeGreaterThan(0);
   });
 
   test('a non-PmsError thrown inside the analysis loop leaves stage closure and every file unknown (fault injection)', async () => {

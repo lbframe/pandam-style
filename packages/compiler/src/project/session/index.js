@@ -4320,24 +4320,31 @@ export function createProjectSession(config) {
       }
 
       // Nominal check (metadata only): the reported path names this file in
-      // the directory this call opened.
-      auditStep('nominal-check', at);
+      // the directory this call opened. It runs after the rename and again as
+      // the final step, so a relocation before success is never reported as
+      // a receipt for a path that no longer names the written file.
       const nominalDir = path.join(names.parent, names.audit);
       const nominalFile = path.join(nominalDir, finalName);
-      let sameDirectory = false;
-      try {
-        const held = fs.fstatSync(D);
-        const dir = fs.lstatSync(nominalDir);
-        sameDirectory =
-          dir.isDirectory() && dir.dev === held.dev && dir.ino === held.ino;
-      } catch (error) {
-        if (!MISSING_ENTRY.has(error?.code)) throw error;
-      }
-      if (!sameDirectory) throw unsafeAuditPath('audit-directory-moved');
-      // The directory is the one written: a different file at the name was
-      // substituted after the temporary file was created.
-      if (!isOurs(lstatOrNull(finalName)))
-        throw unsafeAuditPath('audit-file-replaced');
+      const nominalCheck = () => {
+        let sameDirectory = false;
+        let nominalEntry = null;
+        try {
+          const held = fs.fstatSync(D);
+          const dir = fs.lstatSync(nominalDir);
+          sameDirectory =
+            dir.isDirectory() && dir.dev === held.dev && dir.ino === held.ino;
+          if (sameDirectory) nominalEntry = fs.lstatSync(nominalFile);
+        } catch (error) {
+          if (!MISSING_ENTRY.has(error?.code)) throw error;
+        }
+        if (!sameDirectory) throw unsafeAuditPath('audit-directory-moved');
+        // The directory is the one written: a different file at the name was
+        // substituted after the temporary file was created.
+        if (!isOurs(nominalEntry) || !isOurs(lstatOrNull(finalName)))
+          throw unsafeAuditPath('audit-file-replaced');
+      };
+      auditStep('nominal-check', at);
+      nominalCheck();
 
       // Publication point, the last step before success: the entry names the
       // file this call created, and its content is the canonical document.
@@ -4377,8 +4384,8 @@ export function createProjectSession(config) {
       } finally {
         fs.closeSync(R);
       }
-      if (!isOurs(lstatOrNull(finalName)))
-        throw unsafeAuditPath('audit-file-replaced');
+      auditStep('nominal-final', at);
+      nominalCheck();
       ok = true;
       return nominalFile;
     } catch (error) {
@@ -4482,16 +4489,39 @@ export function createProjectSession(config) {
           held.size !== bytes
         )
           return result('unreadable', 'not-regular-file', bytes);
-        const data = Buffer.alloc(bytes);
+        // To end of file, at most one byte past the expected size, so growth
+        // during the read is seen, as in the writer's verification.
+        const data = Buffer.alloc(bytes + 1);
         let got = 0;
-        while (got < bytes) {
+        while (got <= bytes) {
           auditStep('read', at);
-          const n = fs.readSync(F, data, got, bytes - got, got);
+          const n = fs.readSync(F, data, got, data.length - got, got);
           if (n === 0) break;
           got += n;
         }
         if (got !== bytes) return result('stale', 'size-differs', bytes);
-        return sha256(data) === canonical.sha256
+        // The file read is still the entry, of the same size: a change of
+        // length or identity around the read is never fresh.
+        auditStep('read-after', at);
+        const after = fs.fstatSync(F);
+        let named = null;
+        try {
+          named = fs.lstatSync(anchoredPath(O, name));
+        } catch (error) {
+          if (!MISSING_ENTRY.has(error?.code)) throw error;
+        }
+        if (named == null) return result('missing', null);
+        if (after.size !== bytes || named.size !== bytes)
+          return result('stale', 'size-differs', bytes);
+        if (
+          !named.isFile() ||
+          after.dev !== entry.dev ||
+          after.ino !== entry.ino ||
+          named.dev !== entry.dev ||
+          named.ino !== entry.ino
+        )
+          return result('stale', 'content-differs', bytes);
+        return sha256(data.subarray(0, bytes)) === canonical.sha256
           ? result('fresh', null, bytes)
           : result('stale', 'content-differs', bytes);
       } catch {
