@@ -147,8 +147,12 @@ export async function measure() {
         }
       }
       let found = null;
+      // Acceptable is what passes a required feature (CE-01.1 §5.1): native,
+      // a proven transformation (CE-01.2) or a reviewed equivalent.
       const acceptable = (state) =>
-        state === 'native' || state === 'equivalent-fallback';
+        state === 'native' ||
+        state === 'transformed-with-proof' ||
+        state === 'equivalent-fallback';
       if (acceptable(latest.state)) {
         for (const version of releases[engine]) {
           if (acceptable(t.featureOutcome(record, target(version)).state)) {
@@ -357,7 +361,7 @@ export function profileRecord(result) {
     androidWebViewQuery: FROZEN.androidWebViewQuery,
     measurement: {
       method:
-        'Floor = max over the floor set of the earliest Browserslist release whose outcome is native or equivalent-fallback; features never acceptable on some default engine set no floor (tools/targets/measure-floor.mjs).',
+        'Floor = max over the floor set of the earliest Browserslist release whose outcome is native, transformed-with-proof or equivalent-fallback; features never acceptable on some default engine set no floor (tools/targets/measure-floor.mjs).',
       variant: 'designed',
       groups: designed.groups,
       featureCount: designed.featureCount,

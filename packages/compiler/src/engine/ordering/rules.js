@@ -12,6 +12,7 @@
  */
 
 import { MediaQuery } from './media-query/media-query';
+import { applyTransforms } from '../../targets/transforms';
 import type { MediaQueryRule } from './media-query/media-query';
 import {
   LOGICAL_FLOAT_END_VAR,
@@ -556,7 +557,10 @@ function transformRuleEntry(
   // `rule` is the VALUE of `new Map(rules.map(([a, b]) => [a, b]))`, i.e. the
   // InjectableStyle `{ltr, rtl}`, not the rule tuple. `a` is the class name the
   // map was keyed by, which is where the deduplication happens.
-  const { ltr, rtl } = rule;
+  // The CE-01.2 transformation stage: after ordering (which read the
+  // untransformed text), before the final text and every digest over it.
+  const ltr = applyTransforms(rule.ltr);
+  const rtl = rule.rtl == null ? rule.rtl : applyTransforms(rule.rtl);
   let ltrRule = ltr,
     rtlRule = rtl;
 

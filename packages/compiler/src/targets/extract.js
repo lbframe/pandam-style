@@ -19,6 +19,7 @@
 import { tokenize } from '@csstools/css-tokenizer';
 
 import { tokenizeEmitted } from './tokens';
+import { transformOfProperty, transformOfVariant } from './transforms';
 
 const GLOBAL_KEYWORDS = new Set([
   'inherit',
@@ -1329,6 +1330,37 @@ function analyseValue(tokens, start, end, property, out, context) {
   }
 }
 
+/**
+ * Name, colon index, value end and `!important` of a declaration range, or
+ * null when the range is not `<ident> : …`.
+ */
+function declarationHead(tokens, s, e) {
+  if (type(tokens[s]) !== 'ident-token') return null;
+  let colon = s + 1;
+  while (colon < e && isWs(tokens[colon])) colon += 1;
+  if (colon >= e || type(tokens[colon]) !== 'colon-token') return null;
+  const rawName = String(value(tokens[s]));
+  const name = rawName.startsWith('--') ? rawName : rawName.toLowerCase();
+  let valueEnd = e;
+  let important = false;
+  // `! important` at the end of the value.
+  let k = e - 1;
+  while (k > colon && isWs(tokens[k])) k -= 1;
+  if (
+    k > colon &&
+    type(tokens[k]) === 'ident-token' &&
+    String(value(tokens[k])).toLowerCase() === 'important'
+  ) {
+    let bang = k - 1;
+    while (bang > colon && isWs(tokens[bang])) bang -= 1;
+    if (type(tokens[bang]) === 'delim-token' && value(tokens[bang]) === '!') {
+      important = true;
+      valueEnd = bang;
+    }
+  }
+  return { name, colon, valueEnd, important };
+}
+
 function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
   // Per block: the pseudo-elements its rule styles and its keyframes rule.
   const elements = pseudoElementsOf(context.selector);
@@ -1343,7 +1375,12 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
     explicit: false,
     names: [],
   };
-  for (const range of splitTop(tokens, start, end, 'semicolon-token')) {
+  const ranges = splitTop(tokens, start, end, 'semicolon-token');
+  // A transformation-stage pair (`-webkit-user-select:v;user-select:v`) is
+  // one construct of the base property, read at the base declaration.
+  let pairedBase = null;
+  for (let r = 0; r < ranges.length; r += 1) {
+    const range = ranges[r];
     const [s, e] = trimRange(tokens, range);
     if (s >= e) continue;
     if (descriptorOf === 'page' && type(tokens[s]) === 'at-keyword-token') {
@@ -1371,33 +1408,29 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
       }
       continue;
     }
-    if (type(tokens[s]) !== 'ident-token') {
+    const head = declarationHead(tokens, s, e);
+    if (head == null) {
       out.add({ kind: 'unclassified', where: 'declaration' }, context);
       continue;
     }
-    let colon = s + 1;
-    while (colon < e && isWs(tokens[colon])) colon += 1;
-    if (colon >= e || type(tokens[colon]) !== 'colon-token') {
-      out.add({ kind: 'unclassified', where: 'declaration' }, context);
-      continue;
-    }
-    const rawName = String(value(tokens[s]));
-    const name = rawName.startsWith('--') ? rawName : rawName.toLowerCase();
-    let valueEnd = e;
-    let important = false;
-    // `! important` at the end of the value.
-    let k = e - 1;
-    while (k > colon && isWs(tokens[k])) k -= 1;
-    if (
-      k > colon &&
-      type(tokens[k]) === 'ident-token' &&
-      String(value(tokens[k])).toLowerCase() === 'important'
-    ) {
-      let bang = k - 1;
-      while (bang > colon && isWs(tokens[bang])) bang -= 1;
-      if (type(tokens[bang]) === 'delim-token' && value(tokens[bang]) === '!') {
-        important = true;
-        valueEnd = bang;
+    const { name, colon, valueEnd, important } = head;
+    const paired = pairedBase === name;
+    pairedBase = null;
+    if (descriptorOf == null) {
+      const variantOf = transformOfVariant(name);
+      if (variantOf != null && r + 1 < ranges.length) {
+        const [ns, ne] = trimRange(tokens, ranges[r + 1]);
+        const next = ns < ne ? declarationHead(tokens, ns, ne) : null;
+        if (
+          next != null &&
+          next.name === variantOf.property &&
+          next.important === important &&
+          text(tokens, next.colon + 1, next.valueEnd) ===
+            text(tokens, colon + 1, valueEnd)
+        ) {
+          pairedBase = variantOf.property;
+          continue;
+        }
       }
     }
     const declarationContext = {
@@ -1439,7 +1472,12 @@ function analyseDeclarations(tokens, start, end, out, context, descriptorOf) {
       );
       continue;
     }
-    out.add({ kind: 'property', name }, declarationContext);
+    out.add(
+      paired
+        ? { kind: 'property', name, transform: transformOfProperty(name).id }
+        : { kind: 'property', name },
+      declarationContext,
+    );
     if (elements.length > 0) {
       pseudoElementForms(
         elements,

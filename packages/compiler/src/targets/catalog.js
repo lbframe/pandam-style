@@ -23,6 +23,7 @@
  */
 
 import { compatData } from './data';
+import { transformOfProperty } from './transforms';
 import caveatReviews from './catalog/caveats.v1.json';
 import inapplicableReviews from './catalog/inapplicable.v1.json';
 import subfeatureReviews from './catalog/subfeatures.v1.json';
@@ -258,8 +259,8 @@ export const COMBINATIONS = Object.freeze({
     fixed: { state: 'incompatible', reason: 'invalid-combination' },
   },
   // `!important` inside a cascade layer reverses layer precedence. It is
-  // native where layers are native, and the restriction is recorded: whether
-  // any lowering preserves it is CE-01.2's decision (#45).
+  // native where layers are native, and the restriction is recorded. CE-01.2
+  // (D-BP-10) admits no lowering: the `:not(#\#)` ladder does not reverse it.
   'at-rule:layer/block+important': {
     components: ['at-rule:layer/block'],
     restriction: 'important-reverses-layer-order',
@@ -808,6 +809,40 @@ function subfeature(parent, suffix) {
   ]);
 }
 
+export const TRANSFORM_FORM = 'prefix-alias';
+
+/**
+ * The record of a base property emitted with its transform-table variant
+ * (`property:user-select/prefix-alias`): evaluated on the base's statements,
+ * with the variant's statements as the proven transformation (outcome.js).
+ */
+function transformedPropertyFeature(name) {
+  const entry = transformOfProperty(name);
+  const base = propertyFeature(name);
+  if (entry == null || !base.recognized || base.kind !== 'property') {
+    return unrecognized(
+      `property:${name}/${TRANSFORM_FORM}`,
+      'property',
+      'no transform-table entry',
+    );
+  }
+  return record(
+    `${base.feature}/${TRANSFORM_FORM}`,
+    'property',
+    base.feature,
+    base.bcd,
+    {
+      base: base.base,
+      transform: Object.freeze({
+        id: entry.id,
+        kind: entry.kind,
+        variant: entry.variant,
+        prefix: entry.prefix,
+      }),
+    },
+  );
+}
+
 /** The record of the construct a form qualifies. */
 function formParent(construct) {
   switch (construct.of) {
@@ -854,7 +889,11 @@ export function featuresOf(construct) {
       return feature == null ? [] : [feature];
     }
     case 'property':
-      return [propertyFeature(construct.name)];
+      return [
+        construct.transform == null
+          ? propertyFeature(construct.name)
+          : transformedPropertyFeature(construct.name),
+      ];
     case 'value-keyword': {
       const feature = keywordFeature(
         construct.property,
@@ -1085,6 +1124,14 @@ export function featureByKey(key) {
   // A form key: `<parent key>/<suffix>`.
   const cut = key.lastIndexOf('/');
   if (cut <= 0) return null;
+  if (
+    key.startsWith('property:') &&
+    key.slice(cut + 1) === TRANSFORM_FORM &&
+    key.indexOf('/') === cut
+  ) {
+    const form = transformedPropertyFeature(key.slice('property:'.length, cut));
+    return form.recognized ? form : null;
+  }
   const form = subfeature(featureByKey(key.slice(0, cut)), key.slice(cut + 1));
   return form != null && form.feature === key ? form : null;
 }

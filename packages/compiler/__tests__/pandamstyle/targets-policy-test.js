@@ -88,7 +88,7 @@ describe('enhancement policy validation (definition field `enhancements`)', () =
     }
   });
 
-  test('`alternative-value` is in the schema but its emission is deferred to CE-01.2', () => {
+  test('`alternative-value` is in the schema but its emission is deferred to CE-07.3 (#62)', () => {
     expect(targets.FALLBACK_KINDS).toEqual(['degrade', 'alternative-value']);
     const [d] = invalid([
       {
@@ -102,7 +102,7 @@ describe('enhancement policy validation (definition field `enhancements`)', () =
     ]);
     expect(d).toMatchObject({
       code: 'PMS_INVALID_ENHANCEMENT_POLICY',
-      context: { deferredTo: 'CE-01.2' },
+      context: { deferredTo: 'CE-07.3' },
     });
   });
 
