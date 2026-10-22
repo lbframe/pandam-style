@@ -476,6 +476,11 @@ export function createProjectSession(config) {
     auditDue: false,
     definitionDigest: null,
     designDeclarationsKey: null,
+    // AG-01.1 freshness (I9). `designSystem` keeps the last SUCCESSFUL build,
+    // and these say whether that build is the current revision's: false from
+    // the start of a rebuild until it completes, and the revision that ran it.
+    designSystemCurrent: false,
+    designSystemRevisionId: null,
   };
 
   // Per-revision tallies. The perf collector is reset by whoever drives the
@@ -651,6 +656,9 @@ export function createProjectSession(config) {
     // definition edit does not by itself change helper binding views; file
     // output dependencies are represented by semantic units below.
     state.dsv.designSystemEpoch += 1;
+    // Any throw below leaves the last good build in place but NOT current, so
+    // it is never reported, served or published for this revision.
+    state.designSystemCurrent = false;
 
     const targetResolution = phase('targets_resolve_ms', () =>
       resolveTargets(cfg.targets),
@@ -713,6 +721,8 @@ export function createProjectSession(config) {
     state.designDeclarationsSource = declarationsSource;
     state.generatedModulePath = generatedModulePath;
     refreshModuleOverlay();
+    state.designSystemRevisionId = state.active?.revisionId ?? state.revisionId;
+    state.designSystemCurrent = true;
     return { changedSemanticUnits, changedFileInputs };
   }
 
@@ -2175,13 +2185,18 @@ export function createProjectSession(config) {
     active.designSystemDefinitionChanged = definitionChanged;
 
     try {
+      // A build that failed stays failed until a rebuild succeeds: it is
+      // retried on every revision rather than replaced by the last good one.
+      const retryFailedBuild =
+        state.designSystem != null && !state.designSystemCurrent;
       if (
         state.designSystem == null ||
+        !state.designSystemCurrent ||
         fallbackReason != null ||
         definitionChanged
       ) {
         const rebuilt = rebuildDesignSystem();
-        if (definitionChanged && fallbackReason == null) {
+        if ((definitionChanged || retryFailedBuild) && fallbackReason == null) {
           invalidateSemanticConsumers(rebuilt.changedFileInputs);
         }
       }
@@ -2445,7 +2460,8 @@ export function createProjectSession(config) {
     const start = perfNow();
     try {
       if (active.scanError != null) throw active.scanError;
-      if (state.designSystem == null) rebuildDesignSystem();
+      if (state.designSystem == null || !state.designSystemCurrent)
+        rebuildDesignSystem();
 
       // The module-graph parse cache is process-global and the session now owns
       // its lifetime: a file whose bytes changed must never be served a node
@@ -3743,7 +3759,7 @@ export function createProjectSession(config) {
    * are properties of that file. `projectEntries` is a count, so a reader can
    * see that the project is large without this object being large.
    */
-  function affectedCoverageOf(active) {
+  function affectedEntriesOf(active) {
     const touched = new Set();
     for (const file of active.invalid) touched.add(file);
     for (const file of active.newFiles) touched.add(file);
@@ -3770,6 +3786,11 @@ export function createProjectSession(config) {
       });
     }
     entries.sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
+    return entries;
+  }
+
+  function affectedCoverageOf(active) {
+    const entries = affectedEntriesOf(active);
     // The cap, and what is said about it. See `DEFAULT_AFFECTED_ENTRY_LIMIT`:
     // the affected set is normally a handful of files and this never fires, but a
     // GLOBAL FALLBACK's affected set is the whole project, and a result that
@@ -4280,7 +4301,33 @@ export function createProjectSession(config) {
         : Object.freeze({
             systemId: identity.systemId,
             registryDigest: identity.registryDigest,
+            derivedFromRevisionId: state.designSystemRevisionId,
+            current: state.designSystemCurrent,
           });
+    },
+
+    /**
+     * One page of the current revision's affected list, recomputed (AG-01.1).
+     *
+     * The same computation as `affectedCoverageOf`, without its inline cap,
+     * over state the session already keeps for the active revision. Nothing is
+     * retained, and no validation or compile step calls it.
+     */
+    _affectedCoverage({ offset = 0, limit = 0 } = {}) {
+      const active = state.active;
+      if (active == null) return { total: 0, entries: [] };
+      const entries = affectedEntriesOf(active);
+      return {
+        total: entries.length,
+        entries: entries.slice(offset, offset + limit),
+      };
+    },
+
+    _candidateCategories() {
+      const byCategory =
+        state.designSystem?.snapshot?.tooling.candidateDomains.tokens
+          .byCategory;
+      return byCategory == null ? [] : Object.keys(byCategory).sort();
     },
 
     _candidateTokenEntries(ids) {

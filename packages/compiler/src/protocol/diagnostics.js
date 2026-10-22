@@ -142,6 +142,8 @@ export const Codes = {
   TARGET_ENHANCEMENT_DEGRADED: 'PMS_TARGET_ENHANCEMENT_DEGRADED',
   TARGET_ENHANCEMENT_INEFFECTIVE: 'PMS_TARGET_ENHANCEMENT_INEFFECTIVE',
   INVALID_ENHANCEMENT_POLICY: 'PMS_INVALID_ENHANCEMENT_POLICY',
+  // AG-01.1: a definition field that cannot identify a design system.
+  INVALID_DEFINITION: 'PMS_INVALID_DEFINITION',
 };
 
 /** Stable single-line rendering of a diagnostic (used by the build report). */

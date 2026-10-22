@@ -185,7 +185,15 @@ export interface DiagnosticsResult {
   readonly documentKind: 'pandamstyle-diagnostics-result';
   readonly schemaVersion: 1;
   readonly revision: RevisionIdentity;
-  readonly designSystem: DesignSystemIdentity;
+  /**
+   * Both fields are `null` when the revision has no design system built from
+   * its own definition and configuration (a failed definition or `targets`
+   * build); an older build is never reported for it.
+   */
+  readonly designSystem: Readonly<{
+    systemId: string | null;
+    registryDigest: string | null;
+  }>;
   readonly abiVersion: 1;
   readonly ok: boolean;
   readonly completeness: Readonly<Record<string, unknown>>;
