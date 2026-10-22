@@ -19,6 +19,9 @@
  *     and recipe source and the Project Service, with generated types checked
  *     by tsc;
  *   - the `property-domains` incremental unit, against the fresh oracle;
+ *   - freshness across an invalid `propertyDomains` (AG-01.1 handoff): the
+ *     refusal persists on unchanged revisions, nothing is published, and the
+ *     unit is rebuilt from the recovered table, never the last good one;
  *   - the target-candidate memo recomputes on a domain change and hits on an
  *     unchanged revision.
  */
@@ -31,6 +34,11 @@ const {
   loadCompiler,
   openProject,
 } = require('./session-helpers');
+const {
+  definitionWith,
+  emptyMutation,
+  openAgentProject,
+} = require('./agent-helpers');
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
 const compiler = loadCompiler();
@@ -1146,5 +1154,157 @@ describe('target candidates follow the effective table', () => {
     });
     expect(again.errors).toBe(changed.errors);
     expect(candidates(again)).toEqual(candidates(changed));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Freshness across an invalid propertyDomains (AG-01.1 handoff, #135).
+//
+// The bug AG-01.1 fixed: after a failed definition build, the next unchanged
+// revision validated `ok: true` and published under the previous design
+// system. Here the failure is a refused `propertyDomains` entry, and the
+// recovery narrows the domain, so a `property-domains` unit that kept the last
+// good digest would reuse the page's old verdict.
+
+describe('freshness across an invalid propertyDomains', () => {
+  const WIDE = { width: { values: ['100%', 'auto'] } };
+  const NARROW = { width: { values: ['100%'] } };
+  // A misspelt property: PMS_INVALID_PROPERTY_DOMAIN, rule unknown-property.
+  const INVALID = { widht: { values: ['auto'] } };
+  const PAGE = pageOf(["create({ n: { width: 'auto' } })"]);
+  const withDomains = (fixture, propertyDomains) =>
+    definitionWith(fixture, (definition) => {
+      definition.propertyDomains = propertyDomains;
+    });
+
+  test('agent check: refused while invalid and on every unchanged revision; nothing published', async () => {
+    const base = openProject('valid');
+    const project = await openAgentProject('valid', {
+      definition: withDomains(base, WIDE),
+      prepare(fixture) {
+        fs.writeFileSync(fixture.src('src/ce021.js'), PAGE);
+      },
+    });
+    const advance = async (change) => {
+      const applied = await project.session.applyChanges({
+        ...emptyMutation(await project.revision()),
+        ...change,
+      });
+      return applied.revision;
+    };
+    try {
+      // 1. Valid: the wide domain admits the page's `auto`; it publishes.
+      const r1 = await project.revision();
+      const valid = await project.dispatch('check', { rev: r1 });
+      expect(valid.outcome).toBe('success');
+      expect(valid.result.document.ok).toBe(true);
+      const original = valid.identities.designSystem;
+      await project.session.compile(r1);
+      const published = project.fixture.published();
+
+      // 2. Invalid, then 3. and 4. unchanged: refused every time.
+      const refused = async (rev) => {
+        const check = await project.dispatch('check', { rev });
+        const document = check.result.document;
+        expect(check.outcome).not.toBe('success');
+        expect(document.ok).toBe(false);
+        expect(document.diagnostics.map((d) => d.code)).toContain(
+          'PMS_INVALID_PROPERTY_DOMAIN',
+        );
+        expect(check.identities.designSystem).toBeUndefined();
+        expect(check.identities.lastValidDesignSystem).toMatchObject(original);
+        await expect(project.session.compile(rev)).rejects.toThrow();
+        await expect(project.session.preparePublication(rev)).rejects.toThrow(
+          /Invalid revisions cannot prepare publication/,
+        );
+        expect(project.fixture.published()).toEqual(published);
+      };
+      await refused(await advance({ definition: withDomains(base, INVALID) }));
+      await refused(await advance({}));
+      await refused(await advance({}));
+
+      // 5. Recovered with a narrower domain, the page unchanged: the page is
+      // checked against the new table, not the last good one.
+      const r5 = await advance({ definition: withDomains(base, NARROW) });
+      const narrowed = await project.dispatch('check', { rev: r5 });
+      expect(narrowed.identities.designSystem.registryDigest).not.toBe(
+        original.registryDigest,
+      );
+      expect(narrowed.result.document.ok).toBe(false);
+      expect(
+        narrowed.result.document.diagnostics.map((d) => [
+          d.code,
+          d.location?.file,
+        ]),
+      ).toEqual([['PMS_FORBIDDEN_VALUE', 'src/ce021.js']]);
+      await expect(project.session.compile(r5)).rejects.toThrow();
+      expect(project.fixture.published()).toEqual(published);
+
+      // 6. Back to the wide domain: current and publishable again.
+      const r6 = await advance({ definition: withDomains(base, WIDE) });
+      const restored = await project.dispatch('check', { rev: r6 });
+      expect(restored.result.document.ok).toBe(true);
+      expect(restored.identities.designSystem).toEqual(original);
+      await project.session.compile(r6);
+    } finally {
+      await project.close();
+    }
+  });
+
+  test('session: the property-domains unit is never the last good digest after a failure', () => {
+    const h = openProject('valid');
+    const page = h.src('src/ce021.js');
+    fs.writeFileSync(page, PAGE);
+    const pageState = () =>
+      h.session.fileStates().find((state) => state.file === page);
+    const revise = (propertyDomains) => {
+      const changes =
+        propertyDomains === undefined
+          ? {}
+          : { definition: withDomains(h, propertyDomains) };
+      try {
+        h.session.applyChanges({ changed: [page], ...changes });
+      } catch (error) {
+        if (!Array.isArray(error.diagnostics)) throw error;
+      }
+      return h.session.validate();
+    };
+
+    // The definition differs only by `propertyDomains` between steps, so the
+    // page's semantic-input digest moves exactly with the unit.
+    expect(revise(WIDE).ok).toBe(true);
+    h.session.compile();
+    const before = pageState();
+
+    for (const step of [INVALID, undefined, undefined]) {
+      const validation = revise(step);
+      expect(validation.ok).toBe(false);
+      expect(validation.diagnostics.map((d) => d.code)).toContain(
+        'PMS_INVALID_PROPERTY_DOMAIN',
+      );
+      // Not recompiled, so not re-keyed, against any table while none is
+      // current.
+      expect(pageState().compiledRevision).toBe(before.compiledRevision);
+      expect(pageState().validity).toEqual(before.validity);
+    }
+
+    const narrowed = revise(NARROW);
+    expect(narrowed.diagnostics.map((d) => [d.code, d.location?.file])).toEqual(
+      [['PMS_FORBIDDEN_VALUE', page]],
+    );
+    // The page was rechecked against the narrowed table: its verdict keyed on
+    // the last good digest is dropped, not kept.
+    const recovered = pageState();
+    expect(recovered.validity).toBeNull();
+    expect(recovered.ruleCount).toBeNull();
+
+    // The last good table again: recompiled, and the unit returns to its
+    // digest, which the narrowed table never carried.
+    expect(revise(WIDE).ok).toBe(true);
+    const restored = pageState();
+    expect(restored.compiledRevision).toBeGreaterThan(before.compiledRevision);
+    expect(restored.validity.semanticUnitsDigest).toBe(
+      before.validity.semanticUnitsDigest,
+    );
   });
 });
