@@ -368,7 +368,11 @@ describe('AG-02.1 R1: maximum content attaches, one byte above is refused', () =
     expect(bytesOf(raw.ready)).toBeLessThanOrEqual(CEILINGS.ready);
 
     for (const extra of [0, 1]) {
-      const host = await openHost();
+      // The descriptor's projectId matches the maximal identities, so only
+      // the negotiation is left to refuse the maximal frame.
+      const host = await openHost({
+        sessionOptions: { projectId: 'p'.repeat(1024) },
+      });
       await fakeOwner(host, {
         ready: (descriptor) =>
           paddedFrame(
@@ -379,7 +383,14 @@ describe('AG-02.1 R1: maximum content attaches, one byte above is refused', () =
       });
       const remote = openWorkspace(host);
       const attached = await remote.attach();
-      if (extra === 0) expect(attached.outcome).toBe('success');
+      // At the ceiling the frame is read and validated; its announced
+      // limits (16 MiB) exceed this client's own, which is a negotiation
+      // refusal, not a frame bound (fix round 1, R2).
+      if (extra === 0)
+        expect(failureOf(attached)).toEqual([
+          'unsupported-capability',
+          'limits',
+        ]);
       else {
         expect(failureOf(attached)).toEqual([
           'internal-error',
@@ -403,7 +414,11 @@ describe('AG-02.1 R1: maximum content attaches, one byte above is refused', () =
             limits: { maxRequestBytes: 65536, compact, detail: compact },
           }),
         response: (frame) => {
-          const envelope = { protocol: 'pandamstyle-agent', pad: '' };
+          const envelope = {
+            protocol: 'pandamstyle-agent',
+            protocolVersion: 1,
+            pad: '',
+          };
           const wrapper = { t: 'response', seq: frame.seq, envelope };
           const size = frames.responseCeiling(compact) + extra;
           envelope.pad = 'z'.repeat(size - bytesOf(wrapper));

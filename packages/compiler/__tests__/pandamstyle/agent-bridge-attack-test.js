@@ -463,6 +463,220 @@ describe('AG-02.1 sequence and connection bounds (AC2, A14, A16)', () => {
   });
 });
 
+/**
+ * An owner stand-in at a real bridge's endpoint, holding its real key: every
+ * proof is valid, and `script` chooses what the owner selects or announces.
+ */
+async function negotiatingOwner(host, script) {
+  const { runtimeDir } = host;
+  const { name } = host.bridge;
+  const descriptor = readDescriptorFile(runtimeDir, name);
+  const keyText = fs.readFileSync(entryPath(runtimeDir, name, 'key'), 'latin1');
+  const key = { text: keyText, bytes: Buffer.from(keyText, 'base64') };
+  await host.bridge.close();
+  host.bridge = null;
+  fs.writeFileSync(entryPath(runtimeDir, name, 'key'), keyText, {
+    mode: 0o600,
+  });
+  fs.writeFileSync(
+    entryPath(runtimeDir, name, 'json'),
+    JSON.stringify(descriptor),
+    { mode: 0o600 },
+  );
+  const seen = { auth: false, requests: 0, closed: false };
+  const server = net.createServer((socket) => {
+    let buffer = Buffer.alloc(0);
+    let state = 'hello';
+    let cn = null;
+    const sn = handshake.nonce();
+    socket.on('error', () => {});
+    socket.on('close', () => (seen.closed = true));
+    socket.on('data', (chunk) => {
+      buffer = Buffer.concat([buffer, chunk]);
+      while (
+        buffer.length >= 4 &&
+        buffer.length >= 4 + buffer.readUInt32BE(0)
+      ) {
+        const frame = JSON.parse(
+          buffer.subarray(4, 4 + buffer.readUInt32BE(0)).toString('utf8'),
+        );
+        buffer = buffer.subarray(4 + buffer.readUInt32BE(0));
+        if (state === 'hello') {
+          cn = frame.cn;
+          state = 'auth';
+          socket.write(
+            frames.encodeFrame({
+              t: 'challenge',
+              bridge: script.bridge ?? 1,
+              sn,
+              sessionId: descriptor.sessionId,
+              proof: handshake.proof(
+                key,
+                'server',
+                name,
+                cn,
+                sn,
+                descriptor.sessionId,
+              ),
+            }),
+          );
+        } else if (state === 'auth') {
+          seen.auth = true;
+          state = 'ready';
+          socket.write(
+            frames.encodeFrame({
+              t: 'ready',
+              identities: {
+                projectId: descriptor.projectId,
+                sessionId: descriptor.sessionId,
+                ...(script.identities ?? {}),
+              },
+              grants: ['consult'],
+              limits: {
+                maxRequestBytes: 65536,
+                compact: 262144,
+                detail: 2097152,
+                ...(script.limits ?? {}),
+              },
+            }),
+          );
+        } else {
+          seen.requests += 1;
+          socket.write(
+            frames.encodeFrame({
+              t: 'response',
+              seq: frame.seq,
+              envelope: {
+                protocol: 'pandamstyle-agent',
+                protocolVersion: script.protocolVersion ?? 1,
+                outcome: 'success',
+              },
+            }),
+          );
+        }
+      }
+    });
+  });
+  await new Promise((resolve) =>
+    server.listen(entryPath(runtimeDir, name, 'sock'), resolve),
+  );
+  onCleanup(() => new Promise((resolve) => server.close(resolve)));
+  return { descriptor, seen };
+}
+
+describe('AG-02.1 negotiated values are among those offered (fix round 1, R2)', () => {
+  test('a bridge version the client did not offer is refused before any proof is sent', async () => {
+    for (const bridge of [2, 1024]) {
+      const host = await openHost();
+      const { seen } = await negotiatingOwner(host, { bridge });
+      const attach = await openWorkspace(host).attach();
+      expect([bridge, ...failureOf(attach)]).toEqual([
+        bridge,
+        'unsupported-capability',
+        'protocol-version',
+      ]);
+      expectDeclared(attach);
+      expect(seen.auth).toBe(false);
+    }
+  });
+
+  test('limits above the client own caps are refused, each field alone', async () => {
+    const caps = {
+      maxRequestBytes: compiler.REGISTRY.request.maxRequestBytes,
+      compact: compiler.REGISTRY.views.compact.maxResponseBytes,
+      detail: compiler.REGISTRY.views.detail.maxResponseBytes,
+    };
+    for (const field of Object.keys(caps)) {
+      for (const [value, accepted] of [
+        [caps[field], true],
+        [caps[field] + 1, false],
+      ]) {
+        const host = await openHost();
+        await negotiatingOwner(host, { limits: { [field]: value } });
+        const attach = await openWorkspace(host).attach();
+        expect([field, value, ...failureOf(attach)]).toEqual(
+          accepted
+            ? [field, value, 'success', undefined]
+            : [field, value, 'unsupported-capability', 'limits'],
+        );
+        if (!accepted) expectDeclared(attach);
+      }
+    }
+  });
+
+  test('owner identities other than the descriptor are descriptor-stale', async () => {
+    const other = '00000000-0000-4000-8000-000000000000';
+    const cases = {
+      projectId: { projectId: 'another-project' },
+      'revision.projectId': (descriptor) => ({
+        revision: {
+          projectId: 'another-project',
+          sessionId: descriptor.sessionId,
+          revisionId: 1,
+        },
+      }),
+      'revision.sessionId': (descriptor) => ({
+        revision: {
+          projectId: descriptor.projectId,
+          sessionId: other,
+          revisionId: 1,
+        },
+      }),
+    };
+    for (const [label, identities] of Object.entries(cases)) {
+      const host = await openHost();
+      const descriptor = readDescriptorFile(host.runtimeDir, host.bridge.name);
+      await negotiatingOwner(host, {
+        identities:
+          typeof identities === 'function'
+            ? identities(descriptor)
+            : identities,
+      });
+      const attach = await openWorkspace(host).attach();
+      expect([label, ...failureOf(attach)]).toEqual([
+        label,
+        'stale-revision',
+        'descriptor-stale',
+      ]);
+      expectDeclared(attach);
+    }
+  });
+
+  test('a response in a protocol version that was not agreed is refused and closes the connection', async () => {
+    const host = await openHost();
+    const { seen } = await negotiatingOwner(host, { protocolVersion: 2 });
+    const remote = openWorkspace(host);
+    expect((await remote.attach()).outcome).toBe('success');
+    const response = await remote.dispatch('session.status', {});
+    expect(failureOf(response)).toEqual([
+      'unsupported-capability',
+      'protocol-version',
+    ]);
+    expectDeclared(response, 'session.status');
+    expect(seen.requests).toBe(1);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(seen.closed).toBe(true);
+    // The protocol versions offered by the attach bound the agreed set too.
+    const agreedHost = await openHost();
+    const descriptor = readDescriptorFile(
+      agreedHost.runtimeDir,
+      agreedHost.bridge.name,
+    );
+    fs.writeFileSync(
+      entryPath(agreedHost.runtimeDir, agreedHost.bridge.name, 'json'),
+      JSON.stringify({ ...descriptor, protocolVersions: [2] }),
+      { mode: 0o600 },
+    );
+    const unagreed = await openWorkspace(agreedHost).attach({
+      protocolVersions: [1, 2],
+    });
+    expect(failureOf(unagreed)).toEqual([
+      'unsupported-capability',
+      'protocol-version',
+    ]);
+  });
+});
+
 describe('AG-02.1 class-level frame fuzzing (AC2)', () => {
   test('random frames, before and after the handshake, only ever yield closed structured errors', async () => {
     const host = await openHost();

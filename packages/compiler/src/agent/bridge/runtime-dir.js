@@ -21,6 +21,32 @@ import path from 'node:path';
  */
 
 const C = fs.constants;
+/**
+ * Linux `O_PATH`, which Node does not name: a descriptor that pins an inode
+ * without needing read permission on it. `fchmod` refuses such a descriptor
+ * (`EBADF`); its `/proc/self/fd/<fd>` link reaches the pinned inode itself, and
+ * a pinned symlink refuses `chmod` (`ENOTSUP`).
+ */
+const O_PATH = 0o10000000;
+
+/** The modes the bridge creates, set explicitly and verified (umask-proof). */
+export const MODES = Object.freeze({
+  directory: 0o700,
+  file: 0o600,
+  socket: 0o600,
+});
+const permissions = (stat) => stat.mode & 0o777;
+
+/**
+ * Sets `mode` on the inode `pin` holds and verifies it, never by path. `kind`
+ * is checked first, so the pinned object is the one the caller created.
+ */
+function enforceMode(pin, kind, mode) {
+  const before = fs.fstatSync(pin);
+  if (!before[kind]() || before.uid !== process.getuid()) return false;
+  if (permissions(before) !== mode) fs.chmodSync(`/proc/self/fd/${pin}`, mode);
+  return permissions(fs.fstatSync(pin)) === mode;
+}
 const ENTRY_NAME =
   /^[0-9a-f]{16}-[0-9a-f]{16}\.(?:json|key|sock)(?:\.[0-9a-f]{12}\.tmp)?$/;
 
@@ -131,10 +157,12 @@ export function openRuntimeDir(dir, { create = false, protectedRoots = [] }) {
         if (error?.code !== 'EEXIST') return { refused: 'runtime-dir-unsafe' };
       }
     }
+    // Pinned without read permission, so a restrictive umask cannot hide it.
+    let pin;
     try {
-      fd = fs.openSync(
+      pin = fs.openSync(
         anchored(parent, leaf),
-        C.O_RDONLY | C.O_DIRECTORY | C.O_NOFOLLOW,
+        O_PATH | C.O_DIRECTORY | C.O_NOFOLLOW,
       );
     } catch (error) {
       return {
@@ -144,13 +172,30 @@ export function openRuntimeDir(dir, { create = false, protectedRoots = [] }) {
             : 'runtime-dir-unsafe',
       };
     }
-    const stat = fs.fstatSync(fd);
-    if (
-      !stat.isDirectory() ||
-      stat.uid !== process.getuid() ||
-      (stat.mode & 0o077) !== 0
-    )
+    try {
+      const stat = fs.fstatSync(pin);
+      // Group or other bits were granted by someone: never tightened silently.
+      if (
+        !stat.isDirectory() ||
+        stat.uid !== process.getuid() ||
+        (stat.mode & 0o077) !== 0
+      )
+        return { refused: 'runtime-dir-unsafe' };
+      // The owner sets the directory's mode; a client only verifies it (R1).
+      if (
+        create
+          ? !enforceMode(pin, 'isDirectory', MODES.directory)
+          : permissions(stat) !== MODES.directory
+      )
+        return { refused: 'runtime-dir-unsafe' };
+      fd = fs.openSync(`/proc/self/fd/${pin}`, C.O_RDONLY | C.O_DIRECTORY);
+      if (fs.fstatSync(fd).ino !== stat.ino)
+        return { refused: 'runtime-dir-unsafe' };
+    } catch {
       return { refused: 'runtime-dir-unsafe' };
+    } finally {
+      fs.closeSync(pin);
+    }
     if (!anchorHolds(fd)) return { refused: 'anchoring-unavailable' };
     const placement = placementOf(fd, protectedRoots);
     if (placement != null) return { refused: placement };
@@ -187,10 +232,16 @@ function createHandle(fd, protectedRoots) {
       const file = fs.openSync(
         anchored(fd, temporary),
         C.O_WRONLY | C.O_CREAT | C.O_EXCL | C.O_NOFOLLOW,
-        0o600,
+        MODES.file,
       );
       try {
         try {
+          // The create mode is masked by the umask: set it, then verify (R1).
+          fs.fchmodSync(file, MODES.file);
+          if (permissions(fs.fstatSync(file)) !== MODES.file)
+            throw Object.assign(new Error('owner bridge: file mode'), {
+              code: 'runtime-dir-unsafe',
+            });
           let written = 0;
           const bytes = Buffer.from(data);
           while (written < bytes.length)
@@ -219,7 +270,12 @@ function createHandle(fd, protectedRoots) {
       }
       try {
         const stat = fs.fstatSync(file);
-        if (!stat.isFile() || stat.uid !== process.getuid() || stat.size > max)
+        if (
+          !stat.isFile() ||
+          stat.uid !== process.getuid() ||
+          permissions(stat) !== MODES.file ||
+          stat.size > max
+        )
           return { missing: false, bytes: null };
         const buffer = Buffer.alloc(max + 1);
         let read = 0;
@@ -232,6 +288,19 @@ function createHandle(fd, protectedRoots) {
         return { missing: false, bytes: buffer.subarray(0, read) };
       } finally {
         fs.closeSync(file);
+      }
+    },
+    /** Sets and verifies the socket's mode once it is bound (R1). */
+    secureSocket(name) {
+      checkName(name);
+      const pin = fs.openSync(anchored(fd, name), O_PATH | C.O_NOFOLLOW);
+      try {
+        if (!enforceMode(pin, 'isSocket', MODES.socket))
+          throw Object.assign(new Error('owner bridge: socket mode'), {
+            code: 'runtime-dir-unsafe',
+          });
+      } finally {
+        fs.closeSync(pin);
       }
     },
     remove(name) {

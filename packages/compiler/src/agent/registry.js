@@ -948,6 +948,8 @@ const ENTRIES = [
       contract('unsupported-capability', AgentCodes.OPERATION_UNSUPPORTED, [
         'binding',
         'anchoring-unavailable',
+        // AG-02.1 fix round 1: the owner announced limits above the client's.
+        'limits',
       ]),
       contract('invalid-input', AgentCodes.INVALID_REQUEST, [
         'owner-ambiguous',

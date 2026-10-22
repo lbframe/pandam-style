@@ -284,7 +284,11 @@ describe('AG-02.1 R3: the client consumes one frame at a time', () => {
     onCleanup(() => new Promise((resolve) => server.close(resolve)));
     return host;
   }
-  const envelope = { protocol: 'pandamstyle-agent', outcome: 'success' };
+  const envelope = {
+    protocol: 'pandamstyle-agent',
+    protocolVersion: 1,
+    outcome: 'success',
+  };
 
   test('an owner sending two frames for one request is owner-protocol-error', async () => {
     const host = await scriptedOwner((frame, socket) =>

@@ -12,7 +12,9 @@ import {
   AgentCodes,
   AgentError,
   AGENT_PROTOCOL,
+  AGENT_PROTOCOL_VERSION,
 } from '../../protocol/envelope.js';
+import { REGISTRY } from '../registry.js';
 import { stringBytes } from '../schema.js';
 import {
   keyIdOf,
@@ -47,6 +49,24 @@ import {
  */
 
 const DESCRIPTOR_NAME = /^[0-9a-f]{16}-[0-9a-f]{16}\.json$/;
+
+/** What this client offers and accepts in a negotiation (R2). */
+const OFFERED_BRIDGE_VERSIONS = Object.freeze([BRIDGE_VERSION]);
+const SUPPORTED_PROTOCOL_VERSIONS = Object.freeze([AGENT_PROTOCOL_VERSION]);
+/** The largest limits this client accepts from an owner: its own. */
+const CLIENT_CAPS = Object.freeze({
+  maxRequestBytes: REGISTRY.request.maxRequestBytes,
+  compact: REGISTRY.views.compact.maxResponseBytes,
+  detail: REGISTRY.views.detail.maxResponseBytes,
+});
+
+const staleDescriptor = () =>
+  new AgentError({
+    outcome: 'stale-revision',
+    code: Codes.STALE_REVISION,
+    reason: 'descriptor-stale',
+    stage: 'execution',
+  });
 
 const ownerRequired = (reason, context = {}) =>
   new AgentError({
@@ -210,11 +230,18 @@ export async function connectOwner({
       tmpdir,
     });
     const { handle, name, descriptor } = found;
+    // The agent protocol versions both sides may use: requested, advertised
+    // and spoken by this client. Every response is checked against them.
+    const agreed = SUPPORTED_PROTOCOL_VERSIONS.filter(
+      (version) =>
+        protocolVersions.includes(version) &&
+        descriptor.protocolVersions.includes(version),
+    );
     if (
-      !descriptor.bridgeVersions.includes(BRIDGE_VERSION) ||
-      !descriptor.protocolVersions.some((version) =>
-        protocolVersions.includes(version),
-      )
+      !descriptor.bridgeVersions.some((version) =>
+        OFFERED_BRIDGE_VERSIONS.includes(version),
+      ) ||
+      agreed.length === 0
     ) {
       handle.close();
       throw unsupported('protocol-version', 'protocol-version');
@@ -226,18 +253,40 @@ export async function connectOwner({
       // An owner restarting between its key and its descriptor: re-read once.
       if (attempt === 0) continue;
       if (key == null) throw ownerRequired('owner-unreachable');
-      throw new AgentError({
-        outcome: 'stale-revision',
-        code: Codes.STALE_REVISION,
-        reason: 'descriptor-stale',
-        stage: 'execution',
-      });
+      throw staleDescriptor();
     }
-    return handshake({ handle, name, descriptor, key });
+    return handshake({ handle, name, descriptor, key, agreed });
   }
 }
 
-function handshake({ handle, name, descriptor, key }) {
+/**
+ * `null` when every value the owner selected or announced in `ready` is one
+ * this client offered or accepts, else the error to report (R2).
+ */
+function readyProblem(frame, descriptor) {
+  for (const field of Object.keys(CLIENT_CAPS))
+    if (frame.limits[field] > CLIENT_CAPS[field])
+      return unsupported('limits', 'limits');
+  const { identities } = frame;
+  const sessions = [
+    identities.sessionId,
+    identities.revision?.sessionId,
+    identities.lastValidDesignSystem?.derivedFromRevision?.sessionId,
+  ];
+  const projects = [
+    identities.projectId,
+    identities.revision?.projectId,
+    identities.lastValidDesignSystem?.derivedFromRevision?.projectId,
+  ];
+  if (
+    sessions.some((id) => id != null && id !== descriptor.sessionId) ||
+    projects.some((id) => id != null && id !== descriptor.projectId)
+  )
+    return staleDescriptor();
+  return null;
+}
+
+function handshake({ handle, name, descriptor, key, agreed }) {
   return new Promise((resolve, reject) => {
     const socket = net.createConnection(handle.path(`${name}.sock`));
     const cn = nonce();
@@ -273,7 +322,7 @@ function handshake({ handle, name, descriptor, key }) {
       connection?.lost();
     });
 
-    const consumer = consumeFrames(socket, {
+    consumeFrames(socket, {
       ceiling: () =>
         Math.max(
           CEILINGS.error,
@@ -298,6 +347,15 @@ function handshake({ handle, name, descriptor, key }) {
           return;
         }
         if (state === 'challenge') {
+          // A bridge version this client did not offer: refused before any
+          // proof is sent (R2).
+          if (
+            validFrame('challenge', frame) &&
+            !OFFERED_BRIDGE_VERSIONS.includes(frame.bridge)
+          ) {
+            settle(unsupported('protocol-version', 'protocol-version'));
+            return;
+          }
           if (
             !validFrame('challenge', frame) ||
             frame.sessionId !== descriptor.sessionId ||
@@ -326,26 +384,32 @@ function handshake({ handle, name, descriptor, key }) {
           return;
         }
         if (state === 'ready') {
-          if (
-            !validFrame('ready', frame) ||
-            (frame.identities.sessionId != null &&
-              frame.identities.sessionId !== descriptor.sessionId)
-          ) {
+          if (!validFrame('ready', frame)) {
             settle(protocolError());
+            return;
+          }
+          const problem = readyProblem(frame, descriptor);
+          if (problem != null) {
+            settle(problem);
             return;
           }
           state = 'open';
           connection = createConnection({
             socket,
-            consumer,
             descriptor,
             ready: frame,
+            agreed,
           });
           settle(null, connection.api);
           return;
         }
-        if (connection == null || !connection.receive(frame)) {
-          connection?.fail(protocolError());
+        const received = connection?.receive(frame) ?? 'invalid';
+        if (received !== 'delivered') {
+          connection?.fail(
+            received === 'protocol-version'
+              ? unsupported('protocol-version', 'protocol-version')
+              : protocolError(),
+          );
           socket.destroy();
         }
       },
@@ -353,7 +417,7 @@ function handshake({ handle, name, descriptor, key }) {
   });
 }
 
-function createConnection({ socket, descriptor, ready }) {
+function createConnection({ socket, descriptor, ready, agreed }) {
   let seq = 0;
   let pending = null;
   let closed = false;
@@ -416,7 +480,11 @@ function createConnection({ socket, descriptor, ready }) {
         : responseCeiling(
             pending.view === 'detail' ? limits.detail : limits.compact,
           ),
-    /** A response for the pending request; `false` for anything else. */
+    /**
+     * `delivered` for a response to the pending request in an agreed
+     * protocol version, `protocol-version` for one in a version that was not
+     * agreed (R2), `invalid` for anything else.
+     */
     receive(frame) {
       if (
         pending == null ||
@@ -426,11 +494,13 @@ function createConnection({ socket, descriptor, ready }) {
         frame.seq !== pending.seq ||
         frame.envelope?.protocol !== AGENT_PROTOCOL
       )
-        return false;
+        return 'invalid';
+      if (!agreed.includes(frame.envelope.protocolVersion))
+        return 'protocol-version';
       const current = pending;
       pending = null;
       current.resolve({ envelope: frame.envelope });
-      return true;
+      return 'delivered';
     },
     fail,
     lost() {

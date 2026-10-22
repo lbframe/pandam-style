@@ -55,6 +55,23 @@ export const START_REFUSALS = Object.freeze([
   'runtime-dir-unsafe',
 ]);
 
+const unusable = () =>
+  Object.assign(new Error('owner bridge: unusable entry'), {
+    code: 'runtime-dir-unsafe',
+  });
+
+/** Resolves once `socketPath` accepts a connection, which is closed at once. */
+function selfConnect(socketPath) {
+  return new Promise((resolve, reject) => {
+    const socket = net.createConnection(socketPath);
+    socket.once('connect', () => {
+      socket.destroy();
+      resolve();
+    });
+    socket.once('error', () => reject(unusable()));
+  });
+}
+
 const live = new Set();
 let exitHandlerInstalled = false;
 function removeLiveEntries() {
@@ -336,19 +353,31 @@ export async function startOwnerBridge({
       server.once('error', reject);
       server.listen(dir.path(files.sock), resolve);
     });
-    dir.write(
-      files.json,
-      JSON.stringify(
-        buildDescriptor({
-          projectId: binding.projectId,
-          sessionId,
-          rootDir,
-          outDir,
-          keyText: key.text,
-          host,
-        }),
-      ),
+    // The bound socket's mode follows the umask: set and verify it (R1).
+    dir.secureSocket(files.sock);
+    // Before advertising, the owner checks it can use what it created: it
+    // reads its key back and connects to its own endpoint.
+    if (
+      dir.read(files.key, CEILINGS.key).bytes?.toString('latin1') !== key.text
+    )
+      throw unusable();
+    await selfConnect(dir.path(files.sock));
+    const descriptorText = JSON.stringify(
+      buildDescriptor({
+        projectId: binding.projectId,
+        sessionId,
+        rootDir,
+        outDir,
+        keyText: key.text,
+        host,
+      }),
     );
+    dir.write(files.json, descriptorText);
+    if (
+      dir.read(files.json, CEILINGS.descriptor).bytes?.toString('utf8') !==
+      descriptorText
+    )
+      throw unusable();
   } catch (error) {
     if (server != null) await new Promise((resolve) => server.close(resolve));
     owner.removeEntries();

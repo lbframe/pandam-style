@@ -231,18 +231,35 @@ describe('AG-02.1 without an owner (deliverable 6, AC3 for live operations)', ()
 });
 
 describe('AG-02.1 descriptor lifecycle and identity (AC4)', () => {
-  for (const mask of [0o000, 0o002]) {
-    test(`modes and contents under umask ${mask.toString(8).padStart(3, '0')}`, async () => {
-      const previous = process.umask(mask);
-      try {
-        const host = await openHost();
+  // Fix round 1, class R1: modes are set and verified, never assumed from the
+  // umask. Masks that remove owner bits, and permissive ones, each followed by
+  // a real attach; with a new directory and with an existing one.
+  for (const existing of [false, true]) {
+    for (const mask of [0o000, 0o002, 0o022, 0o100, 0o200, 0o400, 0o700]) {
+      test(`umask ${mask.toString(8).padStart(4, '0')}, ${existing ? 'existing' : 'new'} directory: exact modes, then a real attach`, async () => {
+        // The fixture and session are created under the usual umask; only the
+        // bridge's own creation runs under `mask`.
+        const host = await openHost({ bridge: false });
         const { runtimeDir } = host;
+        if (existing) fs.mkdirSync(runtimeDir, { mode: 0o700 });
+        const previous = process.umask(mask);
+        try {
+          host.bridge = await compiler.startOwnerBridge({
+            session: host.session,
+            host: 'test',
+            runtimeDir,
+          });
+        } finally {
+          process.umask(previous);
+        }
+        expect(host.bridge.started).toBe(true);
         const { name } = host.bridge;
         expect(fs.statSync(runtimeDir).mode & 0o777).toBe(0o700);
-        for (const ext of ['json', 'key'])
-          expect(
-            fs.statSync(entryPath(runtimeDir, name, ext)).mode & 0o777,
-          ).toBe(0o600);
+        for (const ext of ['json', 'key', 'sock'])
+          expect([
+            ext,
+            fs.lstatSync(entryPath(runtimeDir, name, ext)).mode & 0o777,
+          ]).toEqual([ext, 0o600]);
         expect(
           fs.lstatSync(entryPath(runtimeDir, name, 'sock')).isSocket(),
         ).toBe(true);
@@ -276,11 +293,53 @@ describe('AG-02.1 descriptor lifecycle and identity (AC4)', () => {
         expect(text.includes(key.text)).toBe(false);
         expect(text.includes(key.bytes.toString('hex'))).toBe(false);
         expect(descriptor.keyId).toBe(descriptorModule.keyIdOf(key.text));
-      } finally {
-        process.umask(previous);
-      }
-    });
+        // The real attach the modes exist for.
+        const remote = openWorkspace(host);
+        const attached = await remote.attach();
+        expect(attached.outcome).toBe('success');
+        expect((await remote.dispatch('session.status', {})).outcome).toBe(
+          'success',
+        );
+      });
+    }
   }
+
+  test('a client verifies the modes it reads: a loosened key or descriptor, or a directory without owner bits, is refused', async () => {
+    const host = await openHost();
+    const { runtimeDir } = host;
+    const { name } = host.bridge;
+    const remote = openWorkspace(host);
+    const cases = [
+      ['json', 0o644, ['owner-required', 'descriptor-invalid']],
+      ['json', 0o400, ['owner-required', 'descriptor-invalid']],
+      ['key', 0o640, ['owner-required', 'owner-unreachable']],
+      ['key', 0o400, ['owner-required', 'owner-unreachable']],
+    ];
+    for (const [ext, mode, expected] of cases) {
+      const file = entryPath(runtimeDir, name, ext);
+      fs.chmodSync(file, mode);
+      const attach = await remote.attach();
+      expect([
+        ext,
+        mode.toString(8),
+        attach.outcome,
+        attach.failure?.reason,
+      ]).toEqual([ext, mode.toString(8), ...expected]);
+      expectDeclared(attach);
+      fs.chmodSync(file, 0o600);
+    }
+    fs.chmodSync(runtimeDir, 0o500);
+    try {
+      const dir = await remote.attach();
+      expect([dir.outcome, dir.failure?.reason]).toEqual([
+        'owner-required',
+        'runtime-dir-unusable',
+      ]);
+    } finally {
+      fs.chmodSync(runtimeDir, 0o700);
+    }
+    expect((await remote.attach()).outcome).toBe('success');
+  });
 
   test('a clean stop removes every entry; the next owner of a name cleans it; other names are untouched', async () => {
     const runtimeDir = makeRuntimeDir();
