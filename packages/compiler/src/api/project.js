@@ -21,6 +21,7 @@ import { buildDiagnosticsResult } from '../protocol/diagnostics-result-v1.js';
 import { Codes, PmsError, diagnostic } from '../protocol/diagnostics.js';
 import { normalizeMutationTransaction } from '../project/mutations/transaction.js';
 import { perfNow, recordDuration } from '../observability/metrics.js';
+import { ownDefinitionOf } from '../design-system/registry/ingress.js';
 import {
   captureAcceptedSnapshot,
   createAcceptedSnapshotStore,
@@ -84,7 +85,36 @@ function snapshotInput(value, seen = new WeakMap()) {
   return copy;
 }
 
+// A container (`config`, `transaction`) spread without its `definition`
+// property: only `ownDefinitionOf` reads that one, by descriptor (AG-03.1,
+// design note §3.8.0). Keys are defined, so an own `__proto__` stays own.
+function withoutDefinition(container) {
+  const out = {};
+  for (const key of Reflect.ownKeys(container)) {
+    if (key === 'definition') continue;
+    const descriptor = Object.getOwnPropertyDescriptor(container, key);
+    if (!descriptor.enumerable) continue;
+    Object.defineProperty(out, key, {
+      value: container[key],
+      enumerable: true,
+      writable: true,
+      configurable: true,
+    });
+  }
+  return out;
+}
+
+function snapshotConfigChanges(config) {
+  if (config == null || typeof config !== 'object')
+    return snapshotInput(config);
+  const copy = snapshotInput(withoutDefinition(config));
+  if (Object.hasOwn(config, 'definition'))
+    copy.definition = ownDefinitionOf(config);
+  return copy;
+}
+
 function resolveConfig(config = {}) {
+  const definition = ownDefinitionOf(config);
   const rootDir = canonicalPath(config.rootDir ?? process.cwd());
   const projectId = config.projectId ?? rootDir;
   const outDir = canonicalPath(
@@ -101,12 +131,12 @@ function resolveConfig(config = {}) {
     }
   }
   return {
-    ...config,
+    ...withoutDefinition(config),
     projectId,
     rootDir,
     outDir,
     roots,
-    definition: snapshotInput(config.definition),
+    definition,
     engineOptions: snapshotInput(config.engineOptions ?? {}),
     // CE-01.1: browser targets, plain data; absent means the default profile
     // in advisory mode.
@@ -176,12 +206,11 @@ function resolveConfigChanges(changes, normalized) {
       );
     }
   }
+  const definition = ownDefinitionOf(changes);
   return {
-    ...changes,
+    ...withoutDefinition(changes),
     ...(roots === undefined ? {} : { roots }),
-    ...(changes.definition === undefined
-      ? {}
-      : { definition: snapshotInput(changes.definition) }),
+    ...(definition === undefined ? {} : { definition }),
     ...(changes.engineOptions === undefined
       ? {}
       : { engineOptions: snapshotInput(changes.engineOptions) }),
@@ -219,10 +248,10 @@ function snapshotMutation(transaction) {
   if (transaction == null || typeof transaction !== 'object')
     return transaction;
   return {
-    ...transaction,
+    ...withoutDefinition(transaction),
     baseRevision: snapshotRevision(transaction.baseRevision),
-    definition: snapshotInput(transaction.definition),
-    config: snapshotInput(transaction.config),
+    definition: ownDefinitionOf(transaction),
+    config: snapshotConfigChanges(transaction.config),
     changed: Array.isArray(transaction.changed)
       ? [...transaction.changed]
       : transaction.changed,

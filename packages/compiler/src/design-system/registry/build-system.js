@@ -27,6 +27,17 @@ import { effectivePropertiesOf } from '../policy/domains';
 import { designSystemTargetFacts, unitSummary } from '../../targets/evaluate';
 import { tokenGrammars } from '../../targets/catalog';
 import { PmsError } from '../../protocol/diagnostics';
+import { checkExamples } from '../semantics/examples';
+import {
+  isEmptySemantics,
+  isPrivateIn,
+  semanticEntities,
+} from '../semantics/build';
+import {
+  createMetadataReporter,
+  privateEntityOrder,
+} from '../semantics/diagnostics';
+import { snapshotVocabulary } from '../semantics/views';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, phase as perfPhase } from '../../observability/metrics';
 
@@ -85,6 +96,18 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
     }
   });
   Object.assign(injected, recipeInjected);
+
+  // AG-03.1: metadata examples, compiled by the unchanged policy and then
+  // discarded (design note §3.6). Every failure is collected, then thrown
+  // together before any snapshot exists (I5).
+  const exampleDiagnostics = metadataExampleDiagnostics(
+    definition,
+    registry,
+    varsByToken,
+    recipes,
+    options,
+  );
+  if (exampleDiagnostics.length > 0) throw new PmsError(exampleDiagnostics);
 
   const create = (namespaces, callOptions = {}) => {
     const result = compileStyles({
@@ -160,6 +183,36 @@ export function buildDesignSystem(definition, options = {}, context = {}) {
     renderCss: () => renderCss(injected),
     injected,
   };
+}
+
+function metadataExampleDiagnostics(
+  definition,
+  registry,
+  varsByToken,
+  recipes,
+  options,
+) {
+  if (isEmptySemantics(registry.semantics)) return [];
+  const vocabulary = snapshotVocabulary({ registry });
+  const entities = semanticEntities(registry.semantics, vocabulary);
+  if (!entities.some((entity) => entity.own.examples !== undefined)) return [];
+  const diagnose = createMetadataReporter({
+    order: privateEntityOrder(definition),
+    isPrivate: isPrivateIn(vocabulary),
+  });
+  const diagnostics = [];
+  checkExamples({
+    entities,
+    registry,
+    varsByToken,
+    recipes,
+    options,
+    report: (entity, field, cause) =>
+      diagnostics.push(
+        diagnose('metadata.invalid-example', entity.address, field, { cause }),
+      ),
+  });
+  return diagnostics;
 }
 
 /**

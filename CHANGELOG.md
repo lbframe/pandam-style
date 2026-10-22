@@ -31,6 +31,24 @@
   pre-publication staging branch, used by the CLI, is unchanged.
 - The agent layer implements `audit.read`, `audit.compute` and
   `audit.materialize` (private compiler source, no package export).
+- Compiler (AG-03.1, #12): design-system definitions can declare descriptive
+  `meta` on the system, token leaves, themes, conditions (object form), recipes,
+  slots, variant axes and values, compiler patterns and `propertyDomains`
+  entries. It is validated against a closed schema, stored in
+  `registry.semantics` outside every compiled record, and never changes the
+  registry digest, CSS, types, manifest or module. Invalid metadata fails with
+  the new `PMS_INVALID_METADATA` (rules `metadata.*`). Migration:
+  - a `meta` key that was silently ignored at one of those positions is now
+    validated, and invalid content fails the build;
+  - a token group or category key named `meta` is now an error
+    (`metadata.unsupported-position`) instead of a token path segment: rename
+    the segment;
+  - a definition that is not plain data (an accessor, a function, a class
+    instance, a `Date`, `Map`, `Set` or `RegExp`, any other non-plain prototype,
+    a symbol key other than a `token()` mark) is now rejected by
+    `createProjectSession` and `applyChanges` with `PMS_INVALID_DEFINITION`,
+    rule `definition.shape`. The compiler no longer runs author getters while
+    copying a definition.
 
 ## 0.1.0-alpha.1
 
