@@ -68,12 +68,16 @@ node tools/baselines/archive.mjs build --store <empty dir>  # registry, nodejs.o
 node tools/baselines/archive.mjs verify --store <dir> --replay --rebuilt  # a rebuilt store
 node tools/baselines/archive.mjs verify --store <copy of the archived store> --replay
 node tools/baselines/archive.mjs closure --store <dir> --dest <dir>  # offline closure copy
+node tools/baselines/archive.mjs verify --committed  # no store: what Git proves
 ```
 
 `verify` recomputes every digest of the manifest. `--replay` then re-creates the
 source archive and reinstalls the closure offline with `npm ci --offline`. The
 reinstalled tree must be byte-identical to the recorded one, apart from npm's
-hidden `.package-lock.json`.
+hidden `.package-lock.json`. `verify --committed` needs no store: it runs only
+the checks that Git objects and committed files can prove. Those are the source
+tree, the release tag commit, product equivalence, the lockfiles, the packages'
+closure lockfile entries, and the assets and corpora file by file.
 
 The store and `manifest.v1.json` are immutable. Run `verify --replay` and any
 digest recomputation on a copy of the store, because an offline `npm ci` writes
@@ -616,3 +620,57 @@ node tools/baselines/budgets.mjs gate --rev <evaluated revision> \
   - the exact predecessor, by path and SHA-256;
   - a new comparable baseline run, because reused result files are rejected;
   - a justified relaxation entry for every loosened or removed budget.
+
+**Committed-record check.** `node tools/baselines/validate-records.mjs` runs in
+the CI `static` job. It needs the full Git history, but no store and no network.
+It reuses the existing commands:
+
+| Check                  | What it proves                                                                                                                                        |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `manifest`             | `archive.mjs verify --committed` passes                                                                                                               |
+| `workloads`            | `workloads.mjs digest` reports every frozen workload as `frozen`                                                                                      |
+| `ce-corpus derivation` | `workloads/ce-corpus.v1.json` equals the candidates of the pinned accounting and policy less its recorded exclusions, with matching inputs and totals |
+| `budgets`              | every `budgets.vN.json` re-freezes byte for byte from its policy and baseline runs with the current derivation                                        |
+| `frozen`               | every file here except this README that is published in the base is byte-identical at `HEAD` and in the working tree                                  |
+
+- **Intended coupling.** The `budgets` check binds the current derivation to
+  every committed policy version on purpose. A derivation change must keep each
+  committed `budgets.vN.json` reproducible, as the version 3 change did.
+- **Evidence is not recomputed.** Committed results, summaries and gate reports
+  are evidence. The `frozen` rule protects their bytes, and they are not
+  re-derived with today's scripts.
+- **Base.** The base of the `frozen` rule is the merge base of `HEAD` and
+  `origin/main`, or `HEAD`'s first parent when `HEAD` is already on
+  `origin/main`. On a push to `main`, CI passes the tip before the push
+  (`--base`), because a rebase merge can push several commits at once.
+- **Unpublished files.** Files absent from the base are not constrained by
+  `frozen`: they may change until they merge. Their other checks still apply.
+  Removing or renaming a published file fails.
+
+`--mutations` commits one edit per class to a temporary clone, with the same
+base, and requires the clone's validator to fail that class. The classes are:
+
+- a manifest digest and the source tree;
+- a frozen workload, also with its digest re-bound;
+- a synthetic workload seed;
+- result samples, a summary and a gate report;
+- a budget limit;
+- a frozen file edited, left uncommitted or removed.
+
+An unmutated clone must pass. The run then applies the `frozen` rule to
+temporary repositories with real Git histories:
+
+- direct branches;
+- a pull-request merge ref and a merge commit;
+- squash and rebase;
+- a multi-commit push to `main`;
+- detached `HEAD`;
+- a file added then edited before its merge (accepted), or after it (rejected).
+
+Two checks stay local-only, because they need the archived store:
+
+- the store digests: `archive.mjs verify --store <copy> --replay`;
+- the CE-00.2 corpus exclusions, which only the Alpha 1 compiler decides:
+  `derive-ce-corpus.mjs --closure <store>/closure`, then `git diff`.
+
+The measurements themselves cannot be re-observed.
