@@ -24,6 +24,23 @@ This is the state of the core-evolution epic when the perf host and the CI runne
 | #149 host qualification flakes under load | issue | Not started | — |
 | #94 archived Chromium runs | issue | Blocked: the archived engine needs an AppArmor profile on the host for its sandbox (a host decision) | — |
 
+## CE-02.2 perf round 2 (WIP, unverified)
+
+The work in progress is commit `48e728f` on `core-evolution/ce-02.2b-perf-wip-handoff`. It caches each token's session file-input digest across rebuilds, in the new module `project/session/token-inputs.js`. An unchanged token therefore skips the verdict computation and the hashing.
+
+- **Local A/B on an earlier version of the same memo:** ce-corpus 1.004 and alpha1-valid-fixture 0.998, both against CE-02.1.
+- **Verified on the final tree:**
+  - the incremental oracle, now 14/14;
+  - the full suite, 4,171/4,171.
+- **Not yet run:**
+  - the mutation battery (stopped at 27 of 55);
+  - the final A/B;
+  - equivalence, negatives and migrations;
+  - AgentDoc (overrides on `session/index.js` likely need repinning);
+  - the leak scan.
+
+**To resume:** finish those checks, squash into a proper commit on #154, push, then run the perf gate.
+
 ## Known risk for the next gates
 
 - The incremental token-value edit on the small workloads (about 2 ms per edit) is the tightest timing cell.
