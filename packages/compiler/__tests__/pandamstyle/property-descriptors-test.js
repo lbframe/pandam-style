@@ -122,6 +122,7 @@ const CATEGORIES = [
 ];
 const ds = compiler.buildDesignSystem({
   systemId: 'ce021-descriptors',
+  conditions: { hover: ':hover' },
   tokens: Object.fromEntries(
     CATEGORIES.map((category) => [
       category,
@@ -139,6 +140,22 @@ function newOutcome(property, value) {
       registry: ds.registry,
       varsByToken: ds.varsByToken,
       namespaces: { n: { [property]: value } },
+      role: 'consumer',
+    });
+    return null;
+  } catch (error) {
+    if (!Array.isArray(error.diagnostics)) throw error;
+    expect(error.diagnostics).toHaveLength(1);
+    return [error.diagnostics[0].code, error.diagnostics[0].rule];
+  }
+}
+
+function newOutcomeIn(block, property, value) {
+  try {
+    compiler.compileStyles({
+      registry: ds.registry,
+      varsByToken: ds.varsByToken,
+      namespaces: { n: { [block]: { [property]: value } } },
       role: 'consumer',
     });
     return null;
@@ -744,6 +761,14 @@ describe('Alpha 1 equivalence', () => {
           'supported-properties',
         ]);
         expect(newOutcome(key, value)).toEqual([
+          'PMS_UNSUPPORTED_PROPERTY',
+          RULES[entry.disposition],
+        ]);
+      }
+      // Inside a named-condition block and an engine condition block, the
+      // name is checked by the same policy and stays rejected.
+      for (const block of ['_hover', ':hover']) {
+        expect(newOutcomeIn(block, key, 'x')).toEqual([
           'PMS_UNSUPPORTED_PROPERTY',
           RULES[entry.disposition],
         ]);

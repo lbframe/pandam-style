@@ -69,7 +69,7 @@ spec:
       source:
         path: docs/agent-repair.md
         section: common-categories-and-local-repair
-        sha256: 75ebaca3672dbdf2cce131a0a501d9fde40e3970e0da79e1098d7c46c95f3d55
+        sha256: af803bf93403fde95649d4bdf1d0df1691fd669524e3de6b79018ef01439f0c2
     - id: agent-use-choose-a-primitive
       key: requirement.agent-use-choose-a-primitive
       value: implemented
@@ -244,7 +244,7 @@ spec:
       source:
         path: docs/architecture/diagnostics-protocol-v1.md
         section: stable-code-families-and-repairs
-        sha256: c2f94ce4c5230fae61cbc1437982240c01e965731d505805f95ecc86674ffde4
+        sha256: 63c4eb624f7df14820ec38633691c70b212d443f3d57b4ec663581f66a3a625e
     - id: diagnostics-protocol-v1-audit-and-protocol-evolution
       key: requirement.diagnostics-protocol-v1-audit-and-protocol-evolution
       value: implemented
@@ -258,7 +258,7 @@ spec:
       source:
         path: docs/architecture/generated-design-system-abi-v1.md
         section: generated-artifacts
-        sha256: cb303030103782123090bb5135e1a89a7e705cf5b86373ab86e2e8e82a6bf910
+        sha256: 766986d7f884737ab11a751288d204a00c5b11a0911e1a44d69e83fa1f729a1f
     - id: generated-design-system-abi-v1-runtime-references
       key: requirement.generated-design-system-abi-v1-runtime-references
       value: implemented
@@ -370,7 +370,7 @@ spec:
       source:
         path: docs/reference/authoring.md
         section: styles-and-tokens
-        sha256: 7566a42b0ff1b9fd7bea9d5705fcb128d59cd6900b4734b3b90dfd6ec9e2690a
+        sha256: 3abc91f426f4e288c0cfbc7cc8a875208cd626b6eab361f4b7476552f4c30100
     - id: authoring-recipes-slots-and-compounds
       key: requirement.authoring-recipes-slots-and-compounds
       value: implemented
@@ -412,7 +412,7 @@ spec:
       source:
         path: docs/reference/compiler-api.md
         section: diagnostics
-        sha256: 404848e1689b99c93fd1309468f5b5c16fb2a79c4dbc14a25e32c443191cefd1
+        sha256: 7d007d8f6ab9dd3ec09a840c19b5847c0dacc6f80cf9e9bddbfbd77a9fd8dadf
     - id: compiler-api-generated-artifacts
       key: requirement.compiler-api-generated-artifacts
       value: implemented
@@ -426,7 +426,7 @@ spec:
       source:
         path: docs/reference/design-system.md
         section: definition-shape
-        sha256: b157486e55bf8b9dae0b41966c4dfa0f8da604c89fba2296f46ba696ce4eeda6
+        sha256: 2f221a47ffb4089d15305a807cbdd690246176c20ca6cba6d34de3f7e802aa29
     - id: design-system-conditions
       key: requirement.design-system-conditions
       value: implemented

@@ -245,6 +245,9 @@ function transformCreateCall(callPath, ctx, ds) {
     }
   }
 
+  // The verdict of every declaration depends on the effective property
+  // domains, whether it passes or fails: recorded before compiling.
+  addSemanticUnit(ctx, 'property-domains');
   let result;
   try {
     result = compileNamespaces(namespaces, ctx, ds);
@@ -395,6 +398,8 @@ function transformPatternCall(callPath, ctx, ds) {
   addSemanticUnit(ctx, `pattern:${patternId}`);
   addSemanticUnit(ctx, 'runtime-identity');
   addSemanticUnit(ctx, 'conditions');
+  // Pattern declarations pass through the same property policy.
+  addSemanticUnit(ctx, 'property-domains');
   // Locate parameter/token failures at their authored value, including conditions.
   const locateParameter = (parameter, condition) => {
     let valuePath = args[0];

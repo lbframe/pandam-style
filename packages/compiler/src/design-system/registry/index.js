@@ -15,6 +15,11 @@
  */
 
 import { normalizeEnhancements } from '../../targets/policy';
+import {
+  effectivePropertiesOf,
+  normalizePropertyDomains,
+  patternConflicts,
+} from '../policy/domains';
 import { createHash } from 'crypto';
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 import { validateRecipeDefinition } from '../recipes/validate';
@@ -478,6 +483,21 @@ export function buildRegistry(definition) {
   diagnostics.push(...enhancementPolicy.diagnostics);
   const enhancements = enhancementPolicy.enhancements;
 
+  // CE-02.1: design-system property domains. Author data only: validated
+  // against each descriptor's `standard` domain; an entry is the whole
+  // effective domain of its property.
+  const domainPolicy = normalizePropertyDomains(
+    definition.propertyDomains,
+    tokensOut,
+  );
+  diagnostics.push(...domainPolicy.diagnostics);
+  const propertyDomains = domainPolicy.propertyDomains;
+  if (domainPolicy.diagnostics.length === 0) {
+    diagnostics.push(
+      ...patternConflicts(effectivePropertiesOf({ propertyDomains })),
+    );
+  }
+
   const payload = {
     systemId,
     tokens: tokensOut,
@@ -494,6 +514,8 @@ export function buildRegistry(definition) {
     // Present only when declared, so a definition without enhancements keeps
     // the registry digest it always had.
     ...(enhancements.length === 0 ? {} : { enhancements }),
+    // Likewise: a definition without property domains keeps its digest.
+    ...(Object.keys(propertyDomains).length === 0 ? {} : { propertyDomains }),
   };
   const allTokenIds = Object.keys(tokensOut);
   const publicTokenIds = allTokenIds.filter(
@@ -532,6 +554,7 @@ export function buildRegistry(definition) {
     conditionOrder,
     recipes: recs,
     enhancements,
+    propertyDomains,
     vocabularyDomains,
     diagnostics,
     registryDigest: registryDigest(payload),

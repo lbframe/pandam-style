@@ -144,6 +144,8 @@ export const Codes = {
   INVALID_ENHANCEMENT_POLICY: 'PMS_INVALID_ENHANCEMENT_POLICY',
   // AG-01.1: a definition field that cannot identify a design system.
   INVALID_DEFINITION: 'PMS_INVALID_DEFINITION',
+  // CE-02.1: a design-system `propertyDomains` entry the compiler refuses.
+  INVALID_PROPERTY_DOMAIN: 'PMS_INVALID_PROPERTY_DOMAIN',
 };
 
 /** Stable single-line rendering of a diagnostic (used by the build report). */

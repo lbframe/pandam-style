@@ -35,6 +35,8 @@ entry:      { css?, values?, tokens?, range?, form?, origin? }
   `{ min: 0, legacy: true }`). An artifact set whose manifest has a `null` or
   non-finite bound is invalid.
 - `form: 'rejected-composite'` marks a refused composite form.
+- `origin` is `approved` or `narrowed` for a property the design system's
+  `propertyDomains` overrides: the entry is then the whole admitted domain.
 - Members are omitted when empty, `css` when it is the kebab-case key, and
   `origin` when it is `default`.
 

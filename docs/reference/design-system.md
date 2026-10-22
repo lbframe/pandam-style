@@ -85,6 +85,38 @@ Declared enhancements enter the registry digest; a definition without the
 field keeps the digest it had before. Declaring an enhancement changes what the
 system promises, so it is a design-system decision, not a repair for page code.
 
+An optional `propertyDomains` object (CE-02.1) sets, per property, the
+domain this design system admits, chosen from the compiler's standard domain
+for that property:
+
+```js
+propertyDomains: {
+  width: { tokens: ['sizes'], values: ['auto', 'min-content'] }, // approve: mixed
+  display: { values: ['flex', 'inline-flex', 'grid', 'none'] }, // narrow
+  opacity: { values: [0, 1] },                                  // finite numbers
+},
+```
+
+- A key is a property authoring key the compiler admits (not a composite form
+  or a platform extension). An entry holds at least one of `values`, `tokens`
+  and `range`, and nothing else.
+- Every member must belong to the property's standard domain: standard
+  keywords and literals, standard token categories with at least one declared
+  token, and, on the four legacy rows (`opacity`, `flex`, `flexGrow`,
+  `flexShrink`), finite numbers or a `range` (`{ min, max }`, or `{ min }` for
+  no upper bound) within the standard range. Arbitrary strings, numbers,
+  functions and patterns are refused.
+- The entry is the whole domain of the property, for every role (recipes and
+  pages alike): a member it does not restate is no longer admitted, whatever
+  the compiler default held.
+- A domain that removes a value or token category a pattern emits is refused,
+  so the manifest never offers an unusable pattern selection.
+- Any invalid entry is `PMS_INVALID_PROPERTY_DOMAIN` (phase `registry`, one
+  rule per class, `property-domains.*`), and the whole definition is refused.
+- Declared domains enter the registry digest; a definition without the field
+  keeps its digest. Changing a domain is a design-system decision, never a
+  repair for page code.
+
 ## Conditions
 
 `conditions` maps a finite name to selector or at-rule text. Consumers use the
