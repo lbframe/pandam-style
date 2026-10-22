@@ -817,8 +817,10 @@ function evaluateKey(mapKey, use, ctx) {
         use.record.kind === 'value' &&
         context.property != null
       ) {
+        // The admitted values come from the design system's effective
+        // property table: its digest is part of the key.
         candidates = memoCandidates(
-          `${resolution.digest}|value|${context.property}`,
+          `${resolution.digest}|${domainOf?.digest ?? ''}|value|${context.property}`,
           () => valueCandidates(context.property, domainOf, resolution),
         );
         repair = {

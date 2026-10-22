@@ -142,6 +142,28 @@ export function createUsageContext({
   };
 }
 
+/**
+ * Defines `key` as an own, enumerable data property. Plain assignment into an
+ * object literal is not equivalent: `obj['__proto__'] = v` replaces the
+ * prototype and drops the key, so a declaration named after an
+ * `Object.prototype` member would vanish before validation.
+ */
+export function setOwnKey(target, key, value) {
+  Object.defineProperty(target, key, {
+    configurable: true,
+    enumerable: true,
+    value,
+    writable: true,
+  });
+  return target;
+}
+
+/** `Object.assign` without its setter semantics: own keys only, each defined. */
+export function assignOwn(target, source) {
+  for (const key of Object.keys(source)) setOwnKey(target, key, source[key]);
+  return target;
+}
+
 export function addSemanticUnit(ctx, unit) {
   ctx.semanticUnits?.add(unit);
 }
@@ -807,7 +829,7 @@ function evaluateObject(nodePath, ctx, origin, mode = 'declaration') {
       }
       // The spread is folded: every value it carries passes through policy
       // again, so an alias or a spread never launders a value.
-      Object.assign(out, v);
+      assignOwn(out, v);
       continue;
     }
     if (!prop.isObjectProperty()) {
@@ -829,14 +851,14 @@ function evaluateObject(nodePath, ctx, origin, mode = 'declaration') {
       if (raw === FAIL) return FAIL;
       const keyNode = prop.node.key;
       if (keyNode.type === 'Identifier' && !prop.node.computed) {
-        out[keyNode.name] = raw;
+        setOwnKey(out, keyNode.name, raw);
       } else {
         const evaluatedKey = forkEvaluate(prop.get('key'), ctx);
         if (evaluatedKey.confident) {
-          out[String(evaluatedKey.value)] = raw;
+          setOwnKey(out, String(evaluatedKey.value), raw);
         } else {
           const sym = prop.node.key;
-          if (sym.type === 'Identifier') out[sym.name] = raw;
+          if (sym.type === 'Identifier') setOwnKey(out, sym.name, raw);
         }
       }
       continue;
@@ -849,7 +871,7 @@ function evaluateObject(nodePath, ctx, origin, mode = 'declaration') {
       'value',
     );
     if (value === FAIL) return FAIL;
-    out[key.name] = value;
+    setOwnKey(out, key.name, value);
   }
   if (origin != null) ctx.origins.set(origin, locationOf(nodePath, ctx));
   return out;

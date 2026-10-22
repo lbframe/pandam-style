@@ -108,6 +108,9 @@ jobs:
       - run: node tools/targets/build-compat-data.mjs --check
       - run: node tools/targets/measure-floor.mjs --check
       - run: node tools/targets/build-builtin-resolutions.mjs --check
+      # CE-02.1: the recognized property names re-derive from the CE-00.1
+      # registry byte for byte.
+      - run: node tools/policy/build-recognized.mjs --check
       # Host DX runtime: the Vite and Rsbuild (`@rsbuild/core` 2.2.11, a root
       # devDependency) plugins forwarding `targets`, the Next semantic-dev
       # suites and the source-map type check.

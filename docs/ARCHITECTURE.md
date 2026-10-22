@@ -8,7 +8,7 @@ approved semantics while the compiler rejects invalid values and provenance.
 [ADR 0003](architecture/adr/0003-authoring-api.md) records the authoring choice;
 [ADR 0004](architecture/adr/0004-generated-import-model.md) explains why project
 vocabulary arrives through an authenticated generated module. Compiler
-[policy](../packages/compiler/src/design-system/policy/properties.js),
+[policy](../packages/compiler/src/design-system/policy/descriptors.js),
 [registry](../packages/compiler/src/design-system/registry/build-system.js)
 and [frontend](../packages/compiler/src/frontend/babel/compile-file.js)
 implement distinct parts of that boundary.

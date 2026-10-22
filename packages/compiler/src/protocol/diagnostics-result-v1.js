@@ -6,7 +6,6 @@
  */
 
 import path from 'node:path';
-import { propertyCategory } from '../design-system/policy/properties.js';
 
 export const DIAGNOSTICS_RESULT_KIND = 'pandamstyle-diagnostics-result';
 export const DIAGNOSTICS_RESULT_SCHEMA_VERSION = 1;
@@ -159,6 +158,19 @@ function candidatesOf(diagnostic, revision, candidateLimit) {
   };
 }
 
+/**
+ * The single token category of a property in the revision's canonical
+ * snapshot, or null (no snapshot, no property, or a domain with zero or
+ * several categories).
+ */
+function propertyCategoryOf(property, repairDomain) {
+  if (typeof property !== 'string' || typeof repairDomain !== 'function') {
+    return null;
+  }
+  const domain = repairDomain({ kind: 'property', property });
+  return domain?.tokens?.length === 1 ? domain.tokens[0] : null;
+}
+
 export function protocolDiagnostic(diagnostic, revision, options = {}) {
   const context = normalizeContext(diagnostic?.context ?? {}, options.rootDir);
   const contextualCategory =
@@ -170,7 +182,7 @@ export function protocolDiagnostic(diagnostic, revision, options = {}) {
       diagnostic?.expected?.category ??
       context.category ??
       contextualCategory ??
-      propertyCategory(context.property) ??
+      propertyCategoryOf(context.property, options.repairDomain) ??
       null,
     visibility: ['PMS_TOKEN_NOT_PUBLIC', 'PMS_FORBIDDEN_VALUE'].includes(
       diagnostic?.code,

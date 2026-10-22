@@ -48,11 +48,21 @@ export {
   registryDigest,
 } from '../../packages/compiler/src/design-system/registry/index.js';
 export {
-  propertyCategory,
-  propertyKind,
-  structuralDomain,
-  supportedProperties,
-} from '../../packages/compiler/src/design-system/policy/properties.js';
+  descriptorKeys,
+  ENFORCED_FIELDS,
+  platformExtensions,
+} from '../../packages/compiler/src/design-system/policy/descriptors.js';
+export {
+  domainOfCssFor,
+  effectiveDomain,
+  effectivePropertiesOf,
+  propertyRow,
+} from '../../packages/compiler/src/design-system/policy/domains.js';
+export { recognizedProperty } from '../../packages/compiler/src/design-system/policy/recognized.js';
+// Engine tables the descriptor parity tests compare against (CE-02.3 owns
+// rewiring the engine to the descriptors).
+export { default as flatMapExpandedShorthands } from '../../packages/compiler/src/engine/atomic/preprocess-rules/index.js';
+export { default as generateLTR } from '../../packages/compiler/src/engine/atomic/direction/generate-ltr.js';
 export {
   defineRecipe,
   isStyleRef,

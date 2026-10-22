@@ -7,6 +7,7 @@
 
 import { createHash } from 'crypto';
 import { diagnostic, Codes, PmsError } from '../../protocol/diagnostics';
+import { MANIFEST_SCHEMA_VERSION } from '../../design-system/registry/snapshot';
 
 const ARTIFACTS = ['designModule', 'declarations', 'manifest', 'css'];
 
@@ -104,7 +105,7 @@ export function validateArtifactSet(metadata, contents) {
     metadata.schemaVersion !== 1 ||
     metadata.abiVersion !== 1 ||
     metadata.compilerContractVersion !== 'pms-0.1' ||
-    metadata.manifestSchemaVersion !== 1
+    metadata.manifestSchemaVersion !== MANIFEST_SCHEMA_VERSION
   ) {
     mismatch('artifacts.json', 'unsupported schema or compiler identity');
   }
@@ -118,6 +119,25 @@ export function validateArtifactSet(metadata, contents) {
   for (const key of Object.keys(identity)) {
     if (manifest[key] !== identity[key]) {
       mismatch('manifest', `identity field ${key} differs`);
+    }
+  }
+  // CE-02.1: legacy range bounds are finite numbers; an unbounded range omits
+  // `max`. A `null` or non-finite bound is not a valid manifest.
+  for (const [property, entry] of Object.entries(
+    manifest?.properties?.byProperty ?? {},
+  )) {
+    const range = entry?.range;
+    if (range == null) continue;
+    const finite = (bound) =>
+      typeof bound === 'number' && Number.isFinite(bound);
+    if (
+      !finite(range.min) ||
+      (Object.hasOwn(range, 'max') && !finite(range.max))
+    ) {
+      mismatch(
+        'manifest',
+        `range bounds of ${property} are not finite numbers`,
+      );
     }
   }
   // CE-01.1, additive: the target digest binds the artifact set to the target
