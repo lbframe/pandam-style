@@ -20,6 +20,17 @@
   `context.reason`. Codes and rules are unchanged.
 - The agent operation registry and machine protocol are added as private
   compiler source, with no package export (AG-02.5 exposes them).
+- Compiler (AG-01.2, #9): `requestFullAudit()` after publication writes its
+  standalone coverage document through directory descriptors and never follows
+  a symbolic link: a temporary file, then a rename and a read-back of the
+  installed bytes. A symlinked or replaced audit directory, a directory at the
+  file name, a substitution during the write, or a failed write now fails with
+  the new `PMS_UNSAFE_AUDIT_PATH` (closed `context.reason`) and leaves no file
+  it created. Where `/proc/self/fd` anchoring is unavailable (non-Linux), the
+  standalone document fails closed with reason `anchoring-unavailable`; the
+  pre-publication staging branch, used by the CLI, is unchanged.
+- The agent layer implements `audit.read`, `audit.compute` and
+  `audit.materialize` (private compiler source, no package export).
 
 ## 0.1.0-alpha.1
 
