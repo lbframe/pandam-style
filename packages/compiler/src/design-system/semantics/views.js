@@ -19,7 +19,7 @@
 import { PATTERN_IDS } from '../patterns/compile';
 import { addressKey } from './diagnostics';
 import { ownFields } from './build';
-import { isPlain, kindOfAddress } from './schema';
+import { isPlain, kindOfAddress, ownValue } from './schema';
 import { resolveAddress, vocabularyOf } from './references';
 
 export const SEMANTICS_VIEW_KIND = 'pandamstyle-semantics-view';
@@ -70,37 +70,55 @@ export function semanticsViewOf(snapshot, { audience = 'consumer' } = {}) {
       : ownFields('system', semantics.system),
   );
   for (const tokenId of Object.keys(registry.tokens))
-    add({ token: tokenId }, 'definition', semantics.tokens[tokenId]);
+    add({ token: tokenId }, 'definition', ownValue(semantics.tokens, tokenId));
   for (const name of Object.keys(registry.themes))
-    add({ theme: name }, 'definition', semantics.themes[name]);
+    add({ theme: name }, 'definition', ownValue(semantics.themes, name));
   for (const name of registry.conditionOrder)
-    add({ condition: name }, 'definition', semantics.conditions[name]);
+    add(
+      { condition: name },
+      'definition',
+      ownValue(semantics.conditions, name),
+    );
   for (const patternId of PATTERN_IDS)
     add(
       { pattern: patternId },
       'compiler',
-      semantics.system?.patterns?.[patternId],
+      ownValue(ownValue(semantics.system, 'patterns'), patternId),
     );
   for (const property of Object.keys(registry.propertyDomains ?? {}))
-    add({ property }, 'definition', semantics.propertyDomains[property]);
+    add(
+      { property },
+      'definition',
+      ownValue(semantics.propertyDomains, property),
+    );
   for (const recipeId of Object.keys(registry.recipes)) {
     const recipe = registry.recipes[recipeId];
-    const meta = semantics.recipes[recipeId];
+    const meta = ownValue(semantics.recipes, recipeId);
     add(
       { recipe: recipeId },
       'definition',
       meta === undefined ? undefined : ownFields('recipe', meta),
     );
     for (const slot of recipe.slots ?? [])
-      add({ recipe: recipeId, slot }, 'definition', meta?.slots?.[slot]);
+      add(
+        { recipe: recipeId, slot },
+        'definition',
+        ownValue(ownValue(meta, 'slots'), slot),
+      );
     for (const axis of recipe.axisOrder) {
-      const entry = meta?.variants?.[axis];
-      add({ recipe: recipeId, variant: axis }, 'definition', entry?.meta);
+      // Own-property lookups only (fix round 1, B3): a value named
+      // `constructor` or `toString` must not inherit an invented `meta`.
+      const entry = ownValue(ownValue(meta, 'variants'), axis);
+      add(
+        { recipe: recipeId, variant: axis },
+        'definition',
+        ownValue(entry, 'meta'),
+      );
       for (const value of Object.keys(recipe.variants[axis]))
         add(
           { recipe: recipeId, variant: axis, value },
           'definition',
-          entry?.values?.[value],
+          ownValue(ownValue(entry, 'values'), value),
         );
     }
   }
@@ -134,6 +152,21 @@ function assertConsumerSafe(meta, vocabulary) {
       ? []
       : [meta.deprecated.replacement]),
   ];
+  // Token references written as data inside examples, under any key.
+  const walk = (value) => {
+    if (Array.isArray(value)) return value.forEach(walk);
+    if (!isPlain(value)) return undefined;
+    const keys = Object.keys(value);
+    if (
+      keys.length === 1 &&
+      keys[0] === 'token' &&
+      typeof value.token === 'string'
+    )
+      targets.push({ token: value.token });
+    else for (const key of keys) walk(ownValue(value, key));
+    return undefined;
+  };
+  walk(ownValue(meta, 'examples'));
   for (const target of targets) {
     if (!isPlain(target) || kindOfAddress(target) === 'component') continue;
     if (resolveAddress(vocabulary, target)?.visibility !== 'public')

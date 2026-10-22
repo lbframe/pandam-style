@@ -114,6 +114,11 @@ propertyDomains: {
   so the manifest never offers an unusable pattern selection.
 - Any invalid entry is `PMS_INVALID_PROPERTY_DOMAIN` (phase `registry`, one
   rule per class, `property-domains.*`), and the whole definition is refused.
+  The `malformed*` rules cover malformed plain data (a string instead of an
+  object, a number instead of an array, an unknown member). Through the public
+  API, a value that is not plain data (a function, `Map`, prototyped object,
+  accessor or symbol key) is caught earlier as `PMS_INVALID_DEFINITION`, rule
+  `definition.shape`.
 - Declared domains enter the registry digest; a definition without the field
   keeps its digest. Changing a domain is a design-system decision, never a
   repair for page code.

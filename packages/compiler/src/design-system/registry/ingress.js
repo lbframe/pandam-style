@@ -149,23 +149,28 @@ export function snapshotDefinition(definition) {
     if (type === 'symbol') throw new ShapeError('symbol-value', field);
     if (type === 'bigint') throw new ShapeError('bigint', field);
     if (seen.has(value)) return seen.get(value);
-    let proto;
-    let keys;
-    try {
-      proto = Object.getPrototypeOf(value);
-      keys = Reflect.ownKeys(value);
-    } catch {
-      throw new ShapeError('unreadable', field);
-    }
-    const describe = (key) => {
+    // Every reflective operation on an author object is guarded: a trap that
+    // throws or answers inconsistently (a key without a descriptor, a
+    // prototype chain that throws) is the closed reason `unreadable`, and no
+    // author error or text escapes (fix round 1, B5).
+    const guard = (op) => {
       try {
-        return Object.getOwnPropertyDescriptor(value, key);
+        return op();
       } catch {
         throw new ShapeError('unreadable', field);
       }
     };
-    if (Array.isArray(value)) {
-      if (!isIntrinsicPrototype(proto, 'Array'))
+    const proto = guard(() => Object.getPrototypeOf(value));
+    const keys = guard(() => Reflect.ownKeys(value));
+    const describe = (key) => {
+      const descriptor = guard(() =>
+        Object.getOwnPropertyDescriptor(value, key),
+      );
+      if (descriptor === undefined) throw new ShapeError('unreadable', field);
+      return descriptor;
+    };
+    if (guard(() => Array.isArray(value))) {
+      if (!guard(() => isIntrinsicPrototype(proto, 'Array')))
         throw new ShapeError('prototype', field);
       const length = describe('length').value;
       const out = new Array(length);
@@ -191,7 +196,7 @@ export function snapshotDefinition(definition) {
       }
       return out;
     }
-    if (proto !== null && !isIntrinsicPrototype(proto, 'Object'))
+    if (proto !== null && !guard(() => isIntrinsicPrototype(proto, 'Object')))
       throw new ShapeError('prototype', field);
     if (keys.length === 1 && keys[0] === TOKEN_REF) {
       const descriptor = describe(TOKEN_REF);
@@ -243,7 +248,12 @@ export function snapshotDefinition(definition) {
  */
 export function ownDefinitionOf(container) {
   if (container === null || typeof container !== 'object') return undefined;
-  const descriptor = Object.getOwnPropertyDescriptor(container, 'definition');
+  let descriptor;
+  try {
+    descriptor = Object.getOwnPropertyDescriptor(container, 'definition');
+  } catch {
+    throw new PmsError([shapeDiagnostic('unreadable', [])]);
+  }
   if (descriptor === undefined) return undefined;
   if (!('value' in descriptor))
     throw new PmsError([shapeDiagnostic('accessor', [])]);

@@ -23,7 +23,7 @@ import {
   META_CAPS,
   snapshotMetadata,
 } from './snapshot';
-import { CHILD_KEYS, validateEntityMeta } from './schema';
+import { CHILD_KEYS, defineOwn, ownValue, validateEntityMeta } from './schema';
 import {
   addressKey,
   childAddress,
@@ -70,7 +70,24 @@ export function isEmptySemantics(semantics) {
 }
 
 export function buildSemantics(definition, vocabularyOf) {
-  const { entities: inputs, positions } = collectMetaInputs(definition);
+  const {
+    entities: inputs,
+    positions,
+    unreadable,
+  } = collectMetaInputs(definition);
+  if (unreadable) {
+    const diagnose = createMetadataReporter({
+      order: new Map(),
+      isPrivate: () => false,
+    });
+    return {
+      semantics: EMPTY_SEMANTICS,
+      diagnostics: [
+        diagnose('metadata.malformed', null, [], { reason: 'unreadable' }),
+      ],
+      entities: [],
+    };
+  }
   if (inputs.length === 0 && positions.length === 0)
     return { semantics: EMPTY_SEMANTICS, diagnostics: [], entities: [] };
   // `vocabularyOf` is a thunk: the vocabulary is built only when needed.
@@ -109,8 +126,10 @@ export function buildSemantics(definition, vocabularyOf) {
     if (resolveAddress(vocabulary, address) == null) continue;
     const report = (rule, field, extra) =>
       diagnostics.push(diagnose(rule, address, field, extra));
-    if (slot.accessor) {
-      report('metadata.malformed', [], { reason: 'accessor' });
+    if (slot.accessor || slot.unreadable) {
+      report('metadata.malformed', [], {
+        reason: slot.accessor ? 'accessor' : 'unreadable',
+      });
       continue;
     }
     const snapshot = snapshotMetadata(slot.value);
@@ -229,7 +248,9 @@ export function semanticEntities(semantics, vocabulary) {
   };
   if (semantics.system !== undefined) {
     push('system', { system: true }, semantics.system);
-    for (const [name, meta] of Object.entries(semantics.system.patterns ?? {}))
+    for (const [name, meta] of Object.entries(
+      ownValue(semantics.system, 'patterns') ?? {},
+    ))
       push('pattern', { pattern: name }, meta);
   }
   for (const [id, meta] of Object.entries(semantics.tokens))
@@ -242,12 +263,20 @@ export function semanticEntities(semantics, vocabulary) {
     push('property', { property }, meta);
   for (const [recipeId, meta] of Object.entries(semantics.recipes)) {
     push('recipe', { recipe: recipeId }, meta);
-    for (const [slot, child] of Object.entries(meta.slots ?? {}))
+    for (const [slot, child] of Object.entries(ownValue(meta, 'slots') ?? {}))
       push('slot', { recipe: recipeId, slot }, child);
-    for (const [axis, entry] of Object.entries(meta.variants ?? {})) {
+    for (const [axis, entry] of Object.entries(
+      ownValue(meta, 'variants') ?? {},
+    )) {
       if (Object.hasOwn(entry, 'meta'))
-        push('axis', { recipe: recipeId, variant: axis }, entry.meta);
-      for (const [value, child] of Object.entries(entry.values ?? {}))
+        push(
+          'axis',
+          { recipe: recipeId, variant: axis },
+          ownValue(entry, 'meta'),
+        );
+      for (const [value, child] of Object.entries(
+        ownValue(entry, 'values') ?? {},
+      ))
         push('value', { recipe: recipeId, variant: axis, value }, child);
     }
   }
@@ -264,6 +293,6 @@ export function ownFields(kind, meta) {
   if (children === undefined) return meta;
   const own = {};
   for (const key of Object.keys(meta))
-    if (!children.includes(key)) own[key] = meta[key];
+    if (!children.includes(key)) defineOwn(own, key, meta[key]);
   return own;
 }

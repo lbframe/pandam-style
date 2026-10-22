@@ -251,3 +251,4 @@ export {
   ownFields,
 } from '../../packages/compiler/src/design-system/semantics/build.js';
 export { semanticsViewOf } from '../../packages/compiler/src/design-system/semantics/views.js';
+export { canonicalAddress } from '../../packages/compiler/src/design-system/semantics/schema.js';

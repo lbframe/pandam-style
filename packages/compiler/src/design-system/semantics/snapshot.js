@@ -40,10 +40,18 @@ export const META_CAPS = Object.freeze({
   componentExport: 128,
 });
 
-/** `undefined` when no own `meta` key, else `{ value }` or `{ accessor: true }`. */
+/**
+ * `undefined` when no own `meta` key, else `{ value }`, `{ accessor: true }`
+ * or `{ unreadable: true }` when inspecting the record throws (B5).
+ */
 export function metaSlotOf(record) {
   if (record === null || typeof record !== 'object') return undefined;
-  const descriptor = Object.getOwnPropertyDescriptor(record, 'meta');
+  let descriptor;
+  try {
+    descriptor = Object.getOwnPropertyDescriptor(record, 'meta');
+  } catch {
+    return { unreadable: true };
+  }
   if (descriptor === undefined) return undefined;
   return 'value' in descriptor
     ? { value: descriptor.value }
@@ -64,17 +72,35 @@ export function isTokenLeaf(entry) {
 const isRecord = (value) =>
   value !== null && typeof value === 'object' && !Array.isArray(value);
 
+// Collections (token categories and groups, themes, conditions, recipes) are
+// read by the compiler with `Object.keys` on any object, arrays included, so
+// the metadata traversal reads exactly the same shapes (fix round 1, B4).
+const isCollection = (value) => value !== null && typeof value === 'object';
+
 /**
  * Every `meta` slot of a definition, and every unsupported `meta` position.
  * `entities` are in definition order: `{ kind, address, visibility, slot }`.
  * `positions` are `{ reason, field }`, `field` in index form (§3.9).
  */
 export function collectMetaInputs(definition) {
+  // Public input is plain data (ingress, §3.8.0). For an internal caller, a
+  // traversal that throws is reported as unreadable, never as a raw error
+  // (fix round 1, B5).
+  try {
+    return collectMetaInputsUnguarded(definition);
+  } catch {
+    return { entities: [], positions: [], unreadable: true };
+  }
+}
+
+function collectMetaInputsUnguarded(definition) {
   const entities = [];
   const positions = [];
-  if (!isRecord(definition)) return { entities, positions };
+  if (!isCollection(definition)) return { entities, positions };
   const own = (record, key) =>
-    isRecord(record) && Object.hasOwn(record, key) ? record[key] : undefined;
+    isCollection(record) && Object.hasOwn(record, key)
+      ? record[key]
+      : undefined;
 
   const systemSlot = metaSlotOf(definition);
   if (systemSlot !== undefined) {
@@ -89,7 +115,7 @@ export function collectMetaInputs(definition) {
   const tokens = own(definition, 'tokens');
   const seenTokens = new Set();
   const walkTokens = (node, category, prefix, field, override) => {
-    if (!isRecord(node)) return;
+    if (!isCollection(node)) return;
     const keys = Object.keys(node);
     keys.forEach((key, index) => {
       if (key === '') return;
@@ -122,13 +148,13 @@ export function collectMetaInputs(definition) {
           visibility: entry.visibility === 'private' ? 'private' : 'public',
           slot,
         });
-      } else if (isRecord(entry)) {
+      } else if (isCollection(entry)) {
         walkTokens(entry, category, path, at, override);
       }
     });
   };
   const walkCategories = (root, field, override) => {
-    if (!isRecord(root)) return;
+    if (!isCollection(root)) return;
     Object.keys(root).forEach((category, index) => {
       if (category === 'meta') {
         positions.push({ reason: 'token-category', field: [...field, 'meta'] });
@@ -140,7 +166,7 @@ export function collectMetaInputs(definition) {
   walkCategories(tokens, ['tokens'], false);
 
   const themes = own(definition, 'themes');
-  if (isRecord(themes)) {
+  if (isCollection(themes)) {
     Object.keys(themes).forEach((name, index) => {
       const theme = themes[name];
       const slot = metaSlotOf(theme);
@@ -161,7 +187,7 @@ export function collectMetaInputs(definition) {
   }
 
   const conditions = own(definition, 'conditions');
-  if (isRecord(conditions)) {
+  if (isCollection(conditions)) {
     for (const name of Object.keys(conditions)) {
       const slot = metaSlotOf(conditions[name]);
       if (slot === undefined) continue;
@@ -175,7 +201,7 @@ export function collectMetaInputs(definition) {
   }
 
   const recipes = own(definition, 'recipes');
-  if (isRecord(recipes)) {
+  if (isCollection(recipes)) {
     for (const recipeId of Object.keys(recipes)) {
       const recipe = recipes[recipeId];
       const slot = metaSlotOf(recipe);
@@ -218,6 +244,25 @@ export const PATTERN_ID_SET = new Set(PATTERN_IDS);
  */
 export function snapshotMetadata(input, caps = META_CAPS) {
   const onPath = new Set();
+  // Every reflective operation on an author object is guarded: a throwing or
+  // lying Proxy trap becomes the closed reason `unreadable`, never a raw
+  // error carrying author text (fix round 1, B5).
+  const guard = (op, field) => {
+    try {
+      return op();
+    } catch (error) {
+      if (error instanceof MetaIssue) throw error;
+      throw issue('unreadable', field);
+    }
+  };
+  const describe = (value, key, field) => {
+    const descriptor = guard(
+      () => Object.getOwnPropertyDescriptor(value, key),
+      field,
+    );
+    if (descriptor === undefined) throw issue('unreadable', field);
+    return descriptor;
+  };
   const walk = (value, field, depth) => {
     const type = typeof value;
     if (type === 'string' || type === 'boolean') return value;
@@ -232,8 +277,8 @@ export function snapshotMetadata(input, caps = META_CAPS) {
     if (type !== 'object') throw issue(type, field);
     if (depth > caps.depth) throw issue('depth', field);
     if (onPath.has(value)) throw issue('cycle', field);
-    const proto = Object.getPrototypeOf(value);
-    const array = Array.isArray(value);
+    const proto = guard(() => Object.getPrototypeOf(value), field);
+    const array = guard(() => Array.isArray(value), field);
     if (
       array
         ? proto !== Array.prototype
@@ -242,10 +287,10 @@ export function snapshotMetadata(input, caps = META_CAPS) {
       throw issue('prototype', field);
     }
     onPath.add(value);
-    const keys = Reflect.ownKeys(value);
+    const keys = guard(() => Reflect.ownKeys(value), field);
     let out;
     if (array) {
-      const length = Object.getOwnPropertyDescriptor(value, 'length').value;
+      const length = describe(value, 'length', field).value;
       for (const key of keys) {
         if (key === 'length') continue;
         if (
@@ -257,7 +302,10 @@ export function snapshotMetadata(input, caps = META_CAPS) {
       }
       out = [];
       for (let i = 0; i < length; i++) {
-        const descriptor = Object.getOwnPropertyDescriptor(value, String(i));
+        const descriptor = guard(
+          () => Object.getOwnPropertyDescriptor(value, String(i)),
+          [...field, i],
+        );
         if (descriptor === undefined) throw issue('hole', [...field, i]);
         if (!('value' in descriptor)) throw issue('accessor', [...field, i]);
         out.push(walk(descriptor.value, [...field, i], depth + 1));
@@ -266,8 +314,8 @@ export function snapshotMetadata(input, caps = META_CAPS) {
       out = {};
       keys.forEach((key, index) => {
         if (typeof key === 'symbol') throw issue('symbol-key', field);
-        const descriptor = Object.getOwnPropertyDescriptor(value, key);
         const at = [...field, { index }];
+        const descriptor = describe(value, key, at);
         if (!('value' in descriptor)) throw issue('accessor', at);
         if (!descriptor.enumerable) throw issue('non-enumerable', at);
         Object.defineProperty(out, key, {
@@ -297,48 +345,20 @@ class MetaIssue extends Error {
 }
 const issue = (reason, field) => new MetaIssue({ reason, field });
 
+// Built at run time: the bundle must stay one-byte source.
+const PROTOCOL_ESCAPED = new RegExp('[\\u007f-\\uffff]', 'g');
+
 /**
- * Size in the AG-01.1 canonical serialization: JSON with sorted keys and every
- * non-ASCII UTF-16 unit escaped as `\uXXXX`.
+ * Size in bytes of the AG-01.1 protocol serialization (`canonicalJson` in
+ * protocol/envelope.js): `JSON.stringify`, then every UTF-16 unit in
+ * U+007F..U+FFFF replaced by the six ASCII bytes of its `\\uXXXX` escape.
+ * It is computed from the same `JSON.stringify` output and the same character
+ * class, so it equals that serializer's byte count exactly (fix round 1, B6);
+ * a differential test holds the two together. Key order does not change it.
  */
 export function canonicalSize(value) {
-  if (value === null) return 4;
-  switch (typeof value) {
-    case 'string':
-      return stringSize(value);
-    case 'number':
-    case 'boolean':
-      return JSON.stringify(value).length;
-    default:
-      break;
-  }
-  if (Array.isArray(value)) {
-    let size = 2 + Math.max(0, value.length - 1);
-    for (const item of value) size += canonicalSize(item);
-    return size;
-  }
-  const keys = Object.keys(value);
-  let size = 2 + Math.max(0, keys.length - 1);
-  for (const key of keys)
-    size += stringSize(key) + 1 + canonicalSize(value[key]);
-  return size;
-}
-
-function stringSize(text) {
-  let size = 2;
-  for (let i = 0; i < text.length; i++) {
-    const code = text.charCodeAt(i);
-    if (code === 0x22 || code === 0x5c) size += 2;
-    else if (
-      code === 0x08 ||
-      code === 0x09 ||
-      code === 0x0a ||
-      code === 0x0c ||
-      code === 0x0d
-    )
-      size += 2;
-    else if (code < 0x20 || code > 0x7f) size += 6;
-    else size += 1;
-  }
-  return size;
+  const json = JSON.stringify(value);
+  if (json === undefined) return 0;
+  const escaped = json.match(PROTOCOL_ESCAPED);
+  return json.length + 5 * (escaped === null ? 0 : escaped.length);
 }

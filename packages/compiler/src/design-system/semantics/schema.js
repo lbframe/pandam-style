@@ -79,6 +79,70 @@ const INVISIBLE = new RegExp(
 );
 const EXPORT_NAME = new RegExp('^[\\p{ID_Start}$_][\\p{ID_Continue}$]*$', 'u');
 
+/**
+ * Author-keyed maps (AG-03.1 fix round 1, B1/B3): an author key is always
+ * read as an own property and always created with `defineProperty`, so a key
+ * such as `__proto__`, `constructor` or `toString` is neither inherited from
+ * `Object.prototype` nor turned into a prototype setter.
+ */
+export function ownValue(map, key) {
+  return map !== null &&
+    typeof map === 'object' &&
+    Object.prototype.hasOwnProperty.call(map, key)
+    ? map[key]
+    : undefined;
+}
+
+export function defineOwn(target, key, value) {
+  Object.defineProperty(target, key, {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true,
+  });
+  return target;
+}
+
+/** The fields of an address, in their one canonical order (B2). */
+const ADDRESS_KEY_ORDER = Object.freeze([
+  'system',
+  'token',
+  'theme',
+  'condition',
+  'recipe',
+  'slot',
+  'variant',
+  'value',
+  'pattern',
+  'property',
+  'component',
+]);
+
+/**
+ * The canonical form of an address: fields in `ADDRESS_KEY_ORDER`, a
+ * component as `{ module, export }`. Every comparison, graph edge, ordering
+ * and deduplication uses `addressKey`, so two spellings of one address with
+ * fields in another order are the same entity (fix round 1, B2).
+ */
+export function canonicalAddress(address) {
+  const out = {};
+  for (const key of ADDRESS_KEY_ORDER) {
+    if (!Object.prototype.hasOwnProperty.call(address, key)) continue;
+    const value = address[key];
+    out[key] =
+      key === 'component' && value !== null && typeof value === 'object'
+        ? {
+            module: ownValue(value, 'module'),
+            export: ownValue(value, 'export'),
+          }
+        : value;
+  }
+  return out;
+}
+
+export const addressKey = (address) =>
+  JSON.stringify(canonicalAddress(address));
+
 export const isPlain = (value) =>
   value !== null && typeof value === 'object' && !Array.isArray(value);
 
@@ -139,7 +203,7 @@ export function validateEntityMeta(kind, meta, report, declared = null) {
       collectChildren(kind, key, value, report, declared, children);
       return;
     }
-    own[key] = value;
+    defineOwn(own, key, value);
     validateField(kind, key, value, [key], report);
   });
   return { own, children };
@@ -163,7 +227,11 @@ function collectChildren(kind, key, value, report, declared, children) {
         report('metadata.unknown-child', at, {});
         return;
       }
-      children.push({ kind: 'pattern', key: [name], value: value[name] });
+      children.push({
+        kind: 'pattern',
+        key: [name],
+        value: ownValue(value, name),
+      });
       return;
     }
     if (key === 'slots') {
@@ -171,16 +239,20 @@ function collectChildren(kind, key, value, report, declared, children) {
         report('metadata.unknown-child', at, {});
         return;
       }
-      children.push({ kind: 'slot', key: [name], value: value[name] });
+      children.push({
+        kind: 'slot',
+        key: [name],
+        value: ownValue(value, name),
+      });
       return;
     }
     // variants.<axis>: { meta?, values? }
-    const values = declared?.axes?.[name];
-    if (values === undefined || !Object.hasOwn(declared.axes, name)) {
+    const values = ownValue(declared?.axes, name);
+    if (values === undefined) {
       report('metadata.unknown-child', at, {});
       return;
     }
-    const entry = value[name];
+    const entry = ownValue(value, name);
     if (!isPlain(entry)) {
       report('metadata.field-type', at, { reason: 'not-object' });
       return;
@@ -196,10 +268,14 @@ function collectChildren(kind, key, value, report, declared, children) {
       }
     });
     if (Object.hasOwn(entry, 'meta')) {
-      children.push({ kind: 'axis', key: [name], value: entry.meta });
+      children.push({
+        kind: 'axis',
+        key: [name],
+        value: ownValue(entry, 'meta'),
+      });
     }
     if (Object.hasOwn(entry, 'values')) {
-      const map = entry.values;
+      const map = ownValue(entry, 'values');
       const mapField = [...at, 'values'];
       if (!isPlain(map)) {
         report('metadata.field-type', mapField, { reason: 'not-object' });
@@ -222,7 +298,7 @@ function collectChildren(kind, key, value, report, declared, children) {
         children.push({
           kind: 'value',
           key: [name, valueName],
-          value: map[valueName],
+          value: ownValue(map, valueName),
         });
       });
     }
@@ -294,7 +370,10 @@ function validateField(kind, key, value, field, report) {
           });
         }
         referenceShape(relation.target, [...at, 'target'], report);
-        const identity = JSON.stringify([relation.relation, relation.target]);
+        const identity = JSON.stringify([
+          relation.relation,
+          isPlain(relation.target) ? addressKey(relation.target) : null,
+        ]);
         if (seen.has(identity))
           report('metadata.field-type', at, { reason: 'duplicate' });
         seen.add(identity);

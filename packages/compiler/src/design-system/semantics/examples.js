@@ -20,7 +20,7 @@
 import { compileStyles } from '../../engine/lowering/styles';
 import { createPatternIR } from '../patterns/compile';
 import { mintTokenRef } from '../tokens/ref';
-import { isPlain } from './schema';
+import { defineOwn, isPlain, ownValue } from './schema';
 
 const refOf = (value) =>
   isPlain(value) && Object.hasOwn(value, 'token')
@@ -102,14 +102,20 @@ function runExample(entity, example, compile, registry, recipes) {
       compile({ [address.property]: refOf(example.value) }, 'public');
       return;
     case 'pattern': {
+      // Author keys are created as own properties (fix round 1, B1): an own
+      // `__proto__` parameter reaches the policy, which refuses it, instead
+      // of being swallowed by a prototype setter.
       const parameters = {};
       for (const [name, value] of Object.entries(example.parameters)) {
-        parameters[name] =
+        defineOwn(
+          parameters,
+          name,
           isPlain(value) && !Object.hasOwn(value, 'token')
             ? Object.fromEntries(
                 Object.entries(value).map(([cond, v]) => [cond, refOf(v)]),
               )
-            : refOf(value);
+            : refOf(value),
+        );
       }
       const ir = createPatternIR(address.pattern, parameters, {
         registry,
@@ -120,7 +126,7 @@ function runExample(entity, example, compile, registry, recipes) {
       return;
     }
     case 'recipe': {
-      const recipe = recipes[address.recipe];
+      const recipe = ownValue(recipes, address.recipe);
       recipe(example.select ?? {});
       if (
         example.slot !== undefined &&

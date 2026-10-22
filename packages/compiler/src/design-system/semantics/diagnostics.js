@@ -24,9 +24,16 @@
 
 import { Codes, diagnostic } from '../../protocol/diagnostics';
 import { collectMetaInputs, snapshotMetadata } from './snapshot';
-import { CHILD_KEYS, isPlain } from './schema';
+import {
+  CHILD_KEYS,
+  addressKey,
+  canonicalAddress,
+  defineOwn,
+  isPlain,
+  ownValue,
+} from './schema';
 
-export const addressKey = (address) => JSON.stringify(address);
+export { addressKey } from './schema';
 
 const CONTEXT_KEYS = new Set([
   'reason',
@@ -75,11 +82,20 @@ const childKindOf = (key) =>
  * `resolvePrivateEntity` compute the same ordinals.
  */
 export function privateEntityOrder(definition) {
+  try {
+    return privateEntityOrderUnguarded(definition);
+  } catch {
+    // Unreadable input (internal callers only): no ordinal is shown, and a
+    // private entity without one fails closed in `safeEntity`.
+    return new Map();
+  }
+}
+
+function privateEntityOrderUnguarded(definition) {
   const { entities } = collectMetaInputs(definition);
-  const recipes =
-    isPlain(definition) && isPlain(definition.recipes)
-      ? definition.recipes
-      : {};
+  // Collections are any object, as the compiler reads them (B4); author keys
+  // are read as own properties only (B3).
+  const recipes = ownValue(definition, 'recipes');
   const found = [];
   for (const entity of entities) {
     if (entity.visibility !== 'private') continue;
@@ -87,7 +103,7 @@ export function privateEntityOrder(definition) {
     if (entity.kind !== 'recipe' || !('value' in entity.slot)) continue;
     const snapshot = snapshotMetadata(entity.slot.value);
     if (snapshot.issue != null || !isPlain(snapshot.value)) continue;
-    const declared = declaredRecipe(recipes[entity.address.recipe]);
+    const declared = declaredRecipe(ownValue(recipes, entity.address.recipe));
     for (const child of childEntities('recipe', snapshot.value, declared)) {
       found.push({
         kind: child.kind,
@@ -118,10 +134,11 @@ export function declaredRecipe(recipe) {
       ? recipe.slots.filter((slot) => typeof slot === 'string')
       : [];
   const axes = {};
-  if (isPlain(recipe) && isPlain(recipe.variants)) {
-    for (const axis of Object.keys(recipe.variants)) {
-      const values = recipe.variants[axis];
-      axes[axis] = isPlain(values) ? Object.keys(values) : [];
+  const variants = isPlain(recipe) ? ownValue(recipe, 'variants') : undefined;
+  if (isPlain(variants)) {
+    for (const axis of Object.keys(variants)) {
+      const values = ownValue(variants, axis);
+      defineOwn(axes, axis, isPlain(values) ? Object.keys(values) : []);
     }
   }
   return { slots, axes };
@@ -134,26 +151,27 @@ export function declaredRecipe(recipe) {
 export function childEntities(kind, meta, declared) {
   const out = [];
   for (const key of CHILD_KEYS[kind] ?? []) {
-    const map = meta[key];
+    const map = ownValue(meta, key);
     if (!isPlain(map)) continue;
     for (const name of Object.keys(map)) {
       const childKind = childKindOf(key);
       if (childKind === 'pattern' || childKind === 'slot') {
         if (childKind === 'slot' && !declared.slots.includes(name)) continue;
-        out.push({ kind: childKind, key: [name], value: map[name] });
+        out.push({ kind: childKind, key: [name], value: ownValue(map, name) });
         continue;
       }
-      if (!Object.hasOwn(declared.axes, name) || !isPlain(map[name])) continue;
-      const entry = map[name];
+      const entry = ownValue(map, name);
+      if (!Object.hasOwn(declared.axes, name) || !isPlain(entry)) continue;
       if (Object.hasOwn(entry, 'meta'))
-        out.push({ kind: 'axis', key: [name], value: entry.meta });
-      if (isPlain(entry.values)) {
-        for (const value of Object.keys(entry.values)) {
-          if (!declared.axes[name].includes(value)) continue;
+        out.push({ kind: 'axis', key: [name], value: ownValue(entry, 'meta') });
+      const values = ownValue(entry, 'values');
+      if (isPlain(values)) {
+        for (const value of Object.keys(values)) {
+          if (!ownValue(declared.axes, name).includes(value)) continue;
           out.push({
             kind: 'value',
             key: [name, value],
-            value: entry.values[value],
+            value: ownValue(values, value),
           });
         }
       }
@@ -187,7 +205,7 @@ export function childAddress(parent, child) {
 export function createMetadataReporter({ order, isPrivate }) {
   const safeEntity = (address) => {
     if (address == null) return null;
-    if (!isPrivate(address)) return address;
+    if (!isPrivate(address)) return canonicalAddress(address);
     const ranked = order.get(addressKey(address));
     // Fail closed: a private entity without an ordinal must never be shown.
     if (ranked == null)
@@ -203,7 +221,7 @@ export function createMetadataReporter({ order, isPrivate }) {
     if (isPrivate(address))
       return `a private ${order.get(addressKey(address))?.kind ?? 'entity'}`;
     if (Object.hasOwn(address, 'system')) return 'the design system';
-    return Object.entries(address)
+    return Object.entries(canonicalAddress(address))
       .map(([key, value]) =>
         key === 'component' ? 'a component' : `${key} ${JSON.stringify(value)}`,
       )
