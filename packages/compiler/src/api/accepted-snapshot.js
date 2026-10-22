@@ -8,7 +8,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { parse } from '@babel/parser';
-import babelTraverse from '@babel/traverse';
 import { validateArtifactSet } from '../artifacts/metadata/artifact-set.js';
 import { readPublishedGenerationMembers } from '../artifacts/publication/transaction.js';
 import { Codes, PmsError, diagnostic } from '../protocol/diagnostics.js';
@@ -22,10 +21,19 @@ const MEMBER_KINDS = Object.freeze([
   'artifact-metadata',
 ]);
 const SET_DOMAIN = 'pandamstyle-canonical-five-file-set-v1\0';
-const traverse = babelTraverse?.default ?? babelTraverse;
 
-/** Compiler-produced transport provenance; offsets use JavaScript UTF-16. */
-export function generatedImportsFor(javascript, sourceFile, designFile) {
+/**
+ * Compiler-produced transport provenance; offsets use JavaScript UTF-16.
+ * `traverse` is the caller's `@babel/traverse`: the Project Service passes
+ * the compiler's private instance (frontend/babel/private-babel.js), so this
+ * module loads no Babel traversal of its own.
+ */
+export function generatedImportsFor(
+  javascript,
+  sourceFile,
+  designFile,
+  traverse,
+) {
   const target = path.resolve(designFile);
   const acceptedPaths = new Set([
     target,

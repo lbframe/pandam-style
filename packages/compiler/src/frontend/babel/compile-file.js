@@ -5,10 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import babel from '@babel/core';
 import path from 'node:path';
-import presetTypeScript from '@babel/preset-typescript';
-import presetReact from '@babel/preset-react';
+import { clearPrivatePaths, privateBabel } from './private-babel';
 import { pandamstyleBabelPlugin } from './plugin';
 import { normalizeEngineOptions } from '../../engine/index';
 import {
@@ -19,12 +17,22 @@ import {
   withParseOwner,
 } from '../../observability/metrics';
 
-// Babel presets ship as CommonJS; normalize the interop shape once.
-const tsPreset = presetTypeScript?.default ?? presetTypeScript;
-const reactPreset = presetReact?.default ?? presetReact;
+/**
+ * Runs both Babel passes for one source module, on the compiler's private
+ * Babel instance. Its NodePath cache is cleared after each file: nothing
+ * traverses a finished file's ASTs again, and no other Babel user shares the
+ * instance (private-babel.js).
+ */
+export function compileFile(...args) {
+  try {
+    return compileFileWith(privateBabel(), ...args);
+  } finally {
+    clearPrivatePaths();
+  }
+}
 
-/** Runs both Babel passes for one source module. */
-export function compileFile(
+function compileFileWith(
+  { core: babel, presetTypeScript: tsPreset, presetReact: reactPreset },
   code,
   filename,
   designSystem,

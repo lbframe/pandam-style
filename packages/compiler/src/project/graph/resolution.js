@@ -24,7 +24,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { parse as parseModule } from '@babel/parser';
-import traverse from '@babel/traverse';
+import { privateBabel } from '../../frontend/babel/private-babel';
 import { getBindingIdentifiers } from '@babel/types';
 import {
   count,
@@ -506,7 +506,7 @@ function extractMarker(ast) {
 function collectReexports(ast) {
   const out = [];
   let scope;
-  (traverse.default ?? traverse)(ast, {
+  privateBabel().traverse(ast, {
     Program(p) {
       scope = p.scope;
       p.stop();

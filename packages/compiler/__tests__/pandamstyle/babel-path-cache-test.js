@@ -13,8 +13,10 @@
 // compilation's paths, bindings or path data, including a compilation
 // suspended while the Project Service validates.
 
+const { createRequire } = require('module');
 const babel = require('@babel/core');
-const { openProject } = require('./session-helpers');
+const sharedTraverse = require('@babel/traverse').default;
+const { loadCompiler, openProject } = require('./session-helpers');
 
 const OUTER_SOURCE = 'const foo = 1; console.log(foo);';
 
@@ -109,6 +111,44 @@ describe('Babel path cache shared with other compilations (#130)', () => {
         data: 'held',
       });
       expect(result.code).toBe('const foo = 2;\nconsole.log(foo);');
+    });
+  });
+});
+
+describe('the compiler Babel instance is private (#150)', () => {
+  test('compiling leaves the shared path cache untouched and clears its own', async () => {
+    const { privateBabel } = loadCompiler();
+    const own = privateBabel().traverse;
+    // Distinct from the test's Babel and from the process's own CommonJS
+    // instance of the same installed files (Jest has a registry of its own).
+    const nodeRequire = createRequire(require.resolve('@babel/core'));
+    expect(own === sharedTraverse).toBe(false);
+    expect(own === nodeRequire('@babel/traverse').default).toBe(false);
+    expect(privateBabel().core === nodeRequire('@babel/core')).toBe(false);
+
+    // A path the user holds in the process's shared Babel cache.
+    const ast = babel.parseSync('const held = 1;', {
+      babelrc: false,
+      configFile: false,
+    });
+    let held = null;
+    sharedTraverse(ast, {
+      VariableDeclarator(p) {
+        held = p;
+      },
+    });
+    const sharedCache = sharedTraverse.cache.path;
+    const cachedHeld = () =>
+      sharedTraverse.cache.path.get(held.parent)?.get(held.node);
+
+    await withValidatedProject(async (validate) => {
+      const before = own.cache.path;
+      await validate();
+      // Ours: the compiled files' paths were dropped (a fresh table).
+      expect(own.cache.path === before).toBe(false);
+      // Theirs: the same table, still answering with the held path.
+      expect(sharedTraverse.cache.path === sharedCache).toBe(true);
+      expect(cachedHeld() === held).toBe(true);
     });
   });
 });

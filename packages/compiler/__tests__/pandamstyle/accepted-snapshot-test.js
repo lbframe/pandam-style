@@ -126,6 +126,7 @@ function local(require) { return require('../generated/design'); }
       javascript,
       '/project/src/page.js',
       '/project/generated/design.js',
+      require('@babel/traverse').default,
     );
     expect(ranges).toHaveLength(5);
     expect(

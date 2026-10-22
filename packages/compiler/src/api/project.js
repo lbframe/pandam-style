@@ -26,6 +26,7 @@ import {
   createAcceptedSnapshotStore,
   generatedImportsFor,
 } from './accepted-snapshot.js';
+import { privateBabel } from '../frontend/babel/private-babel';
 
 // The agent layer's private access to a session (AG-01.1). The symbol is not
 // exported from `api/index.js`, so no published entry can reach the hooks.
@@ -340,7 +341,12 @@ export function createProjectSession(config) {
       previous?.designFile === designFile
     )
       return previous.imports;
-    const imports = generatedImportsFor(javascript, sourceFile, designFile);
+    const imports = generatedImportsFor(
+      javascript,
+      sourceFile,
+      designFile,
+      privateBabel().traverse,
+    );
     generatedImportMetadata.set(sourceFile, {
       javascript,
       designFile,
