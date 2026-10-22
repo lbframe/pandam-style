@@ -85,27 +85,47 @@ Declared enhancements enter the registry digest; a definition without the
 field keeps the digest it had before. Declaring an enhancement changes what the
 system promises, so it is a design-system decision, not a repair for page code.
 
-An optional `propertyDomains` object (CE-02.1) sets, per property, the
-domain this design system admits, chosen from the compiler's standard domain
-for that property:
+An optional `propertyDomains` object (CE-02.1, CE-02.2) sets, per property,
+the domain this design system admits, chosen from the compiler's standard
+domain for that property:
 
 ```js
 propertyDomains: {
-  width: { tokens: ['sizes'], values: ['auto', 'min-content'] }, // approve: mixed
-  display: { values: ['flex', 'inline-flex', 'grid', 'none'] }, // narrow
-  opacity: { values: [0, 1] },                                  // finite numbers
+  width: { tokens: ['sizes'], values: ['auto', 'min-content', '46ch'] }, // approve: mixed
+  display: { values: ['flex', 'inline-flex', 'grid', 'none'] },          // narrow
+  opacity: { values: [0, 0.33, 1] },                                    // finite numbers
 },
 ```
 
 - A key is a property authoring key the compiler admits (not a composite form
-  or a platform extension). An entry holds at least one of `values`, `tokens`
-  and `range`, and nothing else.
-- Every member must belong to the property's standard domain: standard
-  keywords and literals, standard token categories with at least one declared
-  token, and, on the four legacy rows (`opacity`, `flex`, `flexGrow`,
-  `flexShrink`), finite numbers or a `range` (`{ min, max }`, or `{ min }` for
-  no upper bound) within the standard range. Arbitrary strings, numbers,
-  functions and patterns are refused.
+  or a platform extension). An entry holds at least one of `values` and
+  `tokens`, and nothing else. CE-02.1's `range` member was removed by CE-02.2:
+  every domain is finite (`property-domains.range-removed`).
+- A token category must be a standard category of the property with at least
+  one declared token.
+- A value is in the standard domain (CE-02.2) when it is one of:
+  - a reviewed standard value of the property, exactly as the compiler lists
+    it (`flex`, `repeat(3, minmax(0, 1fr))`);
+  - a keyword alternative of the property's grammar (`auto`, `min-content`);
+  - a numeric literal satisfying a numeric alternative of the grammar
+    (`<length-percentage [0,∞]>`, `<number [0,1]>`, `<time>`): its units, its
+    bounds (`paddingTop: '-4px'` is refused, `marginTop: '-4px'` admitted), at
+    most 4 fraction digits and a magnitude of at most 1e6;
+  - `inherit`, `initial`, `unset` or `revert` (`revert-layer` is refused).
+- A numeric literal is written in its one canonical spelling: a number stays a
+  number on a number grammar (`0.5`, not `'0.5'`); a dimension is
+  `<number><unit>` with no `+`, exponent, redundant zero or upper-case unit
+  (`'18px'`, not `'18.0px'`); the zero of a length is `'0'` (numeric `0` is
+  the same value). A non-canonical value is refused with its canonical
+  spelling in `context.canonical`; it is never rewritten silently. A number is
+  never given a unit: `width: 18` is refused.
+- Grammar the compiler does not interpret (a property reference, a
+  multiplier, a function, another data type) admits only the reviewed values:
+  anything else is refused as `property-domains.grammar-unsupported`, a
+  compiler gap, not an authoring error.
+- Without an override, `opacity` admits the multiples of 0.05 from 0 to 1,
+  and `flex`, `flexGrow` and `flexShrink` the integers 0 to 12 (CE-02.2;
+  Alpha 1 accepted any number in a continuous range).
 - The entry is the whole domain of the property, for every role (recipes and
   pages alike): a member it does not restate is no longer admitted, whatever
   the compiler default held.
@@ -116,6 +136,19 @@ propertyDomains: {
 - Declared domains enter the registry digest; a definition without the field
   keeps its digest. Changing a domain is a design-system decision, never a
   repair for page code.
+
+A token's numeric value must also be a value of the property it is used on
+(CE-02.2). Where a property's token categories can carry a number (spacing,
+sizes, radii, font sizes and weights, line heights, letter spacings,
+durations), each whitespace-separated component of the token's value, in the
+base and in every theme, must satisfy the property's constraint: a `-4px`
+spacing token is a valid margin or offset and is refused on a padding or a
+gap; `padding` takes 1 to 4 components, `paddingInline` 1 or 2, a longhand 1.
+A refusal is `PMS_FORBIDDEN_VALUE` / `category-strict` with
+`context.reason: 'token-value-out-of-domain'` (or `non-finite` for `NaN` and
+`Infinity`), naming the token, the theme and the constraint. Values that are
+not plain numbers (`calc()`, colors, mixed lists) are not checked yet
+(typed category grammar is CE-03).
 
 ## Conditions
 

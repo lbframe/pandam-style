@@ -166,6 +166,38 @@ the design module or its declarations changes.
 During migration, record the new declaration as an expected CSS byte change.
 Do not add or remove `userSelect` to change a migration result.
 
+## Finite numeric domains (CE-02.2 behavior change)
+
+Since CE-02.2 every property domain is finite and numeric literals are checked
+against the property's grammar
+([design note](https://github.com/lbframe/pandam-style/blob/f1040b3/docs/research/ce-02.2-design-note.md),
+[definition reference](reference/design-system.md)). Byte-identical CSS is
+expected only where the migration preserves behavior; the expected output of
+each case is stated below.
+
+| Case | Before | After CE-02.2 | Repair (role) | Expected CSS after repair |
+| --- | --- | --- | --- | --- |
+| M1 | Alpha 1 accepts `opacity: 0.33` | `PMS_FORBIDDEN_VALUE` / `structural-domain`, `reason: not-in-domain`; the 0.05 grid is admitted | `propertyDomains: { opacity: { values: [0, 0.33, 1] } }` (design system), or an admitted grid value (page) | Byte-equal to Alpha 1 for the approved value |
+| M2 | Alpha 1 accepts `flexGrow: 1.5` | Same rule and reason; integers 0 to 12 are admitted | `propertyDomains: { flexGrow: { values: [0, 1, 1.5] } }` (design system) | Byte-equal to Alpha 1 |
+| M3 | Alpha 1 accepts `flex: 1e308` and emits `flex:Infinity` | Same rule and reason | Page: an admitted integer, such as `flex: 1` | `flex:1`; no byte equality (the Alpha 1 output was invalid CSS) |
+| M4 | CE-02.1 accepts `propertyDomains: { opacity: { range: { min: 0, max: 1 } } }` | `PMS_INVALID_PROPERTY_DOMAIN` / `property-domains.range-removed` | List the values used: `values: [0, 0.5, 1]` | Byte-equal to CE-02.1 for those values |
+| M5 | Alpha 1 accepts a `-4px` spacing token on `paddingTop` (invalid at computed-value time) and on `marginTop` | Padding: `PMS_FORBIDDEN_VALUE` / `category-strict`, `reason: token-value-out-of-domain`. Margin: unchanged | Page: a non-negative spacing token on the padding | Margin: byte-equal. Padding: the replacement token's variable; an intended behavior change |
+| M7 | CE-02.1 refuses `propertyDomains: { width: { values: ['18px'] } }` (`outside-standard`) | `'18px'` is admitted; `'18.0px'` is refused with `property-domains.non-canonical`, `canonical: '18px'` | `values: ['18px']`, then page `width: '18px'` | `width:18px`; no earlier output exists |
+
+- Numbers: an admitted literal has at most 4 fraction digits, so two distinct
+  values never collapse into one class as Alpha 1's rounding allowed.
+- A number is never given a unit: `width: 16` is refused
+  (`reason: number-not-length`); write the approved `'16px'`.
+- Generated declarations lose their `number` branch: the four rows are typed
+  as unions of their finite numbers.
+- The CE-00.3 workloads compile unchanged: their opacity (0.4, 0.6, 0.8, 1) and
+  flex factors (0, 1, 2) are inside the finite defaults, and none of their
+  tokens is refused at use.
+
+During migration, do not widen `propertyDomains` to make page code compile:
+report the refused value and its reason, and change a domain only under
+design-system authorization.
+
 ## Rollback expectations
 
 Before each batch, preserve the user's existing changes. Use the repository's

@@ -28,7 +28,13 @@ import {
   literalAllowed,
   propertyDomainsOf,
   propertyRow,
+  refusalReason,
+  describeConstraint,
 } from '../../design-system/policy/domains';
+import {
+  scalarOf,
+  tokenValueRefusal,
+} from '../../design-system/policy/numeric-facts';
 import { recognizedProperty } from '../../design-system/policy/recognized';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, perfCollector } from '../../observability/metrics';
@@ -288,12 +294,9 @@ function checkValue({
 
   const domain = row.domain;
   // The rule names the shape of the domain, as Alpha 1 did: `category-strict`
-  // for a token-only domain, `structural-domain` for literal values or a
-  // range, `property-domain` for a domain that mixes both.
-  const tokenOnly =
-    domain.tokens.length > 0 &&
-    domain.values.length === 0 &&
-    domain.range == null;
+  // for a token-only domain, `structural-domain` for literal values,
+  // `property-domain` for a domain that mixes both.
+  const tokenOnly = domain.tokens.length > 0 && domain.values.length === 0;
   const literalOnly = domain.tokens.length === 0;
   const valueRule = tokenOnly
     ? 'category-strict'
@@ -308,6 +311,24 @@ function checkValue({
   const tokenId = tokenPathOf(value, refKind);
   if (tokenId == null || literalOnly) {
     if (tokenId == null && literalAllowed(domain, value)) return value;
+    // CE-02.2: why the literal is refused, computed on this path only, and
+    // the in-domain spelling of a value written differently, first.
+    const refusal = tokenId == null ? refusalReason(row, value) : null;
+    const why =
+      refusal == null
+        ? {}
+        : {
+            reason: refusal.reason,
+            ...(refusal.canonical === undefined
+              ? {}
+              : { canonical: refusal.canonical }),
+          };
+    const admitted = admittedValues(domain);
+    const at =
+      refusal?.canonical === undefined
+        ? -1
+        : admitted.indexOf(refusal.canonical);
+    if (at > 0) admitted.unshift(...admitted.splice(at, 1));
     if (literalOnly) {
       diagnostics.push(
         diagnostic({
@@ -319,7 +340,8 @@ function checkValue({
           context: {
             property,
             value,
-            admitted: admittedValues(domain),
+            ...why,
+            admitted,
             conditionPath,
             ...(row.origin === 'default' ? {} : { origin: row.origin }),
           },
@@ -341,8 +363,9 @@ function checkValue({
         context: {
           property,
           category,
-          ...(tokenOnly ? {} : { admitted: admittedValues(domain) }),
+          ...(tokenOnly ? {} : { admitted }),
           value,
+          ...why,
           systemId,
           candidates: admittedTokens(registry, categories, allowPrivateTokens),
           conditionPath,
@@ -412,6 +435,44 @@ function checkValue({
           category: entry.category,
           visibility: entry.visibility,
           candidates: admitted,
+          conditionPath,
+        },
+      }),
+    );
+    return null;
+  }
+  // CE-02.2 §3.5: the token's numeric value, in the base and in every theme,
+  // must be a value of the property (a negative spacing token is a margin,
+  // never a padding).
+  const refusal = tokenValueRefusal(registry, property, tokenId);
+  if (refusal != null) {
+    const scalar = scalarOf(property);
+    diagnostics.push(
+      diagnostic({
+        code: Codes.FORBIDDEN_VALUE,
+        phase: 'policy',
+        message: `${tokenId} cannot be used on ${property}: its ${refusal.theme == null ? 'value' : `value in theme ${refusal.theme}`} ${refusal.cause === 'component-count' ? `has ${refusal.count} components` : refusal.reason === 'non-finite' ? 'is not finite' : `is not a ${property} value (${refusal.cause})`}.`,
+        source: where,
+        rule: 'category-strict',
+        context: {
+          property,
+          tokenId,
+          systemId,
+          category: entry.category,
+          reason: refusal.reason,
+          theme: refusal.theme,
+          ...(refusal.component === undefined
+            ? {}
+            : { component: refusal.component }),
+          ...(refusal.cause === undefined ? {} : { cause: refusal.cause }),
+          constraint: {
+            count: [...scalar.count],
+            constraints: scalar.constraints.map(describeConstraint),
+          },
+          candidates: admitted.filter(
+            (candidate) =>
+              tokenValueRefusal(registry, property, candidate) == null,
+          ),
           conditionPath,
         },
       }),

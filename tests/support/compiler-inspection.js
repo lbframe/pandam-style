@@ -52,6 +52,7 @@ export {
   descriptorKeys,
   descriptorOf,
   ENFORCED_FIELDS,
+  grammarOf,
   platformExtensions,
 } from '../../packages/compiler/src/design-system/policy/descriptors.js';
 export {
@@ -60,8 +61,28 @@ export {
   effectivePropertiesOf,
   normalizePropertyDomains,
   propertyRow,
+  refusalReason,
+  CSS_WIDE_KEYWORDS,
 } from '../../packages/compiler/src/design-system/policy/domains.js';
 export { recognizedProperty } from '../../packages/compiler/src/design-system/policy/recognized.js';
+// CE-02.2: the grammar subset, numeric literals and token numeric facts.
+export {
+  compileGrammar,
+  numericConstraint,
+} from '../../packages/compiler/src/design-system/policy/grammar.js';
+export {
+  checkNumericLiteral,
+  isCanonicalSpelling,
+  FRACTION_DIGITS,
+  MAGNITUDE,
+} from '../../packages/compiler/src/design-system/policy/literals.js';
+export {
+  numericFactsOfValue,
+  numericFactsOf,
+  tokenValueRefusal,
+  NON_FINITE,
+} from '../../packages/compiler/src/design-system/policy/numeric-facts.js';
+export { unitsOfType } from '../../packages/compiler/src/targets/units.js';
 // Engine tables the descriptor parity tests compare against (CE-02.3 owns
 // rewiring the engine to the descriptors).
 export { default as flatMapExpandedShorthands } from '../../packages/compiler/src/engine/atomic/preprocess-rules/index.js';

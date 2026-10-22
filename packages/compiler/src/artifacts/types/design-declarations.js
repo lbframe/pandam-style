@@ -374,8 +374,9 @@ export function generateDesignSystemDeclarations(snapshot) {
     ]),
     (paths) => union(paths),
   );
-  // One alias holds the three admission members. A property may appear in
-  // several of them (a mixed domain); `PropertyValue` is their union.
+  // One alias holds the admission members. A property may appear in both (a
+  // mixed domain); `PropertyValue` is their union. Every domain is finite
+  // (CE-02.2): there is no `number` branch.
   const propertyDomains = [
     '{',
     `  tokens: ${typeRecord(
@@ -389,12 +390,6 @@ export function generateDesignSystemDeclarations(snapshot) {
         .filter((row) => row.domain.values.length > 0)
         .map((row) => [row.key, literalTypeValues(row.domain)]),
       (values) => union(values),
-    )};`,
-    // A legacy continuous range (CE-02.2 replaces it): any number.
-    `  ranges: ${union(
-      propertyRows
-        .filter((row) => row.domain.range != null)
-        .map((row) => row.key),
     )};`,
     '}',
   ].join('\n');
@@ -480,12 +475,12 @@ export function generateDesignSystemDeclarations(snapshot) {
     `export type RecipeAxisValue = ${recipeAxisValueTypes.length === 0 ? 'never' : recipeAxisValueTypes.join(' | ')};`,
     '',
     `type PropertyDomains = ${propertyDomains};`,
-    "type StyleProperty = keyof PropertyDomains['tokens'] | keyof PropertyDomains['values'] | PropertyDomains['ranges'];",
+    "type StyleProperty = keyof PropertyDomains['tokens'] | keyof PropertyDomains['values'];",
     'type CategoryTokenReference<Category extends string> = Category extends PublicTokenCategory ? CoreTokenRef<Category, TokenPathByCategory<Category>> : never;',
-    "type PropertyValue<Property extends StyleProperty> = (Property extends keyof PropertyDomains['tokens'] ? CategoryTokenReference<PropertyDomains['tokens'][Property]> : never) | (Property extends keyof PropertyDomains['values'] ? PropertyDomains['values'][Property] : never) | (Property extends PropertyDomains['ranges'] ? number : never);",
+    "type PropertyValue<Property extends StyleProperty> = (Property extends keyof PropertyDomains['tokens'] ? CategoryTokenReference<PropertyDomains['tokens'][Property]> : never) | (Property extends keyof PropertyDomains['values'] ? PropertyDomains['values'][Property] : never);",
     "type ConditionValue<Property extends StyleProperty> = Partial<Record<PmsConditionName | 'base' | 'default', PropertyValue<Property>>>;",
     `type ManifestProperty = StyleProperty | ${union(refusedForms)};`,
-    "type ManifestPropertyEntry<Property extends string> = Readonly<{ css?: string; form?: 'rejected-composite'; origin?: 'approved' | 'narrowed' } & (Property extends keyof PropertyDomains['tokens'] ? { tokens: readonly PropertyDomains['tokens'][Property][] } : {}) & (Property extends keyof PropertyDomains['values'] ? { values: readonly PropertyDomains['values'][Property][] } : {}) & (Property extends PropertyDomains['ranges'] ? { range: Readonly<{ min: number; max?: number; legacy: true }> } : {})>;",
+    "type ManifestPropertyEntry<Property extends string> = Readonly<{ css?: string; form?: 'rejected-composite'; origin?: 'approved' | 'narrowed' } & (Property extends keyof PropertyDomains['tokens'] ? { tokens: readonly PropertyDomains['tokens'][Property][] } : {}) & (Property extends keyof PropertyDomains['values'] ? { values: readonly PropertyDomains['values'][Property][] } : {})>;",
     'export type PmsStyleRule = { [Property in StyleProperty]?: PropertyValue<Property> | ConditionValue<Property> };',
     'export type PmsStyleSheet = Readonly<Record<string, PmsStyleRule>>;',
     '',

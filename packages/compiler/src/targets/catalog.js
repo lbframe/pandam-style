@@ -28,6 +28,7 @@ import caveatReviews from './catalog/caveats.v1.json';
 import inapplicableReviews from './catalog/inapplicable.v1.json';
 import subfeatureReviews from './catalog/subfeatures.v1.json';
 import { platformExtensions } from '../design-system/policy/descriptors';
+import { UNIT_PATHS } from './units';
 
 export const CATALOG_KIND = 'pandamstyle-feature-catalog';
 export const CATALOG_SCHEMA_VERSION = 1;
@@ -41,69 +42,6 @@ const VENDOR_PREFIXES = ['-webkit-', '-moz-'];
 // announces their platform. CSS name -> platform id, read from the property
 // descriptors (CE-02.1), the only property authority.
 export const PLATFORM_FEATURES = platformExtensions();
-
-// Units with their own BCD statement. Units absent here are unrecognized.
-const UNIT_PATHS = Object.freeze({
-  ...Object.fromEntries(
-    ['cqw', 'cqh', 'cqi', 'cqb', 'cqmin', 'cqmax'].map((u) => [
-      u,
-      'css.types.length.container_query_length_units',
-    ]),
-  ),
-  ...Object.fromEntries(
-    ['dvh', 'dvw', 'dvi', 'dvb', 'dvmin', 'dvmax'].map((u) => [
-      u,
-      'css.types.length.viewport_percentage_units_dynamic',
-    ]),
-  ),
-  ...Object.fromEntries(
-    ['lvh', 'lvw', 'lvi', 'lvb', 'lvmin', 'lvmax'].map((u) => [
-      u,
-      'css.types.length.viewport_percentage_units_large',
-    ]),
-  ),
-  ...Object.fromEntries(
-    ['svh', 'svw', 'svi', 'svb', 'svmin', 'svmax'].map((u) => [
-      u,
-      'css.types.length.viewport_percentage_units_small',
-    ]),
-  ),
-  ...Object.fromEntries(
-    [
-      'cap',
-      'ch',
-      'em',
-      'ex',
-      'ic',
-      'lh',
-      'rcap',
-      'rch',
-      'rem',
-      'rex',
-      'ric',
-      'rlh',
-      'vb',
-      'vh',
-      'vi',
-      'vmax',
-      'vmin',
-      'vw',
-    ].map((u) => [u, `css.types.length.${u}`]),
-  ),
-  q: 'css.types.length.Q',
-  ...Object.fromEntries(
-    ['px', 'cm', 'mm', 'in', 'pt', 'pc'].map((u) => [u, 'css.types.length']),
-  ),
-  ...Object.fromEntries(
-    ['deg', 'grad', 'rad', 'turn'].map((u) => [u, `css.types.angle.${u}`]),
-  ),
-  s: 'css.types.time',
-  ms: 'css.types.time',
-  fr: 'css.types.flex',
-  ...Object.fromEntries(
-    ['dpcm', 'dpi', 'dppx', 'x'].map((u) => [u, `css.types.resolution.${u}`]),
-  ),
-});
 
 // Where a value function is looked up, in order, for an emitting property.
 // Type families are only searched for properties whose grammar uses them, so
