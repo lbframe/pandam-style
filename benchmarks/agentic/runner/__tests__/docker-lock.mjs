@@ -50,7 +50,7 @@ function holderOf(name, run) {
   return r.status === 0 ? r.stdout.trim() : 'a holder that just released';
 }
 
-/** One creation attempt: the held lock, or the refusal's stderr. */
+/** One creation attempt: the held lock, or the failed attempt's output. */
 function tryAcquire(name, owner) {
   const token = randomUUID();
   const child = spawn(
@@ -113,14 +113,25 @@ function tryAcquire(name, owner) {
         resolve({ lock });
       } else {
         child.stdin.end();
-        resolve({ stderr: `lock ${name} attached but owned by ${seen}` });
+        resolve({ failure: `attached to a lock owned by ${seen || 'nobody'}` });
       }
     });
-    child.on(
-      'error',
-      (e) => !done && ((done = true), resolve({ stderr: e.message })),
-    );
-    child.on('exit', () => !done && ((done = true), resolve({ stderr: err })));
+    child.on('error', (e) => {
+      if (done) return;
+      done = true;
+      resolve({ failure: `docker could not be started: ${e.message}` });
+    });
+    // 'close', not 'exit': 'exit' can come before the last stderr data (a
+    // name conflict then reads as an empty error).
+    child.on('close', (code, signal) => {
+      if (done) return;
+      done = true;
+      const output = err.trim() || out.trim() || '(no output)';
+      resolve({
+        conflict: CONFLICT.test(err),
+        failure: `docker run ${signal ? `killed by ${signal}` : `exited with code ${code}`}: ${output}`,
+      });
+    });
   });
 }
 
@@ -136,11 +147,13 @@ export async function acquireDockerLock({
   for (;;) {
     const r = await tryAcquire(name, owner);
     if (r.lock) return r.lock;
-    if (!CONFLICT.test(r.stderr))
-      throw new Error(`docker lock ${name}: ${r.stderr.trim()}`);
+    // Held by another: the conflict message, or (whatever the wording) the
+    // name existing on the daemon. Any other failure is reported as is.
+    const held = r.conflict || run(['container', 'inspect', name]).status === 0;
+    if (!held) throw new Error(`docker lock ${name}: ${r.failure}`);
     if (Date.now() >= deadline)
       throw new Error(
-        `docker lock ${name}: still held by ${holderOf(name, run)} after ${waitMs} ms`,
+        `docker lock ${name}: still held by ${holderOf(name, run)} after ${waitMs} ms (last attempt: ${r.failure})`,
       );
     await delay(pollMs);
   }

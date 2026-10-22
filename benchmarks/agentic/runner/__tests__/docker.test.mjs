@@ -971,3 +971,36 @@ test(
     assert.notEqual(docker(['container', 'inspect', name]).status, 0);
   },
 );
+
+test(
+  "the daemon-wide lock: concurrent refused acquirers all name the holder; any other failure reports docker's error",
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const name = lockName('refused');
+    const a = await acquireDockerLock({ owner: 'a', name });
+    try {
+      // Many failed `docker run` clients at once (as racing suites): each
+      // refusal is read in full, never as an empty error.
+      const results = await Promise.allSettled(
+        Array.from({ length: 40 }, () =>
+          acquireDockerLock({ owner: 'x', name, waitMs: 0 }),
+        ),
+      );
+      for (const r of results) {
+        assert.equal(r.status, 'rejected');
+        assert.match(
+          r.reason.message,
+          /still held by a after 0 ms \(last attempt: docker run exited with code \d+: .*Conflict/s,
+        );
+      }
+      assertDockerLockHeld(a);
+    } finally {
+      assert.equal(releaseDockerLock(a), true);
+    }
+    // A failure that is not a held lock surfaces docker's own output.
+    await assert.rejects(
+      acquireDockerLock({ owner: 'x', name: 'bad name!', waitMs: 0 }),
+      /docker lock bad name!: docker run exited with code \d+: .*Invalid container name/s,
+    );
+  },
+);
