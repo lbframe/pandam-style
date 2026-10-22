@@ -13,10 +13,11 @@
  * types, the manifest, diagnostics, repair and target candidates) reads the
  * effective rows built here, never a descriptor's `standard` or `default`.
  *
- * In this version no design system declares an override, so every row is the
- * compiler-owned default and the effective table is one shared, frozen object.
- * The `propertyDomains` schema that supplies overrides arrives with the next
- * CE-02.1 change.
+ * A design system narrows or approves a property's domain through
+ * `propertyDomains` (`normalizePropertyDomains`, run in `buildRegistry`): an
+ * override may hold only members of the descriptor's `standard` domain, and it
+ * is the WHOLE effective domain. Without overrides, every row is the
+ * compiler-owned default and the table is one shared, frozen object.
  */
 
 import {
@@ -27,6 +28,8 @@ import {
   descriptorOf,
   digestOfRows,
 } from './descriptors';
+import { Codes, diagnostic } from '../../protocol/diagnostics';
+import { patternEmissions } from '../patterns/compile';
 
 export const PROPERTY_CATALOG_KIND = 'pandamstyle-property-catalog';
 export const PROPERTY_CATALOG_SCHEMA_VERSION = 1;
@@ -48,23 +51,92 @@ export function effectiveDomain(descriptor, override = null) {
   });
 }
 
+// A range's upper bound; an absent `max` is unbounded.
+const upper = (range) => range.max ?? Infinity;
+const inRange = (range, value) =>
+  range != null &&
+  typeof value === 'number' &&
+  Number.isFinite(value) &&
+  value >= range.min &&
+  value <= upper(range);
+
+/**
+ * The CSS zero, defined once. Where a domain lists the CSS zero `'0'` (a
+ * length or keyword list), the numeric `0` of style objects is the same value:
+ * the domain stores `'0'`, acceptance admits both spellings, and the generated
+ * types admit both. On a legacy numeric row (`opacity`, `flex*`), `0` is a
+ * number like any other and `'0'` is not admitted, as in Alpha 1.
+ */
+export const CSS_ZERO = '0';
+
+/** The stored spelling of an approved literal: `'0'` for the CSS zero. */
+export function canonicalLiteral(value, standardValues) {
+  return (value === 0 || value === CSS_ZERO) &&
+    standardValues.includes(CSS_ZERO)
+    ? CSS_ZERO
+    : value;
+}
+
+/** The literals a domain's generated type admits: both zero spellings. */
+export function literalTypeValues(domain) {
+  return domain.values.includes(CSS_ZERO)
+    ? [...domain.values, 0]
+    : [...domain.values];
+}
+
+const sameValue = (a, b) =>
+  a === b || (a === 0 && b === CSS_ZERO) || (a === CSS_ZERO && b === 0);
+const hasValue = (values, value) => values.some((v) => sameValue(v, value));
+
+/** Whether domain `a` admits nothing that domain `b` does not. */
+function domainWithin(a, b) {
+  return (
+    a.values.every(
+      (v) =>
+        hasValue(b.values, v) || (typeof v === 'number' && inRange(b.range, v)),
+    ) &&
+    a.tokens.every((t) => b.tokens.includes(t)) &&
+    (a.range == null ||
+      (b.range != null &&
+        a.range.min >= b.range.min &&
+        upper(a.range) <= upper(b.range)))
+  );
+}
+
 function effectiveRow(descriptor, override = null) {
+  const domain = effectiveDomain(descriptor, override);
   const out = {};
   for (const field of ENFORCED_FIELDS) {
-    if (field === 'domain') out.domain = effectiveDomain(descriptor, override);
-    else if (field === 'origin') out.origin = 'default';
-    else out[field] = descriptor[field];
+    if (field === 'domain') out.domain = domain;
+    else if (field === 'origin') {
+      // `narrowed` admits nothing the compiler default does not; `approved`
+      // admits a standard member the default leaves out.
+      out.origin =
+        override == null
+          ? 'default'
+          : domainWithin(domain, descriptor.default)
+            ? 'narrowed'
+            : 'approved';
+    } else out[field] = descriptor[field];
   }
   return Object.freeze(out);
 }
 
 let defaultProperties = null;
 
-function buildDefaultProperties() {
+function buildProperties(overrides) {
   const descriptors = Object.create(null);
   const rows = [];
   for (const key of descriptorKeys()) {
-    const row = effectiveRow(descriptorOf(key));
+    const descriptor = descriptorOf(key);
+    const override =
+      overrides != null && Object.hasOwn(overrides, key)
+        ? overrides[key]
+        : null;
+    const row =
+      override == null && defaultProperties != null
+        ? defaultProperties.descriptors[key]
+        : effectiveRow(descriptor, override);
     descriptors[key] = row;
     rows.push(row);
   }
@@ -78,13 +150,358 @@ function buildDefaultProperties() {
   });
 }
 
+// Tables with overrides, by the canonical text of the normalized overrides:
+// an unchanged `propertyDomains` keeps the same table object across design
+// system rebuilds, so identity-keyed memos (target candidates) keep hitting.
+const tablesByOverrides = new Map();
+const TABLE_CACHE_LIMIT = 16;
+
 /**
  * The effective property table of a design-system registry: the snapshot's
- * `properties` member. Built once and shared while no override exists.
+ * `properties` member. Built from the registry's normalized `propertyDomains`
+ * and the compiler defaults, never from any other input.
  */
-export function effectivePropertiesOf(_registry) {
-  if (defaultProperties == null) defaultProperties = buildDefaultProperties();
-  return defaultProperties;
+export function effectivePropertiesOf(registry) {
+  if (defaultProperties == null) defaultProperties = buildProperties(null);
+  const overrides = registry?.propertyDomains;
+  if (overrides == null || Object.keys(overrides).length === 0) {
+    return defaultProperties;
+  }
+  const key = JSON.stringify(overrides);
+  let table = tablesByOverrides.get(key);
+  if (table == null) {
+    table = buildProperties(overrides);
+    if (tablesByOverrides.size >= TABLE_CACHE_LIMIT) tablesByOverrides.clear();
+    tablesByOverrides.set(key, table);
+  }
+  return table;
+}
+
+// ---------------------------------------------------------------------------
+// `propertyDomains`: design-system author data.
+
+const MEMBERS = new Set(['values', 'tokens', 'range']);
+
+function isPlainRecord(value) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+  const proto = Object.getPrototypeOf(value);
+  return (
+    (proto === Object.prototype || proto === null) &&
+    Object.getOwnPropertySymbols(value).length === 0
+  );
+}
+
+function domainError(rule, message, context) {
+  return {
+    ...diagnostic({
+      code: Codes.INVALID_PROPERTY_DOMAIN,
+      severity: 'error',
+      phase: 'registry',
+      message,
+      source: null,
+      rule: `property-domains.${rule}`,
+      context,
+    }),
+    // Author data: no page-role repair edits the design-system definition.
+    repair: {
+      kind: 'edit-design-system-definition',
+      applicable: false,
+      target: { property: context.property ?? null },
+      expected: null,
+      reason: 'property domains are design-system author data',
+    },
+  };
+}
+
+/**
+ * Validates and normalizes `definition.propertyDomains`. Each key names a
+ * standard, admitted property; each entry holds only `values`, `tokens` and
+ * `range`, each a member of the descriptor's `standard` domain. Returns
+ * `{ propertyDomains, diagnostics }`; `propertyDomains` holds the valid
+ * entries, sorted by key, frozen.
+ */
+export function normalizePropertyDomains(input, tokens = {}) {
+  const diagnostics = [];
+  const out = {};
+  const fail = (rule, message, context) =>
+    diagnostics.push(domainError(rule, message, context));
+  if (input == null)
+    return { propertyDomains: Object.freeze(out), diagnostics };
+  if (!isPlainRecord(input)) {
+    fail(
+      'malformed',
+      '`propertyDomains` must be a plain object keyed by property.',
+      {
+        property: null,
+      },
+    );
+    return { propertyDomains: Object.freeze(out), diagnostics };
+  }
+  const categories = new Set();
+  for (const id of Object.keys(tokens)) categories.add(tokens[id].category);
+  for (const property of Object.keys(input).sort()) {
+    const descriptor = descriptorOf(property);
+    const entry = input[property];
+    const at = { property };
+    if (descriptor == null) {
+      fail(
+        'unknown-property',
+        `"${property}" is not a property the compiler describes.`,
+        {
+          ...at,
+          admitted: descriptorKeys().filter(
+            (k) => descriptorOf(k).default != null,
+          ),
+        },
+      );
+      continue;
+    }
+    if (descriptor.form === 'rejected-composite') {
+      fail(
+        'composite-form',
+        `"${property}" is a refused composite form; declare its longhands.`,
+        at,
+      );
+      continue;
+    }
+    if (descriptor.status !== 'standard') {
+      fail(
+        'platform-extension',
+        `"${property}" is a platform extension; platform extensions are not admitted.`,
+        {
+          ...at,
+          platform: descriptor.platform,
+        },
+      );
+      continue;
+    }
+    if (!isPlainRecord(entry)) {
+      fail(
+        'malformed-entry',
+        `propertyDomains.${property} must be an object with values, tokens or range.`,
+        at,
+      );
+      continue;
+    }
+    const members = Object.keys(entry);
+    const unknown = members.filter((m) => !MEMBERS.has(m));
+    if (unknown.length > 0) {
+      fail(
+        'unknown-member',
+        `propertyDomains.${property} has unknown member(s): ${unknown.join(', ')}.`,
+        {
+          ...at,
+          member: unknown[0],
+          admitted: [...MEMBERS],
+        },
+      );
+      continue;
+    }
+    if (members.length === 0) {
+      fail(
+        'empty',
+        `propertyDomains.${property} must restate at least one of values, tokens, range.`,
+        at,
+      );
+      continue;
+    }
+    const standard = descriptor.standard;
+    const normalized = {};
+    let ok = true;
+    for (const member of ['values', 'tokens']) {
+      if (!Object.hasOwn(entry, member)) continue;
+      const list = entry[member];
+      if (!Array.isArray(list) || list.length === 0) {
+        fail(
+          'malformed-member',
+          `propertyDomains.${property}.${member} must be a non-empty array.`,
+          {
+            ...at,
+            member,
+          },
+        );
+        ok = false;
+        continue;
+      }
+      const seen = [];
+      for (const value of list) {
+        const primitive =
+          member === 'tokens'
+            ? typeof value === 'string'
+            : typeof value === 'string' ||
+              (typeof value === 'number' && Number.isFinite(value));
+        if (!primitive) {
+          fail(
+            'malformed-value',
+            `propertyDomains.${property}.${member} holds a value that is not a ${member === 'tokens' ? 'category name' : 'string or finite number'}.`,
+            {
+              ...at,
+              member,
+              value: typeof value === 'number' ? String(value) : typeof value,
+            },
+          );
+          ok = false;
+          continue;
+        }
+        if (seen.some((v) => sameValue(v, value))) {
+          fail(
+            'duplicate',
+            `propertyDomains.${property}.${member} lists ${JSON.stringify(value)} twice.`,
+            {
+              ...at,
+              member,
+              value,
+            },
+          );
+          ok = false;
+          continue;
+        }
+        seen.push(
+          member === 'tokens'
+            ? value
+            : canonicalLiteral(value, standard.values),
+        );
+        const inStandard =
+          member === 'tokens'
+            ? standard.tokens.includes(value)
+            : hasValue(standard.values, value) ||
+              (typeof value === 'number' && inRange(standard.range, value));
+        if (!inStandard) {
+          fail(
+            'outside-standard',
+            `${JSON.stringify(value)} is not an approvable ${member === 'tokens' ? 'token category' : 'value'} of ${property}.`,
+            {
+              ...at,
+              member,
+              value,
+              admitted:
+                member === 'tokens'
+                  ? [...standard.tokens]
+                  : admittedValues(standard),
+            },
+          );
+          ok = false;
+          continue;
+        }
+        if (member === 'tokens' && !categories.has(value)) {
+          fail(
+            'empty-category',
+            `propertyDomains.${property} approves the token category "${value}", which declares no token.`,
+            {
+              ...at,
+              member,
+              value,
+            },
+          );
+          ok = false;
+        }
+      }
+      normalized[member] = seen;
+    }
+    if (Object.hasOwn(entry, 'range')) {
+      // `{ min, max }`, or `{ min }` for no upper bound: finite numbers only,
+      // the JSON-safe encoding of the manifest.
+      const range = entry.range;
+      const keys = isPlainRecord(range) ? Object.keys(range).sort().join() : '';
+      const finite = (bound) =>
+        typeof bound === 'number' && Number.isFinite(bound);
+      const valid =
+        (keys === 'max,min' || keys === 'min') &&
+        finite(range.min) &&
+        (keys === 'min' || (finite(range.max) && range.min <= range.max));
+      if (!valid) {
+        fail(
+          'malformed-member',
+          `propertyDomains.${property}.range must be { min, max } or { min } with finite bounds and min <= max.`,
+          { ...at, member: 'range' },
+        );
+        ok = false;
+      } else if (
+        standard.range == null ||
+        range.min < standard.range.min ||
+        upper(range) > upper(standard.range)
+      ) {
+        fail(
+          'outside-standard',
+          `The range [${range.min}, ${range.max ?? 'unbounded'}] is not within an approvable range of ${property}.`,
+          {
+            ...at,
+            member: 'range',
+            value:
+              keys === 'min'
+                ? { min: range.min }
+                : { min: range.min, max: range.max },
+            admitted:
+              standard.range == null
+                ? []
+                : admittedValues({ values: [], range: standard.range }),
+          },
+        );
+        ok = false;
+      } else {
+        normalized.range =
+          keys === 'min'
+            ? { min: range.min }
+            : { min: range.min, max: range.max };
+      }
+    }
+    if (ok) out[property] = normalized;
+  }
+  return { propertyDomains: deepFreeze(out), diagnostics };
+}
+
+/**
+ * Pattern conflicts of an effective table: every literal value and token
+ * category a pattern can emit must stay admitted, so the manifest never
+ * advertises a pattern selection the policy would refuse.
+ */
+export function patternConflicts(properties) {
+  const diagnostics = [];
+  if (properties === defaultProperties) return diagnostics;
+  const emissions = patternEmissions();
+  for (const patternId of Object.keys(emissions)) {
+    for (const [property, emitted] of Object.entries(emissions[patternId])) {
+      const row = propertyRow(properties, property);
+      if (row == null || row.origin === 'default') continue;
+      for (const value of emitted.values) {
+        if (!literalAllowed(row.domain, value)) {
+          diagnostics.push(
+            domainError(
+              'pattern-conflict',
+              `The ${property} domain excludes ${JSON.stringify(value)}, which patterns.${patternId}() emits.`,
+              {
+                property,
+                member: 'values',
+                value,
+                patternId,
+                admitted: admittedValues(row.domain),
+              },
+            ),
+          );
+        }
+      }
+      for (const category of emitted.tokens) {
+        if (!row.domain.tokens.includes(category)) {
+          diagnostics.push(
+            domainError(
+              'pattern-conflict',
+              `The ${property} domain excludes ${category} tokens, which patterns.${patternId}() emits.`,
+              {
+                property,
+                member: 'tokens',
+                value: category,
+                patternId,
+                admitted: [...row.domain.tokens],
+              },
+            ),
+          );
+        }
+      }
+    }
+  }
+  return diagnostics;
 }
 
 const PROTOTYPE_NAMES = new Set([
@@ -116,9 +533,8 @@ export function isAdmitted(row) {
 /** Whether a literal (non-token) value belongs to a domain. */
 export function literalAllowed(domain, value) {
   if (domain.values.includes(value)) return true;
-  // CSS treats the numeric zero accepted by style-object APIs as the same
-  // value as the explicit CSS string `"0"`.
-  if (value === 0 && domain.values.includes('0')) return true;
+  // The CSS zero (see CSS_ZERO): a domain listing '0' admits numeric 0.
+  if (value === 0 && domain.values.includes(CSS_ZERO)) return true;
   const range = domain.range;
   return (
     range != null &&

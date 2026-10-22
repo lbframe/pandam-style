@@ -22,13 +22,16 @@ const styles = create({
 export const shellProps = props(styles.shell);
 ```
 
-Use existing public tokens for semantic values. Properties are restricted to
-the compiler's supported property/category policy. Token-valued properties
-require the matching category; non-token structural values use finite allowed
-domains (for example `display: 'flex'`). Unsupported properties, CSS
-composite forms, forbidden raw values, private consumer tokens and dynamic
-values fail compilation. The full allowlist is defined in compiler source and
-the design-system manifest; do not assume all CSS is supported.
+Use existing public tokens for semantic values. Each property admits one
+finite effective domain: token categories, literal values (for example
+`display: 'flex'`), or both for a mixed domain (`width` can admit a `sizes`
+token or `'auto'`). The compiler's property descriptors define the default
+domains, and the design system may narrow or approve them through
+`propertyDomains`. Read a project's domains from
+`manifest.properties.byProperty`. Unsupported properties, CSS composite forms,
+values outside the domain, private consumer tokens and dynamic values fail
+compilation. Do not assume all CSS is supported, and do not edit
+`propertyDomains` to make page code compile: it is design-system author data.
 
 Responsive declaration objects use `base` plus declared `conditions`. Selector
 conditions can be expressed through the compiler's named conditional keys used

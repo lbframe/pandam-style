@@ -68,7 +68,9 @@ Examples of current error codes include `PMS_UNKNOWN_TOKEN`,
 `PMS_INVALID_VARIANT_VALUE`, `PMS_INVALID_RECIPE_SLOT`,
 `PMS_AMBIGUOUS_RECIPE_COMPOUND`, `PMS_UNKNOWN_PATTERN`,
 `PMS_INVALID_PATTERN_PARAMETER`, `PMS_NON_STATIC_VALUE`,
-`PMS_COVERAGE_GAP`, and `PMS_ABI_MISMATCH`. This list is not exhaustive.
+`PMS_COVERAGE_GAP`, `PMS_ABI_MISMATCH` and `PMS_INVALID_PROPERTY_DOMAIN` (a
+refused `propertyDomains` entry, phase `registry`). This list is not
+exhaustive.
 
 Browser targets (CE-01.1) add phase `targets` codes: `PMS_INVALID_TARGET_CONFIG`,
 `PMS_INCOMPATIBLE_TARGET_ENGINE`, `PMS_TARGET_CAPABILITY_INCOMPATIBLE`,

@@ -122,6 +122,7 @@ const CATEGORIES = [
 ];
 const ds = compiler.buildDesignSystem({
   systemId: 'ce021-descriptors',
+  conditions: { hover: ':hover' },
   tokens: Object.fromEntries(
     CATEGORIES.map((category) => [
       category,
@@ -139,6 +140,22 @@ function newOutcome(property, value) {
       registry: ds.registry,
       varsByToken: ds.varsByToken,
       namespaces: { n: { [property]: value } },
+      role: 'consumer',
+    });
+    return null;
+  } catch (error) {
+    if (!Array.isArray(error.diagnostics)) throw error;
+    expect(error.diagnostics).toHaveLength(1);
+    return [error.diagnostics[0].code, error.diagnostics[0].rule];
+  }
+}
+
+function newOutcomeIn(block, property, value) {
+  try {
+    compiler.compileStyles({
+      registry: ds.registry,
+      varsByToken: ds.varsByToken,
+      namespaces: { n: { [block]: { [property]: value } } },
       role: 'consumer',
     });
     return null;
@@ -748,6 +765,14 @@ describe('Alpha 1 equivalence', () => {
           RULES[entry.disposition],
         ]);
       }
+      // Inside a named-condition block and an engine condition block, the
+      // name is checked by the same policy and stays rejected.
+      for (const block of ['_hover', ':hover']) {
+        expect(newOutcomeIn(block, key, 'x')).toEqual([
+          'PMS_UNSUPPORTED_PROPERTY',
+          RULES[entry.disposition],
+        ]);
+      }
     },
   );
 
@@ -828,9 +853,28 @@ describe('platform extensions stay rejected under a matching profile', () => {
     expect(PLATFORM_NAMES).toHaveLength(7);
   });
 
+  // A project profile that announces the `electron` platform with a query
+  // every pinned data version resolves the same way. The built-in
+  // `pandamstyle:electron@1` profile (query `electron 44.7`) resolves only
+  // with the lockfile's electron-to-chromium: with another installed version
+  // the precomputed list is (correctly) not used, the live query fails with
+  // PMS_INVALID_TARGET_CONFIG and no page is compiled, which says nothing
+  // about platform extensions.
+  const ELECTRON_PROJECT = {
+    profiles: ['project:desktop'],
+    define: { desktop: { query: 'chrome 120', platform: 'electron' } },
+  };
+
+  test('the project profile announces the electron platform', () => {
+    const { record } = targets.resolveTargets(ELECTRON_PROJECT);
+    expect(record.profiles.map((p) => [p.ref, p.platform])).toEqual([
+      ['project:desktop', 'electron'],
+    ]);
+  });
+
   test.each([
     ['without targets', undefined],
-    ['under pandamstyle:electron@1', { profiles: ['pandamstyle:electron@1'] }],
+    ['under a profile announcing the electron platform', ELECTRON_PROJECT],
   ])('%s', (_, targetConfig) => {
     const h = openProject('valid');
     if (targetConfig !== undefined) h.setBuildOption('targets', targetConfig);
@@ -854,6 +898,13 @@ describe('platform extensions stay rejected under a matching profile', () => {
     });
     const validation = h.session.validate();
     expect(validation.ok).toBe(false);
+    // The targets resolved: the refusals below come from the property policy,
+    // not from a revision stopped at target resolution.
+    expect(
+      validation.diagnostics.filter(
+        (d) => d.code === 'PMS_INVALID_TARGET_CONFIG',
+      ),
+    ).toEqual([]);
     const platform = validation.diagnostics.filter(
       (d) => d.location?.file === page,
     );

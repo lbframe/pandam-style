@@ -1,0 +1,21 @@
+{
+  "name": "pandamstyle-candidate-closure",
+  "private": true,
+  "description": "Candidate epoch closure: the packed PandamStyle packages of one commit and the alpha1 closure host pins.",
+  "dependencies": {
+    "@pandamstyle/compiler": "file:packs/pandamstyle-compiler-0.1.0-alpha.1.tgz",
+    "@pandamstyle/core": "file:packs/pandamstyle-core-0.1.0-alpha.1.tgz",
+    "@pandamstyle/next": "file:packs/pandamstyle-next-0.1.0-alpha.1.tgz",
+    "@pandamstyle/rsbuild": "file:packs/pandamstyle-rsbuild-0.1.0-alpha.1.tgz",
+    "@pandamstyle/vite": "file:packs/pandamstyle-vite-0.1.0-alpha.1.tgz",
+    "@rsbuild/core": "2.2.11",
+    "@rspack/core": "2.2.8",
+    "@vitejs/plugin-react": "6.1.1",
+    "next": "16.3.8",
+    "playwright-core": "1.60.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.1"
+  }
+}

@@ -321,6 +321,7 @@ function checkValue({
             value,
             admitted: admittedValues(domain),
             conditionPath,
+            ...(row.origin === 'default' ? {} : { origin: row.origin }),
           },
         }),
       );
@@ -345,6 +346,7 @@ function checkValue({
           systemId,
           candidates: admittedTokens(registry, categories, allowPrivateTokens),
           conditionPath,
+          ...(row.origin === 'default' ? {} : { origin: row.origin }),
         },
       }),
     );

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "kind": "pandamstyle-baseline-epoch-manifest",
+  "epoch": "ce-02.1-5a79a68",
+  "epochKind": "candidate",
+  "description": "Candidate epoch: the PandamStyle packages packed from one commit and installed with the alpha1 closure host pins. Compare it with alpha1 by name; it never replaces alpha1.",
+  "generatedBy": "node tools/baselines/archive.mjs candidate-manifest --epoch ce-02.1-5a79a68",
+  "recordedAt": "2026-10-22T07:23:46.045Z",
+  "store": {
+    "note": "The packs and the installed closure live outside Git, produced by `archive.mjs candidate-pack`. Paths below are relative to that directory."
+  },
+  "source": {
+    "commit": "5a79a68f173afe88b75e8f27cc379ffbdc62eaad",
+    "tree": "988ec50ed3b1c20227fd088e3b8f61d3d0eefef5",
+    "packedFrom": "a clean detached checkout of the commit (yarn install --frozen-lockfile --ignore-scripts, compiler build, npm pack)"
+  },
+  "lockfiles": [
+    {
+      "path": "yarn.lock",
+      "commit": "5a79a68f173afe88b75e8f27cc379ffbdc62eaad",
+      "sha256": "dc6fbf52734c76169125c0e08534f2beef56fd58ca95297ce2867b03a46d4f3a",
+      "role": "workspace install used to build and pack the candidate"
+    },
+    {
+      "path": "benchmarks/core-evolution/epochs/ce-02.1-5a79a68/closure/package-lock.json",
+      "sha256": "57fdc4499c2b61ec5a794b87e94e477af95ca5fb6466a45c50848b2ade49941f",
+      "role": "executable closure: the candidate packs and the alpha1 host pins"
+    },
+    {
+      "path": "benchmarks/core-evolution/epochs/ce-02.1-5a79a68/closure/package.json",
+      "sha256": "28c4820e387158095e86f568d5a91429a930f73f5a4058635414bc2690f72e8d",
+      "role": "executable closure manifest"
+    },
+    {
+      "path": "benchmarks/core-evolution/epochs/alpha1/closure/package.json",
+      "sha256": "b346ff95df518843a673f990d2971f42d94bc5add94fe502a7f907732256d626",
+      "role": "host pins the closure reuses"
+    }
+  ],
+  "packages": [
+    {
+      "name": "@pandamstyle/core",
+      "version": "0.1.0-alpha.1",
+      "pack": {
+        "file": "packs/pandamstyle-core-0.1.0-alpha.1.tgz",
+        "bytes": 7294,
+        "sha256": "0a774508cb52220fd6ceeea5664ab179a51dadd9ef79de4b71658ed6fbcca486",
+        "integrity": "sha512-FeVg+0YuU6vWfL50TFfcHDyYkeLg1yaPOhKLim+nhWCIhpKbT1/axsIhXTF0/1amuB2Mvm2Ee3ljvV8JI2Vu2w==",
+        "shasum": "60f5daf4e65541276cbe46aaf5b78e6ffea6f96a",
+        "repeatSha256": "0a774508cb52220fd6ceeea5664ab179a51dadd9ef79de4b71658ed6fbcca486",
+        "reproducible": true
+      },
+      "closureLock": {
+        "resolved": "file:packs/pandamstyle-core-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-FeVg+0YuU6vWfL50TFfcHDyYkeLg1yaPOhKLim+nhWCIhpKbT1/axsIhXTF0/1amuB2Mvm2Ee3ljvV8JI2Vu2w==",
+        "matchesPack": true
+      }
+    },
+    {
+      "name": "@pandamstyle/compiler",
+      "version": "0.1.0-alpha.1",
+      "pack": {
+        "file": "packs/pandamstyle-compiler-0.1.0-alpha.1.tgz",
+        "bytes": 450334,
+        "sha256": "021a9336dad34a1a13806123805adcc966f6fefd3e8d59ca2cc203f258e76442",
+        "integrity": "sha512-GpAyfY42iSPULY+VqZbdaTHJUrwY0OyQHpWdfrfjhqQIJWwhuDvVU1Ip51fFN6rWGYJZ41CZyt9dwF80xv6uwA==",
+        "shasum": "7c03a764048ac268e1e82906b5a88e87e6027318",
+        "repeatSha256": "021a9336dad34a1a13806123805adcc966f6fefd3e8d59ca2cc203f258e76442",
+        "reproducible": true
+      },
+      "closureLock": {
+        "resolved": "file:packs/pandamstyle-compiler-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-GpAyfY42iSPULY+VqZbdaTHJUrwY0OyQHpWdfrfjhqQIJWwhuDvVU1Ip51fFN6rWGYJZ41CZyt9dwF80xv6uwA==",
+        "matchesPack": true
+      }
+    },
+    {
+      "name": "@pandamstyle/vite",
+      "version": "0.1.0-alpha.1",
+      "pack": {
+        "file": "packs/pandamstyle-vite-0.1.0-alpha.1.tgz",
+        "bytes": 12602,
+        "sha256": "5274a41dc1f87e44744db61bce8caf35271c6b5af99134600073b161a5e595c1",
+        "integrity": "sha512-eo4UGtnDHNzHjNkYrL6mvtWUFSpBsPYRf5DCt+Ugb90zmRHzQweIls4ugqeW1dqFv/nOmg2VABP6z0FqESMnAw==",
+        "shasum": "aecdee467cbe4af5c36efed9f931e03dd241672d",
+        "repeatSha256": "5274a41dc1f87e44744db61bce8caf35271c6b5af99134600073b161a5e595c1",
+        "reproducible": true
+      },
+      "closureLock": {
+        "resolved": "file:packs/pandamstyle-vite-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-eo4UGtnDHNzHjNkYrL6mvtWUFSpBsPYRf5DCt+Ugb90zmRHzQweIls4ugqeW1dqFv/nOmg2VABP6z0FqESMnAw==",
+        "matchesPack": true
+      }
+    },
+    {
+      "name": "@pandamstyle/next",
+      "version": "0.1.0-alpha.1",
+      "pack": {
+        "file": "packs/pandamstyle-next-0.1.0-alpha.1.tgz",
+        "bytes": 31405,
+        "sha256": "ddaa73e1d7ed6dc9abdb11158a3cde1767173622ef5b66a35783cc5b0ed0b819",
+        "integrity": "sha512-7rZ8mHxOzMAKb/NCpRxphtKy5gxydN40PtB7yHZs0ffZ0INS9a1EZanbMxz7ahCF3J3eBGlLW2fEFh7N498NEw==",
+        "shasum": "3fa4975c6abc8b356b925295dd65e0f8a3e7c03d",
+        "repeatSha256": "ddaa73e1d7ed6dc9abdb11158a3cde1767173622ef5b66a35783cc5b0ed0b819",
+        "reproducible": true
+      },
+      "closureLock": {
+        "resolved": "file:packs/pandamstyle-next-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-7rZ8mHxOzMAKb/NCpRxphtKy5gxydN40PtB7yHZs0ffZ0INS9a1EZanbMxz7ahCF3J3eBGlLW2fEFh7N498NEw==",
+        "matchesPack": true
+      }
+    },
+    {
+      "name": "@pandamstyle/rsbuild",
+      "version": "0.1.0-alpha.1",
+      "pack": {
+        "file": "packs/pandamstyle-rsbuild-0.1.0-alpha.1.tgz",
+        "bytes": 11910,
+        "sha256": "d376c0fe1f5d95387210270ae39dea597247674bd4af3d04d8160fd815f7fbfb",
+        "integrity": "sha512-JewJEhH5/Xmn541cVHITykL3KEL35pD+mGqqHMG8dR7IkhbkMOpSL5ujXZvGgtGRQC9jyfNaCXu+djX/QK8VoQ==",
+        "shasum": "4257bb03a16bbe4828e73f652f8c408a8a580cb6",
+        "repeatSha256": "d376c0fe1f5d95387210270ae39dea597247674bd4af3d04d8160fd815f7fbfb",
+        "reproducible": true
+      },
+      "closureLock": {
+        "resolved": "file:packs/pandamstyle-rsbuild-0.1.0-alpha.1.tgz",
+        "integrity": "sha512-JewJEhH5/Xmn541cVHITykL3KEL35pD+mGqqHMG8dR7IkhbkMOpSL5ujXZvGgtGRQC9jyfNaCXu+djX/QK8VoQ==",
+        "matchesPack": true
+      }
+    }
+  ],
+  "closure": {
+    "path": "closure",
+    "install": "copy packs/ into closure/packs/, then npm ci --ignore-scripts --no-audit --no-fund",
+    "installedTree": {
+      "sha256": "d10fbf0a6fc216e63c8c433670c58b6540e1c4a9af631b9635405c889e6021f6",
+      "files": 12508,
+      "bytes": 468013777
+    },
+    "installedPandamstyle": {
+      "sha256": "b4456e9a32b67c42d99ff50feb256cb6c67aa4e5b72e1e61d75fb4326bbe0073",
+      "files": 59,
+      "bytes": 2857519
+    },
+    "lockedPackages": 174,
+    "hosts": {
+      "@rsbuild/core": "2.2.11",
+      "@rspack/core": "2.2.8",
+      "@vitejs/plugin-react": "6.1.1",
+      "next": "16.3.8",
+      "playwright-core": "1.60.0",
+      "react": "19.3.0",
+      "react-dom": "19.3.0",
+      "typescript": "5.9.3",
+      "vite": "8.3.1"
+    }
+  },
+  "node": {
+    "version": "v22.22.0"
+  },
+  "reconstruction": [
+    "git checkout 5a79a68f173afe88b75e8f27cc379ffbdc62eaad",
+    "node tools/baselines/archive.mjs candidate-pack --dest <empty dir>",
+    "compare the packs and closure digests with benchmarks/core-evolution/epochs/ce-02.1-5a79a68/manifest.v1.json"
+  ],
+  "agReuse": "Bind an agentic qualification to this epoch by name (\"ce-02.1-5a79a68\") and by the pack and installed-tree digests above; alpha1 stays the baseline epoch."
+}
