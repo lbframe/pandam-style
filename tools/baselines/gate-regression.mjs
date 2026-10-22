@@ -1008,12 +1008,14 @@ for (const budget of minBudgets) {
   );
   add(
     'statistic',
-    `${budget.metric} min: every round +15% fails`,
+    `${budget.metric} min: every round x (factor ${budget.limit.factor} + 0.05) fails`,
     'fail',
     () => {
       const raws = fresh();
       for (const s of candidateSamples(raws))
-        usage(s).maxRssBytes = Math.round(usage(s).maxRssBytes * 1.15);
+        usage(s).maxRssBytes = Math.round(
+          usage(s).maxRssBytes * (budget.limit.factor + 0.05),
+        );
       return expectStatus(gateOn(raws), budget, 'fail');
     },
   );
@@ -1236,6 +1238,154 @@ for (const [name, previous, next, expected] of [
   add('statistic', `loosening: ${name}`, expected, () =>
     loosening(previous, next),
   );
+// Per-budget memory floors (thresholdRule.memoryFloor). For every in-force
+// budget with a raised floor: the candidate statistic exactly at the limit
+// passes, one byte above fails, and a regression of the baseline statistic
+// by 14% passes while 16% fails. A floor override is refused on a timing,
+// paired-ratio runtime or deterministic budget, unmatched, duplicated or not
+// a finite number above 1; one equal to memory.floor derives like none.
+const floorBudgets = committedBudgets.budgets.filter(
+  (b) => b.limit.floor != null && SOURCE[b.metric],
+);
+for (const budget of floorBudgets) {
+  const statistic = budget.limit.statistic ?? 'median';
+  const limit = budget.limit.maxMin ?? budget.limit.maxMedian;
+  const base = budget.baseline[statistic === 'min' ? 'min' : 'median'];
+  const setAll = (value) => () => {
+    const raws = fresh();
+    for (const s of raws.flatMap((r) => r.samples))
+      if (
+        s.workload === budget.workload &&
+        s.kind === 'compile' &&
+        s.epoch === 'alpha1-replay'
+      )
+        s.result[SOURCE[budget.metric]].maxRssBytes = value;
+    return raws;
+  };
+  for (const [name, value, expected] of [
+    ['at the limit', limit, 'pass'],
+    ['one byte above the limit', limit + 1, 'fail'],
+    ['baseline +14%', Math.round(base * 1.14), 'pass'],
+    ['baseline +16%', Math.round(base * 1.16), 'fail'],
+  ])
+    add(
+      'memory-floor',
+      `${budget.workload} ${budget.metric} (${statistic}, floor ${budget.limit.floor}): ${name} ${expected === 'pass' ? 'passes' : 'fails'}`,
+      expected,
+      () => expectStatus(gateOn(setAll(value)()), budget, expected),
+    );
+}
+const absoluteMemoryBudget = committedBudgets.budgets.find(
+  (b) =>
+    b.class === 'memory' &&
+    b.limit.mode === 'absolute' &&
+    b.limit.floor == null,
+);
+const deterministicBudget = committedBudgets.budgets.find(
+  (b) => b.class === 'deterministic',
+);
+const addFloors =
+  (...overrides) =>
+  (policy) => {
+    policy.thresholdRule.memoryFloor ??= { overrides: [] };
+    policy.thresholdRule.memoryFloor.overrides.push(...overrides);
+    return policy;
+  };
+const floorOf = (budget, floor) => ({
+  workload: budget.workload,
+  metric: budget.metric,
+  floor,
+});
+for (const [name, mutate, text] of [
+  [
+    'a timing budget',
+    addFloors(floorOf(timingBudget, 1.2)),
+    'matches no absolute memory budget',
+  ],
+  [
+    'a paired-ratio runtime budget',
+    addFloors(floorOf(ratioBudget, 1.2)),
+    'matches no absolute memory budget',
+  ],
+  [
+    'a deterministic budget',
+    addFloors(floorOf(deterministicBudget, 1.2)),
+    'matches no absolute memory budget',
+  ],
+  [
+    'an unmatched budget',
+    addFloors({
+      workload: 'no-such-workload',
+      metric: 'session.maxRssBytes',
+      floor: 1.2,
+    }),
+    'matches no absolute memory budget',
+  ],
+  [
+    'a duplicate floor',
+    addFloors(
+      floorOf(absoluteMemoryBudget, 1.2),
+      floorOf(absoluteMemoryBudget, 1.2),
+    ),
+    'memory floor given twice',
+  ],
+  [
+    'a floor of 1',
+    addFloors(floorOf(absoluteMemoryBudget, 1)),
+    'finite number above 1',
+  ],
+  [
+    'a string floor',
+    addFloors(floorOf(absoluteMemoryBudget, '1.2')),
+    'finite number above 1',
+  ],
+])
+  add(
+    'memory-floor',
+    `committed v${NEXT} policy with a memory floor on ${name} is refused`,
+    'fail',
+    () => {
+      const dir = clone(`floor-${name.replaceAll(' ', '-')}`);
+      honestNext(dir, mutate);
+      return expectProblem(gateIn(dir), text);
+    },
+  );
+add(
+  'memory-floor',
+  `memory floor equal to memory.floor on ${absoluteMemoryBudget.metric} derives and gates like none`,
+  'pass',
+  () => {
+    const dir = clone('floor-default');
+    honestNext(
+      dir,
+      (policy) =>
+        addFloors(
+          floorOf(absoluteMemoryBudget, policy.thresholdRule.memory.floor),
+        )(policy),
+      { deriveMutated: true },
+    );
+    const report = gateIn(dir);
+    const derived = readJson(path.join(dir, budgetsPath(NEXT))).budgets;
+    return JSON.stringify(derived) === JSON.stringify(committedBudgets.budgets)
+      ? report
+      : { ...report, verdict: 'budgets differ from no override' };
+  },
+);
+add(
+  'memory-floor',
+  `memory floor 1.15 on ${absoluteMemoryBudget.metric} raises the limit and needs a relaxation`,
+  'fail',
+  () => {
+    const dir = clone('floor-raised');
+    honestNext(dir, addFloors(floorOf(absoluteMemoryBudget, 1.15)), {
+      deriveMutated: true,
+    });
+    return expectProblem(
+      gateIn(dir),
+      'loosened without a justified relaxation',
+    );
+  },
+);
 add(
   'review-r2',
   'stale-revision-harness-same (identical committed inputs at f4a7106, v1 evidence)',

@@ -571,6 +571,11 @@ async function runDevQualification() {
   let serverClosed = false;
   let initialSessionId = null;
   try {
+    // Observe before the first request: serving index.html pre-transforms its
+    // module graph, App.jsx included, and a transform event sent before the
+    // socket connects is lost (#143).
+    socket = await connectHmr(port, events);
+    const clientTransformCursor = events.length;
     const htmlResponse = await fetch(`http://127.0.0.1:${port}/`);
     assert.equal(htmlResponse.status, 200);
     const html = await htmlResponse.text();
@@ -584,8 +589,6 @@ async function runDevQualification() {
       htmlProxy?.code.includes('pandamstyle:client'),
       'the Vite HTML proxy omitted the PandamStyle HMR client',
     );
-    socket = await connectHmr(port, events);
-    const clientTransformCursor = events.length;
     const transformStarted = performance.now();
     const transformed =
       await server.environments.client.transformRequest('/src/pages/App.jsx');

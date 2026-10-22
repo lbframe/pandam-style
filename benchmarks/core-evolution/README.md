@@ -303,6 +303,8 @@ recorded.
 | `alpha1-v2-sk-b3`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 1.81; mean CPU per sample 9.2% (max 25.4%)                 |
 | `alpha1-v3-sk-c1`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 1.78; mean CPU per sample 9.1% (max 14.3%)                 |
 | `alpha1-v3-sk-c4`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 1.61; mean CPU per sample 9.1% (max 13.5%)                 |
+| `alpha1-v4-sk-d1`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 1.67; mean CPU per sample 9.1% (max 15.4%)                 |
+| `alpha1-v4-sk-d2`        | `alpha1`, `alpha1-replay`     | 232, 0 failed | max 1-minute load average 1.78; mean CPU per sample 9.1% (max 16.0%)                 |
 
 - The two `alpha1-final` runs are the version 1 baseline.
   [`gate-null-alpha1-replay.json`](results/gate-null-alpha1-replay.json) is the
@@ -318,6 +320,11 @@ recorded.
   [`gate-null-alpha1-replay-v3.json`](results/gate-null-alpha1-replay-v3.json)
   is the gate on both runs with the identical artifact as candidate, under
   version 3: `pass`, 110 of 110 budgets, no reconciliation error.
+- The two `alpha1-v4-sk` runs are the version 4 baseline, measured on the same
+  host.
+  [`gate-null-alpha1-replay-v4.json`](results/gate-null-alpha1-replay-v4.json)
+  is the gate on both runs with the identical artifact as candidate, under
+  version 4: `pass`, 110 of 110 budgets, no reconciliation error.
 - `gate-injected-slowdown` checks the gate itself. Its candidate, built by
   [`make-candidate.mjs`](results/gate-injected-slowdown/make-candidate.mjs), is
   `alpha1` with every compiler session call slowed by 30%. The fixture, CE-00.2
@@ -421,21 +428,43 @@ reused result files), measured on the same host and store copy at commit
   regenerates the login message. From C3 on, the polling used one SSH connection
   per 10 minutes.
 
+### Version 4 baseline provenance
+
+Version 4 re-derives every budget from a new baseline (the change policy rejects
+reused result files), measured on the same host and store copy, with the same
+harness files as versions 2 and 3.
+
+- **Series D (pre-registered 2026-10-22):** the series C rules unchanged (start
+  condition, no abort, samplers, admissibility within the version 3 noise
+  ceilings and without any foreign process at half a core or more), at most 4
+  attempts, stopping at two admissible attempts; status polled through one SSH
+  connection per 10 minutes.
+
+| Attempt              | Verdict        | Worst noise / v3 ceiling | Max 1-min load | Foreign windows | c10000 high-mode rounds (`alpha1`, `alpha1-replay`) |
+| -------------------- | -------------- | ------------------------ | -------------- | --------------- | --------------------------------------------------- |
+| D1 `alpha1-v4-sk-d1` | **admissible** | 0.072 / 0.10             | 1.67           | 0 of 115        | 0 of 5, 0 of 5                                      |
+| D2 `alpha1-v4-sk-d2` | **admissible** | 0.057 / 0.10             | 1.78           | 0 of 115        | 0 of 5, 1 of 5 (both cells)                         |
+
+- D1 and D2 are the first two admissible attempts; `budgets.v4.json` is frozen
+  from them. D3 and D4 never started.
+
 ## Budgets
 
-[`budget-policy.v3.json`](budget-policy.v3.json) is the versioned threshold rule
+[`budget-policy.v4.json`](budget-policy.v4.json) is the versioned threshold rule
 in force. It lists the budgeted metrics, the metrics that stay `unknown`, the
-change policy and, for every budget that loosened relative to version 2, a
-relaxation with its justification. [`budgets.v3.json`](budgets.v3.json) is
-generated from the policy and the version 3 baseline runs by
+change policy and, for every budget that loosened relative to version 3, a
+relaxation with its justification. [`budgets.v4.json`](budgets.v4.json) is
+generated from the policy and the version 4 baseline runs by
 `budgets.mjs freeze`, never by hand. Rerunning the same freeze command must
 reproduce it byte for byte.
 
-Versions 1 and 2 ([`budget-policy.v1.json`](budget-policy.v1.json),
+Versions 1 to 3 ([`budget-policy.v1.json`](budget-policy.v1.json),
 [`budgets.v1.json`](budgets.v1.json),
 [`budget-policy.v2.json`](budget-policy.v2.json),
-[`budgets.v2.json`](budgets.v2.json)) are superseded and stay committed,
-unchanged: the gate verifies the chain from version 3 back to version 1.
+[`budgets.v2.json`](budgets.v2.json),
+[`budget-policy.v3.json`](budget-policy.v3.json),
+[`budgets.v3.json`](budgets.v3.json)) are superseded and stay committed,
+unchanged: the gate verifies the chain from version 4 back to version 1.
 
 - **Version 2 (CE-00.3, #42):** raises only the paired-ratio timing floor, from
   1.10 to 1.25, for the measured cost of the always-on browser-target feature
@@ -477,6 +506,32 @@ unchanged: the gate verifies the chain from version 3 back to version 1.
     absolute medians, from the quieter baseline). The host binding of version 2
     still applies.
 
+- **Version 4 (CE-00.3, #42, #76):** raises the memory floor of three session
+  peak-RSS cells from 1.10 to 1.15 (`thresholdRule.memoryFloor`); their
+  statistics are unchanged.
+  - Why: after CE-02.1 and AG-01.1 these cells sat at their version 3 limits
+    (c10000 `session.maxRssBytes` about 1,345 MB against 1,347.6 MB, one gate
+    failing by 0.16 MB; c1000 `session.maxRssBytes` about 382–386 MB against
+    393.3 MB; c10000 `full.maxRssBytes` at about +8–9%), with cumulative growth
+    of about +9.8% against the 10% budget. #130 recovered what was recoverable,
+    the CE-02.1 investigation found nothing more, and #150 traded one cell
+    against the other. The remainder is the legitimate cost of the planned
+    capabilities; CE-12.3 (#76) owns the final qualification and recovery.
+  - The c1000 cell keeps the median: its high mode (about 700–850 MB in 20–40%
+    of candidate samples, never in `alpha1` on the measurement host) is a real
+    effect of the candidates, which the median keeps visible.
+  - Like the timing floor, the raised floor is cumulative against `alpha1` for
+    the whole epic: about 5% of headroom remains on these cells.
+  - All budgets are re-derived from the series D baseline: 12 relaxations
+    relative to version 3 (the 3 raised floors; 5 absolute memory medians,
+    +0.18% to +0.34%; 4 noise ceilings) and 2 tightenings.
+
+| Cell                         | Statistic | Version 3 limit             | Version 4 limit             |
+| ---------------------------- | --------- | --------------------------- | --------------------------- |
+| c1000 `session.maxRssBytes`  | median    | 393,282,560 (factor 1.10)   | 411,446,374 (factor 1.15)   |
+| c10000 `full.maxRssBytes`    | min       | 1,142,872,473 (factor 1.10) | 1,201,429,913 (factor 1.15) |
+| c10000 `session.maxRssBytes` | min       | 1,347,615,948 (factor 1.10) | 1,415,117,209 (factor 1.15) |
+
 - **Timing and runtime (paired ratios):** for each round, the candidate sample
   is divided by the adjacent `alpha1` sample. A budget passes when the upper
   bound of the bootstrap interval of the median ratio is within the limit, fails
@@ -503,6 +558,11 @@ unchanged: the gate verifies the chain from version 3 back to version 1.
     anywhere else, any unknown statistic, a duplicate override and an override
     that matches no budget, and treats a statistic change as a loosening that
     needs a relaxation.
+  - Floor: a policy may raise the floor of a named absolute memory budget
+    (`thresholdRule.memoryFloor`); its factor is then max(that floor, 1 + 3 CV).
+    A floor equal to the rule's floor derives like none. The gate refuses a
+    floor that is not a number above 1, a duplicate, and a floor on any budget
+    that is not an absolute memory budget; a raised limit is a loosening.
   - c10000 peak RSS: on the version 1 host it is bimodal (about 1.05 GB or about
     2.3 GB, in both epochs of the identical artifact), so in version 1 its two
     cells fell back to paired ratios with limits of 2.15 and 2.30 and noise
