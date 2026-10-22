@@ -22,15 +22,18 @@
 // fixed tag lets another run delete the images this run uses by id. Every
 // image tag and Docker name the suite creates is therefore unique to the run,
 // the run removes only its own tags (never forced, never a prune), and each
-// assertion on leftovers is scoped to the run's own resources. Concurrency
-// check (separate checkouts or one):
+// assertion on leftovers is scoped to the run's own resources. The runner
+// also enumerates daemon-wide state (the self-test lists every network, then
+// inspects them), so the suite holds a daemon-wide lock for all of its Docker
+// work (docker-lock.mjs): concurrent suites queue, bounded by LOCK_WAIT_MS.
+// Concurrency check (separate checkouts or one):
 //   for i in 1 2 3; do (sleep $((i * 30 - 30)); \
 //     yarn bench:agentic:runner:docker-test) & done; wait
 
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import test, { after } from 'node:test';
+import test, { after, before } from 'node:test';
 import {
   MODELS,
   claudeInit,
@@ -49,6 +52,7 @@ import {
   writeScenario,
   assertDocumentsValid,
 } from './helpers.mjs';
+import { acquireDockerLock, releaseDockerLock } from './docker-lock.mjs';
 import { DockerExecutor, containerEvaluator, docker } from '../src/docker.mjs';
 import {
   IMAGE_PATH,
@@ -71,23 +75,37 @@ const tagsOf = (runId) => ({
   agent: `pms-agentic-test-agent:${runId}`,
 });
 
-function buildFixtureImages(tags) {
-  const harness = buildHarnessImage({ tag: tags.harness });
-  const agent = buildFixtureAgentImage({
-    tag: tags.agent,
-    harnessTag: tags.harness,
-  });
-  return { agent, proxy: harness, grader: harness, baseDigest: null };
-}
+// Every tag this run may create, registered before its build starts.
+const ownTags = new Set();
 
 /**
  * Untags a run's own images; Docker deletes an image when its last tag goes
- * and refuses while a container uses it (no force, no prune).
+ * and refuses while a container uses it (no force, no prune). A tag whose
+ * build never produced it is already gone.
  */
 function removeTags(tags) {
-  const r = docker(['image', 'rm', tags.agent, tags.harness]);
-  if (r.status !== 0)
-    process.stderr.write(`image cleanup: ${r.stderr.trim()}\n`);
+  for (const tag of tags) {
+    const r = docker(['image', 'rm', tag]);
+    if (r.status === 0 || /No such image/.test(r.stderr)) ownTags.delete(tag);
+    else process.stderr.write(`image cleanup: ${tag}: ${r.stderr.trim()}\n`);
+  }
+}
+
+/** Builds a run's fixture images; a partial build removes what it tagged. */
+function buildFixtureImages(
+  tags,
+  { buildAgent = buildFixtureAgentImage } = {},
+) {
+  const all = [tags.agent, tags.harness];
+  for (const tag of all) ownTags.add(tag);
+  try {
+    const harness = buildHarnessImage({ tag: tags.harness });
+    const agent = buildAgent({ tag: tags.agent, harnessTag: tags.harness });
+    return { agent, proxy: harness, grader: harness, baseDigest: null };
+  } catch (error) {
+    removeTags(all);
+    throw error;
+  }
 }
 
 let images = null;
@@ -96,8 +114,17 @@ function fixtureImages() {
   return images;
 }
 
+let lock = null;
+before(async () => {
+  if (ENABLED) lock = await acquireDockerLock({ owner: RUN_ID });
+});
+
 after(() => {
-  if (images) removeTags(tagsOf(RUN_ID));
+  removeTags([...ownTags]);
+  if (lock && !releaseDockerLock(lock))
+    process.stderr.write(
+      'docker lock: expired before release; another suite may have run concurrently\n',
+    );
 });
 
 function dockerConfig(over = {}) {
@@ -713,10 +740,9 @@ test(
     const own = fixtureImages();
     const peerTags = tagsOf(`${RUN_ID}-peer`);
     assert.notDeepEqual(peerTags, tagsOf(RUN_ID));
-    let peer = null;
     try {
       // Another run's suite builds its fixture images on the same daemon.
-      peer = buildFixtureImages(peerTags);
+      buildFixtureImages(peerTags);
       for (const id of new Set([own.agent, own.proxy])) {
         const r = docker([
           'run',
@@ -731,10 +757,89 @@ test(
         assert.equal(r.status, 0, `${id}: ${r.stderr}`);
       }
     } finally {
-      if (peer) removeTags(peerTags);
+      removeTags([peerTags.agent, peerTags.harness]);
     }
     // The peer's cleanup removed only the peer's tags.
     for (const id of new Set([own.agent, own.proxy]))
       assert.equal(docker(['image', 'inspect', id]).status, 0, id);
+  },
+);
+
+test(
+  'a partial fixture build removes the tags it created',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  () => {
+    const tags = tagsOf(`${RUN_ID}-partial`);
+    assert.throws(
+      () =>
+        buildFixtureImages(tags, {
+          buildAgent: () => {
+            // The harness image exists, tagged, when the agent build fails.
+            assert.equal(docker(['image', 'inspect', tags.harness]).status, 0);
+            assert.ok(ownTags.has(tags.harness) && ownTags.has(tags.agent));
+            throw new Error('injected agent build failure');
+          },
+        }),
+      /injected agent build failure/,
+    );
+    assert.notEqual(docker(['image', 'inspect', tags.harness]).status, 0);
+    assert.notEqual(docker(['image', 'inspect', tags.agent]).status, 0);
+    assert.equal(ownTags.has(tags.harness) || ownTags.has(tags.agent), false);
+  },
+);
+
+test(
+  'the daemon-wide lock: exclusive, bounded wait, expires after a lost holder, released by id',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    // Its own lock name: the suite lock is held by this run.
+    const name = `pms-agentic-docker-test-lock-${RUN_ID}`;
+    const holders = [];
+    try {
+      const a = await acquireDockerLock({ owner: 'a', name, holdSeconds: 60 });
+      holders.push(a);
+      await assert.rejects(
+        acquireDockerLock({ owner: 'b', name, waitMs: 1500, pollMs: 200 }),
+        /still held by a until /,
+      );
+      assert.equal(releaseDockerLock(a), true);
+      const b = await acquireDockerLock({
+        owner: 'b',
+        name,
+        holdSeconds: 2,
+        waitMs: 5000,
+        pollMs: 200,
+      });
+      holders.push(b);
+      // b is lost (never released, as after SIGKILL): the daemon frees the
+      // lock when its hold ends.
+      const c = await acquireDockerLock({
+        owner: 'c',
+        name,
+        holdSeconds: 60,
+        waitMs: 30000,
+        pollMs: 200,
+      });
+      holders.push(c);
+      // b's late release cannot remove c's lock.
+      assert.equal(releaseDockerLock(b), false);
+      assert.equal(
+        docker(['container', 'inspect', '-f', '{{.Id}}', name]).stdout.trim(),
+        c.id,
+      );
+      assert.equal(
+        docker([
+          'container',
+          'inspect',
+          '-f',
+          '{{.HostConfig.NetworkMode}}',
+          c.id,
+        ]).stdout.trim(),
+        'none',
+      );
+    } finally {
+      for (const h of holders) releaseDockerLock(h);
+    }
+    assert.notEqual(docker(['container', 'inspect', name]).status, 0);
   },
 );
