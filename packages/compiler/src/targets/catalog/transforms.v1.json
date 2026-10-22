@@ -1,0 +1,45 @@
+{
+  "kind": "pandamstyle-transform-table",
+  "schemaVersion": 1,
+  "decision": "D-BP-07, D-BP-09 (docs/architecture/ce-01.2-transformation-stage.md)",
+  "policy": [
+    "Every rewrite the compiler applies to emitted CSS is an entry here; the stage applies nothing else. The rewrite takes no target, host, file or ordering input, so CSS bytes never depend on targets.",
+    "kind prefix-alias: a declaration of `property` whose value is in `values` is preceded, in the same declaration block, by `variant` with the identical value. The standard form stays last, so an engine that parses both uses it.",
+    "An entry requires: the variant is, on every announced engine at the O13 floor, an alias of the base (CE-00.1 vendor-legacy-variant, never divergent-legacy-variant), the only form, or dropped at parse time; every admitted value of the base is in `values`; and a proof with a rationale, fixture ids and the evidence classes executed and deferred.",
+    "A renamed value (an alternative name such as -webkit-fill-available) is never a prefix alias."
+  ],
+  "entries": [
+    {
+      "id": "prefix-alias:user-select:-webkit-",
+      "kind": "prefix-alias",
+      "property": "user-select",
+      "variant": "-webkit-user-select",
+      "prefix": "-webkit-",
+      "values": ["auto", "text", "none", "all"],
+      "proof": {
+        "rationale": "BCD 8.1.6 records unprefixed user-select on Chromium 54+, Firefox 69+ and Firefox Android 79+, and only in preview on Safari; -webkit-user-select ships on every announced engine at the O13 floor (Chrome 1, Chrome Android 18, Edge 12, WebView 4.4, Firefox and Firefox Android 49, Safari and iOS Safari 3). CE-00.1 classifies -webkit-user-select as vendor-legacy-variant of user-select (docs/research/core-evolution-registry.v1.json). Where both parse they are one property, so the pair in one block keeps the rule's selector, specificity, layer and order position: the cascade picks the same rule for both. Every value of the shared subset is paired, so a descendant's own value overrides an ancestor's value in both forms even if an engine inherits the prefixed form.",
+        "fixtures": [
+          "TX-1 user-select pair",
+          "TX-1b user-select descendant override"
+        ],
+        "evidence": {
+          "executed": [
+            {
+              "class": "E4",
+              "engines": ["chrome"],
+              "test": "packages/compiler/__tests__/pandamstyle/targets-transform-browser-test.js"
+            }
+          ],
+          "deferred": [
+            {
+              "class": "E4",
+              "engines": ["safari", "safari_ios"],
+              "issue": 81,
+              "check": "Whether WebKit treats -webkit-user-select as inherited, and that a descendant's paired value overrides an ancestor's none (computed value and selection behavior)."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

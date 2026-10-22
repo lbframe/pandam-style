@@ -21,7 +21,9 @@ export function parseVersion(value) {
   if (value == null) return { kind: 'null' };
   if (value === 'preview') return { kind: 'preview' };
   if (typeof value !== 'string') return { kind: 'null' };
-  const ranged = value.startsWith('≤');
+  // Escaped: one non-Latin-1 character makes V8 hold the whole bundle source
+  // as a two-byte string, doubling what the loaded compiler keeps.
+  const ranged = value.startsWith('\u2264');
   const text = ranged ? value.slice(1) : value;
   if (!/^\d+(\.\d+)*$/.test(text)) return { kind: 'null' };
   return {

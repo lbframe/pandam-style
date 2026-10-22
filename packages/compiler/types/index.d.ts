@@ -56,7 +56,7 @@ export interface TargetProfileDefinition {
 export interface TargetEnhancementPolicy {
   /** A feature key of emitted CSS, e.g. `selector::has` or `value:text-wrap/pretty`. */
   readonly feature: string;
-  /** CE-01.1 accepts `degrade`; `alternative-value` emission is CE-01.2. */
+  /** `degrade` only; `alternative-value` emission is deferred to CE-07.3 (#62). */
   readonly fallback: { readonly kind: 'degrade'; readonly note?: string };
 }
 

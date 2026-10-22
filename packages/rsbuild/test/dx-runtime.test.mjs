@@ -12,7 +12,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { createRsbuild } from '@rsbuild/core';
+import { createRequire } from 'node:module';
 import { pandamstyle } from '../src/index.js';
+
+const { declarationEquivalence, normalizeCss } = createRequire(import.meta.url)(
+  '../../../tools/pms/css-equivalence.cjs',
+);
 
 test('real Rsbuild/Rspack composes authored JavaScript and extracted CSS source maps', async (t) => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'pms15d-rsbuild-'));
@@ -140,4 +145,100 @@ test('the plugin forwards `targets` to the Project Service (CE-01.1)', async (t)
       excluded: 0,
     },
   ]);
+});
+
+test('a host browserslist cannot redefine the delivered stylesheet (CE-01.2)', async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'pms-ce012-rsbuild-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  await fs.symlink(
+    fileURLToPath(new URL('../../../node_modules', import.meta.url)),
+    path.join(root, 'node_modules'),
+    'dir',
+  );
+  await fs.mkdir(path.join(root, 'src'));
+  await fs.mkdir(path.join(root, 'app'));
+  await fs.writeFile(path.join(root, 'package.json'), '{"type":"module"}');
+  await fs.writeFile(
+    path.join(root, 'src/index.js'),
+    "import { create, props } from '../generated/design.js';\nconst styles = create({ box: { display: 'flex', userSelect: 'none' } });\ndocument.body.setAttribute('class', props(styles.box).className);\n",
+  );
+  // Application CSS outside the PandamStyle roots keeps Rsbuild's treatment.
+  await fs.writeFile(
+    path.join(root, 'app/app.css'),
+    '.app { color: red; -webkit-user-select: none; user-select: none; }\n',
+  );
+  const delivered = async (output) => {
+    const instance = await createRsbuild({
+      cwd: root,
+      rsbuildConfig: {
+        mode: 'production',
+        source: {
+          entry: { index: './src/index.js' },
+          preEntry: ['./app/app.css'],
+        },
+        output,
+        plugins: [
+          pandamstyle({
+            definition: {
+              systemId: 'rsbuild-ce012@1',
+              tokens: {},
+              themes: {},
+              recipes: {},
+              conditions: {},
+            },
+            roots: ['src'],
+            outDir: 'generated',
+            designSystemFile: 'design.js',
+          }),
+        ],
+      },
+    });
+    const result = await instance.build();
+    try {
+      assert.equal(result.stats.hasErrors(), false);
+    } finally {
+      await result.close();
+    }
+    const html = await fs.readFile(path.join(root, 'dist/index.html'), 'utf8');
+    const links = [...html.matchAll(/href="\/?([^"]+\.css)"/g)].map(
+      (m) => m[1],
+    );
+    const files = await Promise.all(
+      links.map((file) => fs.readFile(path.join(root, 'dist', file), 'utf8')),
+    );
+    return { links, files };
+  };
+  for (const output of [{}, { overrideBrowserslist: ['chrome >= 100'] }]) {
+    const { links, files } = await delivered(output);
+    const canonical = await fs.readFile(
+      path.join(root, 'generated/styles.css'),
+      'utf8',
+    );
+    assert.ok(canonical.includes('-webkit-user-select:none;user-select:none'));
+    // One delivered asset, as before: frameworks link CSS per JS chunk.
+    assert.equal(links.length, 1, JSON.stringify(links));
+    const rules = normalizeCss(files[0]);
+    // `.app` as the normaliser's token keys.
+    const appSelector = JSON.stringify([
+      JSON.stringify(['delim-token', '.']),
+      JSON.stringify(['ident-token', 'app']),
+    ]);
+    const isApp = (rule) => rule.rule?.includes(appSelector) === true;
+    const app = rules.filter(isApp);
+    const ours = rules.filter((rule) => !isApp(rule));
+    assert.deepEqual(ours, normalizeCss(canonical));
+    // The application's CSS still follows its own browserslist.
+    assert.equal(app.length, 1);
+    assert.equal(
+      app[0].declarations.some(([name]) => name === '-webkit-user-select'),
+      output.overrideBrowserslist == null,
+      JSON.stringify(app[0]),
+    );
+    // The stylesheet text itself is declaration-equivalent.
+    const own = files[0].slice(
+      files[0].indexOf('/* pandamstyle-design-system'),
+    );
+    const result = declarationEquivalence(canonical, own);
+    assert.equal(result.equivalent, true, JSON.stringify(result.difference));
+  }
 });

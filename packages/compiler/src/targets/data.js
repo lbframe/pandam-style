@@ -85,9 +85,11 @@ const PATH_KEY = /"(css\.[^"\\]*)":\{/g;
 /**
  * Locates every entry of the `paths` object without parsing it: path -> the
  * [start, end) of its value. Returns null when the text is not shaped as
- * expected, and the caller parses it whole instead.
+ * expected, and the caller parses it whole instead. `keyAt(start, end)` reads
+ * a key: a slice of the scan text would be a V8 sliced string that keeps the
+ * whole scan text alive for as long as the key lives.
  */
-function scanPaths(text) {
+function scanPaths(text, keyAt) {
   const key = text.indexOf('"paths"');
   if (key === -1) return null;
   let i = skipSpace(text, key + 7);
@@ -98,10 +100,18 @@ function scanPaths(text) {
   const starts = [];
   PATH_KEY.lastIndex = objectStart;
   for (let match; (match = PATH_KEY.exec(text)) != null; ) {
-    starts.push([match[1], match.index, PATH_KEY.lastIndex - 1]);
+    const keyStart = match.index + 1;
+    starts.push([
+      keyAt(keyStart, keyStart + match[1].length),
+      match.index,
+      PATH_KEY.lastIndex - 1,
+    ]);
   }
   if (starts.length === 0) return null;
+  // path -> its index in `spans`, which holds [start, end) pairs: one typed
+  // array instead of a two-element array per entry.
   const offsets = new Map();
+  const spans = new Uint32Array(starts.length * 2);
   for (let k = 0; k < starts.length; k += 1) {
     const [path, , valueStart] = starts[k];
     // A value ends at the comma before the next key, or for the last one at
@@ -118,12 +128,13 @@ function scanPaths(text) {
       valueEnd = skipComposite(text, valueStart);
       if (valueEnd === -1) return null;
     }
-    offsets.set(path, [valueStart, valueEnd]);
+    spans[k * 2] = valueStart;
+    spans[k * 2 + 1] = valueEnd;
+    offsets.set(path, k);
   }
-  const last = starts.at(-1);
-  const close = skipSpace(text, offsets.get(last[0])[1]);
+  const close = skipSpace(text, spans[offsets.get(starts.at(-1)[0]) * 2 + 1]);
   if (text.charCodeAt(close) !== CLOSE_BRACE) return null;
-  return { offsets, objectStart, objectEnd: close + 1 };
+  return { offsets, spans, objectStart, objectEnd: close + 1 };
 }
 
 /**
@@ -138,6 +149,7 @@ function sourceOf(input) {
   if (typeof input === 'string') {
     return {
       scanText: input,
+      key: (start, end) => input.slice(start, end),
       read: (start, end) => input.slice(start, end),
       contains: (start, end, needle) =>
         input.slice(start, end).includes(needle),
@@ -146,6 +158,8 @@ function sourceOf(input) {
   const bytes = input;
   return {
     scanText: bytes.toString('latin1'),
+    // The scan text's characters, as a string of their own.
+    key: (start, end) => bytes.toString('latin1', start, end),
     read: (start, end) => bytes.toString('utf8', start, end),
     contains: (start, end, needle) =>
       bytes.subarray(start, end).indexOf(needle, 0, 'utf8') !== -1,
@@ -164,7 +178,7 @@ function load(input, knownDigest = null) {
     'sha256:' + crypto.createHash('sha256').update(input).digest('hex');
   const source = sourceOf(input);
   const length = typeof input === 'string' ? input.length : input.byteLength;
-  const scanned = scanPaths(source.scanText);
+  const scanned = scanPaths(source.scanText, source.key);
   // Only the scan reads the whole text.
   source.scanText = null;
   const raw =
@@ -186,25 +200,26 @@ function load(input, knownDigest = null) {
     scanned == null
       ? new Map(Object.keys(raw.paths).map((path) => [path, null]))
       : scanned.offsets;
+  const spans = scanned?.spans ?? null;
   const parsed = new Map();
   const entry = (bcdPath) => {
     if (!offsets.has(bcdPath)) return null;
     let value = parsed.get(bcdPath);
     if (value === undefined) {
-      const span = offsets.get(bcdPath);
+      const at = offsets.get(bcdPath);
       value =
-        span == null
+        at == null
           ? raw.paths[bcdPath]
-          : JSON.parse(source.read(span[0], span[1]));
+          : JSON.parse(source.read(spans[at * 2], spans[at * 2 + 1]));
       parsed.set(bcdPath, value);
     }
     return value;
   };
   const contains = (bcdPath, needle) => {
-    const span = offsets.get(bcdPath);
-    return span == null
+    const at = offsets.get(bcdPath);
+    return at == null
       ? JSON.stringify(raw.paths[bcdPath]).includes(needle)
-      : source.contains(span[0], span[1], needle);
+      : source.contains(spans[at * 2], spans[at * 2 + 1], needle);
   };
   let children = null;
   return Object.freeze({

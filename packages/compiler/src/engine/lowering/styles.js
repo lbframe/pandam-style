@@ -29,6 +29,7 @@ import {
 } from '../../design-system/policy/properties';
 // Benchmark-only measurement hooks (Spike 1).
 import { count, perfCollector } from '../../observability/metrics';
+import { applyTransforms } from '../../targets/transforms';
 
 // Stable variable identity: systemId + tokenId (D-03). The upstream hash
 // is computed over `${exportId}.${key}`, independent of the checkout path.
@@ -544,5 +545,5 @@ export function renderCss(injectedByKey) {
     priority: s.priority ?? 0,
   }));
   entries.sort((a, b) => a.priority - b.priority);
-  return entries.map((e) => e.ltr).join('\n');
+  return entries.map((e) => applyTransforms(e.ltr)).join('\n');
 }

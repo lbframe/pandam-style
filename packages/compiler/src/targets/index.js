@@ -97,3 +97,13 @@ export {
   evidenceProblems,
   evidenceSupports,
 } from './evidence';
+export {
+  TRANSFORM_KINDS,
+  TRANSFORM_TABLE_KIND,
+  applyTransforms,
+  compileTransformTable,
+  transformOfProperty,
+  transformOfVariant,
+  transformTable,
+  transformTableProblems,
+} from './transforms';

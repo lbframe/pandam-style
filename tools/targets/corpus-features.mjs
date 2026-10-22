@@ -164,9 +164,11 @@ export async function emittedCss(workloadId) {
 export async function collectFeatureUses({ includeEmitted = true } = {}) {
   const inspection = loadInspection();
   const t = inspection.targets;
+  // Every input is read as the compiler would emit it: through the CE-01.2
+  // transformation stage (idempotent on already emitted CSS).
   const toUses = (css, attribution, dedupe = true, grammars = null) =>
     t
-      .extractConstructs(css, { dedupe, grammars })
+      .extractConstructs(t.applyTransforms(css), { dedupe, grammars })
       .flatMap(({ construct, context }) =>
         t.featuresOf(construct).map((record) => ({
           feature: record.feature,
