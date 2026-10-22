@@ -41,7 +41,9 @@ digest-bound identity of the baseline. It records:
 Some system browsers float and are not pinned: `/usr/local/bin/chromium` and
 `/opt/google/chrome/chrome`, which the Alpha 1 qualification scripts launch
 unless `PMS_CHROMIUM` is set. The manifest records their observed versions as
-unpinned. A reproduction sets `PMS_CHROMIUM` to the archived engine.
+unpinned. A reproduction sets `PMS_CHROMIUM` to the archived engine and
+`PMS_BROWSER_PIN` to its pin; see
+[Browser evidence on the archived engine](#browser-evidence-on-the-archived-engine).
 
 ### Store and reconstruction
 
@@ -115,6 +117,69 @@ regression test for this class.
 - The offline replay was sound throughout: npm checks every tarball against the
   lockfile integrity, and the reinstalled tree digest was compared with the
   manifest.
+
+### Browser evidence on the archived engine
+
+[`epochs/alpha1/browser.v1.json`](epochs/alpha1/browser.v1.json) pins the
+identity that the archived Chromium engine reports: `Google Chrome for Testing
+148.0.7778.96`. The manifest binds the engine bytes; this record is a separate
+versioned file, and the manifest is unchanged. A tooling test checks that the
+pin names the manifest's `chromium` engine and its `browserVersion`.
+
+Run a qualification harness against the archived engine from the repository
+root:
+
+```sh
+PMS_CHROMIUM=<store>/engines/ms-playwright/chromium-1223/chrome-linux64/chrome \
+PMS_BROWSER_PIN=benchmarks/core-evolution/epochs/alpha1/browser.v1.json \
+  node tools/semantic-oracle/run.js .pms-bench/<dir>
+```
+
+The same variables apply to `tools/pms/qualify-next.mjs` and
+`tools/pilot/run-rsbuild-qualification.js`. Each harness records `browser`
+(executable, product, version, `expected` and `pin`) in its report. It stops
+before any case or build if the binary reports another identity.
+
+**First runs (#94), 2026-10-21, at `03f1bfd` plus this change [executed].**
+
+- **Engine bytes.** Before the runs, the engine trees were recomputed read-only
+  with `fileTreeDigest` and `ENGINE_FILES` from `tools/baselines/archive.mjs`.
+  Both match the manifest: `chromium` `f003730a…` (303 files) and
+  `chromium-headless-shell` `d8c653b0…` (287 files).
+- **Identity.** All three harnesses recorded `Google Chrome for Testing
+  148.0.7778.96` with `matchesExpected: true` against the alpha1 pin.
+- **Semantic oracle.** 148 of 154 tests passed. The 6 `browser.*` cases failed,
+  and `failedCount` is 6. Each of those cases aborts with `FATAL
+  zygote_host_impl_linux.cc:128 No usable sandbox!`.
+- **Rsbuild qualification.** The run stops at its first browser launch
+  (`chromiumSandbox: true`) with the same abort.
+- **Next qualification.** It launches with `--no-sandbox`, so it runs on the
+  archived engine. The production lanes passed. The Turbopack semantic-dev
+  matrix failed in two runs, each time with "unobserved condition" browser
+  timeouts on different rows: 2 of 80, then 10 of 80. A control run with the
+  workstation's Google Chrome 145.0.7632.116 passed that matrix 80 of 80. It
+  then failed the readiness assertion of the performance report
+  (`nextReadyObservedAt`). Other jobs loaded the workstation during these
+  runs, with a load average from 7 to 20 on 16 threads. These runs do not show
+  whether the matrix failures come from the engine or from the load.
+  **[unresolved]**
+
+**Cause of the sandbox abort.** The cause is the same as F2 in the
+[CI repair record](../../docs/research/core-evolution-ci-repair.md). Ubuntu
+24.04 sets `kernel.apparmor_restrict_unprivileged_userns = 1`. Only binaries
+with an AppArmor profile that grants `userns` can create the browser sandbox.
+Google Chrome has such a profile for `/opt/google/chrome/chrome`; the store
+path has none. The store is read-only, so its `chrome_sandbox` SUID helper is
+not installed.
+
+**Remaining work.** It is not done in this repository, because it needs host
+access or a change in launch policy:
+
+- Grant `userns` to the store's engine path with a host AppArmor profile, of
+  the same form as Chrome's. This keeps the harness launch flags and the
+  sandbox unchanged.
+- Rerun the Next qualification on an otherwise idle host, to settle the
+  Turbopack matrix result.
 
 ## Executable baseline and agentic-optimizations reuse
 
