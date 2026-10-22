@@ -16,10 +16,30 @@
 const QUALIFIED_ELEMENT_TIMEOUT_MS = 30000;
 const BODY_EXCERPT_CHARS = 600;
 const RENAVIGATION_INTERVAL_MS = 500;
+// A failure is reported promptly even while a navigation is still in flight:
+// reading the document waits for that navigation otherwise.
+const DOCUMENT_READ_TIMEOUT_MS = 1000;
 // The document navigated itself during page.goto, such as a Fast Refresh
 // full reload.
 const SELF_NAVIGATION_ERROR =
   /net::ERR_ABORTED|Navigating frame was detached|Not attached to an active page/;
+// Absolute local paths in page text: file:// URLs, Windows drive and UNC
+// paths, and Unix paths of two or more segments that start a token. A URL's
+// own path follows its host, so it does not start a token and is kept.
+const LOCAL_PATHS = [
+  /file:\/\/[^\s"'`<>()]*/gi,
+  /(?<![A-Za-z0-9])[A-Za-z]:[\\/][^\s"'`<>()]*/g,
+  /\\\\[^\s"'`<>()]+/g,
+  /(?<=^|[\s"'`(=,[{>])\/[^\s"'`<>()/]+(?:\/[^\s"'`<>()]*)+/g,
+];
+
+// Report text is published as a CI artifact; page text can name local files.
+function redactLocalPaths(text) {
+  return LOCAL_PATHS.reduce(
+    (value, pattern) => value.replace(pattern, '<path>'),
+    text,
+  );
+}
 
 // Records the last main-frame document response, including reloads the page
 // performs by itself, such as a Fast Refresh full reload.
@@ -40,8 +60,9 @@ function trackDocumentResponses(page) {
 async function describeDocument(page, selectors) {
   let missing = selectors;
   let excerpt;
+  let timer;
   try {
-    ({ missing, excerpt } = await page.evaluate(
+    const read = page.evaluate(
       (candidates, limit) => ({
         missing: candidates.filter(
           (selector) => document.querySelector(selector) == null,
@@ -55,11 +76,28 @@ async function describeDocument(page, selectors) {
       }),
       selectors,
       BODY_EXCERPT_CHARS,
-    ));
+    );
+    read.catch(() => {});
+    ({ missing, excerpt } = await Promise.race([
+      read,
+      new Promise((resolve, reject) => {
+        timer = setTimeout(
+          () =>
+            reject(
+              new Error(
+                `not readable within ${DOCUMENT_READ_TIMEOUT_MS} ms (navigation in flight)`,
+              ),
+            ),
+          DOCUMENT_READ_TIMEOUT_MS,
+        );
+      }),
+    ]));
   } catch (error) {
     excerpt = `<document unreadable: ${error.message}>`;
+  } finally {
+    clearTimeout(timer);
   }
-  return { missing, excerpt };
+  return { missing, excerpt: redactLocalPaths(excerpt) };
 }
 
 function documentSummary(page, documents, excerpt) {
@@ -98,36 +136,54 @@ async function gotoQualified(
 ) {
   const deadline = Date.now() + timeout;
   const transient = [];
+  let status = null;
+  const unavailable = async (reason, cause) => {
+    const { excerpt } = await describeDocument(page, []);
+    return qualifiedDocumentError(page, documents, {
+      excerpt,
+      status,
+      transient,
+      reason,
+      cause,
+    });
+  };
   for (;;) {
-    let status = null;
+    // Every attempt, and every pause, ends by the deadline.
+    const remaining = deadline - Date.now();
+    if (remaining <= 0)
+      throw await unavailable(`not served within ${timeout} ms`);
+    status = null;
     try {
-      status = (await page.goto(url))?.status() ?? null;
+      status = (await page.goto(url, { timeout: remaining }))?.status() ?? null;
     } catch (error) {
+      if (error.name === 'TimeoutError' || Date.now() >= deadline)
+        throw await unavailable(`not served within ${timeout} ms`, error);
       if (!SELF_NAVIGATION_ERROR.test(error.message)) throw error;
       transient.push(error.message.split('\n')[0]);
     }
+    // A document observed after the deadline is not accepted.
+    if (Date.now() > deadline)
+      throw await unavailable(`not served within ${timeout} ms`);
     if (status === 200)
       return { url, renavigations: transient.length, transient };
-    if (status != null && status < 500) {
-      const { excerpt } = await describeDocument(page, []);
-      throw qualifiedDocumentError(page, documents, excerpt, status, transient);
-    }
+    if (status != null && status < 500)
+      throw await unavailable('non-transient status');
     if (status != null) transient.push(status);
-    if (Date.now() >= deadline) {
-      const { excerpt } = await describeDocument(page, []);
-      throw qualifiedDocumentError(page, documents, excerpt, status, transient);
-    }
-    await new Promise((resolve) =>
-      setTimeout(resolve, RENAVIGATION_INTERVAL_MS),
-    );
+    const pause = Math.min(RENAVIGATION_INTERVAL_MS, deadline - Date.now());
+    if (pause > 0) await new Promise((resolve) => setTimeout(resolve, pause));
   }
 }
 
-function qualifiedDocumentError(page, documents, excerpt, status, transient) {
+function qualifiedDocumentError(
+  page,
+  documents,
+  { excerpt, status, transient, reason, cause },
+) {
   const error = new Error(
-    `Qualified document not served: last status ${status ?? 'none'} after ` +
+    `Qualified document not served (${reason}): last status ${status ?? 'none'} after ` +
       `${transient.length} re-navigation(s) ${JSON.stringify(transient)}; ` +
       documentSummary(page, documents, excerpt),
+    cause == null ? undefined : { cause },
   );
   error.code = 'PMS_QUALIFIED_DOCUMENT_UNAVAILABLE';
   return error;
@@ -171,6 +227,8 @@ module.exports = {
   QUALIFIED_ELEMENT_TIMEOUT_MS,
   BODY_EXCERPT_CHARS,
   RENAVIGATION_INTERVAL_MS,
+  DOCUMENT_READ_TIMEOUT_MS,
+  redactLocalPaths,
   trackDocumentResponses,
   gotoQualified,
   readComputedStyles,

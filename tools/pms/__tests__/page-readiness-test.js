@@ -13,6 +13,7 @@ const {
   QUALIFIED_ELEMENT_TIMEOUT_MS,
   BODY_EXCERPT_CHARS,
   RENAVIGATION_INTERVAL_MS,
+  DOCUMENT_READ_TIMEOUT_MS,
   trackDocumentResponses,
   gotoQualified,
   readComputedStyles,
@@ -33,12 +34,28 @@ function fakePage({ url = 'http://localhost:3000/', body = '' } = {}) {
     mainFrame: () => mainFrame,
     url: () => url,
     // Each goto takes the next planned outcome (the last one repeats): an
-    // HTTP status, or an Error thrown by the navigation.
+    // HTTP status, an Error thrown by the navigation, or { status, ms } for a
+    // navigation that takes ms. Like puppeteer, a navigation longer than its
+    // timeout option fails with a TimeoutError, unless ignoresTimeout is set.
     plan: [200],
     gotos: 0,
-    async goto(target) {
-      const outcome = page.plan[Math.min(page.gotos++, page.plan.length - 1)];
+    gotoTimeouts: [],
+    async goto(target, { timeout } = {}) {
+      page.gotoTimeouts.push(timeout);
+      let outcome = page.plan[Math.min(page.gotos++, page.plan.length - 1)];
       if (outcome instanceof Error) throw outcome;
+      if (typeof outcome === 'object') {
+        const { status, ms } = outcome;
+        if (!page.ignoresTimeout && timeout != null && ms > timeout) {
+          await new Promise((resolve) => setTimeout(resolve, timeout));
+          throw Object.assign(
+            new Error(`Navigation timeout of ${timeout} ms exceeded`),
+            { name: 'TimeoutError' },
+          );
+        }
+        await new Promise((resolve) => setTimeout(resolve, ms));
+        outcome = status;
+      }
       response(page, { url: target, status: outcome });
       return { status: () => outcome };
     },
@@ -56,6 +73,8 @@ function fakePage({ url = 'http://localhost:3000/', body = '' } = {}) {
       page.afterWait?.(selector);
     },
     async evaluate(fn, ...args) {
+      // A navigation that never commits: the read never settles.
+      if (page.evaluateHangs) return new Promise(() => {});
       if (page.evaluateError) throw page.evaluateError;
       const previous = [globalThis.document, globalThis.getComputedStyle];
       globalThis.document = {
@@ -253,6 +272,143 @@ test('a 500 that persists until the bound fails with URL, status and body excerp
   expect(error.message).toContain('HTTP status 500');
   expect(error.message).toContain('Unexpected end of JSON input');
   expect(page.gotos).toBeGreaterThan(1);
+});
+
+test('each navigation is bounded by the time left before the deadline', async () => {
+  const page = fakePage();
+  page.plan = [{ status: 200, ms: 80 }];
+  const started = Date.now();
+  const error = await gotoQualified(
+    page,
+    trackDocumentResponses(page),
+    'http://localhost:3000/',
+    20,
+  ).catch((value) => value);
+  expect(error.code).toBe('PMS_QUALIFIED_DOCUMENT_UNAVAILABLE');
+  expect(error.message).toContain('not served within 20 ms');
+  expect(error.cause.name).toBe('TimeoutError');
+  expect(page.gotoTimeouts).toHaveLength(1);
+  expect(page.gotoTimeouts[0]).toBeGreaterThan(0);
+  expect(page.gotoTimeouts[0]).toBeLessThanOrEqual(20);
+  expect(Date.now() - started).toBeLessThan(80);
+});
+
+test('a 200 document observed after the deadline is rejected', async () => {
+  const page = fakePage();
+  page.ignoresTimeout = true;
+  page.plan = [{ status: 200, ms: 80 }];
+  const error = await gotoQualified(
+    page,
+    trackDocumentResponses(page),
+    'http://localhost:3000/',
+    20,
+  ).catch((value) => value);
+  expect(error.code).toBe('PMS_QUALIFIED_DOCUMENT_UNAVAILABLE');
+  expect(error.message).toContain('not served within 20 ms');
+  expect(error.message).toContain('last status 200');
+});
+
+test('the pause between navigations ends at the deadline', async () => {
+  const page = fakePage();
+  page.plan = [500, 200];
+  const started = Date.now();
+  const error = await gotoQualified(
+    page,
+    trackDocumentResponses(page),
+    'http://localhost:3000/',
+    20,
+  ).catch((value) => value);
+  expect(error.code).toBe('PMS_QUALIFIED_DOCUMENT_UNAVAILABLE');
+  expect(error.message).toContain('last status 500 after 1 re-navigation(s)');
+  expect(page.gotos).toBe(1);
+  expect(Date.now() - started).toBeLessThan(RENAVIGATION_INTERVAL_MS);
+});
+
+test('a deadline failure is reported even while the navigation is still in flight', async () => {
+  const page = fakePage();
+  page.plan = [{ status: 200, ms: 60000 }];
+  page.evaluateHangs = true;
+  const started = Date.now();
+  const error = await gotoQualified(
+    page,
+    trackDocumentResponses(page),
+    'http://localhost:3000/',
+    20,
+  ).catch((value) => value);
+  expect(error.code).toBe('PMS_QUALIFIED_DOCUMENT_UNAVAILABLE');
+  expect(error.message).toContain('not served within 20 ms');
+  expect(error.message).toContain(
+    `document unreadable: not readable within ${DOCUMENT_READ_TIMEOUT_MS} ms`,
+  );
+  expect(Date.now() - started).toBeLessThan(DOCUMENT_READ_TIMEOUT_MS + 500);
+});
+
+const UNIX_PATH = '/home/someone/project/app/shared.jsx:2:110';
+const WINDOWS_PATH = 'C:\\Users\\someone\\project\\app\\shared.jsx';
+const FILE_URL = 'file:///home/someone/project/.next/server/app/page.js';
+const PATH_BODY =
+  `ENOENT: no such file or directory, open '${UNIX_PATH}'\n` +
+  `at Page (${WINDOWS_PATH}:4:57) at ${FILE_URL}:1:2\n` +
+  'GET http://localhost:3000/_next/static/chunks/main.js 500';
+
+function expectRedacted(message) {
+  for (const local of ['/home/someone', 'Users', 'someone', 'file://'])
+    expect(message).not.toContain(local);
+  expect(message).toContain('<path>');
+  expect(message).toContain(
+    'http://localhost:3000/_next/static/chunks/main.js',
+  );
+}
+
+test('local paths in a missing-element excerpt are redacted', async () => {
+  const page = fakePage({ body: PATH_BODY });
+  const error = await readComputedStyles(
+    page,
+    trackDocumentResponses(page),
+    READS,
+    10,
+  ).catch((value) => value);
+  expect(error.code).toBe('PMS_QUALIFIED_ELEMENT_MISSING');
+  expectRedacted(error.message);
+});
+
+test('local paths in an unavailable-document excerpt are redacted', async () => {
+  const page = fakePage({ body: PATH_BODY });
+  page.plan = [404];
+  const error = await gotoQualified(
+    page,
+    trackDocumentResponses(page),
+    'http://localhost:3000/',
+  ).catch((value) => value);
+  expect(error.code).toBe('PMS_QUALIFIED_DOCUMENT_UNAVAILABLE');
+  expectRedacted(error.message);
+});
+
+test('local paths in an unreadable-document diagnostic are redacted', async () => {
+  for (const local of [UNIX_PATH, WINDOWS_PATH, FILE_URL]) {
+    const page = fakePage();
+    page.evaluateError = new Error(`Protocol error at ${local}`);
+    page.plan = [404];
+    const error = await gotoQualified(
+      page,
+      trackDocumentResponses(page),
+      'http://localhost:3000/',
+    ).catch((value) => value);
+    expect(error.message).toContain(
+      'document unreadable: Protocol error at <path>',
+    );
+    expect(error.message).not.toContain('someone');
+    const missing = await readComputedStyles(
+      page,
+      trackDocumentResponses(page),
+      READS,
+      10,
+    ).catch((value) => value);
+    expect(missing.message).toContain(
+      'document unreadable: Protocol error at <path>',
+    );
+    expect(missing.message).not.toContain('someone');
+  }
 });
 
 test('a non-transient status fails at once without re-navigation', async () => {
