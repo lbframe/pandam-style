@@ -176,7 +176,10 @@ export function compileSchema(schema, position, path = [], parent = null) {
   const has = (type) => types.includes(type);
   const allowed = new Set(['type', 'description']);
   if (schema.format != null) {
-    const format = FORMATS[schema.format];
+    const format =
+      typeof schema.format === 'string' && Object.hasOwn(FORMATS, schema.format)
+        ? FORMATS[schema.format]
+        : null;
     if (format == null) fail(path, `format ${schema.format} is closed`);
     if (!has(format.type))
       fail(path, `format ${schema.format} needs ${format.type}`);

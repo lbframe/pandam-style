@@ -7,6 +7,7 @@
 
 import {
   agentPage,
+  continuation,
   envelopePage,
   pack,
   pageWindow,
@@ -14,15 +15,10 @@ import {
   rejectRequest,
 } from './pages.js';
 
-function nextReferences(ctx, operation, input, packed, rev) {
+function nextReferences(ctx, operation, limit, packed, rev) {
   const references = [];
-  if (packed.truncated) {
-    references.push({
-      operation,
-      view: ctx.view,
-      input: { ...input, page: { offset: packed.nextOffset, limit: 256 } },
-    });
-  }
+  if (packed.truncated)
+    references.push(continuation(ctx, operation, packed.nextOffset, limit));
   if (packed.withheld.length > 0)
     references.push(readReference(ctx.view, rev, packed.withheld[0]));
   return references;
@@ -71,7 +67,7 @@ export async function diagnosticsCandidates(ctx) {
     references: nextReferences(
       ctx,
       'diagnostics.candidates',
-      { rev, domain },
+      limit,
       packed,
       rev,
     ),
@@ -99,12 +95,6 @@ export async function diagnosticsAffected(ctx) {
     result: { page: agentPage('affected', offset, packed, value.total) },
     page: envelopePage(offset, limit, packed, value.total),
     withheld: packed.withheld,
-    references: nextReferences(
-      ctx,
-      'diagnostics.affected',
-      { rev },
-      packed,
-      rev,
-    ),
+    references: nextReferences(ctx, 'diagnostics.affected', limit, packed, rev),
   };
 }

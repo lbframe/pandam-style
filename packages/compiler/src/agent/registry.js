@@ -17,7 +17,7 @@ import {
 import { DENIAL_REASONS, GRANTS } from './capabilities.js';
 import { HANDLERS } from './handlers/index.js';
 import { describeOperation } from './handlers/operations.js';
-import { recordInfo } from '../protocol/envelope.js';
+import { own, ownIndex, recordInfo } from '../protocol/envelope.js';
 import { compileSchema, maxJsonBytes } from './schema.js';
 import {
   AGENT_PAGE,
@@ -32,6 +32,7 @@ import {
   int,
   nullable,
   obj,
+  oneOf,
   PAGE_INPUT,
   RECORD_ADDRESS,
   REVISION_INPUT,
@@ -1132,27 +1133,27 @@ const ENTRIES = [
 
 // ---------------------------------------------------------- the frame -----
 
-const REFERENCE = obj(
-  {
-    operation: enumOf([
-      'check',
-      'diagnostics.candidates',
-      'diagnostics.affected',
-      'records.read',
-      'protocol.operations',
-    ]),
-    view: enumOf(VIEWS),
-    input: obj(
-      {
-        rev: nullable(REVISION_OUTPUT),
-        page: CHUNK_PAGE_INPUT,
-        domain: CANDIDATE_DOMAIN,
-        address: RECORD_ADDRESS,
-      },
-      [],
-    ),
-  },
-  ['operation', 'view', 'input'],
+const REFERENCE_TARGETS = [
+  'check',
+  'diagnostics.candidates',
+  'diagnostics.affected',
+  'records.read',
+  'protocol.operations',
+];
+
+/**
+ * A reference is a request to an implemented operation: each branch carries
+ * that operation's own input schema, so a continuation can hold every
+ * selector of its originating request (R2), and is bounded by it.
+ */
+const REFERENCE = oneOf(
+  ...REFERENCE_TARGETS.map((name) =>
+    obj({
+      operation: constant(name),
+      view: enumOf(VIEWS),
+      input: ENTRIES.find((entry) => entry.name === name).input,
+    }),
+  ),
 );
 
 /**
@@ -1314,11 +1315,11 @@ function checkEntry(entry, handlers) {
 
   if (!Array.isArray(entry.effects) || entry.effects.length === 0)
     refuse(name, 'effects must be non-empty');
-  const allowed = GRANT_EFFECTS[grant ?? 'none'];
+  const allowed = own(GRANT_EFFECTS, grant ?? 'none');
   for (const effect of entry.effects) {
     if (!EFFECT_KINDS.includes(effect?.kind))
       refuse(name, 'effect kind is closed');
-    const details = EFFECT_DETAILS[effect.kind];
+    const details = own(EFFECT_DETAILS, effect.kind);
     if (
       details == null ? effect.detail != null : !details.includes(effect.detail)
     )
@@ -1330,9 +1331,9 @@ function checkEntry(entry, handlers) {
   if (!Array.isArray(entry.preconditions))
     refuse(name, 'preconditions is a list');
   for (const precondition of entry.preconditions) {
-    if (PRECONDITIONS[precondition?.id] == null)
+    if (own(PRECONDITIONS, precondition?.id) == null)
       refuse(name, 'precondition id is closed');
-    if (PRECONDITIONS[precondition.id] !== precondition.outcome)
+    if (own(PRECONDITIONS, precondition.id) !== precondition.outcome)
       refuse(name, `precondition ${precondition.id} has a fixed outcome`);
   }
 
@@ -1488,9 +1489,9 @@ export function createRegistry(entries = ENTRIES, handlers = HANDLERS) {
         maxJsonBytes(envelopeSchema(entry.output, operationNames)),
       ),
   );
-  const views = {};
+  const views = Object.create(null);
   for (const view of VIEWS) {
-    const defaults = VIEW_DEFAULTS[view];
+    const defaults = own(VIEW_DEFAULTS, view);
     // One failure record may sit in the frame (§3.10): it is bounded by the
     // record ceiling through the `classify()` fail-safe.
     const frameMax = frame + defaults.recordCeiling;
@@ -1518,7 +1519,7 @@ export function createRegistry(entries = ENTRIES, handlers = HANDLERS) {
   }
   return deepFreeze({
     entries: entries.map((entry) => entry),
-    byName: Object.fromEntries(entries.map((entry) => [entry.name, entry])),
+    byName: ownIndex(entries, (entry) => entry.name),
     names: operationNames,
     handlers,
     views,

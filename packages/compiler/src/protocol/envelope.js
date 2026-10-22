@@ -19,6 +19,25 @@ import { protocolDiagnostic } from './diagnostics-result-v1.js';
  */
 
 export const AGENT_PROTOCOL = 'pandamstyle-agent';
+
+/**
+ * The value `table` holds for `key` as an OWN property, else `undefined`.
+ * Every table indexed by request, definition or project data is read through
+ * this, so `constructor`, `__proto__` or `toString` never resolve to an
+ * inherited member (R1).
+ */
+export function own(table, key) {
+  return typeof key === 'string' && Object.hasOwn(table, key)
+    ? table[key]
+    : undefined;
+}
+
+/** A frozen null-prototype index of `entries` by `keyOf`. */
+export function ownIndex(entries, keyOf) {
+  const index = Object.create(null);
+  for (const entry of entries) index[keyOf(entry)] = entry;
+  return Object.freeze(index);
+}
 export const AGENT_PROTOCOL_VERSION = 1;
 
 export const OUTCOMES = Object.freeze([
@@ -145,7 +164,7 @@ function agentDiagnostic(error) {
     code: error.code,
     phase: 'agent',
     rule: `agent.${error.outcome}`,
-    message: AGENT_ERROR_MESSAGES[error.code],
+    message: own(AGENT_ERROR_MESSAGES, error.code),
     context: { reason: error.reason, ...error.context },
   });
 }
@@ -184,7 +203,7 @@ export function classifyError(error, { stage = 'execution' } = {}) {
     const base = { stage, precondition: null, capability: null, diagnostics };
     switch (first?.code) {
       case Codes.INVALID_REVISION: {
-        const outcome = INVALID_REVISION_OUTCOMES[reason];
+        const outcome = own(INVALID_REVISION_OUTCOMES, reason);
         if (outcome == null) break;
         return {
           ...base,
@@ -194,7 +213,7 @@ export function classifyError(error, { stage = 'execution' } = {}) {
             reason === 'design-system-unavailable' || stage === 'bootstrap'
               ? 'bootstrap'
               : stage,
-          precondition: PRECONDITION_OF_REASON[reason] ?? null,
+          precondition: own(PRECONDITION_OF_REASON, reason) ?? null,
           capability:
             reason === 'snapshot-disabled'
               ? 'feature:accepted-snapshots'
@@ -276,7 +295,7 @@ export function failureOf(classified) {
     reason: classified.reason,
     precondition: classified.precondition ?? null,
     capability: classified.capability ?? null,
-    retry: RETRY_OF_OUTCOME[classified.outcome],
+    retry: own(RETRY_OF_OUTCOME, classified.outcome),
   };
 }
 

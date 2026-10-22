@@ -69,6 +69,20 @@ export function envelopePage(offset, limit, packed, total) {
   };
 }
 
+/**
+ * The continuation of the request being answered: the same operation, view
+ * and input, every selector included, with only the page offset advanced
+ * (R2). It is built from the validated request snapshot, never rebuilt from
+ * parts, so a filter or a domain can never be dropped on the way.
+ */
+export function continuation(ctx, operation, nextOffset, limit) {
+  return {
+    operation,
+    view: ctx.view,
+    input: { ...ctx.input, page: { offset: nextOffset, limit } },
+  };
+}
+
 /** The `records.read` reference for a withheld record, at offset 0. */
 export function readReference(view, rev, withheld) {
   return {

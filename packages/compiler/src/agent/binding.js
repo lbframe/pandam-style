@@ -12,6 +12,7 @@ import {
   AGENT_PROTOCOL,
   buildEnvelope,
   classifyError,
+  own,
   failureDiagnostics,
   internalAgentError,
   OUTCOMES,
@@ -120,7 +121,7 @@ export async function createAgentBinding({
   checkHostBound('rootDir', paths.rootDir, BOUNDS.rootDir);
   checkHostBound('outDir', paths.outDir, BOUNDS.outDir);
 
-  const views = {};
+  const views = Object.create(null);
   for (const view of VIEWS) {
     const base = registry.views[view];
     const ceiling = limits?.[view]?.maxResponseBytes ?? base.maxResponseBytes;
@@ -346,7 +347,7 @@ export async function createAgentBinding({
         throw unsupported('protocol-version', 'protocol-version');
 
       // (2) The operation exists. (3) It is implemented and has the view.
-      entry = registry.byName[value.operation] ?? null;
+      entry = own(registry.byName, value.operation) ?? null;
       if (entry == null) {
         throw new AgentError({
           outcome: 'invalid-input',
@@ -417,7 +418,10 @@ export async function createAgentBinding({
       beforeStart?.();
 
       // (7) Execution, on the same snapshot that was validated.
-      const handled = await registry.handlers[entry.name]({
+      const handled = await own(
+        registry.handlers,
+        entry.name,
+      )({
         input,
         view,
         viewLimits,
@@ -427,7 +431,7 @@ export async function createAgentBinding({
         budget: { remaining: maxResponseBytes - viewLimits.frameMax },
         binding: { bootstrapFailure: () => bootstrap },
         grants: grantsOf(capability, key),
-        limitsOf: (name) => views[name],
+        limitsOf: (name) => own(views, name),
         vocabularies: VOCABULARIES,
       });
       return finish({

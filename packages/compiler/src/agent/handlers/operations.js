@@ -10,8 +10,15 @@ import {
   AgentError,
   AGENT_PROTOCOL,
   AGENT_PROTOCOL_VERSION,
+  own,
 } from '../../protocol/envelope.js';
-import { agentPage, envelopePage, pack, pageWindow } from './pages.js';
+import {
+  agentPage,
+  continuation,
+  envelopePage,
+  pack,
+  pageWindow,
+} from './pages.js';
 
 /**
  * One operation's description, rendered from its registry entry only (I7).
@@ -67,7 +74,10 @@ export async function protocolOperations(ctx) {
     });
   }
   const names = input.names ?? null;
-  if (names != null && !names.every((name) => registry.byName[name] != null)) {
+  if (
+    names != null &&
+    !names.every((name) => own(registry.byName, name) != null)
+  ) {
     throw new AgentError({
       outcome: 'invalid-input',
       code: AgentCodes.UNKNOWN_OPERATION,
@@ -122,13 +132,7 @@ export async function protocolOperations(ctx) {
     page: envelopePage(offset, limit, packed, records.length),
     withheld: packed.withheld,
     references: packed.truncated
-      ? [
-          {
-            operation: 'protocol.operations',
-            view,
-            input: { page: { offset: packed.nextOffset, limit: 256 } },
-          },
-        ]
+      ? [continuation(ctx, 'protocol.operations', packed.nextOffset, limit)]
       : [],
   };
 }

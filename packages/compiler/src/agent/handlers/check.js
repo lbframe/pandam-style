@@ -8,6 +8,7 @@
 import { classifyVerdict } from '../../protocol/envelope.js';
 import {
   agentPage,
+  continuation,
   diagnosticDescription,
   envelopePage,
   pack,
@@ -45,13 +46,8 @@ export async function check(ctx) {
     describe: diagnosticDescription,
   });
   const references = [];
-  if (packed.truncated) {
-    references.push({
-      operation: 'check',
-      view: 'detail',
-      input: { rev, page: { offset: packed.nextOffset, limit: 256 } },
-    });
-  }
+  if (packed.truncated)
+    references.push(continuation(ctx, 'check', packed.nextOffset, limit));
   const withheld = [...packed.withheld];
 
   if (offset > 0) {
@@ -92,7 +88,7 @@ export async function check(ctx) {
         rev,
         page: {
           offset: affectedShown.length + affectedPacked.withheld.length,
-          limit: 256,
+          limit: viewLimits.pageLimit,
         },
       },
     });
@@ -109,7 +105,7 @@ export async function check(ctx) {
         domain: { kind: 'from-diagnostic', index: truncatedCandidates },
         page: {
           offset: packed.records[truncatedCandidates].candidates.length,
-          limit: 256,
+          limit: viewLimits.pageLimit,
         },
       },
     });

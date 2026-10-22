@@ -125,25 +125,69 @@ function hashTree(dir) {
   return out;
 }
 
-/** Reads a whole record through `records.read`, chunk by chunk. */
-async function readRecord(dispatch, rev, address, chunk, view = 'compact') {
-  let offset = 0;
+/** Dispatches a reference exactly as the response returned it. */
+function follow(dispatch, reference) {
+  return dispatch(reference.operation, reference.input, {
+    view: reference.view,
+  });
+}
+
+/**
+ * The continuation a response returns for `request`: present exactly when the
+ * page is truncated, and equal to the request with only the offset advanced
+ * (every selector, the view and the limit preserved, R2).
+ */
+function continuationOf(response, request, nextOffset, limit) {
+  const continuations = response.references.filter(
+    (reference) => reference.operation === request.operation,
+  );
+  if (nextOffset == null) {
+    expect(continuations).toEqual([]);
+    return null;
+  }
+  expect(continuations).toEqual([
+    {
+      operation: request.operation,
+      view: request.view,
+      input: { ...request.input, page: { offset: nextOffset, limit } },
+    },
+  ]);
+  return continuations[0];
+}
+
+/**
+ * Reads a whole record through `records.read`, following only the
+ * continuations the responses return.
+ */
+async function readReferenced(dispatch, first) {
+  let reference = first;
   let text = '';
   let last = null;
   for (let guard = 0; guard < 100000; guard += 1) {
-    const response = await dispatch(
-      'records.read',
-      { rev, address, page: { offset, limit: chunk } },
-      { view },
-    );
+    const response = await follow(dispatch, reference);
     if (response.outcome !== 'success') return { response, text: null };
     last = response.result;
     text += last.chunk;
-    if (last.nextOffset == null) break;
-    expect(last.nextOffset).toBeGreaterThan(offset);
-    offset = last.nextOffset;
+    if (last.nextOffset != null)
+      expect(last.nextOffset).toBeGreaterThan(last.offset);
+    reference = continuationOf(
+      response,
+      reference,
+      last.nextOffset,
+      reference.input.page.limit,
+    );
+    if (reference == null) break;
   }
   return { text, bytes: last.bytes, sha256: last.sha256 };
+}
+
+/** Reads a record from its first chunk request, then by its references. */
+function readRecord(dispatch, rev, address, chunk, view = 'compact') {
+  return readReferenced(dispatch, {
+    operation: 'records.read',
+    view,
+    input: { rev, address, page: { offset: 0, limit: chunk } },
+  });
 }
 
 function sha256(text) {
@@ -172,13 +216,16 @@ function declares(entry, triple) {
 
 module.exports = {
   compiler,
+  continuationOf,
   declares,
   definitionWith,
+  follow,
   emptyMutation,
   hashTree,
   observedTriple,
   openAgentProject,
   readRecord,
+  readReferenced,
   request,
   sha256,
 };

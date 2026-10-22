@@ -550,10 +550,11 @@ describe('AG-01.1 outcomes (§3.6)', () => {
     expect(handled.result.document.ok).toBe(false);
     expect(handled.classified.outcome).toBe('constraint-violation');
     expect(handled.classified.reason).toBe('validation-errors');
+    // The continuation resumes the request as made: same view, same limit.
     expect(handled.references[0]).toEqual({
       operation: 'check',
-      view: 'detail',
-      input: { rev: revision, page: { offset: 20, limit: 256 } },
+      view: 'compact',
+      input: { rev: revision, page: { offset: 20, limit: 20 } },
     });
     // A document that is ok:false with no error is never success.
     const incomplete = compiler.classifyVerdict(
@@ -1184,5 +1185,145 @@ describe('AG-01.1 declared error contracts (fault-injection matrix, AC1)', () =>
         reason: 'session-closed',
       }),
     ).toBe(true);
+  });
+});
+
+// R1: a key taken from a request, a definition or a project never resolves to
+// an inherited member of a prototype-bearing table.
+const INHERITED = [
+  '__proto__',
+  'constructor',
+  'prototype',
+  'toString',
+  'valueOf',
+  'hasOwnProperty',
+  'isPrototypeOf',
+  'propertyIsEnumerable',
+  'toLocaleString',
+  '__defineGetter__',
+  '__defineSetter__',
+  '__lookupGetter__',
+  '__lookupSetter__',
+];
+
+describe('AG-01.1 inherited property names are never registered keys (R1)', () => {
+  test('through dispatch, discovery, views, domains, addresses and input keys', async () => {
+    const project = await openAgentProject('valid');
+    try {
+      const rev = await project.revision();
+      await project.dispatch('check', { rev });
+      for (const name of INHERITED) {
+        const dispatched = await project.dispatch(name, {});
+        expectFailure(dispatched, 'invalid-input', 'unknown-operation');
+        expect(dispatched.operation).toBeUndefined();
+        expect(dispatched.diagnostics[0].code).toBe('PMS_UNKNOWN_OPERATION');
+
+        const discovered = await project.dispatch('protocol.operations', {
+          names: [name],
+        });
+        expectFailure(discovered, 'invalid-input', 'unknown-operation');
+        const mixed = await project.dispatch('protocol.operations', {
+          names: ['check', name],
+        });
+        expectFailure(mixed, 'invalid-input', 'unknown-operation');
+
+        const viewed = await project.dispatch('check', { rev }, { view: name });
+        expectFailure(viewed, 'invalid-input', 'schema-enum');
+
+        const category = await project.dispatch('diagnostics.candidates', {
+          rev,
+          domain: { kind: 'category', category: name },
+        });
+        expect(category.outcome).toBe('success');
+        expect(category.result.page.total).toBe(0);
+        expect(category.result.categoryIndex).toBeNull();
+
+        for (const input of [
+          { rev, domain: { kind: name, index: 0 } },
+          {
+            rev,
+            address: { kind: name, index: 0 },
+            page: { offset: 0, limit: 1 },
+          },
+        ]) {
+          const operation =
+            input.domain == null ? 'records.read' : 'diagnostics.candidates';
+          const response = await project.dispatch(operation, input);
+          expectFailure(response, 'invalid-input', 'schema-one-of');
+        }
+        // An own key with an inherited name, as JSON can carry it.
+        const ownKey = JSON.parse(
+          `{"rev":${JSON.stringify(rev)},${JSON.stringify(name)}:1}`,
+        );
+        expect(Object.hasOwn(ownKey, name)).toBe(true);
+        const keyed = await project.dispatch('check', ownKey);
+        expectFailure(keyed, 'invalid-input', 'schema-additional-properties');
+        const framed = await project.binding.dispatch(
+          JSON.parse(
+            `{"protocolVersion":1,"operation":"check","input":{"rev":${JSON.stringify(rev)}},${JSON.stringify(name)}:{}}`,
+          ),
+          { capability: project.capability },
+        );
+        expectFailure(framed, 'invalid-input', 'schema-additional-properties');
+
+        expect(() =>
+          project.binding.mintCapability({ grants: [name] }),
+        ).toThrow(/unknown grant/);
+      }
+    } finally {
+      await project.close();
+    }
+  });
+
+  test('through classify() and the registry load tables', () => {
+    const { classifyError, PmsError, diagnostic } = compiler;
+    for (const name of INHERITED) {
+      for (const code of ['PMS_INVALID_REVISION', name]) {
+        const error = new PmsError([
+          diagnostic({
+            code,
+            phase: 'lifecycle',
+            message: 'x',
+            severity: 'warning',
+            context: { reason: name },
+          }),
+        ]);
+        expect(classifyError(error)).toMatchObject({
+          outcome: 'internal-error',
+          reason: 'unclassified',
+        });
+      }
+      const mutations = [
+        (entry) => {
+          entry.requires.grant = name;
+        },
+        (entry) => {
+          entry.effects.push({ kind: name });
+        },
+        (entry) => {
+          entry.effects.push({ kind: 'session-state', detail: name });
+        },
+        (entry) => {
+          entry.preconditions.push({ id: name, outcome: 'invalid-input' });
+        },
+        (entry) => {
+          entry.input.properties.rev = { type: 'string', format: name };
+        },
+        (entry) => {
+          entry.views = [name];
+        },
+        (entry) => {
+          entry.input.properties.rev = { type: name };
+        },
+      ];
+      for (const mutate of mutations) {
+        const entries = clone(REGISTRY_ENTRIES);
+        mutate(entries.find((entry) => entry.name === 'check'));
+        expect(() => createRegistry(entries)).toThrow(
+          /pandamstyle agent (registry|schema)/,
+        );
+      }
+    }
+    expect(Object.getPrototypeOf(REGISTRY.byName)).toBeNull();
   });
 });

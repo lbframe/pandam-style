@@ -6,7 +6,7 @@
  */
 
 import { recordInfo } from '../../protocol/envelope.js';
-import { rejectRequest } from './pages.js';
+import { continuation, rejectRequest } from './pages.js';
 
 async function recordAt(ctx) {
   const { input, hooks, binding } = ctx;
@@ -78,13 +78,18 @@ export async function recordsRead(ctx) {
     stop += 1;
   }
   ctx.budget.remaining -= cost;
+  const nextOffset = stop < info.bytes ? stop : null;
   return {
     identities,
+    references:
+      nextOffset == null
+        ? []
+        : [continuation(ctx, 'records.read', nextOffset, ctx.input.page.limit)],
     result: {
       chunk: info.text.slice(start, stop),
       offset: start,
       returned: stop - start,
-      nextOffset: stop < info.bytes ? stop : null,
+      nextOffset,
       bytes: info.bytes,
       sha256: info.sha256,
     },

@@ -1566,69 +1566,123 @@ export type AgentEnvelopeFrame = {
     readonly capability: string | null;
     readonly retry: 'never' | 'after-refresh' | 'same-request';
   } | null;
-  readonly references: ReadonlyArray<{
-    readonly operation:
-      | 'check'
-      | 'diagnostics.candidates'
-      | 'diagnostics.affected'
-      | 'records.read'
-      | 'protocol.operations';
-    readonly view: 'compact' | 'detail';
-    readonly input: {
-      readonly rev?: {
-        readonly projectId: string;
-        readonly sessionId: string;
-        readonly revisionId: number;
-      } | null;
-      readonly page?: {
-        readonly offset: number;
-        readonly limit: number;
-      };
-      readonly domain?:
-        | {
-            readonly kind: 'category-index';
-            readonly index: number;
-          }
-        | {
-            readonly kind: 'category';
-            readonly category: string;
-          }
-        | {
-            readonly kind: 'from-diagnostic';
-            readonly index: number;
+  readonly references: ReadonlyArray<
+    | {
+        readonly operation: 'check';
+        readonly view: 'compact' | 'detail';
+        readonly input: {
+          readonly rev: {
+            readonly projectId: string;
+            readonly sessionId: string;
+            readonly revisionId: number;
           };
-      readonly address?:
-        | {
-            readonly kind: 'diagnostic';
-            readonly index: number;
-          }
-        | {
-            readonly kind: 'candidate';
-            readonly domain:
-              | {
-                  readonly kind: 'category-index';
-                  readonly index: number;
-                }
-              | {
-                  readonly kind: 'category';
-                  readonly category: string;
-                }
-              | {
-                  readonly kind: 'from-diagnostic';
-                  readonly index: number;
-                };
-            readonly index: number;
-          }
-        | {
-            readonly kind: 'affected';
-            readonly index: number;
-          }
-        | {
-            readonly kind: 'bootstrap';
-            readonly index: number;
+          readonly page?: {
+            readonly offset: number;
+            readonly limit: number;
           };
-    };
-  }>;
+        };
+      }
+    | {
+        readonly operation: 'diagnostics.candidates';
+        readonly view: 'compact' | 'detail';
+        readonly input: {
+          readonly rev: {
+            readonly projectId: string;
+            readonly sessionId: string;
+            readonly revisionId: number;
+          };
+          readonly domain:
+            | {
+                readonly kind: 'category-index';
+                readonly index: number;
+              }
+            | {
+                readonly kind: 'category';
+                readonly category: string;
+              }
+            | {
+                readonly kind: 'from-diagnostic';
+                readonly index: number;
+              };
+          readonly page?: {
+            readonly offset: number;
+            readonly limit: number;
+          };
+        };
+      }
+    | {
+        readonly operation: 'diagnostics.affected';
+        readonly view: 'compact' | 'detail';
+        readonly input: {
+          readonly rev: {
+            readonly projectId: string;
+            readonly sessionId: string;
+            readonly revisionId: number;
+          };
+          readonly page?: {
+            readonly offset: number;
+            readonly limit: number;
+          };
+        };
+      }
+    | {
+        readonly operation: 'records.read';
+        readonly view: 'compact' | 'detail';
+        readonly input: {
+          readonly rev: {
+            readonly projectId: string;
+            readonly sessionId: string;
+            readonly revisionId: number;
+          } | null;
+          readonly address:
+            | {
+                readonly kind: 'diagnostic';
+                readonly index: number;
+              }
+            | {
+                readonly kind: 'candidate';
+                readonly domain:
+                  | {
+                      readonly kind: 'category-index';
+                      readonly index: number;
+                    }
+                  | {
+                      readonly kind: 'category';
+                      readonly category: string;
+                    }
+                  | {
+                      readonly kind: 'from-diagnostic';
+                      readonly index: number;
+                    };
+                readonly index: number;
+              }
+            | {
+                readonly kind: 'affected';
+                readonly index: number;
+              }
+            | {
+                readonly kind: 'bootstrap';
+                readonly index: number;
+              };
+          readonly page: {
+            readonly offset: number;
+            readonly limit: number;
+          };
+        };
+      }
+    | {
+        readonly operation: 'protocol.operations';
+        readonly view: 'compact' | 'detail';
+        readonly input: {
+          readonly protocolVersions?: readonly number[];
+          readonly names?: readonly string[];
+          readonly page?: {
+            readonly offset: number;
+            readonly limit: number;
+          };
+        };
+      }
+  >;
   readonly view: 'compact' | 'detail';
   readonly page: {
     readonly offset: number;

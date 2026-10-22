@@ -23,10 +23,13 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const {
   compiler,
+  continuationOf,
   definitionWith,
+  follow,
   emptyMutation,
   openAgentProject,
   readRecord,
+  readReferenced,
   request,
   sha256,
 } = require('./agent-helpers');
@@ -100,42 +103,47 @@ const clean = (i) =>
  */
 async function readList(project, operation, input, view, limit) {
   const out = [];
-  let offset = 0;
+  // Only the first request is built here. Every later page, and every
+  // withheld record, is reached by following a reference the response
+  // returned (R2).
+  let request = {
+    operation,
+    view,
+    input: { ...input, page: { offset: 0, limit } },
+  };
   for (let guard = 0; guard < 10000; guard += 1) {
     const response = checkResponse(
       operation,
-      await project.dispatch(
-        operation,
-        { ...input, page: { offset, limit } },
-        { view },
-      ),
+      await follow(project.dispatch, request),
     );
     expect(['success', 'constraint-violation']).toContain(response.outcome);
     const page = response.result.page ?? null;
     const records = page?.records ?? response.result.document.diagnostics;
-    const withheld = response.withheld;
     out.push(...records);
-    for (const entry of withheld) {
-      const read = await readRecord(
-        project.dispatch,
-        input.rev,
-        entry.address,
-        262144,
-        view,
+    for (const entry of response.withheld) {
+      const reference = response.references.find(
+        (item) =>
+          item.operation === 'records.read' &&
+          JSON.stringify(item.input.address) === JSON.stringify(entry.address),
       );
+      expect(reference).toBeDefined();
+      const read = await readReferenced(project.dispatch, reference);
       expect(read.sha256).toBe(entry.sha256);
       expect(read.text.length).toBe(entry.bytes);
       out.push(JSON.parse(read.text));
     }
     if (response.page.offset < response.page.total)
       expect(response.page.nextOffset ?? response.page.total).toBeGreaterThan(
-        offset,
+        response.page.offset,
       );
-    if (response.page.nextOffset == null) {
-      expect(response.page.truncated).toBe(false);
-      return out;
-    }
-    offset = response.page.nextOffset;
+    expect(response.page.truncated).toBe(response.page.nextOffset != null);
+    request = continuationOf(
+      response,
+      request,
+      response.page.nextOffset,
+      response.page.limit,
+    );
+    if (request == null) return out;
   }
   throw new Error('paging did not terminate');
 }
@@ -159,9 +167,16 @@ describe('AG-01.1 compact and detail (AC #8 required check)', () => {
       expect(document.diagnosticsTruncated).toBe(true);
       expect(compact.references).toContainEqual({
         operation: 'check',
-        view: 'detail',
-        input: { rev, page: { offset: 20, limit: 256 } },
+        view: 'compact',
+        input: { rev, page: { offset: 20, limit: 20 } },
       });
+      // Followed as returned, the compact continuation completes the list.
+      const compactFull = (
+        await project.session.agentResult(rev, { candidateLimit: 8 })
+      ).diagnostics;
+      expect(await readList(project, 'check', { rev }, 'compact', 20)).toEqual(
+        compactFull,
+      );
       for (const diagnostic of document.diagnostics)
         expect(diagnostic.candidates.length).toBeLessThanOrEqual(8);
 
@@ -429,6 +444,94 @@ describe('AG-01.1 exhaustive paging of every list kind (I10, T15)', () => {
           limit,
         );
         expect(all.map((entry) => entry.name)).toEqual(REGISTRY.names);
+      }
+    } finally {
+      await project.close();
+    }
+  });
+});
+
+describe('AG-01.1 continuations resume their request (R2)', () => {
+  test('discovery: filtered and unfiltered, both views, page sizes 1, 2, 7 and 256', async () => {
+    const project = await openAgentProject('valid');
+    try {
+      const filters = [
+        null,
+        ['check', 'records.read'],
+        ['records.read', 'check'],
+        ['check', 'check', 'session.status'],
+        ['publish', 'diagnostics.affected', 'query', 'session.close'],
+        [REGISTRY.names[REGISTRY.names.length - 1]],
+      ];
+      for (const names of filters) {
+        const expected = REGISTRY.names.filter(
+          (name) => names == null || names.includes(name),
+        );
+        for (const view of ['compact', 'detail']) {
+          for (const limit of [1, 2, 7, 256]) {
+            const input = {
+              protocolVersions: [1],
+              ...(names == null ? {} : { names }),
+            };
+            const all = await readList(
+              project,
+              'protocol.operations',
+              input,
+              view,
+              limit,
+            );
+            expect({ names, view, limit, got: all.map((e) => e.name) }).toEqual(
+              { names, view, limit, got: expected },
+            );
+            expect(
+              all.every((entry) => (view === 'detail') === 'input' in entry),
+            ).toBe(true);
+          }
+        }
+      }
+    } finally {
+      await project.close();
+    }
+  });
+
+  test('candidates keep their domain form, affected and check keep their view and limit', async () => {
+    const project = await openAgentProject('valid', {
+      prepare: (fixture) => writePages(fixture, 30, forbidden),
+    });
+    try {
+      const rev = await project.revision();
+      await project.dispatch('check', { rev });
+      const full = (
+        await project.session.agentResult(rev, { candidateLimit: 32 })
+      ).diagnostics;
+      for (const limit of [1, 3, 256]) {
+        expect(
+          await readList(project, 'check', { rev }, 'detail', limit),
+        ).toEqual(full);
+        const affected = await readList(
+          project,
+          'diagnostics.affected',
+          { rev },
+          'compact',
+          limit,
+        );
+        expect(affected).toHaveLength(39);
+        for (const domain of [
+          { kind: 'category', category: 'spacing' },
+          { kind: 'category-index', index: 0 },
+          { kind: 'from-diagnostic', index: 3 },
+        ]) {
+          const all = await readList(
+            project,
+            'diagnostics.candidates',
+            { rev, domain },
+            'detail',
+            limit,
+          );
+          const ids = all.map((entry) => entry.tokenId);
+          expect(new Set(ids).size).toBe(ids.length);
+          expect(ids.length).toBeGreaterThan(0);
+        }
       }
     } finally {
       await project.close();
