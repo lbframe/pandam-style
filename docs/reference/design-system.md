@@ -112,12 +112,16 @@ propertyDomains: {
   the compiler default held.
 - A domain that removes a value or token category a pattern emits is refused,
   so the manifest never offers an unusable pattern selection.
-- Any invalid entry is `PMS_INVALID_PROPERTY_DOMAIN` (phase `registry`, one
-  rule per class, `property-domains.*`), and the whole definition is refused.
-  The `malformed*` rules cover malformed plain data (a string instead of an
-  object, a number instead of an array, an unknown member). Through the public
-  API, a value that is not plain data (a function, `Map`, prototyped object,
-  accessor or symbol key) is caught earlier as `PMS_INVALID_DEFINITION`, rule
+- Any invalid entry is `PMS_INVALID_PROPERTY_DOMAIN` (phase `registry`, one rule
+  per class, `property-domains.*`), and the whole definition is refused.
+  Malformed plain data keeps its own rule: `malformed` (the map is not a plain
+  object), `malformed-entry` (an entry is not an object), `unknown-member`,
+  `empty` (no domain member, including an entry holding only `meta`),
+  `malformed-member` (a member that is not a non-empty array, or an invalid
+  `range`), `malformed-value` (a value that is not a string or finite number, or
+  a category name that is not a string) and `duplicate`. Through the public API,
+  a value that is not plain data (a function, `Map`, prototyped object, accessor
+  or symbol key) is caught earlier as `PMS_INVALID_DEFINITION`, rule
   `definition.shape`.
 - Declared domains enter the registry digest; a definition without the field
   keeps its digest. Changing a domain is a design-system decision, never a
