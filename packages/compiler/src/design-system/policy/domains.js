@@ -60,8 +60,32 @@ const inRange = (range, value) =>
   value >= range.min &&
   value <= upper(range);
 
+/**
+ * The CSS zero, defined once. Where a domain lists the CSS zero `'0'` (a
+ * length or keyword list), the numeric `0` of style objects is the same value:
+ * the domain stores `'0'`, acceptance admits both spellings, and the generated
+ * types admit both. On a legacy numeric row (`opacity`, `flex*`), `0` is a
+ * number like any other and `'0'` is not admitted, as in Alpha 1.
+ */
+export const CSS_ZERO = '0';
+
+/** The stored spelling of an approved literal: `'0'` for the CSS zero. */
+export function canonicalLiteral(value, standardValues) {
+  return (value === 0 || value === CSS_ZERO) &&
+    standardValues.includes(CSS_ZERO)
+    ? CSS_ZERO
+    : value;
+}
+
+/** The literals a domain's generated type admits: both zero spellings. */
+export function literalTypeValues(domain) {
+  return domain.values.includes(CSS_ZERO)
+    ? [...domain.values, 0]
+    : [...domain.values];
+}
+
 const sameValue = (a, b) =>
-  a === b || (a === 0 && b === '0') || (a === '0' && b === 0);
+  a === b || (a === 0 && b === CSS_ZERO) || (a === CSS_ZERO && b === 0);
 const hasValue = (values, value) => values.some((v) => sameValue(v, value));
 
 /** Whether domain `a` admits nothing that domain `b` does not. */
@@ -334,7 +358,11 @@ export function normalizePropertyDomains(input, tokens = {}) {
           ok = false;
           continue;
         }
-        seen.push(value);
+        seen.push(
+          member === 'tokens'
+            ? value
+            : canonicalLiteral(value, standard.values),
+        );
         const inStandard =
           member === 'tokens'
             ? standard.tokens.includes(value)
@@ -505,9 +533,8 @@ export function isAdmitted(row) {
 /** Whether a literal (non-token) value belongs to a domain. */
 export function literalAllowed(domain, value) {
   if (domain.values.includes(value)) return true;
-  // CSS treats the numeric zero accepted by style-object APIs as the same
-  // value as the explicit CSS string `"0"`.
-  if (value === 0 && domain.values.includes('0')) return true;
+  // The CSS zero (see CSS_ZERO): a domain listing '0' admits numeric 0.
+  if (value === 0 && domain.values.includes(CSS_ZERO)) return true;
   const range = domain.range;
   return (
     range != null &&

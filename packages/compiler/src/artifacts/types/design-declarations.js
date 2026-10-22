@@ -6,6 +6,7 @@
  */
 
 import { runtimeProjectionOf } from '../../design-system/registry/snapshot';
+import { literalTypeValues } from '../../design-system/policy/domains';
 
 const BANNER = [
   '/**',
@@ -386,7 +387,7 @@ export function generateDesignSystemDeclarations(snapshot) {
     `  values: ${typeRecord(
       propertyRows
         .filter((row) => row.domain.values.length > 0)
-        .map((row) => [row.key, row.domain.values]),
+        .map((row) => [row.key, literalTypeValues(row.domain)]),
       (values) => union(values),
     )};`,
     // A legacy continuous range (CE-02.2 replaces it): any number.
