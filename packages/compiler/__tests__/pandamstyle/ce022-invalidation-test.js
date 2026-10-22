@@ -29,7 +29,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const { openProject, fingerprint } = require('./session-helpers');
+const v8 = require('v8');
+const vm = require('vm');
+const { openProject, fingerprint, loadCompiler } = require('./session-helpers');
 
 const VERIFIED = {
   changed: [],
@@ -369,5 +371,52 @@ describe('CE-02.2 incremental validity equals a full rebuild', () => {
       [true, []],
       [false, []],
     ]);
+  });
+});
+
+describe('the verdict keys', () => {
+  test('retain nothing of a design system that is gone', async () => {
+    const compiler = loadCompiler();
+    v8.setFlagsFromString('--expose-gc');
+    const gc = vm.runInNewContext('gc');
+    // The 0.05 opacity grid: 64 distinct override domains.
+    const grid = Array.from({ length: 21 }, (_, k) =>
+      Number((k * 0.05).toFixed(2)),
+    );
+    const N = 64;
+    const alive = (() => {
+      const refs = [];
+      for (let i = 1; i <= N; i++) {
+        const ds = compiler.buildDesignSystem({
+          systemId: `ce022-retention-${i}`,
+          tokens: {
+            // An unchecked numeric shape: its entry list is the shared empty
+            // one, which must not hold the contexts it was checked against.
+            spacing: { c: { value: 'calc(1px + 1px)', visibility: 'public' } },
+          },
+          propertyDomains: {
+            opacity: {
+              values: [
+                0,
+                1,
+                ...grid.filter((_, k) => k > 0 && k < 20 && (i >> (k - 1)) & 1),
+              ],
+            },
+          },
+        });
+        const { properties } = ds.snapshot;
+        compiler.tokenUseVerdicts(ds.registry, 'spacing.c', properties);
+        refs.push(new WeakRef(compiler.useContextsOf(properties, 'spacing')));
+      }
+      return refs;
+    })();
+    // A WeakRef target is kept to the end of the job that created it.
+    await new Promise((resolve) => setImmediate(resolve));
+    gc();
+    await new Promise((resolve) => setImmediate(resolve));
+    gc();
+    const retained = alive.filter((ref) => ref.deref() !== undefined).length;
+    // At most the property tables the bounded override cache keeps (16).
+    expect(retained).toBeLessThanOrEqual(16);
   });
 });

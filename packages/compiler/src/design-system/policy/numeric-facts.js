@@ -210,7 +210,7 @@ export function tokenValueRefusal(registry, property, tokenId) {
 // order.
 const contextsByTable = new WeakMap();
 
-function useContextsOf(properties, category) {
+export function useContextsOf(properties, category) {
   let byCategory = contextsByTable.get(properties);
   if (byCategory == null) {
     byCategory = new Map();
@@ -237,7 +237,9 @@ function useContextsOf(properties, category) {
   return contexts;
 }
 
-// entries -> use contexts -> key: a kept entry list keeps its key.
+// use contexts -> entries -> key, both held weakly: a kept entry list keeps
+// its key, and a context list (owned by its property table) is released
+// with the table, never retained by a permanent entry list (NO_FACTS).
 const verdictKeys = new WeakMap();
 
 /**
@@ -256,19 +258,19 @@ export function tokenUseVerdicts(registry, tokenId, properties) {
   const contexts = useContextsOf(properties, token.category);
   if (contexts.length === 0) return null;
   const entries = numericFactsOf(registry, tokenId);
-  let byContexts = verdictKeys.get(entries);
-  if (byContexts == null) {
-    byContexts = new Map();
-    verdictKeys.set(entries, byContexts);
+  let byEntries = verdictKeys.get(contexts);
+  if (byEntries == null) {
+    byEntries = new WeakMap();
+    verdictKeys.set(contexts, byEntries);
   }
-  let key = byContexts.get(contexts);
+  let key = byEntries.get(entries);
   if (key === undefined) {
     key = JSON.stringify(
       contexts.map((property) =>
         tokenValueRefusal(registry, property, tokenId),
       ),
     );
-    byContexts.set(contexts, key);
+    byEntries.set(entries, key);
   }
   return key;
 }

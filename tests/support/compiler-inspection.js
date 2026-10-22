@@ -79,6 +79,8 @@ export {
 export {
   numericFactsOfValue,
   numericFactsOf,
+  tokenUseVerdicts,
+  useContextsOf,
   tokenValueRefusal,
   NON_FINITE,
 } from '../../packages/compiler/src/design-system/policy/numeric-facts.js';
