@@ -14,8 +14,12 @@ const { tokenize } = require('@csstools/css-tokenizer');
 
 /**
  * Parses CSS text into `[{ prelude: [...], declarations: [[property, value
- * tokens]] }]`, nested at-rules flattened with their prelude path. Throws on a
- * tokenizer error or an unbalanced block.
+ * tokens]] }]`, nested at-rules flattened with their prelude path. Strict:
+ * it throws unless it consumes the whole input as balanced rules, so a
+ * tokenizer error, a stray `}`, an unclosed `{`, an unbalanced bracket or
+ * trailing text is an error, never a silently dropped rule. A prelude keeps
+ * every token's text exactly (quoted strings included); only whitespace
+ * tokens are written as one space.
  */
 function readCss(css) {
   const errors = [];
@@ -27,16 +31,21 @@ function readCss(css) {
   const rules = [];
   const text = (list) =>
     list
-      .map((t) => t[1])
+      .map((t) => (t[0] === 'whitespace-token' ? ' ' : t[1]))
       .join('')
-      .trim()
-      .replace(/\s+/g, ' ');
+      .trim();
   function block(start, path) {
     let i = start;
     let prelude = [];
     while (i < tokens.length) {
       const [type] = tokens[i];
-      if (type === '}-token') return i + 1;
+      if (type === '}-token') {
+        if (path.length === 0) throw new Error(`stray } at token ${i}`);
+        if (text(prelude) !== '') {
+          throw new Error(`text before } in ${path.join(' ')}`);
+        }
+        return i + 1;
+      }
       if (type === '{-token') {
         const head = text(prelude);
         const first = prelude.find((t) => t[0] !== 'whitespace-token');
@@ -58,7 +67,7 @@ function readCss(css) {
   function declarations(start, path) {
     const declared = [];
     let current = [];
-    let depth = 0;
+    const open = [];
     let i = start;
     const flush = () => {
       const kept = current.filter((t) => t[0] !== 'whitespace-token');
@@ -71,9 +80,17 @@ function readCss(css) {
     };
     for (; i < tokens.length; i++) {
       const [type] = tokens[i];
-      if (type === '(-token' || type === 'function-token' || type === '[-token')
-        depth++;
-      if (type === ')-token' || type === ']-token') depth--;
+      if (type === '(-token' || type === 'function-token') open.push(')-token');
+      if (type === '[-token') open.push(']-token');
+      if (type === ')-token' || type === ']-token') {
+        if (open.pop() !== type) {
+          throw new Error('unbalanced bracket in declarations');
+        }
+      }
+      const depth = open.length;
+      if (depth > 0 && type === '}-token') {
+        throw new Error('} inside a bracket in declarations');
+      }
       if (depth === 0 && type === 'semicolon-token') {
         flush();
         current = [];
@@ -89,7 +106,8 @@ function readCss(css) {
     }
     throw new Error('unbalanced declarations');
   }
-  block(0, []);
+  const end = block(0, []);
+  if (end !== tokens.length) throw new Error('input not fully consumed');
   return rules;
 }
 

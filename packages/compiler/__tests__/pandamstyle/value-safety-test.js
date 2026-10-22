@@ -21,6 +21,8 @@
  *   - S1 tokenizes each author text exactly once, before any verdict (a JS
  *     number from its canonical text), at every entry point;
  *   - every compiler-owned standard, default and opaque value passes S1;
+ *   - the strict CSS reader refuses malformed CSS (stray `}`, unclosed
+ *     blocks, unbalanced brackets, trailing text) and keeps strings exactly;
  *   - S2: every emitted rule re-reads, alone and inside the whole stylesheet,
  *     as the same prelude and declarations, one declaration per property,
  *     with the approved value's tokens; before and after the CE-01.2
@@ -729,6 +731,30 @@ const {
   readCss,
   valueForm,
 } = require('../../../../tests/support/css-reread.cjs');
+
+describe('the strict CSS reader', () => {
+  test.each([
+    ['a stray }', '.a{color:red}}.b{color:blue}', /stray \}/],
+    ['an unclosed {', '.a{color:red', /unbalanced/],
+    ['an unclosed at-rule', '@media (x){.a{color:red}', /unbalanced/],
+    ['trailing garbage', '.a{color:red} junk', /trailing text/],
+    ['a bracket closed twice', '.a{color:red)}', /unbalanced bracket/],
+    ['mismatched brackets', '.a{color:rgb(1 2 3]}', /unbalanced bracket/],
+    ['} inside a bracket', '.a{color:(red}}', /inside a bracket/],
+    ['a tokenizer error', '.a{content:"x}', /tokenizer error/],
+  ])('refuses %s', (_, css, message) => {
+    expect(() => readCss(css)).toThrow(message);
+  });
+
+  test('keeps whitespace inside a quoted string exactly', () => {
+    const [two] = readCss('[x="a  b"] .c{color:red}');
+    const [one] = readCss('[x="a b"] .c{color:red}');
+    expect(two.prelude).toEqual(['[x="a  b"] .c']);
+    expect(one.prelude).not.toEqual(two.prelude);
+    // Whitespace between tokens is one space.
+    expect(readCss('.a   .b{color:red}')[0].prelude).toEqual(['.a .b']);
+  });
+});
 
 function s2(injected, transform) {
   const texts = Object.values(injected).map((rule) =>
