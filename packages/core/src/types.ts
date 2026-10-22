@@ -94,7 +94,7 @@ export type GeneratedIdentity = Readonly<{
   abiVersion: AbiVersion;
   compilerContractVersion: 'pms-0.1';
   designSystem: DesignSystemIdentity;
-  manifestSchemaVersion: 1 | 2;
+  manifestSchemaVersion: 1 | 2 | 3;
   capabilities: Readonly<{
     slots: boolean;
     compoundVariants: boolean;

@@ -190,6 +190,10 @@ each case is stated below.
   (`reason: number-not-length`); write the approved `'16px'`.
 - Generated declarations lose their `number` branch: the four rows are typed
   as unions of their finite numbers.
+- The manifest is version 3 (`manifestSchemaVersion: 3`): its four former
+  range rows carry `values` where a version 2 manifest carried `range`. A
+  reader built against CE-02.1 output refuses version 3 explicitly; regenerate
+  the design module and declarations rather than editing them.
 - The CE-00.3 workloads compile unchanged: their opacity (0.4, 0.6, 0.8, 1) and
   flex factors (0, 1, 2) are inside the finite defaults, and none of their
   tokens is refused at use.

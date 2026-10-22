@@ -1,0 +1,1186 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// packages/compiler/src/artifacts/metadata/artifact-set.js
+var artifact_set_exports = {};
+__export(artifact_set_exports, {
+  createArtifactSet: () => createArtifactSet,
+  designDeclarationFile: () => designDeclarationFile,
+  designSystemCssHeader: () => designSystemCssHeader,
+  validateArtifactSet: () => validateArtifactSet,
+  withDesignSystemCssIdentity: () => withDesignSystemCssIdentity
+});
+module.exports = __toCommonJS(artifact_set_exports);
+var import_crypto = require("crypto");
+
+// packages/compiler/src/protocol/diagnostics.js
+var DIAG_SCHEMA_VERSION = 1;
+function normalizeLocation(source) {
+  if (source == null) return { source: null, location: null };
+  if (typeof source === "string") {
+    return { source, location: null };
+  }
+  if (typeof source === "object") {
+    const { file = null, line = null, column = null, role = null } = source;
+    if (file == null && line == null) {
+      return { source: null, location: null };
+    }
+    return {
+      source: role != null ? `${file} (${role})` : file,
+      location: { file, line, column, role }
+    };
+  }
+  return { source: null, location: null };
+}
+function renderLocation(diag) {
+  if (diag.location == null) return "";
+  const { file, line, column } = diag.location;
+  if (file == null) return "";
+  if (line == null) return ` (${file})`;
+  if (column == null) return ` (${file}:${line})`;
+  return ` (${file}:${line}:${column})`;
+}
+function diagnostic({
+  code,
+  severity = "error",
+  phase,
+  message,
+  source = null,
+  location = null,
+  rule = null,
+  context = {}
+}) {
+  const normalizedSource = normalizeLocation(source);
+  let normalizedLocation = normalizedSource.location;
+  let normalizedLabel = normalizedSource.source;
+  if (location != null) {
+    const n = normalizeLocation(location);
+    normalizedLocation = n.location ?? normalizedLocation;
+    normalizedLabel = n.source ?? normalizedLabel;
+  }
+  return {
+    schemaVersion: DIAG_SCHEMA_VERSION,
+    code,
+    severity,
+    phase,
+    message,
+    source: normalizedLabel,
+    location: normalizedLocation,
+    rule,
+    context,
+    autofix: null
+  };
+}
+var PmsError = class extends Error {
+  constructor(diagnostics) {
+    super(
+      diagnostics.map((d) => `${d.code}: ${d.message}${renderLocation(d)}`).join("\n")
+    );
+    this.name = "PmsError";
+    this.diagnostics = diagnostics;
+  }
+};
+var Codes = {
+  UNKNOWN_PATTERN: "PMS_UNKNOWN_PATTERN",
+  INVALID_PATTERN_PARAMETER: "PMS_INVALID_PATTERN_PARAMETER",
+  UNKNOWN_TOKEN: "PMS_UNKNOWN_TOKEN",
+  TOKEN_CYCLE: "PMS_TOKEN_CYCLE",
+  DUPLICATE_TOKEN: "PMS_DUPLICATE_TOKEN",
+  INVALID_TOKEN_CATEGORY: "PMS_INVALID_TOKEN_CATEGORY",
+  TOKEN_NOT_PUBLIC: "PMS_TOKEN_NOT_PUBLIC",
+  UNKNOWN_THEME: "PMS_UNKNOWN_THEME",
+  INVALID_THEME: "PMS_INVALID_THEME",
+  THEME_CYCLE: "PMS_THEME_CYCLE",
+  THEME_TOKEN_CYCLE: "PMS_THEME_TOKEN_CYCLE",
+  FORBIDDEN_VALUE: "PMS_FORBIDDEN_VALUE",
+  UNSUPPORTED_PROPERTY: "PMS_UNSUPPORTED_PROPERTY",
+  UNSUPPORTED_PROPERTY_FORM: "PMS_UNSUPPORTED_PROPERTY_FORM",
+  UNKNOWN_CONDITION: "PMS_UNKNOWN_CONDITION",
+  INVALID_VARIANT_KEY: "PMS_INVALID_VARIANT_KEY",
+  INVALID_VARIANT_VALUE: "PMS_INVALID_VARIANT_VALUE",
+  INVALID_RECIPE: "PMS_INVALID_RECIPE",
+  INVALID_RECIPE_SLOT: "PMS_INVALID_RECIPE_SLOT",
+  AMBIGUOUS_RECIPE_COMPOUND: "PMS_AMBIGUOUS_RECIPE_COMPOUND",
+  UNSUPPORTED_FEATURE: "PMS_UNSUPPORTED_FEATURE",
+  // Codes added by this batch (build boundaries and non-static values).
+  NON_STATIC_VALUE: "PMS_NON_STATIC_VALUE",
+  FORBIDDEN_IMPORT: "PMS_FORBIDDEN_IMPORT",
+  FORBIDDEN_STYLE_CHANNEL: "PMS_FORBIDDEN_STYLE_CHANNEL",
+  UNVERIFIED_JSX_SPREAD: "PMS_UNVERIFIED_JSX_SPREAD",
+  ROLE_VIOLATION: "PMS_ROLE_VIOLATION",
+  COVERAGE_GAP: "PMS_COVERAGE_GAP",
+  // Codes added by the consolidation batch.
+  //
+  // A `props()` argument whose provenance is not demonstrated. Separate from
+  // PMS_UNVERIFIED_JSX_SPREAD on purpose: the spread may be a recognized
+  // props() result whose ARGUMENT is raw, and the two need different fixes.
+  UNVERIFIED_PROPS_SOURCE: "PMS_UNVERIFIED_PROPS_SOURCE",
+  // A value that was proven and can then still be written to or escaped into
+  // an unrecognized call, so its provenance is not durable.
+  UNVERIFIED_PROVENANCE: "PMS_UNVERIFIED_PROVENANCE",
+  STALE_REVISION: "PMS_STALE_REVISION",
+  SUPERSEDED_REVISION: "PMS_SUPERSEDED_REVISION",
+  INVALID_REVISION: "PMS_INVALID_REVISION",
+  SESSION_CLOSED: "PMS_SESSION_CLOSED",
+  ABI_MISMATCH: "PMS_ABI_MISMATCH",
+  GENERATED_ARTIFACT_MISMATCH: "PMS_GENERATED_ARTIFACT_MISMATCH",
+  // CE-01.1 browser targets and capability outcomes (phase `targets`).
+  INVALID_TARGET_CONFIG: "PMS_INVALID_TARGET_CONFIG",
+  INCOMPATIBLE_TARGET_ENGINE: "PMS_INCOMPATIBLE_TARGET_ENGINE",
+  TARGET_CAPABILITY_INCOMPATIBLE: "PMS_TARGET_CAPABILITY_INCOMPATIBLE",
+  TARGET_CAPABILITY_UNKNOWN: "PMS_TARGET_CAPABILITY_UNKNOWN",
+  TARGET_ENHANCEMENT_DEGRADED: "PMS_TARGET_ENHANCEMENT_DEGRADED",
+  TARGET_ENHANCEMENT_INEFFECTIVE: "PMS_TARGET_ENHANCEMENT_INEFFECTIVE",
+  INVALID_ENHANCEMENT_POLICY: "PMS_INVALID_ENHANCEMENT_POLICY",
+  // CE-02.1: a design-system `propertyDomains` entry the compiler refuses.
+  INVALID_PROPERTY_DOMAIN: "PMS_INVALID_PROPERTY_DOMAIN"
+};
+
+// packages/compiler/src/design-system/patterns/compile.js
+var ALIGN = {
+  start: "flex-start",
+  end: "flex-end",
+  center: "center",
+  stretch: "stretch",
+  baseline: "baseline"
+};
+var JUSTIFY = {
+  start: "flex-start",
+  end: "flex-end",
+  center: "center",
+  between: "space-between",
+  around: "space-around"
+};
+var SCHEMAS = {
+  stack: { gap: "spacing", align: ALIGN, justify: JUSTIFY },
+  inline: { gap: "spacing", align: ALIGN, justify: JUSTIFY },
+  center: { inline: "boolean" },
+  grid: { columns: "columns", gap: "spacing", align: ALIGN },
+  box: {
+    padding: "spacing",
+    paddingInline: "spacing",
+    paddingBlock: "spacing"
+  }
+};
+var PATTERN_IDS = Object.freeze(Object.keys(SCHEMAS));
+var PATTERN_CATALOG = Object.freeze(
+  Object.fromEntries(
+    PATTERN_IDS.map((patternId) => [
+      patternId,
+      Object.freeze({
+        patternId,
+        parameters: Object.freeze(
+          Object.fromEntries(
+            Object.entries(SCHEMAS[patternId]).map(([parameter, domain2]) => [
+              parameter,
+              Object.freeze({
+                responsive: domain2 !== "boolean",
+                ...domain2 === "spacing" ? { category: "spacing", token: true } : {
+                  values: Object.freeze(
+                    domain2 === "boolean" ? [false, true] : domain2 === "columns" ? [1, 2, 3, 4, 5, 6] : Object.keys(domain2)
+                  )
+                }
+              })
+            ])
+          )
+        )
+      })
+    ])
+  )
+);
+
+// packages/compiler/src/design-system/policy/descriptors.js
+var ENFORCED_FIELDS = Object.freeze([
+  "key",
+  "css",
+  "aliases",
+  "status",
+  "platform",
+  "grammar",
+  "contexts",
+  "domain",
+  "origin",
+  "form",
+  "longhands",
+  "family",
+  "conflicts",
+  "direction",
+  "targetFeature"
+]);
+var CATALOG_FIELDS = Object.freeze([
+  "key",
+  "css",
+  "aliases",
+  "status",
+  "platform",
+  "grammar",
+  "contexts",
+  "standard",
+  "default",
+  "form",
+  "longhands",
+  "family",
+  "conflicts",
+  "direction",
+  "targetFeature"
+]);
+var ELEMENT = Object.freeze(["element"]);
+var NONE = Object.freeze([]);
+var kebab = (key) => key.replace(/^(Webkit|Moz)/, (m) => `-${m.toLowerCase()}`).replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
+function domain({ values = NONE, tokens = NONE, range = null } = {}) {
+  return { values: [...values], tokens: [...tokens], resources: [], range };
+}
+var COLOR = (key, grammar, family, extra = {}) => [
+  key,
+  grammar,
+  family,
+  {
+    def: { tokens: ["colors"] },
+    std: { values: ["currentColor", "transparent"], tokens: ["colors"] },
+    ...extra
+  }
+];
+var SPACING = (key, grammar, family, values, extra = {}) => [
+  key,
+  grammar,
+  family,
+  {
+    def: { tokens: ["spacing"] },
+    std: { values, tokens: ["spacing"] },
+    ...extra
+  }
+];
+var SIZE_KEYWORDS = ["auto", "min-content", "max-content", "fit-content"];
+var ALPHA1_SIZES = [
+  "1px",
+  "16px",
+  "20px",
+  "24px",
+  "28px",
+  "32px",
+  "36px",
+  "40px"
+];
+var DURATION = (key, grammar) => [
+  key,
+  grammar,
+  key.startsWith("animation") ? "animations" : "transitions",
+  { def: { tokens: ["durations"] }, std: { tokens: ["durations"] } }
+];
+var EASING = (key) => [
+  key,
+  "<easing-function>#",
+  key.startsWith("animation") ? "animations" : "transitions",
+  {
+    def: { tokens: ["easings"] },
+    std: {
+      values: [
+        "linear",
+        "ease",
+        "ease-in",
+        "ease-out",
+        "ease-in-out",
+        "step-start",
+        "step-end"
+      ],
+      tokens: ["easings"]
+    }
+  }
+];
+var SET = (key, grammar, family, def, std = [], extra = {}) => [
+  key,
+  grammar,
+  family,
+  { def: { values: def }, std: { values: std }, ...extra }
+];
+var rangeOf = (min, max) => max === Infinity ? { min } : { min, max };
+var RANGE = (key, grammar, family, min, max, extra = {}) => [
+  key,
+  grammar,
+  family,
+  {
+    def: { range: rangeOf(min, max) },
+    std: { range: rangeOf(min, max) },
+    ...extra
+  }
+];
+var COMPOSITE = (key, grammar, family, longhands) => [
+  key,
+  grammar,
+  family,
+  { form: "rejected-composite", longhands }
+];
+var PLATFORM = (key, grammar, family, platform) => [
+  key,
+  grammar,
+  family,
+  { status: "platform", platform }
+];
+var side = (axis, s) => ({ axis, side: s });
+var physical = (p) => ({ physical: p });
+var corner = (c) => ({ corner: c });
+var shorthand = (longhands, direction = null) => ({
+  form: "shorthand",
+  longhands,
+  direction
+});
+var sides = (prefix, suffix = "") => ["top", "right", "bottom", "left"].map((s) => `${prefix}${s}${suffix}`);
+var PADDING = "<'padding-top'>";
+var MARGIN = "<'margin-top'>";
+var INSET = "<'top'>";
+var LENGTH_PERCENTAGE_0 = "<length-percentage [0,\u221E]>";
+var RADIUS = "<length-percentage [0,\u221E]>{1,2}";
+var ROWS = [
+  // Colors (Alpha 1: token category `colors`).
+  COLOR("color", "<color>", "text-basic"),
+  COLOR("backgroundColor", "<color>", "backgrounds"),
+  COLOR("borderColor", "<color>{1,4}", "borders", {
+    ...shorthand(sides("border-", "-color"))
+  }),
+  COLOR("borderTopColor", "<color>", "borders", {
+    direction: physical("top")
+  }),
+  COLOR("borderRightColor", "<color>", "borders", {
+    direction: physical("right")
+  }),
+  COLOR("borderBottomColor", "<color>", "borders", {
+    direction: physical("bottom")
+  }),
+  COLOR("borderLeftColor", "<color>", "borders", {
+    direction: physical("left")
+  }),
+  COLOR("borderInlineColor", "<'border-top-color'>{1,2}", "borders", {
+    ...shorthand(
+      ["border-inline-start-color", "border-inline-end-color"],
+      side("inline", null)
+    )
+  }),
+  COLOR("borderBlockColor", "<'border-top-color'>{1,2}", "borders", {
+    ...shorthand(
+      ["border-block-start-color", "border-block-end-color"],
+      side("block", null)
+    )
+  }),
+  COLOR("outlineColor", "auto | <color>", "outlines"),
+  COLOR("textDecorationColor", "<color>", "text-basic"),
+  COLOR("caretColor", "auto | <color>", "form-controls"),
+  COLOR("fill", "<paint>", "svg-icon-paint"),
+  COLOR("stroke", "<paint>", "svg-icon-paint"),
+  // Spacing (Alpha 1: token category `spacing`).
+  SPACING("padding", `${PADDING}{1,4}`, "spacing", ["0"], {
+    ...shorthand(sides("padding-"))
+  }),
+  SPACING("paddingTop", LENGTH_PERCENTAGE_0, "spacing", ["0"], {
+    direction: physical("top")
+  }),
+  SPACING("paddingRight", LENGTH_PERCENTAGE_0, "spacing", ["0"], {
+    direction: physical("right")
+  }),
+  SPACING("paddingBottom", LENGTH_PERCENTAGE_0, "spacing", ["0"], {
+    direction: physical("bottom")
+  }),
+  SPACING("paddingLeft", LENGTH_PERCENTAGE_0, "spacing", ["0"], {
+    direction: physical("left")
+  }),
+  SPACING("paddingInline", `${PADDING}{1,2}`, "spacing", ["0"], {
+    ...shorthand(
+      ["padding-inline-start", "padding-inline-end"],
+      side("inline", null)
+    )
+  }),
+  SPACING("paddingInlineStart", PADDING, "spacing", ["0"], {
+    direction: side("inline", "start")
+  }),
+  SPACING("paddingInlineEnd", PADDING, "spacing", ["0"], {
+    direction: side("inline", "end")
+  }),
+  SPACING("paddingBlock", `${PADDING}{1,2}`, "spacing", ["0"], {
+    ...shorthand(
+      ["padding-block-start", "padding-block-end"],
+      side("block", null)
+    )
+  }),
+  SPACING("paddingBlockStart", PADDING, "spacing", ["0"], {
+    direction: side("block", "start")
+  }),
+  SPACING("paddingBlockEnd", PADDING, "spacing", ["0"], {
+    direction: side("block", "end")
+  }),
+  SPACING("margin", `${MARGIN}{1,4}`, "spacing", ["0", "auto"], {
+    ...shorthand(sides("margin-"))
+  }),
+  SPACING("marginTop", "<length-percentage> | auto", "spacing", ["0", "auto"], {
+    direction: physical("top")
+  }),
+  SPACING(
+    "marginRight",
+    "<length-percentage> | auto",
+    "spacing",
+    ["0", "auto"],
+    { direction: physical("right") }
+  ),
+  SPACING(
+    "marginBottom",
+    "<length-percentage> | auto",
+    "spacing",
+    ["0", "auto"],
+    { direction: physical("bottom") }
+  ),
+  SPACING(
+    "marginLeft",
+    "<length-percentage> | auto",
+    "spacing",
+    ["0", "auto"],
+    { direction: physical("left") }
+  ),
+  SPACING("marginInlineStart", MARGIN, "spacing", ["0", "auto"], {
+    direction: side("inline", "start")
+  }),
+  SPACING("marginInlineEnd", MARGIN, "spacing", ["0", "auto"], {
+    direction: side("inline", "end")
+  }),
+  SPACING("marginBlock", `${MARGIN}{1,2}`, "spacing", ["0", "auto"], {
+    ...shorthand(
+      ["margin-block-start", "margin-block-end"],
+      side("block", null)
+    )
+  }),
+  SPACING("marginBlockStart", MARGIN, "spacing", ["0", "auto"], {
+    direction: side("block", "start")
+  }),
+  SPACING("marginBlockEnd", MARGIN, "spacing", ["0", "auto"], {
+    direction: side("block", "end")
+  }),
+  SPACING("top", "auto | <length-percentage>", "position", ["0", "auto"], {
+    direction: physical("top")
+  }),
+  SPACING("right", "auto | <length-percentage>", "position", ["0", "auto"], {
+    direction: physical("right")
+  }),
+  SPACING("bottom", "auto | <length-percentage>", "position", ["0", "auto"], {
+    direction: physical("bottom")
+  }),
+  SPACING("left", "auto | <length-percentage>", "position", ["0", "auto"], {
+    direction: physical("left")
+  }),
+  SPACING("insetInlineStart", INSET, "position", ["0", "auto"], {
+    direction: side("inline", "start")
+  }),
+  SPACING("insetInlineEnd", INSET, "position", ["0", "auto"], {
+    direction: side("inline", "end")
+  }),
+  SPACING("insetBlockStart", INSET, "position", ["0", "auto"], {
+    direction: side("block", "start")
+  }),
+  SPACING("insetBlockEnd", INSET, "position", ["0", "auto"], {
+    direction: side("block", "end")
+  }),
+  SPACING("textUnderlineOffset", "auto | <length-percentage>", "text-basic", [
+    "auto",
+    "0"
+  ]),
+  SPACING("gap", "<'row-gap'> <'column-gap'>?", "spacing", ["0", "normal"], {
+    ...shorthand(["row-gap", "column-gap"])
+  }),
+  SPACING("rowGap", `normal | ${LENGTH_PERCENTAGE_0}`, "spacing", [
+    "0",
+    "normal"
+  ]),
+  SPACING("columnGap", `normal | ${LENGTH_PERCENTAGE_0}`, "spacing", [
+    "0",
+    "normal"
+  ]),
+  // Radii (Alpha 1: token category `radii`).
+  [
+    "borderRadius",
+    `${LENGTH_PERCENTAGE_0}{1,4} [ / ${LENGTH_PERCENTAGE_0}{1,4} ]?`,
+    "borders",
+    {
+      def: { tokens: ["radii"] },
+      std: { values: ["0"], tokens: ["radii"] },
+      ...shorthand([
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-bottom-right-radius",
+        "border-bottom-left-radius"
+      ])
+    }
+  ],
+  ...[
+    ["borderTopLeftRadius", physical("top-left")],
+    ["borderTopRightRadius", physical("top-right")],
+    ["borderBottomLeftRadius", physical("bottom-left")],
+    ["borderBottomRightRadius", physical("bottom-right")],
+    ["borderStartStartRadius", corner("start-start")],
+    ["borderStartEndRadius", corner("start-end")],
+    ["borderEndStartRadius", corner("end-start")],
+    ["borderEndEndRadius", corner("end-end")]
+  ].map(([key, direction]) => [
+    key,
+    RADIUS,
+    "borders",
+    {
+      def: { tokens: ["radii"] },
+      std: { values: ["0"], tokens: ["radii"] },
+      direction
+    }
+  ]),
+  // Typography.
+  [
+    "fontFamily",
+    "[ <family-name> | <generic-family> ]#",
+    "text-basic",
+    {
+      def: { tokens: ["fontFamilies"] },
+      std: {
+        values: ["serif", "sans-serif", "monospace", "system-ui"],
+        tokens: ["fontFamilies"]
+      }
+    }
+  ],
+  [
+    "fontSize",
+    `<absolute-size> | <relative-size> | ${LENGTH_PERCENTAGE_0} | math`,
+    "text-basic",
+    {
+      def: { tokens: ["fontSizes"] },
+      std: {
+        values: [
+          "xx-small",
+          "x-small",
+          "small",
+          "medium",
+          "large",
+          "x-large",
+          "xx-large",
+          "smaller",
+          "larger"
+        ],
+        tokens: ["fontSizes"]
+      }
+    }
+  ],
+  [
+    "fontWeight",
+    "<font-weight-absolute> | bolder | lighter",
+    "text-basic",
+    {
+      def: { tokens: ["fontWeights"] },
+      std: {
+        values: ["normal", "bold", "bolder", "lighter"],
+        tokens: ["fontWeights"]
+      }
+    }
+  ],
+  [
+    "lineHeight",
+    `normal | <number [0,\u221E]> | ${LENGTH_PERCENTAGE_0}`,
+    "text-basic",
+    {
+      def: { tokens: ["lineHeights"] },
+      std: { values: ["normal"], tokens: ["lineHeights"] }
+    }
+  ],
+  [
+    "letterSpacing",
+    "normal | <length-percentage>",
+    "text-basic",
+    {
+      def: { tokens: ["letterSpacings"] },
+      std: { values: ["normal"], tokens: ["letterSpacings"] }
+    }
+  ],
+  // Shadows.
+  [
+    "boxShadow",
+    "none | <shadow>#",
+    "effects",
+    {
+      def: { tokens: ["shadows"] },
+      std: { values: ["none"], tokens: ["shadows"] }
+    }
+  ],
+  [
+    "textShadow",
+    "none | <shadow-t>#",
+    "text-basic",
+    {
+      def: { tokens: ["shadows"] },
+      std: { values: ["none"], tokens: ["shadows"] }
+    }
+  ],
+  // Motion.
+  DURATION("transitionDuration", "<time [0s,\u221E]>#"),
+  DURATION("transitionDelay", "<time>#"),
+  EASING("transitionTimingFunction"),
+  DURATION("animationDuration", "[ auto | <time [0s,\u221E]> ]#"),
+  DURATION("animationDelay", "<time>#"),
+  EASING("animationTimingFunction"),
+  // Finite literal sets (Alpha 1 `STRUCTURAL`).
+  SET(
+    "gridTemplateColumns",
+    "none | <track-list> | <auto-track-list> | subgrid <line-name-list>?",
+    "grid",
+    [1, 2, 3, 4, 5, 6].map((n) => `repeat(${n}, minmax(0, 1fr))`),
+    ["none"]
+  ),
+  SET(
+    "display",
+    "[ <display-outside> || <display-inside> ] | <display-listitem> | <display-internal> | <display-box> | <display-legacy>",
+    "display-box",
+    ["flex", "inline-flex", "block", "inline-block", "grid", "none"],
+    ["inline", "inline-grid", "contents", "flow-root"]
+  ),
+  SET("flexDirection", "row | row-reverse | column | column-reverse", "flex", [
+    "row",
+    "row-reverse",
+    "column",
+    "column-reverse"
+  ]),
+  SET(
+    "alignItems",
+    "normal | stretch | <baseline-position> | [ <overflow-position>? <self-position> ]",
+    "alignment",
+    ["flex-start", "flex-end", "center", "baseline", "stretch"],
+    ["normal", "start", "end", "self-start", "self-end"]
+  ),
+  SET(
+    "justifyContent",
+    "normal | <content-distribution> | <overflow-position>? [ <content-position> | left | right ]",
+    "alignment",
+    ["flex-start", "flex-end", "center", "space-between", "space-around"],
+    ["normal", "start", "end", "space-evenly", "stretch", "left", "right"]
+  ),
+  SET(
+    "boxSizing",
+    "content-box | border-box",
+    "sizing",
+    ["border-box"],
+    ["content-box"]
+  ),
+  SET(
+    "width",
+    `auto | ${LENGTH_PERCENTAGE_0} | min-content | max-content | fit-content | fit-content(${LENGTH_PERCENTAGE_0})`,
+    "sizing",
+    ["100%", "fit-content", ...ALPHA1_SIZES],
+    SIZE_KEYWORDS,
+    { std: { values: SIZE_KEYWORDS, tokens: ["sizes", "spacing"] } }
+  ),
+  SET(
+    "height",
+    `auto | ${LENGTH_PERCENTAGE_0} | min-content | max-content | fit-content | fit-content(${LENGTH_PERCENTAGE_0})`,
+    "sizing",
+    [...ALPHA1_SIZES.slice(1), "1px", "100%"],
+    SIZE_KEYWORDS,
+    { std: { values: SIZE_KEYWORDS, tokens: ["sizes", "spacing"] } }
+  ),
+  SET(
+    "minWidth",
+    `auto | ${LENGTH_PERCENTAGE_0} | min-content | max-content | fit-content | fit-content(${LENGTH_PERCENTAGE_0})`,
+    "sizing",
+    ["0", ...ALPHA1_SIZES.slice(1), "100%"],
+    SIZE_KEYWORDS,
+    { std: { values: SIZE_KEYWORDS, tokens: ["sizes", "spacing"] } }
+  ),
+  SET(
+    "maxWidth",
+    `none | ${LENGTH_PERCENTAGE_0} | min-content | max-content | fit-content | fit-content(${LENGTH_PERCENTAGE_0})`,
+    "sizing",
+    ["100%", "240px", "320px"],
+    ["none", "min-content", "max-content", "fit-content"],
+    {
+      std: {
+        values: ["none", "min-content", "max-content", "fit-content"],
+        tokens: ["sizes", "spacing"]
+      }
+    }
+  ),
+  SET(
+    "position",
+    "static | relative | absolute | sticky | fixed",
+    "position",
+    ["relative", "absolute"],
+    ["static", "sticky", "fixed"]
+  ),
+  SET("inset", `${INSET}{1,4}`, "position", ["0"], ["auto"], {
+    std: { values: ["auto"], tokens: ["spacing"] },
+    ...shorthand(["top", "right", "bottom", "left"])
+  }),
+  SET(
+    "overflow",
+    "<'overflow-block'>{1,2}",
+    "overflow-scroll",
+    ["hidden"],
+    ["visible", "clip", "scroll", "auto"],
+    shorthand(["overflow-x", "overflow-y"])
+  ),
+  SET(
+    "clipPath",
+    "<clip-source> | [ <basic-shape> || <geometry-box> ] | none",
+    "clipping",
+    ["inset(50%)"],
+    ["none"]
+  ),
+  SET(
+    "userSelect",
+    "auto | text | none | contain | all",
+    "interaction",
+    ["none"],
+    ["auto", "text", "all"]
+  ),
+  SET(
+    "whiteSpace",
+    "normal | pre | pre-wrap | pre-line | <'white-space-collapse'> || <'text-wrap-mode'>",
+    "text-basic",
+    ["nowrap"],
+    ["normal", "pre", "pre-wrap", "pre-line", "break-spaces"]
+  ),
+  SET(
+    "backgroundClip",
+    "<bg-clip>#",
+    "backgrounds",
+    ["padding-box"],
+    ["border-box", "content-box", "text"]
+  ),
+  SET(
+    "borderWidth",
+    "<line-width>{1,4}",
+    "borders",
+    ["1px"],
+    ["0", "thin", "medium", "thick"],
+    shorthand(sides("border-", "-width"))
+  ),
+  SET(
+    "borderStyle",
+    "<line-style>{1,4}",
+    "borders",
+    ["solid"],
+    [
+      "none",
+      "hidden",
+      "dotted",
+      "dashed",
+      "double",
+      "groove",
+      "ridge",
+      "inset",
+      "outset"
+    ],
+    shorthand(sides("border-", "-style"))
+  ),
+  SET(
+    "pointerEvents",
+    "auto | bounding-box | visiblePainted | visibleFill | visibleStroke | visible | painted | fill | stroke | all | none",
+    "interaction",
+    ["none"],
+    ["auto"]
+  ),
+  SET(
+    "filter",
+    "none | <filter-value-list>",
+    "effects",
+    ["grayscale(1)"],
+    ["none"]
+  ),
+  SET(
+    "transform",
+    "none | <transform-list>",
+    "transforms",
+    ["translateY(1px)"],
+    ["none"]
+  ),
+  SET(
+    "textAlign",
+    "start | end | left | right | center | justify | match-parent",
+    "text-basic",
+    ["left", "start"],
+    ["end", "right", "center", "justify", "match-parent"]
+  ),
+  SET(
+    "textDecorationLine",
+    "none | [ underline || overline || line-through || blink ] | spelling-error | grammar-error",
+    "text-basic",
+    ["underline"],
+    ["none", "overline", "line-through"]
+  ),
+  SET(
+    "animationName",
+    "[ none | <keyframes-name> ]#",
+    "keyframes",
+    ["spin", "pulse"],
+    ["none"]
+  ),
+  SET("animationIterationCount", "infinite | <number [0,\u221E]>", "animations", [
+    "infinite"
+  ]),
+  SET(
+    "alignSelf",
+    "auto | normal | stretch | <baseline-position> | <overflow-position>? <self-position>",
+    "alignment",
+    ["flex-start"],
+    [
+      "auto",
+      "normal",
+      "stretch",
+      "baseline",
+      "center",
+      "flex-end",
+      "start",
+      "end"
+    ]
+  ),
+  SET(
+    "transitionProperty",
+    "none | <single-transition-property>#",
+    "transitions",
+    ["all"],
+    ["none"]
+  ),
+  SET("marginInline", `${MARGIN}{1,2}`, "spacing", ["auto"], ["0"], {
+    std: { values: ["0"], tokens: ["spacing"] },
+    ...shorthand(
+      ["margin-inline-start", "margin-inline-end"],
+      side("inline", null)
+    )
+  }),
+  // Legacy continuous ranges (Alpha 1 `STRUCTURAL_NUMBER_RANGES`).
+  RANGE("opacity", "<number> | <percentage>", "effects", 0, 1),
+  RANGE(
+    "flex",
+    "none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]",
+    "flex",
+    0,
+    Infinity,
+    shorthand(["flex-grow", "flex-shrink", "flex-basis"])
+  ),
+  RANGE("flexGrow", "<number [0,\u221E]>", "flex", 0, Infinity),
+  RANGE("flexShrink", "<number [0,\u221E]>", "flex", 0, Infinity),
+  // Composite forms, refused (Alpha 1 `COMPOSITE_FORMS`).
+  COMPOSITE("background", "<bg-layer>#? , <final-bg-layer>", "backgrounds", [
+    "background-color",
+    "background-image",
+    "background-position",
+    "background-size",
+    "background-repeat",
+    "background-attachment",
+    "background-origin",
+    "background-clip"
+  ]),
+  COMPOSITE("border", "<line-width> || <line-style> || <color>", "borders", [
+    "border-width",
+    "border-style",
+    "border-color"
+  ]),
+  COMPOSITE(
+    "font",
+    "[ [ <'font-style'> || <font-variant-css2> || <'font-weight'> || <font-width-css3> ]? <'font-size'> [ / <'line-height'> ]? <'font-family'># ] | <system-family-name>",
+    "text-basic",
+    [
+      "font-style",
+      "font-variant",
+      "font-weight",
+      "font-stretch",
+      "font-size",
+      "line-height",
+      "font-family"
+    ]
+  ),
+  COMPOSITE("animation", "<single-animation>#", "animations", [
+    "animation-name",
+    "animation-duration",
+    "animation-timing-function",
+    "animation-delay",
+    "animation-iteration-count",
+    "animation-direction",
+    "animation-fill-mode",
+    "animation-play-state"
+  ]),
+  COMPOSITE("transition", "<single-transition>#", "transitions", [
+    "transition-property",
+    "transition-duration",
+    "transition-timing-function",
+    "transition-delay"
+  ]),
+  // Platform extensions: recognition-only (CE-01.1 D-BP-03 platform ids).
+  PLATFORM("WebkitAppRegion", "drag | no-drag", "interaction", "electron"),
+  PLATFORM(
+    "WebkitUserDrag",
+    "auto | element | none",
+    "interaction",
+    "electron"
+  ),
+  PLATFORM(
+    "WebkitFontSmoothing",
+    "auto | none | antialiased | subpixel-antialiased",
+    "font-rendering",
+    "electron"
+  )
+];
+var union = (a, b) => [.../* @__PURE__ */ new Set([...a, ...b])];
+function row([key, grammar, family, spec]) {
+  const css = kebab(key);
+  const status = spec.status ?? "standard";
+  const form = spec.form ?? "longhand";
+  const admitted = status === "standard" && form !== "rejected-composite";
+  const def = admitted ? domain(spec.def) : null;
+  const std = admitted ? domain({
+    values: union(def.values, spec.std?.values ?? NONE),
+    tokens: union(def.tokens, spec.std?.tokens ?? NONE),
+    range: spec.std?.range ?? def.range
+  }) : null;
+  return {
+    key,
+    css,
+    aliases: NONE,
+    status,
+    platform: spec.platform ?? null,
+    grammar,
+    contexts: ELEMENT,
+    standard: std,
+    default: def,
+    form,
+    longhands: spec.longhands ?? null,
+    family,
+    conflicts: NONE,
+    direction: spec.direction ?? null,
+    targetFeature: status === "platform" ? `platform:${spec.platform}/${css}` : `property:${css}`
+  };
+}
+function deepFreeze(value) {
+  if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
+    for (const key of Object.keys(value)) deepFreeze(value[key]);
+    Object.freeze(value);
+  }
+  return value;
+}
+var CATALOG = (() => {
+  const rows = ROWS.map(row);
+  const byCss = new Map(rows.map((r) => [r.css, r.key]));
+  const conflicts = /* @__PURE__ */ new Map();
+  for (const r of rows) {
+    if (r.form !== "shorthand") continue;
+    for (const longhand of r.longhands) {
+      const key = byCss.get(longhand);
+      if (key == null) continue;
+      if (!conflicts.has(key)) conflicts.set(key, []);
+      conflicts.get(key).push(r.key);
+    }
+  }
+  const map = /* @__PURE__ */ new Map();
+  for (const r of rows) {
+    if (map.has(r.key)) throw new Error(`duplicate descriptor ${r.key}`);
+    if (conflicts.has(r.key)) r.conflicts = conflicts.get(r.key).sort();
+    map.set(r.key, deepFreeze(r));
+  }
+  return map;
+})();
+var KEYS = Object.freeze([...CATALOG.keys()]);
+
+// packages/compiler/src/design-system/policy/domains.js
+var PROTOTYPE_NAMES = /* @__PURE__ */ new Set([
+  ...Object.getOwnPropertyNames(Object.prototype),
+  "prototype"
+]);
+
+// packages/compiler/src/design-system/registry/snapshot.js
+var MANIFEST_SCHEMA_VERSION = 2;
+var DESIGN_SYSTEM_CAPABILITIES = Object.freeze({
+  slots: true,
+  compoundVariants: true,
+  patterns: true,
+  rawDynamicStyles: false
+});
+
+// packages/compiler/src/artifacts/metadata/artifact-set.js
+var ARTIFACTS = ["designModule", "declarations", "manifest", "css"];
+function sha256(content) {
+  return (0, import_crypto.createHash)("sha256").update(content, "utf8").digest("hex");
+}
+function identityPayload(identity) {
+  return {
+    systemId: identity.systemId,
+    registryDigest: identity.registryDigest,
+    abiVersion: identity.abiVersion,
+    compilerContractVersion: identity.compilerContractVersion,
+    manifestSchemaVersion: identity.manifestSchemaVersion
+  };
+}
+function artifactSetDigest(identity, artifacts) {
+  const content = {
+    ...identityPayload(identity),
+    artifacts: Object.fromEntries(
+      ARTIFACTS.map((name) => [
+        name,
+        {
+          file: artifacts[name].file,
+          sha256: artifacts[name].sha256,
+          bytes: artifacts[name].bytes
+        }
+      ])
+    )
+  };
+  return sha256(JSON.stringify(content));
+}
+function mismatch(artifact, reason) {
+  throw new PmsError([
+    diagnostic({
+      code: Codes.GENERATED_ARTIFACT_MISMATCH,
+      phase: "artifacts",
+      rule: "artifact-set.coherence",
+      message: `Generated artifact set mismatch for ${artifact}: ${reason}.`,
+      context: { artifact, reason }
+    })
+  ]);
+}
+function designDeclarationFile(designModuleFile) {
+  return /\.(?:mjs|cjs|js)$/i.test(designModuleFile) ? designModuleFile.replace(/\.(?:mjs|cjs|js)$/i, ".d.ts") : `${designModuleFile}.d.ts`;
+}
+function designSystemCssHeader(identity) {
+  return `/* pandamstyle-design-system ${JSON.stringify(identityPayload(identity))} */`;
+}
+function withDesignSystemCssIdentity(css, identity) {
+  return `${designSystemCssHeader(identity)}
+${css}`;
+}
+function validateArtifactSet(metadata, contents) {
+  if (metadata == null || typeof metadata !== "object") {
+    mismatch("artifacts.json", "metadata is not an object");
+  }
+  const identity = {
+    systemId: metadata.systemId,
+    registryDigest: metadata.registryDigest,
+    abiVersion: metadata.abiVersion,
+    compilerContractVersion: metadata.compilerContractVersion,
+    manifestSchemaVersion: metadata.manifestSchemaVersion
+  };
+  const records = metadata.artifacts ?? {};
+  for (const name of ARTIFACTS) {
+    const record = records[name];
+    const content = contents?.[name];
+    if (record == null || typeof content !== "string") {
+      mismatch(name, "artifact content or digest record is missing");
+    }
+    if (record.bytes !== Buffer.byteLength(content, "utf8")) {
+      mismatch(name, "byte length does not match artifacts.json");
+    }
+    if (record.sha256 !== sha256(content)) {
+      mismatch(name, "SHA-256 does not match artifacts.json");
+    }
+  }
+  if (metadata.artifactSetDigest !== artifactSetDigest(identity, records)) {
+    mismatch("artifacts.json", "artifact-set digest is invalid");
+  }
+  if (metadata.schemaVersion !== 1 || metadata.abiVersion !== 1 || metadata.compilerContractVersion !== "pms-0.1" || metadata.manifestSchemaVersion !== MANIFEST_SCHEMA_VERSION) {
+    mismatch("artifacts.json", "unsupported schema or compiler identity");
+  }
+  let manifest;
+  try {
+    manifest = JSON.parse(contents.manifest);
+  } catch {
+    mismatch("manifest", "JSON could not be parsed");
+  }
+  for (const key of Object.keys(identity)) {
+    if (manifest[key] !== identity[key]) {
+      mismatch("manifest", `identity field ${key} differs`);
+    }
+  }
+  for (const [property, entry] of Object.entries(
+    manifest?.properties?.byProperty ?? {}
+  )) {
+    const range = entry?.range;
+    if (range == null) continue;
+    const finite = (bound) => typeof bound === "number" && Number.isFinite(bound);
+    if (!finite(range.min) || Object.hasOwn(range, "max") && !finite(range.max)) {
+      mismatch(
+        "manifest",
+        `range bounds of ${property} are not finite numbers`
+      );
+    }
+  }
+  if ((manifest.targets?.digest ?? null) !== (metadata.targetsDigest ?? null)) {
+    mismatch("artifacts.json", "targetsDigest differs from the manifest");
+  }
+  const markerMatch = contents.designModule.match(
+    /export const __pandamstyle = (\{[\s\S]*?\n\});/
+  );
+  let marker;
+  try {
+    marker = markerMatch == null ? null : JSON.parse(markerMatch[1]);
+  } catch {
+    marker = null;
+  }
+  if (marker == null || marker.abiVersion !== identity.abiVersion || marker.compilerContractVersion !== identity.compilerContractVersion || marker.manifestSchemaVersion !== identity.manifestSchemaVersion || marker.designSystem?.systemId !== identity.systemId || marker.designSystem?.registryDigest !== identity.registryDigest || marker.capabilities?.slots !== true || marker.capabilities?.compoundVariants !== true || marker.capabilities?.patterns !== true || marker.capabilities?.rawDynamicStyles !== false) {
+    mismatch("designModule", "generated identity marker differs");
+  }
+  for (const [field, value] of Object.entries(identity)) {
+    if (!contents.declarations.includes(`${field}: ${JSON.stringify(value)};`)) {
+      mismatch("declarations", `identity field ${field} differs`);
+    }
+  }
+  if (!contents.css.startsWith(`${designSystemCssHeader(identity)}
+`)) {
+    mismatch("css", "design-system identity header differs");
+  }
+  return true;
+}
+function createArtifactSet(snapshot, {
+  designModuleFile,
+  declarationsFile,
+  designModule,
+  declarations,
+  manifest,
+  css
+}) {
+  const identity = identityPayload(snapshot.identity);
+  const files = {
+    designModule: designModuleFile,
+    declarations: declarationsFile,
+    manifest: "manifest.json",
+    css: "styles.css"
+  };
+  const contents = { designModule, declarations, manifest, css };
+  const artifacts = Object.fromEntries(
+    ARTIFACTS.map((name) => [
+      name,
+      {
+        file: files[name],
+        sha256: sha256(contents[name]),
+        bytes: Buffer.byteLength(contents[name], "utf8")
+      }
+    ])
+  );
+  const metadata = {
+    schemaVersion: 1,
+    ...identity,
+    artifactSetDigest: artifactSetDigest(identity, artifacts),
+    artifacts,
+    ...snapshot.targets == null ? {} : { targetsDigest: snapshot.targets.digest }
+  };
+  validateArtifactSet(metadata, contents);
+  const text = `${JSON.stringify(metadata, null, 2)}
+`;
+  return Object.freeze({ metadata, text, contents: Object.freeze(contents) });
+}
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  createArtifactSet,
+  designDeclarationFile,
+  designSystemCssHeader,
+  validateArtifactSet,
+  withDesignSystemCssIdentity
+});

@@ -417,8 +417,10 @@ export function generateDesignSystemDeclarations(snapshot) {
   manifestSchemaVersion: ${literal(identity.manifestSchemaVersion)};
   capabilities: ${capabilityLiteral};
 }>`;
+  // The manifest's own `schemaVersion` is its schema version (snapshot.js);
+  // it was written here as the literal 1 through CE-02.1.
   const manifestLiteral = `Readonly<{
-  schemaVersion: 1;
+  schemaVersion: ${literal(snapshot.tooling.manifest.schemaVersion)};
   systemId: ${literal(identity.systemId)};
   registryDigest: ${literal(identity.registryDigest)};
   abiVersion: 1;

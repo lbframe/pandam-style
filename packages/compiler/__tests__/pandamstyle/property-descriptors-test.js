@@ -371,9 +371,9 @@ describe('the effective property table', () => {
     }
   });
 
-  test('the manifest is the projection of the table, as manifest version 2', () => {
+  test('the manifest is the projection of the table, as manifest version 3', () => {
     const manifest = ds.snapshot.tooling.manifest;
-    expect(manifest.manifestSchemaVersion).toBe(2);
+    expect(manifest.manifestSchemaVersion).toBe(3);
     expect(manifest).not.toHaveProperty('supportedProperties');
     expect(manifest.properties.digest).toBe(properties.digest);
     for (const row of rows) {
