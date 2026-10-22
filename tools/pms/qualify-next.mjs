@@ -1183,7 +1183,7 @@ export async function load(url, context, nextLoad) {
       await openQualified('dev-server');
       const sourceFile = 'app/shared.jsx';
       const original = await fs.readFile(path.join(app, sourceFile), 'utf8');
-      for (const opacity of [0.33, 0.77]) {
+      for (const opacity of [0.35, 0.75]) {
         const began = performance.now();
         const wallStart = Date.now();
         await page.evaluate(() => {
@@ -1217,7 +1217,7 @@ export async function load(url, context, nextLoad) {
           path.join(app, '.pandamstyle/styles.css'),
           'utf8',
         );
-        if (opacity === 0.77) assert(!css.includes('opacity:.33'));
+        if (opacity === 0.75) assert(!css.includes('opacity:.35'));
         const observations = (await readEvents()).slice(count);
         const diagnostic = observations.find(
           (event) => event.type === 'diagnostics',
@@ -1234,7 +1234,7 @@ export async function load(url, context, nextLoad) {
             ? 'RSC/Fast Refresh without document reload'
             : 'full reload',
           events: observations,
-          staleRuleRemoved: opacity === 0.77,
+          staleRuleRemoved: opacity === 0.75,
         });
       }
       const valid = await fs.readFile(path.join(app, sourceFile), 'utf8');
@@ -1264,7 +1264,7 @@ export async function load(url, context, nextLoad) {
           name + '-repair',
         );
         await openQualified(name + '-repair');
-        assert.equal((await styles()).serverOpacity, '0.77');
+        assert.equal((await styles()).serverOpacity, '0.75');
         report.dev.push({
           case: name + '-repair',
           ms: performance.now() - began,
@@ -1403,7 +1403,7 @@ export async function load(url, context, nextLoad) {
       server = await start('start', 'production-after-definition-server');
       await openQualified('production-after-definition-server');
       assert.equal((await styles()).color, 'rgb(34, 68, 102)');
-      assert.equal((await styles()).serverOpacity, '0.77');
+      assert.equal((await styles()).serverOpacity, '0.75');
       await server.stop();
       server = null;
       server = await start('dev', 'minimum-node-dev', minimumNode);
