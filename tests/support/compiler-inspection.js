@@ -164,3 +164,47 @@ export { createPassState } from '../../packages/compiler/src/frontend/babel/pass
 export { conformanceDefinition } from '../fixtures/design-systems/conformance.js';
 // CE-01.1 targets: pure resolution, catalog, outcome and evaluation functions.
 export * as targets from '../../packages/compiler/src/targets/index.js';
+// AG-01.1 agent layer: reachable from this private bundle only, never from a
+// published entry (design note §3.1, §5.3).
+export { createAgentBinding } from '../../packages/compiler/src/agent/binding.js';
+export {
+  createRegistry,
+  envelopeSchema,
+  universalErrors,
+  schemaFailureReason,
+  EFFECT_KINDS,
+  EFFECT_DETAILS,
+  GRANT_EFFECTS,
+  PRECONDITIONS,
+  REGISTRY,
+  REGISTRY_ENTRIES,
+  REQUEST_FAILURE_REASONS,
+} from '../../packages/compiler/src/agent/registry.js';
+export {
+  compileSchema,
+  maxJsonBytes,
+  validateSchema,
+  SCHEMA_KEYWORDS,
+  FORMATS,
+} from '../../packages/compiler/src/agent/schema.js';
+export {
+  snapshotRequest,
+  DEFAULT_REQUEST_LIMITS,
+} from '../../packages/compiler/src/agent/snapshot.js';
+export {
+  GRANTS,
+  DENIAL_REASONS,
+} from '../../packages/compiler/src/agent/capabilities.js';
+export { HANDLERS as AGENT_HANDLERS } from '../../packages/compiler/src/agent/handlers/index.js';
+export { describeOperations } from '../../packages/compiler/src/agent/handlers/operations.js';
+export { generateOperationTypes } from '../../packages/compiler/src/agent/codegen.js';
+export {
+  AgentCodes,
+  canonicalJson,
+  classifyError,
+  classifyVerdict,
+  recordInfo,
+  INVALID_REVISION_OUTCOMES,
+  OUTCOMES,
+} from '../../packages/compiler/src/protocol/envelope.js';
+export { AGENT_SESSION_HOOKS } from '../../packages/compiler/src/api/project.js';
