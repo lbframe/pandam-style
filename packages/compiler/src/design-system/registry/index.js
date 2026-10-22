@@ -510,15 +510,40 @@ export function buildRegistry(definition) {
   // definition's `meta` values against the declared vocabulary and is NOT in
   // the digest payload below: no compiled record holds metadata (design note
   // §3.1, I2).
-  const semanticPolicy = buildSemantics(definition, () =>
-    vocabularyOf({
-      tokens: tokensOut,
-      themeNames,
-      conditionNames: conditionOrder,
-      recipes: recs,
-      patternIds: PATTERN_IDS,
-      propertyKeys: Object.keys(propertyDomains),
-    }),
+  const semanticPolicy = buildSemantics(
+    definition,
+    () =>
+      vocabularyOf({
+        tokens: tokensOut,
+        themeNames,
+        conditionNames: conditionOrder,
+        recipes: recs,
+        patternIds: PATTERN_IDS,
+        propertyKeys: Object.keys(propertyDomains),
+      }),
+    // Everything metadata validation reads from the registry: the structure
+    // of the vocabulary (ids, visibility, categories, slots, axes, values),
+    // never token values, so a value edit keeps the signature.
+    () =>
+      JSON.stringify([
+        Object.values(tokensOut).map((t) => [
+          t.tokenId,
+          t.visibility,
+          t.category,
+        ]),
+        themeNames,
+        conditionOrder,
+        Object.keys(recs).map((id) => [
+          id,
+          recs[id].visibility,
+          recs[id].slots ?? null,
+          recs[id].axisOrder.map((axis) => [
+            axis,
+            Object.keys(recs[id].variants[axis]),
+          ]),
+        ]),
+        Object.keys(propertyDomains),
+      ]),
   );
   diagnostics.push(...semanticPolicy.diagnostics);
 

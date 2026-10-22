@@ -24,6 +24,8 @@ import {
   snapshotMetadata,
 } from './snapshot';
 import { CHILD_KEYS, defineOwn, ownValue, validateEntityMeta } from './schema';
+import { isIngressCopy, isMetalessCopy } from '../registry/ingress';
+import { count } from '../../observability/metrics';
 import {
   addressKey,
   childAddress,
@@ -69,7 +71,59 @@ export function isEmptySemantics(semantics) {
   );
 }
 
-export function buildSemantics(definition, vocabularyOf) {
+const EMPTY_RESULT = Object.freeze({
+  semantics: EMPTY_SEMANTICS,
+  diagnostics: Object.freeze([]),
+  entities: Object.freeze([]),
+});
+
+// Results of the full build, keyed by `memoKeyOf` (ingress copies only).
+const MEMO = new Map();
+const MEMO_LIMIT = 16;
+
+/**
+ * An injective key of the metadata inputs and the vocabulary they are checked
+ * against, or null when the inputs hold a value JSON would not distinguish
+ * (a token mark, `undefined`, a hole, `-0`, a non-finite number); null means
+ * "do not memoize". Only called on `snapshotDefinition` copies, which are
+ * plain data, so serializing them runs no author code.
+ */
+function memoKeyOf(inputs, positions, signature) {
+  let safe = true;
+  const text = JSON.stringify(
+    [inputs.map((i) => [i.kind, i.address, i.visibility, i.slot]), positions],
+    (key, value) => {
+      if (
+        value === undefined ||
+        typeof value === 'function' ||
+        (typeof value === 'number' &&
+          (!Number.isFinite(value) || Object.is(value, -0))) ||
+        (value !== null &&
+          typeof value === 'object' &&
+          Object.getOwnPropertySymbols(value).length > 0)
+      )
+        safe = false;
+      return value;
+    },
+  );
+  return safe ? `${signature}\n${text}` : null;
+}
+
+/**
+ * The semantics of a definition, with two shortcuts that change no result
+ * (AG-03.1 perf):
+ * - a `snapshotDefinition` copy that holds no `meta` key at all is not walked;
+ * - an ingress copy whose metadata inputs and vocabulary signature equal a
+ *   previous build's reuses that build (same table, same diagnostics), so an
+ *   unrelated edit (a token value) does not re-validate unchanged metadata,
+ *   and changed metadata is always validated again.
+ */
+export function buildSemantics(definition, vocabularyOf, signatureOf = null) {
+  if (isMetalessCopy(definition)) {
+    count('semantics_skipped');
+    return EMPTY_RESULT;
+  }
+  count('semantics_collect');
   const {
     entities: inputs,
     positions,
@@ -88,8 +142,37 @@ export function buildSemantics(definition, vocabularyOf) {
       entities: [],
     };
   }
-  if (inputs.length === 0 && positions.length === 0)
-    return { semantics: EMPTY_SEMANTICS, diagnostics: [], entities: [] };
+  if (inputs.length === 0 && positions.length === 0) return EMPTY_RESULT;
+  const key =
+    signatureOf !== null && isIngressCopy(definition)
+      ? memoKeyOf(inputs, positions, signatureOf())
+      : null;
+  if (key !== null && MEMO.has(key)) {
+    count('semantics_memo_hits');
+    const hit = MEMO.get(key);
+    MEMO.delete(key);
+    MEMO.set(key, hit);
+    // Diagnostics are handed to callers as fresh objects every time.
+    return { ...hit, diagnostics: structuredClone(hit.diagnostics) };
+  }
+  count('semantics_builds');
+  const result = buildSemanticsUncached(
+    definition,
+    vocabularyOf,
+    inputs,
+    positions,
+  );
+  if (key !== null) {
+    if (MEMO.size >= MEMO_LIMIT) MEMO.delete(MEMO.keys().next().value);
+    MEMO.set(key, {
+      ...result,
+      diagnostics: structuredClone(result.diagnostics),
+    });
+  }
+  return result;
+}
+
+function buildSemanticsUncached(definition, vocabularyOf, inputs, positions) {
   // `vocabularyOf` is a thunk: the vocabulary is built only when needed.
   const vocabulary = vocabularyOf();
   const diagnose = createMetadataReporter({

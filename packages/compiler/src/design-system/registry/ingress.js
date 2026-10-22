@@ -129,13 +129,89 @@ function shapeDiagnostic(reason, field) {
   });
 }
 
+// Definitions copied by `snapshotDefinition` that hold no own `meta` key
+// anywhere: the semantics build skips them without walking them again
+// (AG-03.1 perf). Identity-keyed, so only these exact copies qualify.
+const METALESS_COPIES = new WeakSet();
+// Every `snapshotDefinition` copy: plain data with this realm's prototypes,
+// so reading it (e.g. to key a cache) runs no author code.
+const INGRESS_COPIES = new WeakSet();
+
+/** True for an object returned by `snapshotDefinition`. */
+export function isIngressCopy(definition) {
+  return (
+    definition !== null &&
+    typeof definition === 'object' &&
+    INGRESS_COPIES.has(definition)
+  );
+}
+
+/** True for a `snapshotDefinition` copy that holds no `meta` key at all. */
+export function isMetalessCopy(definition) {
+  return (
+    definition !== null &&
+    typeof definition === 'object' &&
+    METALESS_COPIES.has(definition)
+  );
+}
+
+// Every reflective read of one author object, guarded as one unit (fix round
+// 1, B5): a trap that throws or answers inconsistently (a key without a
+// descriptor) gives `null`, reported as `unreadable`. The caught value is
+// never inspected, so a thrown Proxy runs no further author code.
+function readObject(value) {
+  try {
+    const proto = Object.getPrototypeOf(value);
+    const array = Array.isArray(value);
+    const keys = Reflect.ownKeys(value);
+    const descriptors = new Array(keys.length);
+    for (let i = 0; i < keys.length; i++) {
+      const descriptor = Object.getOwnPropertyDescriptor(value, keys[i]);
+      if (descriptor === undefined) return null;
+      descriptors[i] = descriptor;
+    }
+    return { proto, array, keys, descriptors };
+  } catch {
+    return null;
+  }
+}
+
+function intrinsicOrUnreadable(proto, name) {
+  if (proto === (name === 'Object' ? Object.prototype : Array.prototype))
+    return true;
+  try {
+    return isIntrinsicPrototype(proto, name);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * The plain-data copy of a definition, or a thrown `PmsError`. `undefined`
  * and `null` pass through.
+ *
+ * The path to the current node is kept in primitive stacks and turned into a
+ * `field` only when a shape is refused, so an accepted definition allocates
+ * nothing beyond its copy.
  */
 export function snapshotDefinition(definition) {
   const seen = new Map();
-  const walk = (value, field, context) => {
+  const pathKeys = [];
+  const pathIndexes = [];
+  const pathNamed = [];
+  let hasMeta = false;
+  const fieldOf = () =>
+    pathKeys.map((key, i) => (pathNamed[i] ? key : { index: pathIndexes[i] }));
+  const fail = (reason) => {
+    throw new ShapeError(reason, fieldOf());
+  };
+  const failAt = (reason, key, index, named) => {
+    pathKeys.push(key);
+    pathIndexes.push(index);
+    pathNamed.push(named);
+    fail(reason);
+  };
+  const walk = (value, context) => {
     const type = typeof value;
     if (
       value === null ||
@@ -145,100 +221,112 @@ export function snapshotDefinition(definition) {
       type === 'undefined'
     )
       return value;
-    if (type === 'function') throw new ShapeError('function', field);
-    if (type === 'symbol') throw new ShapeError('symbol-value', field);
-    if (type === 'bigint') throw new ShapeError('bigint', field);
-    if (seen.has(value)) return seen.get(value);
-    // Every reflective operation on an author object is guarded: a trap that
-    // throws or answers inconsistently (a key without a descriptor, a
-    // prototype chain that throws) is the closed reason `unreadable`, and no
-    // author error or text escapes (fix round 1, B5).
-    const guard = (op) => {
-      try {
-        return op();
-      } catch {
-        throw new ShapeError('unreadable', field);
-      }
-    };
-    const proto = guard(() => Object.getPrototypeOf(value));
-    const keys = guard(() => Reflect.ownKeys(value));
-    const describe = (key) => {
-      const descriptor = guard(() =>
-        Object.getOwnPropertyDescriptor(value, key),
-      );
-      if (descriptor === undefined) throw new ShapeError('unreadable', field);
-      return descriptor;
-    };
-    if (guard(() => Array.isArray(value))) {
-      if (!guard(() => isIntrinsicPrototype(proto, 'Array')))
-        throw new ShapeError('prototype', field);
-      const length = describe('length').value;
+    if (type === 'function') fail('function');
+    if (type === 'symbol') fail('symbol-value');
+    if (type === 'bigint') fail('bigint');
+    const prior = seen.get(value);
+    if (prior !== undefined) return prior;
+    const read = readObject(value);
+    if (read === null) fail('unreadable');
+    const { proto, array, keys, descriptors } = read;
+    if (array) {
+      const intrinsic = intrinsicOrUnreadable(proto, 'Array');
+      if (intrinsic === null) fail('unreadable');
+      if (!intrinsic) fail('prototype');
+      const lengthAt = keys.indexOf('length');
+      if (lengthAt < 0) fail('unreadable');
+      const length = descriptors[lengthAt].value;
       const out = new Array(length);
       seen.set(value, out);
-      for (const key of keys) {
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
         if (key === 'length') continue;
         if (
           typeof key !== 'string' ||
           !INDEX_KEY.test(key) ||
           Number(key) >= length
         )
-          throw new ShapeError('array-shape', field);
-        const descriptor = describe(key);
-        const at = [...field, Number(key)];
-        if (!('value' in descriptor)) throw new ShapeError('accessor', at);
+          fail('array-shape');
+        const index = Number(key);
+        const descriptor = descriptors[i];
+        if (!('value' in descriptor)) failAt('accessor', index, index, true);
+        pathKeys.push(index);
+        pathIndexes.push(index);
+        pathNamed.push(true);
         // Holes stay holes: they hold no behaviour.
+        out[index] = walk(descriptor.value, 'opaque');
+        pathKeys.pop();
+        pathIndexes.pop();
+        pathNamed.pop();
+      }
+      return out;
+    }
+    if (proto !== null) {
+      const intrinsic = intrinsicOrUnreadable(proto, 'Object');
+      if (intrinsic === null) fail('unreadable');
+      if (!intrinsic) fail('prototype');
+    }
+    if (keys.length === 1 && keys[0] === TOKEN_REF) {
+      const descriptor = descriptors[0];
+      if (!('value' in descriptor) || typeof descriptor.value !== 'string')
+        fail('token-mark');
+      return Object.freeze({ [TOKEN_REF]: descriptor.value });
+    }
+    let isLeaf = false;
+    if (context === 'node') {
+      for (let i = 0; i < keys.length && !isLeaf; i++) {
+        const d = descriptors[i];
+        if (!('value' in d)) continue;
+        isLeaf =
+          (keys[i] === 'value' &&
+            (typeof d.value === 'string' || typeof d.value === 'number')) ||
+          (keys[i] === 'ref' && typeof d.value === 'string');
+      }
+    }
+    const named = namesOf(context, isLeaf);
+    const out = {};
+    seen.set(value, out);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (typeof key === 'symbol') fail('symbol-key');
+      const descriptor = descriptors[i];
+      const isNamed = named.includes(key);
+      if (!('value' in descriptor)) failAt('accessor', key, i, isNamed);
+      if (!descriptor.enumerable) failAt('non-enumerable', key, i, isNamed);
+      if (key === 'meta') hasMeta = true;
+      pathKeys.push(key);
+      pathIndexes.push(i);
+      pathNamed.push(isNamed);
+      const copied = walk(descriptor.value, childContext(context, key, isLeaf));
+      pathKeys.pop();
+      pathIndexes.pop();
+      pathNamed.pop();
+      // An own `__proto__` stays an own key; every other key is a plain
+      // data property of a fresh object.
+      if (key === '__proto__')
         Object.defineProperty(out, key, {
-          value: walk(descriptor.value, at, 'opaque'),
+          value: copied,
           enumerable: true,
           writable: true,
           configurable: true,
         });
-      }
-      return out;
+      else out[key] = copied;
     }
-    if (proto !== null && !guard(() => isIntrinsicPrototype(proto, 'Object')))
-      throw new ShapeError('prototype', field);
-    if (keys.length === 1 && keys[0] === TOKEN_REF) {
-      const descriptor = describe(TOKEN_REF);
-      if (!('value' in descriptor) || typeof descriptor.value !== 'string')
-        throw new ShapeError('token-mark', field);
-      return Object.freeze({ [TOKEN_REF]: descriptor.value });
-    }
-    const descriptors = keys.map((key) => [key, describe(key)]);
-    const isLeaf =
-      context === 'node' &&
-      descriptors.some(
-        ([key, d]) =>
-          (key === 'value' &&
-            'value' in d &&
-            (typeof d.value === 'string' || typeof d.value === 'number')) ||
-          (key === 'ref' && 'value' in d && typeof d.value === 'string'),
-      );
-    const named = namesOf(context, isLeaf);
-    const out = {};
-    seen.set(value, out);
-    descriptors.forEach(([key, descriptor], index) => {
-      if (typeof key === 'symbol') throw new ShapeError('symbol-key', field);
-      const at = [...field, named.includes(key) ? key : { index }];
-      if (!('value' in descriptor)) throw new ShapeError('accessor', at);
-      if (!descriptor.enumerable) throw new ShapeError('non-enumerable', at);
-      const next = childContext(context, key, isLeaf);
-      Object.defineProperty(out, key, {
-        value: walk(descriptor.value, at, next),
-        enumerable: true,
-        writable: true,
-        configurable: true,
-      });
-    });
     return out;
   };
+  let copy;
   try {
-    return walk(definition, [], 'root');
+    copy = walk(definition, 'root');
   } catch (error) {
     if (error instanceof ShapeError)
       throw new PmsError([shapeDiagnostic(error.reason, error.field)]);
     throw error;
   }
+  if (copy !== null && typeof copy === 'object') {
+    INGRESS_COPIES.add(copy);
+    if (!hasMeta) METALESS_COPIES.add(copy);
+  }
+  return copy;
 }
 
 /**

@@ -806,3 +806,166 @@ describe('CE owner: definition.shape and PMS_INVALID_PROPERTY_DOMAIN never compe
     );
   });
 });
+
+// ---------------------------------------------------------------------------
+// AG-03.1 perf: a definition without `meta` costs no semantics walk, and an
+// unchanged `meta` is reused across an unrelated edit; results are unchanged.
+
+describe('perf: skip without meta, reuse unchanged meta', () => {
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+
+  function counter() {
+    const counts = {};
+    return {
+      counts,
+      addDuration() {},
+      addParse() {},
+      sampleMemory() {},
+      reset() {},
+      snapshot() {
+        return {};
+      },
+      addCount(name, n = 1) {
+        counts[name] = (counts[name] ?? 0) + n;
+      },
+    };
+  }
+
+  async function withSession(definition, run) {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-perf-'));
+    fs.mkdirSync(path.join(root, 'src'));
+    fs.writeFileSync(path.join(root, 'src/a.js'), 'export const a = 1;\n');
+    const session = compiler.createPublicProjectSession({
+      rootDir: root,
+      roots: [path.join(root, 'src')],
+      outDir: fs.mkdtempSync(path.join(os.tmpdir(), 'pms-perf-out-')),
+      definition,
+    });
+    const collector = counter();
+    const uninstall = compiler.installPerfCollector(collector);
+    try {
+      const init = await session.initialize();
+      let revision = (await session.validate(init.revision)).revision;
+      const edit = async (next) => {
+        const applied = await session.applyChanges({
+          baseRevision: revision,
+          mode: 'verified-explicit',
+          changed: [],
+          added: [],
+          removed: [],
+          renamed: [],
+          definition: next,
+        });
+        const checked = await session.validate(applied.revision);
+        revision = checked.revision;
+        return checked;
+      };
+      await run({ counts: collector.counts, edit });
+    } finally {
+      uninstall();
+      await session.close();
+    }
+  }
+
+  test('a definition without meta never enters the semantics walk, across edits', async () => {
+    await withSession(baseDefinition(), async ({ counts, edit }) => {
+      for (const value of ['#fefefe', '#ffffff']) {
+        const d = baseDefinition();
+        d.tokens.colors.paper.value = value;
+        expect((await edit(d)).ok).toBe(true);
+      }
+      expect(counts.semantics_collect ?? 0).toBe(0);
+      expect(counts.semantics_builds ?? 0).toBe(0);
+      expect(counts.semantics_skipped).toBeGreaterThanOrEqual(3);
+    });
+  });
+
+  test('unchanged meta is reused across a token-value edit; changed meta is rebuilt and validated', async () => {
+    const withMeta = (description, value = '#ffffff') => {
+      const d = baseDefinition();
+      d.tokens.colors.paper.value = value;
+      d.tokens.colors.paper.meta = { description };
+      d.recipes.button.meta = {
+        relations: [{ relation: 'related', target: { recipe: 'card' } }],
+      };
+      return d;
+    };
+    await withSession(withMeta('Paper.'), async ({ counts, edit }) => {
+      const builds0 = counts.semantics_builds ?? 0;
+      expect(builds0).toBeGreaterThanOrEqual(1);
+      // An unrelated token-value edit: the metadata inputs are unchanged.
+      expect((await edit(withMeta('Paper.', '#fefefe'))).ok).toBe(true);
+      expect(counts.semantics_builds ?? 0).toBe(builds0);
+      expect(counts.semantics_memo_hits).toBeGreaterThanOrEqual(1);
+      // A metadata edit is rebuilt and validated.
+      expect((await edit(withMeta('Paper, edited.', '#fefefe'))).ok).toBe(true);
+      expect(counts.semantics_builds).toBe(builds0 + 1);
+      // An invalid edit is reported on the revision that introduces it ...
+      const invalid = await edit(withMeta('', '#fefefe'));
+      expect(invalid.ok).toBe(false);
+      expect(invalid.diagnostics.map((x) => x.rule)).toEqual(['metadata.text']);
+      // ... and on a later unrelated edit too, from the reused result.
+      const later = await edit(withMeta('', '#ffffff'));
+      expect(later.ok).toBe(false);
+      expect(later.diagnostics.map((x) => x.rule)).toEqual(['metadata.text']);
+    });
+  });
+
+  test('unchanged meta is re-validated when the vocabulary it names changes', async () => {
+    const make = (withCard) => {
+      const d = baseDefinition();
+      if (!withCard) delete d.recipes.card;
+      d.recipes.button.meta = {
+        relations: [{ relation: 'related', target: { recipe: 'card' } }],
+      };
+      return d;
+    };
+    await withSession(make(true), async ({ edit }) => {
+      const removed = await edit(make(false));
+      expect(removed.ok).toBe(false);
+      expect(removed.diagnostics.map((x) => x.rule)).toEqual([
+        'metadata.unknown-reference',
+      ]);
+      expect((await edit(make(true))).ok).toBe(true);
+    });
+  });
+
+  test('the reuse key is injective: values JSON would not distinguish are never reused for each other', () => {
+    const first = baseDefinition();
+    first.tokens.colors.paper.meta = {
+      relations: [
+        { relation: 'related', target: compiler.token('spacing.sm') },
+      ],
+    };
+    const second = baseDefinition();
+    second.tokens.colors.paper.meta = {
+      relations: [{ relation: 'related', target: {} }],
+    };
+    const a = publicBuild(first).diagnostics;
+    const b = publicBuild(second).diagnostics;
+    expect(a.map((x) => x.rule)).toEqual(['metadata.malformed']);
+    expect(b.map((x) => [x.rule, x.context.reason])).toEqual([
+      ['metadata.field-type', 'reference-shape'],
+    ]);
+    // And the reverse order.
+    expect(publicBuild(second).diagnostics.map((x) => x.rule)).toEqual([
+      'metadata.field-type',
+    ]);
+    expect(publicBuild(first).diagnostics.map((x) => x.rule)).toEqual([
+      'metadata.malformed',
+    ]);
+  });
+
+  test('reused diagnostics are fresh objects each time', () => {
+    const d = baseDefinition();
+    d.tokens.colors.paper.meta = { description: '' };
+    const runs = [1, 2, 3].map(() => publicBuild(d).diagnostics);
+    expect(runs[1]).toEqual(runs[0]);
+    expect(runs[2]).toEqual(runs[0]);
+    // The second and third builds are both reuses: neither shares objects.
+    expect(runs[2][0]).not.toBe(runs[1][0]);
+    expect(runs[1][0]).not.toBe(runs[0][0]);
+  });
+});
