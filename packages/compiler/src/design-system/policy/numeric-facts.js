@@ -205,6 +205,74 @@ export function tokenValueRefusal(registry, property, tokenId) {
   return verdict;
 }
 
+// properties table -> category -> the token's use contexts: one property per
+// distinct scalar among the effective rows that admit the category, in key
+// order.
+const contextsByTable = new WeakMap();
+
+function useContextsOf(properties, category) {
+  let byCategory = contextsByTable.get(properties);
+  if (byCategory == null) {
+    byCategory = new Map();
+    contextsByTable.set(properties, byCategory);
+  }
+  let contexts = byCategory.get(category);
+  if (contexts === undefined) {
+    const seen = new Set();
+    contexts = [];
+    for (const key of Object.keys(properties.descriptors).sort()) {
+      if (!properties.descriptors[key].domain?.tokens?.includes(category)) {
+        continue;
+      }
+      const scalar = descriptorOf(key)?.scalar ?? null;
+      if (scalar == null) continue;
+      const shape = JSON.stringify(scalar);
+      if (seen.has(shape)) continue;
+      seen.add(shape);
+      contexts.push(key);
+    }
+    contexts = Object.freeze(contexts);
+    byCategory.set(category, contexts);
+  }
+  return contexts;
+}
+
+// entries -> use contexts -> key: a kept entry list keeps its key.
+const verdictKeys = new WeakMap();
+
+/**
+ * The use-site verdicts of a token (CE-02.2 §3.5), as a compact key: its
+ * tokenValueRefusal result for each distinct scalar among the effective
+ * properties (`properties`, the snapshot's table) that admit its category;
+ * null when no such property has a scalar. Equal keys mean every use site
+ * of the token has the same verdict and diagnostic; a Project Service
+ * session keys a file's dependency on the token by it, so an edit that
+ * changes no verdict revalidates nothing and one that does revalidates the
+ * files using the token.
+ */
+export function tokenUseVerdicts(registry, tokenId, properties) {
+  const token = registry.tokens?.[tokenId];
+  if (token == null) return null;
+  const contexts = useContextsOf(properties, token.category);
+  if (contexts.length === 0) return null;
+  const entries = numericFactsOf(registry, tokenId);
+  let byContexts = verdictKeys.get(entries);
+  if (byContexts == null) {
+    byContexts = new Map();
+    verdictKeys.set(entries, byContexts);
+  }
+  let key = byContexts.get(contexts);
+  if (key === undefined) {
+    key = JSON.stringify(
+      contexts.map((property) =>
+        tokenValueRefusal(registry, property, tokenId),
+      ),
+    );
+    byContexts.set(contexts, key);
+  }
+  return key;
+}
+
 /** The scalar of a property, for diagnostics: `{ constraints, count }`. */
 export function scalarOf(property) {
   return descriptorOf(property)?.scalar ?? null;
