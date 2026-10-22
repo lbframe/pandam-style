@@ -86,6 +86,26 @@ export const DESIGN_SYSTEM_OUTPUT = obj({
   registryDigest: { type: 'string', format: 'hex-digest' },
 });
 
+/**
+ * The envelope's `identities`: each key absent when unknown (§3.5). Shared by
+ * the envelope and by the owner bridge's `ready` frame (AG-02.1 §3.5), whose
+ * ceiling is derived from it.
+ */
+export const IDENTITIES_OUTPUT = obj(
+  {
+    projectId: str(BOUNDS.projectId),
+    sessionId: { type: 'string', format: 'uuid' },
+    revision: REVISION_OUTPUT,
+    designSystem: DESIGN_SYSTEM_OUTPUT,
+    lastValidDesignSystem: obj({
+      systemId: str(BOUNDS.systemId),
+      registryDigest: { type: 'string', format: 'hex-digest' },
+      derivedFromRevision: REVISION_OUTPUT,
+    }),
+  },
+  [],
+);
+
 export const PAGE_INPUT = obj(
   {
     offset: int(0),

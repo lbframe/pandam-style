@@ -67,6 +67,7 @@ export type ProtocolOperationsOutput = {
       | 'writes-audit'
       | 'writes-sources'
       | 'executes-config'
+      | 'reads-owner-descriptors'
     >;
     readonly outcomes: ReadonlyArray<
       | 'success'
@@ -77,6 +78,7 @@ export type ProtocolOperationsOutput = {
       | 'stale-revision'
       | 'cancelled'
       | 'internal-error'
+      | 'owner-required'
     >;
     readonly stages: ReadonlyArray<'request' | 'bootstrap' | 'execution'>;
     readonly retry: ReadonlyArray<'never' | 'after-refresh' | 'same-request'>;
@@ -1072,23 +1074,45 @@ export type SessionOpenOutput = {
   };
 };
 
-/** `session.attach` (planned, AG-02.1 #11). */
+/** `session.attach` (implemented, AG-02.1 #11). */
 export type SessionAttachInput = {
-  readonly projectId: string;
+  readonly projectId?: string;
+  readonly outDir?: string;
   readonly protocolVersions: readonly number[];
 };
 export type SessionAttachOutput = {
   readonly identities: {
-    readonly revision: {
+    readonly projectId?: string;
+    readonly sessionId?: string;
+    readonly revision?: {
       readonly projectId: string;
       readonly sessionId: string;
       readonly revisionId: number;
     };
-    readonly designSystem: {
+    readonly designSystem?: {
       readonly systemId: string;
       readonly registryDigest: string;
-    } | null;
+    };
+    readonly lastValidDesignSystem?: {
+      readonly systemId: string;
+      readonly registryDigest: string;
+      readonly derivedFromRevision: {
+        readonly projectId: string;
+        readonly sessionId: string;
+        readonly revisionId: number;
+      };
+    };
   };
+  readonly granted: ReadonlyArray<
+    | 'consult'
+    | 'publish'
+    | 'mutate-sources'
+    | 'extend-design-system'
+    | 'materialize-audit'
+    | 'load-config'
+    | 'manage-session'
+  >;
+  readonly previousSessionId: string | null;
 };
 
 /** `session.close` (planned, AG-10.1 #29). */
@@ -1571,6 +1595,7 @@ export interface OperationResults {
   readonly 'diagnostics.candidates': DiagnosticsCandidatesOutput;
   readonly 'diagnostics.affected': DiagnosticsAffectedOutput;
   readonly 'records.read': RecordsReadOutput;
+  readonly 'session.attach': SessionAttachOutput;
   readonly 'audit.read': AuditReadOutput;
   readonly 'audit.compute': AuditComputeOutput;
   readonly 'audit.materialize': AuditMaterializeOutput;
@@ -1631,7 +1656,8 @@ export type AgentEnvelopeFrame = {
     | 'denied-access'
     | 'stale-revision'
     | 'cancelled'
-    | 'internal-error';
+    | 'internal-error'
+    | 'owner-required';
   readonly identities: {
     readonly projectId?: string;
     readonly sessionId?: string;

@@ -33,6 +33,7 @@ import {
   constant,
   DESIGN_SYSTEM_OUTPUT,
   enumOf,
+  IDENTITIES_OUTPUT,
   int,
   nullable,
   obj,
@@ -76,6 +77,9 @@ export const EFFECT_KINDS = Object.freeze([
   'writes-audit',
   'writes-sources',
   'executes-config',
+  // AG-02.1 §3.12: reads owner descriptors and keys in the per-user runtime
+  // directory; never writes them.
+  'reads-owner-descriptors',
 ]);
 
 export const EFFECT_DETAILS = Object.freeze({
@@ -101,6 +105,7 @@ const CONSULT_EFFECTS = Object.freeze([
   'computes',
   'session-state:records-validation-verdict',
   'session-state:binds-client',
+  'reads-owner-descriptors',
 ]);
 
 const MUTATE_EFFECTS = Object.freeze([
@@ -295,10 +300,25 @@ export function universalErrors(entry) {
       contract('internal-error', Codes.GENERATED_ARTIFACT_MISMATCH, [
         'compiler-fault',
       ]),
+      // AG-02.1 §3.12: through a workspace binding, a session-bound operation
+      // can find no owner, lose it, or meet a replaced session.
+      contract('owner-required', AgentCodes.OWNER_REQUIRED, OWNER_REASONS),
+      contract('stale-revision', Codes.STALE_REVISION, ['session-changed']),
+      contract('internal-error', AgentCodes.INTERNAL, ['owner-protocol-error']),
     );
   }
   return errors;
 }
+
+/** The `owner-required` reasons a forwarded operation can meet (§3.12). */
+const OWNER_REASONS = Object.freeze(['owner-absent', 'owner-closed']);
+
+/**
+ * Operations served only by a workspace binding (AG-02.1 §3.9): a host binding
+ * already is the owner, so it refuses them with `unsupported-capability:
+ * binding`.
+ */
+export const WORKSPACE_OPERATIONS = Object.freeze(['session.attach']);
 
 const SAFE = Object.freeze({ idempotent: true, policy: 'safe' });
 const NEVER = Object.freeze({ idempotent: false, policy: 'never' });
@@ -889,26 +909,50 @@ const ENTRIES = [
   }),
   define({
     name: 'session.attach',
-    status: 'planned',
+    status: 'implemented',
     owner: 'AG-02.1 #11',
     summary:
-      'Attaches to the existing owner of a project and returns its identities.',
+      'Attaches a workspace binding to the authenticated owner of its project through the owner bridge, and returns the owner identities and the granted capabilities. Session-bound operations are then served by that owner.',
     requires: { grant: 'consult', binding: 'none', revision: 'none' },
     effects: [
       { kind: 'session-state', detail: 'binds-client' },
-      { kind: 'reads-generated' },
+      { kind: 'reads-owner-descriptors' },
     ],
-    input: obj({
-      projectId: str(BOUNDS.projectId),
-      protocolVersions: arr(int(1, 1024), 16),
+    input: obj(
+      {
+        projectId: str(BOUNDS.projectId),
+        outDir: { type: 'string', format: 'project-relative-path' },
+        protocolVersions: arr(int(1, 1024), 16),
+      },
+      ['protocolVersions'],
+    ),
+    output: obj({
+      identities: IDENTITIES_OUTPUT,
+      granted: arr(enumOf(GRANTS), GRANTS.length),
+      previousSessionId: nullable({ type: 'string', format: 'uuid' }),
     }),
-    output: obj({ identities: RECEIPT_IDENTITIES }),
     errors: [
-      contract('unsupported-capability', AgentCodes.OPERATION_UNSUPPORTED, [
+      contract('owner-required', AgentCodes.OWNER_REQUIRED, [
         'owner-absent',
-        'protocol-version',
+        'owner-unreachable',
+        'descriptor-invalid',
+        'owner-closed',
+        'owner-busy',
+        'runtime-dir-unusable',
       ]),
       contract('stale-revision', Codes.STALE_REVISION, ['descriptor-stale']),
+      contract('denied-access', AgentCodes.ACCESS_DENIED, [
+        'authentication-failed',
+        'endpoint-unauthenticated',
+      ]),
+      contract('unsupported-capability', AgentCodes.OPERATION_UNSUPPORTED, [
+        'binding',
+        'anchoring-unavailable',
+      ]),
+      contract('invalid-input', AgentCodes.INVALID_REQUEST, [
+        'owner-ambiguous',
+      ]),
+      contract('internal-error', AgentCodes.INTERNAL, ['owner-protocol-error']),
     ],
     retry: SAFE,
   }),
@@ -1206,20 +1250,7 @@ export function envelopeSchema(resultSchema, operationNames) {
       operation: enumOf(operationNames),
       requestId: { type: 'string', format: 'request-id' },
       outcome: enumOf(OUTCOMES),
-      identities: obj(
-        {
-          projectId: str(BOUNDS.projectId),
-          sessionId: { type: 'string', format: 'uuid' },
-          revision: REVISION_OUTPUT,
-          designSystem: DESIGN_SYSTEM_OUTPUT,
-          lastValidDesignSystem: obj({
-            systemId: str(BOUNDS.systemId),
-            registryDigest: { type: 'string', format: 'hex-digest' },
-            derivedFromRevision: REVISION_OUTPUT,
-          }),
-        },
-        [],
-      ),
+      identities: IDENTITIES_OUTPUT,
       result: nullable(resultSchema),
       diagnostics: arr({ type: 'object', format: 'record' }, 256),
       diagnosticsTotal: int(0),
@@ -1509,6 +1540,11 @@ export function createRegistry(entries = ENTRIES, handlers = HANDLERS) {
   for (const handlerName of Object.keys(handlers)) {
     if (!names.has(handlerName))
       refuse(handlerName, 'a handler exists for no registered entry');
+  }
+  for (const name of WORKSPACE_OPERATIONS) {
+    const entry = entries.find((candidate) => candidate.name === name);
+    if (entry == null || entry.requires.binding !== 'none')
+      refuse(name, 'a workspace operation is a registered unbound entry');
   }
   const operationNames = [...names];
   const frame = Math.max(
