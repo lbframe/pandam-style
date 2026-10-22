@@ -181,6 +181,88 @@ describe('AG-02.1 R2: runtime storage inside a protected tree fails closed befor
     }
   }
 
+  // Fix round 2, class R4: every refusal is decided before any mutation. A
+  // refused runtime directory keeps its mode, contents and mtime, and a
+  // missing one is not created.
+  test('a refused runtime directory is not changed: equal to or inside the project, an outDir, a watch root', async () => {
+    const base = fs.mkdtempSync(path.join(os.tmpdir(), 'pms-place-intact-'));
+    onCleanup(() => fs.rmSync(base, { recursive: true, force: true }));
+    const outside = path.join(base, 'out-outside');
+    const shared = mkdir700(path.join(base, 'shared-assets'));
+    const host = await openHost({ bridge: false });
+    const inner = mkdir700(path.join(host.project, 'inner'));
+    const existingOut = mkdir700(path.join(base, 'out-existing'));
+    const cases = [
+      { label: 'the project itself', dir: host.project, outDir: null },
+      { label: 'a directory inside the project', dir: inner, outDir: null },
+      { label: 'an existing outDir', dir: existingOut, outDir: existingOut },
+      {
+        label: 'a watch root',
+        dir: shared,
+        outDir: null,
+        watchRoots: [shared],
+      },
+      {
+        label: 'a missing outDir outside rootDir',
+        dir: outside,
+        outDir: outside,
+        missing: true,
+      },
+    ];
+    for (const item of cases) {
+      const target =
+        item.outDir == null
+          ? host
+          : await openHost({
+              bridge: false,
+              sessionOptions: { outDir: item.outDir },
+            });
+      const restore = [];
+      if (!item.missing) {
+        // 0500 would pass every other check and invite a chmod to 0700.
+        const original = fs.statSync(item.dir).mode & 0o777;
+        fs.chmodSync(item.dir, 0o500);
+        restore.push(() => fs.chmodSync(item.dir, original));
+      }
+      try {
+        const before = item.missing
+          ? null
+          : {
+              mode: fs.statSync(item.dir).mode & 0o777,
+              mtimeMs: fs.statSync(item.dir).mtimeMs,
+              entries: fs.readdirSync(item.dir).sort(),
+            };
+        const result = await compiler.startOwnerBridge({
+          session: target.session,
+          host: 'test',
+          runtimeDir: item.dir,
+          watchRoots: item.watchRoots ?? [],
+        });
+        if (result.started) onCleanup(() => result.close());
+        expect([item.label, result]).toEqual([
+          item.label,
+          { started: false, reason: 'runtime-dir-overlap' },
+        ]);
+        if (item.missing)
+          expect([item.label, fs.existsSync(item.dir)]).toEqual([
+            item.label,
+            false,
+          ]);
+        else
+          expect([
+            item.label,
+            {
+              mode: fs.statSync(item.dir).mode & 0o777,
+              mtimeMs: fs.statSync(item.dir).mtimeMs,
+              entries: fs.readdirSync(item.dir).sort(),
+            },
+          ]).toEqual([item.label, before]);
+      } finally {
+        for (const undo of restore) undo();
+      }
+    }
+  });
+
   test('a protected tree inside the runtime directory is not an overlap', async () => {
     const runtimeDir = makeRuntimeDir();
     mkdir700(runtimeDir);

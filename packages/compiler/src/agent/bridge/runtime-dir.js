@@ -99,13 +99,15 @@ export function isInside(root, real) {
   return real.startsWith(root.endsWith(path.sep) ? root : root + path.sep);
 }
 
-function placementOf(fd, protectedRoots) {
+function placementOf(fd, protectedRoots, leaf = null) {
   let real;
   try {
     real = fs.readlinkSync(`/proc/self/fd/${fd}`);
   } catch {
     return 'anchoring-unavailable';
   }
+  // `leaf`: the entry this directory would hold, checked before it exists.
+  if (leaf != null) real = path.join(real, leaf);
   for (const root of protectedRoots) {
     if (isInside(canonicalPath(root), real)) return 'runtime-dir-overlap';
   }
@@ -146,13 +148,28 @@ export function openRuntimeDir(dir, { create = false, protectedRoots = [] }) {
   let fd = null;
   try {
     if (!anchorHolds(parent)) return { refused: 'anchoring-unavailable' };
-    // Nothing is created before the parent's placement is known (R2).
-    const parentPlacement = placementOf(parent, protectedRoots);
-    if (parentPlacement != null) return { refused: parentPlacement };
+    // Every refusal is decided before any mutation (R2, fix round 2 R4): the
+    // parent's placement and the leaf's prospective placement come first.
     const leaf = path.basename(dir);
+    const prospective =
+      placementOf(parent, protectedRoots) ??
+      placementOf(parent, protectedRoots, leaf);
+    if (prospective != null) return { refused: prospective };
+    let created = false;
+    const refuse = (reason) => {
+      // Only a directory this call created is removed, and only if empty.
+      if (created)
+        try {
+          fs.rmdirSync(anchored(parent, leaf));
+        } catch {
+          /* not empty, or gone */
+        }
+      return { refused: reason };
+    };
     if (create) {
       try {
         fs.mkdirSync(anchored(parent, leaf), { mode: 0o700 });
+        created = true;
       } catch (error) {
         if (error?.code !== 'EEXIST') return { refused: 'runtime-dir-unsafe' };
       }
@@ -165,12 +182,9 @@ export function openRuntimeDir(dir, { create = false, protectedRoots = [] }) {
         O_PATH | C.O_DIRECTORY | C.O_NOFOLLOW,
       );
     } catch (error) {
-      return {
-        refused:
-          error?.code === 'ENOENT'
-            ? 'runtime-dir-missing'
-            : 'runtime-dir-unsafe',
-      };
+      return refuse(
+        error?.code === 'ENOENT' ? 'runtime-dir-missing' : 'runtime-dir-unsafe',
+      );
     }
     try {
       const stat = fs.fstatSync(pin);
@@ -180,25 +194,28 @@ export function openRuntimeDir(dir, { create = false, protectedRoots = [] }) {
         stat.uid !== process.getuid() ||
         (stat.mode & 0o077) !== 0
       )
-        return { refused: 'runtime-dir-unsafe' };
+        return refuse('runtime-dir-unsafe');
+      // The pinned directory's own placement and anchor, before its mode is
+      // touched: a refused directory keeps its mode (fix round 2, R4).
+      if (!anchorHolds(pin)) return refuse('anchoring-unavailable');
+      const placement = placementOf(pin, protectedRoots);
+      if (placement != null) return refuse(placement);
       // The owner sets the directory's mode; a client only verifies it (R1).
       if (
         create
           ? !enforceMode(pin, 'isDirectory', MODES.directory)
           : permissions(stat) !== MODES.directory
       )
-        return { refused: 'runtime-dir-unsafe' };
+        return refuse('runtime-dir-unsafe');
       fd = fs.openSync(`/proc/self/fd/${pin}`, C.O_RDONLY | C.O_DIRECTORY);
       if (fs.fstatSync(fd).ino !== stat.ino)
-        return { refused: 'runtime-dir-unsafe' };
+        return refuse('runtime-dir-unsafe');
     } catch {
-      return { refused: 'runtime-dir-unsafe' };
+      return refuse('runtime-dir-unsafe');
     } finally {
       fs.closeSync(pin);
     }
-    if (!anchorHolds(fd)) return { refused: 'anchoring-unavailable' };
-    const placement = placementOf(fd, protectedRoots);
-    if (placement != null) return { refused: placement };
+    if (!anchorHolds(fd)) return refuse('anchoring-unavailable');
     const handle = createHandle(fd, protectedRoots);
     fd = null;
     return { handle };

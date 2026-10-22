@@ -341,9 +341,23 @@ function handshake({ handle, name, descriptor, key, agreed }) {
       onFrame(body) {
         const frame = parseFrame(body);
         if (frame?.t === 'error' && validFrame('error', frame)) {
-          const error = ownerFrameError(frame);
-          if (connection != null) connection.fail(error);
-          settle(error);
+          // During the handshake only a connection-wide error (no `seq`) is
+          // meaningful; settling with an error closes the socket.
+          if (connection == null) {
+            settle(
+              frame.seq == null ? ownerFrameError(frame) : protocolError(),
+            );
+            return;
+          }
+          // On an open connection an error answers the pending request with
+          // its `seq`; any other error is a protocol error. Either way the
+          // owner ends the connection, and so does the client (fix round 2, R3).
+          connection.fail(
+            connection.correlates(frame.seq)
+              ? ownerFrameError(frame)
+              : protocolError(),
+          );
+          socket.destroy();
           return;
         }
         if (state === 'challenge') {
@@ -503,6 +517,8 @@ function createConnection({ socket, descriptor, ready, agreed }) {
       return 'delivered';
     },
     fail,
+    /** True when `seq` is the pending request's sequence number. */
+    correlates: (seq) => pending != null && seq === pending.seq,
     lost() {
       closed = true;
       fail(ownerRequired('owner-closed'));

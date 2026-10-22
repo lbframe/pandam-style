@@ -350,6 +350,88 @@ describe('AG-02.1 R3: the client consumes one frame at a time', () => {
     ]);
   });
 
+  // Fix round 2, class R3: every owner frame is matched to the pending
+  // request; anything else ends the connection, and the next call fails
+  // structurally.
+  const errorFrame = (seq, reason = 'owner-closed') => ({
+    t: 'error',
+    seq,
+    outcome: 'owner-required',
+    reason,
+  });
+  const responseFrame = (seq) => ({ t: 'response', seq, envelope });
+  const correlationCases = {
+    'an error for another sequence number': {
+      reply: (frame) => [errorFrame(frame.seq + 5)],
+      first: ['internal-error', 'owner-protocol-error'],
+    },
+    'a connection-wide error after the handshake': {
+      reply: () => [errorFrame(null)],
+      first: ['internal-error', 'owner-protocol-error'],
+    },
+    'a correlated error, which ends the connection': {
+      reply: (frame) => [errorFrame(frame.seq)],
+      first: ['owner-required', 'owner-closed'],
+    },
+    'a duplicate error, spaced': {
+      reply: (frame) => [errorFrame(frame.seq), 'pause', errorFrame(frame.seq)],
+      first: ['owner-required', 'owner-closed'],
+    },
+    // Two frames in one chunk meet the one-frame-at-a-time rule first.
+    'a duplicate error, coalesced': {
+      reply: (frame) => [[errorFrame(frame.seq), errorFrame(frame.seq)]],
+      first: ['internal-error', 'owner-protocol-error'],
+    },
+    'an unsolicited error after a response': {
+      reply: (frame) => [
+        responseFrame(frame.seq),
+        'pause',
+        errorFrame(frame.seq),
+      ],
+      first: ['success', undefined],
+    },
+    'a response for another sequence number': {
+      reply: (frame) => [responseFrame(frame.seq + 5)],
+      first: ['internal-error', 'owner-protocol-error'],
+    },
+    'a duplicate response': {
+      reply: (frame) => [
+        responseFrame(frame.seq),
+        'pause',
+        responseFrame(frame.seq),
+      ],
+      first: ['success', undefined],
+    },
+  };
+  for (const [label, { reply, first }] of Object.entries(correlationCases)) {
+    test(`${label}: the connection is closed and the next call fails structurally`, async () => {
+      let serverClosed = false;
+      const host = await scriptedOwner(async (frame, socket) => {
+        socket.once('close', () => (serverClosed = true));
+        for (const item of reply(frame)) {
+          if (item === 'pause') await sleep(30);
+          else if (Array.isArray(item))
+            socket.write(
+              Buffer.concat(item.map((one) => frames.encodeFrame(one))),
+            );
+          else socket.write(frames.encodeFrame(item));
+        }
+      });
+      const remote = openWorkspace(host);
+      expect((await remote.attach()).outcome).toBe('success');
+      const answer = await remote.dispatch('session.status', {});
+      expect([answer.outcome, answer.failure?.reason]).toEqual(first);
+      await sleep(100);
+      expect(serverClosed).toBe(true);
+      expect(remote.workspace.subject().closed).toBe(true);
+      const next = await remote.dispatch('session.status', {});
+      expect([next.outcome, next.failure?.reason]).toEqual([
+        'owner-required',
+        'owner-closed',
+      ]);
+    });
+  }
+
   test('concurrent calls on one workspace are queued, one request in flight', async () => {
     let active = 0;
     let maxActive = 0;
