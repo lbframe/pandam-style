@@ -830,7 +830,7 @@ withPandamStyle({ ...semanticDev, publicationMode: 'automatic' });
       assert.equal(
         (
           await readComputedStyles(page, documents, {
-            margin: ['#nested', 'margin'],
+            margin: { selector: '#nested', property: 'margin' },
           })
         ).margin,
         '8px',
@@ -1547,10 +1547,10 @@ export async function load(url, context, nextLoad) {
     }
     async function styles() {
       return readComputedStyles(page, documents, {
-        padding: ['#server-style', 'padding'],
-        color: ['#server-style', 'color'],
-        opacity: ['#client-style', 'opacity'],
-        serverOpacity: ['#server-style', 'opacity'],
+        padding: { selector: '#server-style', property: 'padding' },
+        color: { selector: '#server-style', property: 'color' },
+        opacity: { selector: '#client-style', property: 'opacity' },
+        serverOpacity: { selector: '#server-style', property: 'opacity' },
       });
     }
   }

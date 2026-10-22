@@ -111,8 +111,8 @@ function response(page, { url, status, navigation = true, frame }) {
 }
 
 const READS = {
-  padding: ['#server-style', 'padding'],
-  opacity: ['#client-style', 'opacity'],
+  padding: { selector: '#server-style', property: 'padding' },
+  opacity: { selector: '#client-style', property: 'opacity' },
 };
 
 test('the readiness bound is one named constant used by every wait', async () => {

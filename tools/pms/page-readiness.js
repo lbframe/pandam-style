@@ -189,7 +189,7 @@ function qualifiedDocumentError(
   return error;
 }
 
-// Waits for every selector in `reads` ({ key: [selector, property] }), then
+// Waits for every selector in `reads` ({ key: { selector, property } }), then
 // returns { key: computed value }. An element removed between the wait and the
 // read also fails explicitly.
 async function readComputedStyles(
@@ -199,7 +199,7 @@ async function readComputedStyles(
   timeout = QUALIFIED_ELEMENT_TIMEOUT_MS,
 ) {
   const selectors = [
-    ...new Set(Object.values(reads).map(([selector]) => selector)),
+    ...new Set(Object.values(reads).map(({ selector }) => selector)),
   ];
   try {
     await Promise.all(
@@ -211,7 +211,7 @@ async function readComputedStyles(
   const { values, missing } = await page.evaluate((entries) => {
     const values = {};
     const missing = [];
-    for (const [key, [selector, property]] of entries) {
+    for (const [key, { selector, property }] of entries) {
       const node = document.querySelector(selector);
       if (node == null) missing.push(selector);
       else values[key] = getComputedStyle(node)[property];
