@@ -11,6 +11,17 @@
 //   node tools/baselines/archive.mjs manifest [--store <dir>]
 //   node tools/baselines/archive.mjs verify   [--store <dir>] [--replay]
 //   node tools/baselines/archive.mjs closure  --dest <dir> [--store <dir>]
+//   node tools/baselines/archive.mjs candidate-pack --dest <empty dir>
+//   node tools/baselines/archive.mjs candidate-manifest --epoch <name> --dest <dir> [--epochs-dir <dir>]
+//
+// Candidate epochs (CE-02.1): `candidate-pack` packs the five packages of the
+// committed HEAD from a clean detached checkout (twice, to record
+// reproducibility) and installs a candidate closure next to them, with the
+// alpha1 closure's host pins. `candidate-manifest` records that closure as
+// benchmarks/core-evolution/epochs/<name>/manifest.v1.json, with its closure
+// package.json and lockfile. It never overwrites an epoch: an existing epoch
+// directory, `alpha1`, or a name that is not a plain lowercase identifier is
+// refused.
 //
 // The store holds large binaries outside Git (default
 // ~/.local/share/pandamstyle-baselines/alpha1). Git holds the manifest
@@ -985,6 +996,234 @@ export function verify(store, { replay = false, rebuilt = false } = {}) {
   return checks;
 }
 
+// ------------------------------------------------------- candidate epochs
+
+const EPOCH_NAME = /^[a-z0-9][a-z0-9.-]*[a-z0-9]$/;
+const EPOCHS_DIR = path.join(BENCH, 'epochs');
+const HOST_PINS = path.join(CLOSURE_DIR, 'package.json');
+const CANDIDATE_RECORD = 'candidate.json';
+
+function git(args) {
+  return execFileSync('git', args, { cwd: REPO, encoding: 'utf8' }).trim();
+}
+
+const packFile = (name, version) => `pandamstyle-${name}-${version}.tgz`;
+
+/**
+ * Packs the committed HEAD and installs its candidate closure into `dest`:
+ * `packs/`, `packs-repeat/`, `closure/` (package.json, package-lock.json,
+ * packs/, node_modules/) and `candidate.json` (the packed commit). Refuses a
+ * dirty worktree: a candidate is a commit, never uncommitted bytes.
+ */
+export function candidatePack(dest) {
+  if (git(['status', '--porcelain']) !== '')
+    throw new Error('candidate-pack needs a clean worktree: commit first');
+  if (fs.existsSync(dest) && fs.readdirSync(dest).length > 0)
+    throw new Error(`${dest} is not empty`);
+  fs.mkdirSync(dest, { recursive: true });
+  const commit = git(['rev-parse', 'HEAD']);
+  const checkout = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-candidate-'));
+  fs.rmSync(checkout, { recursive: true });
+  run('git', ['worktree', 'add', '--detach', checkout, commit], { cwd: REPO });
+  try {
+    run(
+      'yarn',
+      ['install', '--frozen-lockfile', '--ignore-scripts', '--non-interactive'],
+      { cwd: checkout },
+    );
+    run('yarn', ['workspace', '@pandamstyle/compiler', 'run', 'build'], {
+      cwd: checkout,
+    });
+    for (const kind of ['packs', 'packs-repeat']) {
+      fs.mkdirSync(path.join(dest, kind), { recursive: true });
+      for (const name of PACKAGES)
+        run(
+          'npm',
+          ['pack', '--pack-destination', path.join(dest, kind), '--silent'],
+          { cwd: path.join(checkout, 'packages', name) },
+        );
+    }
+  } finally {
+    run('git', ['worktree', 'remove', '--force', checkout], { cwd: REPO });
+  }
+  const closure = path.join(dest, 'closure');
+  fs.mkdirSync(path.join(closure, 'packs'), { recursive: true });
+  const pins = readJson(HOST_PINS);
+  const dependencies = { ...pins.dependencies };
+  for (const name of PACKAGES) {
+    const file = fs
+      .readdirSync(path.join(dest, 'packs'))
+      .find((f) => f.startsWith(`pandamstyle-${name}-`));
+    fs.copyFileSync(
+      path.join(dest, 'packs', file),
+      path.join(closure, 'packs', file),
+    );
+    dependencies[`@pandamstyle/${name}`] = `file:packs/${file}`;
+  }
+  writeJson(path.join(closure, 'package.json'), {
+    name: 'pandamstyle-candidate-closure',
+    private: true,
+    description:
+      'Candidate epoch closure: the packed PandamStyle packages of one commit and the alpha1 closure host pins.',
+    dependencies,
+  });
+  run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], {
+    cwd: closure,
+  });
+  writeJson(path.join(dest, CANDIDATE_RECORD), { commit });
+  return commit;
+}
+
+/**
+ * Records the candidate closure in `dest` as epoch `name`. Returns the
+ * manifest. Never overwrites: refuses `alpha1`, an existing epoch directory and
+ * any name that is not a plain lowercase identifier.
+ */
+export function candidateManifest(name, dest, epochsDir = EPOCHS_DIR) {
+  if (typeof name !== 'string' || !EPOCH_NAME.test(name) || name === EPOCH)
+    throw new Error(`refused epoch name ${JSON.stringify(name)}`);
+  const epochDir = path.join(epochsDir, name);
+  if (fs.existsSync(epochDir))
+    throw new Error(`${name} exists: an epoch is never overwritten`);
+  const { commit } = readJson(path.join(dest, CANDIDATE_RECORD));
+  if (!/^[0-9a-f]{40}$/.test(commit ?? ''))
+    throw new Error('candidate.json has no commit');
+  const tree = git(['rev-parse', `${commit}^{tree}`]);
+  const closure = path.join(dest, 'closure');
+  const lock = readJson(path.join(closure, 'package-lock.json'));
+  // Every locked package resolves to the registry or to a pack inside the
+  // closure: no absolute or machine-local path enters the record.
+  for (const [key, entry] of Object.entries(lock.packages))
+    if (
+      key !== '' &&
+      entry.resolved != null &&
+      !entry.resolved.startsWith('https://registry.npmjs.org/') &&
+      !/^file:packs\/[^/]+\.tgz$/.test(entry.resolved)
+    )
+      throw new Error(`${key} resolves outside the registry and packs/`);
+  const packages = PACKAGES.map((short) => {
+    const lockKey = `node_modules/@pandamstyle/${short}`;
+    const locked = lock.packages[lockKey];
+    if (locked == null) throw new Error(`${lockKey} is not in the lockfile`);
+    const version = locked.version;
+    const file = packFile(short, version);
+    const bytes = fs.readFileSync(path.join(dest, 'packs', file));
+    const repeat = path.join(dest, 'packs-repeat', file);
+    const integrity = sha512Integrity(bytes);
+    if (locked.integrity !== integrity)
+      throw new Error(`${lockKey} lock integrity differs from packs/${file}`);
+    if (
+      sha256(fs.readFileSync(path.join(closure, 'packs', file))) !==
+      sha256(bytes)
+    )
+      throw new Error(`closure/packs/${file} differs from packs/${file}`);
+    return {
+      name: `@pandamstyle/${short}`,
+      version,
+      pack: {
+        file: `packs/${file}`,
+        bytes: bytes.length,
+        sha256: sha256(bytes),
+        integrity,
+        shasum: sha1(bytes),
+        repeatSha256: fs.existsSync(repeat) ? fileSha256(repeat) : null,
+        reproducible: fs.existsSync(repeat)
+          ? fileSha256(repeat) === sha256(bytes)
+          : null,
+      },
+      closureLock: {
+        resolved: locked.resolved,
+        integrity: locked.integrity,
+        matchesPack: true,
+      },
+    };
+  });
+  const hostVersion = (pkg) =>
+    readJson(path.join(closure, 'node_modules', pkg, 'package.json')).version;
+  const record = {
+    schemaVersion: 1,
+    kind: 'pandamstyle-baseline-epoch-manifest',
+    epoch: name,
+    epochKind: 'candidate',
+    description:
+      'Candidate epoch: the PandamStyle packages packed from one commit and installed with the alpha1 closure host pins. Compare it with alpha1 by name; it never replaces alpha1.',
+    generatedBy: `node tools/baselines/archive.mjs candidate-manifest --epoch ${name}`,
+    recordedAt: new Date().toISOString(),
+    store: {
+      note: 'The packs and the installed closure live outside Git, produced by `archive.mjs candidate-pack`. Paths below are relative to that directory.',
+    },
+    source: {
+      commit,
+      tree,
+      packedFrom:
+        'a clean detached checkout of the commit (yarn install --frozen-lockfile --ignore-scripts, compiler build, npm pack)',
+    },
+    lockfiles: [
+      {
+        path: 'yarn.lock',
+        commit,
+        sha256: sha256(
+          execFileSync('git', ['cat-file', 'blob', `${commit}:yarn.lock`], {
+            cwd: REPO,
+            maxBuffer: 1 << 30,
+          }),
+        ),
+        role: 'workspace install used to build and pack the candidate',
+      },
+      {
+        path: `benchmarks/core-evolution/epochs/${name}/closure/package-lock.json`,
+        sha256: fileSha256(path.join(closure, 'package-lock.json')),
+        role: 'executable closure: the candidate packs and the alpha1 host pins',
+      },
+      {
+        path: `benchmarks/core-evolution/epochs/${name}/closure/package.json`,
+        sha256: fileSha256(path.join(closure, 'package.json')),
+        role: 'executable closure manifest',
+      },
+      {
+        path: path.relative(REPO, HOST_PINS),
+        sha256: fileSha256(HOST_PINS),
+        role: 'host pins the closure reuses',
+      },
+    ],
+    packages,
+    closure: {
+      path: 'closure',
+      install:
+        'copy packs/ into closure/packs/, then npm ci --ignore-scripts --no-audit --no-fund',
+      installedTree: fileTreeDigest(
+        path.join(closure, 'node_modules'),
+        CLOSURE_FILES,
+      ),
+      installedPandamstyle: fileTreeDigest(
+        path.join(closure, 'node_modules/@pandamstyle'),
+      ),
+      lockedPackages: Object.keys(lock.packages).filter((k) => k !== '').length,
+      hosts: Object.fromEntries(
+        Object.keys(readJson(HOST_PINS).dependencies)
+          .filter((pkg) => !pkg.startsWith('@pandamstyle/'))
+          .sort()
+          .map((pkg) => [pkg, hostVersion(pkg)]),
+      ),
+    },
+    node: { version: process.version },
+    reconstruction: [
+      `git checkout ${commit}`,
+      'node tools/baselines/archive.mjs candidate-pack --dest <empty dir>',
+      `compare the packs and closure digests with benchmarks/core-evolution/epochs/${name}/manifest.v1.json`,
+    ],
+    agReuse: `Bind an agentic qualification to this epoch by name ("${name}") and by the pack and installed-tree digests above; alpha1 stays the baseline epoch.`,
+  };
+  fs.mkdirSync(path.join(epochDir, 'closure'), { recursive: true });
+  for (const file of ['package.json', 'package-lock.json'])
+    fs.copyFileSync(
+      path.join(closure, file),
+      path.join(epochDir, 'closure', file),
+    );
+  writeJson(path.join(epochDir, 'manifest.v1.json'), record);
+  return record;
+}
+
 const [command, ...argv] = process.argv.slice(2);
 if (import.meta.url === `file://${process.argv[1]}`) {
   const store = storeOf(argv);
@@ -998,6 +1237,30 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     const record = manifest(store);
     console.log(
       `wrote ${path.relative(REPO, MANIFEST)} (${record.packages.length} packages, ${record.engines.length} engines)`,
+    );
+  } else if (command === 'candidate-pack') {
+    const index = argv.indexOf('--dest');
+    if (index < 0)
+      throw new Error('usage: archive.mjs candidate-pack --dest <empty dir>');
+    console.log(`packed ${candidatePack(path.resolve(argv[index + 1]))}`);
+  } else if (command === 'candidate-manifest') {
+    const value = (flag) => {
+      const index = argv.indexOf(flag);
+      return index < 0 ? null : argv[index + 1];
+    };
+    if (value('--epoch') == null || value('--dest') == null)
+      throw new Error(
+        'usage: archive.mjs candidate-manifest --epoch <name> --dest <dir> [--epochs-dir <dir>]',
+      );
+    const record = candidateManifest(
+      value('--epoch'),
+      path.resolve(value('--dest')),
+      value('--epochs-dir') == null
+        ? undefined
+        : path.resolve(value('--epochs-dir')),
+    );
+    console.log(
+      `recorded epoch ${record.epoch} (${record.packages.length} packages, commit ${record.source.commit})`,
     );
   } else if (command === 'closure') {
     const index = argv.indexOf('--dest');

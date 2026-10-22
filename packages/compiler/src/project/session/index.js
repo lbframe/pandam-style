@@ -609,6 +609,13 @@ export function createProjectSession(config) {
     set(semanticUnits, 'conditions', conditions);
     set(fileInputs, 'conditions', conditions);
 
+    // CE-02.1: the effective property domains every compiled declaration is
+    // checked against. One coarse unit (design note D9): a domain edit
+    // revalidates every file that compiles declarations, and nothing else.
+    const properties = designSystem.snapshot.properties;
+    set(semanticUnits, 'property-domains', properties.digest);
+    set(fileInputs, 'property-domains', properties.digest);
+
     return { semanticUnits, fileInputs };
   }
 

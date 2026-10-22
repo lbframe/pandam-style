@@ -28,6 +28,12 @@ node tools/baselines/archive.mjs build --store <empty dir>
 node tools/baselines/archive.mjs verify --store <copy of the store> --replay
 node tools/baselines/archive.mjs closure --dest <dir>
 
+# Candidate epoch (CE-02.1): pack a clean committed HEAD and install its
+# closure with the alpha1 host pins, then record it. An epoch is never
+# overwritten, and `alpha1` is refused.
+node tools/baselines/archive.mjs candidate-pack --dest <empty dir>
+node tools/baselines/archive.mjs candidate-manifest --epoch <name> --dest <dir>
+
 # Workloads: check the frozen digests.
 node tools/baselines/workloads.mjs digest
 

@@ -52,6 +52,14 @@ export interface TargetProfileDefinition {
   readonly platform?: 'electron';
 }
 
+/** One `propertyDomains` entry: at least one member, nothing else. */
+export interface PropertyDomainDefinition {
+  readonly values?: readonly (string | number)[];
+  readonly tokens?: readonly string[];
+  /** `{ min }` alone has no upper bound. */
+  readonly range?: Readonly<{ min: number; max?: number }>;
+}
+
 /** A design-system author's optional progressive enhancement. */
 export interface TargetEnhancementPolicy {
   /** A feature key of emitted CSS, e.g. `selector::has` or `value:text-wrap/pretty`. */
@@ -63,6 +71,12 @@ export interface TargetEnhancementPolicy {
 export interface Definition {
   readonly systemId: string;
   readonly enhancements?: readonly TargetEnhancementPolicy[];
+  /**
+   * Property domains (CE-02.1): per property, the whole admitted domain,
+   * taken from the compiler's standard domain for that property. Keys are
+   * authoring keys (`width`); they are validated by the compiler.
+   */
+  readonly propertyDomains?: Readonly<Record<string, PropertyDomainDefinition>>;
   readonly [key: string]: unknown;
 }
 

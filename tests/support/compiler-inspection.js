@@ -19,6 +19,7 @@ export {
 export { compileFile } from '../../packages/compiler/src/frontend/babel/compile-file.js';
 export {
   createPatternIR,
+  patternEmissions,
   patternStyles,
   PATTERN_IDS,
   PATTERN_CATALOG,
@@ -49,6 +50,7 @@ export {
 } from '../../packages/compiler/src/design-system/registry/index.js';
 export {
   descriptorKeys,
+  descriptorOf,
   ENFORCED_FIELDS,
   platformExtensions,
 } from '../../packages/compiler/src/design-system/policy/descriptors.js';
@@ -56,6 +58,7 @@ export {
   domainOfCssFor,
   effectiveDomain,
   effectivePropertiesOf,
+  normalizePropertyDomains,
   propertyRow,
 } from '../../packages/compiler/src/design-system/policy/domains.js';
 export { recognizedProperty } from '../../packages/compiler/src/design-system/policy/recognized.js';

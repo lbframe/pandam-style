@@ -216,6 +216,7 @@ describe('the root jest configuration is not a broad ignore', () => {
         'packages/compiler/__tests__/pandamstyle/targets-transform-test.js',
         // CE-02.1 property descriptors.
         'packages/compiler/__tests__/pandamstyle/property-descriptors-test.js',
+        'packages/compiler/__tests__/pandamstyle/property-domains-test.js',
       ].sort(),
     );
   });
