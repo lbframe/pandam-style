@@ -27,6 +27,10 @@
 // unsupported-property rule gains a suffix, and a prototype name (`__proto__`
 // literal or computed, `constructor`, `prototype`, ...) is refused by the
 // candidate as an unrecognized property, whatever Alpha 1 did (asserted).
+// CE-02.2 deltas are listed in full, separately, and accepted only in their
+// two classes: a number Alpha 1's continuous range admitted that the finite
+// default refuses (`structural-domain`), and a token whose value ('1px') is
+// not a value of a number or time property (`category-strict`).
 // Recipes, patterns, condition blocks, spreads and platform names under
 // target profiles are covered by the Jest suite
 // packages/compiler/__tests__/pandamstyle/property-descriptors-test.js.
@@ -115,6 +119,44 @@ ${CATEGORIES.map(
   },
 };
 `;
+
+// CE-02.2 finite defaults of the former ranges, and the rows whose scalar
+// refuses a '1px' token value (a font weight is a number; a duration a time).
+const CE022_FINITE = {
+  opacity: Array.from({ length: 21 }, (_, i) => (i * 5) / 100),
+  flex: Array.from({ length: 13 }, (_, i) => i),
+  flexGrow: Array.from({ length: 13 }, (_, i) => i),
+  flexShrink: Array.from({ length: 13 }, (_, i) => i),
+};
+const CE022_LENGTH_TOKEN_REFUSED = new Set([
+  'fontWeight',
+  'transitionDuration',
+  'transitionDelay',
+  'animationDuration',
+  'animationDelay',
+]);
+const FORBIDDEN = (rule) => JSON.stringify([['PMS_FORBIDDEN_VALUE', rule]]);
+function ce022Delta(p, a, c) {
+  if (a.length !== 0) return null;
+  if (Object.hasOwn(CE022_FINITE, p.key)) {
+    const n = Number(p.value);
+    if (
+      /^-?[\d.e+]+$/.test(p.value) &&
+      !CE022_FINITE[p.key].includes(n) &&
+      JSON.stringify(c) === FORBIDDEN('structural-domain')
+    ) {
+      return 'finite-default';
+    }
+  }
+  if (
+    CE022_LENGTH_TOKEN_REFUSED.has(p.key) &&
+    /^token\('[a-zA-Z]+\.a'\)$/.test(p.value) &&
+    JSON.stringify(c) === FORBIDDEN('category-strict')
+  ) {
+    return 'token-value-out-of-domain';
+  }
+  return null;
+}
 
 // Probe values as source text. Literals the compiler resolves statically.
 const COMMON = [
@@ -245,6 +287,7 @@ async function main() {
             c[i][1].startsWith('supported-properties.'))),
     );
   const differences = [];
+  const ce022Deltas = [];
   const prototypeKeys = [];
   let accepted = 0;
   let rejected = 0;
@@ -264,6 +307,11 @@ async function main() {
       if (a.length === 0) accepted += 1;
       else rejected += 1;
       if (!intended(a, c)) {
+        const kind = ce022Delta(p, a, c);
+        if (kind != null) {
+          ce022Deltas.push({ kind, key: p.key, value: p.value, candidate: c });
+          return;
+        }
         differences.push({
           key: p.key,
           value: p.value,
@@ -289,6 +337,8 @@ async function main() {
     rejected,
     differences: differences.length,
     firstDifferences: differences.slice(0, 20),
+    ce022Deltas: ce022Deltas.length,
+    ce022DeltaList: ce022Deltas,
     prototypeKeys,
     prototypeFailures: prototypeFailures.length,
   };

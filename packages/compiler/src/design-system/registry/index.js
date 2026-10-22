@@ -23,6 +23,7 @@ import {
 import { createHash } from 'crypto';
 import { diagnostic, PmsError, Codes } from '../../protocol/diagnostics';
 import { validateRecipeDefinition } from '../recipes/validate';
+import { recordNumericFacts } from '../policy/numeric-facts';
 
 const lexicalCompare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -542,7 +543,7 @@ export function buildRegistry(definition) {
       .filter((recipeId) => recs[recipeId].visibility === 'public')
       .sort(lexicalCompare),
   };
-  return {
+  const registry = {
     systemId,
     tokens: tokensOut,
     resolvedValues: resolved,
@@ -559,4 +560,7 @@ export function buildRegistry(definition) {
     diagnostics,
     registryDigest: registryDigest(payload),
   };
+  // CE-02.2: the numeric facts of token values, derived once per registry.
+  recordNumericFacts(registry);
+  return registry;
 }

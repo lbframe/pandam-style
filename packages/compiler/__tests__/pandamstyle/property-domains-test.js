@@ -57,14 +57,23 @@ const CATEGORIES = [
   'easings',
   'sizes',
 ];
+// Token values valid for their category's properties (CE-02.2 checks a
+// token's numeric value at use): a number for weights, a time for durations.
+const TOKEN_VALUES = {
+  fontWeights: ['400', '700'],
+  durations: ['100ms', '200ms'],
+};
 const TOKENS = Object.fromEntries(
-  CATEGORIES.map((category) => [
-    category,
-    {
-      a: { value: '1px', visibility: 'public' },
-      p: { value: '2px', visibility: 'private' },
-    },
-  ]),
+  CATEGORIES.map((category) => {
+    const [a, p] = TOKEN_VALUES[category] ?? ['1px', '2px'];
+    return [
+      category,
+      {
+        a: { value: a, visibility: 'public' },
+        p: { value: p, visibility: 'private' },
+      },
+    ];
+  }),
 );
 
 const build = (propertyDomains, extra = {}) =>
@@ -110,9 +119,6 @@ const admittedRows = compiler
 function declarationMember(declarations, member) {
   const start = declarations.indexOf('type PropertyDomains = {');
   const text = declarations.slice(start);
-  if (member === 'ranges') {
-    return /\n {2}ranges: ([^;]*);/.exec(text)[1];
-  }
   const open = text.indexOf(`  ${member}: `);
   let depth = 0;
   for (let i = text.indexOf('{', open); i < text.length; i++) {
@@ -169,30 +175,22 @@ describe('the propertyDomains schema', () => {
     ['empty', 'an empty entry', { width: {} }],
     ['malformed-member', 'an empty list', { width: { values: [] } }],
     ['malformed-member', 'a scalar member', { width: { values: 'auto' } }],
+    // CE-02.2: `range` is removed; every domain is finite.
     [
-      'malformed-member',
-      'a text bound',
-      { opacity: { range: { min: 0, max: '1' } } },
+      'range-removed',
+      'a CE-02.1 range',
+      { opacity: { range: { min: 0, max: 1 } } },
+    ],
+    ['range-removed', 'an unbounded range', { flex: { range: { min: 0 } } }],
+    [
+      'range-removed',
+      'a range beside values',
+      { opacity: { values: [0], range: { min: 0, max: 1 } } },
     ],
     [
-      'malformed-member',
-      'inverted bounds',
-      { opacity: { range: { min: 1, max: 0 } } },
-    ],
-    [
-      'malformed-member',
-      'a NaN bound',
-      { opacity: { range: { min: NaN, max: 1 } } },
-    ],
-    [
-      'malformed-member',
-      'an Infinity bound',
-      { flex: { range: { min: 0, max: Infinity } } },
-    ],
-    [
-      'malformed-member',
-      'an extra range key',
-      { opacity: { range: { min: 0, max: 1, step: 1 } } },
+      'range-removed',
+      'a range on a row without one',
+      { width: { range: { min: 0, max: 1 } } },
     ],
     [
       'malformed-value',
@@ -200,46 +198,97 @@ describe('the propertyDomains schema', () => {
       { width: { values: [() => 'auto'] } },
     ],
     ['malformed-value', 'an object value', { width: { values: [{}] } }],
-    ['malformed-value', 'NaN', { opacity: { values: [NaN] } }],
-    ['malformed-value', 'Infinity', { flexGrow: { values: [Infinity] } }],
+    ['non-finite', 'NaN', { opacity: { values: [NaN] } }],
+    ['non-finite', 'Infinity', { flexGrow: { values: [Infinity] } }],
+    ['non-finite', '-Infinity', { marginTop: { values: [-Infinity] } }],
     ['malformed-value', 'a boolean', { width: { values: [true] } }],
     ['malformed-value', 'a RegExp', { width: { values: [/auto/] } }],
     ['malformed-value', 'null', { width: { values: [null] } }],
     ['malformed-value', 'a numeric category', { color: { tokens: [1] } }],
     ['duplicate', 'a repeated value', { width: { values: ['auto', 'auto'] } }],
     ['duplicate', '0 and "0"', { margin: { values: [0, '0'] } }],
-    ['outside-standard', 'a pixel length', { width: { values: ['18px'] } }],
+    // CE-02.2: author literals are checked against the grammar subset.
+    ['non-canonical', 'a redundant zero', { width: { values: ['18.0px'] } }],
+    ['non-canonical', 'an upper-case unit', { width: { values: ['18PX'] } }],
+    ['non-canonical', 'a leading +', { width: { values: ['+18px'] } }],
+    ['non-canonical', 'a leading dot', { width: { values: ['.5px'] } }],
+    ['non-canonical', 'an exponent', { width: { values: ['1e1px'] } }],
+    ['non-canonical', 'surrounding space', { width: { values: [' 18px'] } }],
+    ['non-canonical', 'a unit on the zero', { width: { values: ['0px'] } }],
+    ['non-canonical', 'a numeric string', { opacity: { values: ['0.5'] } }],
+    ['non-canonical', 'an upper-case keyword', { width: { values: ['AUTO'] } }],
     [
-      'outside-standard',
+      'non-canonical',
+      'an upper-case CSS-wide keyword',
+      { width: { values: ['Inherit'] } },
+    ],
+    [
+      'grammar-unsupported',
       'a calc() string',
       { width: { values: ['calc(100% - 1px)'] } },
     ],
-    ['outside-standard', 'a wildcard', { width: { values: ['*'] } }],
+    ['grammar-unsupported', 'a wildcard', { width: { values: ['*'] } }],
+    [
+      'grammar-unsupported',
+      'a keyword of an opaque production',
+      { display: { values: ['table'] } },
+    ],
+    [
+      'grammar-unsupported',
+      'a length on a property-reference row',
+      { paddingInlineStart: { values: ['4px'] } },
+    ],
+    [
+      'grammar-mismatch',
+      'a keyword outside a closed grammar',
+      { flexDirection: { values: ['diagonal'] } },
+    ],
+    [
+      'grammar-mismatch',
+      'a number on a keyword-only grammar',
+      { flexDirection: { values: [1] } },
+    ],
+    [
+      'unit-not-applicable',
+      'an angle on a length row',
+      { width: { values: ['18deg'] } },
+    ],
+    [
+      'unit-not-applicable',
+      'an unknown unit',
+      { width: { values: ['18furlongs'] } },
+    ],
+    [
+      'unit-not-applicable',
+      'a unitless number on a length row',
+      { width: { values: [18] } },
+    ],
+    [
+      'unit-not-applicable',
+      'a unit on a number row',
+      { opacity: { values: ['0.5px'] } },
+    ],
+    [
+      'out-of-bounds',
+      'a negative padding',
+      { paddingTop: { values: ['-4px'] } },
+    ],
+    ['out-of-bounds', 'a negative width', { width: { values: ['-1%'] } }],
+    ['out-of-bounds', 'a number above 1', { opacity: { values: [2] } }],
+    ['out-of-bounds', 'a magnitude above 1e6', { flexGrow: { values: [1e7] } }],
+    ['out-of-bounds', 'a huge length', { width: { values: ['1e308px'] } }],
+    ['precision', 'five fraction digits', { opacity: { values: [0.12345] } }],
+    ['precision', 'a binary fraction', { flexGrow: { values: [0.1 + 0.2] } }],
+    ['precision', 'a tiny length', { width: { values: ['0.00001px'] } }],
+    [
+      'css-wide-unsupported',
+      'revert-layer',
+      { width: { values: ['revert-layer'] } },
+    ],
     [
       'outside-standard',
       'a foreign category',
       { color: { tokens: ['spacing'] } },
-    ],
-    ['outside-standard', 'a numeric string', { opacity: { values: ['0.5'] } }],
-    [
-      'outside-standard',
-      'a number above the range',
-      { opacity: { values: [2] } },
-    ],
-    [
-      'outside-standard',
-      'a wider range',
-      { opacity: { range: { min: 0, max: 2 } } },
-    ],
-    [
-      'outside-standard',
-      'an unbounded range on a bounded row',
-      { opacity: { range: { min: 0 } } },
-    ],
-    [
-      'outside-standard',
-      'a range on a row without one',
-      { width: { range: { min: 0, max: 1 } } },
     ],
     [
       'pattern-conflict',
@@ -288,11 +337,42 @@ describe('the propertyDomains schema', () => {
   test('one refused entry refuses the whole definition', () => {
     const diagnostics = refusal({
       width: { values: ['auto'] },
-      height: { values: ['18px'] },
+      height: { values: ['18.0px'] },
     });
     expect(diagnostics.map((d) => d.rule)).toEqual([
-      'property-domains.outside-standard',
+      'property-domains.non-canonical',
     ]);
+    expect(diagnostics[0].context).toMatchObject({
+      property: 'height',
+      value: '18.0px',
+      canonical: '18px',
+    });
+  });
+
+  // CE-02.2: what an author may approve, stored in its one spelling.
+  test.each([
+    ['width', ['18px', '46ch', '62ch', '50%', '0.5rem', '100dvh', 0]],
+    ['height', ['220px', 'auto', 'min-content']],
+    ['marginTop', ['-4px', '-0.25rem', 'auto']],
+    ['top', ['-1px', '50%']],
+    ['opacity', [0, 0.33, 1, 0.0001]],
+    ['flexGrow', [0, 1, 1.5, 1000000]],
+    ['flex', ['none', 2.5]],
+    ['lineHeight', [1.5, 'normal', '24px', '150%']],
+    ['transitionDuration', []],
+    ['width', ['inherit', 'initial', 'unset', 'revert']],
+    ['maxWidth', ['none', '62ch']],
+  ])('%s approves %j', (key, values) => {
+    if (values.length === 0) return;
+    const { propertyDomains, diagnostics } = compiler.normalizePropertyDomains(
+      { [key]: { values } },
+      {},
+    );
+    expect(diagnostics).toEqual([]);
+    // The CSS zero is stored as '0'; everything else as written.
+    expect(propertyDomains[key].values).toEqual(
+      values.map((v) => (v === 0 && key === 'width' ? '0' : v)),
+    );
   });
 
   test('normalization keeps own data only, sorted and frozen', () => {
@@ -365,13 +445,12 @@ describe('the effective table', () => {
 // Invariant 6: no inherited admission branch, enumerated.
 
 describe('an override disables every branch it does not restate', () => {
-  const KINDS = ['values', 'tokens', 'range'];
+  const KINDS = ['values', 'tokens'];
   const cases = [];
   for (const descriptor of admittedRows) {
-    const present = KINDS.filter((kind) =>
-      kind === 'range'
-        ? descriptor.standard.range != null
-        : descriptor.standard[kind].length > 0,
+    expect(descriptor.standard).not.toHaveProperty('range');
+    const present = KINDS.filter(
+      (kind) => descriptor.standard[kind].length > 0,
     );
     expect(descriptor.standard.resources).toEqual([]);
     for (let mask = 1; mask < 1 << present.length; mask++) {
@@ -391,8 +470,7 @@ describe('an override disables every branch it does not restate', () => {
     const override = {};
     if (restated.includes('values')) override.values = [...S.values];
     if (restated.includes('tokens')) override.tokens = [...S.tokens];
-    if (restated.includes('range')) override.range = { ...S.range };
-    const omitted = ['values', 'tokens', 'range'].filter(
+    const omitted = ['values', 'tokens'].filter(
       (kind) => !restated.includes(kind),
     );
 
@@ -422,9 +500,6 @@ describe('an override disables every branch it does not restate', () => {
     }
     if (restated.includes('tokens')) {
       expect(outcome(ds, key, compiler.token(`${S.tokens[0]}.a`))).toBe(null);
-    }
-    if (restated.includes('range')) {
-      expect(outcome(ds, key, S.range.min)).toBe(null);
     }
 
     // Every omitted branch, from the standard and from the default domain,
@@ -460,28 +535,11 @@ describe('an override disables every branch it does not restate', () => {
           quotedKey,
         );
       }
-      if (kind === 'range') {
-        const probes = [S.range, D.range]
-          .filter(Boolean)
-          .map((r) => r.min + 0.25);
-        for (const probe of probes) {
-          if (row.domain.values.includes(probe)) continue;
-          expect(outcome(ds, key, probe)).toMatchObject([
-            ['PMS_FORBIDDEN_VALUE', expect.any(String)],
-          ]);
-        }
-        expect(row.domain.range).toBe(null);
-        expect(manifest).not.toHaveProperty('range');
-        expect(repair.range).toBe(null);
-        expect(declarationMember(declarations, 'ranges')).not.toContain(
-          JSON.stringify(key),
-        );
-      }
     }
   });
 });
 
-describe('the four legacy ranges under an override', () => {
+describe('the four former ranges under an override (CE-02.2)', () => {
   test('opacity values [0, 1] rejects 0.5 and types 0 | 1', () => {
     const ds = build({ opacity: { values: [0, 1] } });
     expect(outcome(ds, 'opacity', 1)).toBe(null);
@@ -495,28 +553,26 @@ describe('the four legacy ranges under an override', () => {
     expect(declarationMember(declarations, 'values')).toContain(
       'readonly "opacity": 0 | 1;',
     );
-    expect(declarationMember(declarations, 'ranges')).not.toContain(
-      '"opacity"',
-    );
+    expect(declarations).not.toMatch(/ranges/);
   });
 
   test.each([
-    ['flex', { range: { min: 0, max: 3 } }, [0, 3, 1.5], [4, -1]],
-    ['flexShrink', { range: { min: 0 } }, [0, 1e9], [-1]],
-    ['flexGrow', { values: [1] }, [1], [2, 0]],
-    ['opacity', { range: { min: 0.25, max: 0.5 } }, [0.25, 0.5], [0, 1]],
-  ])('%s %j', (key, override, accepted, refused) => {
-    const ds = build({ [key]: override });
-    for (const v of accepted) expect(outcome(ds, key, v)).toBe(null);
+    ['flex', [0, 3, 1.5], 'approved', [4, -1, 0.5]],
+    ['flexShrink', [0, 1000000], 'approved', [-1, 1, 1e9]],
+    ['flexGrow', [1], 'narrowed', [2, 0]],
+    ['opacity', [0.25, 0.33, 0.5], 'approved', [0, 1, 0.3]],
+  ])('%s values %j', (key, values, origin, refused) => {
+    const ds = build({ [key]: { values } });
+    for (const v of values) expect(outcome(ds, key, v)).toBe(null);
     for (const v of refused) {
       expect(outcome(ds, key, v)).toEqual([
         ['PMS_FORBIDDEN_VALUE', 'structural-domain'],
       ]);
     }
-    const range = ds.snapshot.tooling.manifest.properties.byProperty[key].range;
-    expect(JSON.parse(JSON.stringify(range ?? null))).toEqual(
-      override.range == null ? null : { ...override.range, legacy: true },
-    );
+    expect(ds.snapshot.tooling.manifest.properties.byProperty[key]).toEqual({
+      values,
+      origin,
+    });
   });
 });
 
@@ -525,8 +581,9 @@ describe('the four legacy ranges under an override', () => {
 
 describe('the CSS zero', () => {
   const ZERO_ROWS = admittedRows.filter((d) => d.standard.values.includes('0'));
-  const RANGE_ROWS = admittedRows.filter(
-    (d) => d.standard.range != null && d.standard.range.min <= 0,
+  // The former range rows: a <number> grammar, so 0 is a number.
+  const RANGE_ROWS = admittedRows.filter((d) =>
+    ['flex', 'flexGrow', 'flexShrink', 'opacity'].includes(d.key),
   );
 
   const typecheck = (declarations, lines) => {
@@ -593,6 +650,9 @@ describe('the CSS zero', () => {
       'flexShrink',
       'opacity',
     ]);
+    for (const d of RANGE_ROWS) {
+      expect(d.standard.numeric.map((c) => c.type)).toEqual(['number']);
+    }
   });
 
   test.each([
@@ -671,7 +731,7 @@ describe('the CSS zero', () => {
     ).toBe('');
   });
 
-  test('a legacy numeric row keeps 0 a number: the string is refused, as in Alpha 1', () => {
+  test('a former range row keeps 0 a number: the string is refused, as in Alpha 1', () => {
     const ds = build(
       Object.fromEntries(RANGE_ROWS.map((d) => [d.key, { values: [0, 1] }])),
     );
@@ -693,10 +753,12 @@ describe('the CSS zero', () => {
     expect(
       typecheck(compiler.generateDesignSystemDeclarations(ds.snapshot), lines),
     ).toBe('');
-    // The string spelling is not an approvable value of a numeric row.
-    expect(refusal({ opacity: { values: ['0'] } }).map((d) => d.rule)).toEqual([
-      'property-domains.outside-standard',
+    // The string spelling is not the canonical value of a numeric row.
+    const refused = refusal({ opacity: { values: ['0'] } });
+    expect(refused.map((d) => d.rule)).toEqual([
+      'property-domains.non-canonical',
     ]);
+    expect(refused[0].context.canonical).toBe(0);
   });
 });
 

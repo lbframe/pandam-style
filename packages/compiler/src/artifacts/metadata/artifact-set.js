@@ -76,6 +76,19 @@ export function validateArtifactSet(metadata, contents) {
   if (metadata == null || typeof metadata !== 'object') {
     mismatch('artifacts.json', 'metadata is not an object');
   }
+  // A reader reads exactly its own manifest schema version. A newer one is
+  // refused explicitly, before any other check: its entries may not have the
+  // shape this reader types (CE-02.2: version 3 replaced version 2's `range`
+  // rows with `values`).
+  if (
+    Number.isInteger(metadata.manifestSchemaVersion) &&
+    metadata.manifestSchemaVersion > MANIFEST_SCHEMA_VERSION
+  ) {
+    mismatch(
+      'artifacts.json',
+      `manifest schema version ${metadata.manifestSchemaVersion} is newer than this reader's version ${MANIFEST_SCHEMA_VERSION}`,
+    );
+  }
   const identity = {
     systemId: metadata.systemId,
     registryDigest: metadata.registryDigest,

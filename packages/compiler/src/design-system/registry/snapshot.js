@@ -21,7 +21,11 @@ const ABI_VERSION = 1;
 const COMPILER_CONTRACT_VERSION = 'pms-0.1';
 // Version 2 (CE-02.1): `supportedProperties` is replaced by `properties`, the
 // projection of the effective property table.
-export const MANIFEST_SCHEMA_VERSION = 2;
+// Version 3 (CE-02.2): every property domain is finite. The four former range
+// rows (`opacity`, `flex`, `flexGrow`, `flexShrink`) carry `values` where a
+// version 2 manifest required `range`, so a reader typed against version 2
+// cannot read them: the version changes.
+export const MANIFEST_SCHEMA_VERSION = 3;
 const lexicalCompare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
 export const DESIGN_SYSTEM_CAPABILITIES = Object.freeze({

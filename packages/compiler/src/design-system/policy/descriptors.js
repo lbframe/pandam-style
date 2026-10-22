@@ -6,7 +6,7 @@
  */
 
 /**
- * PandamStyle - canonical property descriptors (CE-02.1).
+ * PandamStyle - canonical property descriptors (CE-02.1, CE-02.2).
  *
  * The only property authority of the compiler. One record per property the
  * compiler describes:
@@ -15,8 +15,15 @@
  *   aliases       accepted authoring spellings (none yet; CE-02.3)
  *   status        'standard' | 'platform'
  *   platform      CE-01.1 platform id of a platform extension, else null
- *   grammar       CSS value definition, transcribed from the specification.
- *                 Informative here; CE-02.2 validates against it
+ *   grammar       CSS value definition, transcribed from the specification
+ *                 (narrowed where policy says so: `opacity`, `flex`). Its
+ *                 closed subset (policy/grammar.js) decides which keywords
+ *                 and numeric literals an author may approve
+ *   scalar        CE-02.2: { constraints, count } a numeric token value must
+ *                 satisfy on this row, per whitespace-separated component;
+ *                 null on rows whose token categories carry no number
+ *   opaqueValues  CE-02.2: the reviewed `standard` values that only an
+ *                 opaque grammar branch matches (exact strings)
  *   contexts      applicable contexts; 'element' only until CE-07
  *   standard      the maximum domain a design system may approve
  *   default       the domain admitted without an override: Alpha 1's
@@ -29,12 +36,13 @@
  *                 | { corner } (logical) | { physical } | null
  *   targetFeature target feature key of the emitted property
  *
- * A domain has four members: `values` (finite literal values; numeric 0 is the
- * same value as '0'), `tokens` (token categories), `resources` (resource
- * kinds, empty until CE-03) and `range`. `range` exists only on the four Alpha
- * 1 rows `opacity`, `flex`, `flexGrow` and `flexShrink`: it is a continuous
- * legacy interval, never a finite domain, and CE-02.2 replaces it. Its `max` is
- * omitted when the interval has no upper bound (`{ min: 0 }`).
+ * A domain has three members: `values` (finite literal values; numeric 0 is
+ * the same value as '0'), `tokens` (token categories) and `resources`
+ * (resource kinds, empty until CE-03). Every domain is finite: CE-02.2
+ * replaced the four Alpha 1 continuous ranges (`opacity`, `flex`, `flexGrow`,
+ * `flexShrink`) with finite default values. `standard` also carries
+ * `numeric`, the numeric constraints compiled from the grammar, which decide
+ * the numeric literals an author may approve.
  *
  * Platform-extension rows are recognition-only in CE-02.1: they have no
  * domain and every use is rejected.
@@ -45,8 +53,9 @@
  */
 
 import { createHash } from 'crypto';
+import { compileGrammar } from './grammar';
 
-export const CATALOG_VERSION = 1;
+export const CATALOG_VERSION = 2;
 
 /**
  * The fields of an effective row (the snapshot's `properties.descriptors`)
@@ -83,6 +92,8 @@ const CATALOG_FIELDS = Object.freeze([
   'contexts',
   'standard',
   'default',
+  'scalar',
+  'opaqueValues',
   'form',
   'longhands',
   'family',
@@ -99,9 +110,26 @@ const kebab = (key) =>
     .replace(/^(Webkit|Moz)/, (m) => `-${m.toLowerCase()}`)
     .replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
 
-function domain({ values = NONE, tokens = NONE, range = null } = {}) {
-  return { values: [...values], tokens: [...tokens], resources: [], range };
+function domain({ values = NONE, tokens = NONE } = {}) {
+  return { values: [...values], tokens: [...tokens], resources: [] };
 }
+
+/**
+ * The numeric constraint a token value must satisfy on a row, per component,
+ * and the number of whitespace-separated components the row accepts (CSS Box
+ * 4 and CSS Logical 1 shorthand forms). `text` uses the numeric types of the
+ * grammar subset only.
+ */
+function scalar(text, minCount = 1, maxCount = minCount) {
+  const compiled = compileGrammar(text);
+  if (compiled.keywords.length > 0 || compiled.opaque.length > 0) {
+    throw new Error(`a scalar holds numeric types only: ${text}`);
+  }
+  return { constraints: compiled.numeric, count: [minCount, maxCount] };
+}
+
+const NON_NEGATIVE = '<length-percentage [0,\u221E]>';
+const SIGNED = '<length-percentage>';
 
 // Each row: [key, grammar, family, { std, def, form, longhands, direction }].
 // `def` is the Alpha 1 domain; `std` adds what a design system may approve.
@@ -169,19 +197,6 @@ const SET = (key, grammar, family, def, std = [], extra = {}) => [
   family,
   { def: { values: def }, std: { values: std }, ...extra },
 ];
-// A range with no upper bound omits `max`: the domain stays JSON-safe, with
-// no Infinity to serialize as null.
-const rangeOf = (min, max) => (max === Infinity ? { min } : { min, max });
-const RANGE = (key, grammar, family, min, max, extra = {}) => [
-  key,
-  grammar,
-  family,
-  {
-    def: { range: rangeOf(min, max) },
-    std: { range: rangeOf(min, max) },
-    ...extra,
-  },
-];
 const COMPOSITE = (key, grammar, family, longhands) => [
   key,
   grammar,
@@ -211,6 +226,12 @@ const MARGIN = "<'margin-top'>";
 const INSET = "<'top'>";
 const LENGTH_PERCENTAGE_0 = '<length-percentage [0,\u221E]>';
 const RADIUS = '<length-percentage [0,\u221E]>{1,2}';
+
+// CE-02.2 finite defaults of the former ranges: opacity in steps of 0.05 and
+// the flex factors as the integers 0 to 12. A design system approves other
+// values of `standard` through `propertyDomains`.
+const OPACITY_GRID = Array.from({ length: 21 }, (_, i) => (i * 5) / 100);
+const FLEX_INTEGERS = Array.from({ length: 13 }, (_, i) => i);
 
 const ROWS = [
   // Colors (Alpha 1: token category `colors`).
@@ -735,18 +756,21 @@ const ROWS = [
     ),
   }),
 
-  // Legacy continuous ranges (Alpha 1 `STRUCTURAL_NUMBER_RANGES`).
-  RANGE('opacity', '<number> | <percentage>', 'effects', 0, 1),
-  RANGE(
+  // Finite numeric domains (CE-02.2), replacing Alpha 1's continuous
+  // `STRUCTURAL_NUMBER_RANGES`. The grammar is the policy's: `opacity` takes
+  // a number in [0, 1] (percentages are follow-up work), and `flex` its
+  // single-number form (the full shorthand belongs to CE-02.3).
+  SET('opacity', '<number [0,1]>', 'effects', OPACITY_GRID),
+  SET(
     'flex',
-    "none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]",
+    'none | <number [0,\u221E]>',
     'flex',
-    0,
-    Infinity,
+    FLEX_INTEGERS,
+    [],
     shorthand(['flex-grow', 'flex-shrink', 'flex-basis']),
   ),
-  RANGE('flexGrow', '<number [0,\u221E]>', 'flex', 0, Infinity),
-  RANGE('flexShrink', '<number [0,\u221E]>', 'flex', 0, Infinity),
+  SET('flexGrow', '<number [0,\u221E]>', 'flex', FLEX_INTEGERS),
+  SET('flexShrink', '<number [0,\u221E]>', 'flex', FLEX_INTEGERS),
 
   // Composite forms, refused (Alpha 1 `COMPOSITE_FORMS`).
   COMPOSITE('background', '<bg-layer>#? , <final-bg-layer>', 'backgrounds', [
@@ -813,18 +837,234 @@ const ROWS = [
 
 const union = (a, b) => [...new Set([...a, ...b])];
 
+// CE-02.2: the numeric constraint of a token value per row, and the number
+// of whitespace-separated components the row accepts. Every row whose token
+// categories can carry a number has one; a catalog test enforces it.
+const SCALARS = {
+  padding: scalar(NON_NEGATIVE, 1, 4),
+  paddingTop: scalar(NON_NEGATIVE),
+  paddingRight: scalar(NON_NEGATIVE),
+  paddingBottom: scalar(NON_NEGATIVE),
+  paddingLeft: scalar(NON_NEGATIVE),
+  paddingInline: scalar(NON_NEGATIVE, 1, 2),
+  paddingInlineStart: scalar(NON_NEGATIVE),
+  paddingInlineEnd: scalar(NON_NEGATIVE),
+  paddingBlock: scalar(NON_NEGATIVE, 1, 2),
+  paddingBlockStart: scalar(NON_NEGATIVE),
+  paddingBlockEnd: scalar(NON_NEGATIVE),
+  margin: scalar(SIGNED, 1, 4),
+  marginTop: scalar(SIGNED),
+  marginRight: scalar(SIGNED),
+  marginBottom: scalar(SIGNED),
+  marginLeft: scalar(SIGNED),
+  marginInline: scalar(SIGNED, 1, 2),
+  marginInlineStart: scalar(SIGNED),
+  marginInlineEnd: scalar(SIGNED),
+  marginBlock: scalar(SIGNED, 1, 2),
+  marginBlockStart: scalar(SIGNED),
+  marginBlockEnd: scalar(SIGNED),
+  top: scalar(SIGNED),
+  right: scalar(SIGNED),
+  bottom: scalar(SIGNED),
+  left: scalar(SIGNED),
+  inset: scalar(SIGNED, 1, 4),
+  insetInlineStart: scalar(SIGNED),
+  insetInlineEnd: scalar(SIGNED),
+  insetBlockStart: scalar(SIGNED),
+  insetBlockEnd: scalar(SIGNED),
+  textUnderlineOffset: scalar(SIGNED),
+  gap: scalar(NON_NEGATIVE, 1, 2),
+  rowGap: scalar(NON_NEGATIVE),
+  columnGap: scalar(NON_NEGATIVE),
+  borderRadius: scalar(NON_NEGATIVE, 1, 4),
+  borderTopLeftRadius: scalar(NON_NEGATIVE, 1, 2),
+  borderTopRightRadius: scalar(NON_NEGATIVE, 1, 2),
+  borderBottomLeftRadius: scalar(NON_NEGATIVE, 1, 2),
+  borderBottomRightRadius: scalar(NON_NEGATIVE, 1, 2),
+  borderStartStartRadius: scalar(NON_NEGATIVE, 1, 2),
+  borderStartEndRadius: scalar(NON_NEGATIVE, 1, 2),
+  borderEndStartRadius: scalar(NON_NEGATIVE, 1, 2),
+  borderEndEndRadius: scalar(NON_NEGATIVE, 1, 2),
+  fontSize: scalar(NON_NEGATIVE),
+  fontWeight: scalar('<number [1,1000]>'),
+  lineHeight: scalar(`<number [0,\u221E]> | ${NON_NEGATIVE}`),
+  letterSpacing: scalar(SIGNED),
+  transitionDuration: scalar('<time [0s,\u221E]>'),
+  transitionDelay: scalar('<time>'),
+  animationDuration: scalar('<time [0s,\u221E]>'),
+  animationDelay: scalar('<time>'),
+  width: scalar(NON_NEGATIVE),
+  height: scalar(NON_NEGATIVE),
+  minWidth: scalar(NON_NEGATIVE),
+  maxWidth: scalar(NON_NEGATIVE),
+};
+
+// CE-02.2: the reviewed `standard` values that only an opaque grammar branch
+// matches (a property reference, a multiplier, a function or another data
+// type). They are admitted as exact strings, never by grammar. A catalog test
+// checks that this table is exactly the residue of `standard.values` that no
+// keyword or numeric branch matches.
+const OPAQUE_VALUES = {
+  color: ['currentColor', 'transparent'],
+  backgroundColor: ['currentColor', 'transparent'],
+  borderColor: ['currentColor', 'transparent'],
+  borderTopColor: ['currentColor', 'transparent'],
+  borderRightColor: ['currentColor', 'transparent'],
+  borderBottomColor: ['currentColor', 'transparent'],
+  borderLeftColor: ['currentColor', 'transparent'],
+  borderInlineColor: ['currentColor', 'transparent'],
+  borderBlockColor: ['currentColor', 'transparent'],
+  outlineColor: ['currentColor', 'transparent'],
+  textDecorationColor: ['currentColor', 'transparent'],
+  caretColor: ['currentColor', 'transparent'],
+  fill: ['currentColor', 'transparent'],
+  stroke: ['currentColor', 'transparent'],
+  padding: ['0'],
+  paddingInline: ['0'],
+  paddingInlineStart: ['0'],
+  paddingInlineEnd: ['0'],
+  paddingBlock: ['0'],
+  paddingBlockStart: ['0'],
+  paddingBlockEnd: ['0'],
+  margin: ['0', 'auto'],
+  marginInlineStart: ['0', 'auto'],
+  marginInlineEnd: ['0', 'auto'],
+  marginBlock: ['0', 'auto'],
+  marginBlockStart: ['0', 'auto'],
+  marginBlockEnd: ['0', 'auto'],
+  insetInlineStart: ['0', 'auto'],
+  insetInlineEnd: ['0', 'auto'],
+  insetBlockStart: ['0', 'auto'],
+  insetBlockEnd: ['0', 'auto'],
+  gap: ['0', 'normal'],
+  borderRadius: ['0'],
+  borderTopLeftRadius: ['0'],
+  borderTopRightRadius: ['0'],
+  borderBottomLeftRadius: ['0'],
+  borderBottomRightRadius: ['0'],
+  borderStartStartRadius: ['0'],
+  borderStartEndRadius: ['0'],
+  borderEndStartRadius: ['0'],
+  borderEndEndRadius: ['0'],
+  fontFamily: ['serif', 'sans-serif', 'monospace', 'system-ui'],
+  fontSize: [
+    'xx-small',
+    'x-small',
+    'small',
+    'medium',
+    'large',
+    'x-large',
+    'xx-large',
+    'smaller',
+    'larger',
+  ],
+  fontWeight: ['normal', 'bold'],
+  transitionTimingFunction: [
+    'linear',
+    'ease',
+    'ease-in',
+    'ease-out',
+    'ease-in-out',
+    'step-start',
+    'step-end',
+  ],
+  animationTimingFunction: [
+    'linear',
+    'ease',
+    'ease-in',
+    'ease-out',
+    'ease-in-out',
+    'step-start',
+    'step-end',
+  ],
+  gridTemplateColumns: [
+    'repeat(1, minmax(0, 1fr))',
+    'repeat(2, minmax(0, 1fr))',
+    'repeat(3, minmax(0, 1fr))',
+    'repeat(4, minmax(0, 1fr))',
+    'repeat(5, minmax(0, 1fr))',
+    'repeat(6, minmax(0, 1fr))',
+  ],
+  display: [
+    'flex',
+    'inline-flex',
+    'block',
+    'inline-block',
+    'grid',
+    'none',
+    'inline',
+    'inline-grid',
+    'contents',
+    'flow-root',
+  ],
+  alignItems: [
+    'flex-start',
+    'flex-end',
+    'center',
+    'baseline',
+    'start',
+    'end',
+    'self-start',
+    'self-end',
+  ],
+  justifyContent: [
+    'flex-start',
+    'flex-end',
+    'center',
+    'space-between',
+    'space-around',
+    'start',
+    'end',
+    'space-evenly',
+    'stretch',
+    'left',
+    'right',
+  ],
+  inset: ['0', 'auto'],
+  overflow: ['hidden', 'visible', 'clip', 'scroll', 'auto'],
+  clipPath: ['inset(50%)'],
+  whiteSpace: ['nowrap', 'break-spaces'],
+  backgroundClip: ['padding-box', 'border-box', 'content-box', 'text'],
+  borderWidth: ['1px', '0', 'thin', 'medium', 'thick'],
+  borderStyle: [
+    'solid',
+    'none',
+    'hidden',
+    'dotted',
+    'dashed',
+    'double',
+    'groove',
+    'ridge',
+    'inset',
+    'outset',
+  ],
+  filter: ['grayscale(1)'],
+  transform: ['translateY(1px)'],
+  textDecorationLine: ['underline', 'overline', 'line-through'],
+  animationName: ['spin', 'pulse', 'none'],
+  alignSelf: ['flex-start', 'baseline', 'center', 'flex-end', 'start', 'end'],
+  transitionProperty: ['all'],
+  marginInline: ['auto', '0'],
+};
+
+const GRAMMARS = new Map();
+
 function row([key, grammar, family, spec]) {
   const css = kebab(key);
   const status = spec.status ?? 'standard';
   const form = spec.form ?? 'longhand';
   const admitted = status === 'standard' && form !== 'rejected-composite';
+  const compiled = compileGrammar(grammar);
+  GRAMMARS.set(key, compiled);
   const def = admitted ? domain(spec.def) : null;
   const std = admitted
-    ? domain({
-        values: union(def.values, spec.std?.values ?? NONE),
-        tokens: union(def.tokens, spec.std?.tokens ?? NONE),
-        range: spec.std?.range ?? def.range,
-      })
+    ? {
+        ...domain({
+          values: union(def.values, spec.std?.values ?? NONE),
+          tokens: union(def.tokens, spec.std?.tokens ?? NONE),
+        }),
+        numeric: compiled.numeric,
+      }
     : null;
   return {
     key,
@@ -836,6 +1076,8 @@ function row([key, grammar, family, spec]) {
     contexts: ELEMENT,
     standard: std,
     default: def,
+    scalar: admitted ? (SCALARS[key] ?? null) : null,
+    opaqueValues: admitted ? (OPAQUE_VALUES[key] ?? NONE) : NONE,
     form,
     longhands: spec.longhands ?? null,
     family,
@@ -884,6 +1126,14 @@ const KEYS = Object.freeze([...CATALOG.keys()]);
 /** The descriptor of an authoring key, or null. Policy-internal. */
 export function descriptorOf(key) {
   return typeof key === 'string' ? (CATALOG.get(key) ?? null) : null;
+}
+
+/**
+ * The compiled grammar subset of a described key (policy/grammar.js):
+ * `{ keywords, numeric, opaque }`, or null. Policy-internal.
+ */
+export function grammarOf(key) {
+  return typeof key === 'string' ? (GRAMMARS.get(key) ?? null) : null;
 }
 
 /** Every described authoring key, in catalog order. Policy-internal. */

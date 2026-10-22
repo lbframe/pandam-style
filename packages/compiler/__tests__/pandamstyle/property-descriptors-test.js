@@ -71,6 +71,43 @@ function loadAlpha1Policy() {
 
 const alpha1 = loadAlpha1Policy();
 
+// CE-02.2 intended deltas from Alpha 1, stated independently of the
+// implementation:
+//  - the four former continuous ranges are finite: opacity in steps of 0.05,
+//    flex/flexGrow/flexShrink the integers 0 to 12;
+//  - a token whose value is not a value of the property is refused at use.
+//    In this suite every token's value is '1px'/'2px', which is not a
+//    font-weight (a number) nor a time.
+const CE022_FINITE = {
+  opacity: Array.from({ length: 21 }, (_, i) => (i * 5) / 100),
+  flex: Array.from({ length: 13 }, (_, i) => i),
+  flexGrow: Array.from({ length: 13 }, (_, i) => i),
+  flexShrink: Array.from({ length: 13 }, (_, i) => i),
+};
+const CE022_LENGTH_TOKEN_REFUSED = new Set([
+  'fontWeight',
+  'transitionDuration',
+  'transitionDelay',
+  'animationDuration',
+  'animationDelay',
+]);
+function ce022Outcome(registry, property, value) {
+  const outcome = alpha1Outcome(registry, property, value);
+  if (outcome != null) return outcome;
+  if (Object.hasOwn(CE022_FINITE, property)) {
+    return CE022_FINITE[property].includes(value)
+      ? null
+      : ['PMS_FORBIDDEN_VALUE', 'structural-domain'];
+  }
+  if (
+    CE022_LENGTH_TOKEN_REFUSED.has(property) &&
+    compiler.tokenPathOf(value, 'author') != null
+  ) {
+    return ['PMS_FORBIDDEN_VALUE', 'category-strict'];
+  }
+  return null;
+}
+
 // Alpha 1's checkValue dispatch (engine/lowering/styles.js at 01a556b) over the
 // pinned policy, for a consumer: [code, rule] or null when accepted.
 function alpha1Outcome(registry, property, value) {
@@ -209,8 +246,8 @@ describe('the effective property table', () => {
     expect(ds.snapshot.properties).toBe(properties);
     expect(properties).toMatchObject({
       kind: 'pandamstyle-property-catalog',
-      schemaVersion: 1,
-      catalogVersion: 1,
+      schemaVersion: 2,
+      catalogVersion: 2,
     });
     expect(properties.digest).toMatch(/^sha256:[0-9a-f]{64}$/);
     expect(properties.catalogDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
@@ -276,9 +313,7 @@ describe('the effective property table', () => {
         counts.admitted += 1;
         expect(row.domain.resources).toEqual([]);
         expect(
-          row.domain.values.length +
-            row.domain.tokens.length +
-            (row.domain.range == null ? 0 : 1),
+          row.domain.values.length + row.domain.tokens.length,
         ).toBeGreaterThan(0);
       }
       expect(row.origin).toBe('default');
@@ -289,60 +324,56 @@ describe('the effective property table', () => {
     expect(counts).toEqual({ admitted: 102, composite: 5, platform: 3 });
   });
 
-  test('only the four legacy rows carry a range', () => {
-    expect(
-      rows
-        .filter((row) => row.domain?.range != null)
-        .map((row) => row.key)
-        .sort(),
-    ).toEqual(['flex', 'flexGrow', 'flexShrink', 'opacity']);
+  // CE-02.2: every domain is finite; no row carries a range.
+  test('every domain is exactly { values, tokens, resources }', () => {
+    for (const row of rows) {
+      if (row.domain == null) continue;
+      expect(Object.keys(row.domain).sort()).toEqual([
+        'resources',
+        'tokens',
+        'values',
+      ]);
+    }
   });
 
-  // An unbounded range omits `max`: no Infinity anywhere it is published.
+  // The four former ranges are finite numbers everywhere they are published.
+  const OPACITY_GRID = Array.from({ length: 21 }, (_, i) => (i * 5) / 100);
+  const FLEX_INTEGERS = Array.from({ length: 13 }, (_, i) => i);
   test.each([
-    ['opacity', { min: 0, max: 1 }],
-    ['flex', { min: 0 }],
-    ['flexGrow', { min: 0 }],
-    ['flexShrink', { min: 0 }],
-  ])('%s range round-trips through every serialization', (key, range) => {
-    expect(rowOf(key).domain.range).toEqual(range);
+    ['opacity', OPACITY_GRID],
+    ['flex', FLEX_INTEGERS],
+    ['flexGrow', FLEX_INTEGERS],
+    ['flexShrink', FLEX_INTEGERS],
+  ])('%s default is finite in every serialization', (key, values) => {
+    expect(rowOf(key).domain).toEqual({ values, tokens: [], resources: [] });
     const manifest = ds.snapshot.tooling.manifest;
-    const entry = { ...range, legacy: true };
-    expect(manifest.properties.byProperty[key].range).toEqual(entry);
-    // manifest.json and the embedded module manifest parse back to the same
-    // range, with no `null` bound.
+    expect(manifest.properties.byProperty[key]).toEqual({ values });
     expect(
-      JSON.parse(JSON.stringify(manifest)).properties.byProperty[key].range,
-    ).toEqual(entry);
+      JSON.parse(JSON.stringify(manifest)).properties.byProperty[key],
+    ).toEqual({ values });
     const module = compiler.generateDesignSystemModule({ designSystem: ds });
     const embedded = JSON.parse(
       /export const manifest = ([\s\S]*?);\n\nexport const props/.exec(
         module,
       )[1],
     );
-    expect(embedded.properties.byProperty[key].range).toEqual(entry);
+    expect(embedded.properties.byProperty[key]).toEqual({ values });
     expect(
-      JSON.parse(
-        JSON.stringify(
-          compiler.repairDomainOf(ds.snapshot, {
-            kind: 'property',
-            property: key,
-          }),
-        ),
-      ).range,
-    ).toEqual(range);
+      compiler.repairDomainOf(ds.snapshot, { kind: 'property', property: key }),
+    ).toEqual({ values, tokens: [], resources: [] });
     const declarations = compiler.generateDesignSystemDeclarations(ds.snapshot);
     expect(declarations).toContain(
-      'range: Readonly<{ min: number; max?: number; legacy: true }>',
+      `readonly ${JSON.stringify(key)}: ${values.map((v) => JSON.stringify(v)).join(' | ')};`,
     );
+    expect(declarations).not.toMatch(/ranges|legacy: true/);
     for (const text of [JSON.stringify(manifest), module]) {
-      expect(text).not.toMatch(/"max":\s*null/);
+      expect(text).not.toMatch(/"range"|Infinity/);
     }
   });
 
-  test('the manifest is the projection of the table, as manifest version 2', () => {
+  test('the manifest is the projection of the table, as manifest version 3', () => {
     const manifest = ds.snapshot.tooling.manifest;
-    expect(manifest.manifestSchemaVersion).toBe(2);
+    expect(manifest.manifestSchemaVersion).toBe(3);
     expect(manifest).not.toHaveProperty('supportedProperties');
     expect(manifest.properties.digest).toBe(properties.digest);
     for (const row of rows) {
@@ -353,11 +384,7 @@ describe('the effective property table', () => {
       }
       expect(entry.values ?? []).toEqual(row.domain?.values ?? []);
       expect(entry.tokens ?? []).toEqual(row.domain?.tokens ?? []);
-      expect(entry.range ?? null).toEqual(
-        row.domain?.range == null
-          ? null
-          : { ...row.domain.range, legacy: true },
-      );
+      expect(entry).not.toHaveProperty('range');
       expect(entry.form ?? 'admitted').toBe(
         row.form === 'rejected-composite' ? row.form : 'admitted',
       );
@@ -407,12 +434,29 @@ describe('the effective property table', () => {
     expect(domainOf.digest).toBe(properties.digest);
     expect(domainOf('display')).toBe(rowOf('display').domain.values);
     expect(domainOf('color')).toBe(null);
-    expect(domainOf('opacity')).toBe(null);
+    // CE-02.2: the former range rows have finite candidates.
+    expect(domainOf('opacity')).toBe(rowOf('opacity').domain.values);
     expect(domainOf('constructor')).toBe(null);
   });
 });
 
+// The manifest v2 reader is unchanged by CE-02.2 (D2): it still accepts the
+// CE-02.1 shape, a legacy `range` entry with finite bounds, and refuses a
+// malformed one. CE-02.2 manifests simply never carry `range`.
 describe('validateArtifactSet and legacy range bounds', () => {
+  const LEGACY = {
+    opacity: { min: 0, max: 1, legacy: true },
+    flex: { min: 0, legacy: true },
+    flexGrow: { min: 0, legacy: true },
+    flexShrink: { min: 0, legacy: true },
+  };
+  const withLegacyRanges = (text) => {
+    const manifest = JSON.parse(text);
+    for (const [key, range] of Object.entries(LEGACY)) {
+      manifest.properties.byProperty[key] = { range: { ...range } };
+    }
+    return manifest;
+  };
   const setWith = (manifestText) =>
     compiler.createArtifactSet(ds.snapshot, {
       designModuleFile: 'design.js',
@@ -430,6 +474,13 @@ describe('validateArtifactSet and legacy range bounds', () => {
   test('the generated manifest is valid', () => {
     const set = setWith(manifestText);
     expect(compiler.validateArtifactSet(set.metadata, set.contents)).toBe(true);
+    expect(manifestText).not.toMatch(/"range"/);
+  });
+
+  test('a CE-02.1-shaped manifest with legacy ranges is still valid', () => {
+    const text = `${JSON.stringify(withLegacyRanges(manifestText), null, 2)}\n`;
+    const set = setWith(text);
+    expect(compiler.validateArtifactSet(set.metadata, set.contents)).toBe(true);
   });
 
   test.each([
@@ -439,7 +490,7 @@ describe('validateArtifactSet and legacy range bounds', () => {
     ['flexShrink min null', 'flexShrink', (r) => ({ ...r, min: null })],
     ['opacity min absent', 'opacity', ({ min: _min, ...r }) => r],
   ])('%s is refused', (_, key, tamper) => {
-    const manifest = JSON.parse(manifestText);
+    const manifest = withLegacyRanges(manifestText);
     manifest.properties.byProperty[key].range = tamper(
       manifest.properties.byProperty[key].range,
     );
@@ -451,11 +502,12 @@ describe('validateArtifactSet and legacy range bounds', () => {
   });
 
   test('a bound that parses to Infinity is refused', () => {
-    const tampered = manifestText.replace(
+    const legacyText = `${JSON.stringify(withLegacyRanges(manifestText), null, 2)}\n`;
+    const tampered = legacyText.replace(
       /("flex": \{[^}]*"range": \{\s*"min": 0)/,
       '$1,\n        "max": 1e999',
     );
-    expect(tampered).not.toBe(manifestText);
+    expect(tampered).not.toBe(legacyText);
     expect(() => setWith(tampered)).toThrow(
       /range bounds of flex are not finite numbers/,
     );
@@ -468,7 +520,6 @@ describe('effectiveDomain', () => {
       values: ['a'],
       tokens: ['spacing'],
       resources: [],
-      range: { min: 0, max: 1 },
     },
   };
   test('without an override it is the default object', () => {
@@ -479,10 +530,9 @@ describe('effectiveDomain', () => {
   const MEMBERS = {
     values: ['b'],
     tokens: ['sizes'],
-    range: { min: 0, max: 0.5 },
   };
   const subsets = [];
-  for (let mask = 1; mask < 8; mask++) {
+  for (let mask = 1; mask < 4; mask++) {
     subsets.push(Object.keys(MEMBERS).filter((_, i) => mask & (1 << i)));
   }
   test.each(subsets.map((s) => [s.join('+'), s]))(
@@ -494,7 +544,6 @@ describe('effectiveDomain', () => {
         values: members.includes('values') ? ['b'] : [],
         tokens: members.includes('tokens') ? ['sizes'] : [],
         resources: [],
-        range: members.includes('range') ? { min: 0, max: 0.5 } : null,
       });
       expect(Object.isFrozen(effective)).toBe(true);
       expect(Object.isFrozen(effective.values)).toBe(true);
@@ -719,8 +768,39 @@ describe('Alpha 1 equivalence', () => {
     expect(new Set(ALPHA1_NAMES).size).toBe(107);
   });
 
+  test('the CE-02.2 deltas are exercised by the probes', () => {
+    const deltas = [];
+    for (const property of ALPHA1_NAMES) {
+      for (const value of probesOf(property)) {
+        const a = alpha1Outcome(ds.registry, property, value);
+        const b = ce022Outcome(ds.registry, property, value);
+        if (JSON.stringify(a) !== JSON.stringify(b)) {
+          deltas.push(`${property}=${describeValue(value)}`);
+        }
+      }
+    }
+    // flex*: 0.5 and 1e308 (Alpha 1 accepted any number >= 0); opacity: none
+    // of the probes in [0, 1] is off the grid; the public token of the
+    // length-valued category on five number/time rows.
+    expect(deltas.sort()).toEqual(
+      [
+        'flex=0.5',
+        'flex=1e+308',
+        'flexGrow=0.5',
+        'flexGrow=1e+308',
+        'flexShrink=0.5',
+        'flexShrink=1e+308',
+        'fontWeight=fontWeights.a',
+        'transitionDuration=durations.a',
+        'transitionDelay=durations.a',
+        'animationDuration=durations.a',
+        'animationDelay=durations.a',
+      ].sort(),
+    );
+  });
+
   test.each(ALPHA1_NAMES.map((name) => [name]))(
-    '%s: every probe has the Alpha 1 outcome, code and rule',
+    '%s: every probe has the Alpha 1 outcome, code and rule (CE-02.2 deltas aside)',
     (property) => {
       for (const value of probesOf(property)) {
         expect({
@@ -728,7 +808,7 @@ describe('Alpha 1 equivalence', () => {
           outcome: newOutcome(property, value),
         }).toEqual({
           value: describeValue(value),
-          outcome: alpha1Outcome(ds.registry, property, value),
+          outcome: ce022Outcome(ds.registry, property, value),
         });
       }
     },

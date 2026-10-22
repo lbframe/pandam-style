@@ -52,12 +52,17 @@ export interface TargetProfileDefinition {
   readonly platform?: 'electron';
 }
 
-/** One `propertyDomains` entry: at least one member, nothing else. */
+/**
+ * One `propertyDomains` entry: at least one member, nothing else. Every
+ * domain is finite (CE-02.2): `values` lists each approved literal in its one
+ * canonical spelling (numbers as numbers, `'18px'`, the CSS zero `'0'`); a
+ * literal is approvable when it is a reviewed standard value, a keyword or a
+ * numeric value of the property's grammar, or `inherit`, `initial`, `unset`
+ * or `revert`.
+ */
 export interface PropertyDomainDefinition {
   readonly values?: readonly (string | number)[];
   readonly tokens?: readonly string[];
-  /** `{ min }` alone has no upper bound. */
-  readonly range?: Readonly<{ min: number; max?: number }>;
 }
 
 /** A design-system author's optional progressive enhancement. */
@@ -72,7 +77,7 @@ export interface Definition {
   readonly systemId: string;
   readonly enhancements?: readonly TargetEnhancementPolicy[];
   /**
-   * Property domains (CE-02.1): per property, the whole admitted domain,
+   * Property domains (CE-02.1, CE-02.2): per property, the whole admitted domain,
    * taken from the compiler's standard domain for that property. Keys are
    * authoring keys (`width`); they are validated by the compiler.
    */

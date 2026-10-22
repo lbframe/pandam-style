@@ -1184,6 +1184,67 @@ export class BrowserProbe {
   }
 }
 
+// CE-02.2: every property domain is finite, and an off-grid opacity is
+// refused. Each opacity this harness writes is a fingerprint of one source
+// revision; the fixture design system approves exactly this list
+// (`propertyDomains.opacity`). Computed fingerprints are integers on a fixed
+// decimal scale, so each is canonical (at most 4 fraction digits) by
+// construction, and `approvedOpacity` fails explicitly on a value outside
+// the list instead of letting a refused style end in a timeout.
+const scaled = (units, scale) => units / scale;
+const integers = (from, count) =>
+  Array.from({ length: count }, (_, index) => from + index);
+export const OPACITY = Object.freeze({
+  preparedR2: (attempt) => scaled(301 + attempt, 1000),
+  acceptedR3: (attempt) => scaled(351 + attempt, 1000),
+  burstServer: (index) => scaled(40 + index, 100),
+  burstClient: (index) => scaled(60 + index, 100),
+  strictBoundary: (index) => scaled(760 + index, 1000),
+});
+export const APPROVED_OPACITIES = Object.freeze(
+  [
+    ...new Set([
+      0.1234,
+      0.4213,
+      0.44,
+      0.46,
+      0.48,
+      0.5,
+      0.52,
+      0.57,
+      0.61,
+      0.63,
+      0.65,
+      0.66,
+      0.67,
+      0.69,
+      0.71,
+      0.72,
+      0.73,
+      0.74,
+      0.77,
+      0.79,
+      0.82,
+      0.84,
+      0.93,
+      1,
+      ...integers(0, 12).map(OPACITY.preparedR2),
+      ...integers(0, 12).map(OPACITY.acceptedR3),
+      ...integers(0, 16).map(OPACITY.burstServer),
+      ...integers(0, 16).map(OPACITY.burstClient),
+      ...integers(0, 3).map(OPACITY.strictBoundary),
+    ]),
+  ].sort((a, b) => a - b),
+);
+export function approvedOpacity(value) {
+  if (!APPROVED_OPACITIES.includes(value)) {
+    throw new Error(
+      `opacity ${value} is not approved by the harness design system; add it to APPROVED_OPACITIES (propertyDomains.opacity)`,
+    );
+  }
+  return value;
+}
+
 export function fixtureDefinition({
   padding = '16px',
   color = '#112233',
@@ -1230,6 +1291,7 @@ export function fixtureDefinition({
         defaultVariants: { tone: 'quiet' },
       },
     },
+    propertyDomains: { opacity: { values: [...APPROVED_OPACITIES] } },
   };
 }
 
@@ -1252,7 +1314,7 @@ export function serverSource({
   return `import { create, token, props } from '../.pandamstyle/design.js';
 import Shared from './Broker.jsx';
 export * from '../.pandamstyle/design.js';
-const styles = create({ panel: { display: 'block', padding: ${padding}, color: token('colors.text'), backgroundColor: token('colors.surface'), opacity: ${opacity} } });
+const styles = create({ panel: { display: 'block', padding: ${padding}, color: token('colors.text'), backgroundColor: token('colors.surface'), opacity: ${approvedOpacity(opacity)} } });
 ${extra}
 export default function Server() { return <section><p id="server-style" {...props(styles.panel)}>${label}</p><Shared id="shared-server" /></section>; }
 `;
@@ -1279,7 +1341,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { create, props, recipes, token } from '../.pandamstyle/design.js';
 import Shared from './Shared.jsx';
-const styles = create({ panel: { padding: token('spacing.md'), backgroundColor: token('colors.surface'), opacity: ${opacity} } });
+const styles = create({ panel: { padding: token('spacing.md'), backgroundColor: token('colors.surface'), opacity: ${approvedOpacity(opacity)} } });
 ${extra}
 export default function Client() {
   useEffect(() => { document.documentElement.dataset.pmsQualificationHydrated = 'true'; return () => { delete document.documentElement.dataset.pmsQualificationHydrated; }; }, []);
@@ -1299,7 +1361,7 @@ export default function Client() {
 export function lazySource({ label = 'lazy-initial', opacity = 0.84 } = {}) {
   return `import { create, token, props } from '../.pandamstyle/design.js';
 export * from '../.pandamstyle/design.js';
-const styles = create({ lazy: { color: token('colors.text'), padding: token('spacing.md'), opacity: ${opacity} } });
+const styles = create({ lazy: { color: token('colors.text'), padding: token('spacing.md'), opacity: ${approvedOpacity(opacity)} } });
 export default function Lazy() { return <p id="lazy-style" {...props(styles.lazy)}>${label}</p>; }
 `;
 }
@@ -1334,7 +1396,7 @@ export default function RootShell({ children }) { return <html lang="en" {...pro
     `'use client';
 import { create, props, token } from '../.pandamstyle/design.js';
 export * from '../.pandamstyle/design.js';
-const styles = create({ dynamic: { color: token('colors.text'), padding: token('spacing.md'), opacity: 0.93 } });
+const styles = create({ dynamic: { color: token('colors.text'), padding: token('spacing.md'), opacity: ${approvedOpacity(0.93)} } });
 export default function Dynamic() { return <p id="dynamic-style" {...props(styles.dynamic)}>dynamic component</p>; }
 `,
   );
@@ -2606,12 +2668,12 @@ export async function runDevMatrix(lane, secondary, strictProof) {
       const sequence = (await lane.events()).at(-1).sequence;
       const r2 = {
         ...server,
-        opacity: 0.301 + attempt / 1000,
+        opacity: OPACITY.preparedR2(attempt),
         label: 'prepared-r2-' + attempt,
       };
       const r3 = {
         ...server,
-        opacity: 0.351 + attempt / 1000,
+        opacity: OPACITY.acceptedR3(attempt),
         label: 'accepted-r3-' + attempt,
       };
       const r2Source = serverSource(r2);
@@ -2964,11 +3026,11 @@ export default function Historical() { return <p id="historical-style" className
     const samples = [];
     for (let index = 0; index < 16; index++) {
       await writeServer({
-        opacity: 0.4 + index / 100,
+        opacity: OPACITY.burstServer(index),
         label: 'burst-server-' + index,
       });
       await writeClient({
-        opacity: 0.6 + index / 100,
+        opacity: OPACITY.burstClient(index),
         label: 'burst-client-' + index,
       });
       samples.push({
@@ -3045,7 +3107,7 @@ export default function Historical() { return <p id="historical-style" className
   await row('T13', async () => {
     const previous = await lane.state();
     const source = `import { create, props, token } from '../.pandamstyle/design.js';
-const styles = create({ added: { opacity: 0.4213, padding: token('spacing.added31') } });
+const styles = create({ added: { opacity: ${approvedOpacity(0.4213)}, padding: token('spacing.added31') } });
 export default function Added() { return <p id="added-style" {...props(styles.added)}>added semantic module</p>; }
 `;
     await run.write('semantic/Added.jsx', source);
@@ -3865,7 +3927,7 @@ export default function Page() { return <Added />; }
     await run.write(
       'semantic/StoppedOrphan.jsx',
       `import { create } from '../.pandamstyle/design.js';
-export const orphan = create({ orphan: { opacity: 0.1234 } });
+export const orphan = create({ orphan: { opacity: ${approvedOpacity(0.1234)} } });
 `,
     );
     const beforeStop = await lane.acceptedAfter(previous);
@@ -4999,7 +5061,7 @@ export default function MissingRoute() { return <Missing />; }
       const previous = await captureCanonical(run);
       source = {
         ...source,
-        opacity: 0.76 + index / 1000,
+        opacity: OPACITY.strictBoundary(index),
         label: 'strict-after-boundary-' + index,
       };
       await run.write('semantic/Server.jsx', serverSource(source));

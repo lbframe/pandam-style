@@ -6,7 +6,7 @@
  */
 
 /**
- * PandamStyle - effective property domains (CE-02.1).
+ * PandamStyle - effective property domains (CE-02.1, CE-02.2).
  *
  * `effectiveDomain` is the only function that computes the domain a design
  * system admits for a property. Every consumer (value acceptance, generated
@@ -18,6 +18,13 @@
  * override may hold only members of the descriptor's `standard` domain, and it
  * is the WHOLE effective domain. Without overrides, every row is the
  * compiler-owned default and the table is one shared, frozen object.
+ *
+ * CE-02.2: every domain is finite (`values`, `tokens`, `resources`). An
+ * author literal is in `standard` when it is a standard value, a keyword
+ * branch of the descriptor grammar, a canonical numeric literal satisfying a
+ * numeric branch (policy/literals.js), or one of the CSS-wide keywords
+ * `inherit`, `initial`, `unset` and `revert`. Anything else is refused with
+ * the rule of its class; nothing is rewritten silently.
  */
 
 import {
@@ -27,12 +34,30 @@ import {
   descriptorKeys,
   descriptorOf,
   digestOfRows,
+  grammarOf,
 } from './descriptors';
 import { Codes, diagnostic } from '../../protocol/diagnostics';
 import { patternEmissions } from '../patterns/compile';
+import {
+  CSS_ZERO,
+  checkNumericLiteral,
+  isCanonicalSpelling,
+  readNumeric,
+} from './literals';
 
 export const PROPERTY_CATALOG_KIND = 'pandamstyle-property-catalog';
-export const PROPERTY_CATALOG_SCHEMA_VERSION = 1;
+// 2 (CE-02.2): a domain has no `range` member any more.
+export const PROPERTY_CATALOG_SCHEMA_VERSION = 2;
+
+/** CSS-wide keywords an author may approve per property (CE-02.2). */
+export const CSS_WIDE_KEYWORDS = Object.freeze([
+  'inherit',
+  'initial',
+  'unset',
+  'revert',
+]);
+// Its meaning depends on cascade layers (CE-07): never approvable here.
+const CSS_WIDE_UNSUPPORTED = Object.freeze(['revert-layer']);
 
 /**
  * The effective domain of a descriptor. With an override, exactly the
@@ -47,18 +72,8 @@ export function effectiveDomain(descriptor, override = null) {
     values: Object.freeze([...(override.values ?? [])]),
     tokens: Object.freeze([...(override.tokens ?? [])]),
     resources: Object.freeze([]),
-    range: override.range == null ? null : Object.freeze({ ...override.range }),
   });
 }
-
-// A range's upper bound; an absent `max` is unbounded.
-const upper = (range) => range.max ?? Infinity;
-const inRange = (range, value) =>
-  range != null &&
-  typeof value === 'number' &&
-  Number.isFinite(value) &&
-  value >= range.min &&
-  value <= upper(range);
 
 /**
  * The CSS zero, defined once. Where a domain lists the CSS zero `'0'` (a
@@ -67,7 +82,7 @@ const inRange = (range, value) =>
  * types admit both. On a legacy numeric row (`opacity`, `flex*`), `0` is a
  * number like any other and `'0'` is not admitted, as in Alpha 1.
  */
-export const CSS_ZERO = '0';
+export { CSS_ZERO };
 
 /** The stored spelling of an approved literal: `'0'` for the CSS zero. */
 export function canonicalLiteral(value, standardValues) {
@@ -91,15 +106,8 @@ const hasValue = (values, value) => values.some((v) => sameValue(v, value));
 /** Whether domain `a` admits nothing that domain `b` does not. */
 function domainWithin(a, b) {
   return (
-    a.values.every(
-      (v) =>
-        hasValue(b.values, v) || (typeof v === 'number' && inRange(b.range, v)),
-    ) &&
-    a.tokens.every((t) => b.tokens.includes(t)) &&
-    (a.range == null ||
-      (b.range != null &&
-        a.range.min >= b.range.min &&
-        upper(a.range) <= upper(b.range)))
+    a.values.every((v) => hasValue(b.values, v)) &&
+    a.tokens.every((t) => b.tokens.includes(t))
   );
 }
 
@@ -180,7 +188,9 @@ export function effectivePropertiesOf(registry) {
 // ---------------------------------------------------------------------------
 // `propertyDomains`: design-system author data.
 
-const MEMBERS = new Set(['values', 'tokens', 'range']);
+const MEMBERS = new Set(['values', 'tokens']);
+// CE-02.1's continuous `range` member; CE-02.2 removes it (enumerate values).
+const REMOVED_MEMBERS = new Set(['range']);
 
 function isPlainRecord(value) {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
@@ -215,10 +225,108 @@ function domainError(rule, message, context) {
   };
 }
 
+const NUMERIC_RULE_MESSAGES = {
+  'non-finite': 'is not a finite number',
+  'out-of-bounds': 'is outside the bounds of the grammar',
+  'number-not-length': 'is a unitless number where the grammar takes a unit',
+  'unit-not-applicable': 'has a unit the grammar does not take',
+  'non-integer': 'is not an integer',
+  precision: 'has more than 4 fraction digits',
+};
+
+/**
+ * Whether an author literal is a value of a descriptor's `standard` domain
+ * (CE-02.2). Returns `{ stored }` (its one canonical spelling) or
+ * `{ rule, message, canonical?, constraint? }` naming the refusal.
+ */
+function approvableValue(descriptor, value) {
+  const { standard } = descriptor;
+  const property = descriptor.key;
+  const shown = JSON.stringify(value);
+  // A reviewed standard value, exactly; the CSS zero in both spellings only
+  // where the standard domain lists the CSS zero (a numeric row's 0 is a
+  // number, never '0').
+  if (
+    standard.values.includes(value) ||
+    ((value === 0 || value === CSS_ZERO) && standard.values.includes(CSS_ZERO))
+  ) {
+    return { stored: canonicalLiteral(value, standard.values) };
+  }
+  if (typeof value === 'string') {
+    if (CSS_WIDE_KEYWORDS.includes(value)) return { stored: value };
+    const lower = value.trim().toLowerCase();
+    if (CSS_WIDE_UNSUPPORTED.includes(lower)) {
+      return {
+        rule: 'css-wide-unsupported',
+        message: `${shown} cannot be approved: its meaning depends on cascade layers.`,
+      };
+    }
+    const grammar = grammarOf(property);
+    if (grammar.keywords.includes(value)) return { stored: value };
+    const keyword =
+      CSS_WIDE_KEYWORDS.find((k) => k === lower) ??
+      grammar.keywords.find((k) => k.toLowerCase() === lower) ??
+      standard.values.find(
+        (v) => typeof v === 'string' && v.toLowerCase() === lower,
+      );
+    if (keyword !== undefined) {
+      return {
+        rule: 'non-canonical',
+        message: `${shown} is spelled ${JSON.stringify(keyword)} in ${property}.`,
+        canonical: keyword,
+      };
+    }
+  }
+  const numeric = checkNumericLiteral(standard.numeric, value);
+  if (numeric != null) {
+    if (numeric.ok) {
+      if (isCanonicalSpelling(value, numeric.canonical)) {
+        return { stored: numeric.canonical };
+      }
+      return {
+        rule: 'non-canonical',
+        message: `${shown} is spelled ${JSON.stringify(numeric.canonical)}.`,
+        canonical: numeric.canonical,
+      };
+    }
+    return {
+      rule:
+        numeric.reason === 'number-not-length'
+          ? 'unit-not-applicable'
+          : numeric.reason,
+      message: `${shown} ${NUMERIC_RULE_MESSAGES[numeric.reason]} of ${property} (${descriptor.grammar}).`,
+      constraint: standard.numeric.map(describeConstraint),
+    };
+  }
+  // Only an opaque branch could match: a compiler gap, not an authoring error.
+  const grammar = grammarOf(property);
+  if (grammar.opaque.length > 0) {
+    return {
+      rule: 'grammar-unsupported',
+      message: `${shown} cannot be approved for ${property}: the compiler admits only its reviewed values and grammar keywords and numbers (${descriptor.grammar}).`,
+    };
+  }
+  return {
+    rule: 'grammar-mismatch',
+    message: `${shown} is not a value of ${property} (${descriptor.grammar}).`,
+  };
+}
+
+/** A JSON description of a numeric constraint, for diagnostics. */
+export function describeConstraint(constraint) {
+  return {
+    type: constraint.type,
+    min: constraint.min,
+    max: constraint.max,
+    ...(constraint.units.length > 0 ? { units: [...constraint.units] } : {}),
+  };
+}
+
 /**
  * Validates and normalizes `definition.propertyDomains`. Each key names a
- * standard, admitted property; each entry holds only `values`, `tokens` and
- * `range`, each a member of the descriptor's `standard` domain. Returns
+ * standard, admitted property; each entry holds only `values` and `tokens`,
+ * each a member of the descriptor's `standard` domain (see the module
+ * comment for what a value of `standard` is). Returns
  * `{ propertyDomains, diagnostics }`; `propertyDomains` holds the valid
  * entries, sorted by key, frozen.
  */
@@ -280,12 +388,25 @@ export function normalizePropertyDomains(input, tokens = {}) {
     if (!isPlainRecord(entry)) {
       fail(
         'malformed-entry',
-        `propertyDomains.${property} must be an object with values, tokens or range.`,
+        `propertyDomains.${property} must be an object with values or tokens.`,
         at,
       );
       continue;
     }
     const members = Object.keys(entry);
+    const removed = members.filter((m) => REMOVED_MEMBERS.has(m));
+    if (removed.length > 0) {
+      fail(
+        'range-removed',
+        `propertyDomains.${property}.range was removed (CE-02.2): every domain is finite; list the approved numbers in values.`,
+        {
+          ...at,
+          member: 'range',
+          admitted: [...MEMBERS],
+        },
+      );
+      continue;
+    }
     const unknown = members.filter((m) => !MEMBERS.has(m));
     if (unknown.length > 0) {
       fail(
@@ -302,7 +423,7 @@ export function normalizePropertyDomains(input, tokens = {}) {
     if (members.length === 0) {
       fail(
         'empty',
-        `propertyDomains.${property} must restate at least one of values, tokens, range.`,
+        `propertyDomains.${property} must restate at least one of values, tokens.`,
         at,
       );
       continue;
@@ -327,11 +448,23 @@ export function normalizePropertyDomains(input, tokens = {}) {
       }
       const seen = [];
       for (const value of list) {
+        if (
+          member === 'values' &&
+          typeof value === 'number' &&
+          !Number.isFinite(value)
+        ) {
+          fail(
+            'non-finite',
+            `propertyDomains.${property}.values holds ${String(value)}; a numeric value is finite.`,
+            { ...at, member, value: String(value) },
+          );
+          ok = false;
+          continue;
+        }
         const primitive =
           member === 'tokens'
             ? typeof value === 'string'
-            : typeof value === 'string' ||
-              (typeof value === 'number' && Number.isFinite(value));
+            : typeof value === 'string' || typeof value === 'number';
         if (!primitive) {
           fail(
             'malformed-value',
@@ -358,28 +491,37 @@ export function normalizePropertyDomains(input, tokens = {}) {
           ok = false;
           continue;
         }
-        seen.push(
-          member === 'tokens'
-            ? value
-            : canonicalLiteral(value, standard.values),
-        );
-        const inStandard =
-          member === 'tokens'
-            ? standard.tokens.includes(value)
-            : hasValue(standard.values, value) ||
-              (typeof value === 'number' && inRange(standard.range, value));
-        if (!inStandard) {
+        if (member === 'values') {
+          const verdict = approvableValue(descriptor, value);
+          if (verdict.rule != null) {
+            fail(verdict.rule, verdict.message, {
+              ...at,
+              member,
+              value,
+              ...(verdict.canonical === undefined
+                ? {}
+                : { canonical: verdict.canonical }),
+              ...(verdict.constraint == null
+                ? {}
+                : { constraint: verdict.constraint }),
+              admitted: [...standard.values],
+            });
+            ok = false;
+            continue;
+          }
+          seen.push(verdict.stored);
+          continue;
+        }
+        seen.push(value);
+        if (!standard.tokens.includes(value)) {
           fail(
             'outside-standard',
-            `${JSON.stringify(value)} is not an approvable ${member === 'tokens' ? 'token category' : 'value'} of ${property}.`,
+            `${JSON.stringify(value)} is not an approvable token category of ${property}.`,
             {
               ...at,
               member,
               value,
-              admitted:
-                member === 'tokens'
-                  ? [...standard.tokens]
-                  : admittedValues(standard),
+              admitted: [...standard.tokens],
             },
           );
           ok = false;
@@ -399,53 +541,6 @@ export function normalizePropertyDomains(input, tokens = {}) {
         }
       }
       normalized[member] = seen;
-    }
-    if (Object.hasOwn(entry, 'range')) {
-      // `{ min, max }`, or `{ min }` for no upper bound: finite numbers only,
-      // the JSON-safe encoding of the manifest.
-      const range = entry.range;
-      const keys = isPlainRecord(range) ? Object.keys(range).sort().join() : '';
-      const finite = (bound) =>
-        typeof bound === 'number' && Number.isFinite(bound);
-      const valid =
-        (keys === 'max,min' || keys === 'min') &&
-        finite(range.min) &&
-        (keys === 'min' || (finite(range.max) && range.min <= range.max));
-      if (!valid) {
-        fail(
-          'malformed-member',
-          `propertyDomains.${property}.range must be { min, max } or { min } with finite bounds and min <= max.`,
-          { ...at, member: 'range' },
-        );
-        ok = false;
-      } else if (
-        standard.range == null ||
-        range.min < standard.range.min ||
-        upper(range) > upper(standard.range)
-      ) {
-        fail(
-          'outside-standard',
-          `The range [${range.min}, ${range.max ?? 'unbounded'}] is not within an approvable range of ${property}.`,
-          {
-            ...at,
-            member: 'range',
-            value:
-              keys === 'min'
-                ? { min: range.min }
-                : { min: range.min, max: range.max },
-            admitted:
-              standard.range == null
-                ? []
-                : admittedValues({ values: [], range: standard.range }),
-          },
-        );
-        ok = false;
-      } else {
-        normalized.range =
-          keys === 'min'
-            ? { min: range.min }
-            : { min: range.min, max: range.max };
-      }
     }
     if (ok) out[property] = normalized;
   }
@@ -534,30 +629,72 @@ export function isAdmitted(row) {
 export function literalAllowed(domain, value) {
   if (domain.values.includes(value)) return true;
   // The CSS zero (see CSS_ZERO): a domain listing '0' admits numeric 0.
-  if (value === 0 && domain.values.includes(CSS_ZERO)) return true;
-  const range = domain.range;
-  return (
-    range != null &&
-    typeof value === 'number' &&
-    Number.isFinite(value) &&
-    value >= range.min &&
-    (range.max == null || value <= range.max)
-  );
+  return value === 0 && domain.values.includes(CSS_ZERO);
+}
+
+/** The admitted values of a domain as reported in diagnostics. */
+export function admittedValues(domain) {
+  return [...domain.values];
 }
 
 /**
- * The admitted values of a domain as reported in diagnostics: its finite
- * values, and a range as the text Alpha 1 reported (a continuous interval,
- * not an enumeration).
+ * Why a literal is not in a row's effective domain (CE-02.2), computed on the
+ * refusal path only: `{ reason, canonical? }`. `canonical` is the in-domain
+ * spelling of a value written differently. Reasons: `null-value`,
+ * `css-wide-keyword`, `non-finite`, `non-canonical`, `number-not-length`,
+ * `precision`, `not-in-domain`.
  */
-export function admittedValues(domain) {
-  return domain.range == null
-    ? [...domain.values]
-    : [
-        ...domain.values,
-        // Alpha 1's text; an unbounded range reads `Infinity` here, as before.
-        `number in [${domain.range.min}, ${domain.range.max ?? Infinity}]`,
-      ];
+export function refusalReason(row, value) {
+  if (value === null || value === undefined) return { reason: 'null-value' };
+  const domain = row.domain;
+  const descriptor = descriptorOf(row.key);
+  if (typeof value === 'number' && !Number.isFinite(value)) {
+    return { reason: 'non-finite' };
+  }
+  if (typeof value === 'string') {
+    const lower = value.trim().toLowerCase();
+    const spelled = domain.values.find(
+      (v) => typeof v === 'string' && v.toLowerCase() === lower,
+    );
+    if (spelled !== undefined) {
+      return { reason: 'non-canonical', canonical: spelled };
+    }
+    if (
+      CSS_WIDE_KEYWORDS.includes(lower) ||
+      CSS_WIDE_UNSUPPORTED.includes(lower)
+    ) {
+      return { reason: 'css-wide-keyword' };
+    }
+  }
+  const numeric = checkNumericLiteral(descriptor?.standard?.numeric, value);
+  if (numeric != null) {
+    if (numeric.ok) {
+      if (
+        !isCanonicalSpelling(value, numeric.canonical) &&
+        literalAllowed(domain, numeric.canonical)
+      ) {
+        return { reason: 'non-canonical', canonical: numeric.canonical };
+      }
+      return { reason: 'not-in-domain' };
+    }
+    if (
+      ['number-not-length', 'precision', 'non-finite'].includes(numeric.reason)
+    ) {
+      return { reason: numeric.reason };
+    }
+    return { reason: 'not-in-domain' };
+  }
+  // A number on a row whose grammar has no numeric branch: still a number
+  // where a length is written with a unit, when the domain lists lengths.
+  const reading = readNumeric(value);
+  if (
+    reading?.number === true &&
+    reading.value !== 0 &&
+    domain.values.some((v) => readNumeric(v)?.unit != null)
+  ) {
+    return { reason: 'number-not-length' };
+  }
+  return { reason: 'not-in-domain' };
 }
 
 const domainOfCssCache = new WeakMap();
@@ -614,10 +751,6 @@ export function propertyManifestOf(properties) {
       if (row.domain != null) {
         if (row.domain.values.length > 0) entry.values = [...row.domain.values];
         if (row.domain.tokens.length > 0) entry.tokens = [...row.domain.tokens];
-        if (row.domain.range != null) {
-          // `max` is absent for an unbounded range, as in the domain.
-          entry.range = { ...row.domain.range, legacy: true };
-        }
       }
       if (row.form === 'rejected-composite') entry.form = row.form;
       if (row.origin !== 'default') entry.origin = row.origin;

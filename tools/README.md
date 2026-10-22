@@ -30,16 +30,26 @@ The tools in this directory support PandamStyle development and qualification.
   `lightningcss-probe.mjs` runs the Vite-installed Lightning CSS on the same
   probes.
 
-- `tools/policy/` contains the CE-02.1 property-descriptor tools:
+- `tools/policy/` contains the CE-02.1 and CE-02.2 property-descriptor tools:
   `build-recognized.mjs` regenerates the recognized property names
   (`packages/compiler/src/design-system/policy/recognized.v1.json`) from the
   CE-00.1 registry (`--check` requires byte identity);
   `alpha1-equivalence.mjs --alpha1 <closure>` compiles the same probes with an
   installed Alpha 1 compiler (such as the CE-00.3 store closure, read only)
   and the workspace build, and fails on any difference other than the
-  CE-02.1 rule suffixes; `measure-catalog.mjs [--base <root>] [--definition
-  <design.mjs>]` reports the catalog's bundle bytes and heap/RSS costs in the
-  built compiler, with no verdict.
+  CE-02.1 rule suffixes and the two listed CE-02.2 delta classes (finite
+  defaults of the former ranges, token values refused at use);
+  `measure-catalog.mjs [--base <root>] [--definition <design.mjs>]` reports
+  the catalog's bundle bytes and heap/RSS costs in the built compiler, with no
+  verdict; `numeric-token-report.mjs [<workload id> ...]` reports, for the
+  frozen CE-00.3 workloads, the tokens the CE-02.2 token numeric checks would
+  refuse on some admitted property and the refusals a validation of the
+  workload's own source raises, with no verdict;
+  `migration-examples.mjs [--alpha1 <closure>] [--ce021 <pack dir>]` runs the
+  CE-02.2 migration examples (M1-M5, M7) against their Alpha 1 or CE-02.1
+  baseline and the workspace build, skipping a baseline that is not given
+  with its reason (the `migration-examples-test.js` suite reads
+  `PMS_ALPHA1_CLOSURE` and `PMS_CE021_PACK`).
 
 ## Qualification browser
 
