@@ -97,7 +97,8 @@ export type ProtocolOperationsOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -130,6 +131,10 @@ export type ProtocolOperationsOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -230,7 +235,8 @@ export type CheckOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -263,6 +269,10 @@ export type CheckOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -306,7 +316,8 @@ export type DiagnosticsCandidatesOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -339,6 +350,10 @@ export type DiagnosticsCandidatesOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -371,7 +386,8 @@ export type DiagnosticsAffectedOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -404,6 +420,10 @@ export type DiagnosticsAffectedOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -449,6 +469,10 @@ export type RecordsReadInput = {
       }
     | {
         readonly kind: 'bootstrap';
+        readonly index: number;
+      }
+    | {
+        readonly kind: 'audit-entry';
         readonly index: number;
       };
   readonly page: {
@@ -504,7 +528,8 @@ export type DiscoverOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -537,6 +562,10 @@ export type DiscoverOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -571,7 +600,8 @@ export type QueryOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -604,6 +634,10 @@ export type QueryOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -641,7 +675,8 @@ export type DescribeOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -674,6 +709,10 @@ export type DescribeOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -705,7 +744,8 @@ export type ContextOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -738,6 +778,10 @@ export type ContextOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -770,7 +814,8 @@ export type ImpactOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -803,6 +848,10 @@ export type ImpactOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -834,7 +883,8 @@ export type RepairProposeOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -867,6 +917,10 @@ export type RepairProposeOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -929,7 +983,8 @@ export type ExtendProposeOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -962,6 +1017,10 @@ export type ExtendProposeOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -1064,69 +1123,41 @@ export type SessionApplyChangesOutput = {
   };
 };
 
-/** `audit.read` (planned, AG-01.2 #9). */
+/** `audit.read` (implemented, AG-01.2 #9). */
 export type AuditReadInput = {
   readonly rev: {
     readonly projectId: string;
     readonly sessionId: string;
     readonly revisionId: number;
   };
-  readonly generationId?: number;
 };
 export type AuditReadOutput = {
-  readonly present: boolean;
-  readonly fresh: boolean;
-  readonly page: {
-    readonly kind: 'pandamstyle-agent-page';
-    readonly list:
-      | 'diagnostics'
-      | 'candidates'
-      | 'affected'
-      | 'bootstrap'
-      | 'operations';
-    readonly offset: number;
-    readonly records: readonly AgentRecord[];
-    readonly total: number;
-    readonly withheld: ReadonlyArray<{
-      readonly address:
-        | {
-            readonly kind: 'diagnostic';
-            readonly index: number;
-          }
-        | {
-            readonly kind: 'candidate';
-            readonly domain:
-              | {
-                  readonly kind: 'category-index';
-                  readonly index: number;
-                }
-              | {
-                  readonly kind: 'category';
-                  readonly category: string;
-                }
-              | {
-                  readonly kind: 'from-diagnostic';
-                  readonly index: number;
-                };
-            readonly index: number;
-          }
-        | {
-            readonly kind: 'affected';
-            readonly index: number;
-          }
-        | {
-            readonly kind: 'bootstrap';
-            readonly index: number;
-          };
-      readonly code?: string;
-      readonly severity?: 'error' | 'warning' | 'info';
-      readonly bytes: number;
-      readonly sha256: string;
-    }>;
-  };
+  readonly canonical: {
+    readonly documentKind: 'pandamstyle-coverage-report';
+    readonly schemaVersion: 1;
+    readonly generationId: number | null;
+    readonly bytes: number;
+    readonly sha256: string;
+  } | null;
+  readonly artifacts: ReadonlyArray<{
+    readonly location: 'generation' | 'audit-directory';
+    readonly path: string;
+    readonly status: 'fresh' | 'stale' | 'missing' | 'unreadable';
+    readonly reason:
+      | 'revision-invalid'
+      | 'size-differs'
+      | 'content-differs'
+      | 'not-regular-file'
+      | 'directory-not-directory'
+      | 'read-failed'
+      | 'anchoring-unavailable'
+      | null;
+    readonly bytes: number | null;
+    readonly sha256: string | null;
+  }>;
 };
 
-/** `audit.compute` (planned, AG-01.2 #9). */
+/** `audit.compute` (implemented, AG-01.2 #9). */
 export type AuditComputeInput = {
   readonly rev: {
     readonly projectId: string;
@@ -1139,6 +1170,49 @@ export type AuditComputeInput = {
   };
 };
 export type AuditComputeOutput = {
+  readonly audit?: {
+    readonly kind: 'pandamstyle-agent-audit';
+    readonly version: 1;
+    readonly validation: {
+      readonly ok: boolean;
+    };
+    readonly coverage: {
+      readonly stage: 'none' | 'closure-partial' | 'closure' | 'analysed';
+      readonly completeness: 'complete' | 'partial' | 'unknown';
+      readonly coveredFiles: number | null;
+      readonly knownEntries: number;
+      readonly unknownEntries: number;
+      readonly summary: {
+        readonly entries: number;
+        readonly pages: number;
+        readonly designSystem: number;
+        readonly failed: number;
+        readonly withDiagnostics: number;
+        readonly usedDesignSystem: number;
+        readonly usedPmsHelpers: number;
+        readonly ruleTotal: number;
+        readonly relayChainEntries: number;
+        readonly maxRelayChain: number;
+      };
+    };
+    readonly limitations: ReadonlyArray<
+      | 'validation-failed'
+      | 'design-system-unavailable'
+      | 'scan-failed'
+      | 'closure-not-computed'
+      | 'closure-incomplete'
+      | 'analysis-not-run'
+      | 'files-not-analysed'
+      | 'failed-files-without-rules'
+    >;
+    readonly canonical: {
+      readonly documentKind: 'pandamstyle-coverage-report';
+      readonly schemaVersion: 1;
+      readonly generationId: number | null;
+      readonly bytes: number;
+      readonly sha256: string;
+    } | null;
+  };
   readonly page: {
     readonly kind: 'pandamstyle-agent-page';
     readonly list:
@@ -1146,7 +1220,8 @@ export type AuditComputeOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -1180,6 +1255,10 @@ export type AuditComputeOutput = {
         | {
             readonly kind: 'bootstrap';
             readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
+            readonly index: number;
           };
       readonly code?: string;
       readonly severity?: 'error' | 'warning' | 'info';
@@ -1189,30 +1268,37 @@ export type AuditComputeOutput = {
   };
 };
 
-/** `audit.materialize` (planned, AG-01.2 #9). */
+/** `audit.materialize` (implemented, AG-01.2 #9). */
 export type AuditMaterializeInput = {
   readonly rev: {
     readonly projectId: string;
     readonly sessionId: string;
     readonly revisionId: number;
   };
-  readonly expectedGenerationId: number;
+  readonly expectedGenerationId: number | null;
 };
 export type AuditMaterializeOutput = {
-  readonly path: string;
-  readonly bytes: number;
-  readonly digest: string;
-  readonly identities: {
-    readonly revision: {
-      readonly projectId: string;
-      readonly sessionId: string;
-      readonly revisionId: number;
-    };
-    readonly designSystem: {
-      readonly systemId: string;
-      readonly registryDigest: string;
-    } | null;
+  readonly receiptKind: 'pandamstyle-audit-receipt';
+  readonly receiptVersion: 1;
+  readonly operation: 'audit.materialize';
+  readonly requestId: string | null;
+  readonly revision: {
+    readonly projectId: string;
+    readonly sessionId: string;
+    readonly revisionId: number;
   };
+  readonly designSystem: {
+    readonly systemId: string;
+    readonly registryDigest: string;
+  };
+  readonly generationId: number | null;
+  readonly location: 'audit-directory';
+  readonly path: string;
+  readonly documentKind: 'pandamstyle-coverage-report';
+  readonly schemaVersion: 1;
+  readonly bytes: number;
+  readonly sha256: string;
+  readonly entryCount: number;
 };
 
 /** `install.plan` (planned, AG-11.1 #30). */
@@ -1230,7 +1316,8 @@ export type InstallPlanOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -1263,6 +1350,10 @@ export type InstallPlanOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -1307,7 +1398,8 @@ export type MigrationPlanOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -1340,6 +1432,10 @@ export type MigrationPlanOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -1387,7 +1483,8 @@ export type MeasurementCollectOutput = {
       | 'candidates'
       | 'affected'
       | 'bootstrap'
-      | 'operations';
+      | 'operations'
+      | 'audit-entries';
     readonly offset: number;
     readonly records: readonly AgentRecord[];
     readonly total: number;
@@ -1420,6 +1517,10 @@ export type MeasurementCollectOutput = {
           }
         | {
             readonly kind: 'bootstrap';
+            readonly index: number;
+          }
+        | {
+            readonly kind: 'audit-entry';
             readonly index: number;
           };
       readonly code?: string;
@@ -1470,6 +1571,9 @@ export interface OperationResults {
   readonly 'diagnostics.candidates': DiagnosticsCandidatesOutput;
   readonly 'diagnostics.affected': DiagnosticsAffectedOutput;
   readonly 'records.read': RecordsReadOutput;
+  readonly 'audit.read': AuditReadOutput;
+  readonly 'audit.compute': AuditComputeOutput;
+  readonly 'audit.materialize': AuditMaterializeOutput;
 }
 
 /** A request. `input` is checked by the compiler, whatever its static type. */
@@ -1583,6 +1687,21 @@ export type AgentEnvelopeFrame = {
         };
       }
     | {
+        readonly operation: 'audit.compute';
+        readonly view: 'compact' | 'detail';
+        readonly input: {
+          readonly rev: {
+            readonly projectId: string;
+            readonly sessionId: string;
+            readonly revisionId: number;
+          };
+          readonly page?: {
+            readonly offset: number;
+            readonly limit: number;
+          };
+        };
+      }
+    | {
         readonly operation: 'diagnostics.candidates';
         readonly view: 'compact' | 'detail';
         readonly input: {
@@ -1663,6 +1782,10 @@ export type AgentEnvelopeFrame = {
             | {
                 readonly kind: 'bootstrap';
                 readonly index: number;
+              }
+            | {
+                readonly kind: 'audit-entry';
+                readonly index: number;
               };
           readonly page: {
             readonly offset: number;
@@ -1721,6 +1844,10 @@ export type AgentEnvelopeFrame = {
         }
       | {
           readonly kind: 'bootstrap';
+          readonly index: number;
+        }
+      | {
+          readonly kind: 'audit-entry';
           readonly index: number;
         };
     readonly code?: string;

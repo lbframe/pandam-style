@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { auditCompute, auditMaterialize, auditRead } from './audit.js';
 import { check } from './check.js';
 import { diagnosticsAffected, diagnosticsCandidates } from './lists.js';
 import { protocolOperations } from './operations.js';
@@ -23,4 +24,7 @@ export const HANDLERS = Object.freeze({
   'diagnostics.candidates': diagnosticsCandidates,
   'diagnostics.affected': diagnosticsAffected,
   'records.read': recordsRead,
+  'audit.read': auditRead,
+  'audit.compute': auditCompute,
+  'audit.materialize': auditMaterialize,
 });

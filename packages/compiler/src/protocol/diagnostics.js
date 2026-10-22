@@ -146,6 +146,9 @@ export const Codes = {
   INVALID_DEFINITION: 'PMS_INVALID_DEFINITION',
   // CE-02.1: a design-system `propertyDomains` entry the compiler refuses.
   INVALID_PROPERTY_DOMAIN: 'PMS_INVALID_PROPERTY_DOMAIN',
+  // AG-01.2: an audit document was not written, because its directory or file
+  // is not the one the session pinned, or the write failed.
+  UNSAFE_AUDIT_PATH: 'PMS_UNSAFE_AUDIT_PATH',
 };
 
 /** Stable single-line rendering of a diagnostic (used by the build report). */

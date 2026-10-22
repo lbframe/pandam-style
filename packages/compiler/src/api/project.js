@@ -1378,6 +1378,37 @@ export function createProjectSession(config) {
             .map(({ tokenId, category }) => ({ tokenId, category })),
         };
       }),
+    // AG-01.2 §3.6. Read and compute assign nothing and never validate: an
+    // unvalidated revision is refused, so its validation state is preserved.
+    auditCompute: (expected, options, beforeStart) =>
+      agentStep(beforeStart, () => {
+        requireValidated(expected, 'audit.compute');
+        return implementation._auditCoverage({
+          offset: options.offset,
+          limit: options.limit,
+          summary: options.summary === true,
+          canonical: options.summary === true,
+        });
+      }),
+    auditRead: (expected, beforeStart) =>
+      agentStep(beforeStart, () => {
+        requireValidated(expected, 'audit.read');
+        return implementation._auditArtifacts();
+      }),
+    // One queued step: the revision, validity and generation checks and the
+    // write see the same state. It never stages and never revokes a ticket.
+    auditMaterialize: (expected, expectedGenerationId, beforeStart) =>
+      agentStep(beforeStart, () => {
+        requireValidated(expected, 'audit.materialize', true);
+        if (implementation._auditGenerationId() !== expectedGenerationId) {
+          throw lifecycleError(
+            Codes.STALE_REVISION,
+            'audit.materialize expected another generation.',
+            { reason: 'generation-changed' },
+          );
+        }
+        return implementation._materializeAudit();
+      }),
   });
 
   return Object.freeze({
