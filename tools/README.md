@@ -70,6 +70,15 @@ browser. [`pms/browser.js`](pms/browser.js) resolves it for all of them.
 - A semantic-oracle browser failure keeps the last 65,536 characters of the
   browser's stderr in its case report. A longer stream is cut with an explicit
   truncation line.
+- The Next qualification reads computed styles through
+  [`pms/page-readiness.js`](pms/page-readiness.js). Before a page expected to be
+  valid, once the server has answered HTTP 200, it navigates again while the
+  document is a transient 5xx or reloads itself, for at most
+  `QUALIFIED_ELEMENT_TIMEOUT_MS`. Each re-navigation is listed in the report's
+  `documentRenavigations`. It then waits up to the same bound for the elements
+  to exist. A persistent 5xx, another status or an element that never appears
+  fails with the page URL, the document's HTTP status and a body excerpt. Steps
+  that expect a failure never re-navigate.
 
 Run the full required qualification from the repository root with
 `./verify-pms.sh`. Package publication is handled only after the later release

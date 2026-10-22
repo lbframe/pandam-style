@@ -15,11 +15,28 @@
 // Opt-in (images are built, containers started): PMS_RUNNER_DOCKER_TESTS=1
 // `yarn bench:agentic:runner:docker-test`. Needs Docker 28 or later (isolated
 // gateway mode) and the pinned node base image.
+//
+// Concurrent runs share one Docker daemon (CI jobs on the self-hosted
+// runner). With the containerd image store, `docker build -t <tag>` deletes
+// the image the tag pointed to, and every rebuild yields a new image id, so a
+// fixed tag lets another run delete the images this run uses by id. Every
+// image tag and Docker name the suite creates is therefore unique to the run,
+// the run removes only its own tags (never forced, never a prune), and each
+// assertion on leftovers is scoped to the run's own resources. The runner
+// also enumerates daemon-wide state (the self-test lists every network, then
+// inspects them), so the suite holds a daemon-wide lock for all of its Docker
+// work (docker-lock.mjs): concurrent suites queue, bounded by LOCK_WAIT_MS,
+// and a suite that loses the lock stops its Docker work and fails.
+// Concurrency check (separate checkouts or one):
+//   for i in 1 2 3; do (sleep $((i * 30 - 30)); \
+//     yarn bench:agentic:runner:docker-test) & done; wait
 
 import assert from 'node:assert/strict';
+import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import test from 'node:test';
+import test, { after, before, beforeEach } from 'node:test';
+import { setTimeout as delay } from 'node:timers/promises';
 import {
   MODELS,
   claudeInit,
@@ -38,6 +55,11 @@ import {
   writeScenario,
   assertDocumentsValid,
 } from './helpers.mjs';
+import {
+  acquireDockerLock,
+  assertDockerLockHeld,
+  releaseDockerLock,
+} from './docker-lock.mjs';
 import { DockerExecutor, containerEvaluator, docker } from '../src/docker.mjs';
 import {
   IMAGE_PATH,
@@ -52,15 +74,71 @@ import { REPO_ROOT, readJson } from '../src/util.mjs';
 const ENABLED = process.env.PMS_RUNNER_DOCKER_TESTS === '1';
 const DISCOVERY = 'discovery-positive-card-vocabulary';
 
+const RUN_ID = `${process.pid}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+
+/** Tags of one run's fixture images (`runId` names the run). */
+const tagsOf = (runId) => ({
+  harness: `pms-agentic-test-harness:${runId}`,
+  agent: `pms-agentic-test-agent:${runId}`,
+});
+
+// Every tag this run may create, registered before its build starts.
+const ownTags = new Set();
+
+/**
+ * Untags a run's own images; Docker deletes an image when its last tag goes
+ * and refuses while a container uses it (no force, no prune). A tag whose
+ * build never produced it is already gone.
+ */
+function removeTags(tags) {
+  for (const tag of tags) {
+    const r = docker(['image', 'rm', tag]);
+    if (r.status === 0 || /No such image/.test(r.stderr)) ownTags.delete(tag);
+    else process.stderr.write(`image cleanup: ${tag}: ${r.stderr.trim()}\n`);
+  }
+}
+
+/** Builds a run's fixture images; a partial build removes what it tagged. */
+function buildFixtureImages(
+  tags,
+  { buildAgent = buildFixtureAgentImage } = {},
+) {
+  const all = [tags.agent, tags.harness];
+  for (const tag of all) ownTags.add(tag);
+  try {
+    const harness = buildHarnessImage({ tag: tags.harness });
+    const agent = buildAgent({ tag: tags.agent, harnessTag: tags.harness });
+    return { agent, proxy: harness, grader: harness, baseDigest: null };
+  } catch (error) {
+    removeTags(all);
+    throw error;
+  }
+}
+
+let lock = null;
+before(async () => {
+  if (ENABLED) lock = await acquireDockerLock({ owner: RUN_ID });
+});
+
+// No Docker work without the lock: each test and the image build start only
+// while this run still holds it.
+beforeEach(() => {
+  if (lock) assertDockerLockHeld(lock);
+});
+
+after(() => {
+  // The run's own tags only: removed whether or not the lock is still held.
+  removeTags([...ownTags]);
+  if (lock && !releaseDockerLock(lock))
+    throw new Error(
+      `lost the docker lock ${lock.name} before release: another suite may have run concurrently`,
+    );
+});
+
 let images = null;
 function fixtureImages() {
-  if (images) return images;
-  const harness = buildHarnessImage({ tag: 'pms-agentic-test-harness:local' });
-  const agent = buildFixtureAgentImage({
-    tag: 'pms-agentic-test-agent:local',
-    harnessTag: 'pms-agentic-test-harness:local',
-  });
-  images = { agent, proxy: harness, grader: harness, baseDigest: null };
+  if (!images && lock) assertDockerLockHeld(lock);
+  images ??= buildFixtureImages(tagsOf(RUN_ID));
   return images;
 }
 
@@ -137,7 +215,7 @@ test(
     // Docker churn between the self-test and preflight (a new bridge and a
     // container's veth, then their removal) keeps the binding: only stable
     // routable host addresses are bound (no timing assumption).
-    const churn = `pms-st-churn-${Date.now().toString(36)}`;
+    const churn = `pms-st-churn-${RUN_ID}`;
     try {
       assert.equal(
         docker(['network', 'create', '--label', 'pms-agentic=selftest', churn])
@@ -187,6 +265,27 @@ test(
   },
 );
 
+const exists = (r) => ({
+  container: docker(['container', 'inspect', r.container]).status === 0,
+  proxy: docker(['container', 'inspect', r.proxy]).status === 0,
+  network: docker(['network', 'inspect', r.network]).status === 0,
+});
+
+/** Records the Docker resources of every attempt `ex` starts. */
+function recordResources(ex) {
+  const resources = [];
+  const start = ex.start.bind(ex);
+  ex.start = (args) =>
+    start({
+      ...args,
+      onResources: (r) => {
+        resources.push(r);
+        args.onResources(r);
+      },
+    });
+  return resources;
+}
+
 async function dockerAttempt({
   model,
   steps,
@@ -208,6 +307,7 @@ async function dockerAttempt({
     fixtureScenario: scenario,
     auditIntervalMs: 2000,
   });
+  const resources = recordResources(executor);
   const root = tmpDir('docker-runs');
   const out = await runMatrix({
     config,
@@ -250,14 +350,14 @@ async function dockerAttempt({
         },
   });
   assertDocumentsValid(out.matrixDir);
-  return { out, record: recordsOf(out.matrixDir)[0] };
+  return { out, record: recordsOf(out.matrixDir)[0], resources };
 }
 
 test(
   'B6 + B7 Codex in the agent container: -C /workspace, cwd /workspace, graded in the grader container',
   { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
   async () => {
-    const { out, record } = await dockerAttempt({
+    const { out, record, resources } = await dockerAttempt({
       model: MODELS.sol,
       // Alive across several channel-audit samples (at 1 s, then every
       // 2 s), whatever the start-up latency of `docker exec` and the sidecar.
@@ -305,16 +405,14 @@ test(
     assert.ok(record.integrity.channelAudit.samples >= 1);
     assert.equal(record.integrity.channelAudit.cliNonDumpable, true);
     assert.equal(record.integrity.channelAudit.foreignStreamHolders, 0);
-    // Nothing left behind: containers, networks, working copies.
-    assert.equal(
-      docker([
-        'ps',
-        '-aq',
-        '--filter',
-        'label=pms-agentic=agent',
-      ]).stdout.trim(),
-      '',
-    );
+    // Nothing left behind: containers, networks, working copies. Scoped to
+    // this attempt: a concurrent run's containers carry the same labels.
+    assert.equal(resources.length, 1);
+    assert.deepEqual(exists(resources[0]), {
+      container: false,
+      proxy: false,
+      network: false,
+    });
     assert.equal(fs.existsSync(path.join(out.matrixDir, '.work')), false);
   },
 );
@@ -378,7 +476,6 @@ function startFailureExecutor({
       return { status: 1, stdout: '', stderr: 'injected removal failure' };
     return docker(args, opts);
   };
-  const resources = [];
   const ex = new DockerExecutor({
     images: { agent: config.images.agent, harness: config.images.proxy },
     limits: limits ?? config.container,
@@ -387,23 +484,8 @@ function startFailureExecutor({
     fixtureScenario: scenario,
     run,
   });
-  const start = ex.start.bind(ex);
-  ex.start = (args) =>
-    start({
-      ...args,
-      onResources: (r) => {
-        resources.push(r);
-        args.onResources(r);
-      },
-    });
-  return { ex, resources, config };
+  return { ex, resources: recordResources(ex), config };
 }
-
-const exists = (r) => ({
-  container: docker(['container', 'inspect', r.container]).status === 0,
-  proxy: docker(['container', 'inspect', r.proxy]).status === 0,
-  network: docker(['network', 'inspect', r.network]).status === 0,
-});
 
 async function runStartFailure(opts) {
   const { ex, resources, config } = startFailureExecutor(opts);
@@ -519,7 +601,6 @@ test(
         down = true;
       return r;
     };
-    const resources = [];
     const ex = new DockerExecutor({
       images: { agent: config.images.agent, harness: config.images.proxy },
       limits: { ...config.container, cpus: -1 },
@@ -528,15 +609,7 @@ test(
       fixtureScenario: scenario,
       run,
     });
-    const start = ex.start.bind(ex);
-    ex.start = (args) =>
-      start({
-        ...args,
-        onResources: (r) => {
-          resources.push(r);
-          args.onResources(r);
-        },
-      });
+    const resources = recordResources(ex);
     const root = tmpDir('b4druns');
     const stateDir = path.join(root, '.state');
     try {
@@ -672,5 +745,262 @@ test(
         label,
       );
     }
+  },
+);
+
+test(
+  "a concurrent run's image build leaves this run's images: tags are unique per run",
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  () => {
+    const own = fixtureImages();
+    const peerTags = tagsOf(`${RUN_ID}-peer`);
+    assert.notDeepEqual(peerTags, tagsOf(RUN_ID));
+    try {
+      // Another run's suite builds its fixture images on the same daemon.
+      buildFixtureImages(peerTags);
+      for (const id of new Set([own.agent, own.proxy])) {
+        const r = docker([
+          'run',
+          '--rm',
+          '--network',
+          'none',
+          id,
+          '/opt/node/bin/node',
+          '-e',
+          '',
+        ]);
+        assert.equal(r.status, 0, `${id}: ${r.stderr}`);
+      }
+    } finally {
+      removeTags([peerTags.agent, peerTags.harness]);
+    }
+    // The peer's cleanup removed only the peer's tags.
+    for (const id of new Set([own.agent, own.proxy]))
+      assert.equal(docker(['image', 'inspect', id]).status, 0, id);
+  },
+);
+
+test(
+  'a partial fixture build removes the tags it created',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  () => {
+    const tags = tagsOf(`${RUN_ID}-partial`);
+    assert.throws(
+      () =>
+        buildFixtureImages(tags, {
+          buildAgent: () => {
+            // The harness image exists, tagged, when the agent build fails.
+            assert.equal(docker(['image', 'inspect', tags.harness]).status, 0);
+            assert.ok(ownTags.has(tags.harness) && ownTags.has(tags.agent));
+            throw new Error('injected agent build failure');
+          },
+        }),
+      /injected agent build failure/,
+    );
+    assert.notEqual(docker(['image', 'inspect', tags.harness]).status, 0);
+    assert.notEqual(docker(['image', 'inspect', tags.agent]).status, 0);
+    assert.equal(ownTags.has(tags.harness) || ownTags.has(tags.agent), false);
+  },
+);
+
+const LOCK_MODULE = new URL('./docker-lock.mjs', import.meta.url).href;
+
+/** A separate holder process of lock `name`; resolves once it holds it. */
+function spawnHolder(name, owner, { detached = false } = {}) {
+  const child = spawn(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      `import { acquireDockerLock } from ${JSON.stringify(LOCK_MODULE)};
+const l = await acquireDockerLock({ owner: ${JSON.stringify(owner)}, name: ${JSON.stringify(name)}, pollMs: 200 });
+console.log(JSON.stringify({ id: l.id, cli: l.child.pid }));
+setInterval(() => {}, 1000);`,
+    ],
+    { stdio: ['ignore', 'pipe', 'inherit'], detached },
+  );
+  return new Promise((resolve, reject) => {
+    let out = '';
+    child.stdout.on('data', (b) => {
+      out += b;
+      if (out.includes('\n')) resolve({ child, ...JSON.parse(out) });
+    });
+    child.on('exit', (code) => reject(new Error(`holder exited ${code}`)));
+  });
+}
+
+const lockName = (suffix) => `pms-agentic-docker-test-lock-${RUN_ID}-${suffix}`;
+
+test(
+  'the daemon-wide lock: a live holder blocked in synchronous work keeps it (no lease to outlive)',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const name = lockName('live');
+    const a = await acquireDockerLock({ owner: 'a', name });
+    try {
+      // This process is blocked (as in a long `docker build`): it renews
+      // nothing while another suite tries for longer than the old lease.
+      const b = spawnSync(
+        process.execPath,
+        [
+          '--input-type=module',
+          '-e',
+          `import { acquireDockerLock } from ${JSON.stringify(LOCK_MODULE)};
+try { await acquireDockerLock({ owner: 'b', name: ${JSON.stringify(name)}, waitMs: 8000, pollMs: 200 }); console.log('ACQUIRED'); }
+catch (e) { console.log(e.message); }`,
+        ],
+        { encoding: 'utf8' },
+      );
+      assert.match(b.stdout, /still held by a after 8000 ms/, b.stderr);
+      assertDockerLockHeld(a);
+    } finally {
+      assert.equal(releaseDockerLock(a), true);
+    }
+    assert.notEqual(docker(['container', 'inspect', name]).status, 0);
+  },
+);
+
+test(
+  'the daemon-wide lock: an abandoned holder is reclaimed in bounded time, then racing acquirers take turns',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    // SIGKILL of the holder alone (its docker client sees the pipe close) and
+    // of its whole process group (the client dies with it).
+    for (const group of [false, true]) {
+      const name = lockName(group ? 'group' : 'holder');
+      const holder = await spawnHolder(name, 'killed', { detached: group });
+      const locks = [];
+      try {
+        assert.equal(
+          docker([
+            'container',
+            'inspect',
+            '-f',
+            '{{.State.Running}}',
+            holder.id,
+          ]).stdout.trim(),
+          'true',
+        );
+        process.kill(group ? -holder.child.pid : holder.child.pid, 'SIGKILL');
+        const killedAt = Date.now();
+        const order = [];
+        let reclaimedMs = null;
+        const compete = async (owner) => {
+          const l = await acquireDockerLock({
+            owner,
+            name,
+            waitMs: 60000,
+            pollMs: 200,
+          });
+          locks.push(l);
+          reclaimedMs ??= Date.now() - killedAt;
+          order.push(`acquire ${owner}`);
+          assertDockerLockHeld(l);
+          assert.equal(
+            docker([
+              'container',
+              'inspect',
+              '-f',
+              '{{.Id}}',
+              name,
+            ]).stdout.trim(),
+            l.id,
+          );
+          await delay(500);
+          order.push(`release ${owner}`);
+          assert.equal(releaseDockerLock(l), true);
+        };
+        const results = await Promise.allSettled([compete('b'), compete('c')]);
+        for (const r of results) if (r.status === 'rejected') throw r.reason;
+        assert.deepEqual(
+          order.map((o) => o.split(' ')[0]),
+          ['acquire', 'release', 'acquire', 'release'],
+        );
+        assert.ok(reclaimedMs < 60000, `reclaimed after ${reclaimedMs} ms`);
+        assert.notEqual(
+          docker(['container', 'inspect', holder.id]).status,
+          0,
+          'the abandoned lock container is gone',
+        );
+      } finally {
+        try {
+          process.kill(group ? -holder.child.pid : holder.child.pid, 'SIGKILL');
+        } catch {
+          // Already gone.
+        }
+        for (const l of locks) releaseDockerLock(l);
+      }
+    }
+  },
+);
+
+test(
+  'the daemon-wide lock: a holder that lost it stops with a clear error and cannot release another holder',
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const name = lockName('lost');
+    const a = await acquireDockerLock({ owner: 'a', name });
+    let b = null;
+    try {
+      assertDockerLockHeld(a);
+      // Lost under a live holder (removed by someone else).
+      docker(['rm', '-f', a.id]);
+      assert.throws(() => assertDockerLockHeld(a), /lost the docker lock/);
+      b = await acquireDockerLock({
+        owner: 'b',
+        name,
+        waitMs: 30000,
+        pollMs: 200,
+      });
+      assert.throws(() => assertDockerLockHeld(a), /lost the docker lock/);
+      assert.equal(releaseDockerLock(a), false);
+      assertDockerLockHeld(b);
+      assert.equal(
+        docker([
+          'container',
+          'inspect',
+          '-f',
+          '{{.HostConfig.NetworkMode}}',
+          b.id,
+        ]).stdout.trim(),
+        'none',
+      );
+    } finally {
+      if (b) assert.equal(releaseDockerLock(b), true);
+    }
+    assert.notEqual(docker(['container', 'inspect', name]).status, 0);
+  },
+);
+
+test(
+  "the daemon-wide lock: concurrent refused acquirers all name the holder; any other failure reports docker's error",
+  { skip: !ENABLED && 'set PMS_RUNNER_DOCKER_TESTS=1' },
+  async () => {
+    const name = lockName('refused');
+    const a = await acquireDockerLock({ owner: 'a', name });
+    try {
+      // Many failed `docker run` clients at once (as racing suites): each
+      // refusal is read in full, never as an empty error.
+      const results = await Promise.allSettled(
+        Array.from({ length: 40 }, () =>
+          acquireDockerLock({ owner: 'x', name, waitMs: 0 }),
+        ),
+      );
+      for (const r of results) {
+        assert.equal(r.status, 'rejected');
+        assert.match(
+          r.reason.message,
+          /still held by a after 0 ms \(last attempt: docker run exited with code \d+: .*Conflict/s,
+        );
+      }
+      assertDockerLockHeld(a);
+    } finally {
+      assert.equal(releaseDockerLock(a), true);
+    }
+    // A failure that is not a held lock surfaces docker's own output.
+    await assert.rejects(
+      acquireDockerLock({ owner: 'x', name: 'bad name!', waitMs: 0 }),
+      /docker lock bad name!: docker run exited with code \d+: .*Invalid container name/s,
+    );
   },
 );
