@@ -37,8 +37,8 @@ const EXAMPLES = path.join(
   REPO,
   'packages/compiler/__tests__/pandamstyle/fixtures/ce022-migrations/examples.json',
 );
-// The CE-02.1 head CE-02.2 is stacked on (#132, round 2).
-const CE021_COMMIT = '8d8f3b7847f70602d866d98234c73c4fc5b07402';
+// The CE-02.1 head on main: the merge of #132 (CE-02.1 PR B).
+const CE021_COMMIT = 'b1b2ab49e22dca5c97d8a4ff715d9e2525ec4905';
 
 const argv = process.argv.slice(2);
 const arg = (name) => {

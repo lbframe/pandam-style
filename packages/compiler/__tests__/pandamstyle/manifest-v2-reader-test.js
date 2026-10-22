@@ -16,9 +16,9 @@
  * with frozen CE-02.1 artifacts:
  *
  *   - fixtures/ce022-manifest-v2/ce021-artifact-set.json: an artifact set the
- *     CE-02.1 compiler (8d8f3b7) generated with generate.cjs;
+ *     CE-02.1 compiler (b1b2ab4, #132 merged) generated with generate.cjs;
  *   - fixtures/ce022-manifest-v2/ce021-reader.bundle.txt: the CE-02.1 reader,
- *     `validateArtifactSet` of 8d8f3b7, bundled verbatim (esbuild, CommonJS,
+ *     `validateArtifactSet` of b1b2ab4, bundled verbatim (esbuild, CommonJS,
  *     see FROZEN_READER below);
  *   - CE-02.1-typed code (its generated `.d.ts`) accepts a v2 manifest and
  *     rejects a v3 one, at runtime and with tsc; the CE-02.2 reader accepts
@@ -34,14 +34,14 @@ const { loadCompiler } = require('./session-helpers');
 const compiler = loadCompiler();
 const REPO = path.resolve(__dirname, '../../../..');
 const FIXTURE = path.join(__dirname, 'fixtures/ce022-manifest-v2');
-const CE021_COMMIT = '8d8f3b7847f70602d866d98234c73c4fc5b07402';
+const CE021_COMMIT = 'b1b2ab49e22dca5c97d8a4ff715d9e2525ec4905';
 // The frozen CE-02.1 reader: in a checkout of CE021_COMMIT,
 //   esbuild packages/compiler/src/artifacts/metadata/artifact-set.js --bundle \
 //     --platform=node --format=cjs --legal-comments=none
 // (esbuild 0.27.7). Its source file has sha256 d1d6b03e…79b1 at that commit.
 const FROZEN_READER = {
   file: 'ce021-reader.bundle.txt',
-  sha256: '0f5758b55a2b1c167e4ec96a46fa5022d37658e31dcdcf14ea9bed4e8fb3805c',
+  sha256: '0123f14a09b0f55495c27f28e9746d2adf4761399a326fded1ee55ee91a395af',
 };
 
 const ce021 = JSON.parse(

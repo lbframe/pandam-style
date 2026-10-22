@@ -147,6 +147,8 @@ var Codes = {
   TARGET_ENHANCEMENT_DEGRADED: "PMS_TARGET_ENHANCEMENT_DEGRADED",
   TARGET_ENHANCEMENT_INEFFECTIVE: "PMS_TARGET_ENHANCEMENT_INEFFECTIVE",
   INVALID_ENHANCEMENT_POLICY: "PMS_INVALID_ENHANCEMENT_POLICY",
+  // AG-01.1: a definition field that cannot identify a design system.
+  INVALID_DEFINITION: "PMS_INVALID_DEFINITION",
   // CE-02.1: a design-system `propertyDomains` entry the compiler refuses.
   INVALID_PROPERTY_DOMAIN: "PMS_INVALID_PROPERTY_DOMAIN"
 };
@@ -825,9 +827,12 @@ var ROWS = [
     ["spin", "pulse"],
     ["none"]
   ),
-  SET("animationIterationCount", "infinite | <number [0,\u221E]>", "animations", [
-    "infinite"
-  ]),
+  SET(
+    "animationIterationCount",
+    "infinite | <number [0,\u221E]>",
+    "animations",
+    ["infinite"]
+  ),
   SET(
     "alignSelf",
     "auto | normal | stretch | <baseline-position> | <overflow-position>? <self-position>",

@@ -15,7 +15,7 @@
  * build. The baselines need installed compilers outside the repository:
  *
  *   PMS_ALPHA1_CLOSURE  the CE-00.3 alpha1 store closure (digest-verified)
- *   PMS_CE021_PACK      a CE-02.1 candidate pack of 8d8f3b7
+ *   PMS_CE021_PACK      a CE-02.1 candidate pack of b1b2ab4 (#132 merged)
  *
  * Without them, the baseline checks (the `before` outcome and every
  * byte-equality with the baseline) are skipped loudly: the suite prints the
