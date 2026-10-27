@@ -23,12 +23,12 @@ jobs:
       (!github.event.pull_request.draft &&
       github.event.pull_request.head.repo.full_name == github.repository)
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # The committed-record check reads the frozen CE-00.3 records and
           # their pinned inputs from Git history and tags.
           fetch-depth: 0
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '22.x'
       # Self-hosted runners have no global yarn; corepack provides the pinned one.
@@ -67,7 +67,7 @@ jobs:
       # the floating `v1` tag is deprecated.
       - name: spelling
         if: ${{ !cancelled() }}
-        uses: crate-ci/typos@v1.50.2
+        uses: crate-ci/typos@v1.51.1
         with:
           config: .github/workflows/typos.toml
 
@@ -85,12 +85,12 @@ jobs:
       # sandboxed launches.
       PMS_CHROMIUM: /opt/google/chrome/chrome
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # The floor check materializes the frozen CE-00.3 workloads from
           # Git objects at their pinned commits.
           fetch-depth: 0
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           # The package and Next qualifications assert this exact host
           # runtime beside their pinned 22.12.0 and 24.21.0 consumer lanes.
@@ -139,8 +139,8 @@ jobs:
       (!github.event.pull_request.draft &&
       github.event.pull_request.head.repo.full_name == github.repository)
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '22.x'
       # Self-hosted runners have no global yarn; corepack provides the pinned one.
